@@ -11,13 +11,14 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('start');
+Route::get('/', 'HomeController@index');
+Route::POST('/startWork', 'HomeController@startWork');
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::middleware(['check-permission'])->group(function () {
 
-Route::get('/admin', ['uses'=>'HomeController@admin','middleware' => 'check-permission','name' => 'test']);
+    Route::get('/admin','HomeController@admin');
+});
+
 
