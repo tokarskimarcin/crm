@@ -13,4 +13,11 @@
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('start');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/admin', ['uses'=>'HomeController@admin','middleware' => 'check-permission','name' => 'test']);
+
