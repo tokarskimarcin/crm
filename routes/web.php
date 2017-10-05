@@ -12,13 +12,16 @@
 */
 
 Route::get('/', 'HomeController@index');
+
 Route::POST('/startWork', 'HomeController@startWork');
+Route::POST('/stopWork', 'HomeController@stopWork');
 
 Auth::routes();
 
 Route::middleware(['check-permission'])->group(function () {
 
     Route::get('/admin','HomeController@admin');
+
 });
 
 

@@ -23,27 +23,46 @@ class HomeController extends Controller
         $this->actuall_hour = date("H:i:s");
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
-        return view('home.index');
+        return view('home.index')->with('status',$this->checkStatusWork());
     }
 
     public function startWork(Request $request)
     {
-        $work_hour = new Work_Hour;
-        $work_hour->status = 1;
-        $work_hour->accept_sec = 0;
-        $work_hour->success = 0;
-        $work_hour->date = $this->actuall_date;
-        $work_hour->id_user = Auth::id();
-        $work_hour->save();
+        if($request->ajax() && $this->checkStatusWork() == 0)
+        {
+            $work_hour = new Work_Hour;
+            $work_hour->status = 1;
+            $work_hour->accept_sec = 0;
+            $work_hour->success = 0;
+            $work_hour->date = $this->actuall_date;
+            $work_hour->click_start = $this->actuall_hour;
+            $work_hour->id_user = Auth::id();
+            $work_hour->save();
+        }
     }
-
+    public function stopWork(Request $request)
+    {
+        if($request->ajax() && $this->checkStatusWork() == 1)
+        {
+            Work_Hour::where('id_user', Auth::id())
+                ->where('date',$this->actuall_date)
+                ->update(['status' => 2,'click_stop' => $this->actuall_hour]);
+        }
+    }
+    public function checkStatusWork()
+    {
+        $status = Work_Hour::where('date',$this->actuall_date)
+            ->where('id_user',Auth::id())
+            ->pluck('status')
+            ->first();
+        if(empty($status))
+        {
+            return 0;
+        } return $status;
+    }
     public function admin()
     {
         return view('admin');
