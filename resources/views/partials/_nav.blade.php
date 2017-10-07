@@ -18,7 +18,18 @@
 
 
             <?php //print_R($group) ?>
-            <?php print_R($links) ?>
+            <?php //print_R($links) ?>
+
+            @foreach($groups as $group)
+            {
+                @foreach($links as $link)
+                {
+
+
+                    {{$link->id}}
+                }@endforeach
+            @endforeach
+
             <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Menu Levels">
                 <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseMulti" data-parent="#exampleAccordion">
                     <i class="fa fa-fw fa-sitemap"></i>

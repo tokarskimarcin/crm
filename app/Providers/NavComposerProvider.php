@@ -19,11 +19,11 @@ class NavComposerProvider extends ServiceProvider
         // Pobranie zaladek o navbaru zaleznie od uprawnien
         view()->composer('partials._nav', function ($view) {
 
-            $links = Privilages::where('priv', 'like', '%,'.Auth::user()->user_type_id . ',%')
+            $links = Privilages::where('priv', 'like', '%;'.Auth::user()->user_type_id . ';%')
                 ->orWhere('priv', 'like', '*')
-                ->get()->toArray();
+                ->get();
 
-            $view->with('group', Link_groups::All()->toArray())->with('links', $links);
+            $view->with('groups', Link_groups::All()->toArray())->with('links', $links);
         });
     }
 
