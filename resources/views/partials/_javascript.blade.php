@@ -10,6 +10,9 @@
 <script src="{{ asset('vendor/bootstrap/js/bootstrap.min.js')}}"></script>
 <!-- Core plugin JavaScript-->
 <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js')}}"></script>
+
+<script src="{{ asset('/js/sb-admin.min.js')}}"></script>
+
 <script>
 
 </script>
