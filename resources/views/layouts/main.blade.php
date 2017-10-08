@@ -8,24 +8,23 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
-<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+<body>
+    <div id="wrapper">
 
     @include('partials._nav')
 
-    <div class="content-wrapper">
-        <div class="container-fluid">
-            @include('partials._Breadcrumbs')
-            <div class="row">
-             <div class="col-12">
-                @yield('content')
-             </div>
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                        @yield('content')
             </div>
+        </div>
+    {{--@include('partials._footer')--}}
+    {{--@include('partials._logout')--}}
+
+
     </div>
-        @include('partials._footer')
-        @include('partials._logout')
-        @include('partials._javascript')
-        @yield('script')
-    </div> <!-- end of .container -->
+    @include('partials._javascript')
+    @yield('script')
 </body>
 
 </html>

@@ -2,23 +2,40 @@
 @section('content')
 
 
-        <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-default">
-                <div class="panel-heading">Dashboard</div>
+{{--Header page --}}
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Forms</h1>
+        </div>
+    </div>
 
-                <div id="start_stop">
-                    <div class="panel-body">
-                    <?php if($status == 0): ?>
-                            <button id="start" class="button"> Start work </button>
-                    <?php elseif($status == 1): ?>
-                            <button id="stop" class="button"> Stop work </button>
-                    <?php elseif($status == 2): ?>
-                            <button id="done" class="button"> Work Done</button>
-                    <?php endif?>
-                     </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Basic Form Elements
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div id="start_stop">
+                                <div class="panel-body">
+                                    <?php if($status == 0): ?>
+                                    <button id="start" class="button"> Start work </button>
+                                    <?php elseif($status == 1): ?>
+                                    <button id="stop" class="button"> Stop work </button>
+                                    <?php elseif($status == 2): ?>
+                                    <button id="done" class="button"> Work Done</button>
+                                    <?php endif?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
 
 
 @endsection
