@@ -15,6 +15,6 @@ class Privilages extends Model
      * @var array
      */
     protected $fillable = [
-        'id', 'link', 'priv','group_lik_id',
+        'id', 'link', 'priv','group_link_id','name'
     ];
 }

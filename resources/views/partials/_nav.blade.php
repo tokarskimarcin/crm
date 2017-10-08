@@ -17,43 +17,23 @@
             </li>
 
 
-            <?php //print_R($group) ?>
-            <?php //print_R($links) ?>
-
             @foreach($groups as $group)
-            {
-                @foreach($links as $link)
-                {
-
-
-                    {{$link->id}}
-                }@endforeach
-            @endforeach
-
-            <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Menu Levels">
-                <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseMulti" data-parent="#exampleAccordion">
-                    <i class="fa fa-fw fa-sitemap"></i>
-                    <span class="nav-link-text">Menu Levels</span>
+            <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+                <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapse{{$group->name}}" data-parent="#exampleAccordion">
+                    <i class="fa fa-fw fa-wrench"></i>
+                    <span class="nav-link-text">{{$group->name}}</span>
                 </a>
-                <ul class="sidenav-second-level collapse" id="collapseMulti">
-                    <li>
-                        <a href="#">Second Level Item</a>
-                    </li>
-                    <li>
-                        <a href="#">Second Level Item</a>
-                    </li>
-                    <li>
-                        <a href="#">Second Level Item</a>
-                    </li>
+                <ul class="sidenav-second-level collapse" id="collapse{{$group->name}}">
+                @foreach($links as $link)
+                    @if($group->id == $link->group_link_id)
+                            <li>
+                                <a href="{{url($link->link)}}">{{$link->name}}</a>
+                            </li>
+                    @endif
+                @endforeach
                 </ul>
             </li>
-
-
-
-
-
-
-
+            @endforeach
 
             <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Link">
                 <a class="nav-link" href="#">

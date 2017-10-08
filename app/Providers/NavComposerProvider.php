@@ -22,8 +22,10 @@ class NavComposerProvider extends ServiceProvider
             $links = Privilages::where('priv', 'like', '%;'.Auth::user()->user_type_id . ';%')
                 ->orWhere('priv', 'like', '*')
                 ->get();
-
-            $view->with('groups', Link_groups::All()->toArray())->with('links', $links);
+            $filtered = $links->groupBy('group_link_id');
+            $filtered = array_keys($filtered->toArray());
+            $groups = Link_groups::wherein('id',$filtered)->get();
+            $view->with('groups', $groups)->with('links', $links);
         });
     }
 

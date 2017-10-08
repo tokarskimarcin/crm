@@ -28,13 +28,15 @@ class CheckPermissionMiddleware
 
         //Usunuięcie rzutowania tablicy
         $privilages_key = $privilages_key[0]['priv'];
+        $split_privilages = explode(";",$privilages_key);
+
         // Dla niezalogowanych oraz nie posiadających uprawnien przekieruj do strony Logowania
         // Wylogowanie i przekierowanie do strony Logowania.
         //jeśli zalogowany i strona nie jest dostępna dla każdego ->
         if(Auth::user() && $privilages_key !='*')
         {
             //Jeśli uprawnienia są niewystarczające wyloguj ze strony
-            if((strpos($privilages_key, (string)$request->user()->priv) === false))
+            if(!in_array($request->user()->priv,$split_privilages))
             {
                 Auth::logout();
                 return redirect()->to('/login')->with('warning', 'Your session has expired because your account is deactivated.');
