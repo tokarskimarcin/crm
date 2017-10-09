@@ -24,6 +24,7 @@
 
     </div>
     @include('partials._javascript')
+    @yield('script.register')
     @yield('script')
 </body>
 

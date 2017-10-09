@@ -5,16 +5,18 @@
 {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Forms</h1>
+            <h1 class="page-header">Panel zarządzania</h1>
         </div>
     </div>
 
 
     <div class="row">
         <div class="col-lg-12">
+
+
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Basic Form Elements
+                    Status Pracy
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -26,7 +28,7 @@
                                     <?php elseif($status == 1): ?>
                                     <button id="stop" class="button"> Stop work </button>
                                     <?php elseif($status == 2): ?>
-                                    <button id="done" class="button"> Work Done</button>
+                                    <button id="done" class="button" data-toggle="modal" data-target="#registerModal">Register hour</button>
                                     <?php endif?>
                                 </div>
                             </div>
@@ -37,14 +39,13 @@
         </div>
     </div>
 
-
+@include('workhours.registerHour');
 @endsection
 
 @section('script')
 
 <script>
     var $status_work = <?php echo $status ?>;
-
     $("#start_stop").on('click', '#start',function () {
             $.ajax({
                 type: "POST",
@@ -68,7 +69,9 @@
             },
             success: function(response) {
                 server = response;
-                $("#stop").text('Done Work');
+                $("#stop").attr('data-toggle','modal');
+                $("#stop").attr('data-target','#registerModal');
+                $("#stop").text('Register hour');
                 $("#stop").attr('id', 'done');
             }
         });

@@ -6,6 +6,9 @@
 
     <title>CRM Verona</title>
 
+    <link href="{{ asset('/css/bootstrap-datetimepicker.min.css')}}" rel="stylesheet">
+
+
     <!-- Bootstrap Core CSS -->
     <link href="{{ asset('/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
 
