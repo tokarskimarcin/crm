@@ -12,7 +12,3 @@
 <script src="{{ asset('/js/sb-admin-2.js')}}"></script>
 <!-- Bootstrap Core JavaScript -->
 
-<script src="{{ asset('/vendor/datatables/js/jquery.dataTables.min.js')}}"></script>
-<script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js')}}"></script>
-<script src="{{ asset('/vendor/datatables-responsive/dataTables.responsive.js')}}"></script>
-

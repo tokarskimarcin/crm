@@ -21,21 +21,14 @@ class WorkHoursController extends Controller
         return view('workhours.acceptHour');
     }
 
+
+
     public function datatableAcceptHour(Request $request)
     {
-        if($request->ajax())
-        {
-            $start = $request->start_date;
-            $start = $request->stop_date;
-            $tabledate =
-            $users = DB::table('work_hours')
-                ->join('users', 'work_hours.id_user', '=', 'users.id')
-                ->select('work_hours.*')
-                ->get();
-        }
-        header("Content-type:application/json");
-        echo json_encode($users);
+
     }
+
+
 
     public function registerHour(Request $request)
     {
