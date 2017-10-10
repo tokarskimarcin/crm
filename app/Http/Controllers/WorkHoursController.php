@@ -27,7 +27,11 @@ class WorkHoursController extends Controller
     {
         if($request->ajax()) {
 
-            $query = Work_Hour::select('id', 'click_start');
+            $start_date = $request->start_date;
+            $stop_date = $request->stop_date;
+            $query = Work_Hour::select('id', 'click_start')
+                ->whereBetween('date',[$start_date,$stop_date]);
+
             return datatables($query)->make(true);
 
         }
