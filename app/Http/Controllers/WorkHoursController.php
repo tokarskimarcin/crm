@@ -25,7 +25,12 @@ class WorkHoursController extends Controller
 
     public function datatableAcceptHour(Request $request)
     {
+        if($request->ajax()) {
 
+            $query = Work_Hour::select('id', 'click_start');
+            return datatables($query)->make(true);
+
+        }
     }
 
 

@@ -11,4 +11,5 @@
 <!-- Custom Theme JavaScript -->
 <script src="{{ asset('/js/sb-admin-2.js')}}"></script>
 <!-- Bootstrap Core JavaScript -->
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 

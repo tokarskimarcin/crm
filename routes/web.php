@@ -16,7 +16,7 @@ Route::get('/', 'HomeController@index');
 Route::POST('/startWork', 'HomeController@startWork');
 Route::POST('/stopWork', 'HomeController@stopWork');
 Route::POST('/register_hour','WorkHoursController@registerHour');
-Route::POST('/datatableAcceptHour','WorkHoursController@datatableAcceptHour');
+Route::POST('/datatableAcceptHour','WorkHoursController@datatableAcceptHour')->name('api.acceptHour');
 
 
 
