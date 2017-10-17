@@ -15,6 +15,10 @@
         #register_start
         {
             width: 75px;}
+        .modifydate{
+            margin-bottom: 0px;
+            height: 41px;
+        }
 
     </style>
 @endsection
@@ -77,34 +81,38 @@
     <script>
         var table;
 
-
+        var firstOpen = true;
         function myFunction() {
             table.ajax.reload();
         }
-        $(function() {
+
             $('.form_date').datetimepicker({
                 language:  'pl',
                 autoclose: 1,
                 minView : 2,
                 pickTime: false,
             });
-                $('.form_time').datetimepicker({
-                    language:  'pl',
-                    weekStart: 1,
-                    todayBtn:  1,
-                    autoclose: 1,
-                    todayHighlight: 1,
-                    startView: 1,
-                    minView: 0,
-                    maxView: 1,
-                    forceParse: 0
-                });
-        });
 
         $(document).ready( function () {
+
             table = $('#datatable').DataTable({
                 "processing": true,
                 "serverSide": true,
+                "drawCallback": function( settings ) {
+
+                    $('.form_time').datetimepicker({
+                        language:  'pl',
+                        weekStart: 1,
+                        todayBtn:  1,
+                        autoclose: 1,
+                        todayHighlight: 1,
+                        startView: 1,
+                        minView: 0,
+                        maxView: 1,
+                        forceParse: 0
+                    });
+
+                },
                 "ajax": {
                     'url': "{{ route('api.acceptHour') }}",
                     'type': 'POST',
@@ -156,9 +164,18 @@
                         "targets": -3,
                         "data": null,
                         "defaultContent": "" +
-                        "<div class='form-group'>" +
+                        "<div class='form-group modifydate' >" +
                         "<div class='input-group date form_time col-md-5' data-date='' data-date-format=hh:ii' data-link-field='dtp_input3' data-link-format='hh:ii'>"+
                         "<input id='register_start' class='form-control' size='16' type='text' value='' readonly>"+
+                        "<span class='input-group-addon'><span class='glyphicon glyphicon-remove'></span></span>"+
+                        "<span class='input-group-addon'><span class='glyphicon glyphicon-time'></span></span>"+
+                        "</div>"+
+                        "<input type='hidden' id='dtp_input3' value='' /><br/>"+
+                        "</div>"+
+
+                        "<div class='form-group modifydate' >" +
+                        "<div class='input-group date form_time col-md-5' data-date='' data-date-format=hh:ii' data-link-field='dtp_input3' data-link-format='hh:ii'>"+
+                        "<input id='register_stop' class='form-control' size='16' type='text' value='' readonly>"+
                         "<span class='input-group-addon'><span class='glyphicon glyphicon-remove'></span></span>"+
                         "<span class='input-group-addon'><span class='glyphicon glyphicon-time'></span></span>"+
                         "</div>"+
@@ -166,26 +183,7 @@
                         "</div>"
                     }]
             });
-            $('#datatable tbody').on( 'click', '#register_start', function () {
-                $("#success-alert").alert();
-                $('.form_time').datetimepicker({
-                    language:  'pl',
-                    weekStart: 1,
-                    todayBtn:  1,
-                    autoclose: 1,
-                    todayHighlight: 1,
-                    startView: 1,
-                    minView: 0,
-                    maxView: 1,
-                    forceParse: 0
-                }).focus();
-            });
-
         });
-
-
-
-
     </script>
 
 
