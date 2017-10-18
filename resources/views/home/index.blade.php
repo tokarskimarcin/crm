@@ -28,6 +28,8 @@
                                     <button id="stop" class="button"> Stop work </button>
                                     <?php elseif($status == 2): ?>
                                     <button id="done" class="button" data-toggle="modal" data-target="#registerModal">Register hour</button>
+                                     <?php elseif($status >=3): ?>
+                                    <button id="done" class="button" data-toggle="modal" data-target="#registerModal">Hour was accepted</button>
                                     <?php endif?>
                                 </div>
                             </div>
@@ -44,6 +46,7 @@
 @section('script')
 
 <script>
+    alert();
     var $status_work = <?php echo $status ?>;
     $("#start_stop").on('click', '#start',function () {
             $.ajax({

@@ -59,6 +59,7 @@
             <th>Start</th>
             <th>Zarejestrowane</th>
             <th>Modyfikacja</th>
+            <th>Sukcesy</th>
             <th>Suma</th>
             <th>Akcja</th>
         </tr>
@@ -147,6 +148,8 @@
                         return data.register_start + "</br><span class='fa fa-arrow-circle-o-down fa-fw'></span> </br> " + data.register_stop;
                     },"name": "register_start"},
 
+                    {"data":null,"targets": -4,"orderable": false, "searchable": false },
+
                     {"data":null,"targets": -3,"orderable": false, "searchable": false },
 
                     {"data": "time", "name": "time","searchable": false },
@@ -158,9 +161,12 @@
                     "targets": -1,
                     "data": "id",
                     "defaultContent": "<button class='button-save'>Zapisz</button>"
-                },
-                    {
-                        "targets": -3,
+                },{
+                    "targets": -3,
+                    "data": "id",
+                    "defaultContent": "<input id='succes' class='form-control' size='16' type='number' value=''>"
+                },{
+                        "targets": -4,
                         "data": null,
                         "defaultContent": "" +
                         "<div class='form-group modifydate' >" +
@@ -188,6 +194,7 @@
             var data = table.row( $(this).parents('tr') ).data();
             var modify_start = $(this).closest("tr").find("input[id='register_start']").val();
             var modify_stop = $(this).closest("tr").find("input[id='register_stop']").val();
+            var succes = $(this).closest("tr").find("input[id='succes']").val();
             var id = data.id;
             var type_edit = 0;
             var validate = 1;
@@ -204,10 +211,10 @@
                 }else
                     type_edit = 1;
             }
-            if(type_edit == 1)
+            if(succes>100 || succes < 0 )
             {
-                modify_start =
-                modify_stop =
+                alert("Błędne informacje o ilości sukcesów");
+                validate = 0;
             }
             if(validate == 1)
             {
@@ -218,7 +225,8 @@
                         "id": id,
                         "register_start": modify_start,
                         "register_stop": modify_stop,
-                        "succes": 0
+                        "type_edit":type_edit,
+                        "succes":succes
                     },
 
                     headers: {
@@ -229,10 +237,12 @@
                         {
                             alert("Brak zarejestrowanych godzin");
                         }else
-                        table.ajax.reload();
+                            table.ajax.reload();
                     }
                 });
             }
+
+
         });
     </script>
 

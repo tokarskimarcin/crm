@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use App\Work_Hour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,17 +17,23 @@ class WorkHoursController extends Controller
         $this->actuall_hour = date("H:i:s");
     }
 
+
+    //******************acceptHour****************** START
     public function acceptHour()
     {
-        return view('workhours.acceptHour');
+        if(Auth::user()->department_type_id == 1)
+        {
+            return view('workhours.acceptHour');
+        }
+        else if(Auth::user()->department_type_id == 2)
+        {
+            return view('workhours.acceptHourSucces');
+        }
     }
-
-
 
     public function datatableAcceptHour(Request $request)
     {
         if($request->ajax()) {
-
             $start_date = $request->start_date;
             $stop_date = $request->stop_date;
             $query = DB::table('work_hours')
@@ -42,14 +49,54 @@ class WorkHoursController extends Controller
                     work_hours.date,
                     SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time'))
                 ->where('work_hours.status', '=', 2)
+                ->where('users.department_id', '=', Auth::user()->department_id)
+                ->where('users.department_type_id', '=', Auth::user()->department_type_id)
+                ->where('users.user_type_id', '=', 1)
+                ->where('work_hours.id_manager', '=', null)
                 ->whereBetween('date',[$start_date,$stop_date]);
             return datatables($query)->make(true);
-
         }
     }
+    public function saveAcceptHour(Request $request)
+    {
+        if($request->ajax())
+        {
+            $id = $request->id;
+            $register_start = $request->register_start;
+            $register_stop = $request->register_stop;
+            $type_edit = $request->type_edit;
+            $succes = $request->succes;
+            $id_manager = Auth::id();
+            if($type_edit == 0)
+            {
+                $work_data = Work_Hour::where('id',$id)->select('register_start'
+                ,'register_stop')->first();
+                $register_start = $work_data->register_start;
+                $register_stop = $work_data->register_stop;
+                if($register_start == null || $register_stop == null)
+                {
+                    echo -1;
+                }else{
+                Work_Hour::where('id', $id)
+                    ->update(['id_manager' => $id_manager,
+                        'accept_start' => $register_start,
+                        'accept_stop' => $register_stop,
+                        'success' => $succes]);}
 
+            }else
+            {
+                Work_Hour::where('id', $id)
+                    ->update(['id_manager' => $id_manager,
+                        'success' => $succes,
+                        'accept_start' => $register_start,
+                        'accept_stop' => $register_stop,
+                        'status' => 3]);
+            }
+        }
+    }
+    //******************acceptHour****************** Stop
 
-
+    //******************RegisterHour****************** Start
     public function registerHour(Request $request)
     {
         if($request->ajax())
@@ -65,8 +112,99 @@ class WorkHoursController extends Controller
             return response()->json(['status'=>'Hooray']);
         }
     }
+    //******************RegisterHour****************** Stop
+
     public function addHour()
     {
         return view('workhours.addHour');
     }
+
+
+    //******************ViewHour****************** Start
+    public function viewHourGet()
+    {
+        $users = $this->getUsers();
+        return view('workhours.viewHour')
+            ->with('users',$users);
+    }
+    public function viewHourPost(Request $request)
+    {
+        $users = $this->getUsers();
+        $month = $request->month;
+        $userid = $request->userid;
+        $user_info = DB::table('work_hours')
+            ->join('users', 'work_hours.id_user', '=', 'users.id')
+            ->leftjoin('users as manager', 'work_hours.id_manager', '=', 'manager.id')
+            ->select(DB::raw(
+                   'work_hours.id as id,                   
+                    work_hours.status, 
+                    work_hours.id_manager, 
+                    users.rate,
+                    manager.first_name,
+                    manager.last_name,
+                    work_hours.accept_start,
+                    work_hours.accept_stop,
+                    work_hours.register_start,
+                    work_hours.register_stop,
+                    work_hours.success,
+                    work_hours.date,
+                    SUBSTRING(SEC_TO_TIME(TIME_TO_SEC(accept_stop) - TIME_TO_SEC(accept_start) ),1,5) as time,
+                    TIME_TO_SEC(accept_stop) - TIME_TO_SEC(accept_start) as second'))
+            ->where('work_hours.id_user', '=', $userid)
+            ->where('date','like',$month.'%')->get();
+
+        return view('workhours.viewHour')
+            ->with('users',$users)
+            ->with('response_userid',$userid)
+            ->with('response_month',$month)
+            ->with('response_user_info',$user_info);
+    }
+
+    public function deleteAcceptHour(Request $request)
+    {
+        if($request->ajax())
+        {
+            $id = $request->id;
+                Work_Hour::where('id', $id)
+                    ->update(['id_manager' => Auth::id(),
+                        'success' => 0,
+                        'accept_start' => null,
+                        'accept_stop' => null,
+                        'status' => 4]);
+        }
+    }
+    public function editAcceptHour(Request $request)
+    {
+        if($request->ajax())
+        {
+            $id = $request->id;
+            $accept_start = $request->accept_start;
+            $accept_stop = $request->accept_stop;
+            $succes = $request->success;
+            $id_manager = Auth::id();
+                Work_Hour::where('id', $id)
+                    ->update(['id_manager' => $id_manager,
+                        'success' => $succes,
+                        'accept_start' => $accept_start,
+                        'accept_stop' => $accept_stop,
+                        'register_start' => $accept_start,
+                        'register_stop' => $accept_stop,
+                        'status' => 3]);
+        }
+    }
+    //******************ViewHour****************** Stop
+
+
+
+    //******************Custom Functions******************
+    function getUsers()
+    {
+        $users = User::where('users.department_id', '=', Auth::user()->department_id)
+            ->where('users.department_type_id', '=', Auth::user()->department_type_id)
+            ->where('users.user_type_id', '=', 1)
+            ->where('users.status_work', '=', 1)
+            ->get();
+        return $users;
+    }
+
 }
