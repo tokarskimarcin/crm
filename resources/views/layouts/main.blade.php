@@ -25,6 +25,8 @@
     </div>
     @include('partials._javascript')
     @yield('script.register')
+    @yield('script.edithour')
+    @yield('script.addhour')
     @yield('script')
 </body>
 

@@ -1,17 +1,17 @@
 <!-- Modal -->
-<div id="editHourModal" class="modal fade" role="dialog">
+<div id="addHourModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Edycja Godzin pracownika</h4>
+                <h4 class="modal-title">Dodaj Godzin pracownika</h4>
             </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label for="dtp_input3" class="col-md-5 control-label">Godzina przyjścia do pracy:</label>
                     <div class="input-group date form_time col-md-5" data-date="" data-date-format="hh:ii" data-link-field="dtp_input3" data-link-format="hh:ii">
-                        <input id="accept_start" class="form-control" size="16" type="text" value="" readonly>
+                        <input id="accept_start_add" class="form-control" size="16" type="text" value="" readonly>
                         <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                         <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
                     </div>
@@ -20,7 +20,7 @@
                 <div class="form-group">
                     <label for="dtp_input3" class="col-md-5 control-label">Godzina zakończenia pracy:</label>
                     <div class="input-group date form_time col-md-5" data-date="" data-date-format="hh:ii" data-link-field="dtp_input3" data-link-format="hh:ii">
-                        <input id="accept_stop" class="form-control" size="16" type="text" value="" readonly>
+                        <input id="accept_stop_add" class="form-control" size="16" type="text" value="" readonly>
                         <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                         <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
                     </div>
@@ -29,11 +29,11 @@
                 <div class="form-group">
                     <label for="dtp_input3" class="col-md-5 control-label">Liczna Sukcesów: </label>
                     <div class="input-group date col-md-5">
-                        <input id="success" class="form-control" size="16" type="number" value="0">
+                        <input id="success_add" class="form-control" size="16" type="number" value="0">
                     </div>
                     <input type="hidden" id="dtp_input3" value="" /><br/>
                 </div>
-                <button id="edit_hour" type="submit" class="btn btn-primary" name="register" style="font-size:18px; width:100%;">Zarejestruj</button>
+                <button id="add_hour" type="submit" class="btn btn-primary" name="register" style="font-size:18px; width:100%;">Zarejestruj</button>
 
             </div>
             <div class="modal-footer">
@@ -45,12 +45,12 @@
 </div>
 
 
-@section('script.edithour')
+@section('script.addhour')
     <script>
 
             var id = 0;
             var load = 0;
-        $('#editHourModal').on('show.bs.modal', function(e) {
+        $('#addHourModal').on('show.bs.modal', function(e) {
             if(load == 0) {
                 var $modal = $(this),
                     esseyId = e.relatedTarget.id;
@@ -59,7 +59,9 @@
             }
         });
 
-
+            $( ".close" ).click(function() {
+                load=0;
+            });
         $(function() {
             $('.form_time').datetimepicker({
                 language:  'pl',
@@ -73,18 +75,13 @@
                 forceParse: 0
             });
         });
-
-            $( ".close" ).click(function() {
-                load=0;
-            });
-
-        $( "#edit_hour" ).click(function() {
+        $( "#add_hour" ).click(function() {
             var accept_start = 0;
             var accept_stop = 0;
             var success = 0;
-            accept_start = $('#accept_start').val();
-            accept_stop = $('#accept_stop').val();
-            success = $('#success').val();
+            accept_start = $('#accept_start_add').val();
+            accept_stop = $('#accept_stop_add').val();
+            success = $('#success_add').val();
             if(accept_start == null || accept_start =='')
             {
                 alert('Brak godziny rozpoczęcia pracy');
@@ -94,9 +91,11 @@
             {
                 $.ajax({
                     type: "POST",
-                    url: '{{ route('api.editAcceptHour') }}',
-                    data: {"accept_start": accept_start, "accept_stop": accept_stop,
-                        "success": success,"id":id},
+                    url: '{{ route('api.addAcceptHour') }}',
+                    data: {"accept_start": accept_start,
+                        "accept_stop": accept_stop,
+                        "success": success,
+                        "id_user_date":id},
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },

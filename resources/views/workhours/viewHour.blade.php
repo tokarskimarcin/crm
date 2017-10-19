@@ -117,50 +117,50 @@
                                                                 $date = date("Y-m-d",mktime(0,0,0,$dateexplode[1],1+$i,$dateexplode[0]));
                                                                 $check = 0;
                                                                 ?>
-                                                                @foreach ($response_user_info as $item)
-                                                                    @if($item->date == $date)
-                                                                        <?php $check++?>
-                                                                        <?php
-                                                                        if($item->success == 0)
-                                                                            $avg = number_format (0,2);
-                                                                        else
-                                                                            $avg = number_format ( ($item->second/3600)/$item->success, 2 );
+                                                                    @foreach ($response_user_info as $item)
+                                                                        @if($item->date == $date)
+                                                                            <?php $check++?>
+                                                                            <?php
+                                                                            if($item->success == 0)
+                                                                                $avg = number_format (0,2);
+                                                                            else
+                                                                                $avg = number_format ( $item->success/($item->second/3600), 2 );
 
-                                                                        if($item->id_manager == null)
-                                                                            $status = 'Oczekuje na akceptacje';
-                                                                        if($item->status == 2 && $item->id_manager != null)
-                                                                            $status = 'Zaakceptowano przez:'."\n".$item->first_name.' '.$item->last_name;
-                                                                        elseif($item->status == 3)
-                                                                            $status = 'Zmodyfikowano przez:'."\n".$item->first_name.' '.$item->last_name;
-                                                                        elseif($item->status == 4)
-                                                                            $status = 'Usunięto przez:'."\n".$item->first_name.' '.$item->last_name;
-                                                                        ?>
-                                                                        <tr>
-                                                                            <td >{{$item->date}}</td>
-                                                                            <td>
-                                                                                {{$item->register_start}}
-                                                                                <br>
-                                                                                <span class='fa fa-arrow-circle-o-down fa-fw'></span>
-                                                                                {{$item->register_stop}}
-                                                                            </td>
-                                                                            <td>
-                                                                                {{$item->accept_start}}
-                                                                                <br>
-                                                                                <span class='fa fa-arrow-circle-o-down fa-fw'></span>
-                                                                                {{$item->accept_stop}}
-                                                                            </td>
-                                                                            <td>{{$item->time}}</td>
-                                                                            <td>{{number_format ( ($item->second/3600)*$item->rate, 2 )}} PLN</td>
-                                                                            <td>{{$item->success}}</td>
-                                                                            <td>{{$avg}}</td>
-                                                                            <td>{{$status}}</td>
-                                                                            <td>
-                                                                                <button type="button" id={{$item->id}} class="btn btn-danger action delete">Usuń</button>
-                                                                                <button type="button" data-toggle="modal" data-target="#editHourModal" id={{$item->id}} class="btn btn-info action edit">Edycja</button>
-                                                                            </td>
-                                                                        </tr>
-                                                                        @endif
-                                                                @endforeach
+                                                                            if($item->id_manager == null)
+                                                                                $status = 'Oczekuje na akceptacje';
+                                                                            if($item->status == 2 && $item->id_manager != null)
+                                                                                $status = 'Zaakceptowano przez:'."\n".$item->first_name.' '.$item->last_name;
+                                                                            elseif($item->status == 3)
+                                                                                $status = 'Zmodyfikowano przez:'."\n".$item->first_name.' '.$item->last_name;
+                                                                            elseif($item->status == 4)
+                                                                                $status = 'Usunięto przez:'."\n".$item->first_name.' '.$item->last_name;
+                                                                            ?>
+                                                                            <tr>
+                                                                                <td >{{$item->date}}</td>
+                                                                                <td>
+                                                                                    {{$item->register_start}}
+                                                                                    <br>
+                                                                                    <span class='fa fa-arrow-circle-o-down fa-fw'></span>
+                                                                                    {{$item->register_stop}}
+                                                                                </td>
+                                                                                <td>
+                                                                                    {{$item->accept_start}}
+                                                                                    <br>
+                                                                                    <span class='fa fa-arrow-circle-o-down fa-fw'></span>
+                                                                                    {{$item->accept_stop}}
+                                                                                </td>
+                                                                                <td>{{$item->time}}</td>
+                                                                                <td>{{number_format ( ($item->second/3600)*$item->rate, 2 )}} PLN</td>
+                                                                                <td>{{$item->success}}</td>
+                                                                                <td>{{$avg}}</td>
+                                                                                <td>{{$status}}</td>
+                                                                                <td>
+                                                                                    <button type="button" id={{$item->id}} class="btn btn-danger action delete">Usuń</button>
+                                                                                    <button type="button" data-toggle="modal" data-target="#editHourModal" id={{$item->id}} class="btn btn-info action edit">Edycja</button>
+                                                                                </td>
+                                                                            </tr>
+                                                                            @endif
+                                                                    @endforeach
                                                                 @if($check == 0)
                                                                     <tr>
                                                                         <td>{{$date}}</td>
@@ -172,8 +172,7 @@
                                                                         <td></td>
                                                                         <td></td>
                                                                         <td>
-                                                                            <button type="button"  class="btn btn-danger action">Usuń</button>
-                                                                            <button type="button"  class="btn btn-success action add">Dodaj</button>
+                                                                            <button type="button" data-toggle="modal" data-target="#addHourModal" id={{$response_userid.'/'.$date}} class="btn btn-success action edit">Dodaj</button>
                                                                         </td>
                                                                     </tr>
                                                                 @endif
@@ -196,6 +195,7 @@
     </div>
 @endsection
 @include('workhours.editHour');
+@include('workhours.addHour');
 @section('script')
     <script>
         $( ".delete" ).click(function() {
@@ -214,9 +214,6 @@
                     location.reload();
                 }
             });
-        });
-        $( ".add" ).click(function() {
-            alert( "Dodanie" );
         });
     </script>
 @endsection

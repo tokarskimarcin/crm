@@ -46,7 +46,6 @@
 @section('script')
 
 <script>
-    alert();
     var $status_work = <?php echo $status ?>;
     $("#start_stop").on('click', '#start',function () {
             $.ajax({

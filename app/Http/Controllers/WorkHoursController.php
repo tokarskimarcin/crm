@@ -142,6 +142,7 @@ class WorkHoursController extends Controller
                     users.rate,
                     manager.first_name,
                     manager.last_name,
+                    work_hours.id_user,
                     work_hours.accept_start,
                     work_hours.accept_stop,
                     work_hours.register_start,
@@ -187,9 +188,29 @@ class WorkHoursController extends Controller
                         'success' => $succes,
                         'accept_start' => $accept_start,
                         'accept_stop' => $accept_stop,
-                        'register_start' => $accept_start,
-                        'register_stop' => $accept_stop,
                         'status' => 3]);
+        }
+    }
+    public function addAcceptHour(Request $request)
+    {
+        if($request->ajax())
+        {
+            $id_user_date = $request->id_user_date;
+            $date = explode('/',$id_user_date);
+            $accept_start = $request->accept_start;
+            $accept_stop = $request->accept_stop;
+            $succes = $request->success;
+            $id_manager = Auth::id();
+            $work_hour = new Work_Hour;
+            $work_hour->status = 3;
+            $work_hour->accept_sec = 0;
+            $work_hour->success = $succes;
+            $work_hour->date = $date[1];
+            $work_hour->accept_start = $accept_start;
+            $work_hour->accept_stop = $accept_stop;
+            $work_hour->id_user = $date[0];
+            $work_hour->id_manager = $id_manager;
+            $work_hour->save();
         }
     }
     //******************ViewHour****************** Stop
