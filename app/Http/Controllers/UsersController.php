@@ -55,10 +55,25 @@ class UsersController extends Controller
         $user->id_manager = Auth::id();
         $user->documents = $request->documents;
         $user->save();
-
-
-
-
         return view('hr.addConsultant')->with('saved','saved')->with('agencies',$agencies);;
     }
+    public function employee_managementGet()
+    {
+        return view('hr.employeeManagement');
+    }
+    public function datatableEmployeeManagement(Request $request)
+    {
+        if($request->ajax()) {
+            $query = User::select('id', 'first_name','last_name',
+                'username', 'start_work',
+                'end_work', 'phone',
+                'documents', 'student',
+                'status_work','last_login')
+                ->where('user_type_id', 1)
+                ->where('department_id', Auth::user()->department_id)
+                ->where('department_type_id', Auth::user()->department_type_id);
+        }
+        return datatables($query)->make(true);
+    }
+
 }
