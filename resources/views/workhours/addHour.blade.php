@@ -17,7 +17,7 @@
                     </div>
                     <input type="hidden" id="dtp_input3" value="" /><br/>
                 </div>
-                <div class="form-group">1
+                <div class="form-group">
                     <label for="dtp_input3" class="col-md-5 control-label">Godzina zakończenia pracy:</label>
                     <div class="input-group date form_time col-md-5" data-date="" data-date-format="hh:ii" data-link-field="dtp_input3" data-link-format="hh:ii">
                         <input id="accept_stop_add" class="form-control" size="16" type="text" value="" readonly>
