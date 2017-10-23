@@ -26,9 +26,9 @@ Route::POST('/editAcceptHour','WorkHoursController@editAcceptHour')->name('api.e
 Route::POST('/addAcceptHour','WorkHoursController@addAcceptHour')->name('api.addAcceptHour');
 
 Route::POST('/uniqueUsername','UsersController@uniqueUsername')->name('api.uniqueUsername');
-
 Route::POST('/datatableEmployeeManagement','UsersController@datatableEmployeeManagement')->name('api.datatableEmployeeManagement');
 
+Route::POST('/datatableDkjRaport','DkjController@datatableDkjRaport')->name('api.datatableDkjRaport');
 //********************AJAX*********************** */
 
 Auth::routes();
@@ -52,6 +52,12 @@ Route::middleware(['check-permission'])->group(function () {
 
     Route::get('/employee_management','UsersController@employee_managementGet');
     // Users -- STOP--
+
+
+    // DKJ --START--
+    Route::get('/dkjRaport','DkjController@dkjRaportGet');
+    Route::POST('/dkjRaport','DkjController@dkjRaportPOST');
+    // DKJ -- STOP--
 
 });
 
