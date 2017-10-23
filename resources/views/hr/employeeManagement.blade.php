@@ -2,7 +2,10 @@
 @section('content')
 
     <style>
-
+        table{
+            font-size: 12px;
+            text-align: center;
+        }
     </style>
 
 {{--Header page --}}
@@ -11,6 +14,12 @@
             <h1 class="page-header">Zarządzaj Pracownikami(Konsultant)</h1>
         </div>
     </div>
+
+    @if(isset($saved))
+        <div class="alert alert-success">
+            <strong>Success!</strong> Konto użytkownika {{$saved}} zostało zmodyfikowane.
+        </div>
+    @endif
 
     <div class="row">
         <div class="col-lg-12">
@@ -27,7 +36,6 @@
                                     <table id="datatable">
                                         <thead>
                                         <tr>
-                                            <th>Id</th>
                                             <th>Imię</th>
                                             <th>Nazwisko</th>
                                             <th>Login</th>
@@ -62,7 +70,6 @@
 
         table = $('#datatable').DataTable({
             "autoWidth": false,
-            "width": "10%",
             "processing": true,
             "serverSide": true,
             "drawCallback": function( settings ) {
@@ -75,16 +82,37 @@
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
             },"columns":[
-                {"data": "id"},
                 {"data": "first_name"},
                 {"data": "last_name"},
                 {"data": "username"},
                 {"data": "start_work"},
                 {"data": "end_work"},
                 {"data": "phone"},
-                {"data": "documents"},
-                {"data": "student"},
+                {"data": function (data, type, dataToSet) {
+                    if(data.documents == 1)
+                        data.documents = "Tak";
+                    else if(data.documents == 0)
+                        data.documents = "Brak";
+                    return data.documents;
+                },"name": "documents"},
+                {"data": function (data, type, dataToSet) {
+                    if(data.student == 1)
+                        data.student = "Tak";
+                    else if(data.student == 0)
+                        data.student = "Nie";
+                    return data.student;
+                },"name": "student"},
                 {"data": "last_login"},
+                {"data": function (data, type, dataToSet) {
+                    if(data.status_work == 1)
+                        data.status_work = "Pracuje";
+                    else if(data.status_work == 0)
+                        data.status_work = "Nie pracuje";
+                    return data.status_work;
+                },"name": "status_work"},
+                {"data": function (data, type, dataToSet) {
+                    return '<a href="/edit_consultant/'+data.id+'" >Edytuj</a>'
+                },"orderable": false, "searchable": false }
                 ]
         });
     });

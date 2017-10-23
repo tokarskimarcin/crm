@@ -47,6 +47,9 @@ Route::middleware(['check-permission'])->group(function () {
     Route::get('/add_consultant','UsersController@add_consultantGet');
     Route::POST('/add_consultant','UsersController@add_consultantPOST');
 
+    Route::get('/edit_consultant/{id}','UsersController@edit_consultantGet');
+    Route::POST('/edit_consultant/{id}','UsersController@edit_consultantPOST');
+
     Route::get('/employee_management','UsersController@employee_managementGet');
     // Users -- STOP--
 

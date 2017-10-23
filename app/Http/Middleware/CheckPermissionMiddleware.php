@@ -23,11 +23,15 @@ class CheckPermissionMiddleware
         $privilages_model = new Privilages;
         // Pobranie ścieżki adresu url
         $route = $request->path();
+        //podział ścieżki na /
+        $route = explode("/", $route);
+        $route= $route[0];
         // Pobranie informacji o stronie
         $privilages_key = $privilages_model->where('link',$route)->select('priv')->get()->toArray();
 
         //Usunuięcie rzutowania tablicy
         $privilages_key = $privilages_key[0]['priv'];
+        print_R($privilages_key);
         $split_privilages = explode(";",$privilages_key);
 
         // Dla niezalogowanych oraz nie posiadających uprawnien przekieruj do strony Logowania
