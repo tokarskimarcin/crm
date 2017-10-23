@@ -14,6 +14,6 @@ class Departments extends Model
      * @var array
      */
     protected $fillable = [
-        'id', 'name', 'desc','type',
+        'id', 'name', 'desc',
     ];
 }
