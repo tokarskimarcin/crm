@@ -39,13 +39,11 @@
                                                     <option>Wybierz</option>
                                                     @if($user->documents == 1)
                                                         <option selected value="1">Tak</option>
-                                                    @else
                                                         <option value="0">Nie</option>
                                                     @endif
                                                     @if($user->documents == 0)
-                                                        <option selected value="0">Nie</option>
-                                                    @else
                                                         <option value="1">Tak</option>
+                                                        <option selected value="0">Nie</option>
                                                     @endif
                                                 </select>
                                             </div>
@@ -104,13 +102,11 @@
                                                 <select class="form-control" style="font-size:18px;" name="student">
                                                     <option>Wybierz</option>
                                                     @if($user->student == 1)
-                                                            <option selected value="1">Tak</option>
-                                                    @else
+                                                        <option selected value="1">Tak</option>
                                                         <option value="0">Nie</option>
                                                     @endif
                                                     @if($user->student == 0)
-                                                            <option selected value="0">Nie</option>
-                                                    @else
+                                                        <option selected value="0">Nie</option>
                                                         <option value="1">Tak</option>
                                                     @endif
                                                 </select>
@@ -125,12 +121,10 @@
                                                     <option>Wybierz</option>
                                                     @if($user->salary_to_account == 1)
                                                         <option selected value="1">Tak</option>
-                                                    @else
                                                         <option value="0">Nie</option>
                                                     @endif
                                                     @if($user->salary_to_account == 0)
                                                         <option selected value="0">Nie</option>
-                                                    @else
                                                         <option value="1">Tak</option>
                                                     @endif
                                                     </select>
@@ -149,12 +143,10 @@
                                                     <option>Wybierz</option>
                                                     @if($user->status_work == 1)
                                                         <option selected value="1">Pracuje</option>
-                                                    @else
                                                         <option value="0">Nie Pracuje</option>
                                                     @endif
                                                     @if($user->status_work == 0)
                                                         <option selected value="0">Nie Pracuje</option>
-                                                    @else
                                                         <option value="1">Pracuje</option>
                                                     @endif
                                                 </select>
