@@ -35,6 +35,10 @@ Auth::routes();
 
 Route::middleware(['check-permission'])->group(function () {
 
+    // Admin_Panel --Start--
+    Route::get('/admin_privilage','AdminController@admin_privilage');
+    Route::get('/admin_privilage_show/{id}','AdminController@admin_privilage_show');
+    // Admin_Panel --Stop--
 
     // Work_hours --Start--
     Route::get('/accept_hour','WorkHoursController@acceptHour');

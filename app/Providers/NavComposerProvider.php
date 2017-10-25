@@ -2,8 +2,7 @@
 
 namespace App\Providers;
 
-use App\Link_groups;
-use App\Links;
+use App\LinkGroups;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\DB;
@@ -36,7 +35,7 @@ class NavComposerProvider extends ServiceProvider
 
             $filtered = $links->groupBy('group_link_id');
             $filtered = array_keys($filtered->toArray());
-            $groups = Link_groups::wherein('id',$filtered)->get();
+            $groups = LinkGroups::wherein('id',$filtered)->get();
 
 
             $view->with('groups', $groups)->with('links', $links);
