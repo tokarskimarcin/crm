@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class User_types extends Model
+class UserTypes extends Model
 {
     protected $table = 'user_types';
     public $timestamps = false;
