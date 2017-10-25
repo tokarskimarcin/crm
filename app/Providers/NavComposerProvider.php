@@ -3,9 +3,10 @@
 namespace App\Providers;
 
 use App\Link_groups;
-use App\Privilages;
+use App\Links;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\DB;
 
 class NavComposerProvider extends ServiceProvider
 {
@@ -19,9 +20,20 @@ class NavComposerProvider extends ServiceProvider
         // Pobranie zaladek o navbaru zaleznie od uprawnien
         view()->composer('partials._nav', function ($view) {
 
-            $links = Privilages::where('priv', 'like', '%;'.Auth::user()->user_type_id . ';%')
-                ->orWhere('priv', 'like', '*')
-                ->get();
+            $links = DB::table('links')
+                ->leftjoin('privilage_relation', 'links.id', '=', 'privilage_relation.link_id')
+                ->leftjoin('privilage_user_relation', 'links.id', '=', 'privilage_user_relation.link_id')
+                ->select(DB::raw('
+                  links.group_link_id,
+                  links.link,
+                  links.name'
+
+                ))
+                ->Where(function ($query) {
+                    $query->orwhere('privilage_relation.user_type_id',Auth::user()->user_type_id)
+                        ->orwhere('privilage_user_relation.user_id',Auth::user()->id);
+                })->get();
+
             $filtered = $links->groupBy('group_link_id');
             $filtered = array_keys($filtered->toArray());
             $groups = Link_groups::wherein('id',$filtered)->get();

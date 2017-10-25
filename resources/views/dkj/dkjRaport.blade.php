@@ -11,6 +11,7 @@
         .panel-heading a.collapsed:after {
             content:"\e080";
         }
+
     </style>
 
 {{--Header page --}}
@@ -110,7 +111,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-12">
                             <div id="start_stop">
                                 <table id="datatable">
                                         <thead>
@@ -171,7 +172,21 @@
                 "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
             },"columns":[
                 {"data": "add_date"},
+                {"data":function (data, type, dataToSet) {
+                    return data.dkj_user_first_name + " " + data.dkj_user_last_name;
+                },"name": " dkj_user.last_name"},
+                {"data":function (data, type, dataToSet) {
+                    return data.user_first_name + " " + data.user_last_name;
+                },"name": "user.last_name"},
                 {"data": "phone"},
+                {"data": "campaign"},
+                {"data": "comment"},
+                {"data": "dkj_status"},
+                {"data":function (data, type, dataToSet) {
+                    return data.manager_status + " " + data.comment_manager;
+                },"name": " dkj.comment_manager"},
+
+
             ]
         });
 

@@ -33,9 +33,17 @@ class DkjController extends Controller
             $stop_date = $request->stop_date;
             $department_id_info = $request->department_id_info;
             $query = DB::table('dkj')
-                ->join('users', 'dkj.id_user', '=', 'users.id')
+                ->join('users as user', 'dkj.id_user', '=', 'user.id')
+                ->leftjoin('users as manager', 'dkj.id_manager', '=', 'manager.id')
+                ->join('users as dkj_user', 'dkj.id_dkj', '=', 'dkj_user.id')
                 ->select(DB::raw(
                     'dkj.id as id,
+                    user.first_name as user_first_name,
+                    user.last_name as user_last_name,
+                    manager.first_name as manager_first_name,
+                    manager.last_name as manager_last_name,
+                    dkj_user.first_name as dkj_user_first_name,
+                    dkj_user.last_name as dkj_user_last_name,
                     dkj.add_date,
                     dkj.phone,
                     dkj.campaign,

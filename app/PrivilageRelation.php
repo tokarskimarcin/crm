@@ -3,11 +3,10 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
-class Privilages extends Model
+
+class PrivilageRelation extends Model
 {
-    use Notifiable;
-    protected $table = 'privilages';
+    protected $table = 'privilage_relation';
     public $timestamps = false;
     /**
      * The attributes that are mass assignable.
@@ -15,6 +14,6 @@ class Privilages extends Model
      * @var array
      */
     protected $fillable = [
-        'id', 'link', 'priv','group_link_id','name'
+        'id', 'user_type_id','link_id',
     ];
 }

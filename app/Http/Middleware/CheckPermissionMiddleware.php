@@ -4,7 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
-use App\Privilages;
+use App\Links;
+use Illuminate\Support\Facades\DB;
 
 class CheckPermissionMiddleware
 {
@@ -20,40 +21,34 @@ class CheckPermissionMiddleware
     public function handle($request, Closure $next)
     {
         // Pobranie instancji modelu
-        $privilages_model = new Privilages;
+        $links = new Links;
         // Pobranie ścieżki adresu url
         $route = $request->path();
         //podział ścieżki na /
         $route = explode("/", $route);
         $route= $route[0];
         // Pobranie informacji o stronie
-        $privilages_key = $privilages_model->where('link',$route)->select('priv')->get()->toArray();
+        $link_key = DB::table('links')
+            ->leftjoin('privilage_relation', 'links.id', '=', 'privilage_relation.link_id')
+            ->leftjoin('privilage_user_relation', 'links.id', '=', 'privilage_user_relation.link_id')
+            ->select(DB::raw('
+              privilage_relation.user_type_id,
+              privilage_user_relation.user_id'
+            ))
+            ->where('link',$route)
+            ->Where(function ($query) {
+                $query->orwhere('privilage_relation.user_type_id',Auth::user()->user_type_id)
+                ->orwhere('privilage_user_relation.user_id',Auth::user()->id);
+            })->get();
 
-        //Usunuięcie rzutowania tablicy
-        $privilages_key = $privilages_key[0]['priv'];
-        print_R($privilages_key);
-        $split_privilages = explode(";",$privilages_key);
-
-        // Dla niezalogowanych oraz nie posiadających uprawnien przekieruj do strony Logowania
-        // Wylogowanie i przekierowanie do strony Logowania.
-        //jeśli zalogowany i strona nie jest dostępna dla każdego ->
-        if(Auth::user() && $privilages_key !='*')
+        if($link_key->isEmpty() || !Auth::user())
         {
-            //Jeśli uprawnienia są niewystarczające wyloguj ze strony
-            if(!in_array($request->user()->priv,$split_privilages))
-            {
-                Auth::logout();
-                return redirect()->to('/login')->with('warning', 'Your session has expired because your account is deactivated.');
-            }else
-            {   // Przekieruj jeśli uprawnienia są wystarczające
-                return $next($request);
-            }   //Przekieryj jeśli użytkwonik jest zalogowany i chce przejść do strony ogólnej
-        }else if(Auth::user() && $privilages_key =='*')
-            return $next($request);
-        else{   // wyloguj jeśli żadne z z rozwiązań nie jest poprawne
             Auth::logout();
             return redirect()->to('/login')->with('warning', 'Your session has expired because your account is deactivated.');
-
+        }else if(!$link_key->isEmpty() && Auth::user())
+        {
+            return $next($request);
         }
+
     }
 }
