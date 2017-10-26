@@ -44,6 +44,9 @@ Route::middleware(['check-permission'])->group(function () {
 
     // Work_hours --Start--
     Route::get('/accept_hour','WorkHoursController@acceptHour');
+
+    Route::get('/accept_hour_cadre','WorkHoursController@acceptHourCadre');
+
     Route::get('/add_hour','WorkHoursController@addHour');
     Route::get('/view_hour','WorkHoursController@viewHourGet');
     Route::Post('/view_hour','WorkHoursController@viewHourPost');

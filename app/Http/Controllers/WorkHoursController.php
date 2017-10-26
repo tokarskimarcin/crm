@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Department_info;
+use App\Department_types;
 use App\User;
 use App\Work_Hour;
 use Illuminate\Http\Request;
@@ -22,19 +23,21 @@ class WorkHoursController extends Controller
     //******************acceptHour****************** START
     public function acceptHour()
     {
-        if(Auth::user()->department_type_id == 1)
-        {
-            return view('workhours.acceptHour');
-        }
-        else if(Auth::user()->department_type_id == 2)
+        $count_agreement = Department_types::find(Auth::user()->department_type_id);
+        if($count_agreement->count_agreement == 1) // czy zliczane są zagody
         {
             return view('workhours.acceptHourSucces');
         }
-        else if(Auth::user()->department_type_id == 3)
+        else
         {
-            $departments = $this->getDepartment();
-            return view('workhours.acceptHourCadre')->with('departments',$departments);
+            return view('workhours.acceptHour');
         }
+    }
+
+    public function acceptHourCadre()
+    {
+            $departments = $this->getDepartment();
+            return view('workhours.acceptHourCadre')->with('departments', $departments);
     }
 
     public function datatableAcceptHour(Request $request)

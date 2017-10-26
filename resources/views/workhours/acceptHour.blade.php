@@ -85,12 +85,12 @@
             table.ajax.reload();
         }
 
-            $('.form_date').datetimepicker({
-                language:  'pl',
-                autoclose: 1,
-                minView : 2,
-                pickTime: false,
-            });
+        $('.form_date').datetimepicker({
+            language:  'pl',
+            autoclose: 1,
+            minView : 2,
+            pickTime: false,
+        });
 
         $(document).ready( function () {
 
@@ -149,6 +149,7 @@
 
                     {"data":null,"targets": -3,"orderable": false, "searchable": false },
 
+
                     {"data": "time", "name": "time","searchable": false },
 
                     {"data":null,"targets": -1,"orderable": false, "searchable": false }
@@ -158,29 +159,28 @@
                     "targets": -1,
                     "data": "id",
                     "defaultContent": "<button class='button-save'>Zapisz</button>"
-                },
-                    {
-                        "targets": -3,
-                        "data": null,
-                        "defaultContent": "" +
-                        "<div class='form-group modifydate' >" +
-                        "<div class='input-group date form_time col-md-5' data-date='' data-date-format=hh:ii data-link-field='dtp_input3' data-link-format='hh:ii'>"+
-                        "<input id='register_start' class='form-control' size='16' type='text' value='' readonly>"+
-                        "<span class='input-group-addon'><span class='glyphicon glyphicon-remove'></span></span>"+
-                        "<span class='input-group-addon'><span class='glyphicon glyphicon-time'></span></span>"+
-                        "</div>"+
-                        "<input type='hidden' id='dtp_input3' value='' /><br/>"+
-                        "</div>"+
+                },{
+                    "targets": -3,
+                    "data": null,
+                    "defaultContent": "" +
+                    "<div class='form-group modifydate' >" +
+                    "<div class='input-group date form_time col-md-5' data-date='' data-date-format=hh:ii data-link-field='dtp_input3' data-link-format='hh:ii'>"+
+                    "<input id='register_start' class='form-control' size='16' type='text' value='' readonly>"+
+                    "<span class='input-group-addon'><span class='glyphicon glyphicon-remove'></span></span>"+
+                    "<span class='input-group-addon'><span class='glyphicon glyphicon-time'></span></span>"+
+                    "</div>"+
+                    "<input type='hidden' id='dtp_input3' value='' /><br/>"+
+                    "</div>"+
 
-                        "<div class='form-group modifydate' >" +
-                        "<div class='input-group date form_time col-md-5' data-date='' data-date-format=hh:ii data-link-field='dtp_input3' data-link-format='hh:ii'>"+
-                        "<input id='register_stop' class='form-control' size='16' type='text' value='' readonly>"+
-                        "<span class='input-group-addon'><span class='glyphicon glyphicon-remove'></span></span>"+
-                        "<span class='input-group-addon'><span class='glyphicon glyphicon-time'></span></span>"+
-                        "</div>"+
-                        "<input type='hidden' id='dtp_input3' value='' /><br/>"+
-                        "</div>"
-                    }]
+                    "<div class='form-group modifydate' >" +
+                    "<div class='input-group date form_time col-md-5' data-date='' data-date-format=hh:ii data-link-field='dtp_input3' data-link-format='hh:ii'>"+
+                    "<input id='register_stop' class='form-control' size='16' type='text' value='' readonly>"+
+                    "<span class='input-group-addon'><span class='glyphicon glyphicon-remove'></span></span>"+
+                    "<span class='input-group-addon'><span class='glyphicon glyphicon-time'></span></span>"+
+                    "</div>"+
+                    "<input type='hidden' id='dtp_input3' value='' /><br/>"+
+                    "</div>"
+                }]
             });
         });
 
@@ -188,6 +188,7 @@
             var data = table.row( $(this).parents('tr') ).data();
             var modify_start = $(this).closest("tr").find("input[id='register_start']").val();
             var modify_stop = $(this).closest("tr").find("input[id='register_stop']").val();
+            var succes = 0;
             var id = data.id;
             var type_edit = 0;
             var validate = 1;
@@ -204,11 +205,6 @@
                 }else
                     type_edit = 1;
             }
-            if(type_edit == 1)
-            {
-                modify_start =
-                modify_stop =
-            }
             if(validate == 1)
             {
                 $.ajax({
@@ -218,7 +214,8 @@
                         "id": id,
                         "register_start": modify_start,
                         "register_stop": modify_stop,
-                        "succes": 0
+                        "type_edit":type_edit,
+                        "succes":succes
                     },
 
                     headers: {
@@ -229,10 +226,12 @@
                         {
                             alert("Brak zarejestrowanych godzin");
                         }else
-                        table.ajax.reload();
+                            table.ajax.reload();
                     }
                 });
             }
+
+
         });
     </script>
 

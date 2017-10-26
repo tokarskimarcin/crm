@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Department_types extends Model
 {
-    protected $table = 'department_types';
+    protected $table = 'department_type';
     public $timestamps = false;
     /**
      * The attributes that are mass assignable.
@@ -14,6 +14,6 @@ class Department_types extends Model
      * @var array
      */
     protected $fillable = [
-        'id', 'name',
+        'id', 'name','count_agreement'
     ];
 }
