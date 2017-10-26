@@ -38,6 +38,7 @@ Route::middleware(['check-permission'])->group(function () {
     // Admin_Panel --Start--
     Route::get('/admin_privilage','AdminController@admin_privilage');
     Route::get('/admin_privilage_show/{id}','AdminController@admin_privilage_show');
+    Route::Post('/admin_privilage_edit/{id}','AdminController@admin_privilage_edit');
     // Admin_Panel --Stop--
 
     // Work_hours --Start--
