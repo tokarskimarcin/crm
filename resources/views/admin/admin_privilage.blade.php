@@ -24,12 +24,14 @@
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
+                                            <th>ID</th>
                                             <th>Grupa panelowa</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach($groups as $group)
                                             <tr>
+                                                <td>{{$group->id}}</td>
                                                 <td>{{$group->name}}</td>
                                             </tr>
                                         @endforeach
@@ -37,6 +39,88 @@
                                 </table>
                             </div>
                         </div>
+
+                        <div class="col-lg-6">
+                            <div id="start_stop">
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Oddziały Ogólne</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach($departments as $item)
+                                        <tr>
+                                            <td>{{$item->id}}</td>
+                                            <td>{{$item->name}}</td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div id="start_stop">
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Dział</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach($department_types as $item)
+                                        <tr>
+                                            <td>{{$item->id}}</td>
+                                            <td>{{$item->name}}</td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div id="start_stop">
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Oddział</th>
+                                        <th>Dział</th>
+                                        <th>Typ</th>
+                                        <th>Prowizja średnia</th>
+                                        <th>Prowizja godziny</th>
+                                        <th>Prowizja PLN</th>
+                                        <th>Cel(tygodniowy)</th>
+                                        <th>Cel(weekend)</th>
+                                        <th>Max % Janków</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach($department_info as $item)
+                                        <tr>
+                                            <td>{{$item->id}}</td>
+                                            <td>{{$item->department_name}}</td>
+                                            <td>{{$item->department_type_name}}</td>
+                                            <td>{{$item->type}}</td>
+                                            <td>{{$item->commission_avg}}</td>
+                                            <td>{{$item->commission_hour}}</td>
+                                            <td>{{$item->commission_start_money}}</td>
+                                            <td>{{$item->dep_aim}}</td>
+                                            <td>{{$item->dep_aim_week}}</td>
+                                            <td>{{$item->commission_janky}}</td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <table class="table table-bordered">

@@ -9,6 +9,7 @@ use App\Work_Hour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class WorkHoursController extends Controller
 {
@@ -23,7 +24,7 @@ class WorkHoursController extends Controller
     //******************acceptHour****************** START
     public function acceptHour()
     {
-        $count_agreement = Department_types::find(Auth::user()->department_type_id);
+        $count_agreement = Department_types::find(Auth::user()->department_info_id);
         if($count_agreement->count_agreement == 1) // czy zliczane są zagody
         {
             return view('workhours.acceptHourSucces');
@@ -58,8 +59,7 @@ class WorkHoursController extends Controller
                     work_hours.date,
                     SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time'))
                 ->where('work_hours.status', '=', 2)
-                ->where('users.department_id', '=', Auth::user()->department_id)
-                ->where('users.department_type_id', '=', Auth::user()->department_type_id)
+                ->where('users.department_info_id', '=', Auth::user()->department_info_id)
                 ->where('users.user_type_id', '=', 1)
                 ->where('work_hours.id_manager', '=', null)
                 ->whereBetween('date',[$start_date,$stop_date]);
@@ -172,6 +172,9 @@ class WorkHoursController extends Controller
         $users = $this->getUsers();
         $month = $request->month;
         $userid = $request->userid;
+        $count_agreement = Department_types::find(Auth::user()->department_info_id);
+        $count_agreement= $count_agreement->count_agreement;
+        Session::put('count_agreement', $count_agreement);
         $user_info = DB::table('work_hours')
             ->join('users', 'work_hours.id_user', '=', 'users.id')
             ->leftjoin('users as manager', 'work_hours.id_manager', '=', 'manager.id')
@@ -198,6 +201,7 @@ class WorkHoursController extends Controller
             ->with('users',$users)
             ->with('response_userid',$userid)
             ->with('response_month',$month)
+            ->with('agreement',$count_agreement)
             ->with('response_user_info',$user_info);
     }
 
@@ -260,8 +264,7 @@ class WorkHoursController extends Controller
     //******************Custom Functions******************
     function getUsers()
     {
-        $users = User::where('users.department_id', '=', Auth::user()->department_id)
-            ->where('users.department_type_id', '=', Auth::user()->department_type_id)
+        $users = User::where('users.department_info_id', '=', Auth::user()->department_info_id)
             ->where('users.user_type_id', '=', 1)
             ->where('users.status_work', '=', 1)
             ->get();

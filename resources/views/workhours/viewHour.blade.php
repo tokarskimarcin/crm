@@ -101,8 +101,10 @@
                                                                 <th>Akc.</th>
                                                                 <th>Godz.</th>
                                                                 <th>Pod.</th>
-                                                                <th>Zap</th>
-                                                                <th>Śr</th>
+                                                                @if($agreement == 1)
+                                                                    <th>Zap</th>
+                                                                    <th>Śr</th>
+                                                                @endif
                                                                 <th>Status</th>
                                                                 <th>Akcja</th>
                                                             </tr>
@@ -151,8 +153,10 @@
                                                                                 </td>
                                                                                 <td>{{$item->time}}</td>
                                                                                 <td>{{number_format ( ($item->second/3600)*$item->rate, 2 )}} PLN</td>
-                                                                                <td>{{$item->success}}</td>
-                                                                                <td>{{$avg}}</td>
+                                                                                @if($agreement == 1)
+                                                                                    <td>{{$item->success}}</td>
+                                                                                    <td>{{$avg}}</td>
+                                                                                @endif
                                                                                 <td>{{$status}}</td>
                                                                                 <td>
                                                                                     <button type="button" id={{$item->id}} class="btn btn-danger action delete">Usuń</button>
@@ -168,8 +172,10 @@
                                                                         <td></td>
                                                                         <td></td>
                                                                         <td></td>
+                                                                        @if($agreement == 1)
                                                                         <td></td>
                                                                         <td></td>
+                                                                        @endif
                                                                         <td></td>
                                                                         <td>
                                                                             <button type="button" data-toggle="modal" data-target="#addHourModal" id={{$response_userid.'/'.$date}} class="btn btn-success action edit">Dodaj</button>

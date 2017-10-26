@@ -26,6 +26,7 @@
                     </div>
                     <input type="hidden" id="dtp_input3" value="" /><br/>
                 </div>
+                @if( Session::get('count_agreement')==1)
                 <div class="form-group">
                     <label for="dtp_input3" class="col-md-5 control-label">Liczna Sukcesów: </label>
                     <div class="input-group date col-md-5">
@@ -33,6 +34,9 @@
                     </div>
                     <input type="hidden" id="dtp_input3" value="" /><br/>
                 </div>
+                @else
+                    <input id="success_add" class="form-control" size="16" type="hidden" value="0">
+                @endif
                 <button id="add_hour" type="submit" class="btn btn-primary" name="register" style="font-size:18px; width:100%;">Zarejestruj</button>
 
             </div>

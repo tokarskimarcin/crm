@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Department_info;
+use App\Department_types;
+use App\Departments;
 use App\LinkGroups;
 use App\Links;
 use App\PrivilageRelation;
@@ -14,6 +17,9 @@ class AdminController extends Controller
     public function admin_privilage()
     {
         $link_groups = LinkGroups::all();
+        $Department_types = Department_types::all();
+        $Department_info = $this->getDepartment();
+        $Departments = Departments::all();
         $links =  DB::table('links')
             ->leftjoin('link_groups', 'link_groups.id', '=', 'links.group_link_id')
             ->select(DB::raw('
@@ -26,7 +32,10 @@ class AdminController extends Controller
 
         return view('admin.admin_privilage')
             ->with('groups',$link_groups)
-            ->with('links',$links);
+            ->with('links',$links)
+            ->with('department_types',$Department_types)
+            ->with('department_info',$Department_info)
+            ->with('departments',$Departments);
     }
     public function admin_privilage_show($id)
     {
@@ -75,4 +84,20 @@ class AdminController extends Controller
             }
         return redirect('/admin_privilage');
     }
+
+
+    private function getDepartment()
+    {
+        $departments = DB::table('department_info')
+            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+            ->select(DB::raw(
+                'department_info.*,
+                    departments.name as department_name,
+                    department_info.type,
+                    department_type.name as department_type_name
+                   '))->orderBy('department_name', 'asc')->get();
+        return $departments;
+    }
+
 }
