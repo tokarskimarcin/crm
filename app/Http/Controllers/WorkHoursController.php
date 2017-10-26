@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Department_info;
 use App\User;
 use App\Work_Hour;
 use Illuminate\Http\Request;
@@ -28,6 +29,11 @@ class WorkHoursController extends Controller
         else if(Auth::user()->department_type_id == 2)
         {
             return view('workhours.acceptHourSucces');
+        }
+        else if(Auth::user()->department_type_id == 3)
+        {
+            $departments = $this->getDepartment();
+            return view('workhours.acceptHourCadre')->with('departments',$departments);
         }
     }
 
@@ -57,6 +63,37 @@ class WorkHoursController extends Controller
             return datatables($query)->make(true);
         }
     }
+
+    public function datatableAcceptHourCadre(Request $request)
+    {
+        if($request->ajax()) {
+            $start_date = $request->start_date;
+            $stop_date = $request->stop_date;
+            $dep_info = $request->dep_info;
+
+            $dep_info = explode('/',$dep_info);
+            $query = DB::table('work_hours')
+                ->join('users', 'work_hours.id_user', '=', 'users.id')
+                ->select(DB::raw(
+                    'work_hours.id as id,
+                    users.first_name,
+                    users.last_name,
+                    work_hours.click_start,
+                    work_hours.click_stop,
+                    work_hours.register_start,
+                    work_hours.register_stop,
+                    work_hours.date,
+                    SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time'))
+                ->where('work_hours.status', '=', 2)
+                ->where('users.department_id', '=', $dep_info[0])
+                ->where('users.department_type_id', '=', $dep_info[1])
+                ->wherenotin('users.user_type_id', array(1,2))
+                ->where('work_hours.id_manager', '=', null)
+                ->whereBetween('date',[$start_date,$stop_date]);
+            return datatables($query)->make(true);
+        }
+    }
+
     public function saveAcceptHour(Request $request)
     {
         if($request->ajax())
@@ -226,6 +263,25 @@ class WorkHoursController extends Controller
             ->where('users.status_work', '=', 1)
             ->get();
         return $users;
+    }
+
+
+
+
+    private function getDepartment()
+    {
+        $departments = DB::table('department_info')
+            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+            ->select(DB::raw(
+                'department_info.id,
+                 department_info.id_dep,
+                 department_info.id_dep_type,
+                    departments.name as department_name,
+                    department_info.type,
+                    department_type.name as department_type_name
+                   '))->get();
+        return $departments;
     }
 
 }
