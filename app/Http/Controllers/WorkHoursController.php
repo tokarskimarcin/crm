@@ -24,7 +24,8 @@ class WorkHoursController extends Controller
     //******************acceptHour****************** START
     public function acceptHour()
     {
-        $count_agreement = Department_types::find(Auth::user()->department_info_id);
+        $myDepartment_info = Department_info::find(Auth::user()->department_info_id);
+        $count_agreement = Department_types::find($myDepartment_info->id_dep_type);
         if($count_agreement->count_agreement == 1) // czy zliczane są zagody
         {
             return view('workhours.acceptHourSucces');
@@ -172,7 +173,8 @@ class WorkHoursController extends Controller
         $users = $this->getUsers();
         $month = $request->month;
         $userid = $request->userid;
-        $count_agreement = Department_types::find(Auth::user()->department_info_id);
+        $myDepartment_info = Department_info::find(Auth::user()->department_info_id);
+        $count_agreement = Department_types::find($myDepartment_info->id_dep_type);
         $count_agreement= $count_agreement->count_agreement;
         Session::put('count_agreement', $count_agreement);
         $user_info = DB::table('work_hours')
