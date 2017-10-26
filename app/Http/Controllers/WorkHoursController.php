@@ -74,8 +74,6 @@ class WorkHoursController extends Controller
             $start_date = $request->start_date;
             $stop_date = $request->stop_date;
             $dep_info = $request->dep_info;
-
-            $dep_info = explode('/',$dep_info);
             $query = DB::table('work_hours')
                 ->join('users', 'work_hours.id_user', '=', 'users.id')
                 ->select(DB::raw(
@@ -89,9 +87,8 @@ class WorkHoursController extends Controller
                     work_hours.date,
                     SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time'))
                 ->where('work_hours.status', '=', 2)
-                ->where('users.department_id', '=', $dep_info[0])
-                ->where('users.department_type_id', '=', $dep_info[1])
-                ->wherenotin('users.user_type_id', array(1,2))
+                ->where('users.department_info_id', '=', $dep_info)
+                ->where('users.user_type_id','!=',1)
                 ->where('work_hours.id_manager', '=', null)
                 ->whereBetween('date',[$start_date,$stop_date]);
             return datatables($query)->make(true);

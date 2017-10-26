@@ -54,7 +54,7 @@
             <select onchange="myFunction()" class="form-control showhidetext" name="department_id_info" style="border-radius: 0px;">
                 <option value="0/0" selected>Wybierz</option>
                 @foreach($departments as $department)
-                    <option value={{$department->id_dep.'/'.$department->id_dep_type}}>{{$department->department_name.' '.$department->department_type_name}}</option>
+                    <option value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name}}</option>
                 @endforeach
             </select>
         </div>
