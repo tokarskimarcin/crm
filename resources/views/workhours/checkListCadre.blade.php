@@ -28,24 +28,16 @@
     {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Akceptacja Godzin Kadry</h1>
+            <h1 class="page-header">Lista Obecności Kadry</h1>
         </div>
     </div>
 
     <div class="col-lg-3">
         <label for ="ipadress">Zakres wyszukiwania:</label>
         <div class="form-group">
-            <label for ="ipadress">Od:</label>
+            <label for ="ipadress">Dzień:</label>
             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
                 <input  onchange="myFunction()"  id="start_date" class="form-control" name="od" type="text" value="{{date("Y-m-d")}}" readonly >
-
-                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for ="ipadress">Do:</label>
-            <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                <input onchange="myFunction()" id="stop_date" class="form-control" name="do" type="text" value="{{date("Y-m-d")}}"readonly >
 
                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
             </div>
@@ -66,9 +58,7 @@
             <th>Osoba</th>
             <th>Start</th>
             <th>Zarejestrowane</th>
-            <th>Modyfikacja</th>
             <th>Suma</th>
-            <th>Akcja</th>
         </tr>
         </thead>
         <tbody>
@@ -122,11 +112,10 @@
 
                 },
                 "ajax": {
-                    'url': "{{ route('api.acceptHourCadre') }}",
+                    'url': "{{ route('api.checkList') }}",
                     'type': 'POST',
                     'data': function ( d ) {
                         d.start_date = $('#start_date').val();
-                        d.stop_date = $('#stop_date').val();
                         d.dep_info =$("select[name='department_id_info']").val();
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
@@ -157,7 +146,7 @@
                         return data.register_start + "</br><span class='fa fa-arrow-circle-o-down fa-fw'></span> </br> " + data.register_stop;
                     },"name": "register_start"},
 
-                    {"data":null,"targets": -3,"orderable": false, "searchable": false },
+
 
                     {"data":function (data, type, dataToSet) {
                         if(data.time == null)
@@ -165,34 +154,8 @@
                         return data.time;
                     }, "name": "time","searchable": false },
 
-                    {"data":null,"targets": -1,"orderable": false, "searchable": false }
                 ],
-                "columnDefs": [ {
-                    "targets": -1,
-                    "data": "id",
-                    "defaultContent": "<button class='button-save'>Zapisz</button>"
-                },{
-                    "targets": -3,
-                    "data": null,
-                    "defaultContent": "" +
-                    "<div class='form-group modifydate' >" +
-                    "<div class='input-group date form_time col-md-5' data-date='' data-date-format=hh:ii data-link-field='dtp_input3' data-link-format='hh:ii'>"+
-                    "<input id='register_start' class='form-control' size='16' type='text' value='' readonly>"+
-                    "<span class='input-group-addon'><span class='glyphicon glyphicon-remove'></span></span>"+
-                    "<span class='input-group-addon'><span class='glyphicon glyphicon-time'></span></span>"+
-                    "</div>"+
-                    "<input type='hidden' id='dtp_input3' value='' /><br/>"+
-                    "</div>"+
 
-                    "<div class='form-group modifydate' >" +
-                    "<div class='input-group date form_time col-md-5' data-date='' data-date-format=hh:ii data-link-field='dtp_input3' data-link-format='hh:ii'>"+
-                    "<input id='register_stop' class='form-control' size='16' type='text' value='' readonly>"+
-                    "<span class='input-group-addon'><span class='glyphicon glyphicon-remove'></span></span>"+
-                    "<span class='input-group-addon'><span class='glyphicon glyphicon-time'></span></span>"+
-                    "</div>"+
-                    "<input type='hidden' id='dtp_input3' value='' /><br/>"+
-                    "</div>"
-                }]
             });
         });
 

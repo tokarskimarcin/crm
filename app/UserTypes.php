@@ -14,6 +14,6 @@ class UserTypes extends Model
      * @var array
      */
     protected $fillable = [
-        'id', 'name',
+        'id', 'name','all_departments',
     ];
 }
