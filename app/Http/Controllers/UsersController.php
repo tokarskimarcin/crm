@@ -6,6 +6,7 @@ use App\Agencies;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class UsersController extends Controller
 {
@@ -60,7 +61,10 @@ class UsersController extends Controller
     {
         return view('hr.employeeManagement');
     }
-
+    public function cadre_managementGet()
+    {
+        return view('hr.cadreManagement');
+    }
     public function edit_consultantGet($id)
     {
         $agencies = Agencies::all();
@@ -114,6 +118,24 @@ class UsersController extends Controller
                 ->where('department_info_id', Auth::user()->department_info_id);
         }
         return datatables($query)->make(true);
+    }
+    public function datatableCadreManagement(Request $request)
+    {
+        if($request->ajax()) {
+            $query = DB::table('users')
+                ->join('department_info', 'department_info.id', '=', 'users.department_info_id')
+                ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+                ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+                ->join('user_types', 'users.user_type_id', '=', 'user_types.id')
+                ->select(DB::raw('
+                users.*,
+                department_type.name as department_type_name,
+                departments.name as department_name
+                user_types.name as user_type_name
+                '))
+                ->where('users.user_type_id','!=',1);
+            return datatables($query)->make(true);
+        }
     }
 
 }
