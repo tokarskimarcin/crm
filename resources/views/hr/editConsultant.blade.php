@@ -57,7 +57,11 @@
                                             <div class="col-md-4">
                                                 <label>Data Zakończenia Pracy:<span style="color:red;">*</span></label>
                                                 <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                                    <input class="form-control" name="end_work" type="text" value={{$user->end_work}} readonly >
+                                                    @if($user->end_work == null)
+                                                    <input class="form-control" name="end_work" type="text" value={{$user->end_work}}  >
+                                                    @else
+                                                    <input class="form-control" name="end_work" type="text" value={{$user->end_work}} readonly  >
+                                                    @endif
                                                     <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                                 </div>
                                             </div>
@@ -199,7 +203,16 @@
             var rate =$("select[name='rate']").val();
             var agency =$("select[name='agency_id']").val();
             var start_date =$("input[name='start_date']").val();
+            var end_work =$("input[name='end_work']").val();
+            var status_work = $("select[name='status_work']").val();
+            if(status_work == 0)
+            {
+                if(end_work == ''){
+                    alert("Wprowadź datę zakończenia pracy");
+                    return false;
+                }
 
+            }
             if (first_name == '') {
                 alert("Pole Imię nie może być puste!");
                 return false;

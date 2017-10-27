@@ -39,8 +39,7 @@ class UsersController extends Controller
         $user->updated_at = date("Y-m-d H:i:s");
         $user->password_date = date("Y-m-d");
         $user->user_type_id = 1;
-        $user->department_id = Auth::user()->department_id;
-        $user->department_type_id = Auth::user()->department_type_id;
+        $user->department_info_id = Auth::user()->department_info_id;
         $user->start_work = $request->start_date;
         $user->status_work = 1;
         $user->phone = $request->phone;
@@ -84,10 +83,9 @@ class UsersController extends Controller
         $user->updated_at = date("Y-m-d H:i:s");
         $user->password_date = date("Y-m-d");
         $user->user_type_id = 1;
-        $user->department_id = Auth::user()->department_id;
-        $user->department_type_id = Auth::user()->department_type_id;
+        $user->department_info_id = Auth::user()->department_info_id;
         $user->start_work = $request->start_date;
-        $user->status_work =$request->status_work;
+        $user->status_work = $request->status_work;
         $user->phone = $request->phone;
         $user->description = $request->description;
         $user->student = $request->student;
@@ -113,8 +111,7 @@ class UsersController extends Controller
                 'documents', 'student',
                 'status_work','last_login')
                 ->where('user_type_id', 1)
-                ->where('department_id', Auth::user()->department_id)
-                ->where('department_type_id', Auth::user()->department_type_id);
+                ->where('department_info_id', Auth::user()->department_info_id);
         }
         return datatables($query)->make(true);
     }
