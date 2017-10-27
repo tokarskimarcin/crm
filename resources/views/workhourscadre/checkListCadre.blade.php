@@ -124,7 +124,7 @@
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },
                 "columns":[
-                    {"data": "date"},
+                    {"data": "start_date"},
 
                     {"data":function (data, type, dataToSet) {
                         return data.first_name + " " + data.last_name;

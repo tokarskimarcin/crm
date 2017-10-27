@@ -40,15 +40,13 @@ class WorkHoursController extends Controller
     public function acceptHourCadre()
     {
             $departments = $this->getDepartment();
-            return view('workhours.acceptHourCadre')->with('departments', $departments);
+            return view('workhourscadre.acceptHourCadre')->with('departments', $departments);
     }
     public function checkListCadre()
     {
         $departments = $this->getDepartment();
-        return view('workhours.checkListCadre')->with('departments', $departments);;
+        return view('workhourscadre.checkListCadre')->with('departments', $departments);;
     }
-
-
 
     public function datatableAcceptHour(Request $request) // akceptacja godzin dla konsultantów
     {
@@ -112,9 +110,12 @@ class WorkHoursController extends Controller
             $start_date = $request->start_date;
             $dep_info = $request->dep_info;
             $query = DB::table('users')
-                ->join('work_hours', 'users.id', '=', 'work_hours.id_user')
-                ->select(DB::raw(
-                    'work_hours.id as id,
+                ->leftjoin("work_hours", function ($join) use ($start_date) {
+                    $join->on("users.id", "=", "work_hours.id_user")
+                    ->where("work_hours.date", "=", $start_date);
+                })->select(DB::raw(
+                    "STR_TO_DATE('$start_date', '%Y-%m-%d') as start_date,
+                     work_hours.id as id,
                     users.first_name,
                     users.last_name,
                     work_hours.click_start,
@@ -122,13 +123,12 @@ class WorkHoursController extends Controller
                     work_hours.register_start,
                     work_hours.register_stop,
                     work_hours.date,
-                    SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time'));
+                    SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time"));
             if($dep_info != '*')
             {
                 $query->where('users.department_info_id', '=', $dep_info);
             }
-            $query->where('users.user_type_id','!=',1)
-                ->where('date',$start_date);
+            $query->where('users.user_type_id','!=',1);
             return datatables($query)->make(true);
         }
     }
@@ -208,7 +208,7 @@ class WorkHoursController extends Controller
         $user_type_info = UserTypes::find(Auth::user()->user_type_id);
         $what_show = $user_type_info->all_departments;
         $users = $this->getCadre($what_show);
-        return view('workhours.viewHourCadre')
+        return view('workhourscadre.viewHourCadre')
             ->with('users',$users);
     }
     public function viewHourPostCadre(Request $request)
@@ -223,7 +223,7 @@ class WorkHoursController extends Controller
         $count_agreement= $count_agreement->count_agreement;
         Session::put('count_agreement', $count_agreement);
         $user_info = $this->user_info($userid,$month);
-        return view('workhours.viewHourCadre')
+        return view('workhourscadre.viewHourCadre')
             ->with('users',$users)
             ->with('response_userid',$userid)
             ->with('response_month',$month)
