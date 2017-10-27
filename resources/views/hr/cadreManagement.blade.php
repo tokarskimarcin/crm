@@ -38,11 +38,10 @@
                                         <tr>
                                             <th>Imię</th>
                                             <th>Nazwisko</th>
-                                            <th>Stanowisko</th>
                                             <th>Oddział</th>
+                                            <th>Dział</th>
+                                            <th>Stanowisko</th>
                                             <th>Nr. Tel.</th>
-                                            <th>Dok.</th>
-                                            <th>Status</th>
                                             <th>Akcja</th>
                                         </tr>
                                         </thead>
@@ -81,25 +80,12 @@
             },"columns":[
                 {"data": "first_name"},
                 {"data": "last_name"},
-                {"data": "department_type_name"},
+                {"data": "department_name","name":"departments.name"},
+                {"data": "department_type_name","name":"department_type.name"},
+                {"data": "user_type_name","name":"user_types.name"},
                 {"data": "phone"},
                 {"data": function (data, type, dataToSet) {
-                    if(data.documents == 1)
-                        data.documents = "Tak";
-                    else if(data.documents == 0)
-                        data.documents = "Brak";
-                    return data.documents;
-                },"name": "documents"},
-                {"data": function (data, type, dataToSet) {
-                    if(data.student == 1)
-                        data.student = "Tak";
-                    else if(data.student == 0)
-                        data.student = "Nie";
-                    return data.student;
-                },"name": "student"},
-                {"data": "last_login"},
-                {"data": function (data, type, dataToSet) {
-                    return '<a href="/edit_consultant/'+data.id+'" >Edytuj</a>'
+                    return '<a href="/edit_cadre/'+data.id+'" >Edytuj</a>'
                 },"orderable": false, "searchable": false }
                 ]
         });

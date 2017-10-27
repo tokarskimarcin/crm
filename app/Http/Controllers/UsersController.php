@@ -130,10 +130,11 @@ class UsersController extends Controller
                 ->select(DB::raw('
                 users.*,
                 department_type.name as department_type_name,
-                departments.name as department_name
+                departments.name as department_name,
                 user_types.name as user_type_name
                 '))
-                ->where('users.user_type_id','!=',1);
+                ->where('users.user_type_id','!=',1)
+                ->where('users.status_work','=',1);
             return datatables($query)->make(true);
         }
     }
