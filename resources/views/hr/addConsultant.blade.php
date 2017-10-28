@@ -94,6 +94,16 @@
                                                     <option value="0">Nie</option>
                                                     </select>
                                             </div>
+                                            @if($send_type == 'Badania/Wysyłka')
+                                                <div class="col-md-4">
+                                                <label>Typ konta:<span style="color:red;">*</span></label>
+                                                <select class="form-control" style="font-size:18px;" name="dating_type">
+                                                    <option>Wybierz</option>
+                                                    <option value="1">Badania</option>
+                                                    <option value="2">Wysyłka</option>
+                                                </select>
+                                            </div>
+                                            @endif
                                             <div class="col-md-4">
                                                 <label>Numer Telefonu:<span style="color:red;">*</span></label>
                                                 <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="phone" value="">
@@ -125,6 +135,7 @@
 @section('script')
 
 <script>
+
     $(document).ready(function() {
 
         $('.form_date').datetimepicker({
@@ -135,7 +146,7 @@
         });
 
         $("#add_consultant").click(function () {
-
+            var dating_type = {!! json_encode($send_type) !!};
             var first_name = $("input[name='first_name']").val();
             var last_name = $("input[name='last_name']").val();
             var password =$("input[name='password']").val();
@@ -150,14 +161,6 @@
             var agency =$("select[name='agency_id']").val();
             var start_date =$("input[name='start_date']").val();
 
-            if (first_name == '') {
-                alert("Pole Imię nie może być puste!");
-                return false;
-            }
-            if (last_name == '') {
-                alert("Pole Nazwisko nie może być puste!");
-                return false;
-            }
             if (username == '') {
                 alert("Pole Login nie może być puste!");
                 return false;
@@ -174,13 +177,30 @@
                     },
                     success: function(response) {
                         if(response == '1')
-                        check = 1;
+                            check = 1;
                     }
                 });
                 if(check == 1) {
                     alert("Użytkownik o podanej nazwie już istnieje");
                     return false;
                 }
+            }
+            if(dating_type == "Badania/Wysyłka")
+            {
+                var send_type =$("select[name='dating_type']").val();
+                if(send_type == 'Wybierz')
+                {
+                    alert("Wybierz typ konta!");
+                    return false;
+                }
+            }
+            if (first_name == '') {
+                alert("Pole Imię nie może być puste!");
+                return false;
+            }
+            if (last_name == '') {
+                alert("Pole Nazwisko nie może być puste!");
+                return false;
             }
             if (password== '') {
                 alert("Pole Hasło nie może być puste!");

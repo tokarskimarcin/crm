@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Agencies;
+use App\Department_info;
 use App\Departments;
 use App\User;
 use App\UserTypes;
@@ -15,7 +16,10 @@ class UsersController extends Controller
     public function add_consultantGet()
     {
         $agencies = Agencies::all();
-        return view('hr.addConsultant')->with('agencies',$agencies);
+        $send_type = Department_info::find(Auth::user()->department_info_id);
+        $send_type = $send_type->type;
+        return view('hr.addConsultant')->with('agencies',$agencies)
+            ->with('send_type',$send_type);
 
     }
     public function add_CadreGet()
@@ -50,6 +54,8 @@ class UsersController extends Controller
     public function add_userPOST(Request $request)
     {
         $redirect = 0;
+        $send_type = Department_info::find(Auth::user()->department_info_id);
+        $send_type = $send_type->type;
         $agencies = Agencies::all();
         $user = new User;
         $user->username = $request->username;
@@ -69,6 +75,10 @@ class UsersController extends Controller
         {
             $user->user_type_id = 1;
             $user->department_info_id = Auth::user()->department_info_id;
+            if(isset($request->dating_type))
+            {
+                $user->dating_type =  $request->dating_type;
+            }
         }
         $user->start_work = $request->start_date;
         $user->status_work = 1;
@@ -84,8 +94,11 @@ class UsersController extends Controller
         $user->id_manager = Auth::id();
         $user->documents = $request->documents;
         $user->save();
-        if( $redirect = 0)
-            return view('hr.addConsultant')->with('saved','saved')->with('agencies',$agencies);
+        if( $redirect = 1)
+            return view('hr.addConsultant')
+                ->with('saved','saved')
+                ->with('agencies',$agencies)
+                ->with('send_type',$send_type);
         else
             return view('hr.addCadre')->with('saved','saved')->with('agencies',$agencies);
     }
