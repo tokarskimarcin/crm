@@ -63,7 +63,7 @@ Route::middleware(['check-permission'])->group(function () {
 
     // Users --Start--
     Route::get('/add_consultant','UsersController@add_consultantGet');
-    Route::POST('/add_consultant','UsersController@add_consultantPOST');
+    Route::POST('/add_consultant','UsersController@add_userPOST');
 
     Route::get('/edit_consultant/{id}','UsersController@edit_consultantGet');
     Route::POST('/edit_consultant/{id}','UsersController@edit_consultantPOST');
@@ -71,6 +71,8 @@ Route::middleware(['check-permission'])->group(function () {
     Route::get('/employee_management','UsersController@employee_managementGet');
 
     Route::get('/cadre_management','UsersController@cadre_managementGet');
+    Route::get('/add_cadre','UsersController@add_cadreGet');
+    Route::POST('/add_cadre','UsersController@add_userPOST');
     // Users -- STOP--
 
 

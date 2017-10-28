@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Agencies;
+use App\Departments;
 use App\User;
+use App\UserTypes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +16,23 @@ class UsersController extends Controller
     {
         $agencies = Agencies::all();
         return view('hr.addConsultant')->with('agencies',$agencies);
+
+    }
+    public function add_CadreGet()
+    {
+        $agencies = Agencies::all();
+        $department_info = $query = DB::table('department_info')
+            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->select(DB::raw('
+                department_info.id,               
+                department_type.name as department_type_name,
+                departments.name as department_name
+                '))->get();
+        $user_types = UserTypes::all();
+        return view('hr.addCadre')->with('agencies',$agencies)
+            ->with('department_info',$department_info)
+            ->with('user_types',$user_types);
 
     }
     public function uniqueUsername(Request $request)
@@ -28,8 +47,9 @@ class UsersController extends Controller
            echo 1;
     }
 
-    public function add_consultantPOST(Request $request)
+    public function add_userPOST(Request $request)
     {
+        $redirect = 0;
         $agencies = Agencies::all();
         $user = new User;
         $user->username = $request->username;
@@ -39,8 +59,17 @@ class UsersController extends Controller
         $user->created_at = date("Y-m-d H:i:s");
         $user->updated_at = date("Y-m-d H:i:s");
         $user->password_date = date("Y-m-d");
-        $user->user_type_id = 1;
-        $user->department_info_id = Auth::user()->department_info_id;
+
+        if(isset($request->department_info) && isset($request->user_type))
+        {
+            $redirect = 1;
+            $user->user_type_id = $request->user_type;
+            $user->department_info_id = $request->department_info;
+        }else
+        {
+            $user->user_type_id = 1;
+            $user->department_info_id = Auth::user()->department_info_id;
+        }
         $user->start_work = $request->start_date;
         $user->status_work = 1;
         $user->phone = $request->phone;
@@ -55,7 +84,10 @@ class UsersController extends Controller
         $user->id_manager = Auth::id();
         $user->documents = $request->documents;
         $user->save();
-        return view('hr.addConsultant')->with('saved','saved')->with('agencies',$agencies);
+        if( $redirect = 0)
+            return view('hr.addConsultant')->with('saved','saved')->with('agencies',$agencies);
+        else
+            return view('hr.addCadre')->with('saved','saved')->with('agencies',$agencies);
     }
     public function employee_managementGet()
     {
