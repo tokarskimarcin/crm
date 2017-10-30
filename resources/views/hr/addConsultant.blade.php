@@ -38,7 +38,7 @@
                                                     <option>Wybierz</option>
                                                     <option value="1">Tak</option>
                                                     <option value="0">Nie</option>
-                                                    </select>
+                                                </select>
                                             </div>
                                             <div class="col-md-4">
                                                 <label>Data Rozpoczęcia Pracy:<span style="color:red;">*</span></label>
@@ -58,7 +58,7 @@
                                                     @foreach($agencies as $agency)
                                                         <option value="{{$agency->id}}">{{$agency->name}}</option>
                                                     @endforeach
-                                                    </select>
+                                                </select>
                                             </div>
                                             <div class="col-md-4">
                                                 <label>Stawka na godzinę:<span style="color:red;">*</span></label>

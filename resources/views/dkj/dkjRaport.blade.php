@@ -1,6 +1,9 @@
 @extends('layouts.main')
 @section('content')
-
+    <link href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/1.4.2/css/buttons.bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/select/1.2.3/css/select.bootstrap.min.css" rel="stylesheet">
+    <link href="https://editor.datatables.net/extensions/Editor/css/editor.bootstrap.min.css" rel="stylesheet">
     <style>
         .panel-heading a:after {
             font-family:'Glyphicons Halflings';
@@ -11,6 +14,7 @@
         .panel-heading a.collapsed:after {
             content:"\e080";
         }
+
 
     </style>
 
@@ -43,7 +47,7 @@
                                             <option>Wybierz</option>
                                             <option>-------Wysyłka-------</option>
                                             @foreach($departments as $department)
-                                                @if($department->type == 'Wysyłka')
+                                                @if($department->type == 'Wysyłka' || $department->type == 'Badania/Wysyłka')
                                                     @if(isset($select_department_id_info))
                                                         @if($select_department_id_info == $department->id)
                                                             <option selected value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name}}</option>
@@ -113,7 +117,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div id="start_stop">
-                                <table id="datatable">
+                                <table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
                                         <thead>
                                             <tr>
                                                 <th>Data</th>
@@ -124,7 +128,6 @@
                                                 <th>Komentarz</th>
                                                 <th>Jank</th>
                                                 <th>Weryfikacja trenera</th>
-                                                <th>Akcja</th>
                                             </tr>
                                         </thead>
                                     <tbody>
@@ -141,55 +144,102 @@
 
 @endsection
 @section('script')
-
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
+<script src="{{ asset('/js/dataTables.editor.min.js')}}"></script>
+<script src="{{ asset('/js/editor.bootstrap.min.js')}}"></script>
 <script>
+    var editor;
+    var tablica = (1,2,3,4);
     $(document).ready(function() {
 
         $('.form_date').datetimepicker({
-            language:  'pl',
+            language: 'pl',
             autoclose: 1,
-            minView : 2,
+            minView: 2,
             pickTime: false,
+        });
+
+        editor = new $.fn.dataTable.Editor({
+            ajax: "../php/staff.php",
+            table: "#datatable",
+            idSrc:  'id',
+            fields: [{
+                label: "Telefon:",
+                name: "phone"
+            }, {
+                label: "Kampania:",
+                name: "campaign"
+            }, {
+                label: "Komentarz:",
+                name: "comment"
+            },{
+                label: "Janek:",
+                name:  "dkj_status",
+                type:  "select",
+                options: [
+                    { label: "Nie", value: "0" },
+                    { label: "Tak",           value: "1" }
+                ]
+            },
+            ]
         });
 
         table = $('#datatable').DataTable({
             "autoWidth": false,
             "processing": true,
             "serverSide": true,
-            "drawCallback": function( settings ) {
+            "drawCallback": function (settings) {
             },
             "ajax": {
                 'url': "{{ route('api.datatableDkjRaport') }}",
                 'type': 'POST',
-                'data': function ( d ) {
+                'data': function (d) {
                     d.start_date = $("input[name='start_date']").val();
                     d.stop_date = $("input[name='stop_date']").val();
                     d.department_id_info = $("select[name='department_id_info']").val();
                 },
                 'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
-            },
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
-            },"columns":[
+            }, "columns": [
                 {"data": "add_date"},
-                {"data":function (data, type, dataToSet) {
-                    return data.dkj_user_first_name + " " + data.dkj_user_last_name;
-                },"name": " dkj_user.last_name"},
-                {"data":function (data, type, dataToSet) {
-                    return data.user_first_name + " " + data.user_last_name;
-                },"name": "user.last_name"},
+                {
+                    "data": function (data, type, dataToSet) {
+                        return data.dkj_user_first_name + " " + data.dkj_user_last_name;
+                    }, "name": " dkj_user.last_name"
+                },
+                {
+                    "data": function (data, type, dataToSet) {
+                        return data.user_first_name + " " + data.user_last_name;
+                    }, "name": "user.last_name"
+                },
                 {"data": "phone"},
                 {"data": "campaign"},
                 {"data": "comment"},
-                {"data": "dkj_status"},
-                {"data":function (data, type, dataToSet) {
-                    return data.manager_status + " " + data.comment_manager;
-                },"name": " dkj.comment_manager"},
-
-
-            ]
+                {"data": function (data, type, dataToSet) {
+                    if(data.dkj_status == 0)
+                        return 'Nie';
+                    else return 'Tak'
+                }, "name": "dkj_status"},
+                {
+                    "data": function (data, type, dataToSet) {
+                        return data.manager_status + " " + data.comment_manager;
+                    }, "name": " dkj.comment_manager"
+                }
+            ],
+            select: true
         });
+        // Display the buttons
+        new $.fn.dataTable.Buttons( table, [
+            { extend: "create", editor: editor },
+            { extend: "edit",   editor: editor },
+            { extend: "remove", editor: editor }
+        ] );
 
-        });
+        table.buttons().container()
+            .appendTo( $('.col-sm-6:eq(0)', table.table().container() ) );
+    });
+
 </script>
 @endsection

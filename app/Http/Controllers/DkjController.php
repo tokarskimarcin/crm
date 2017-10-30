@@ -39,6 +39,7 @@ class DkjController extends Controller
                 ->select(DB::raw(
                     'dkj.id as id,
                     user.first_name as user_first_name,
+                    user.id as user_id,
                     user.last_name as user_last_name,
                     manager.first_name as manager_first_name,
                     manager.last_name as manager_last_name,
