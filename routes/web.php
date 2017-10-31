@@ -34,7 +34,7 @@ Route::POST('/datatableEmployeeManagement','UsersController@datatableEmployeeMan
 Route::POST('/datatableCadreManagement','UsersController@datatableCadreManagement')->name('api.datatableCadreManagement');
 
 Route::POST('/datatableDkjRaport','DkjController@datatableDkjRaport')->name('api.datatableDkjRaport');
-
+Route::POST('/getUser','DkjController@getUser')->name('api.getUser');
 //********************AJAX*********************** */
 
 Auth::routes();

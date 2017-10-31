@@ -47,7 +47,7 @@
                                             <option>Wybierz</option>
                                             <option>-------Wysyłka-------</option>
                                             @foreach($departments as $department)
-                                                @if($department->type == 'Wysyłka' || $department->type == 'Badania/Wysyłka')
+                                                @if($department->type == 'Wysyłka')
                                                     @if(isset($select_department_id_info))
                                                         @if($select_department_id_info == $department->id)
                                                             <option selected value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name}}</option>
@@ -153,7 +153,32 @@
 <script>
     var editor;
     var tablica = (1,2,3,4);
+
     $(document).ready(function() {
+
+        var test= new Array({"label" : "a", "value" : "a"});
+        function getStateList(){
+            test.splice(0,1);
+            $.ajax({
+                type: "POST",
+                url: "{{ route('api.getUser') }}",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                async: false,
+                dataType: 'json',
+                data: {'department_info' : $("select[name='department_id_info']").val()},
+                success: function (json) {
+                    console.log(json);
+//                    for(var a=0;a<json.length;a++){
+//                        obj= { "label" : json[a][1], "value" : json[a][0]};
+//                        test.push(obj);
+//                    }
+                }
+            });
+            return test;
+        }
+
 
         $('.form_date').datetimepicker({
             language: 'pl',
@@ -162,11 +187,21 @@
             pickTime: false,
         });
 
+
+
+
         editor = new $.fn.dataTable.Editor({
+
             ajax: "../php/staff.php",
             table: "#datatable",
             idSrc:  'id',
-            fields: [{
+            fields: [
+                {
+                    label: 'Użytkownik:',
+                    name: 'user.last_name',
+                    type:  "select",
+                    "ipOpts": getStateList()
+                },{
                 label: "Telefon:",
                 name: "phone"
             }, {

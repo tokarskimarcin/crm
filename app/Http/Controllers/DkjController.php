@@ -71,4 +71,23 @@ class DkjController extends Controller
                    '))->get();
         return $departments;
     }
+
+    public function getUser(Request $request)
+    {
+        if($request->ajax())
+        {
+            $departments = DB::table('department_info')
+                ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+                ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+                ->select(DB::raw(
+                    'department_info.id,
+                    departments.name as department_name,
+                    department_info.type,
+                    department_type.name as department_type_name
+                   '))->get();
+        }
+            return $request->department_info;
+
+    }
+
 }
