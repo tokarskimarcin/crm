@@ -32,6 +32,13 @@ class DkjController extends Controller
             $start_date = $request->start_date;
             $stop_date = $request->stop_date;
             $department_id_info = $request->department_id_info;
+            $save_deaprtemnt_inf = $department_id_info;
+            if($department_id_info<0)
+            {
+                $department_id_info=$department_id_info*(-1);
+            }
+            $type = Department_info::find($department_id_info);
+            $type = $type->type;
             $query = DB::table('dkj')
                 ->join('users as user', 'dkj.id_user', '=', 'user.id')
                 ->leftjoin('users as manager', 'dkj.id_manager', '=', 'manager.id')
@@ -52,9 +59,26 @@ class DkjController extends Controller
                     dkj.dkj_status,
                     dkj.comment_manager,
                     dkj.manager_status
-                   '))
-                ->where('dkj.department_info_id', '=', $department_id_info)
-                ->whereBetween('add_date',[$start_date,$stop_date]);
+                   '))->whereBetween('add_date',[$start_date,$stop_date]);
+
+            // <0 Badania >0 Wysyłka
+            if($type =='Badania/Wysyłka')
+            {
+                if($save_deaprtemnt_inf<0)
+                {
+                    $query->where('dkj.department_info_id', '=', $department_id_info)
+                        ->where('user.dating_type', '=', 0);
+                }else
+                {
+                    $query->where('dkj.department_info_id', '=', $department_id_info)
+                        ->where('user.dating_type', '=', 1);
+                }
+            }
+            else
+            {
+                $query->where('dkj.department_info_id', '=', $department_id_info);
+
+            }
             return datatables($query)->make(true);
         }
     }
@@ -76,18 +100,37 @@ class DkjController extends Controller
     {
         if($request->ajax())
         {
-            $departments = DB::table('department_info')
-                ->join('departments', 'department_info.id_dep', '=', 'departments.id')
-                ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
-                ->select(DB::raw(
-                    'department_info.id,
-                    departments.name as department_name,
-                    department_info.type,
-                    department_type.name as department_type_name
-                   '))->get();
-        }
-            return $request->department_info;
+            $department_id_info = $request->department_info;
+            $save_deaprtemnt_inf = $department_id_info;
 
+            if($department_id_info!=0) {
+                if ($department_id_info < 0) {
+                    $department_id_info = $department_id_info * (-1);
+                }
+                $type = Department_info::find($department_id_info);
+                $type = $type->type;
+                $query = DB::table('users')
+                    ->join('department_info', 'department_info.id', '=', 'users.department_info_id')
+                    ->select(DB::raw(
+                        'users.first_name,
+                        users.last_name,
+                        users.id
+                   '));
+                if ($type == 'Badania/Wysyłka') {
+                    if ($save_deaprtemnt_inf < 0) {
+                        $query->where('department_info.id', '=', $department_id_info)
+                            ->where('users.dating_type', '=', 0);
+                    } else {
+                        $query->where('department_info.id', '=', $department_id_info)
+                            ->where('users.dating_type', '=', 1);
+                    }
+                } else {
+                    $query->where('department_info.id', '=', $department_id_info);
+                }
+                return $query->where('users.user_type_id', '=', 1)->get();
+            }else
+            return 0;
+        }
     }
 
 }

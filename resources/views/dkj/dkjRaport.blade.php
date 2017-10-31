@@ -44,8 +44,8 @@
                                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                         <label for="exampleInputPassword1" class="showhidetext">Wybierz Oddział</label>
                                         <select class="form-control showhidetext" name="department_id_info" style="border-radius: 0px;">
-                                            <option>Wybierz</option>
-                                            <option>-------Wysyłka-------</option>
+                                            <option value="0">Wybierz</option>
+                                            <option value="0">-------Wysyłka-------</option>
                                             @foreach($departments as $department)
                                                 @if($department->type == 'Wysyłka')
                                                     @if(isset($select_department_id_info))
@@ -57,10 +57,26 @@
                                                     @else
                                                         <option value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name}}</option>
                                                     @endif
+                                                    @else
+
+
+                                                    @if($department->type == 'Badania/Wysyłka')
+                                                        @if(isset($select_department_id_info))
+                                                            @if($select_department_id_info == $department->id)
+                                                                <option selected value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name.' Wysyłka'}}</option>
+                                                            @else
+                                                                <option value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name.' Wysyłka'}}</option>
+                                                            @endif
+                                                        @else
+                                                        <option value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name.' Wysyłka'}}</option>
+                                                        @endif
+                                                    @endif
+
+
                                                 @endif
                                             @endforeach
 
-                                            <option>-------Badania-------</option>
+                                            <option value="0">-------Badania-------</option>
                                             @foreach($departments as $department)
                                                 @if($department->type == 'Badania')
                                                     @if(isset($select_department_id_info))
@@ -72,6 +88,22 @@
                                                     @else
                                                         <option value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name}}</option>
                                                     @endif
+                                                    @else
+
+
+                                                    @if($department->type == 'Badania/Wysyłka')
+                                                        @if(isset($select_department_id_info))
+                                                            @if($select_department_id_info == $department->id*(-1))
+                                                                <option selected value={{$department->id*(-1)}}>{{$department->department_name.' '.$department->department_type_name.' Badania'}}</option>
+                                                            @else
+                                                                <option value={{$department->id*(-1)}}>{{$department->department_name.' '.$department->department_type_name.' Badania'}}</option>
+                                                            @endif
+                                                        @else
+                                                            <option value={{$department->id*(-1)}}>{{$department->department_name.' '.$department->department_type_name.' Badania'}}</option>
+                                                        @endif
+                                                    @endif
+
+
                                                 @endif
                                             @endforeach
 
@@ -170,10 +202,14 @@
                 data: {'department_info' : $("select[name='department_id_info']").val()},
                 success: function (json) {
                     console.log(json);
-//                    for(var a=0;a<json.length;a++){
-//                        obj= { "label" : json[a][1], "value" : json[a][0]};
-//                        test.push(obj);
-//                    }
+                    if(json!=0)
+                    {
+                        for(var a=0;a<json.length;a++){
+                            obj= { "label" : json[a]['first_name']+" "+json[a]['last_name'], "value" : json[a]['id']};
+                            test.push(obj);
+                        }
+                    }
+
                 }
             });
             return test;
@@ -197,8 +233,8 @@
             idSrc:  'id',
             fields: [
                 {
-                    label: 'Użytkownik:',
-                    name: 'user.last_name',
+                    label: "Użytkownik:",
+                    name: "user_id",
                     type:  "select",
                     "ipOpts": getStateList()
                 },{
@@ -216,7 +252,7 @@
                 type:  "select",
                 options: [
                     { label: "Nie", value: "0" },
-                    { label: "Tak",           value: "1" }
+                    { label: "Tak", value: "1" }
                 ]
             },
             ]
@@ -247,7 +283,7 @@
                 {
                     "data": function (data, type, dataToSet) {
                         return data.user_first_name + " " + data.user_last_name;
-                    }, "name": "user.last_name"
+                    }, "name": "user_id"
                 },
                 {"data": "phone"},
                 {"data": "campaign"},
