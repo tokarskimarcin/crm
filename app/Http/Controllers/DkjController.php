@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Agencies;
 use App\Department_info;
+use App\Dkj;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,7 +48,7 @@ class DkjController extends Controller
                 ->select(DB::raw(
                     'dkj.id as id,
                     user.first_name as user_first_name,
-                    user.id as user_id,
+                    user.id as id_user,
                     user.last_name as user_last_name,
                     manager.first_name as manager_first_name,
                     manager.last_name as manager_last_name,
@@ -60,7 +61,10 @@ class DkjController extends Controller
                     dkj.dkj_status,
                     dkj.comment_manager,
                     dkj.manager_status
-                   '))->whereBetween('add_date',[$start_date,$stop_date]);
+                   '))
+                ->where('deleted',0)
+                ->where('add_date','>=',$start_date.' 00:00:00')
+                ->where('add_date','<=',$stop_date.' 23:00:00');
 
             // <0 Badania >0 Wysyłka
             if($type =='Badania/Wysyłka')
@@ -85,9 +89,45 @@ class DkjController extends Controller
     }
     public function dkjRaportSave(Request $request)
     {
-        $intpu = $request->all();
-        $action = $request->input('action');
-        return $request->input('data');
+        $input = $request->input();
+        $rowFirstId = array_keys($input['data'])[0];
+        $rowIdArray = array_keys($input['data']);
+        if ($input['action'] == 'create') {
+            $dkj = new DKJ($input['data'][$rowFirstId]);
+            $dkj->id_dkj = Auth::user()->id;
+            $dkj->save();
+//            Dkj::create($input['data'][$rowFirstId]);
+        }
+        if ($input['action'] == 'edit') {
+            foreach( $rowIdArray as $rowId) {
+                $dkj =Dkj::find($rowId);
+                $dkj->update($input['data'][$rowId]);
+            }
+        }
+        if ($input['action'] == 'remove') {
+            foreach( $rowIdArray as $rowId) {
+                $dkj = Dkj::find($rowId);
+                $dkj->deleted = 1;
+                $dkj->save();
+            }
+        }
+        foreach( $rowIdArray as $rowId) {
+            $resSuccessful[] = array('DT_RowId' => 'row_' .$rowId) + $input['data'][$rowId] ;
+        }
+        return response()->json(
+            array(
+                'data' =>  $resSuccessful
+            )
+        );
+
+
+
+//        Dkj::updateOrCreate(
+//            ['id_user' => 'Oakland',
+//                '' => 'San Diego'],
+//            ['price' => 99]
+//        );
+
     }
     private function getDepartment()
     {

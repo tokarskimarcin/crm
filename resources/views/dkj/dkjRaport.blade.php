@@ -238,7 +238,7 @@
             fields: [
                 {
                     label: "Użytkownik:",
-                    name: "user_id",
+                    name: "id_user",
                     type:  "select",
                     "ipOpts": getStateList()
                 },{
@@ -250,7 +250,8 @@
             }, {
                 label: "Komentarz:",
                 name: "comment"
-            },{
+            }
+            ,{
                 label: "Janek:",
                 name:  "dkj_status",
                 type:  "select",
@@ -258,7 +259,11 @@
                     { label: "Nie", value: "0" },
                     { label: "Tak", value: "1" }
                 ]
-            },
+            },{
+                    type:  "hidden",
+                    name: "department_info_id",
+                    def: Math.abs($("select[name='department_id_info']").val())
+                }
             ]
         });
 
