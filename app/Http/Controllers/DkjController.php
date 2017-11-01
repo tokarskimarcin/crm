@@ -28,6 +28,7 @@ class DkjController extends Controller
     }
     public function datatableDkjRaport(Request $request)
     {
+        // zmian -1 na 1 gdy oddział jest wysyłka/badania, pojebane ale skuteczne
         if($request->ajax()) {
             $start_date = $request->start_date;
             $stop_date = $request->stop_date;
@@ -81,6 +82,12 @@ class DkjController extends Controller
             }
             return datatables($query)->make(true);
         }
+    }
+    public function dkjRaportSave(Request $request)
+    {
+        $intpu = $request->all();
+        $action = $request->input('action');
+        return $request->input('data');
     }
     private function getDepartment()
     {

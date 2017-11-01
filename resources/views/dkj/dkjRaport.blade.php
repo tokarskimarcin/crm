@@ -227,8 +227,12 @@
 
 
         editor = new $.fn.dataTable.Editor({
-
-            ajax: "../php/staff.php",
+            ajax: {
+                url: "{{ route('api.dkjRaportSave')}}",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            },
             table: "#datatable",
             idSrc:  'id',
             fields: [
@@ -283,7 +287,7 @@
                 {
                     "data": function (data, type, dataToSet) {
                         return data.user_first_name + " " + data.user_last_name;
-                    }, "name": "user_id"
+                    }, "name": "user.last_name"
                 },
                 {"data": "phone"},
                 {"data": "campaign"},
