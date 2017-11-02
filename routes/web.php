@@ -92,6 +92,7 @@ Route::middleware(['check-permission'])->group(function () {
     Route::get('/jankyVerification','DkjController@jankyVerificationGet');
     Route::POST('/jankyVerification','DkjController@jankyVerificationPOST');
 
+    Route::get('/jankyStatistics','DkjController@jankyStatistics');
     // DKJ -- STOP--
 
 });

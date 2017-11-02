@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Agencies;
 use App\Department_info;
 use App\Dkj;
+use App\JankyPenatlyProc;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +17,23 @@ class DkjController extends Controller
     {
         $departments =  $this->getDepartment();
         return view('dkj.dkjRaport')->with('departments',$departments);
+    }
+    public function jankyStatistics()
+    {
+        $actual_month = date("Y-m");
+        $user_dkj_info = DB::table('dkj')
+            ->select(DB::raw(
+                'Date(add_date) as add_date,
+                SUM(CASE WHEN dkj_status = 0 or deleted = 1 THEN 1 ELSE 0 END) as good ,
+                SUM(CASE WHEN dkj_status = 1 AND deleted = 0 THEN 1 ELSE 0 END) as bad'))
+            ->where('id_user', Auth::user()->id)
+            ->where('add_date','like',$actual_month.'%')
+            ->groupBy(DB::raw('Date(add_date)'))
+            ->get();
+        $department_info = Department_info::find(Auth::user()->department_info_id);
+        $janky_system = JankyPenatlyProc::where('system_id',$department_info->janky_system_id)->get();
+        return view('dkj.jankyStatistics')->with('user_info', $user_dkj_info)
+            ->with('janky_system', $janky_system);
     }
     public function dkjVerificationGet()
     {

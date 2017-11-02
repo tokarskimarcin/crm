@@ -16,6 +16,6 @@ class Department_info extends Model
      */
     protected $fillable = [
         'id', 'id_dep','id_dep_type','size','commission_avg','commission_hour','commission_start_money','commission_step',
-        'dep_aim','dep_aim_week','commission_janky','type',
+        'dep_aim','dep_aim_week','commission_janky','type','janky_system_id',
     ];
 }
