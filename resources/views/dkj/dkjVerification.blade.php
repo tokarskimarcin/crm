@@ -54,6 +54,40 @@
                 </div>
         </div>
 
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Janki zweryfikowane</h1>
+        </div>
+    </div>
+    <div class="panel panel-default"  id="panel2">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div id="start_stop">
+                        <table id="datatable_verified" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                            <thead>
+                            <tr>
+                                <th>Data Dodania</th>
+                                <th>Data Ważności</th>
+                                <th>Konsultant</th>
+                                <th>Telefon</th>
+                                <th>Kampania</th>
+                                <th>Komentarz</th>
+                                <th>Status Janka</th>
+                                <th>Weryfikacja Trenera</th>
+                                <th>Komentarz trenera</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 @section('script')
 <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
@@ -109,6 +143,48 @@
                 ],
         });
 
+
+        table_verified = $('#datatable_verified').DataTable({
+            "autoWidth": false,
+            "processing": true,
+            "serverSide": true,
+            "drawCallback": function (settings) {
+            },
+            "ajax": {
+                'url': "{{ route('api.datatableShowDkjVerification') }}",
+                'type': 'POST',
+                'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+            }, "columns": [
+                {"data": "add_date"},
+                {"data": "expiration_date","orderable": false, "searchable": false},
+                {
+                    "data": function (data, type, dataToSet) {
+                        return data.user_first_name + " " + data.user_last_name;
+                    }, "name": "user.last_name"
+                },
+                {"data": "phone"},
+                {"data": "campaign"},
+                {"data": "comment"},
+                {
+                    "data": function (data, type, dataToSet) {
+                        if(data.dkj_status == 2)
+                            return "Anulowany"
+                        else if(data.dkj_status == 1)
+                            return "Zatwierdzony"
+                    }, "name": "dkj_status"
+                },
+                {
+                    "data": function (data, type, dataToSet) {
+                        if(data.manager_status == 0)
+                            return "Brak Janka"
+                        else if(data.manager_status == 1)
+                            return "Janek"
+                    }, "name": "manager_status"
+                },
+                {"data": "comment_manager"},
+            ],
+        });
+
     });
     $('#datatable tbody').on('click', '.button-save', function () {
         var data = table.row( $(this).parents('tr') ).data();
@@ -129,6 +205,7 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
+                        table_verified.ajax.reload();
                         table.ajax.reload();
                 }
             });

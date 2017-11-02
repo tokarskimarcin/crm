@@ -21,6 +21,24 @@ class DkjController extends Controller
     {
         return view('dkj.dkjVerification');
     }
+
+    public function jankyVerificationGet()
+    {
+        $departments =  $this->getDepartment();
+        return view('dkj.jankyVerification')->with('departments',$departments);
+    }
+
+    public function jankyVerificationPOST(Request $request)
+    {
+        $departments = $this->getDepartment();
+        return view('dkj.jankyVerification')
+            ->with('departments',$departments)
+            ->with('select_department_id_info',$request->department_id_info)
+            ->with('select_start_date',$request->start_date)
+            ->with('select_stop_date',$request->stop_date)
+            ->with('show_raport',1);
+    }
+
     public function datatableDkjVerification(Request $request)
     {
         $query = DB::table('dkj')
@@ -41,9 +59,37 @@ class DkjController extends Controller
                 dkj.manager_status
                 '))->where('dkj.dkj_status',1)
                  ->where('dkj.deleted',0)
-                 ->where('dkj.manager_status',null);
+                 ->where('dkj.manager_status',null)
+                 ->where('dkj.department_info_id',Auth::user()->department_info_id);
         return datatables($query)->make(true);
     }
+
+    public function datatableShowDkjVerification(Request $request)
+    {
+        $query = DB::table('dkj')
+            ->join('users as user', 'dkj.id_user', '=', 'user.id')
+            ->leftjoin('users as manager', 'dkj.id_manager', '=', 'manager.id')
+            ->join('users as dkj_user', 'dkj.id_dkj', '=', 'dkj_user.id')
+            ->select(DB::raw(
+                'dkj.id as id,
+                DATE_ADD(dkj.add_date, INTERVAL 2 DAY) as expiration_date,
+                user.id as id_user,
+                user.first_name as user_first_name,
+                user.last_name as user_last_name,
+                dkj.add_date,
+                dkj.phone,
+                dkj.campaign,
+                dkj.comment,
+                dkj.comment_manager,
+                dkj.manager_status,
+                dkj.dkj_status
+                '))->where('dkj.dkj_status',1)
+            ->where('dkj.deleted',0)
+            ->where('dkj.manager_status','!=',null)
+            ->where('dkj.department_info_id',Auth::user()->department_info_id);
+        return datatables($query)->make(true);
+    }
+
     public function saveDkjVerification(Request $request)
     {
              $dkj_id = $request->id;
@@ -122,8 +168,12 @@ class DkjController extends Controller
             else
             {
                 $query->where('dkj.department_info_id', '=', $department_id_info);
-
             }
+            if($request->type_verification == 1)
+            {
+                $query->where('dkj.manager_status','!=',null);
+            }
+
             return datatables($query)->make(true);
         }
     }

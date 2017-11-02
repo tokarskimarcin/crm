@@ -280,6 +280,7 @@
                     d.start_date = $("input[name='start_date']").val();
                     d.stop_date = $("input[name='stop_date']").val();
                     d.department_id_info = $("select[name='department_id_info']").val();
+                    d.type_verification = 0;
                 },
                 'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
             }, "columns": [

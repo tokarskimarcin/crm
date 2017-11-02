@@ -39,6 +39,8 @@ Route::POST('/dkjRaportSave','DkjController@dkjRaportSave')->name('api.dkjRaport
 
 Route::POST('/datatableDkjVerification','DkjController@datatableDkjVerification')->name('api.datatableDkjVerification');
 Route::POST('/saveDkjVerification','DkjController@saveDkjVerification')->name('api.saveDkjVerification');
+Route::POST('/datatableShowDkjVerification','DkjController@datatableShowDkjVerification')->name('api.datatableShowDkjVerification');
+
 
 //********************AJAX*********************** */
 
@@ -86,6 +88,10 @@ Route::middleware(['check-permission'])->group(function () {
     Route::POST('/dkjRaport','DkjController@dkjRaportPOST');
 
     Route::get('/dkjVerification','DkjController@dkjVerificationGet');
+
+    Route::get('/jankyVerification','DkjController@jankyVerificationGet');
+    Route::POST('/jankyVerification','DkjController@jankyVerificationPOST');
+
     // DKJ -- STOP--
 
 });
