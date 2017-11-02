@@ -17,6 +17,45 @@ class DkjController extends Controller
         $departments =  $this->getDepartment();
         return view('dkj.dkjRaport')->with('departments',$departments);
     }
+    public function dkjVerificationGet()
+    {
+        return view('dkj.dkjVerification');
+    }
+    public function datatableDkjVerification(Request $request)
+    {
+        $query = DB::table('dkj')
+            ->join('users as user', 'dkj.id_user', '=', 'user.id')
+            ->leftjoin('users as manager', 'dkj.id_manager', '=', 'manager.id')
+            ->join('users as dkj_user', 'dkj.id_dkj', '=', 'dkj_user.id')
+            ->select(DB::raw(
+                'dkj.id as id,
+                DATE_ADD(dkj.add_date, INTERVAL 2 DAY) as expiration_date,
+                user.id as id_user,
+                user.first_name as user_first_name,
+                user.last_name as user_last_name,
+                dkj.add_date,
+                dkj.phone,
+                dkj.campaign,
+                dkj.comment,
+                dkj.comment_manager,
+                dkj.manager_status
+                '))->where('dkj.dkj_status',1)
+                 ->where('dkj.deleted',0)
+                 ->where('dkj.manager_status',null);
+        return datatables($query)->make(true);
+    }
+    public function saveDkjVerification(Request $request)
+    {
+             $dkj_id = $request->id;
+             $manager_comment = $request->manager_coment;
+             $manager_status = $request->manager_status;
+             $dkj_record = Dkj::find($dkj_id);
+             $dkj_record->comment_manager = $manager_comment;
+             $dkj_record->manager_status = $manager_status;
+             $dkj_record->date_manager = date('Y-m-d H:i:s');
+             $dkj_record->id_manager = Auth::user()->id;
+             $dkj_record->save();
+    }
     public function dkjRaportPost(Request $request)
     {
         $departments = $this->getDepartment();
@@ -27,6 +66,7 @@ class DkjController extends Controller
         ->with('select_stop_date',$request->stop_date)
         ->with('show_raport',1);
     }
+
     public function datatableDkjRaport(Request $request)
     {
         // zmian -1 na 1 gdy oddział jest wysyłka/badania, pojebane ale skuteczne
@@ -46,9 +86,9 @@ class DkjController extends Controller
                 ->leftjoin('users as manager', 'dkj.id_manager', '=', 'manager.id')
                 ->join('users as dkj_user', 'dkj.id_dkj', '=', 'dkj_user.id')
                 ->select(DB::raw(
-                    'dkj.id as id,
-                    user.first_name as user_first_name,
+                    'dkj.id as id,                   
                     user.id as id_user,
+                    user.first_name as user_first_name,
                     user.last_name as user_last_name,
                     manager.first_name as manager_first_name,
                     manager.last_name as manager_last_name,

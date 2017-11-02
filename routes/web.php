@@ -36,6 +36,10 @@ Route::POST('/datatableCadreManagement','UsersController@datatableCadreManagemen
 Route::POST('/datatableDkjRaport','DkjController@datatableDkjRaport')->name('api.datatableDkjRaport');
 Route::POST('/getUser','DkjController@getUser')->name('api.getUser');
 Route::POST('/dkjRaportSave','DkjController@dkjRaportSave')->name('api.dkjRaportSave');
+
+Route::POST('/datatableDkjVerification','DkjController@datatableDkjVerification')->name('api.datatableDkjVerification');
+Route::POST('/saveDkjVerification','DkjController@saveDkjVerification')->name('api.saveDkjVerification');
+
 //********************AJAX*********************** */
 
 Auth::routes();
@@ -80,6 +84,8 @@ Route::middleware(['check-permission'])->group(function () {
     // DKJ --START--
     Route::get('/dkjRaport','DkjController@dkjRaportGet');
     Route::POST('/dkjRaport','DkjController@dkjRaportPOST');
+
+    Route::get('/dkjVerification','DkjController@dkjVerificationGet');
     // DKJ -- STOP--
 
 });
