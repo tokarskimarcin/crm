@@ -12,6 +12,9 @@
     tr.shown td.details-control {
         background: url({{ asset('/image/details_close.png')}}) no-repeat center center;
     }
+    td{
+        text-align: center;
+    }
 </style>
 
 {{--Header page --}}
@@ -143,16 +146,51 @@
             '<tr>';
             for(var i=0;i<7;i++)
             {
-                //table+='<p><input type="checkbox" name="czw_checkbox_'.$key_id.'" id="checkczw-'.$key_id.'" '.$czw_checked.'> Wolne</p>';
                 if(i==0)
                     table+='<th>'+week_array[i]+'. '+start_date.add(0, 'days').format('DD-MM')+'</th>';
                 else
                     table+='<th>'+week_array[i]+'. '+start_date.add(1, 'days').format('DD-MM')+'</th>';
             }
-            table += '</tr>'+
+            table += '<th>Akcja</th></tr>'+
             '</thead>' +
-            '<tbody>' +
-            '</tbody>';
+            '<tbody> <tr>';
+            var time = moment('08'+':'+'00','HH:mm');
+            for(var i=0;i<7;i++)
+            {
+                table +='<td id='+d.id+'>';
+                table+='<p><input type="checkbox" name='+week_array[i]+'>Wolne</p>';
+
+                table+='<div class="hour"><select name='+week_array[i]+'_start_work class="form-control">'+
+                '<option>Wybierz</option>';
+                while(time.format("HH")!='21')
+                {
+                    time.add(15,'m');
+                    table+='<option>'+time.format("HH:mm")+'</option>';
+                }
+                table+='</select>';
+                table+='<span class="glyphicon glyphicon-arrow-down"></span>';
+
+                time = moment('08'+':'+'00','HH:mm');
+                table+='<select name='+week_array[i]+'_stop_work class="form-control">'+
+                    '<option>Wybierz</option>';
+                while(time.format("HH")!='21')
+                {
+                    time.add(15,'m');
+                    table+='<option>'+time.format("HH:mm")+'</option>';
+                }
+                table+='</select></div>';
+
+                table +=
+                    '</td>';
+                time = moment('08'+':'+'00','HH:mm');
+            }
+        table+=
+            '<td>'+
+            '<button type="submit" class="btn btn-primary saved" name="save_schedule">Zapisz</button>'+
+            '</td>'+
+        '</tr>';
+
+            table +='</tbody>';
         return table+'</table>';
 
     }
@@ -212,6 +250,20 @@
                 row.child( format(row.data()) ).show();
                 tr.addClass('shown');
             }
+            $("input[name='Wt']").click(function(){
+                 console.log((this).closest('tr').find('.hour'));
+//                $checkbox = $(this).closest('tr').find("input[name='Pon']");
+//                $start_hour = $(this).closest('tr').find("select[name='Pon_start_work']").val();
+//                $stop_hour = $(this).closest('tr').find("select[name='Pon_stop_work']").val();
+                //console.log($stop_hour);
+            });
+
+            $(".saved").click(function(){
+                $checkbox = $(this).closest('tr').find("input[name='Pon']");
+                $start_hour = $(this).closest('tr').find("select[name='Pon_start_work']").val();
+                $stop_hour = $(this).closest('tr').find("select[name='Pon_stop_work']").val();
+                console.log($stop_hour);
+            });
         } );
     });
 
