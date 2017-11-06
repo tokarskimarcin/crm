@@ -42,6 +42,7 @@ Route::POST('/saveDkjVerification','DkjController@saveDkjVerification')->name('a
 Route::POST('/datatableShowDkjVerification','DkjController@datatableShowDkjVerification')->name('api.datatableShowDkjVerification');
 
 Route::POST('/datatableShowUserSchedule','ScheduleController@datatableShowUserSchedule')->name('api.datatableShowUserSchedule');
+Route::POST('/saveSchedule','ScheduleController@saveSchedule')->name('api.saveSchedule');
 
 
 //********************AJAX*********************** */
@@ -98,8 +99,8 @@ Route::middleware(['check-permission'])->group(function () {
     // DKJ -- STOP--
 
     // Schedule -- START --
-    Route::get('/view_schedule','ScheduleController@viewScheduleGet');
-    Route::Post('/view_schedule','ScheduleController@viewSchedulePOST');
+    Route::get('/set_schedule','ScheduleController@setScheduleGet');
+    Route::Post('/set_schedule','ScheduleController@setSchedulePOST');
     // schedule -- STOP --
 
 });

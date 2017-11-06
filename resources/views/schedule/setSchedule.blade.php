@@ -15,6 +15,9 @@
     td{
         text-align: center;
     }
+    .reason{
+        width: 101px;
+    }
 </style>
 
 {{--Header page --}}
@@ -40,7 +43,7 @@
                                     <div class="col-md-6">
                                         <div class="well">
                                             <h1 style ="font-family: 'bebas_neueregular',sans-serif; margin-top:0px;text-shadow: 2px 2px 2px rgba(150, 150, 150, 0.8); font-size:25px;">Wybierz tydzień:</h1>
-                                            <form class="form-horizontal" method="post" action="view_schedule">
+                                            <form class="form-horizontal" method="post" action="set_schedule">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <select class="form-control" name="show_schedule" id="week_text">
                                                     <option>Wybierz</option>
@@ -153,14 +156,13 @@
             }
             table += '<th>Akcja</th></tr>'+
             '</thead>' +
-            '<tbody> <tr>';
+            '<tbody> <tr id='+d.id_user+'>';
             var time = moment('08'+':'+'00','HH:mm');
             for(var i=0;i<7;i++)
             {
-                table +='<td id='+d.id+'>';
-                table+='<p><input type="checkbox" name='+week_array[i]+'>Wolne</p>';
-
-                table+='<div class="hour"><select name='+week_array[i]+'_start_work class="form-control">'+
+                table +='<td class='+d.id+'>';
+                table+='<div class="hour">' +
+                    '<select name='+week_array[i]+'_start_work class="form-control">'+
                 '<option>Wybierz</option>';
                 while(time.format("HH")!='21')
                 {
@@ -179,14 +181,17 @@
                     table+='<option>'+time.format("HH:mm")+'</option>';
                 }
                 table+='</select></div>';
-
+                table+='<div class="reason" style="display: none;">'+
+                    '<input type="text" name='+week_array[i]+'_reason class="form-control" id="usr" placeholder="Powód">' +
+                    '</div>';
+                table+='<p><input type="checkbox" class="checkbox" name='+week_array[i]+'>Wolne</p>';
                 table +=
                     '</td>';
                 time = moment('08'+':'+'00','HH:mm');
             }
         table+=
             '<td>'+
-            '<button type="submit" class="btn btn-primary saved" name="save_schedule">Zapisz</button>'+
+            '<button type="submit" id='+d.id+' class="btn btn-primary saved" name="save_schedule">Zapisz</button>'+
             '</td>'+
         '</tr>';
 
@@ -250,19 +255,45 @@
                 row.child( format(row.data()) ).show();
                 tr.addClass('shown');
             }
-            $("input[name='Wt']").click(function(){
-                 console.log((this).closest('tr').find('.hour'));
-//                $checkbox = $(this).closest('tr').find("input[name='Pon']");
-//                $start_hour = $(this).closest('tr').find("select[name='Pon_start_work']").val();
-//                $stop_hour = $(this).closest('tr').find("select[name='Pon_stop_work']").val();
-                //console.log($stop_hour);
+            $('.checkbox').change(function(){
+                if( $(this).is(':checked') )
+                {
+                     $(this).closest('td').find('.hour').hide();
+                     $(this).closest('td').find('.reason').show();
+                }else{
+                    $(this).closest('td').find('.hour').show();
+                    $(this).closest('td').find('.reason').hide();
+                }
             });
 
             $(".saved").click(function(){
-                $checkbox = $(this).closest('tr').find("input[name='Pon']");
-                $start_hour = $(this).closest('tr').find("select[name='Pon_start_work']").val();
-                $stop_hour = $(this).closest('tr').find("select[name='Pon_stop_work']").val();
-                console.log($stop_hour);
+                var week_array = ['Pon','Wt','Śr','Czw','Pt','Sob','Nie'];
+                var $start_hour_array = new Array();
+                var $stop_hour_array = new Array();
+                var $reason_array  = new Array();
+                var closestTR =  $(this).closest('tr');
+                var id_user = closestTR.attr('id');
+                var schedule_id =  $(this).attr('id');
+                for(var i=0;i<week_array.length;i++)
+                {
+                    $start_hour_array.push(closestTR.find("select[name="+week_array[i]+"_start_work]").val());
+                    $stop_hour_array.push(closestTR.find("select[name="+week_array[i]+"_stop_work]").val());
+                    $reason_array.push(closestTR.find("input[name="+week_array[i]+"_reason]").val());
+                }
+
+
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.saveSchedule') }}',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data:{"start_hours":$start_hour_array,"stop_hours":$stop_hour_array,"reasons":$reason_array,"id_user":id_user,"schedule_id":schedule_id},
+                    success: function(response) {
+                        console.log(response);
+                    }
+                });
+
             });
         } );
     });
