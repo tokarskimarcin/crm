@@ -305,7 +305,11 @@
                             }, "name": "dkj_status"},
                             {
                                 "data": function (data, type, dataToSet) {
-                                    return data.manager_status + " " + data.comment_manager;
+                                    if(data.manager_status == 0)
+                                    {
+                                        return "Nie " + " " + data.comment_manager;
+                                    }else
+                                    return "Tak "+ " " + data.comment_manager;
                                 }, "name": " dkj.comment_manager"
                             }
                         ],
@@ -313,7 +317,6 @@
                     });
                     // Display the buttons
                     new $.fn.dataTable.Buttons( table, [
-                        { extend: "create", editor: editor },
                         { extend: "edit",   editor: editor },
                         { extend: "remove", editor: editor }
                     ] );

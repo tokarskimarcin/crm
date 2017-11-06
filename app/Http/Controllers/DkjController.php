@@ -167,6 +167,7 @@ class DkjController extends Controller
                     dkj.manager_status
                    '))
                 ->where('deleted',0)
+                ->where('dkj_status',1)
                 ->where('add_date','>=',$start_date.' 00:00:00')
                 ->where('add_date','<=',$stop_date.' 23:00:00');
 
