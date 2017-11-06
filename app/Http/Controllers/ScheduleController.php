@@ -52,9 +52,19 @@ class ScheduleController extends Controller
         $number_week =  $request->session()->get('number_of_week');
         $year = $request->session()->get('year');
         $schedule_id = $request->schedule_id;
-
+        $dayOfWeekArray= array('monday' ,'tuesday','wednesday','thursday','friday','saturday','sunday');
         if($schedule_id == 'null')
         {
+            $schedule = new Schedule();
+            $schedule->id_user = $id_user;
+            $schedule->id_manager = Auth::user()->id;
+            $schedule->year = $year;
+            $schedule->num_week = $number_week;
+
+            for($i=0;$i<count($dayOfWeekArray);$i++)
+            {
+
+            }
 
         }else{
 
