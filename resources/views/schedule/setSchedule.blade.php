@@ -90,22 +90,40 @@
                                 </div>
                                     <div class="col-md-12">
                                         @if (isset($number_of_week))
+
                                             <table class="table table-bordered">
                                                 <div class="panel-heading" style="border:1px solid #d3d3d3;"><h4><b>Analiza Grafik Plan</b></h4></div>
                                                 <tr>
                                                     <td align="center"><b>Godzina</b></td>
-                                                    @for($i=8;$i<=20;$i++)
+                                                    @for($i=8;$i<=21;$i++)
                                                     <td align="center"><b>{{$i}}</b></td>
                                                     @endfor
                                                 </tr>
-                                                @for($i=0;$i<7;$i++)
-                                                    <tr>
-                                                    <td align="center"><b>Pon</b></td>
-                                                    @for($j=8;$j<=20;$j++)
-                                                        <td align="center"><b>{{$number_of_week}}</b></td>
-                                                    @endfor
-                                                    </tr>
-                                                @endfor
+                                                @foreach($schedule_analitics as $item =>$key)
+                                                    <?php $lp = 8; ?>
+                                                    @foreach($key as $item2 =>$key2)
+                                                        @if($lp == 8)
+                                                            <tr>
+                                                                <td>Poniedziałek</td>
+                                                        @endif
+                                                        @if($lp<= 21)
+                                                         <td align="center"><b>{{$key2}}</b></td>
+                                                                    <?php $lp++; ?>
+                                                        @endif
+                                                        @if($lp >21)
+                                                            <?php $lp = 8; ?>
+                                                            </tr>
+                                                        @endif
+                                                    @endforeach
+                                                @endforeach
+                                                {{--@for($i=0;$i<7;$i++)--}}
+                                                    {{--<tr>--}}
+                                                    {{--<td align="center"><b>Pon</b></td>--}}
+                                                    {{--@for($j=8;$j<=20;$j++)--}}
+                                                        {{--<td align="center"><b>{{$number_of_week}}</b></td>--}}
+                                                    {{--@endfor--}}
+                                                    {{--</tr>--}}
+                                                {{--@endfor--}}
                                             </table>
 
                                             <table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
@@ -140,6 +158,9 @@
 <script>
     moment().format();
     function format ( d ) {
+        var start_work = Array(d.monday_start,d.tuesday_start,d.wednesday_start,d.thursday_start,d.friday_start,d.saturday_start,d.sunday_start);
+        var stop_work = Array(d.monday_stop,d.tuesday_stop,d.wednesday_stop,d.thursday_stop,d.friday_stop,d.saturday_stop,d.sunday_stop);
+        var reason = Array(d.monday_comment,d.tuesday_comment,d.wednesday_comment,d.thursday_comment,d.friday_comment,d.saturday_comment,d.sunday_comment);
         var week_array = ['Pon','Wt','Śr','Czw','Pt','Sob','Nie'];
         var day = $("#week_text option:selected").text();
         day = day.split(" ");
@@ -161,12 +182,20 @@
             for(var i=0;i<7;i++)
             {
                 table +='<td class='+d.id+'>';
-                table+='<div class="hour">' +
-                    '<select name='+week_array[i]+'_start_work class="form-control">'+
-                '<option>Wybierz</option>';
+                if(reason[i] != null)
+                    table+='<div class="hour" style="display: none;">';
+                else
+                    table+='<div class="hour">';
+
+                table+= '<select name='+week_array[i]+'_start_work class="form-control">'+
+                '<option value='+null+'>Wybierz</option>';
                 while(time.format("HH")!='21')
                 {
                     time.add(15,'m');
+                    if(start_work[i] != null && start_work[i] == time.format("HH:mm:ss"))
+                    {
+                        table+='<option selected>'+time.format("HH:mm")+'</option>';
+                    }else
                     table+='<option>'+time.format("HH:mm")+'</option>';
                 }
                 table+='</select>';
@@ -178,15 +207,30 @@
                 while(time.format("HH")!='21')
                 {
                     time.add(15,'m');
-                    table+='<option>'+time.format("HH:mm")+'</option>';
+                    if(stop_work[i] != null && stop_work[i] == time.format("HH:mm:ss")) {
+                        table += '<option selected>' + time.format("HH:mm") + '</option>';
+                    }else
+                    {
+                        table += '<option>' + time.format("HH:mm") + '</option>';
+                    }
                 }
                 table+='</select></div>';
-                table+='<div class="reason" style="display: none;">'+
-                    '<input type="text" name='+week_array[i]+'_reason class="form-control" id="usr" placeholder="Powód">' +
-                    '</div>';
-                table+='<p><input type="checkbox" class="checkbox" name='+week_array[i]+'>Wolne</p>';
-                table +=
-                    '</td>';
+                if(reason[i] != null) {
+                    table += '<div class="reason">';
+                    table += '<input type="text" value="' + reason[i] + '" name=' + week_array[i] + '_reason class="form-control" placeholder="Powód">';
+                }
+                    else{
+                        table+='<div class="reason" style="display: none;">';
+                        table+= '<input type="text" name='+week_array[i]+'_reason class="form-control" placeholder="Powód">';
+                }
+                table+=
+                    '</div><p>';
+                if(reason[i] != null)
+                    table+='<input type="checkbox" checked class="checkbox '+week_array[i]+'_reasonCheck">Wolne';
+                else
+                    table+='<input type="checkbox" class="checkbox '+week_array[i]+'_reasonCheck">Wolne';
+
+                    '</p></td>';
                 time = moment('08'+':'+'00','HH:mm');
             }
         table+=
@@ -224,7 +268,8 @@
                     "className": 'details-control',
                     "orderable": false,
                     "data": null,
-                    "defaultContent": ''
+                    "defaultContent": '',
+                    "searchable": false
                 },
                 {"data": "user_first_name", "name": "first_name"},
                 {"data": "user_last_name", "name": "last_name"},
@@ -274,25 +319,51 @@
                 var closestTR =  $(this).closest('tr');
                 var id_user = closestTR.attr('id');
                 var schedule_id =  $(this).attr('id');
+                var checkbox;
+                var valid = true;
+                var time = true;
                 for(var i=0;i<week_array.length;i++)
                 {
+                    checkbox = closestTR.find('.'+week_array[i]+"_reasonCheck");
                     $start_hour_array.push(closestTR.find("select[name="+week_array[i]+"_start_work]").val());
                     $stop_hour_array.push(closestTR.find("select[name="+week_array[i]+"_stop_work]").val());
                     $reason_array.push(closestTR.find("input[name="+week_array[i]+"_reason]").val());
-                }
-
-
-                $.ajax({
-                    type: "POST",
-                    url: '{{ route('api.saveSchedule') }}',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    data:{"start_hours":$start_hour_array,"stop_hours":$stop_hour_array,"reasons":$reason_array,"id_user":id_user,"schedule_id":schedule_id},
-                    success: function(response) {
-                        console.log(response);
+                    if(($start_hour_array[i] == "null" || $stop_hour_array[i] == "null") && !checkbox.is(':checked'))
+                    {
+                        valid = false;
                     }
-                });
+                    else if($start_hour_array[i] > $stop_hour_array[i] && !checkbox.is(':checked'))
+                    {
+                        valid = false;
+                        time = false;
+                    }
+                    if(checkbox.is(':checked'))
+                    {
+                        $start_hour_array[i] = null;
+                        $stop_hour_array[i] = null;
+                    }
+                }
+                console.log(valid);
+                if(valid == true)
+                {
+                    $.ajax({
+                        type: "POST",
+                        url: '{{ route('api.saveSchedule') }}',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data:{"start_hours":$start_hour_array,"stop_hours":$stop_hour_array,"reasons":$reason_array,"id_user":id_user,"schedule_id":schedule_id},
+                        success: function(response) {
+                            table.ajax.reload();
+                        }
+                    });
+                }else {
+                    if(time == false)
+                    {
+                        alert("Godziny są nieprawidłowe");
+                    }else
+                    alert("Nie wszystkie dane zostały uzupełnion.");
+                }
 
             });
         } );
