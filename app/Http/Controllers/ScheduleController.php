@@ -30,7 +30,6 @@ class ScheduleController extends Controller
     }
     public function viewSchedulePost(Request $request)
     {
-
         $number_of_week = $request->show_schedule;
         $year = $request->year;
         $year = explode('.',$year);
