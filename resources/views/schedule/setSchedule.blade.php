@@ -90,40 +90,33 @@
                                 </div>
                                     <div class="col-md-12">
                                         @if (isset($number_of_week))
-
                                             <table class="table table-bordered">
                                                 <div class="panel-heading" style="border:1px solid #d3d3d3;"><h4><b>Analiza Grafik Plan</b></h4></div>
                                                 <tr>
                                                     <td align="center"><b>Godzina</b></td>
-                                                    @for($i=8;$i<=21;$i++)
+                                                    <?php $week_array = ['Pon','Wt','Śr','Czw','Pt','Sob','Nie']; ?>
+                                                    @for($i=8;$i<21;$i++)
                                                     <td align="center"><b>{{$i}}</b></td>
                                                     @endfor
                                                 </tr>
                                                 @foreach($schedule_analitics as $item =>$key)
-                                                    <?php $lp = 8; ?>
+                                                    <?php $lp = 8;
+                                                        $number_day_of_week = 0;?>
                                                     @foreach($key as $item2 =>$key2)
                                                         @if($lp == 8)
                                                             <tr>
-                                                                <td>Poniedziałek</td>
+                                                                <td>{{$week_array[$number_day_of_week++]}}</td>
                                                         @endif
                                                         @if($lp<= 21)
                                                          <td align="center"><b>{{$key2}}</b></td>
                                                                     <?php $lp++; ?>
                                                         @endif
-                                                        @if($lp >21)
+                                                        @if($lp >20)
                                                             <?php $lp = 8; ?>
                                                             </tr>
                                                         @endif
                                                     @endforeach
                                                 @endforeach
-                                                {{--@for($i=0;$i<7;$i++)--}}
-                                                    {{--<tr>--}}
-                                                    {{--<td align="center"><b>Pon</b></td>--}}
-                                                    {{--@for($j=8;$j<=20;$j++)--}}
-                                                        {{--<td align="center"><b>{{$number_of_week}}</b></td>--}}
-                                                    {{--@endfor--}}
-                                                    {{--</tr>--}}
-                                                {{--@endfor--}}
                                             </table>
 
                                             <table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
@@ -178,7 +171,7 @@
             table += '<th>Akcja</th></tr>'+
             '</thead>' +
             '<tbody> <tr id='+d.id_user+'>';
-            var time = moment('08'+':'+'00','HH:mm');
+            var time = moment('07'+':'+'45','HH:mm');
             for(var i=0;i<7;i++)
             {
                 table +='<td class='+d.id+'>';
@@ -354,7 +347,7 @@
                         },
                         data:{"start_hours":$start_hour_array,"stop_hours":$stop_hour_array,"reasons":$reason_array,"id_user":id_user,"schedule_id":schedule_id},
                         success: function(response) {
-                            table.ajax.reload();
+                            location.reload();
                         }
                     });
                 }else {

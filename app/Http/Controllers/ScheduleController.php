@@ -127,25 +127,30 @@ class ScheduleController extends Controller
         $query = DB::table('schedule');
         $sql = '';
         for($j=0;$j<count($dayOfWeekArray);$j++) {
-            for ($i = 8; $i <= 21; $i++) {
+            for ($i = 8; $i < 21; $i++) {
                 if ($i < 10) {
                     if($i == 9)
                     {
                         $czas_plus = $i+1;
-                    }else
-                        $czas_plus = '0' .$i+1;
-                    $czas = '0' . $i;
-                } else $czas = $i;
+                    }else {
+                        $czas_plus = '0' . $i + 1;
+                        $czas = '0' . $i;
+                    }
+                } else
+                {
+                    $czas = $i;
+                    $czas_plus = $i+1;
+                }
 
-                if ($j + 1 == count($dayOfWeekArray) && $i == 21) {
-                    $sql .='sum(CASE WHEN TIME_TO_SEC(CAST("'.$czas .':00:00" as Time))
-                      >= TIME_TO_SEC(schedule.'.$dayOfWeekArray[$j].'_start) And TIME_TO_SEC(CAST("' . $czas_plus . ':00:00" as Time)) 
-                      <= TIME_TO_SEC(schedule.'.$dayOfWeekArray[$j].'_stop) THEN 1 ELSE 0 END) as  "'.$dayOfWeekArray[$j].$i.'"';
+                if ($j + 1 == count($dayOfWeekArray) && $i == 20) {
+                    $sql .='sum(CASE WHEN Hour(CAST("'.$czas .':00:00" as Time))
+                      >= Hour(schedule.'.$dayOfWeekArray[$j].'_start) and Hour(CAST("' . $czas_plus . ':00:00" as Time)) 
+                      <= Hour(schedule.'.$dayOfWeekArray[$j].'_stop) THEN 1 ELSE 0 END) as  "'.$dayOfWeekArray[$j].$i.'"';
 
                 } else {
-                    $sql .='sum(CASE WHEN TIME_TO_SEC(CAST("'.$czas .':00:00" as Time))
-                      >= TIME_TO_SEC(schedule.'.$dayOfWeekArray[$j].'_start) And TIME_TO_SEC(CAST("' . $czas_plus . ':00:00" as Time)) 
-                      <= TIME_TO_SEC(schedule.'.$dayOfWeekArray[$j].'_stop) THEN 1 ELSE 0 END) as "'.$dayOfWeekArray[$j].$i.'",';
+                    $sql .='sum(CASE WHEN Hour(CAST("'.$czas .':00:00" as Time))
+                      >= Hour(schedule.'.$dayOfWeekArray[$j].'_start) and Hour(CAST("' . $czas_plus . ':00:00" as Time)) 
+                      <= Hour(schedule.'.$dayOfWeekArray[$j].'_stop) THEN 1 ELSE 0 END) as "'.$dayOfWeekArray[$j].$i.'",';
                 }
 
             }
