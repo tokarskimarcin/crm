@@ -18,11 +18,47 @@ class ScheduleController extends Controller
 
         $number_of_week = $request->show_schedule;
         $request->session()->put('number_of_week', $number_of_week);
-        $schedule_analitics = $this->setWeekDays($number_of_week);
+        $schedule_analitics = $this->setWeekDays($number_of_week,$request);
         //dd($schedule_analitics);
         return view('schedule.setSchedule')
             ->with('number_of_week',$number_of_week)
             ->with('schedule_analitics',$schedule_analitics);
+    }
+    public function viewScheduleGet()
+    {
+        return view('schedule.viewSchedule');
+    }
+    public function viewSchedulePost(Request $request)
+    {
+
+        $number_of_week = $request->show_schedule;
+        $year = $request->year;
+        $year = explode('.',$year);
+        $year = $year[0];
+        $query = DB::table('users')
+            ->leftjoin("schedule", function ($join) use ($number_of_week,$year) {
+                $join->on("schedule.id_user", "=", "users.id")
+                    ->where("schedule.week_num", "=", $number_of_week)
+                    ->where("schedule.year", "=", $year);
+            })
+            ->select(DB::raw(
+                'schedule.*,
+                time_to_sec(`monday_stop`)-time_to_sec(`monday_start`) as sec_monday,
+                time_to_sec(`tuesday_stop`)-time_to_sec(`tuesday_start`) as sec_tuesday,
+                time_to_sec(`wednesday_stop`)-time_to_sec(`wednesday_start`) as sec_wednesday,
+                time_to_sec(`thursday_stop`)-time_to_sec(`thursday_start`) as sec_thursday,
+                time_to_sec(`friday_stop`)-time_to_sec(`friday_start`) as sec_friday,
+                time_to_sec(`saturday_stop`)-time_to_sec(`saturday_start`) as sec_saturday,
+                time_to_sec(`sunday_stop`)-time_to_sec(`sunday_start`) as sec_sunday,                
+                users.id as id_user,
+                users.first_name as user_first_name,
+                users.last_name as user_last_name
+                '))
+            ->where('users.department_info_id',Auth::user()->department_info_id)->get();
+        //dd($query);
+        return view('schedule.viewSchedule')
+            ->with('number_of_week',$number_of_week)
+            ->with('schedule_user',$query);
     }
 
     public function datatableShowUserSchedule(Request $request)
@@ -121,7 +157,7 @@ class ScheduleController extends Controller
         $ret['week_end'] = $dto->format('Y-m-d');
         return $ret;
     }
-    private function setWeekDays($number_week)
+    private function setWeekDays($number_week,$request)
     {
         $dayOfWeekArray= array('monday' ,'tuesday','wednesday','thursday','friday','saturday','sunday');
         $query = DB::table('schedule');
@@ -152,10 +188,11 @@ class ScheduleController extends Controller
                       >= Hour(schedule.'.$dayOfWeekArray[$j].'_start) and Hour(CAST("' . $czas_plus . ':00:00" as Time)) 
                       <= Hour(schedule.'.$dayOfWeekArray[$j].'_stop) THEN 1 ELSE 0 END) as "'.$dayOfWeekArray[$j].$i.'",';
                 }
-
             }
         }
-        $query->select(DB::raw($sql))->where('week_num',$number_week);
+        $query->select(DB::raw($sql))
+            ->where('week_num',$number_week)
+            ->where('year',$request->session()->get('year'));
         return $query->get();
     }
 

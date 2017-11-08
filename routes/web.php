@@ -101,6 +101,9 @@ Route::middleware(['check-permission'])->group(function () {
     // Schedule -- START --
     Route::get('/set_schedule','ScheduleController@setScheduleGet');
     Route::Post('/set_schedule','ScheduleController@setSchedulePOST');
+
+    Route::get('/view_schedule','ScheduleController@viewScheduleGet');
+    Route::Post('/view_schedule','ScheduleController@viewSchedulePOST');
     // schedule -- STOP --
 
 });
