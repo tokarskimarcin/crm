@@ -106,6 +106,11 @@ Route::middleware(['check-permission'])->group(function () {
     Route::Post('/view_schedule','ScheduleController@viewSchedulePOST');
     // schedule -- STOP --
 
+    // Finances -- START --
+    Route::get('/view_payment','FinancesController@viewPaymentGet');
+    Route::Post('/view_payment','FinancesController@viewPaymentPOST');
+    // Finances -- STOP --
+
 });
 
 
