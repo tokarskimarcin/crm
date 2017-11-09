@@ -80,7 +80,71 @@
                                                         </tr>
                                                         </thead>
                                                         <tbody>
-
+                                                            @foreach($salary as $item => $key)
+                                                                @if($item == 2)
+                                                                    {{--Typ Umowy--}}
+                                                                    @foreach($key as $item2)
+                                                                        @php // set variable
+                                                                            $avg = 0;
+                                                                            $rbh = round($item2->sum/3600,2);
+                                                                            $janky_cost_per_price = 0;
+                                                                            if($item2->success == 0)
+                                                                                $avg = 0;
+                                                                             else
+                                                                                $avg = round($item2->success/($item2->sum/3600),2);
+                                                                            if($item2->ods == 0)
+                                                                                $janky_proc = 0;
+                                                                            else
+                                                                                $janky_proc = round(($item2->janki*100)/$item2->ods ,2);
+                                                                            foreach ($janky_system as $system_item)
+                                                                            {
+                                                                               $system_item->max_proc;
+                                                                               if($janky_proc >= $system_item->min_proc && $janky_proc < $system_item->max_proc)
+                                                                               {
+                                                                                    $janky_cost_per_price = $system_item->cost;
+                                                                               }
+                                                                            }
+                                                                            $janky_cost = $item2->janki * $janky_cost_per_price;
+                                                                            $standart_salary = $rbh * $item2->rate;
+                                                                            $bonus_penalty = $item2->premia -$item2->kara;
+                                                                            $student = ($item2->student == 0) ? "Nie" : "Tak";
+                                                                            $documents = ($item2->documents == 0) ? "Nie" : "Tak";
+                                                                            //System prowizyjny
+                                                                              if ($rbh >= $department_info->commission_hour AND $janky_proc < $department_info->commission_janky) {
+                                                                                    $lp = 1;
+                                                                                    for ($step = $department_info->commission_step; $step <= 20; $step = ($step+0.5)) {
+                                                                                          $avg_min = ($department_info->commission_avg-0.25)+(0.25*$lp);
+                                                                                          $avg_max = $department_info->commission_avg+(0.25*$lp);
+                                                                                          if ($avg >=$avg_min AND $avg < $avg_max) {
+                                                                                              $bonus_per_hour = $step;
+                                                                                          }
+                                                                                      $lp++;
+                                                                                    }
+                                                                            }else{
+                                                                                     $bonus_per_hour = 0;
+                                                                                  }
+                                                                            $bonus_salary = $rbh * $bonus_per_hour;
+                                                                            $salary_total = $standart_salary+$bonus_salary-$janky_cost;
+                                                                        @endphp
+                                                                        <tr>
+                                                                            <td></td>
+                                                                            <td>{{($item2->first_name)}}</td>
+                                                                            <td>{{($item2->last_name)}}</td>
+                                                                            <td>{{($item2->rate.'('.$bonus_per_hour.')')}}</td>
+                                                                            <td>{{($avg)}}</td>
+                                                                            <td>{{$rbh}}</td>
+                                                                            <td>{{($janky_proc)}}%</td>
+                                                                            <td>{{($janky_cost)}} PLN</td>
+                                                                            <td>{{($standart_salary)}} PLN</td>
+                                                                            <td>{{($bonus_penalty)}} PLN</td>
+                                                                            <td>{{($bonus_salary)}} PLN</td>
+                                                                            <td>{{($student)}}</td>
+                                                                            <td>{{($documents)}}</td>
+                                                                            <td>{{($salary_total)}} PLN</td>
+                                                                        </tr>
+                                                                    @endforeach
+                                                                @endif
+                                                            @endforeach
                                                         </tbody>
                                                     </table>
                                                 </div>
