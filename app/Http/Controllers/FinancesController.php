@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Agencies;
 use App\Department_info;
 use App\JankyPenatlyProc;
 use Illuminate\Http\Request;
@@ -20,11 +21,13 @@ class FinancesController extends Controller
         $salary = $this->getSalary($date.'%');
         $department_info = Department_info::find(Auth::user()->department_info_id);
         $janky_system = JankyPenatlyProc::where('system_id',$department_info->janky_system_id)->get();
+        $agencies = Agencies::all();
         return view('finances.viewPayment')
             ->with('month',$date)
             ->with('salary',$salary)
             ->with('department_info',$department_info)
-            ->with('janky_system',$janky_system);
+            ->with('janky_system',$janky_system)
+            ->with('agencies',$agencies);
     }
 
 
@@ -69,7 +72,8 @@ class FinancesController extends Controller
             `f`.`ods`,
             `h`.`janki`,
             `salary_to_account` ')->get();
-            return $r->groupBy('agency_id');
+            $final_salary = $r->groupBy('agency_id');
+            return $final_salary;
 
     }
 }
