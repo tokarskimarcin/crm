@@ -93,21 +93,30 @@
                                                 <input type="hidden" name="show_pb" value="1">
                                                 <label for="exampleInputPassword1">Pracownik:</label>
                                                 <select name="showuser" class="form-control" style="font-size:18px;">
-                                                    <option value=-1>Wszyscy</option>
+                                                    @if($showuser == -1)
+                                                    <option value=-1 selected>Wszyscy</option>
+                                                    @else
+                                                        <option value=-1>Wszyscy</option>
+                                                    @endif
                                                     @foreach($users as $user)
-                                                        <option value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
+                                                            @if($showuser == $user->id)
+                                                                <option selected value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
+                                                            @else
+                                                                <option value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
+                                                            @endif
+
                                                     @endforeach
                                                 </select></br>
 
                                                 <label for="exampleInputPassword1">Zakres Od:</label>
                                                 <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                                    <input class="form-control" name="date_penalty_show_start" type="text" value="{{date("Y-m-d")}}" readonly >
+                                                    <input class="form-control" name="date_penalty_show_start" type="text" value="{{$date_start}}" readonly >
                                                     <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                                 </div></br>
 
                                                 <label for="exampleInputPassword1">Zakres Do:</label>
                                                 <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                                    <input class="form-control" name="date_penalty_show_stop" type="text" value="{{date("Y-m-d")}}" readonly >
+                                                    <input class="form-control" name="date_penalty_show_stop" type="text" value="{{$date_stop}}" readonly >
                                                     <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                                 </div></br>
 

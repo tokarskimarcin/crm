@@ -96,7 +96,10 @@ class FinancesController extends Controller
             {
                 $query->where('users.id' , $request->showuser);
             }
-            $view->with('users_show',$query->get());
+            $view->with('users_show',$query->get())
+            ->with('date_start',$date_start)
+            ->with('date_stop',$date_stop)
+            ->with('showuser',$request->showuser);
         }
         return $view;
     }
