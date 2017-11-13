@@ -105,9 +105,13 @@ class FinancesController extends Controller
     {
         if($request->ajax())
         {
-            $object = new PenaltyBonus($request->id);
+            $object = PenaltyBonus::find($request->id);
             $object->type = $request->type;
-            $object->amount = $request
+            $object->amount = $request->amount;
+            $object->comment = $request->comment;
+            $object->id_manager_edit = Auth::user()->id;
+            $object->save();
+            return 0;
         }
     }
 

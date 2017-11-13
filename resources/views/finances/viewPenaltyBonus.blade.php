@@ -232,33 +232,34 @@
          user_date =  tr.find('.user_date_modal').text();
          user_commnet = tr.find('.user_comment_modal').text();
         $( "#userDetails" ).html( user_name );
-        if(user_status == '1')
+        if(user_status == 'Kara')
         {
-            $( "#statusDetails" ).html( ' <select name="type_penalty" class="form-control" style="font-size:18px;">\n' +
+            $( "#statusDetails" ).html( ' <select id="type_penalty_modal" class="form-control" style="font-size:18px;">\n' +
                 '<option value="1" selected>Kara</option>\n' +
                 '<option value="2">Premia</option>\n' +
                 '</select>' );
         }else
         {
-            $( "#statusDetails" ).html( ' <select name="type_penalty" class="form-control" style="font-size:18px;">\n' +
+            $( "#statusDetails" ).html( ' <select id="type_penalty_modal" class="form-control" style="font-size:18px;">\n' +
                 '<option value="1">Kara</option>\n' +
                 '<option value="2" selected>Premia</option>\n' +
                 '</select>' );
         }
 
-        $( "#amountDetails" ).html(  '<input type="number" min="0" step="1" class="form-control"  value='+user_cost+'id="recipient-name">' );
+        $( "#amountDetails" ).html(  '<input type="number" min="0" step="1"  id="cost_modal" class="form-control"  value='+user_cost+'>' );
         $( "#dateDetails" ).html( user_date );
-        $( "#reasonDetails" ).html( '<input class="form-control" name="reason" type="text" value='+user_commnet+'>' );
+        $( "#reasonDetails" ).html( '<input class="form-control" id="reason_modal" type="text" value='+user_commnet+'>' );
     });
 
     $( "#edit_user_modal" ).click(function() {
-        alert(id_user);
-
+        user_status = $( "#type_penalty_modal option:selected" ).val()
+        user_cost =  $("#cost_modal").val();
+        user_commnet =  $("#reason_modal").val();
             $.ajax({
                 type: "POST",
                 url: '{{ route('api.editPenaltyBonus') }}',
                 data: {"id": id_record, "type": user_status,
-                    "amount": user_cost,"event_date":user_commnet},
+                    "amount": user_cost,"comment":user_commnet},
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
