@@ -44,6 +44,8 @@ Route::POST('/datatableShowDkjVerification','DkjController@datatableShowDkjVerif
 Route::POST('/datatableShowUserSchedule','ScheduleController@datatableShowUserSchedule')->name('api.datatableShowUserSchedule');
 Route::POST('/saveSchedule','ScheduleController@saveSchedule')->name('api.saveSchedule');
 
+Route::POST('/editPenaltyBonus','FinancesController@editPenaltyBonus')->name('api.editPenaltyBonus');
+
 
 //********************AJAX*********************** */
 
