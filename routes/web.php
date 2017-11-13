@@ -109,6 +109,9 @@ Route::middleware(['check-permission'])->group(function () {
     // Finances -- START --
     Route::get('/view_payment','FinancesController@viewPaymentGet');
     Route::Post('/view_payment','FinancesController@viewPaymentPOST');
+
+    Route::get('/view_penalty_bonus','FinancesController@viewPenaltyBonusGet');
+    Route::Post('/view_penalty_bonus','FinancesController@viewPenaltyBonusPOST');
     // Finances -- STOP --
 
 });

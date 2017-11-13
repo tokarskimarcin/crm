@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Agencies;
 use App\Department_info;
+use App\Department_types;
 use App\JankyPenatlyProc;
+use App\PenaltyBonus;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,16 +25,61 @@ class FinancesController extends Controller
         $department_info = Department_info::find(Auth::user()->department_info_id);
         $janky_system = JankyPenatlyProc::where('system_id',$department_info->janky_system_id)->get();
         $agencies = Agencies::all();
-        return view('finances.viewPayment')
-            ->with('month',$date)
-            ->with('salary',$salary)
-            ->with('department_info',$department_info)
-            ->with('janky_system',$janky_system)
-            ->with('agencies',$agencies);
+        $department_type = Department_types::find($department_info->id_dep_type);
+        $count_agreement = $department_type->count_agreement;
+
+        if($count_agreement == 1)
+        {
+            return view('finances.viewPayment')
+                ->with('month',$date)
+                ->with('salary',$salary)
+                ->with('department_info',$department_info)
+                ->with('janky_system',$janky_system)
+                ->with('agencies',$agencies);
+        }
+       else
+        {
+            return view('finances.viewPaymentWithoutAgreement')
+                ->with('month',$date)
+                ->with('salary',$salary)
+                ->with('department_info',$department_info)
+                ->with('janky_system',$janky_system)
+                ->with('agencies',$agencies);
+        }
+
+
+    }
+    public function viewPenaltyBonusGet()
+    {
+        $users =  User::where('department_info_id', Auth::user()->department_info_id)->get();
+        return view('finances.viewPenaltyBonus')
+            ->with('users',$users);
+    }
+    public function viewPenaltyBonusPOST(Request $request)
+    {
+        $users =  User::where('department_info_id', Auth::user()->department_info_id)->get();
+        $id_user = $request->user_id;
+        $date_penalty = $request->date_penalty;
+        $type = $request->type_penalty;
+        $cost = $request->cost;
+        $reason = $request->reason;
+
+        $object = new PenaltyBonus();
+        $object->id_user = $id_user;
+        $object->type = $type;
+        $object->amount = $cost;
+        $object->event_date = $date_penalty;
+        $object->id_manager = Auth::user()->id;
+        $object->comment = $reason;
+        $object->save();
+
+        return view('finances.viewPenaltyBonus')
+            ->with('users',$users);
     }
 
 
 
+    //Custom Function
     private function getSalary($month)
     {
         $query = DB::table(DB::raw("users"))
@@ -74,6 +122,10 @@ class FinancesController extends Controller
             `salary_to_account` ')->get();
             $final_salary = $r->groupBy('agency_id');
             return $final_salary;
+    }
+
+    function user_info($userid,$month)
+    {
 
     }
 }

@@ -14,7 +14,7 @@
     @include('partials._nav')
 
         <div id="page-wrapper">
-            <div class="container-fluid">
+            <div class="container-fluid" id="conntent">
                         @yield('content')
             </div>
         </div>
