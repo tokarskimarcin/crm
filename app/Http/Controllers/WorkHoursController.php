@@ -243,18 +243,18 @@ class WorkHoursController extends Controller
         Session::put('count_agreement', $count_agreement);
         $user_info = $this->user_info($userid,$month);
 
+        $add_hour_success = false;
         if ($request->session()->has('add_hour_success')) {
             $add_hour_success = true;
-        } else {
-           $add_hour_success = false;
         }
-
+        $request->session()->forget('add_hour_success');
         return view('workhours.viewHour')
             ->with('users',$users)
             ->with('response_userid',$userid)
             ->with('response_month',$month)
             ->with('agreement',$count_agreement)
-            ->with('response_user_info',$user_info);
+            ->with('response_user_info',$user_info)
+            ->with('add_hour_success', $add_hour_success);
     }
 
     public function deleteAcceptHour(Request $request)
