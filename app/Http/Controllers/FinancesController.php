@@ -7,6 +7,7 @@ use App\Department_info;
 use App\Department_types;
 use App\JankyPenatlyProc;
 use App\PenaltyBonus;
+use App\SummaryPayment;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -104,6 +105,35 @@ class FinancesController extends Controller
         return $view;
     }
 
+    public function viewSummaryPaymentGet()
+    {
+       return 0;
+    }
+    public function viewSummaryPaymentPOST(Request $request)
+    {
+        return 0;
+    }
+
+
+    public function saveSummaryPayment(Request $request)
+    {
+        if($request->ajax())
+        {
+            $summary_payment = SummaryPayment::firstOrNew(array('month' =>$request->month,
+                'department_info_id' =>Auth::user()->department_info_id));
+            $summary_payment->department_info_id = Auth::user()->department_info_id;
+            $summary_payment->month = $request->month;
+            $summary_payment->payment = $request->payment_total;
+            $summary_payment->month = $request->month;
+            $summary_payment->hours = $request->rbh_total;
+            $summary_payment->dosuments =$request->documents_total;
+            $summary_payment->students = $request->students_total;
+            $summary_payment->employee_count = $request->user_total;
+            $summary_payment->id_user = Auth::user()->id;
+            $summary_payment->save();
+            return $summary_payment;
+        }
+    }
     public function editPenaltyBonus(Request $request)
     {
         if($request->ajax())

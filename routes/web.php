@@ -44,7 +44,12 @@ Route::POST('/datatableShowDkjVerification','DkjController@datatableShowDkjVerif
 Route::POST('/datatableShowUserSchedule','ScheduleController@datatableShowUserSchedule')->name('api.datatableShowUserSchedule');
 Route::POST('/saveSchedule','ScheduleController@saveSchedule')->name('api.saveSchedule');
 
+
+Route::POST('/saveSummaryPayment','FinancesController@saveSummaryPayment')->name('api.summary_payment_save');
 Route::POST('/editPenaltyBonus','FinancesController@editPenaltyBonus')->name('api.editPenaltyBonus');
+
+
+
 
 
 //********************AJAX*********************** */
@@ -114,6 +119,9 @@ Route::middleware(['check-permission'])->group(function () {
 
     Route::get('/view_penalty_bonus','FinancesController@viewPenaltyBonusGet');
     Route::Post('/view_penalty_bonus','FinancesController@viewPenaltyBonusPOST');
+
+    Route::get('/view_summary_payment','FinancesController@viewSummaryPaymentGet');
+    Route::Post('/view_summary_payment','FinancesController@viewSummaryPaymentPOST');
     // Finances -- STOP --
 
 });
