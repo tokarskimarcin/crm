@@ -11,7 +11,7 @@
 
     @if(isset($saved))
         <div class="alert alert-success">
-            <strong>Success!</strong> Konto zostało utworzone
+            <strong>Sukces!</strong> Dodano użytkownika: {{$saved['first_name'] . ' ' . $saved['last_name']}}
         </div>
     @endif
     <div class="row">

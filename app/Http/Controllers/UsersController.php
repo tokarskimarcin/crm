@@ -29,7 +29,7 @@ class UsersController extends Controller
             ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
             ->join('departments', 'department_info.id_dep', '=', 'departments.id')
             ->select(DB::raw('
-                department_info.id,               
+                department_info.id,
                 department_type.name as department_type_name,
                 departments.name as department_name
                 '))->get();
@@ -94,13 +94,17 @@ class UsersController extends Controller
         $user->id_manager = Auth::id();
         $user->documents = $request->documents;
         $user->save();
+        $user_data = array(
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name
+        );
         if( $redirect = 1)
             return view('hr.addConsultant')
-                ->with('saved','saved')
+                ->with('saved',$user_data)
                 ->with('agencies',$agencies)
                 ->with('send_type',$send_type);
         else
-            return view('hr.addCadre')->with('saved','saved')->with('agencies',$agencies);
+            return view('hr.addCadre')->with('saved', $user_data)->with('agencies',$agencies);
     }
     public function employee_managementGet()
     {
