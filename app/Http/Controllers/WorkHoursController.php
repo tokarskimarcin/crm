@@ -199,6 +199,7 @@ class WorkHoursController extends Controller
     //******************ViewHour****************** Start
     public function viewHourGet()
     {
+
         $users = $this->getUsers();
         return view('workhours.viewHour')
             ->with('users',$users);
@@ -241,6 +242,12 @@ class WorkHoursController extends Controller
         $count_agreement= $count_agreement->count_agreement;
         Session::put('count_agreement', $count_agreement);
         $user_info = $this->user_info($userid,$month);
+
+        if ($request->session()->has('add_hour_success')) {
+            $add_hour_success = true;
+        } else {
+           $add_hour_success = false;
+        }
 
         return view('workhours.viewHour')
             ->with('users',$users)
@@ -300,6 +307,7 @@ class WorkHoursController extends Controller
             $work_hour->id_user = $date[0];
             $work_hour->id_manager = $id_manager;
             $work_hour->save();
+            session(['add_hour_success' => true]);
         }
     }
     //******************ViewHour****************** Stop
@@ -335,9 +343,9 @@ class WorkHoursController extends Controller
             ->join('users', 'work_hours.id_user', '=', 'users.id')
             ->leftjoin('users as manager', 'work_hours.id_manager', '=', 'manager.id')
             ->select(DB::raw(
-                'work_hours.id as id,                   
-                    work_hours.status, 
-                    work_hours.id_manager, 
+                'work_hours.id as id,
+                    work_hours.status,
+                    work_hours.id_manager,
                     users.rate,
                     manager.first_name,
                     manager.last_name,

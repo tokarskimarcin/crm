@@ -23,6 +23,12 @@
             <h1 class="page-header">Podgląd godzin</h1>
         </div>
     </div>
+    @if(session()->get('add_hour_success') == true)
+    <?php var_dump($add_hour_success); ?>
+        <div id="success_div" class='alert alert-success'>Godziny zostały zaakceptowane!</div>
+    @endif
+
+
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">

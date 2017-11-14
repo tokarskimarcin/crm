@@ -355,7 +355,7 @@
                     {
                         alert("Godziny są nieprawidłowe");
                     }else
-                    alert("Nie wszystkie dane zostały uzupełnion.");
+                    alert("Nie wszystkie dane zostały uzupełnione.");
                 }
 
             });

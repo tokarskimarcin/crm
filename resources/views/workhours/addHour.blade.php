@@ -51,7 +51,6 @@
 
 @section('script.addhour')
     <script>
-
             var id = 0;
             var load = 0;
         $('#addHourModal').on('show.bs.modal', function(e) {
@@ -105,6 +104,7 @@
                     },
                     success: function(response) {
                        location.reload();
+
                     }
                 });
             }
