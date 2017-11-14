@@ -152,7 +152,11 @@ class UsersController extends Controller
         $user->id_manager = Auth::id();
         $user->documents = $request->documents;
         $user->save();
-        return redirect('employee_management')->with('saved',$user->frist_name.' '.$user->last_name);
+        $user_data = array(
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name
+        );
+        return view('hr.employeeManagement')->with('saved', $user_data);
     }
 
     public function datatableEmployeeManagement(Request $request)

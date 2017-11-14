@@ -17,7 +17,7 @@
 
     @if(isset($saved))
         <div class="alert alert-success">
-            <strong>Success!</strong> Konto użytkownika {{$saved}} zostało zmodyfikowane.
+            <strong>Sukces!</strong> Konto użytkownika: {{$saved['first_name'] . ' ' . $saved['last_name']}} zostało zmodyfikowane!
         </div>
     @endif
 
