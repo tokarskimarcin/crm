@@ -32,6 +32,8 @@
         </div>
     </div>
 
+    <div id="success_div" class='alert alert-success'>Godziny zostały zaakceptowane!</div>
+
     <div class="col-lg-3">
         <label for ="ipadress">Zakres wyszukiwania:</label>
         <div class="form-group">
@@ -79,6 +81,7 @@
 @section('script')
 
     <script>
+    $("#success_div").fadeOut(0);
         var table;
 
         function myFunction() {
@@ -227,6 +230,7 @@
                             alert("Brak zarejestrowanych godzin");
                         }else
                             table.ajax.reload();
+                            $("#success_div").fadeIn();
                     }
                 });
             }
