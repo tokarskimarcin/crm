@@ -124,8 +124,9 @@ Route::middleware(['check-permission'])->group(function () {
     Route::Post('/view_summary_payment','FinancesController@viewSummaryPaymentPOST');
     // Finances -- STOP --
 
-
-
+    // Equipment -- START --
+    Route::get('/show_equipment','EquipmentsController@showEquipment');
+    // Equipment -- STOP --
 
 
 });
