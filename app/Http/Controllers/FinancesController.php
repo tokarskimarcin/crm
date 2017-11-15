@@ -107,11 +107,15 @@ class FinancesController extends Controller
 
     public function viewSummaryPaymentGet()
     {
-       return 0;
+       return view('finances.viewSummaryPayment');
     }
     public function viewSummaryPaymentPOST(Request $request)
     {
-        return 0;
+        $month = $request->search_summary_money_month;
+        $summary_month = SummaryPayment::where('month',$month)->get();
+        return view('finances.viewSummaryPayment')
+            ->with('summary_month',$summary_month)
+            ->with('month',$month);
     }
 
 
@@ -126,7 +130,7 @@ class FinancesController extends Controller
             $summary_payment->payment = $request->payment_total;
             $summary_payment->month = $request->month;
             $summary_payment->hours = $request->rbh_total;
-            $summary_payment->dosuments =$request->documents_total;
+            $summary_payment->documents =$request->documents_total;
             $summary_payment->students = $request->students_total;
             $summary_payment->employee_count = $request->user_total;
             $summary_payment->id_user = Auth::user()->id;

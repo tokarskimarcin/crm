@@ -69,6 +69,13 @@
                                         </div>
                                     </div>
                                                 @if(isset($month))
+                                                            @php
+                                                                $payment_total = 0;
+                                                                $rbh_total = 0;
+                                                                $documents_total = 0;
+                                                                $students_total = 0;
+                                                                $users_total = 0;
+                                                            @endphp
                                                             @foreach($salary as $item => $key)
                                                                 @foreach($agencies as $agency)
                                                                     @if($agency->id == $item)
@@ -113,6 +120,7 @@
                                                                                 $salary_total = 0;
                                                                                 $rbh = round($item2->sum/3600,2);
                                                                                 $janky_cost_per_price = 0;
+
                                                                                 if($item2->success == 0)
                                                                                     $avg = 0;
                                                                                  else
@@ -151,6 +159,12 @@
                                                                                 $bonus_salary = $rbh * $bonus_per_hour;
                                                                                 $salary_total = $standart_salary+$bonus_salary-$janky_cost;
                                                                                 $salary_total_all += $salary_total;
+
+                                                                                $payment_total += $salary_total_all;
+                                                                                $documents_total += $item2->documents;
+                                                                                $students_total +=$item2->student;
+                                                                                $rbh_total += $item2->sum;
+                                                                                $users_total++;
                                                                             @endphp
                                                                             <tr>
                                                                                 <td>{{$row_number++}}</td>
@@ -209,6 +223,34 @@
     <script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
     <script src="//cdn.datatables.net/buttons/1.4.2/js/buttons.html5.min.js"></script>
+
+    @if(isset($payment_total))
+        print_R($payment_total);
+        @if($payment_total !=0)
+            <script>
+                var payment_total =  <?php echo json_encode($payment_total); ?>;
+                var documents_total = <?php echo json_encode($documents_total); ?>;
+                var students_total = <?php echo json_encode($students_total); ?>;
+                var rbh_total = <?php echo json_encode($rbh_total); ?>;
+                var month = <?php echo json_encode($month); ?>;
+                var user_total = <?php echo json_encode($users_total); ?>;
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.summary_payment_save') }}',
+                    data: {"payment_total": payment_total, "documents_total": documents_total,
+                        "students_total": students_total,"rbh_total":rbh_total,"month":month,
+                        "user_total":user_total},
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                    }
+                });
+
+            </script>
+        @endif
+    @endif
+
 <script>
     $(document).ready(function() {
         $('thead > tr> th').css({ 'min-width': '1px', 'max-width': '100px' });
