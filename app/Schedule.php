@@ -19,4 +19,8 @@ class Schedule extends Model
         'friday_hour', 'saturday_comment', 'saturday_hour', 'sunday_comment',
         'sunday_hour','updated_at', 'created_at', 'id_manager_edit'
     ];
+
+    public function user() {
+        return $this->belongsTo('App\User', 'id_user');
+    }
 }

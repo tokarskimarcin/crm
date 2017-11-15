@@ -16,4 +16,8 @@ class UserTypes extends Model
     protected $fillable = [
         'id', 'name','all_departments',
     ];
+
+    public function users() {
+        return $this->hasMany('App\User', 'user_type_id');
+    }
 }

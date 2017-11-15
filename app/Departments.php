@@ -16,4 +16,8 @@ class Departments extends Model
     protected $fillable = [
         'id', 'name', 'desc',
     ];
+
+    public function department_info() {
+        return $this->hasMany('App\Department_info', 'id_dep');
+    }
 }

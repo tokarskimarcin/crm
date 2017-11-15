@@ -10,4 +10,8 @@ class PenaltyBonus extends Model
     protected $fillable = [
         'id', 'type', 'id_user', 'amount', 'id_manager', 'event_date', 'updated_at', 'created_at', 'id_manager_edit'
     ];
+
+    public function user() {
+        return $this->belongsTo('App\User', 'id_user');
+    }
 }

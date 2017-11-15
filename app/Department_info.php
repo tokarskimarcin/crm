@@ -18,4 +18,16 @@ class Department_info extends Model
         'id', 'id_dep','id_dep_type','size','commission_avg','commission_hour','commission_start_money','commission_step',
         'dep_aim','dep_aim_week','commission_janky','type','janky_system_id',
     ];
+
+    public function users() {
+       return $this->hasMany('App\User');
+    }
+
+    public function departments() {
+        return $this->belongsTo('App\Departments', 'id_dep');
+    }
+
+    public function department_type() {
+        return $this->belongsTo('App\Department_types', 'id_dep_type');
+    }
 }

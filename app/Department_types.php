@@ -16,4 +16,8 @@ class Department_types extends Model
     protected $fillable = [
         'id', 'name','count_agreement'
     ];
+
+    public function department_info() {
+        return $this->hasMany('App\Department_info', 'id_dep_type');
+    }
 }

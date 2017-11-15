@@ -16,4 +16,6 @@ class PrivilageRelation extends Model
     protected $fillable = [
         'id', 'user_type_id','link_id',
     ];
+
+  
 }

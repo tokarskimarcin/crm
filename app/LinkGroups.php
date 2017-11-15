@@ -16,4 +16,8 @@ class LinkGroups extends Model
     protected $fillable = [
         'id', 'name',
     ];
+
+    public function links() {
+        return $this->hasMany('App\Links', 'group_link_id');
+    }
 }

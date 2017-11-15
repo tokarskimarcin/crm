@@ -19,4 +19,8 @@ class Work_Hour extends Model
         'id', 'status', 'click_start','click_stop','register_start','register_stop','accept_start','accept_stop','accept_sec',
         'success','id_user','id_manager','date'
     ];
+
+    public function user() {
+        return $this->belongsTo('App\User', 'id_user');
+    }
 }

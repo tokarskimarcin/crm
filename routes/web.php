@@ -124,6 +124,11 @@ Route::middleware(['check-permission'])->group(function () {
     Route::Post('/view_summary_payment','FinancesController@viewSummaryPaymentPOST');
     // Finances -- STOP --
 
+
+
+
+
 });
+//////////////////////Testing ORM///////////////
 
-
+  Route::get('/testorm', 'TestORM@test');

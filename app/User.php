@@ -29,4 +29,36 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function department_info() {
+        return $this->belongsTo('App\Department_info');
+    }
+
+    public function user_type() {
+        return $this->belongsTo('App\User_types', 'user_type_id');
+    }
+
+    public function agencies() {
+        return $this->belongsTo('App\Agencies', 'agency_id');
+    }
+
+    public function schedule() {
+        return $this->hasMany('App\Schedule', 'id_user');
+    }
+
+    public function penalty_bonuses() {
+        return $this->hasMany('App\PenaltyBonus', 'id_user');
+    }
+
+    public function work_hours() {
+        return $this->hasMany('App\Work_hour', 'id_user');
+    }
+
+    public function dkj() {
+        return $this->hasMany('App\Dkj', 'id_user');
+    }
+
+    public function privilages() {
+        return $this->belongsToMany('App\User', 'privilage_relation', 'user_type_id', '1');
+    }
 }
