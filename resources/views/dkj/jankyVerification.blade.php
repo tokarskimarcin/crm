@@ -174,14 +174,63 @@
             @endif
         </div>
 
+
+        <!-- Modal -->
+        <div id="edit_dkj" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Dodaj Godzin pracownika</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="dtp_input3" class="col-md-5 control-label">Pracownik:</label>
+                            <div id="employee_list">
+                                <select class="form-control showhidetext" name="user_id" id="users_select" style="border-radius: 0px;">
+                                @foreach($users as $user)
+                                        <option value={{$user->id}}>{{$user->first_name.' '.$user->last_name}}</option>
+                                @endforeach;
+                            </div>
+                            <input type="hidden" id="dtp_input3" value="" /><br/>
+                        </div>
+                        <div class="form-group">
+                            <label for="dtp_input3" class="col-md-5 control-label">Godzina zakończenia pracy:</label>
+                            <div class="input-group date form_time col-md-5" data-date="" data-date-format="hh:ii" data-link-field="dtp_input3" data-link-format="hh:ii">
+                                <input id="accept_stop_add" class="form-control" size="16" type="text" value="" readonly>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
+                            </div>
+                            <input type="hidden" id="dtp_input3" value="" /><br/>
+                        </div>
+                        @if( Session::get('count_agreement')==1)
+                            <div class="form-group">
+                                <label for="dtp_input3" class="col-md-5 control-label">Liczna Sukcesów: </label>
+                                <div class="input-group date col-md-5">
+                                    <input id="success_add" class="form-control" size="16" type="number" value="0">
+                                </div>
+                                <input type="hidden" id="dtp_input3" value="" /><br/>
+                            </div>
+                        @else
+                            <input id="success_add" class="form-control" size="16" type="hidden" value="0">
+                        @endif
+                        <button id="add_hour" type="submit" class="btn btn-primary" name="register" style="font-size:18px; width:100%;">Zarejestruj</button>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default close" data-dismiss="modal">Anuluj</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
         @endsection
         @section('script')
-            <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
             <script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
             <script src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.bootstrap.min.js"></script>
             <script src="https://cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
-            <script src="{{ asset('/js/dataTables.editor.min.js')}}"></script>
-            <script src="{{ asset('/js/editor.bootstrap.min.js')}}"></script>
             <script>
                 var editor;
                 var tablica = (1,2,3,4);
@@ -214,8 +263,6 @@
                         });
                         return test;
                     }
-
-
                     $('.form_date').datetimepicker({
                         language: 'pl',
                         autoclose: 1,
@@ -226,46 +273,46 @@
 
 
 
-                    editor = new $.fn.dataTable.Editor({
-                        ajax: {
-                            url: "{{ route('api.dkjRaportSave')}}",
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            }
-                        },
-                        table: "#datatable",
-                        idSrc:  'id',
-                        fields: [
-                            {
-                                label: "Użytkownik:",
-                                name: "id_user",
-                                type:  "select",
-                                "ipOpts": getStateList()
-                            },{
-                                label: "Telefon:",
-                                name: "phone"
-                            }, {
-                                label: "Kampania:",
-                                name: "campaign"
-                            }, {
-                                label: "Komentarz:",
-                                name: "comment"
-                            }
-                            ,{
-                                label: "Janek:",
-                                name:  "dkj_status",
-                                type:  "select",
-                                options: [
-                                    { label: "Nie", value: "0" },
-                                    { label: "Tak", value: "1" }
-                                ]
-                            },{
-                                type:  "hidden",
-                                name: "department_info_id",
-                                def: Math.abs($("select[name='department_id_info']").val())
-                            }
-                        ]
-                    });
+                    {{--editor = new $.fn.dataTable.altEditor({--}}
+                        {{--ajax: {--}}
+                            {{--url: "{{ route('api.dkjRaportSave')}}",--}}
+                            {{--headers: {--}}
+                                {{--'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
+                            {{--}--}}
+                        {{--},--}}
+                        {{--table: "#datatable",--}}
+                        {{--idSrc:  'id',--}}
+                        {{--fields: [--}}
+                            {{--{--}}
+                                {{--label: "Użytkownik:",--}}
+                                {{--name: "id_user",--}}
+                                {{--type:  "select",--}}
+                                {{--"ipOpts": getStateList()--}}
+                            {{--},{--}}
+                                {{--label: "Telefon:",--}}
+                                {{--name: "phone"--}}
+                            {{--}, {--}}
+                                {{--label: "Kampania:",--}}
+                                {{--name: "campaign"--}}
+                            {{--}, {--}}
+                                {{--label: "Komentarz:",--}}
+                                {{--name: "comment"--}}
+                            {{--}--}}
+                            {{--,{--}}
+                                {{--label: "Janek:",--}}
+                                {{--name:  "dkj_status",--}}
+                                {{--type:  "select",--}}
+                                {{--options: [--}}
+                                    {{--{ label: "Nie", value: "0" },--}}
+                                    {{--{ label: "Tak", value: "1" }--}}
+                                {{--]--}}
+                            {{--},{--}}
+                                {{--type:  "hidden",--}}
+                                {{--name: "department_info_id",--}}
+                                {{--def: Math.abs($("select[name='department_id_info']").val())--}}
+                            {{--}--}}
+                        {{--]--}}
+                    {{--});--}}
 
                     table = $('#datatable').DataTable({
                         "autoWidth": false,
@@ -273,6 +320,29 @@
                         "serverSide": true,
                         "drawCallback": function (settings) {
                         },
+                        dom: 'Bfrtip',
+                        buttons: [{
+                                text: 'Edytuj',
+                                name: 'edit',        // DO NOT change name
+                                id: 'edit',
+                                extend: 'selected',
+                                action: function ( e, dt, node, config ) {
+                                    var data=  dt.rows( { selected: true } ).data();
+                                    var id_user = data[0]['id_user'];
+                                    var phone = data[0]['phone'];
+                                    var campaign = data[0]['campaign'];
+                                    var comment = data[0]['comment'];
+                                    var dkj_status = data[0]['dkj_status'];
+                                    $('#edit_dkj').modal('show');
+                                    $("#users_select").val(41);
+                                }
+                            },
+                            {
+                                extend: 'selected', // Bind to Selected row
+                                text: 'Usuń',
+                                name: 'delete',      // DO NOT change name
+                                id:'delete'
+                            }],
                         "ajax": {
                             'url': "{{ route('api.datatableDkjRaport') }}",
                             'type': 'POST',
@@ -315,11 +385,11 @@
                         ],
                         select: true
                     });
-                    // Display the buttons
-                    new $.fn.dataTable.Buttons( table, [
-                        { extend: "edit",   editor: editor },
-                        { extend: "remove", editor: editor }
-                    ] );
+//                    // Display the buttons
+//                    new $.fn.dataTable.Buttons( table, [
+//                        { extend: "edit",   editor: editor },
+//                        { extend: "remove", editor: editor }
+//                    ] );
 
                     table.buttons().container()
                         .appendTo( $('.col-sm-6:eq(0)', table.table().container() ) );

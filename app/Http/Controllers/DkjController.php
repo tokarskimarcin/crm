@@ -43,17 +43,31 @@ class DkjController extends Controller
     public function jankyVerificationGet()
     {
         $departments =  $this->getDepartment();
-        return view('dkj.jankyVerification')->with('departments',$departments);
+
+        return view('dkj.jankyVerification')
+            ->with('departments',$departments);
     }
 
     public function jankyVerificationPOST(Request $request)
     {
         $departments = $this->getDepartment();
+        $department_id_info = $request->department_id_info;
+        $dating_type = 0;
+        if($department_id_info<0)
+        {
+            $department_id_info = $department_id_info*(-1);
+            $dating_type = 1;
+        }
+        $users = User::where('department_info_id',$department_id_info)
+                ->where('user_type_id',1)
+                ->where('dating_type',$dating_type)
+                ->get();
         return view('dkj.jankyVerification')
             ->with('departments',$departments)
             ->with('select_department_id_info',$request->department_id_info)
             ->with('select_start_date',$request->start_date)
             ->with('select_stop_date',$request->stop_date)
+            ->with('users',$users)
             ->with('show_raport',1);
     }
 
