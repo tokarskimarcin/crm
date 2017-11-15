@@ -37,7 +37,7 @@
                                                 <label for ="ipadress">Pracownik:</label>
                                                 <select class="form-control" name="userid">
                                                     @if(isset($response_userid))
-                                                        <option>Wybierz</option>
+                                                        <option value="-1">Wybierz</option>
                                                         @foreach ($users as $user)
                                                             @if($response_userid == $user->id)
                                                                 <option  selected value={{$user->id}} >{{ $user->first_name. ' '.$user->last_name}}</option>
@@ -46,7 +46,7 @@
                                                             @endif
                                                          @endforeach
                                                     @else
-                                                    <option selected>Wybierz</option>
+                                                    <option selected value="-1">Wybierz</option>
                                                         @foreach ($users as $user)
                                                             <option value={{$user->id}}>{{ $user->first_name. ' '.$user->last_name}}</option>
                                                         @endforeach
@@ -120,7 +120,7 @@
                                                                         @if($item->date == $date)
                                                                             <?php $check++?>
                                                                             <?php
-                                                                            if($item->success == 0)
+                                                                            if($item->second == 0)
                                                                                 $avg = number_format (0,2);
                                                                             else
                                                                                 $avg = number_format ( $item->success/($item->second/3600), 2 );

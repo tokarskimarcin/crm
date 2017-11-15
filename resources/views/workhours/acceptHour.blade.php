@@ -32,7 +32,7 @@
         </div>
     </div>
 
-    <div id="success_div" class='alert alert-success'>Godziny zostały zaakceptowane!</div>
+    <div id="success_div" style="display: none;" class='alert alert-success'>Godziny zostały zaakceptowane!</div>
 
     <div class="col-lg-3">
         <label for ="ipadress">Zakres wyszukiwania:</label>

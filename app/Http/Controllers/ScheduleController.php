@@ -15,7 +15,6 @@ class ScheduleController extends Controller
     }
     public function setSchedulePost(Request $request)
     {
-
         $number_of_week = $request->show_schedule;
         $request->session()->put('number_of_week', $number_of_week);
         $schedule_analitics = $this->setWeekDays($number_of_week,$request);
@@ -30,6 +29,9 @@ class ScheduleController extends Controller
     }
     public function viewSchedulePost(Request $request)
     {
+        if ($request->show_schedule == "Wybierz") {
+            return view('schedule.viewSchedule');
+        }
         $number_of_week = $request->show_schedule;
         $year = $request->year;
         $year = explode('.',$year);
@@ -48,7 +50,7 @@ class ScheduleController extends Controller
                 time_to_sec(`thursday_stop`)-time_to_sec(`thursday_start`) as sec_thursday,
                 time_to_sec(`friday_stop`)-time_to_sec(`friday_start`) as sec_friday,
                 time_to_sec(`saturday_stop`)-time_to_sec(`saturday_start`) as sec_saturday,
-                time_to_sec(`sunday_stop`)-time_to_sec(`sunday_start`) as sec_sunday,                
+                time_to_sec(`sunday_stop`)-time_to_sec(`sunday_start`) as sec_sunday,
                 users.id as id_user,
                 users.first_name as user_first_name,
                 users.last_name as user_last_name
@@ -72,11 +74,11 @@ class ScheduleController extends Controller
                     ->where("schedule.year", "=", $year);
             })
             ->select(DB::raw(
-                'schedule.*,               
+                'schedule.*,
                 users.id as id_user,
                 users.first_name as user_first_name,
                 users.last_name as user_last_name,
-                users.phone as user_phone             
+                users.phone as user_phone
                 '))
             ->where('users.department_info_id',Auth::user()->department_info_id);
         return datatables($query)->make(true);
@@ -179,12 +181,12 @@ class ScheduleController extends Controller
 
                 if ($j + 1 == count($dayOfWeekArray) && $i == 20) {
                     $sql .='sum(CASE WHEN Hour(CAST("'.$czas .':00:00" as Time))
-                      >= Hour(schedule.'.$dayOfWeekArray[$j].'_start) and Hour(CAST("' . $czas_plus . ':00:00" as Time)) 
+                      >= Hour(schedule.'.$dayOfWeekArray[$j].'_start) and Hour(CAST("' . $czas_plus . ':00:00" as Time))
                       <= Hour(schedule.'.$dayOfWeekArray[$j].'_stop) THEN 1 ELSE 0 END) as  "'.$dayOfWeekArray[$j].$i.'"';
 
                 } else {
                     $sql .='sum(CASE WHEN Hour(CAST("'.$czas .':00:00" as Time))
-                      >= Hour(schedule.'.$dayOfWeekArray[$j].'_start) and Hour(CAST("' . $czas_plus . ':00:00" as Time)) 
+                      >= Hour(schedule.'.$dayOfWeekArray[$j].'_start) and Hour(CAST("' . $czas_plus . ':00:00" as Time))
                       <= Hour(schedule.'.$dayOfWeekArray[$j].'_stop) THEN 1 ELSE 0 END) as "'.$dayOfWeekArray[$j].$i.'",';
                 }
             }

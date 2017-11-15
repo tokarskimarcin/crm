@@ -69,7 +69,7 @@
                                                     </br>
                                                 </div></br></br></br></br></br></br></br></br></br></br></br></br>
                                                 <div class="col-md-12">
-                                                    <button type="submit" class="btn btn-primary" name="addpbsubmit" style="font-size:18px; width:100%;">Zatwierdź</button>
+                                                    <button type="submit" id="addpbsubmit" class="btn btn-primary" name="addpbsubmit" style="font-size:18px; width:100%;">Zatwierdź</button>
                                                 </div>
                                             </form>
                                         </div></br>
@@ -224,10 +224,12 @@
                             <div class="form-group">
                                 <label for="dtp_input3" class="col-md-5 control-label">Kwota</label>
                                 <div id="amountDetails" class="modal-body"></div>
+                                <div class="alert alert-danger" style="display: none" id="amount_modal_error">Podaj kwotę!</div>
                             </div>
                             <div class="form-group">
                                 <label for="dtp_input3" class="col-md-5 control-label">Powód</label>
                                 <div id="reasonDetails" class="modal-body"></div>
+                                <div class="alert alert-danger" id="reason_modal_error" style="display: none">Podaj powód!</div>
                             </div>
                             <button id="edit_user_modal" type="submit" class="btn btn-primary" name="register" style="font-size:18px; width:100%;">Zapisz</button>
                         </div>
@@ -242,6 +244,41 @@
 
 @section('script')
 <script>
+
+$('#editinfo').on('hidden.bs.modal', function () {
+      $("#amount_modal_error").fadeOut(0);
+      $("#reason_modal_error").fadeOut(0);
+})
+
+$("#addpbsubmit").click(function () {
+
+    var user_id = $("select[name='user_id']").val();
+    var type_penalty = $("select[name='type_penalty']").val();
+    var cost = $("input[name='cost']").val();
+    var reason = $("input[name='reason']").val();
+
+    if (user_id == 'Wybierz') {
+        alert("Wybierz użytkownika!");
+        return false;
+    }
+
+    if (type_penalty == 'Wybierz') {
+        alert("Wybierz rodzaj kary/nagrody!");
+        return false;
+    }
+
+    if (cost == '') {
+        alert("Podaj kwotę!");
+        return false;
+    }
+
+    if (reason == '') {
+        alert("Podaj powód!");
+        return false;
+    }
+
+});
+
     var id_record;
     var user_name;
     var user_status;
@@ -278,15 +315,33 @@
                 '</select>' );
         }
 
-        $( "#amountDetails" ).html(  '<input type="number" min="0" step="1"  id="cost_modal" class="form-control"  value='+user_cost+'>' );
+        $( "#amountDetails" ).html(  '<input type="number" min="0" step="1" name="cost_modal" id="cost_modal" class="form-control"  value='+user_cost+'>' );
         $( "#dateDetails" ).html( user_date );
-        $( "#reasonDetails" ).html( '<input class="form-control" id="reason_modal" type="text" value='+user_commnet+'>' );
+        $( "#reasonDetails" ).html( '<input class="form-control" id="reason_modal" name="reason_modal" type="text" value='+user_commnet+'>' );
     });
 
     $( "#edit_user_modal" ).click(function() {
         user_status = $( "#type_penalty_modal option:selected" ).val()
         user_cost =  $("#cost_modal").val();
         user_commnet =  $("#reason_modal").val();
+
+        var validation_error = 0;
+
+        if (user_cost == '') {
+              $("#amount_modal_error").fadeIn(0);
+              validation_error = 1;
+        } else {
+              $("#amount_modal_error").fadeOut(0);
+        }
+
+        if (user_commnet == '') {
+              $("#reason_modal_error").fadeIn(0);
+              validation_error = 1;
+        } else {
+              $("#reason_modal_error").fadeOut(0);
+        }
+
+        if (validation_error == 0) {
             $.ajax({
                 type: "POST",
                 url: '{{ route('api.editPenaltyBonus') }}',
@@ -299,6 +354,8 @@
                     location.reload();
                 }
             });
+        }
+
 
 
     });

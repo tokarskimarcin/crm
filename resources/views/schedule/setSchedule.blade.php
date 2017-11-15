@@ -46,7 +46,7 @@
                                             <form class="form-horizontal" method="post" action="set_schedule">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <select class="form-control" name="show_schedule" id="week_text">
-                                                    <option>Wybierz</option>
+                                                    <option value="-1">Wybierz</option>
                                                     @for ($i=0; $i < 5; $i++)
                                                         @php
                                                         $przelicznik = 7*$i;

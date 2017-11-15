@@ -28,6 +28,7 @@
     @endif
 
 
+
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
@@ -42,7 +43,7 @@
                                                 <label for ="ipadress">Pracownik:</label>
                                                 <select class="form-control" name="userid">
                                                     @if(isset($response_userid))
-                                                        <option>Wybierz</option>
+                                                        <option value="-1">Wybierz</option>
                                                         @foreach ($users as $user)
                                                             @if($response_userid == $user->id)
                                                                 <option  selected value={{$user->id}} >{{ $user->first_name. ' '.$user->last_name}}</option>
@@ -51,7 +52,7 @@
                                                             @endif
                                                          @endforeach
                                                     @else
-                                                    <option selected>Wybierz</option>
+                                                    <option selected value="-1">Wybierz</option>
                                                         @foreach ($users as $user)
                                                             <option value={{$user->id}}>{{ $user->first_name. ' '.$user->last_name}}</option>
                                                         @endforeach

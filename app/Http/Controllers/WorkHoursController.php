@@ -199,21 +199,31 @@ class WorkHoursController extends Controller
     //******************ViewHour****************** Start
     public function viewHourGet()
     {
+        $department_id = Auth::user()->department_info_id;
 
-        $users = $this->getUsers();
+        $department = Department_info::find($department_id);
+        $users = $department->users;
         return view('workhours.viewHour')
             ->with('users',$users);
     }
     public function viewHourGetCadre()
     {
-        $user_type_info = UserTypes::find(Auth::user()->user_type_id);
-        $what_show = $user_type_info->all_departments;
-        $users = $this->getCadre($what_show);
+        //$users = User::select('SELECT * FROM users WHERE user_type_id != 1');
+        $users = User::where('user_type_id', "!=", 1)->get();
+        // $user_type_info = UserTypes::find(Auth::user()->user_type_id);
+        // $what_show = $user_type_info->all_departments;
+        // $users = $this->getCadre($what_show);
+
         return view('workhourscadre.viewHourCadre')
             ->with('users',$users);
     }
     public function viewHourPostCadre(Request $request)
     {
+        if($request->userid == "-1") {
+              $users = User::where('user_type_id', "!=", 1)->get();
+              return view('workhourscadre.viewHourCadre')
+                  ->with('users',$users);
+        }
         $user_type_info = UserTypes::find(Auth::user()->user_type_id);
         $what_show = $user_type_info->all_departments;
         $users = $this->getCadre($what_show);
@@ -224,6 +234,7 @@ class WorkHoursController extends Controller
         $count_agreement= $count_agreement->count_agreement;
         Session::put('count_agreement', $count_agreement);
         $user_info = $this->user_info($userid,$month);
+        $users = User::where('user_type_id', "!=", 1)->get();
         return view('workhourscadre.viewHourCadre')
             ->with('users',$users)
             ->with('response_userid',$userid)
@@ -234,7 +245,14 @@ class WorkHoursController extends Controller
     }
     public function viewHourPost(Request $request)
     {
-        $users = $this->getUsers();
+        if ($request->userid == "-1") {
+          $department_id = Auth::user()->department_info_id;
+          $department = Department_info::find($department_id);
+          $users = $department->users;
+          return view('workhours.viewHour')
+              ->with('users',$users);
+        }
+
         $month = $request->month;
         $userid = $request->userid;
         $myDepartment_info = Department_info::find(Auth::user()->department_info_id);
@@ -242,6 +260,10 @@ class WorkHoursController extends Controller
         $count_agreement= $count_agreement->count_agreement;
         Session::put('count_agreement', $count_agreement);
         $user_info = $this->user_info($userid,$month);
+        $department_id = Auth::user()->department_info_id;
+        $department = Department_info::find($department_id);
+        $users = $department->users;
+        $user = User::find($userid);
 
         $add_hour_success = false;
         if ($request->session()->has('add_hour_success')) {
@@ -254,6 +276,7 @@ class WorkHoursController extends Controller
             ->with('response_month',$month)
             ->with('agreement',$count_agreement)
             ->with('response_user_info',$user_info)
+            ->with('user',$user)
             ->with('add_hour_success', $add_hour_success);
     }
 
