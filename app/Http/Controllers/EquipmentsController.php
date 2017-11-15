@@ -8,6 +8,6 @@ class EquipmentsController extends Controller
 {
     public function showEquipment()
     {
-        return 0;
+        return 1;
     }
 }
