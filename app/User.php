@@ -59,6 +59,10 @@ class User extends Authenticatable
     }
 
     public function privilages() {
-        return $this->belongsToMany('App\User', 'privilage_relation', 'user_type_id', '1');
+        return $this->belongsToMany('App\Links', 'privilage_relation', 'user_type_id', 'link_id');
+    }
+
+    public function summaryPaymets() {
+        return $this->hasMany('App\SummaryPayment', 'id_user');
     }
 }

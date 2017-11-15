@@ -30,4 +30,8 @@ class Department_info extends Model
     public function department_type() {
         return $this->belongsTo('App\Department_types', 'id_dep_type');
     }
+
+    public function summaryPayment() {
+        return $this->hasMany('App\SummaryPayment', 'department_info_id');
+    }
 }

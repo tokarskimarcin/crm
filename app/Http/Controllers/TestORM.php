@@ -16,15 +16,12 @@ use App\Dkj;
 use App\Links;
 use App\LinkGroups;
 use App\PrivilageRelation;
+use App\SummaryPayment;
 
 class TestORM extends Controller
 {
     public function test() {
 
-        $user = User::find(1);
-        $links = Links::find(3);
-
-      return view('testorm')->with('user', $user);
 
 
 

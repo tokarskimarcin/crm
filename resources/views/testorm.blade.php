@@ -1,16 +1,10 @@
 
 
 @if(isset($user))
-    {{$user->privilages}}
-@else
-asd
-@endif
 
 
+    {{$user->summaryPaymets}}
 
-
-@if(isset($links))
-    {{$links}}
 @else
 asd
 @endif

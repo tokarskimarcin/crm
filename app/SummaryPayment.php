@@ -15,4 +15,12 @@ class SummaryPayment extends Model
     protected $fillable = [
         'id', 'department_info_id', 'month', 'payment', 'hours', 'dosuments', 'students', 'employee_count', 'created_at', 'updated_at'
     ];
+
+    public function department_info() {
+        return $this->belongsTo('App\Department_info', 'department_info_id');
+    }
+
+    public function user() {
+        return $this->belongsTo('App\User', 'id_user');
+    }
 }
