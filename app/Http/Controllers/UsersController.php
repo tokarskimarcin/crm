@@ -161,6 +161,15 @@ class UsersController extends Controller
         return view('hr.employeeManagement')->with('saved', $user_data);
     }
 
+    public function edit_cadreGet($id) {
+        $user = User::find($id);
+        $agencies = Agencies::all();
+
+        return view('hr.addConsultantTEST')
+            ->with('agencies', $agencies)
+            ->with('user', $user);
+    }
+
     public function datatableEmployeeManagement(Request $request)
     {
         if($request->ajax()) {

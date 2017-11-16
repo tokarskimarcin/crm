@@ -67,19 +67,19 @@
                                     <tr>
                                         <td style="width: 170px;height:52px;"><b>Imię:</b></td>
                                         <td>
-                                            <input type="text" class="form-control" name="first_name" placeholder="Imię">
+                                            <input type="text" class="form-control" name="first_name" placeholder="Imię" value="{{$user->first_name}}">
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="width: 170px;height:52px;"><b>Nazwisko:</b></td>
                                         <td>
-                                            <input type="text" class="form-control" placeholder="Nazwisko" name="last_name"  value="">
+                                            <input type="text" class="form-control" placeholder="Nazwisko" name="last_name"  value="{{$user->last_name}}">
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="width: 170px;height:52px;"><b>E-mail:</b></td>
                                         <td>
-                                            <input type="mail" class="form-control" placeholder="Email" name="email"  value="">
+                                            <input type="mail" class="form-control" placeholder="Email" name="email"  value="{{$user->email_off}}">
                                         </td>
                                     </tr>
                                     <tr>
@@ -91,12 +91,12 @@
                                     <tr>
                                         <td style="width: 170px;height:52px;"><b>Telefon prywatny:</b></td>
                                         <td>
-                                            <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="private_phone" value="">
+                                            <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="private_phone" value="{{$user->phone}}">
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="width: 170px;height:52px;"><b>Login(Godzinówka):</b></td>
-                                        <td><input type="text" class="form-control" placeholder="Login" name="username" value=""></td>
+                                        <td><input type="text" class="form-control" placeholder="Login" name="username" value="{{$user->username}}"></td>
 
                                     </tr>
                                     <tr>
@@ -110,9 +110,8 @@
                                         <td style="width: 170px;height:52px;"><b>Dokumenty:</b></td>
                                         <td>
                                             <select class="form-control" style="font-size:18px;" name="documents" >
-                                                <option>Wybierz</option>
-                                                <option value="1">Tak</option>
-                                                <option value="0">Nie</option>
+                                                <option value="1" @if($user->documents == 1) selected @endif>Tak</option>
+                                                <option value="0" @if($user->documents == 0) selected @endif>Nie</option>
                                             </select>
                                         </td>
                                     </tr>
@@ -120,9 +119,8 @@
                                         <td style="width: 170px;height:52px;"><b>Student:</b></td>
                                         <td>
                                             <select class="form-control" style="font-size:18px;" name="student">
-                                                <option>Wybierz</option>
-                                                <option value="1">Tak</option>
-                                                <option value="0">Nie</option>
+                                                <option value="1" @if($user->student == 1) selected @endif>Tak</option>
+                                                <option value="0" @if($user->student == 0) selected @endif>Nie</option>
                                             </select>
                                         </td>
                                     </tr>
@@ -130,9 +128,8 @@
                                         <td style="width: 170px;height:52px;"><b>Agencja:</b></td>
                                         <td>
                                             <select class="form-control" style="font-size:18px;" name="agency_id" >
-                                                <option>Wybierz</option>
                                                 @foreach($agencies as $agency)
-                                                    <option value="{{$agency->id}}">{{$agency->name}}</option>
+                                                    <option value="{{$agency->id}}" @if($user->agency_id == $agency->id) selected @endif>{{$agency->name}}</option>
                                                 @endforeach
                                             </select>
                                         </td>
@@ -149,7 +146,7 @@
                                         <td style="width: 170px;height:52px;"><b>Rozpoczęcie Pracy:</b></td>
                                         <td>
                                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                                <input class="form-control" name="start_date" type="text" value="{{date("Y-m-d")}}" readonly >
+                                                <input class="form-control" name="start_date" type="text" value="{{$user->start_work}}" readonly >
                                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                             </div>
                                         </td>
@@ -158,19 +155,24 @@
                                         <td style="width: 170px;height:52px;"><b>Zakończenie Pracy:</b></td>
                                         <td>
                                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                                <input class="form-control" name="stop_date" type="text" value="{{date("Y-m-d")}}" readonly >
+                                                @if(isset($user->end_work))
+                                                    <input class="form-control" name="stop_date" type="text" value="{{$user->end_work}}" readonly >
+                                                @else
+                                                    <input class="form-control" name="stop_date" type="text" value="{{date('Y-m-d')}}" readonly >
+                                                @endif
+
                                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                             </div>
                                         </td>
                                     </tr>
+
                                     <tr>
                                         <td style="width: 170px;height:52px;"><b>Stawka na godzine:</b></td>
                                         <td>
                                             <select class="form-control" style="font-size:18px;" name="rate" >
-                                                <option>Wybierz</option>
                                                 <option>Nie dotyczy</option>
                                                 @for ($i = 7.00; $i <=14; $i+=0.5)
-                                                    <option value="{{number_format ($i,2)}}">{{number_format ($i,2)}}</option>
+                                                    <option value="{{number_format ($i,2)}}" @if($user->rate == $i) selected @endif>{{number_format ($i,2)}}</option>
                                                 @endfor
                                             </select>
                                         </td>
@@ -178,9 +180,14 @@
                                     <tr>
                                         <td style="width: 170px;height:52px;"><b>Wynagrodzenie:</b></td>
                                         <td>
-                                            <input type="number" class="form-control" placeholder="0" name="salary" value="">
+                                          @if(isset($user->salary))
+                                              <input type="number" class="form-control" placeholder="0" name="salary" value="{{$user->salary}}">
+                                          @else
+                                              <input type="number" class="form-control" placeholder="0" name="salary" value="0">
+                                          @endif
                                         </td>
                                     </tr>
+
                                     <tr>
                                         <td style="width: 170px;height:52px;"><b>Dodatek slużbowy:</b></td>
                                         <td>
@@ -191,9 +198,8 @@
                                         <td style="width: 170px;height:52px;"><b>Całość na konto:</b></td>
                                         <td>
                                             <select class="form-control" style="font-size:18px;" name="salary_to_account">
-                                                <option>Wybierz</option>
-                                                <option value="1">Tak</option>
-                                                <option value="0">Nie</option>
+                                                <option value="1" @if($user->salary_to_account == 1) selected @endif>Tak</option>
+                                                <option value="0" @if($user->salary_to_account == 0) selected @endif>Nie</option>
                                             </select>
                                         </td>
                                     </tr>
@@ -225,49 +231,49 @@
     		                    <tbody>
     		                    <b style="font-size: 20px; font-family: sans-serif;">Kary i Premie</b>
     		                      <tr>
-    		                        <td style="width: 10px;"><b>Lp.</b></td>
     		                        <td><b>Data</b></td>
     		                        <td><b>Kara/Premia</b></td>
     		                        <td><b>Dodał</b></td>
     		                        <td><b>Powód</b></td>
     		                        <td></td>
     		                      </tr>
+                              @foreach($user->penalty_bonuses as $penalty)
+                                  <tr>
+        		                        <td nowrap="nowrap">{{$penalty->event_date}}</td>
+                                    @if($penalty->type == 2)
+                                        <td nowrap="nowrap"><span style="background-color: #70ff5c; padding: 4px 10px;border-radius: 5px;border:1px solid #33ff36; color:#4b5c44;">Premia: {{$penalty->amount}} zł</span></td>
+                                    @else
+                                        <td nowrap="nowrap"><span style="background-color: #ff7b7b; padding: 4px 10px;border-radius: 5px;border:1px solid #ff6a6a; color:#7f2222;">Kara: {{$penalty->amount}} zł</span></td>
+                                    @endif
+        		                        <td nowrap="nowrap"><span style="background-color: #d9edf7; padding: 4px 10px;border-radius: 5px;border:1px solid #bce8f1; color:#31708f;">{{$penalty->manager->first_name . ' ' . $penalty->manager->last_name}}</span></td>
+        		                        <td>{{$penalty->comment}}</td>
+        		                        <td><a type="button" class="btn btn-xs btn-danger"><i class="glyphicon glyphicon-trash" style="height: 20px; padding-top:3px; padding-left: 0px;" data-toggle="modal" data-target="#karta_oceny"></i></a></td>
+        		                      </tr>
+                              @endforeach
+                              @if (Session::has('message'))
+                                 <div class="alert alert-success">{{ Session::get('message') }}</div>
+                              @endif
 
-    		                      <?php for ($i=1; $i < 3; $i++) { ?>
-    		                      <tr>
-    		                        <td style="width: 10px;"><b><?php echo $i; ?></b></td>
-    		                        <td nowrap="nowrap">2017-05-0<?php echo $i; ?></td>
-    		                        <td nowrap="nowrap"><span style="background-color: #ff7b7b; padding: 4px 10px;border-radius: 5px;border:1px solid #ff6a6a; color:#7f2222;">Kara: -50zł</span></td>
-    		                        <td nowrap="nowrap"><span style="background-color: #d9edf7; padding: 4px 10px;border-radius: 5px;border:1px solid #bce8f1; color:#31708f;">Paweł Zieliński</span></td>
-    		                        <td>Brak powodu</td>
-    		                        <td><a type="button" class="btn btn-xs btn-danger"><i class="glyphicon glyphicon-trash" style="height: 20px; padding-top:3px; padding-left: 0px;" data-toggle="modal" data-target="#karta_oceny"></i></a></td>
-    		                      </tr>
-    		                      <?php } ?>
-    		                      <?php for ($i=3; $i < 6; $i++) { ?>
-    		                      <tr>
-    		                        <td style="width: 10px;"><b><?php echo $i; ?></b></td>
-    		                        <td nowrap="nowrap">2017-05-0<?php echo $i; ?></td>
-    		                        <td nowrap="nowrap"><span style="background-color: #70ff5c; padding: 4px 10px;border-radius: 5px;border:1px solid #33ff36; color:#4b5c44;">Premia: 100zł</span></td>
-    		                        <td nowrap="nowrap"><span style="background-color: #d9edf7; padding: 4px 10px;border-radius: 5px;border:1px solid #bce8f1; color:#31708f;">Paweł Zieliński</span></td>
-    		                        <td>Brak powodu</td>
-    		                        <td><a type="button" class="btn btn-xs btn-danger"><i class="glyphicon glyphicon-trash" style="height: 20px; padding-top:3px; padding-left: 0px;" data-toggle="modal" data-target="#karta_oceny"></i></a></td>
-    		                      </tr>
-    		                      <?php } ?>
     							            <tr>
-    		                        <td colspan="2"><select class="form-control">
-    		                        	<option value="0">Wybierz</option>
-    		                        	<option value="1">Kara</option>
-    		                        	<option value="2">Premia</option>
-    		                        </select></td>
-    		                        <td><input type="text" placeholder="Kwota" class="form-control"></td>
-    		                        <td colspan="2"><input type="text" placeholder="Powód" class="form-control"></td>
-    		                        <td><a type="button" class="btn btn-xs btn-info"><i class="glyphicon glyphicon-floppy-disk" style="padding-top: 3px; padding-left: 2px;" data-toggle="modal" data-target="#karta_oceny"></i></a></td>
+                                  <form method="POST" action="/view_penalty_bonus_edit">
+                                      <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                      <input type="hidden" name="user_id" value="{{$user->id}}">
+          		                        <td colspan="2"><select class="form-control" name="penalty_type">
+          		                        	<option>Wybierz</option>
+          		                        	<option value="1">Kara</option>
+          		                        	<option value="2">Premia</option>
+          		                        </select></td>
+          		                        <td><input type="number" placeholder="0" name="cost" class="form-control"></td>
+          		                        <td colspan="2"><input type="text" placeholder="Powód" name="reason" class="form-control"></td>
+
+          		                        <td><input type="submit" id="addpbsubmit"></td>
+                                  </form>
     		                      </tr>
 
     		                    </tbody>
     		                  </table>
     		                </div>
-                        <div class=" col-md-10 col-lg-10 ">
+                        <!-- <div class=" col-md-10 col-lg-10 ">
     		                  <table class="table table-user-information">
     		                    <tbody>
     		                    <b style="font-size: 20px; font-family: sans-serif;">Posiadany Sprzęt</b>
@@ -310,7 +316,7 @@
 
     		                    </tbody>
     		                  </table>
-    		                </div>
+    		                </div> -->
             </div>
         </div>
     </div>
@@ -321,7 +327,7 @@
     </div>
 
     <!-- Laptop -->
-    <div class="modal fade" id="laptop" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <!-- <div class="modal fade" id="laptop" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
       <div class="modal-dialog" role="document">
         <div style="width:370px; margin:0 auto; background-color:#fff; border-radius:6px;border: 1px solid rgba(0,0,0,.2);">
           <div class="modal-header">
@@ -372,12 +378,35 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
 @endsection
 @section('script')
 
 <script>
+
+$("#addpbsubmit").click(function () {
+
+    var penalty_type = $("select[name='penalty_type']").val();
+    var cost = $("input[name='cost']").val();
+    var reason = $("input[name='reason']").val();
+
+    if (penalty_type == "Wybierz") {
+        alert("Wybierz rodzaj kary/nagrody!");
+        return false;
+    }
+
+    if (cost == '') {
+        alert("Podaj kwotę!");
+        return false;
+    }
+
+    if (reason == '') {
+        alert("Podaj powód!");
+        return false;
+    }
+
+});
 
     $("#edit-name-button").click(function(){
         $(".name").fadeOut();

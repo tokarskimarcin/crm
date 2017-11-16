@@ -85,6 +85,9 @@ Route::middleware(['check-permission'])->group(function () {
     Route::get('/edit_consultant/{id}','UsersController@edit_consultantGet');
     Route::POST('/edit_consultant/{id}','UsersController@edit_consultantPOST');
 
+    Route::get('/edit_cadre/{id}','UsersController@edit_cadreGet');
+    Route::POST('/edit_carde/{id}','UsersController@edit_cadrePOST');
+
     Route::get('/employee_management','UsersController@employee_managementGet');
 
     Route::get('/cadre_management','UsersController@cadre_managementGet');
@@ -119,6 +122,9 @@ Route::middleware(['check-permission'])->group(function () {
 
     Route::get('/view_penalty_bonus','FinancesController@viewPenaltyBonusGet');
     Route::Post('/view_penalty_bonus','FinancesController@viewPenaltyBonusPOST');
+
+    Route::get('/view_penalty_bonus_edit/{id}','FinancesController@viewPenaltyBonusGetEdit');//here
+    Route::Post('/view_penalty_bonus_edit','FinancesController@viewPenaltyBonusPostEdit');//here
 
     Route::get('/view_summary_payment','FinancesController@viewSummaryPaymentGet');
     Route::Post('/view_summary_payment','FinancesController@viewSummaryPaymentPOST');

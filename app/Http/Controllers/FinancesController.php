@@ -12,6 +12,8 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
+use Session;
 
 class FinancesController extends Controller
 {
@@ -48,6 +50,42 @@ class FinancesController extends Controller
                 ->with('agencies',$agencies);
         }
 
+
+    }
+
+    public function viewPenaltyBonusGetEdit($id) {
+      $user = User::find($id);
+      $agencies = Agencies::all();
+      return view('hr.addConsultantTEST')
+          ->with('user', $user)
+          ->with('agencies', $agencies);
+    }
+
+    public function viewPenaltyBonusPostEdit(Request $request) {
+        $id_manager = Auth::user()->id;
+
+        $object = new PenaltyBonus();
+        $object->id_user = $request->user_id;
+        $object->type = $request->penalty_type;
+        $object->amount = $request->cost;
+        $object->event_date = date('Y-m-d');
+        $object->id_manager = $id_manager;
+        $object->comment = $request->reason;
+        $object->save();
+
+        $message_type = ($request->penalty_type == 1) ? 'Kara' : 'Premia' ;
+        $message = $message_type . ' została dodana pomyślnie';
+
+        $user = User::find($request->user_id);
+        $agencies = Agencies::all();
+
+        Session::flash('message', "Kara/premia dodana pomyślnie!");
+        return Redirect::back();
+
+        return view('hr.addConsultantTEST')
+            ->with('user', $user)
+            ->with('agencies', $agencies)
+            ->with('message', $message);
 
     }
     public function viewPenaltyBonusGet()
