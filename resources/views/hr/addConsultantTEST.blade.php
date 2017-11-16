@@ -237,8 +237,8 @@
     		                        <td><b>Powód</b></td>
     		                        <td></td>
     		                      </tr>
-                              @foreach($user->penalty_bonuses as $penalty)
-                                  <tr>
+                              @foreach($user->penalty_bonuses->where('status', '!=', 0) as $penalty)
+                                  <tr name={{$penalty->id}}>
         		                        <td nowrap="nowrap">{{$penalty->event_date}}</td>
                                     @if($penalty->type == 2)
                                         <td nowrap="nowrap"><span style="background-color: #70ff5c; padding: 4px 10px;border-radius: 5px;border:1px solid #33ff36; color:#4b5c44;">Premia: {{$penalty->amount}} zł</span></td>
@@ -247,7 +247,7 @@
                                     @endif
         		                        <td nowrap="nowrap"><span style="background-color: #d9edf7; padding: 4px 10px;border-radius: 5px;border:1px solid #bce8f1; color:#31708f;">{{$penalty->manager->first_name . ' ' . $penalty->manager->last_name}}</span></td>
         		                        <td>{{$penalty->comment}}</td>
-        		                        <td><a type="button" class="btn btn-xs btn-danger"><i class="glyphicon glyphicon-trash" style="height: 20px; padding-top:3px; padding-left: 0px;" data-toggle="modal" data-target="#karta_oceny"></i></a></td>
+                                    <td><button class="btn btn-danger btn-sm action delete" id="{{$penalty->id}}">Usuń</button></td>
         		                      </tr>
                               @endforeach
                               @if (Session::has('message'))
@@ -384,6 +384,27 @@
 @section('script')
 
 <script>
+
+
+$( ".delete" ).click(function() {
+    var id = (this.id);
+
+    $.ajax({
+        type: "POST",
+        url: '{{ route('api.deletePenaltyBonus') }}',
+        data: {
+            "id": id
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            alert("Pomyślnie usunięto karę/premię!");
+        }
+    });
+    $('tr[name=' + this.id + ']').fadeOut(0);
+});
+
 
 $("#addpbsubmit").click(function () {
 

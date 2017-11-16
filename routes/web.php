@@ -48,6 +48,8 @@ Route::POST('/saveSchedule','ScheduleController@saveSchedule')->name('api.saveSc
 Route::POST('/saveSummaryPayment','FinancesController@saveSummaryPayment')->name('api.summary_payment_save');
 Route::POST('/editPenaltyBonus','FinancesController@editPenaltyBonus')->name('api.editPenaltyBonus');
 
+Route::POST('/deletePenaltyBonus','FinancesController@deletePenaltyBonus')->name('api.deletePenaltyBonus');
+
 
 
 

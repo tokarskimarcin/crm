@@ -171,7 +171,7 @@
                                                     <tbody>
 
                                                         @foreach($users_show as $item)
-                                                            <tr>
+                                                            <tr name="{{$item->id}}">
                                                                 <td class="user_name_modal">{{$item->first_name.' '.$item->last_name}}</td>
                                                                 <td class="user_status_modal">{{($item->type == 1) ? "Kara" : "Premia"}}</td>
                                                                 <td class="user_cost_modal">{{$item->amount}} PLN</td>
@@ -358,6 +358,25 @@ $("#addpbsubmit").click(function () {
 
 
 
+    });
+    // AJAX usuwanie kar/premii
+    $( ".delete" ).click(function() {
+        var id = (this.id);
+
+        $.ajax({
+            type: "POST",
+            url: '{{ route('api.deletePenaltyBonus') }}',
+            data: {
+                "id": id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                alert("Pomyślnie usunięto karę/premię!");
+            }
+        });
+        $('tr[name=' + this.id + ']').fadeOut(0);
     });
 
     {{--$( ".delete" ).click(function() {--}}

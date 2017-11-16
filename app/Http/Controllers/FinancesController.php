@@ -81,11 +81,11 @@ class FinancesController extends Controller
 
         Session::flash('message', "Kara/premia dodana pomyślnie!");
         return Redirect::back();
-
-        return view('hr.addConsultantTEST')
-            ->with('user', $user)
-            ->with('agencies', $agencies)
-            ->with('message', $message);
+        //
+        // return view('hr.addConsultantTEST')
+        //     ->with('user', $user)
+        //     ->with('agencies', $agencies)
+        //     ->with('message', $message);
 
     }
     public function viewPenaltyBonusGet()
@@ -140,6 +140,7 @@ class FinancesController extends Controller
             ->with('date_stop',$date_stop)
             ->with('showuser',$request->showuser);
         }
+
         return $view;
     }
 
@@ -234,6 +235,16 @@ class FinancesController extends Controller
             `salary_to_account` ')->get();
             $final_salary = $r->groupBy('agency_id');
             return $final_salary;
+    }
+
+    public function deletePenaltyBonus(Request $request) {
+        if($request->ajax())
+        {
+            $object = PenaltyBonus::find($request->id);
+            $object->id_manager_edit = Auth::user()->id;
+            $object->status = 0;
+            $object->save();
+        }
     }
 
 }

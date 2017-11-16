@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddColumnSalaryToUsers extends Migration
+class AddColumnStatusToPenaltyBonus extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class AddColumnSalaryToUsers extends Migration
      */
     public function up()
     {
-        // Schema::table('users', function (Blueprint $table) {
-        //     $table->integer('salary')->nullable();
-        // });
+        Schema::table('penalty_bonus', function (Blueprint $table) {
+            $table->integer('status')->nullable();
+        });
     }
 
     /**
