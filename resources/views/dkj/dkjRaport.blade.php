@@ -14,6 +14,9 @@
         .panel-heading a.collapsed:after {
             content:"\e080";
         }
+        .lenght{
+            height: 40px;
+        }
 
 
     </style>
@@ -267,7 +270,7 @@
             },
             "drawCallback": function (settings) {
             },
-            dom: 'Bfrtip',
+            dom: '<"lenght"l>Bfrtip',
             buttons: [
                 {
                     text: 'Dodaj',
@@ -361,7 +364,10 @@
                 }, "name": "dkj_status"},
                 {
                     "data": function (data, type, dataToSet) {
-                        return data.manager_status + " " + data.comment_manager;
+                        if(data.manager_status == null)
+                            return 'brak';
+                        else
+                            return data.manager_status + " " + data.comment_manager;
                     }, "name": " dkj.comment_manager"
                 }
             ],

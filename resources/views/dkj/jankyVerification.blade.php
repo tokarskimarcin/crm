@@ -14,7 +14,9 @@
         .panel-heading a.collapsed:after {
             content:"\e080";
         }
-
+        .lenght{
+            height: 40px;
+        }
 
     </style>
 
@@ -220,6 +222,7 @@
 
         @endsection
         @section('script')
+            <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
             <script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
             <script src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.bootstrap.min.js"></script>
             <script src="https://cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
@@ -265,7 +268,7 @@
                         },
                         "drawCallback": function (settings) {
                         },
-                        dom: 'Bfrtip',
+                        dom: '<"lenght"l>Bfrtip',
                         buttons: [{
                                 text: 'Edytuj',
                                 name: 'edit',        // DO NOT change name
