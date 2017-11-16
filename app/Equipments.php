@@ -13,7 +13,16 @@ class Equipments extends Model
         'signal_cable', 'status', 'id_user', 'id_manager', 'created_at', 'updated_at'
     ];
 
+    public function equipment_type() {
+        return $this->belongsTo('App\EquipmentTypes', 'equipment_type_id');
+    }
     public function user() {
         return $this->belongsTo('App\User', 'id_user');
+    }
+    public function manager() {
+        return $this->belongsTo('App\User', 'id_manager');
+    }
+    public function department_info() {
+        return $this->belongsTo('App\Department_info', 'department_info_id');
     }
 }

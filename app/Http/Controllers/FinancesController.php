@@ -130,7 +130,7 @@ class FinancesController extends Controller
                    '))->where('users.department_info_id',Auth::user()->department_info_id)
                     ->whereBetween('event_date', [$date_start, $date_stop])
                     ->whereIn('type', [1,2])
-                    ->where('users.user_type_id',1);
+                    ->where('users.user_type_id1',1);
             if($request->showuser != -1)
             {
                 $query->where('users.id' , $request->showuser);

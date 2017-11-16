@@ -142,9 +142,6 @@
 
                                                     <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                                 </div></br>
-
-
-
                                                 <button type="submit" class="btn btn-primary" name="showpbsubmit" style="font-size:18px; width:100%;">Wyszukaj</button>
 
                                             </form>
