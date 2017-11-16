@@ -14,4 +14,12 @@ class PenaltyBonus extends Model
     public function user() {
         return $this->belongsTo('App\User', 'id_user');
     }
+
+    public function manager() {
+        return $this->belongsTo('App\User', 'id_manager');
+    }
+
+    public function manager_edit() {
+        return $this->belongsTo('App\User', 'id_manager_edit');
+    }
 }

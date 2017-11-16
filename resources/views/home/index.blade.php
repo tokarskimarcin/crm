@@ -51,7 +51,10 @@
                                     <?php elseif($status == 2): ?>
                                     <button id="done" class="button" data-toggle="modal" data-target="#registerModal">Rarejestruj Godziny</button>
                                      <?php elseif($status >=3): ?>
-                                    <button id="done" class="button" data-toggle="modal" data-target="#registerModal">Godziny Zostały Zarejestrowane</button>
+                                       <div class="alert alert-success">
+                                            Godziny zostały zarejestrowane w przedziale: {{$register_start}} - {{$register_stop}}
+                                       </div>
+                                    <button id="done" class="button" data-toggle="modal" data-target="#registerModal">Edytuj godziny pracy</button>
                                     <?php endif?>
                                 </div>
                             </div>

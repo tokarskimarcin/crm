@@ -234,7 +234,7 @@
                             <button id="edit_user_modal" type="submit" class="btn btn-primary" name="register" style="font-size:18px; width:100%;">Zapisz</button>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-default close" data-dismiss="save_modal">Anuluj</button>
+                            <button type="button" class="btn btn-default close" data-dismiss="modal">Anuluj</button>
                         </div>
                     </div>
 

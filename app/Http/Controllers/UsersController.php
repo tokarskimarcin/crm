@@ -16,24 +16,26 @@ class UsersController extends Controller
     public function add_consultantGet()
     {
         $agencies = Agencies::all();
-        $send_type = Department_info::find(Auth::user()->department_info_id);
-        $send_type = $send_type->type;
+    //     $send_type = Department_info::find(Auth::user()->department_info_id);
+    //     $send_type = $send_type->type;
+        $user = User::find(Auth::user()->id);
         return view('hr.addConsultant')->with('agencies',$agencies)
-            ->with('send_type',$send_type);
+            ->with('send_type',$user->department_info->type);
 
     }
     public function add_CadreGet()
     {
         $agencies = Agencies::all();
-        $department_info = $query = DB::table('department_info')
-            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
-            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
-            ->select(DB::raw('
-                department_info.id,
-                department_type.name as department_type_name,
-                departments.name as department_name
-                '))->get();
+        // $department_info = $query = DB::table('department_info')
+        //     ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+        //     ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+        //     ->select(DB::raw('
+        //         department_info.id,
+        //         department_type.name as department_type_name,
+        //         departments.name as department_name
+        //         '))->get();
         $user_types = UserTypes::all();
+        $department_info = Department_info::all();
         return view('hr.addCadre')->with('agencies',$agencies)
             ->with('department_info',$department_info)
             ->with('user_types',$user_types);

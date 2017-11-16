@@ -104,7 +104,7 @@
                                             <select class="form-control" style="font-size:18px;" name="department_info">
                                                 <option>Wybierz</option>
                                                 @foreach($department_info as $item)
-                                                    <option value={{$item->id}}>{{$item->department_name.' '.$item->department_type_name}}</option>
+                                                    <option value={{$item->id}}>{{$item->departments->name.' '.$item->department_type->name}}</option>
                                                 @endforeach
                                             </select>
                                             </div>
@@ -130,7 +130,7 @@
                                             <div class="col-md-6">
                                                 <label for="exampleInputPassword1" style="padding: 5px 0;"><span style="color:red;">*</span> - wymagane pola.</label>
 
-                                                <input type="submit" class="btn btn-primary" style="font-size:18px; width:100%;" value="Dodaj Pracownika">
+                                                <input type="submit" id="add_consultant" class="btn btn-primary" style="font-size:18px; width:100%;" value="Dodaj Pracownika">
                                             </div>
                                         </form>
                                 </div>

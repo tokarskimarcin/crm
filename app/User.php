@@ -35,7 +35,7 @@ class User extends Authenticatable
     }
 
     public function user_type() {
-        return $this->belongsTo('App\User_types', 'user_type_id');
+        return $this->belongsTo('App\UserTypes', 'user_type_id');
     }
 
     public function agencies() {
