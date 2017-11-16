@@ -191,11 +191,11 @@ class DkjController extends Controller
                 if($save_deaprtemnt_inf<0)
                 {
                     $query->where('dkj.department_info_id', '=', $department_id_info)
-                        ->where('user.dating_type', '=', 0);
+                        ->where('user.dating_type', '=', 1);
                 }else
                 {
                     $query->where('dkj.department_info_id', '=', $department_id_info)
-                        ->where('user.dating_type', '=', 1);
+                        ->where('user.dating_type', '=', 0);
                 }
             }
             else
@@ -212,45 +212,27 @@ class DkjController extends Controller
     }
     public function dkjRaportSave(Request $request)
     {
-        $input = $request->input();
-        $rowFirstId = array_keys($input['data'])[0];
-        $rowIdArray = array_keys($input['data']);
-        if ($input['action'] == 'create') {
-            $dkj = new DKJ($input['data'][$rowFirstId]);
-            $dkj->id_dkj = Auth::user()->id;
-            $dkj->save();
-//            Dkj::create($input['data'][$rowFirstId]);
+
+        if ($request->action == 'create') {
+//            $dkj = new DKJ($input['data'][$rowFirstId]);
+//            $dkj->id_dkj = Auth::user()->id;
+//            $dkj->save();
         }
-        if ($input['action'] == 'edit') {
-            foreach( $rowIdArray as $rowId) {
-                $dkj =Dkj::find($rowId);
-                $dkj->update($input['data'][$rowId]);
-            }
+        if ($request->action == 'edit') {
+                $dkj =Dkj::find($request->id);
+                $dkj->id_user = $request->id_user;
+                $dkj->phone = $request->phone;
+                $dkj->dkj_status = $request->dkj_status;
+                $dkj->comment = $request->comment;
+                $dkj->campaign = $request->campaign;
+                $dkj->save();
         }
-        if ($input['action'] == 'remove') {
-            foreach( $rowIdArray as $rowId) {
-                $dkj = Dkj::find($rowId);
+        if ($request->action == 'remove') {
+                $dkj = Dkj::find($request->id);
                 $dkj->deleted = 1;
                 $dkj->save();
-            }
         }
-        foreach( $rowIdArray as $rowId) {
-            $resSuccessful[] = array('DT_RowId' => 'row_' .$rowId) + $input['data'][$rowId] ;
-        }
-        return response()->json(
-            array(
-                'data' =>  $resSuccessful
-            )
-        );
-
-
-
-//        Dkj::updateOrCreate(
-//            ['id_user' => 'Oakland',
-//                '' => 'San Diego'],
-//            ['price' => 99]
-//        );
-
+        return 'ok';
     }
     private function getDepartment()
     {
@@ -289,10 +271,10 @@ class DkjController extends Controller
                 if ($type == 'Badania/Wysyłka') {
                     if ($save_deaprtemnt_inf < 0) {
                         $query->where('department_info.id', '=', $department_id_info)
-                            ->where('users.dating_type', '=', 0);
+                            ->where('users.dating_type', '=', 1);
                     } else {
                         $query->where('department_info.id', '=', $department_id_info)
-                            ->where('users.dating_type', '=', 1);
+                            ->where('users.dating_type', '=', 0);
                     }
                 } else {
                     $query->where('department_info.id', '=', $department_id_info);
