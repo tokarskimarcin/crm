@@ -94,14 +94,15 @@
 <script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.bootstrap.min.js"></script>
 <script src="https://cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
-<script src="{{ asset('/js/dataTables.editor.min.js')}}"></script>
-<script src="{{ asset('/js/editor.bootstrap.min.js')}}"></script>
 <script>
     $(document).ready(function() {
         table = $('#datatable').DataTable({
             "autoWidth": false,
             "processing": true,
             "serverSide": true,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+            },
             "drawCallback": function (settings) {
             },
             "ajax": {
@@ -148,6 +149,9 @@
             "autoWidth": false,
             "processing": true,
             "serverSide": true,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+            },
             "drawCallback": function (settings) {
             },
             "ajax": {
