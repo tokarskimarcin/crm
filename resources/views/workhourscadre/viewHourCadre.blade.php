@@ -23,6 +23,7 @@
             <h1 class="page-header">Podgląd godzin</h1>
         </div>
     </div>
+    <div id="accept_hour_success" class="alert alert-success" style="display: none">Godziny zarejestrowane pomyślnie!</div>
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">

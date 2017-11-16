@@ -32,7 +32,7 @@
         </div>
     </div>
 
-    <div id="success_div" class='alert alert-success'>Godziny zostały zaakceptowane!</div>
+    <div id="success_div" class='alert alert-success' style="display: none">Godziny zostały zaakceptowane!</div>
 
     <div class="col-lg-3">
         <label for ="ipadress">Zakres wyszukiwania:</label>
@@ -82,7 +82,7 @@
 @section('script')
 
     <script>
-        $("#success_div").fadeOut(0);
+
         var table;
 
         function myFunction() {

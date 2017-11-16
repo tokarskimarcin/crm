@@ -3,7 +3,7 @@
 @if(isset($user))
 
 
-    {{$user->summaryPaymets}}
+    {{$user->department_info->departments->name}}
 
 @else
 asd

@@ -26,7 +26,26 @@ class HomeController extends Controller
 
     public function index()
     {
-        return view('home.index')->with('status',$this->checkStatusWork());
+        if ($this->checkStatusWork() == 3) {
+            $register_start = Work_Hour::where('date',$this->actuall_date)
+                ->where('id_user',Auth::id())
+                ->pluck('register_start')
+                ->first();
+
+            $register_stop = Work_Hour::where('date',$this->actuall_date)
+                ->where('id_user',Auth::id())
+                ->pluck('register_stop')
+                ->first();
+        } else {
+            $register_start = 0;
+            $register_stop = 0;
+        }
+
+
+        return view('home.index')
+        ->with('status',$this->checkStatusWork())
+        ->with('register_start', $register_start)
+        ->with('register_stop', $register_stop);
     }
 
     public function startWork(Request $request)

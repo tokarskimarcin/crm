@@ -64,7 +64,7 @@
             {
                 alert('Brak godziny rozpoczęcia pracy');
             }else if (register_stop == null || register_stop =='')
-                alert('Brak godziny zakączenia pracy');
+                alert('Brak godziny zakończenia pracy');
             else
             {
                 $.ajax({

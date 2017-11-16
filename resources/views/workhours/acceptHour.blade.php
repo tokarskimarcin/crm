@@ -81,7 +81,7 @@
 @section('script')
 
     <script>
-    $("#success_div").fadeOut(0);
+
         var table;
 
         function myFunction() {

@@ -181,11 +181,7 @@ class WorkHoursController extends Controller
             $time_register_stop = $request->register_stop;
             Work_Hour::where('id_user', Auth::id())
                 ->where('date',$this->actuall_date)
-                ->update(['register_start' => $time_register_start,'register_stop' => $time_register_stop]);
-
-            $request->session()->flash('message', 'New customer added successfully.');
-            $request->session()->flash('message-type', 'success');
-            return response()->json(['status'=>'Hooray']);
+                ->update(['register_start' => $time_register_start,'register_stop' => $time_register_stop, 'status' => 3]);
         }
     }
     //******************RegisterHour****************** Stop
