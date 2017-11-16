@@ -92,7 +92,7 @@ class DkjController extends Controller
                 '))->where('dkj.dkj_status',1)
                  ->where('dkj.deleted',0)
                  ->where('dkj.manager_status',null)
-                 ->where('dkj.department_info_id',Auth::user()->department_info_id);
+                 ->where('user.department_info_id',Auth::user()->department_info_id);
         return datatables($query)->make(true);
     }
 
@@ -118,7 +118,7 @@ class DkjController extends Controller
                 '))->where('dkj.dkj_status',1)
             ->where('dkj.deleted',0)
             ->where('dkj.manager_status','!=',null)
-            ->where('dkj.department_info_id',Auth::user()->department_info_id);
+            ->where('user.department_info_id',Auth::user()->department_info_id);
         return datatables($query)->make(true);
     }
 
@@ -137,11 +137,24 @@ class DkjController extends Controller
     public function dkjRaportPost(Request $request)
     {
         $departments = $this->getDepartment();
+        $department_id_info = $request->department_id_info;
+        $dating_type = 0;
+        if($department_id_info<0)
+        {
+            $department_id_info = $department_id_info*(-1);
+            $dating_type = 1;
+        }
+        $users = User::where('department_info_id',$department_id_info)
+            ->where('user_type_id',1)
+            ->where('dating_type',$dating_type)
+            ->get();
+
         return view('dkj.dkjRaport')
         ->with('departments',$departments)
         ->with('select_department_id_info',$request->department_id_info)
         ->with('select_start_date',$request->start_date)
         ->with('select_stop_date',$request->stop_date)
+        ->with('users',$users)
         ->with('show_raport',1);
     }
 
@@ -181,30 +194,25 @@ class DkjController extends Controller
                     dkj.manager_status
                    '))
                 ->where('deleted',0)
-                ->where('dkj_status',1)
                 ->where('add_date','>=',$start_date.' 00:00:00')
-                ->where('add_date','<=',$stop_date.' 23:00:00');
+                ->where('add_date','<=',$stop_date.' 23:00:00')
+                ->where('user.department_info_id', '=', $department_id_info);
 
-            // <0 Badania >0 Wysyłka
+            //  -1 Wysyłka 0 Badania
             if($type =='Badania/Wysyłka')
             {
                 if($save_deaprtemnt_inf<0)
                 {
-                    $query->where('dkj.department_info_id', '=', $department_id_info)
-                        ->where('user.dating_type', '=', 1);
+                    $query->where('user.dating_type', '=', 1);
                 }else
                 {
-                    $query->where('dkj.department_info_id', '=', $department_id_info)
-                        ->where('user.dating_type', '=', 0);
+                    $query->where('user.dating_type', '=', 0);
                 }
-            }
-            else
-            {
-                $query->where('dkj.department_info_id', '=', $department_id_info);
             }
             if($request->type_verification == 1)
             {
-                $query->where('dkj.manager_status','!=',null);
+                $query->where('dkj.manager_status','!=',null)
+                    ->where('dkj_status',1);
             }
 
             return datatables($query)->make(true);
@@ -214,18 +222,22 @@ class DkjController extends Controller
     {
 
         if ($request->action == 'create') {
-//            $dkj = new DKJ($input['data'][$rowFirstId]);
-//            $dkj->id_dkj = Auth::user()->id;
-//            $dkj->save();
+            $dkj = new DKJ();
+            $dkj->id_dkj = Auth::user()->id;
         }
         if ($request->action == 'edit') {
-                $dkj =Dkj::find($request->id);
-                $dkj->id_user = $request->id_user;
-                $dkj->phone = $request->phone;
-                $dkj->dkj_status = $request->dkj_status;
-                $dkj->comment = $request->comment;
-                $dkj->campaign = $request->campaign;
-                $dkj->save();
+            $dkj =Dkj::find($request->id);
+            $dkj->edit_dkj = Auth::user()->id;
+            $dkj->edit_date = date('Y-m-d H:i:s');
+        }
+        if($request->action == 'create' || $request->action == 'edit')
+        {
+            $dkj->id_user = $request->id_user;
+            $dkj->phone = $request->phone;
+            $dkj->dkj_status = $request->dkj_status;
+            $dkj->comment = $request->comment;
+            $dkj->campaign = $request->campaign;
+            $dkj->save();
         }
         if ($request->action == 'remove') {
                 $dkj = Dkj::find($request->id);

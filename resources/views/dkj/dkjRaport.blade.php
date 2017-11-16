@@ -58,21 +58,17 @@
                                                         <option value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name}}</option>
                                                     @endif
                                                     @else
-
-
                                                     @if($department->type == 'Badania/Wysyłka')
                                                         @if(isset($select_department_id_info))
-                                                            @if($select_department_id_info == $department->id)
-                                                                <option selected value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name.' Wysyłka'}}</option>
+                                                            @if($select_department_id_info == $department->id*(-1))
+                                                                <option selected value={{$department->id*(-1)}}>{{$department->department_name.' '.$department->department_type_name.' Wysyłka'}}</option>
                                                             @else
-                                                                <option value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name.' Wysyłka'}}</option>
+                                                                <option value={{$department->id*(-1)}}>{{$department->department_name.' '.$department->department_type_name.' Wysyłka'}}</option>
                                                             @endif
                                                         @else
-                                                        <option value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name.' Wysyłka'}}</option>
+                                                            <option value={{$department->id*(-1)}}>{{$department->department_name.' '.$department->department_type_name.' Wysyłka'}}</option>
                                                         @endif
                                                     @endif
-
-
                                                 @endif
                                             @endforeach
 
@@ -89,21 +85,17 @@
                                                         <option value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name}}</option>
                                                     @endif
                                                     @else
-
-
                                                     @if($department->type == 'Badania/Wysyłka')
                                                         @if(isset($select_department_id_info))
-                                                            @if($select_department_id_info == $department->id*(-1))
-                                                                <option selected value={{$department->id*(-1)}}>{{$department->department_name.' '.$department->department_type_name.' Badania'}}</option>
+                                                            @if($select_department_id_info == $department->id)
+                                                                <option selected value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name.' Badania'}}</option>
                                                             @else
-                                                                <option value={{$department->id*(-1)}}>{{$department->department_name.' '.$department->department_type_name.' Badania'}}</option>
+                                                                <option value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name.' Badania'}}</option>
                                                             @endif
                                                         @else
-                                                            <option value={{$department->id*(-1)}}>{{$department->department_name.' '.$department->department_type_name.' Badania'}}</option>
+                                                            <option value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name.' Badania'}}</option>
                                                         @endif
                                                     @endif
-
-
                                                 @endif
                                             @endforeach
 
@@ -173,48 +165,67 @@
         </div>
         @endif
     </div>
+    @if(isset($show_raport))
+        <!-- Modal -->
+            <div id="edit_dkj" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Dodaj Godzin pracownika</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="dtp_input3" class="col-md-5 control-label">Pracownik:</label>
+                                <div id="employee_list">
+                                    <select class="form-control showhidetext" name="users_select" id="users_select" style="border-radius: 0px;">
+                                        @foreach($users as $user)
+                                            <option value={{$user->id}}>{{$user->first_name.' '.$user->last_name}}</option>
+                                        @endforeach;
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="">Telefon:</label>
+                                <input type="text" class="form-control" placeholder="Telefon" name="phone" id="phone" value="">
+                            </div>
+                            <div class="form-group">
+                                <label for="">Kampania:</label>
+                                <input type="text" class="form-control" placeholder="Kampania" name="campaign" id="campaign"  value="">
+                            </div>
+                            <div class="form-group">
+                                <label for="">Komentarz:</label>
+                                <input type="text" class="form-control" placeholder="Komentarz" name="comment" id="comment"  value="">
+                            </div>
+                            <div class="form-group">
+                                <label for="">Janek:</label>
+                                <select class="form-control showhidetext" name="dkj_status" id="dkj_status" style="border-radius: 0px;">
+                                    <option value="0">Nie</option>
+                                    <option value="1">Tak</option>
+                                </select>
+                            </div>
 
+                            <button id="save_dkj" class="btn btn-primary" name="register" style="font-size:18px; width:100%;">Zapisz</button>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default close" data-dismiss="modal">Anuluj</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
 @endsection
 @section('script')
 <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.bootstrap.min.js"></script>
 <script src="https://cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
-<script src="{{ asset('/js/dataTables.editor.min.js')}}"></script>
-<script src="{{ asset('/js/editor.bootstrap.min.js')}}"></script>
 <script>
-    var editor;
-    var tablica = (1,2,3,4);
-
+    var action = '';
+    var id = -1;
     $(document).ready(function() {
-
-        var test= new Array({"label" : "a", "value" : "a"});
-        function getStateList(){
-            test.splice(0,1);
-            $.ajax({
-                type: "POST",
-                url: "{{ route('api.getUser') }}",
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                async: false,
-                dataType: 'json',
-                data: {'department_info' : $("select[name='department_id_info']").val()},
-                success: function (json) {
-                    console.log(json);
-                    if(json!=0)
-                    {
-                        for(var a=0;a<json.length;a++){
-                            obj= { "label" : json[a]['first_name']+" "+json[a]['last_name'], "value" : json[a]['id']};
-                            test.push(obj);
-                        }
-                    }
-
-                }
-            });
-            return test;
-        }
-
 
         $('.form_date').datetimepicker({
             language: 'pl',
@@ -223,56 +234,100 @@
             pickTime: false,
         });
 
-
-
-
-        editor = new $.fn.dataTable.Editor({
-            ajax: {
-                url: "{{ route('api.dkjRaportSave')}}",
+        $("#save_dkj").click(function () {
+            var id_user = $("#users_select").val();
+            var phone =$("#phone").val();
+            var dkj_status =$("#dkj_status").val();
+            var comment =$("#comment").val();
+            var campaign =$("#campaign").val();
+            $.ajax({
+                type: "POST",
+                url: '{{ route('api.dkjRaportSave') }}',
+                data: {"id_user":id_user,
+                    "phone":phone,"dkj_status":dkj_status,
+                    "comment":comment,"campaign":campaign,
+                    "id":id,"action":action
+                },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    $('#edit_dkj').modal('toggle');
+                    table.ajax.reload();
                 }
-            },
-            table: "#datatable",
-            idSrc:  'id',
-            fields: [
-                {
-                    label: "Użytkownik:",
-                    name: "id_user",
-                    type:  "select",
-                    "ipOpts": getStateList()
-                },{
-                label: "Telefon:",
-                name: "phone"
-            }, {
-                label: "Kampania:",
-                name: "campaign"
-            }, {
-                label: "Komentarz:",
-                name: "comment"
-            }
-            ,{
-                label: "Janek:",
-                name:  "dkj_status",
-                type:  "select",
-                options: [
-                    { label: "Nie", value: "0" },
-                    { label: "Tak", value: "1" }
-                ]
-            },{
-                    type:  "hidden",
-                    name: "department_info_id",
-                    def: Math.abs($("select[name='department_id_info']").val())
-                }
-            ]
+            });
         });
 
         table = $('#datatable').DataTable({
             "autoWidth": false,
             "processing": true,
             "serverSide": true,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+            },
             "drawCallback": function (settings) {
             },
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    text: 'Dodaj',
+                    name: 'add',        // DO NOT change name
+                    id: 'add',
+                    action: function ( e, dt, node, config ) {
+                        action = 'create';
+                        $('#edit_dkj').modal('show');
+                        $("#users_select").val(0);
+                        $("#phone").val('');
+                        $("#dkj_status").val('');
+                        $("#comment").val('');
+                        $("#campaign").val('');
+                    }
+                },
+                {
+                text: 'Edytuj',
+                name: 'edit',        // DO NOT change name
+                id: 'edit',
+                extend: 'selected',
+                action: function ( e, dt, node, config ) {
+                    var data=  dt.rows( { selected: true } ).data();
+                    var id_user = data[0]['id_user'];
+                    id = data[0]['id'];
+                    action = 'edit';
+                    var phone = data[0]['phone'];
+                    var campaign = data[0]['campaign'];
+                    var comment = data[0]['comment'];
+                    var dkj_status = data[0]['dkj_status'];
+                    $('#edit_dkj').modal('show');
+                    $("#users_select").val(id_user);
+                    $("#phone").val(phone);
+                    $("#dkj_status").val(dkj_status);
+                    $("#comment").val(comment);
+                    $("#campaign").val(campaign);
+                }
+            },
+                {
+                    extend: 'selected', // Bind to Selected row
+                    text: 'Usuń',
+                    name: 'delete',      // DO NOT change name
+                    id:'delete',
+                    action: function ( e, dt, node, config ) {
+                        var data=  dt.rows( { selected: true } ).data();
+                        id = data[0]['id'];
+                        action = 'remove';
+                        $.ajax({
+                            type: "POST",
+                            url: '{{ route('api.dkjRaportSave') }}',
+                            data: {"id":id,"action":action
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                table.ajax.reload();
+                            }
+                        });
+                    }
+                }],
             "ajax": {
                 'url': "{{ route('api.datatableDkjRaport') }}",
                 'type': 'POST',
@@ -283,7 +338,8 @@
                     d.type_verification = 0;
                 },
                 'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
-            }, "columns": [
+            },
+            "columns": [
                 {"data": "add_date"},
                 {
                     "data": function (data, type, dataToSet) {
@@ -311,12 +367,6 @@
             ],
             select: true
         });
-        // Display the buttons
-        new $.fn.dataTable.Buttons( table, [
-            { extend: "create", editor: editor },
-            { extend: "edit",   editor: editor },
-            { extend: "remove", editor: editor }
-        ] );
 
         table.buttons().container()
             .appendTo( $('.col-sm-6:eq(0)', table.table().container() ) );
