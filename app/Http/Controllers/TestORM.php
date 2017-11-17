@@ -23,12 +23,12 @@ class TestORM extends Controller
 {
     public function test() {
 
-        $equipments_types = EquipmentTypes::all();
+        // $equipments_types = EquipmentTypes::all();
+        //
+        // return view('hr.showEquipment')
+        //     ->with('equipments_types', $equipments_types);
 
-        return view('hr.showEquipment')
-            ->with('equipments_types', $equipments_types);
-
-
+        return view('testorm');
     }
 
 }

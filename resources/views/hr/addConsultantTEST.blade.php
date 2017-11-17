@@ -43,6 +43,10 @@
         .edit-addmoney{
             display:none;
         }
+        .td-class {
+            width: 170px;
+            height:52px;
+        }
     </style>
 
     <!-- Main -->
@@ -74,51 +78,51 @@
                                         <tbody>
                                         <b style="font-size: 20px; font-family: sans-serif;">Dane Osobowe</b>
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>Imię:</b></td>
+                                            <td class="td-class"><b>Imię:</b></td>
                                             <td>
                                                 <input type="text" class="form-control" name="first_name" placeholder="Imię" value="{{$user->first_name}}">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>Nazwisko:</b></td>
+                                            <td class="td-class"><b>Nazwisko:</b></td>
                                             <td>
                                                 <input type="text" class="form-control" placeholder="Nazwisko" name="last_name"  value="{{$user->last_name}}">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>E-mail:</b></td>
+                                            <td class="td-class"><b>E-mail:</b></td>
                                             <td>
                                                 <input type="mail" class="form-control" placeholder="Email" name="email"  value="{{$user->email_off}}">
                                             </td>
                                         </tr>
                                         @if($type == 2)
                                             <tr>
-                                                <td style="width: 170px;height:52px;"><b>Telefon służbowy:</b></td>
+                                                <td class="td-class"><b>Telefon służbowy:</b></td>
                                                 <td>
                                                     <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="phone" value="{{$user->phone}}">
                                                 </td>
                                             </tr>
                                         @endif
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>Telefon prywatny:</b></td>
+                                            <td class="td-class"><b>Telefon prywatny:</b></td>
                                             <td>
                                                 <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="private_phone" value="{{$user->private_phone}}">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>Login(Godzinówka):</b></td>
+                                            <td class="td-class"><b>Login(Godzinówka):</b></td>
                                             <td><input type="text" class="form-control" placeholder="Login" name="username" value="{{$user->username}}"></td>
 
                                         </tr>
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>Hasło:</b></td>
+                                            <td class="td-class"><b>Hasło:</b></td>
                                             <td>
                                                 <input type="text" class="form-control" placeholder="Hasło" name="password"  value="{{base64_decode($user->guid)}}">
                                             </td>
 
                                         </tr>
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>Dokumenty:</b></td>
+                                            <td class="td-class"><b>Dokumenty:</b></td>
                                             <td>
                                                 <select class="form-control" style="font-size:18px;" name="documents" >
                                                     <option value="1" @if($user->documents == 1) selected @endif>Tak</option>
@@ -127,7 +131,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>Student:</b></td>
+                                            <td class="td-class"><b>Student:</b></td>
                                             <td>
                                                 <select class="form-control" style="font-size:18px;" name="student">
                                                     <option value="1" @if($user->student == 1) selected @endif>Tak</option>
@@ -136,7 +140,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>Agencja:</b></td>
+                                            <td class="td-class"><b>Agencja:</b></td>
                                             <td>
                                                 <select class="form-control" style="font-size:18px;" name="agency_id" >
                                                     @foreach($agencies as $agency)
@@ -154,7 +158,7 @@
                                         <tbody>
                                         <b style="font-size: 20px; font-family: sans-serif;">Informacje cd</b>
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>Rozpoczęcie Pracy:</b></td>
+                                            <td class="td-class"><b>Rozpoczęcie Pracy:</b></td>
                                             <td>
                                                 <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
                                                     <input class="form-control" name="start_date" type="text" value="{{$user->start_work}}" readonly >
@@ -163,7 +167,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>Zakończenie Pracy:</b></td>
+                                            <td class="td-class"><b>Zakończenie Pracy:</b></td>
                                             <td>
                                                 <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
                                                     @if(isset($user->end_work))
@@ -178,7 +182,7 @@
                                         </tr>
 
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>Stawka na godzine:</b></td>
+                                            <td class="td-class"><b>Stawka na godzine:</b></td>
                                             <td>
                                                 <select class="form-control" style="font-size:18px;" name="rate" >
                                                     <option>Nie dotyczy</option>
@@ -190,7 +194,7 @@
                                         </tr>
                                         @if($type == 2)
                                             <tr>
-                                                <td style="width: 170px;height:52px;"><b>Wynagrodzenie:</b></td>
+                                                <td class="td-class"><b>Wynagrodzenie:</b></td>
                                                 <td>
                                                   @if(isset($user->salary))
                                                       <input type="number" class="form-control" placeholder="0" name="salary" value="{{$user->salary}}">
@@ -200,14 +204,14 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td style="width: 170px;height:52px;"><b>Dodatek slużbowy:</b></td>
+                                                <td class="td-class"><b>Dodatek slużbowy:</b></td>
                                                 <td>
                                                     <input type="number" class="form-control" placeholder="0" name="additional_salary" value="{{$user->additional_salary}}">
                                                 </td>
                                             </tr>
                                         @endif
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>Całość na konto:</b></td>
+                                            <td class="td-class"><b>Całość na konto:</b></td>
                                             <td>
                                                 <select class="form-control" style="font-size:18px;" name="salary_to_account">
                                                     <option value="1" @if($user->salary_to_account == 1) selected @endif>Tak</option>
@@ -216,19 +220,19 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>Premia (Październik):</b></td>
+                                            <td class="td-class"><b>Premia (Październik):</b></td>
                                             <td>
                                                 <input type="number" class="form-control" placeholder="0" name="additional_salary_1st_month" value="">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>Premia (Listopad):</b></td>
+                                            <td class="td-class"><b>Premia (Listopad):</b></td>
                                             <td>
                                                 <input type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 170px;height:52px;"><b>Login PBX:</b></td>
+                                            <td class="td-class"><b>Login PBX:</b></td>
                                             <td>
                                                 <input type="text" class="form-control" placeholder="Login z programu do dzwonienia" name="login_phone" value="{{$user->login_phone}}">
                                             </td>
@@ -314,8 +318,6 @@
 
         var first_name = $("input[name='first_name']").val();
         var last_name = $("input[name='last_name']").val();
-        //var email = $("input[name='email']").val();
-        //var work_phone = $("input[name='work_phone']").val();
         var private_phone = $("input[name='private_phone']").val();
         var username = $("input[name='username']").val();
         var password = $("input[name='password']").val();
@@ -329,16 +331,6 @@
             alert("Pole nazwsko nie może być puste!");
             return false;
         }
-
-        // if (email == '') {
-        //     alert("Pole email nie może być puste!");
-        //     return false;
-        // }
-
-        // if (work_phone == '') {
-        //     alert("Pole imie nie może być puste!");
-        //     return false;
-        // }
 
         if (private_phone == '') {
             alert("Pole telefon prywatny nie może być puste!");
@@ -358,114 +350,175 @@
     });
 
 
-$( ".delete" ).click(function() {
-    var id = (this.id);
+    $( ".delete" ).click(function() {
+        var id = (this.id);
 
-    $.ajax({
-        type: "POST",
-        url: '{{ route('api.deletePenaltyBonus') }}',
-        data: {
-            "id": id
-        },
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(response) {
-            alert("Pomyślnie usunięto karę/premię!");
-        }
+        $.ajax({
+            type: "POST",
+            url: '{{ route('api.deletePenaltyBonus') }}',
+            data: {
+                "id": id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                alert("Pomyślnie usunięto karę/premię!");
+            }
+        });
+        $('tr[name=' + this.id + ']').fadeOut(0);
     });
-    $('tr[name=' + this.id + ']').fadeOut(0);
-});
 
 
-$("#addpbsubmit").click(function () {
+    $("#addpbsubmit").click(function () {
 
-    var penalty_type = $("select[name='penalty_type']").val();
-    var cost = $("input[name='cost']").val();
-    var reason = $("input[name='reason']").val();
+        var penalty_type = $("select[name='penalty_type']").val();
+        var cost = $("input[name='cost']").val();
+        var reason = $("input[name='reason']").val();
 
-    if (penalty_type == "Wybierz") {
-        alert("Wybierz rodzaj kary/nagrody!");
-        return false;
-    }
+        if (penalty_type == "Wybierz") {
+            alert("Wybierz rodzaj kary/nagrody!");
+            return false;
+        }
 
-    if (cost == '') {
-        alert("Podaj kwotę!");
-        return false;
-    }
+        if (cost == '') {
+            alert("Podaj kwotę!");
+            return false;
+        }
 
-    if (reason == '') {
-        alert("Podaj powód!");
-        return false;
-    }
+        if (reason == '') {
+            alert("Podaj powód!");
+            return false;
+        }
 
-});
+    });
 
-    // $("#edit-name-button").click(function(){
-    //     $(".name").fadeOut();
-    //     $(".edit-name").delay(500).fadeIn();
-    //
-    // });
-    // $("#edit-surname-button").click(function(){
-    //     $(".surname").fadeOut();
-    //     $(".edit-surname").delay(500).fadeIn();
-    //
-    // });
-    // $("#edit-doc-button").click(function(){
-    //     $(".doc").fadeOut();
-    //     $(".edit-doc").delay(500).fadeIn();
-    //
-    // });
-    // $("#edit-stu-button").click(function(){
-    //     $(".stu").fadeOut();
-    //     $(".edit-stu").delay(500).fadeIn();
-    //
-    // });
-    // $("#edit-statuswork-button").click(function(){
-    //     $(".statuswork").fadeOut();
-    //     $(".edit-statuswork").delay(500).fadeIn();
-    //
-    // });
-    // $("#edit-phonework-button").click(function(){
-    //     $(".phonework").fadeOut();
-    //     $(".edit-phonework").delay(500).fadeIn();
-    //
-    // });
-    // $("#edit-phonepriv-button").click(function(){
-    //     $(".phonepriv").fadeOut();
-    //     $(".edit-phonepriv").delay(500).fadeIn();
-    //
-    // });
-    // $("#edit-datework-button").click(function(){
-    //     $(".datework").fadeOut();
-    //     $(".edit-datework").delay(500).fadeIn();
-    //
-    // });
-    // $("#edit-money-button").click(function(){
-    //     $(".money").fadeOut();
-    //     $(".edit-money").delay(500).fadeIn();
-    //
-    // });
-    // $("#edit-addmoney-button").click(function(){
-    //     $(".addmoney").fadeOut();
-    //     $(".edit-addmoney").delay(500).fadeIn();
-    //
-    // });
-    // $("#edit-branch-button").click(function(){
-    //     $(".branch").fadeOut();
-    //     $(".edit-branch").delay(500).fadeIn();
-    //
-    // });
-    // $("#edit-priv-button").click(function(){
-    //     $(".priv").fadeOut();
-    //     $(".edit-priv").delay(500).fadeIn();
-    //
-    // });
-    // $("#edit-agency-button").click(function(){
-    //     $(".agency").fadeOut();
-    //     $(".edit-agency").delay(500).fadeIn();
-    //
-    // });
+
+    $('#myModal').on('hidden.bs.modal', function () {
+        $("#modal_content").empty();
+    });
+
+
+
+    $(".equipment_data").on('click', function(){
+        var id = this.id;
+
+        var equipment_type_id= $(this).data('equipment_type_id');
+        var laptop_processor= $(this).data('laptop_processor');
+        var laptop_ram= $(this).data('laptop_ram');
+        var laptop_hard_drive= $(this).data('laptop_hard_drive');
+        var phone_box= $(this).data('phone_box');
+        var tablet_modem= $(this).data('tablet_modem');
+        var sim_number_phone= $(this).data('sim_number_phone');
+        var sim_type= $(this).data('sim_type');
+        var sim_pin= $(this).data('sim_pin');
+        var sim_puk= $(this).data('sim_puk');
+        var sim_net= $(this).data('sim_net');
+        var model= $(this).data('model');
+        var serial_code= $(this).data('serial_code');
+        var description= $(this).data('description');
+        var power_cable= $(this).data('power_cable');
+        var signal_cable= $(this).data('signal_cable');
+        var to_user= $(this).data('to_user');
+
+        if(equipment_type_id != '') {
+            equipment_type_id = $("<tr><td><b>" + "Rodzaj sprzętu" + "</b></td><td>" + equipment_type_id + "</td></tr>");
+        }
+
+        if(laptop_processor != '') {
+            laptop_processor = $("<tr><td><b>" + "Rodzaj procesora" + "</b></td><td>" + laptop_processor + "</td></tr>");
+        }
+
+        if(laptop_ram != '') {
+            laptop_ram = $("<tr><td><b>" + "Pamięć RAM" + "</b></td><td>" + laptop_ram + "</td></tr>");
+        }
+
+        if(laptop_hard_drive != '') {
+            laptop_hard_drive = $("<tr><td><b>" + "Dysk twardy" + "</b></td><td>" + laptop_hard_drive + "</td></tr>");
+        }
+
+        if(phone_box != '') {
+            phone_box = 'Tak';
+            phone_box = $("<tr><td><b>" + "Opakowanie na telefon" + "</b></td><td>" + phone_box + "</td></tr>");
+        }
+
+        if(tablet_modem != '') {
+            tablet_modem = 'Tak';
+            tablet_modem = $("<tr><td><b>" + "Modem" + "</b></td><td>" + tablet_modem + "</td></tr>");
+        }
+
+        if(sim_number_phone != '') {
+            sim_number_phone = $("<tr><td><b>" + "Numer telefonu" + "</b></td><td>" + sim_number_phone + "</td></tr>");
+        }
+
+        if(sim_type != '') {
+          if (sim_type == 1) {
+              sim_type = 'Prepaid';
+          } else {
+              sim_type = 'Abonament';
+          }
+            sim_type = $("<tr><td><b>" + "Rodzaj karty SIM" + "</b></td><td>" + sim_type + "</td></tr>");
+        }
+
+        if(sim_pin != '') {
+            sim_pin = $("<tr><td><b>" + "Numer PIN" + "</b></td><td>" + sim_pin + "</td></tr>");
+        }
+
+        if(sim_puk != '') {
+            sim_puk = $("<tr><td><b>" + "Numer PUK" + "</b></td><td>" + sim_puk + "</td></tr>");
+        }
+
+        if(sim_net != '') {
+            sim_net = $("<tr><td><b>" + "Numer NET" + "</b></td><td>" + sim_net + "</td></tr>");
+        }
+
+        if(model != '') {
+            model = $("<tr><td><b>" + "Model" + "</b></td><td>" + model + "</td></tr>");
+        }
+
+        if(serial_code != '') {
+            serial_code = $("<tr><td><b>" + "Numer seryjny" + "</b></td><td>" + serial_code + "</td></tr>");
+        }
+
+        if(description != '') {
+            description = $("<tr><td><b>" + "Opis" + "</b></td><td>" + description + "</td></tr>");
+        }
+
+        if(power_cable != '') {
+            power_cable = 'Tak'
+            power_cable = $("<tr><td><b>" + "Kabel zasilający" + "</b></td><td>" + power_cable + "</td></tr>");
+        }
+
+        if(signal_cable != '') {
+            signal_cable = 'Tak'
+            signal_cable = $("<tr><td><b>" + "Antena" + "</b></td><td>" + signal_cable + "</td></tr>");
+        }
+
+        if(to_user != '') {
+            to_user = $("<tr><td><b>" + "Data wydania" + "</b></td><td>" + to_user + "</td></tr>");
+        }
+
+
+        $("#modal_content").append(
+            equipment_type_id,
+            laptop_processor,
+            laptop_ram,
+            laptop_hard_drive,
+            phone_box,
+            tablet_modem,
+            sim_number_phone,
+            sim_type,
+            sim_pin,
+            sim_puk,
+            sim_net,
+            model,
+            serial_code,
+            description,
+            power_cable,
+            signal_cable,
+            to_user
+          );
+    });
 
 </script>
 @endsection

@@ -18,7 +18,27 @@
                         <td>{{$equipment->created_at}}</td>
                         <td>{{$equipment->equipment_type->name}}</td>
                         <td style="width: 10px;">
-                            <button type="button" name="{{$equipment->id}}" class="btn btn-info" data-toggle="modal" data-target="#myModal">Dane techniczne</button>
+                            <button  type="button" id="{{$equipment->id}}" class="btn btn-info equipment_data" data-toggle="modal" data-target="#myModal"
+                                data-equipment_type_id="{{$equipment->equipment_type->name}}"
+                                data-laptop_processor="{{$equipment->laptop_processor}}"
+                                data-laptop_ram="{{$equipment->laptop_ram}}"
+                                data-laptop_hard_drive="{{$equipment->laptop_hard_drive}}"
+                                data-phone_box="{{$equipment->phone_box}}"
+                                data-tablet_modem="{{$equipment->tablet_modem}}"
+                                data-sim_number_phone="{{$equipment->sim_number_phone}}"
+                                data-sim_type="{{$equipment->sim_type}}"
+                                data-sim_pin="{{$equipment->sim_pin}}"
+                                data-sim_puk="{{$equipment->sim_puk}}"
+                                data-sim_net="{{$equipment->sim_net}}"
+                                data-model="{{$equipment->model}}"
+                                data-serial_code="{{$equipment->serial_code}}"
+                                data-description="{{$equipment->description}}"
+                                data-power_cable="{{$equipment->power_cable}}"
+                                data-signal_cable="{{$equipment->signal_cable}}"
+                                data-status="{{$equipment->status}}"
+                                data-id_user="{{$equipment->id_user}}"
+                                data-to_user="{{$equipment->to_user}}"
+                            >Dane techniczne</button>
                         </td>
                       </tr>
                       <?php $i++; ?>
@@ -43,11 +63,8 @@
       </div>
       <div class="modal-body">
           <div class="table-responsive">
-              <table class="table">
-                  <tr>
-                    <td style="width: 100px;"><b>Data Wydania</b></td>
-                    <td style="width: 10px;">2017-03-04</td>
-                  </tr>
+              <table class="table" id="modal_content">
+
               </table>
           </div>
       </div>

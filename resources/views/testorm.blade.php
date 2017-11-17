@@ -41,7 +41,6 @@ END;
               <td>Title 2</td>
               <td>Title 3</td>
               <td>Title 4</td>
-              <td>Title 5</td>
           </tr>
             <?php for($i = 1; $i <= 5; $i++){
 echo<<<END
@@ -50,7 +49,6 @@ echo<<<END
                 <td>Item 2</td>
                 <td>Item 3</td>
                 <td>Item 4</td>
-                <td>Item 5</td>
             </tr>
 END;
 }?>
@@ -63,8 +61,6 @@ END;
               <td>Title 1</td>
               <td>Title 2</td>
               <td>Title 3</td>
-              <td>Title 4</td>
-              <td>Title 5</td>
           </tr>
             <?php for($i = 1; $i <= 15; $i++){
 echo<<<END
@@ -72,8 +68,6 @@ echo<<<END
                 <td>Item 1</td>
                 <td>Item 2</td>
                 <td>Item 3</td>
-                <td>Item 4</td>
-                <td>Item 5</td>
             </tr>
 END;
 }?>

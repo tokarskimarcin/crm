@@ -9,11 +9,6 @@
         </div>
     </div>
 
-    @if(isset($saved))
-        <div class="alert alert-success">
-            <strong>Sukces!</strong> Dodano użytkownika: {{$saved['first_name'] . ' ' . $saved['last_name']}}
-        </div>
-    @endif
     <div class="row">
         <div class="col-lg-12">
 
@@ -39,7 +34,7 @@
                                                     <td>Pracownik</td>
                                                     <td>Akcja</td>
                                                 </tr>
-                                            @foreach($equipments->where('equipment_type_id',$equipments_type->id) as $equipment)
+                                            @foreach($equipments_type->where('equipment_type_id',$equipments_type->id) as $equipment)
                                                     <td>{{$equipment->model}}</td>
                                                     <td>{{$equipment->serial_code}}</td>
                                                     <td>{{$equipment->laptop_processor}}</td>

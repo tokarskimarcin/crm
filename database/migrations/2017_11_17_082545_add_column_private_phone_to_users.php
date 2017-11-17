@@ -13,9 +13,9 @@ class AddColumnPrivatePhoneToUsers extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->integer('private_phone')->nullable();
-        });
+        // Schema::table('users', function (Blueprint $table) {
+        //     $table->integer('private_phone')->nullable();
+        // });
     }
 
     /**

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddColumnAdditionalSalaryToUsers extends Migration
+class AddColumnToUserToEquipment extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class AddColumnAdditionalSalaryToUsers extends Migration
      */
     public function up()
     {
-        // Schema::table('users', function (Blueprint $table) {
-        //     $table->integer('additional_salary')->nullable();
-        // });
+        Schema::table('equipments', function (Blueprint $table) {
+            $table->dateTime('to_user')->nullable();
+        });
     }
 
     /**
