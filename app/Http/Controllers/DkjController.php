@@ -73,16 +73,27 @@ class DkjController extends Controller
 
     public function departmentStatisticsGet()
     {
-
-        return view('dkj.departmentStatistics');
+        $departments = Department_info::all();
+        $users = User::where('department_info_id',Auth::user()->department_info_id);
+        return view('dkj.departmentStatistics')
+            ->with('departments',$departments)
+            ->with('users',$users);
     }
 
     public function departmentStatisticsPOST(Request $request)
     {
-        $departments =  $this->getDepartment();
-
+        $user_dkj_info = Dkj::whereHas('user', function ($query) {
+                $query->where('department_info_id', 'like', Auth::user()->department_info_id);
+            })->
+            selectRaw(
+                'Date(add_date) as add_date,
+                SUM(CASE WHEN dkj_status = 0 or deleted = 1 THEN 1 ELSE 0 END) as good ,
+                SUM(CASE WHEN dkj_status = 1 AND deleted = 0 THEN 1 ELSE 0 END) as bad')
+            ->where('add_date','like',$request->month.'%')
+            ->groupBy(DB::raw('Date(add_date)'))
+            ->get();
         return view('dkj.departmentStatistics')
-            ->with('departments',$departments);
+            ->with('user_info', $user_dkj_info);
     }
 
 
