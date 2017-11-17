@@ -26,6 +26,8 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <div class="panel-body">
+
+
                                     @foreach($equipments_types as $equipments_type)
                                         @if($equipments_type->name == "Laptop")
                                         <table class="table table-bordered">
@@ -35,14 +37,25 @@
                                                 <td>Procesor</td>
                                                 <td>Ram</td>
                                                 <td>Dysk</td>
-                                                <td>Zmiany</td>
                                                 <td>Opis</td>
                                                 <td>Oddział</td>
                                                 <td>Pracownik</td>
+                                                <td>Akcja</td>
                                             </tr>
                                         @endif
                                         @foreach($equipments->where('equipment_type_id',$equipments_type->id) as $equipment)
-                                            <tr>{{$equipment->department_info->departments->name}}</tr>
+                                                <td>{{$equipment->model}}</td>
+                                                <td>{{$equipment->serial_code}}</td>
+                                                <td>{{$equipment->laptop_processor}}</td>
+                                                <td>{{$equipment->laptop_ram}}</td>
+                                                <td>{{$equipment->laptop_hard_drive}}</td>
+                                                <td>{{$equipment->description}}</td>
+                                                <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                                @if($equipment->user != null)
+                                                    <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
+                                                @else
+                                                    <td>Brak</td>
+                                                @endif
 
                                         @endforeach
                                         </table>
