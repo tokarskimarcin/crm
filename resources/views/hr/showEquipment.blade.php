@@ -42,7 +42,7 @@
                                             </tr>
                                         @endif
                                         @foreach($equipments->where('equipment_type_id',$equipments_type->id) as $equipment)
-                                            <tr>{{$equipment->model}}</tr>
+                                            <tr>{{$equipment->department_info->departments->name}}</tr>
 
                                         @endforeach
                                         </table>
