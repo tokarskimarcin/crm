@@ -142,7 +142,6 @@
         </div>
     </div>
 
-@include('workhours.registerHour');
 @endsection
 
 @section('script')
@@ -196,12 +195,6 @@
             "paging": false,
             "bInfo": false,
         });
-        var element = document.getElementById('datatable1');
-        var positionInfo = element.getBoundingClientRect();
-        var height = positionInfo.height;
-        var width = positionInfo.width;
-        document.getElementById("conntent").style.width = width;
-        console.log(width);
     });
 
 </script>

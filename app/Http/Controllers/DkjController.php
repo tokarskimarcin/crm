@@ -71,6 +71,22 @@ class DkjController extends Controller
             ->with('show_raport',1);
     }
 
+    public function departmentStatisticsGet()
+    {
+
+        return view('dkj.departmentStatistics');
+    }
+
+    public function departmentStatisticsPOST(Request $request)
+    {
+        $departments =  $this->getDepartment();
+
+        return view('dkj.departmentStatistics')
+            ->with('departments',$departments);
+    }
+
+
+
     public function datatableDkjVerification(Request $request)
     {
         $query = DB::table('dkj')

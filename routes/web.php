@@ -108,6 +108,12 @@ Route::middleware(['check-permission'])->group(function () {
     Route::POST('/jankyVerification','DkjController@jankyVerificationPOST');
 
     Route::get('/jankyStatistics','DkjController@jankyStatistics');
+
+    Route::get('/departmentStatistics','DkjController@departmentStatisticsGet');
+    Route::POST('/departmentStatistics','DkjController@departmentStatisticsPOST');
+
+    Route::get('/consultantStatistics','DkjController@consultantStatistics');
+    Route::POST('/consultantStatistics','DkjController@consultantStatistics');
     // DKJ -- STOP--
 
     // Schedule -- START --
