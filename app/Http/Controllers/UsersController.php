@@ -10,6 +10,8 @@ use App\UserTypes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
+use Session;
 
 class UsersController extends Controller
 {
@@ -19,8 +21,10 @@ class UsersController extends Controller
     //     $send_type = Department_info::find(Auth::user()->department_info_id);
     //     $send_type = $send_type->type;
         $user = User::find(Auth::user()->id);
-        return view('hr.addConsultant')->with('agencies',$agencies)
-            ->with('send_type',$user->department_info->type);
+        return view('hr.addConsultantNew')
+            ->with('agencies',$agencies)
+            ->with('send_type',$user->department_info->type)
+            ->with('type', 1);
 
     }
     public function add_CadreGet()
@@ -36,9 +40,10 @@ class UsersController extends Controller
         //         '))->get();
         $user_types = UserTypes::all();
         $department_info = Department_info::all();
-        return view('hr.addCadre')->with('agencies',$agencies)
+        return view('hr.addConsultantNew')->with('agencies',$agencies)
             ->with('department_info',$department_info)
-            ->with('user_types',$user_types);
+            ->with('user_types',$user_types)
+            ->with('type', 2);
 
     }
     public function uniqueUsername(Request $request)
@@ -63,10 +68,14 @@ class UsersController extends Controller
         $user->username = $request->username;
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
+        $user->email_off = $request->email;
         $user->password = bcrypt($request->password);
+        $user->salary = $request->salary;
         $user->created_at = date("Y-m-d H:i:s");
         $user->updated_at = date("Y-m-d H:i:s");
         $user->password_date = date("Y-m-d");
+
+        $user->guid = base64_encode($request->password); // tutaj hashujemy hasło do guid
 
         if(isset($request->department_info) && isset($request->user_type))
         {
@@ -85,6 +94,7 @@ class UsersController extends Controller
         $user->start_work = $request->start_date;
         $user->status_work = 1;
         $user->phone = $request->phone;
+        $user->private_phone = $request->private_phone;
         $user->description = $request->description;
         $user->student = $request->student;
         $user->salary_to_account = $request->salary_to_account;
@@ -100,13 +110,18 @@ class UsersController extends Controller
             'first_name' => $user->first_name,
             'last_name' => $user->last_name
         );
-        if( $redirect = 1)
-            return view('hr.addConsultant')
-                ->with('saved',$user_data)
-                ->with('agencies',$agencies)
-                ->with('send_type',$send_type);
-        else
-            return view('hr.addCadre')->with('saved', $user_data)->with('agencies',$agencies);
+
+        Session::flash('message_ok', "Użytkownik dodany pomyślnie!");
+        return Redirect::back();
+
+        // if( $redirect = 1)
+        //
+        //     return view('hr.addConsultant')
+        //         ->with('saved',$user_data)
+        //         ->with('agencies',$agencies)
+        //         ->with('send_type',$send_type);
+        // else
+        //     return view('hr.addCadre')->with('saved', $user_data)->with('agencies',$agencies);
     }
     public function employee_managementGet()
     {
@@ -118,48 +133,56 @@ class UsersController extends Controller
     }
     public function edit_consultantGet($id)
     {
+        // $agencies = Agencies::all();
+        // $user = User::find($id);
+        // return view('hr.editConsultant')->with('agencies',$agencies)
+        //     ->with('user',$user);
+
+        //nowy widok
         $agencies = Agencies::all();
         $user = User::find($id);
-        return view('hr.editConsultant')->with('agencies',$agencies)
-            ->with('user',$user);
+        return view('hr.addConsultantTEST')->with('agencies',$agencies)
+          ->with('user',$user)
+          ->with('type', 1);
+
     }
 
-    public function edit_consultantPOST($id,Request $request)
-    {
-        $agencies = Agencies::all();
-        $user = User::findOrFail($id);
-        $user->username = $request->username;
-        $user->first_name = $request->first_name;
-        $user->last_name = $request->last_name;
-        if($request->password != '')
-        {
-            $user->password = bcrypt($request->password);
-        }
-        $user->updated_at = date("Y-m-d H:i:s");
-        $user->password_date = date("Y-m-d");
-        $user->user_type_id = 1;
-        $user->department_info_id = Auth::user()->department_info_id;
-        $user->start_work = $request->start_date;
-        $user->status_work = $request->status_work;
-        $user->phone = $request->phone;
-        $user->description = $request->description;
-        $user->student = $request->student;
-        $user->salary_to_account = $request->salary_to_account;
-        $user->agency_id = $request->agency_id;
-        $user->login_phone = $request->login_phone;
-        $user->end_work = $request->end_work;
-        if($request->rate == 'Nie dotyczy')
-            $request->rate = 0;
-        $user->rate = $request->rate;
-        $user->id_manager = Auth::id();
-        $user->documents = $request->documents;
-        $user->save();
-        $user_data = array(
-            'first_name' => $user->first_name,
-            'last_name' => $user->last_name
-        );
-        return view('hr.employeeManagement')->with('saved', $user_data);
-    }
+    // public function edit_consultantPOST($id,Request $request)
+    // {
+    //     $agencies = Agencies::all();
+    //     $user = User::findOrFail($id);
+    //     $user->username = $request->username;
+    //     $user->first_name = $request->first_name;
+    //     $user->last_name = $request->last_name;
+    //     if($request->password != '')
+    //     {
+    //         $user->password = bcrypt($request->password);
+    //     }
+    //     $user->updated_at = date("Y-m-d H:i:s");
+    //     $user->password_date = date("Y-m-d");
+    //     $user->user_type_id = 1;
+    //     $user->department_info_id = Auth::user()->department_info_id;
+    //     $user->start_work = $request->start_date;
+    //     $user->status_work = $request->status_work;
+    //     $user->phone = $request->phone;
+    //     $user->description = $request->description;
+    //     $user->student = $request->student;
+    //     $user->salary_to_account = $request->salary_to_account;
+    //     $user->agency_id = $request->agency_id;
+    //     $user->login_phone = $request->login_phone;
+    //     $user->end_work = $request->end_work;
+    //     if($request->rate == 'Nie dotyczy')
+    //         $request->rate = 0;
+    //     $user->rate = $request->rate;
+    //     $user->id_manager = Auth::id();
+    //     $user->documents = $request->documents;
+    //     $user->save();
+    //     $user_data = array(
+    //         'first_name' => $user->first_name,
+    //         'last_name' => $user->last_name
+    //     );
+    //     return view('hr.employeeManagement')->with('saved', $user_data);
+    // }
 
     public function edit_cadreGet($id) {
         $user = User::find($id);
@@ -167,7 +190,42 @@ class UsersController extends Controller
 
         return view('hr.addConsultantTEST')
             ->with('agencies', $agencies)
-            ->with('user', $user);
+            ->with('user', $user)
+            ->with('type', 2);;
+    }
+
+    public function edit_cadrePOST($id, Request $request) {
+        $manager_id = Auth::user()->id;
+
+        $user = User::find($id);
+
+        $user->username = $request->username;
+        $user->email_off = $request->username;
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
+        $user->updated_at = date("Y-m-d H:i:s");
+        $user->phone = $request->phone;
+        $user->email_off = $request->email;
+        $user->private_phone = $request->private_phone;
+        $user->description = $request->description;
+        $user->student = $request->student;
+        $user->salary_to_account = $request->salary_to_account;
+        $user->agency_id = $request->agency_id;
+        $user->login_phone = $request->login_phone;
+        $user->rate = $request->rate;
+        $user->salary = $request->salary;
+        $user->documents = $request->documents;
+        $user->id_manager = $manager_id;
+        $user->additional_salary = $request->additional_salary;
+        if($request->password != '')
+        {
+            $user->password = bcrypt($request->password);
+            $user->guid = base64_encode($request->password);
+        };
+        $user->save();
+
+        Session::flash('message_edit', "Dane zostały zaktualizowane!");
+        return Redirect::back();
     }
 
     public function datatableEmployeeManagement(Request $request)

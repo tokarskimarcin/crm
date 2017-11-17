@@ -65,4 +65,8 @@ class User extends Authenticatable
     public function summaryPaymets() {
         return $this->hasMany('App\SummaryPayment', 'id_user');
     }
+
+    public function equipments() {
+        return $this->hasMany('App\Equipments', 'id_user');
+    }
 }

@@ -88,7 +88,7 @@ Route::middleware(['check-permission'])->group(function () {
     Route::POST('/edit_consultant/{id}','UsersController@edit_consultantPOST');
 
     Route::get('/edit_cadre/{id}','UsersController@edit_cadreGet');
-    Route::POST('/edit_carde/{id}','UsersController@edit_cadrePOST');
+    Route::POST('/edit_cadre/{id}','UsersController@edit_cadrePOST');
 
     Route::get('/employee_management','UsersController@employee_managementGet');
 
