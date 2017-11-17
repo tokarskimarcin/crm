@@ -23,11 +23,13 @@ class CreateEquipmentTable extends Migration
             $table->integer('phone_box')->nullable();
             $table->integer('tablet_modem')->nullable();
             $table->integer('sim_number_phone')->nullable();
+            $table->integer('sim_id')->nullable();
             $table->integer('sim_type')->nullable();
             $table->integer('sim_pin')->nullable();
             $table->integer('sim_puk')->nullable();
             $table->integer('sim_net')->nullable();
             $table->string('model');
+            $table->string('imei')->nullable();
             $table->string('serial_code');
             $table->string('description')->nullable();
             $table->integer('power_cable')->nullable();
