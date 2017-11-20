@@ -18,17 +18,17 @@ use App\LinkGroups;
 use App\PrivilageRelation;
 use App\SummaryPayment;
 use App\EquipmentTypes;
+use App\Equipments;
 
 class TestORM extends Controller
 {
     public function test() {
 
-        // $equipments_types = EquipmentTypes::all();
-        //
-        // return view('hr.showEquipment')
-        //     ->with('equipments_types', $equipments_types);
+        $equipments_types = Equipments::all();
 
-        return view('testorm');
+        return view('hr.showEquipment')
+            ->with('equipments_types', $equipments_types);
+
     }
 
 }

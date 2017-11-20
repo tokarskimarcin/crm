@@ -143,6 +143,8 @@ Route::middleware(['check-permission'])->group(function () {
 
     // Equipment -- START --
     Route::get('/show_equipment','EquipmentsController@showEquipment');
+    Route::get('/edit_equipment/{id}','EquipmentsController@editEquipmentGet');
+    Route::Post('/edit_equipment/{id}','EquipmentsController@editEquipmentPost');
     // Equipment -- STOP --
 
 

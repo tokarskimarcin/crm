@@ -18,172 +18,173 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <div class="panel-body">
+                                  <ul class="nav nav-tabs">
+                                    <li class="menu_item active" id="menu_laptop"><a href="#">Laptopy</a></li>
+                                    <li class="menu_item" id="menu_tablet"><a href="#">Tablety</a></li>
+                                    <li class="menu_item" id="menu_phone"><a href="#">Telefony</a></li>
+                                    <li class="menu_item" id="menu_sim_card"><a href="#">Karty SIM</a></li>
+                                    <li class="menu_item" id="menu_monitor"><a href="#">Monitory</a></li>
+                                    <li class="menu_item" id="menu_printer"><a href="#">Drukarki</a></li>
+                                  </ul>
+                                  <br />
+                                  <table class="table table-bordered" id="laptop">
+                                      <tr>
+                                          <td>Model</td>
+                                          <td>Numer seryjny</td>
+                                          <td>Procesor</td>
+                                          <td>Ram</td>
+                                          <td>Dysk</td>
+                                          <td>Opis</td>
+                                          <td>Oddział</td>
+                                          <td>Pracownik</td>
+                                          <td>Akcja</td>
+                                      </tr>
+                                      @foreach($equipments_types->where('equipment_type_id', "=", 1) as $equipment)
+                                        <tr>
+                                              <td id="999">{{$equipment->model}}</td>
+                                              <td>{{$equipment->serial_code}}</td>
+                                              <td>{{$equipment->laptop_processor}}</td>
+                                              <td>{{$equipment->laptop_ram}}</td>
+                                              <td>{{$equipment->laptop_hard_drive}}</td>
+                                              <td>{{$equipment->description}}</td>
+                                              <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                              @if($equipment->user != null)
+                                                  <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
+                                              @else
+                                                  <td>Brak</td>
+                                              @endif
+                                              <td>
+                                                  <a href="/edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
+                                              </td>
+                                          </tr>
+                                      @endforeach
+                                      </table>
+                                      <table class="table table-bordered" id="tablet" style="display: none">
+                                          <tr>
+                                              <td>Model</td>
+                                              <td>Numer seryjny</td>
+                                              <td>Imei</td>
+                                              <td>Modem 3G</td>
+                                              <td>Opis</td>
+                                              <td>Oddział</td>
+                                              <td>Pracownik</td>
+                                              <td>Akcja</td>
+                                          </tr>
+                                          @foreach($equipments_types->where('equipment_type_id',"=", 3) as $equipment)
+                                              <td data-model="{{$equipment->model}}">{{$equipment->model}}</td>
+                                              <td>{{$equipment->serial_code}}</td>
+                                              <td>{{$equipment->imei}}</td>
+                                              <td>{{$equipment->tablet_modem}}</td>
+                                              <td>{{$equipment->description}}</td>
+                                              <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                              @if($equipment->user != null)
+                                                  <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
+                                              @else
+                                                  <td>Brak</td>
+                                              @endif
+                                          @endforeach
+                                          </table>
+                                          <table class="table table-bordered" id="phone" style="display: none">
+                                              <tr>
+                                                  <td>Model</td>
+                                                  <td>Numer IMEI</td>
+                                                  <td>Ładowarka</td>
+                                                  <td>Pudełko</td>
+                                                  <td>Opis</td>
+                                                  <td>Oddział</td>
+                                                  <td>Pracownik</td>
+                                                  <td>Akcja</td>
+                                              </tr>
+                                              @foreach($equipments_types->where('equipment_type_id',"=", 2) as $equipment)
+                                                  <td>{{$equipment->model}}</td>
+                                                  <td>{{$equipment->imei}}</td>
+                                                  <td>{{$equipment->power_cable}}</td>
+                                                  <td>{{$equipment->phone_box}}</td>
+                                                  <td>{{$equipment->description}}</td>
+                                                  <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                                  @if($equipment->user != null)
+                                                      <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
+                                                  @else
+                                                      <td>Brak</td>
+                                                  @endif
+                                              @endforeach
+                                          </table>
+                                          <table class="table table-bordered" id="sim_card" style="display: none">
+                                              <tr>
+                                                  <td>Typ</td>
+                                                  <td>Numer Telefonu</td>
+                                                  <td>ID Karty</td>
+                                                  <td>PIN</td>
+                                                  <td>PUK</td>
+                                                  <td>Internet</td>
+                                                  <td>Opis</td>
+                                                  <td>Oddział</td>
+                                                  <td>Pracownik</td>
+                                                  <td>Akcja</td>
+                                              </tr>
+                                              @foreach($equipments_types->where('equipment_type_id',"=", 4) as $equipment)
+                                                  <td>{{$equipment->sim_type}}</td>
+                                                  <td>{{$equipment->sim_number_phone}}</td>
+                                                  <td>{{$equipment->sim_id}}</td>
+                                                  <td>{{$equipment->sim_pin}}</td>
+                                                  <td>{{$equipment->sim_puk}}</td>
+                                                  <td>{{$equipment->sim_net}}</td>
+                                                  <td>{{$equipment->description}}</td>
+                                                  <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                                  @if($equipment->user != null)
+                                                      <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
+                                                  @else
+                                                      <td>Brak</td>
+                                                  @endif
+                                              @endforeach
+                                          </table>
+                                          <table class="table table-bordered" id="monitor" style="display: none">
+                                              <tr>
+                                                  <td>Model</td>
+                                                  <td>Numer seryjny</td>
+                                                  <td>Kabel Sygnałowy</td>
+                                                  <td>Kabel zasilający</td>
+                                                  <td>Opis</td>
+                                                  <td>Oddział</td>
+                                                  <td>Pracownik</td>
+                                                  <td>Akcja</td>
+                                              </tr>
+                                              @foreach($equipments_types->where('equipment_type_id',"=", 5) as $equipment)
+                                                  <td>{{$equipment->model}}</td>
+                                                  <td>{{$equipment->serial_code}}</td>
+                                                  <td>{{$equipment->power_cable}}</td>
+                                                  <td>{{$equipment->signal_cable}}</td>
+                                                  <td>{{$equipment->description}}</td>
+                                                  <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                                  @if($equipment->user != null)
+                                                      <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
+                                                  @else
+                                                      <td>Brak</td>
+                                                  @endif
+                                              @endforeach
+                                          </table>
+                                          <table class="table table-bordered" id="printer" style="display: none">
+                                              <tr>
+                                                  <td>Model</td>
+                                                  <td>Numer seryjny</td>
+                                                  <td>Opis</td>
+                                                  <td>Oddział</td>
+                                                  <td>Pracownik</td>
+                                                  <td>Akcja</td>
+                                              </tr>
+                                              @foreach($equipments_types->where('equipment_type_id',"=", 6) as $equipment)
+                                                  <td>{{$equipment->model}}</td>
+                                                  <td>{{$equipment->serial_code}}</td>
+                                                  <td>{{$equipment->description}}</td>
+                                                  <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                                  @if($equipment->user != null)
+                                                      <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
+                                                  @else
+                                                      <td>Brak</td>
+                                                  @endif
+                                              @endforeach
+                                          </table>
 
-
-                                    @foreach($equipments_types as $equipments_type)
-                                        @if($equipments_type->name == "Laptop")
-                                            <table class="table table-bordered">
-                                                <tr>
-                                                    <td>Model</td>
-                                                    <td>Numer seryjny</td>
-                                                    <td>Procesor</td>
-                                                    <td>Ram</td>
-                                                    <td>Dysk</td>
-                                                    <td>Opis</td>
-                                                    <td>Oddział</td>
-                                                    <td>Pracownik</td>
-                                                    <td>Akcja</td>
-                                                </tr>
-                                            @foreach($equipments_type->where('equipment_type_id',$equipments_type->id) as $equipment)
-                                                    <td>{{$equipment->model}}</td>
-                                                    <td>{{$equipment->serial_code}}</td>
-                                                    <td>{{$equipment->laptop_processor}}</td>
-                                                    <td>{{$equipment->laptop_ram}}</td>
-                                                    <td>{{$equipment->laptop_hard_drive}}</td>
-                                                    <td>{{$equipment->description}}</td>
-                                                    <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
-                                                    @if($equipment->user != null)
-                                                        <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
-                                                    @else
-                                                        <td>Brak</td>
-                                                    @endif
-                                            @endforeach
-                                            </table>
-                                        @elseif($equipments_type->name == "Tablet")
-                                            <table class="table table-bordered">
-                                                <tr>
-                                                    <td>Model</td>
-                                                    <td>Numer seryjny</td>
-                                                    <td>Imei</td>
-                                                    <td>Modem 3G</td>
-                                                    <td>Opis</td>
-                                                    <td>Oddział</td>
-                                                    <td>Pracownik</td>
-                                                    <td>Akcja</td>
-                                                </tr>
-                                                @foreach($equipments->where('equipment_type_id',$equipments_type->id) as $equipment)
-                                                    <td>{{$equipment->model}}</td>
-                                                    <td>{{$equipment->serial_code}}</td>
-                                                    <td>{{$equipment->imei}}</td>
-                                                    <td>{{$equipment->tablet_modem}}</td>
-                                                    <td>{{$equipment->description}}</td>
-                                                    <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
-                                                    @if($equipment->user != null)
-                                                        <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
-                                                    @else
-                                                        <td>Brak</td>
-                                                    @endif
-                                                @endforeach
-                                                </table>
-                                        @elseif($equipments_type->name == "Telefon")
-                                                <table class="table table-bordered">
-                                                    <tr>
-                                                        <td>Model</td>
-                                                        <td>Numer IMEI</td>
-                                                        <td>Ładowarka</td>
-                                                        <td>Pudełko</td>
-                                                        <td>Opis</td>
-                                                        <td>Oddział</td>
-                                                        <td>Pracownik</td>
-                                                        <td>Akcja</td>
-                                                    </tr>
-                                                    @foreach($equipments->where('equipment_type_id',$equipments_type->id) as $equipment)
-                                                        <td>{{$equipment->model}}</td>
-                                                        <td>{{$equipment->imei}}</td>
-                                                        <td>{{$equipment->power_cable}}</td>
-                                                        <td>{{$equipment->phone_box}}</td>
-                                                        <td>{{$equipment->description}}</td>
-                                                        <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
-                                                        @if($equipment->user != null)
-                                                            <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
-                                                        @else
-                                                            <td>Brak</td>
-                                                        @endif
-                                                    @endforeach
-                                                </table>
-                                        @elseif($equipments_type->name == "Karta SIM")
-                                            <table class="table table-bordered">
-                                                <tr>
-                                                    <td>Typ</td>
-                                                    <td>Numer Telefonu</td>
-                                                    <td>ID Karty</td>
-                                                    <td>PIN</td>
-                                                    <td>PUK</td>
-                                                    <td>Internet</td>
-                                                    <td>Opis</td>
-                                                    <td>Oddział</td>
-                                                    <td>Pracownik</td>
-                                                    <td>Akcja</td>
-                                                </tr>
-                                                @foreach($equipments->where('equipment_type_id',$equipments_type->id) as $equipment)
-                                                    <td>{{$equipment->sim_type}}</td>
-                                                    <td>{{$equipment->sim_number_phone}}</td>
-                                                    <td>{{$equipment->sim_id}}</td>
-                                                    <td>{{$equipment->sim_pin}}</td>
-                                                    <td>{{$equipment->sim_puk}}</td>
-                                                    <td>{{$equipment->sim_net}}</td>
-                                                    <td>{{$equipment->description}}</td>
-                                                    <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
-                                                    @if($equipment->user != null)
-                                                        <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
-                                                    @else
-                                                        <td>Brak</td>
-                                                    @endif
-                                                @endforeach
-                                            </table>
-
-                                        @elseif($equipments_type->name == "Monitor")
-                                            <table class="table table-bordered">
-                                                <tr>
-                                                    <td>Model</td>
-                                                    <td>Numer seryjny</td>
-                                                    <td>Kabel Sygnałowy</td>
-                                                    <td>Kabel zasilający</td>
-                                                    <td>Opis</td>
-                                                    <td>Oddział</td>
-                                                    <td>Pracownik</td>
-                                                    <td>Akcja</td>
-                                                </tr>
-                                                @foreach($equipments->where('equipment_type_id',$equipments_type->id) as $equipment)
-                                                    <td>{{$equipment->model}}</td>
-                                                    <td>{{$equipment->serial_code}}</td>
-                                                    <td>{{$equipment->power_cable}}</td>
-                                                    <td>{{$equipment->signal_cable}}</td>
-                                                    <td>{{$equipment->description}}</td>
-                                                    <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
-                                                    @if($equipment->user != null)
-                                                        <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
-                                                    @else
-                                                        <td>Brak</td>
-                                                    @endif
-                                                @endforeach
-                                            </table>
-
-                                        @elseif($equipments_type->name == "Drukarka")
-                                            <table class="table table-bordered">
-                                                <tr>
-                                                    <td>Model</td>
-                                                    <td>Numer seryjny</td>
-                                                    <td>Opis</td>
-                                                    <td>Oddział</td>
-                                                    <td>Pracownik</td>
-                                                    <td>Akcja</td>
-                                                </tr>
-                                                @foreach($equipments->where('equipment_type_id',$equipments_type->id) as $equipment)
-                                                    <td>{{$equipment->model}}</td>
-                                                    <td>{{$equipment->serial_code}}</td>
-                                                    <td>{{$equipment->description}}</td>
-                                                    <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
-                                                    @if($equipment->user != null)
-                                                        <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
-                                                    @else
-                                                        <td>Brak</td>
-                                                    @endif
-                                                @endforeach
-                                            </table>
-
-                                            @endif
-                                    @endforeach
                                 </div>
                             </div>
                         </div>
@@ -193,14 +194,67 @@
         </div>
     </div>
 
+
 @endsection
 @section('script')
 
 <script>
-    $(document).ready(function() {
+
+      $(".equipment_data").on('click', function() {
+          var id = this.name;
+
+      });
 
 
-    });
+      $('.menu_item').on('click', function(){
+          var id = this.id;
+
+          function deletePrevious() {
+              $("#menu_laptop, #menu_tablet, #menu_phone, #menu_sim_card, #menu_monitor, #menu_printer").removeClass('active');
+              $("#laptop, #tablet, #phone, #sim_card, #monitor, #printer").fadeOut(0);
+          }
+
+          if(id == "menu_laptop") {
+              deletePrevious();
+              $("#menu_laptop").addClass('active');
+              $("#laptop").fadeIn(0);
+          }
+
+          if(id == "menu_tablet") {
+              deletePrevious();
+              $("#menu_tablet").addClass('active');
+              $("#tablet").fadeIn(0);
+          }
+
+          if(id == "menu_phone") {
+              deletePrevious();
+              $("#menu_phone").addClass('active');
+              $("#phone").fadeIn(0);
+          }
+
+          if(id == "menu_sim_card") {
+              deletePrevious();
+              $("#menu_sim_card").addClass('active');
+              $("#sim_card").fadeIn(0);
+          }
+
+          if(id == "menu_monitor") {
+              deletePrevious();
+              $("#menu_monitor").addClass('active');
+              $("#monitor").fadeIn(0);
+          }
+
+          if(id == "menu_printer") {
+              deletePrevious();
+              $("#menu_printer").addClass('active');
+              $("#printer").fadeIn(0);
+          }
+
+      });
+
+
+
+
 
 </script>
 @endsection
