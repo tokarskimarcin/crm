@@ -70,16 +70,12 @@ class DkjController extends Controller
             ->with('users',$users)
             ->with('show_raport',1);
     }
-
+// Statystyki oddziału (Konkretnego)
     public function departmentStatisticsGet()
     {
-        $departments = Department_info::all();
-        $users = User::where('department_info_id',Auth::user()->department_info_id);
-        return view('dkj.departmentStatistics')
-            ->with('departments',$departments)
-            ->with('users',$users);
+        return view('dkj.departmentStatistics');
     }
-
+// Statystyki oddziału (Konkretnego)
     public function departmentStatisticsPOST(Request $request)
     {
         $user_dkj_info = Dkj::whereHas('user', function ($query) {
@@ -94,6 +90,36 @@ class DkjController extends Controller
             ->get();
         return view('dkj.departmentStatistics')
             ->with('user_info', $user_dkj_info)
+            ->with('month',$request->month);
+    }
+
+// Statystyki oddziałów, do wyboru;
+    public function departmentsStatisticsGet()
+    {
+        $departments_info = Department_info::where('janky_system_id','>',0)->get();
+        return view('dkj.departmentsStatistics')
+            ->with('departments_info',$departments_info);
+    }
+// Statystyki oddziałów, do wyboru;
+    public function departmentsStatisticsPOST(Request $request)
+    {
+        $departments_info = Department_info::where('janky_system_id','>',0)->get();
+        $department_info_id = $request->department_info_id;
+        $user_dkj_info = Dkj::whereHas('user', function ($query) use ($department_info_id){
+            $query->where('department_info_id', $department_info_id);
+        })->
+        selectRaw(
+            'Date(add_date) as add_date,
+                SUM(CASE WHEN dkj_status = 0 or deleted = 1 THEN 1 ELSE 0 END) as good ,
+                SUM(CASE WHEN dkj_status = 1 AND deleted = 0 THEN 1 ELSE 0 END) as bad')
+            ->where('add_date','like',$request->month.'%')
+            ->groupBy(DB::raw('Date(add_date)'))
+            ->get();
+
+        return view('dkj.departmentsStatistics')
+            ->with('user_info', $user_dkj_info)
+            ->with('departments_info',$departments_info)
+            ->with('department_info_id', $department_info_id)
             ->with('month',$request->month);
     }
 

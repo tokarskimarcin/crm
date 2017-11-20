@@ -112,6 +112,9 @@ Route::middleware(['check-permission'])->group(function () {
     Route::get('/departmentStatistics','DkjController@departmentStatisticsGet');
     Route::POST('/departmentStatistics','DkjController@departmentStatisticsPOST');
 
+    Route::get('/departmentsStatistics','DkjController@departmentsStatisticsGet');
+    Route::POST('/departmentsStatistics','DkjController@departmentsStatisticsPOST');
+
     Route::get('/consultantStatistics','DkjController@consultantStatistics');
     Route::POST('/consultantStatistics','DkjController@consultantStatistics');
     // DKJ -- STOP--
