@@ -93,7 +93,8 @@ class DkjController extends Controller
             ->groupBy(DB::raw('Date(add_date)'))
             ->get();
         return view('dkj.departmentStatistics')
-            ->with('user_info', $user_dkj_info);
+            ->with('user_info', $user_dkj_info)
+            ->with('month',$request->month);
     }
 
 
