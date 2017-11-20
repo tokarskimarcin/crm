@@ -74,6 +74,9 @@ class UsersController extends Controller
         $user->created_at = date("Y-m-d H:i:s");
         $user->updated_at = date("Y-m-d H:i:s");
         $user->password_date = date("Y-m-d");
+        if($request->phone == null) {
+            $request->phone = 0;
+        }
 
         $user->guid = base64_encode($request->password); // tutaj hashujemy hasło do guid
 
@@ -188,10 +191,30 @@ class UsersController extends Controller
         $user = User::find($id);
         $agencies = Agencies::all();
 
+        $month = date('m');
+
+        $months_names = ['Styczeń', 'Luty', 'Marzec', 'Kwiecien', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Padziernik', 'Listopad', 'Grudzień'];
+
+        function month_reverse($mnt) {
+            if ($mnt < 0) {
+                $mnt += 12;
+            }
+            return $mnt;
+        }
+        $months = [$months_names[month_reverse($month - 1)], $months_names[month_reverse($month - 2)]];
+
+        $penalty_bonuses = DB::select("SELECT event_date,SUM(CASE WHEN `type` = 2 AND `status` = 1 THEN `amount` ELSE 0 END) as premia , SUM(CASE WHEN `type` = 1 AND `status` = 1 THEN `amount` ELSE 0 END) as kara FROM
+         `penalty_bonus` WHERE `id_user` = " . $id . " group by MONTH(`event_date`) LIMIT 2");
+
+        //dd($penalty_bonuses);
+
+
         return view('hr.addConsultantTEST')
             ->with('agencies', $agencies)
             ->with('user', $user)
-            ->with('type', 2);;
+            ->with('penalty_bonuses', $penalty_bonuses)
+            ->with('month', $months)
+            ->with('type', 2);
     }
 
     public function edit_cadrePOST($id, Request $request) {

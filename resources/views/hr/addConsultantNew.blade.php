@@ -49,14 +49,14 @@
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Telefon służbowy:</b></td>
                                 <td>
-                                    <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="private_phone" value="">
+                                    <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="phone" value="">
                                 </td>
                             </tr>
                             @endif
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Telefon prywatny:</b></td>
                                 <td>
-                                    <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="phone" value="">
+                                    <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="private_phone" value="">
                                 </td>
                             </tr>
                             <tr>

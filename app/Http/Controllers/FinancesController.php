@@ -130,10 +130,13 @@ class FinancesController extends Controller
                    '))->where('users.department_info_id',Auth::user()->department_info_id)
                     ->whereBetween('event_date', [$date_start, $date_stop])
                     ->whereIn('type', [1,2])
-                    ->where('users.user_type_id1',1);
+                    ->where('users.user_type_id',1)
+                    ->where('status',1);
             if($request->showuser != -1)
             {
-                $query->where('users.id' , $request->showuser);
+                $query
+                  ->where('users.id' , $request->showuser)
+                  ->where('status', 1);
             }
             $view->with('users_show',$query->get())
             ->with('date_start',$date_start)
@@ -243,8 +246,12 @@ class FinancesController extends Controller
             $object = PenaltyBonus::find($request->id);
             $object->id_manager_edit = Auth::user()->id;
             $object->status = 0;
+            $object->updated_at = date('Y-m-d H:i:s');
             $object->save();
+
         }
+
+
     }
 
 }

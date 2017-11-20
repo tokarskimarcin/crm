@@ -176,7 +176,7 @@
                                                                 <td>{{$item->manager_first_name.' '.$item->manager_last_name}}</td>
                                                                 <td class="user_comment_modal">{{$item->comment}}</td>
                                                                 <td>
-                                                                    <button type="button" id={{$item->id}} class="btn btn-danger action delete">Usuń</button>
+                                                                    <button type="button" class="btn btn-danger action delete" data-id_penalty={{$item->id}}>Usuń</button>
                                                                     <button type="button" data-toggle="modal" data-target="#editinfo" id={{$item->id}} class="btn btn-info action edit">Edycja</button>
                                                                 </td>
                                                             </tr>
@@ -358,8 +358,8 @@ $("#addpbsubmit").click(function () {
     });
     // AJAX usuwanie kar/premii
     $( ".delete" ).click(function() {
-        var id = (this.id);
-
+        var id= $(this).data('id_penalty');
+        alert(id);
         $.ajax({
             type: "POST",
             url: '{{ route('api.deletePenaltyBonus') }}',
@@ -370,10 +370,10 @@ $("#addpbsubmit").click(function () {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                alert("Pomyślnie usunięto karę/premię!");
+               console.log(response);
             }
         });
-        $('tr[name=' + this.id + ']').fadeOut(0);
+        $('tr[name=' + id + ']').fadeOut(0);
     });
 
     {{--$( ".delete" ).click(function() {--}}

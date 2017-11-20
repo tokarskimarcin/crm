@@ -219,18 +219,27 @@
                                                 </select>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td class="td-class"><b>Premia (Październik):</b></td>
-                                            <td>
-                                                <input type="number" class="form-control" placeholder="0" name="additional_salary_1st_month" value="">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="td-class"><b>Premia (Listopad):</b></td>
-                                            <td>
-                                                <input type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="">
-                                            </td>
-                                        </tr>
+                                        @if(isset($penalty_bonuses[1]))
+                                            <tr>
+                                                <td class="td-class"><b>Suma kar/premii ({{$month[1]}}):</b></td>
+                                                <td>
+                                                    <input disabled type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="{{$penalty_bonuses[0]->premia - $penalty_bonuses[0]->kara}}">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="td-class"><b>Suma kar/premii ({{$month[0]}}):</b></td>
+                                                <td>
+                                                    <input disabled type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="{{$penalty_bonuses[1]->premia - $penalty_bonuses[1]->kara}}">
+                                                </td>
+                                            </tr>
+                                        @elseif(isset($penalty_bonuses[0]))
+                                            <tr>
+                                                <td class="td-class"><b>Suma kar/premii ({{$month[0]}}):</b></td>
+                                                <td>
+                                                    <input disabled type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="{{$penalty_bonuses[0]->premia - $penalty_bonuses[0]->kara}}">
+                                                </td>
+                                            </tr>
+                                        @endif
                                         <tr>
                                             <td class="td-class"><b>Login PBX:</b></td>
                                             <td>

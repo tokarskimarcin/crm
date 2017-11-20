@@ -65,7 +65,7 @@ class WorkHoursController extends Controller
                     work_hours.register_stop,
                     work_hours.date,
                     SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time'))
-                ->where('work_hours.status', '=', 2)
+                ->where('work_hours.status', '=', 3)
                 ->where('users.department_info_id', '=', Auth::user()->department_info_id)
                 ->where('users.user_type_id', '=', 1)
                 ->where('work_hours.id_manager', '=', null)
@@ -92,7 +92,7 @@ class WorkHoursController extends Controller
                     work_hours.register_stop,
                     work_hours.date,
                     SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time'))
-                ->where('work_hours.status', '=', 2);
+                ->where('work_hours.status', '=', 3);
             if($dep_info != '*')
             {
                 $query->where('users.department_info_id', '=', $dep_info);
@@ -157,6 +157,7 @@ class WorkHoursController extends Controller
                     ->update(['id_manager' => $id_manager,
                         'accept_start' => $register_start,
                         'accept_stop' => $register_stop,
+                        'status' => 4,
                         'success' => $succes]);}
 
             }else
@@ -166,7 +167,7 @@ class WorkHoursController extends Controller
                         'success' => $succes,
                         'accept_start' => $register_start,
                         'accept_stop' => $register_stop,
-                        'status' => 3]);
+                        'status' => 4]);
             }
         }
     }
@@ -204,11 +205,7 @@ class WorkHoursController extends Controller
     }
     public function viewHourGetCadre()
     {
-        //$users = User::select('SELECT * FROM users WHERE user_type_id != 1');
         $users = User::where('user_type_id', "!=", 1)->get();
-        // $user_type_info = UserTypes::find(Auth::user()->user_type_id);
-        // $what_show = $user_type_info->all_departments;
-        // $users = $this->getCadre($what_show);
 
         return view('workhourscadre.viewHourCadre')
             ->with('users',$users);
@@ -286,7 +283,7 @@ class WorkHoursController extends Controller
                         'success' => 0,
                         'accept_start' => null,
                         'accept_stop' => null,
-                        'status' => 4]);
+                        'status' => 6]);
         }
     }
     public function editAcceptHour(Request $request)
@@ -303,7 +300,7 @@ class WorkHoursController extends Controller
                         'success' => $succes,
                         'accept_start' => $accept_start,
                         'accept_stop' => $accept_stop,
-                        'status' => 3]);
+                        'status' => 5]);
         }
     }
     public function addAcceptHour(Request $request)
@@ -317,7 +314,7 @@ class WorkHoursController extends Controller
             $succes = $request->success;
             $id_manager = Auth::id();
             $work_hour = new Work_Hour;
-            $work_hour->status = 3;
+            $work_hour->status = 4;
             $work_hour->accept_sec = 0;
             $work_hour->success = $succes;
             $work_hour->date = $date[1];
