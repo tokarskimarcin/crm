@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Department_info;
 use App\Department_types;
+use App\Schedule;
 use App\User;
 use App\UserTypes;
 use App\Work_Hour;
@@ -46,6 +47,20 @@ class WorkHoursController extends Controller
     {
         $departments = $this->getDepartment();
         return view('workhourscadre.checkListCadre')->with('departments', $departments);;
+    }
+
+    public function usersLive()
+    {
+        $date = date("W", strtotime( date('Y-m-d'))); // numer tygodnia
+        $dayOfWeekArray= array('monday' ,'tuesday','wednesday','thursday','friday','saturday','sunday');
+        $day_number = date('N', strtotime(date('Y-m-d')))-1; // numer dnia tygodnia 0-poniedzialek
+        $shedule = Schedule::where('week_num',45)
+            ->where('year',date('Y'))
+            ->where($dayOfWeekArray[$day_number].'_start','!=',null)->get();
+
+        return view('workhours.usersLive')
+            ->with('shedule',$shedule)
+            ->with('day_number',$day_number);
     }
 
     public function datatableAcceptHour(Request $request) // akceptacja godzin dla konsultantów
