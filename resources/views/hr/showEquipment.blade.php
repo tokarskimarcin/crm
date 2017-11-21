@@ -8,6 +8,9 @@
             <h1 class="page-header">Sprzęt Firmowy</h1>
         </div>
     </div>
+    @if (Session::has('message_ok'))
+        <div class="alert alert-success">{{ Session::get('message_ok') }}</div>
+    @endif
 
     <div class="row">
         <div class="col-lg-12">
@@ -18,6 +21,18 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <div class="panel-body">
+                                  <br />
+                                  <div class="row">
+                                    <div class="col-lg-12">
+                                      <a class="btn btn-default" href="/add_equipment/1">Dodaj laptop</a>
+                                      <a class="btn btn-default" href="/add_equipment/3">Dodaj tablet</a>
+                                      <a class="btn btn-default" href="/add_equipment/2">Dodaj telefon</a>
+                                      <a class="btn btn-default" href="/add_equipment/4">Dodaj kartę SIM</a>
+                                      <a class="btn btn-default" href="/add_equipment/5">Dodaj Monitor</a>
+                                      <a class="btn btn-default" href="/add_equipment/6">Dodaj drukarkę</a>
+                                    </div>
+                                  </div>
+                                  <br/>
                                   <ul class="nav nav-tabs">
                                     <li class="menu_item active" id="menu_laptop"><a href="#">Laptopy</a></li>
                                     <li class="menu_item" id="menu_tablet"><a href="#">Tablety</a></li>
@@ -26,6 +41,7 @@
                                     <li class="menu_item" id="menu_monitor"><a href="#">Monitory</a></li>
                                     <li class="menu_item" id="menu_printer"><a href="#">Drukarki</a></li>
                                   </ul>
+
                                   <br />
                                   <table class="table table-bordered" id="laptop">
                                       <tr>
@@ -41,13 +57,17 @@
                                       </tr>
                                       @foreach($equipments_types->where('equipment_type_id', "=", 1) as $equipment)
                                         <tr>
-                                              <td id="999">{{$equipment->model}}</td>
+                                              <td>{{$equipment->model}}</td>
                                               <td>{{$equipment->serial_code}}</td>
                                               <td>{{$equipment->laptop_processor}}</td>
                                               <td>{{$equipment->laptop_ram}}</td>
                                               <td>{{$equipment->laptop_hard_drive}}</td>
                                               <td>{{$equipment->description}}</td>
-                                              <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                              @if($equipment->department_info_id != -1 && $equipment->department_info_id != 0)
+                                                  <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                              @else
+                                                  <td>Brak</td>
+                                              @endif
                                               @if($equipment->user != null)
                                                   <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
                                               @else
@@ -74,14 +94,26 @@
                                               <td data-model="{{$equipment->model}}">{{$equipment->model}}</td>
                                               <td>{{$equipment->serial_code}}</td>
                                               <td>{{$equipment->imei}}</td>
-                                              <td>{{$equipment->tablet_modem}}</td>
+                                              @if($equipment->tablet_modem == 1)
+                                                  <td>Tak</td>
+                                              @else
+                                                  <td>Nie</td>
+                                              @endif
                                               <td>{{$equipment->description}}</td>
-                                              <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                              @if($equipment->department_info_id != 0)
+                                                  <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                              @else
+                                                  <td>Brak</td>
+                                              @endif
                                               @if($equipment->user != null)
                                                   <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
                                               @else
                                                   <td>Brak</td>
                                               @endif
+                                              <td>
+                                                  <a href="/edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
+                                              </td>
+                                              </tr>
                                           @endforeach
                                           </table>
                                           <table class="table table-bordered" id="phone" style="display: none">
@@ -98,22 +130,38 @@
                                               @foreach($equipments_types->where('equipment_type_id',"=", 2) as $equipment)
                                                   <td>{{$equipment->model}}</td>
                                                   <td>{{$equipment->imei}}</td>
-                                                  <td>{{$equipment->power_cable}}</td>
-                                                  <td>{{$equipment->phone_box}}</td>
+                                                  @if($equipment->power_cable == 1)
+                                                      <td>Tak</td>
+                                                  @else
+                                                      <td>Nie</td>
+                                                  @endif
+                                                  @if($equipment->phone_box == 1)
+                                                      <td>Tak</td>
+                                                  @else
+                                                      <td>Nie</td>
+                                                  @endif
                                                   <td>{{$equipment->description}}</td>
-                                                  <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                                  @if($equipment->department_info_id != 0)
+                                                      <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                                  @else
+                                                      <td>Brak</td>
+                                                  @endif
                                                   @if($equipment->user != null)
                                                       <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
                                                   @else
                                                       <td>Brak</td>
                                                   @endif
+                                                  <td>
+                                                      <a href="/edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
+                                                  </td>
+                                                </tr>
                                               @endforeach
                                           </table>
                                           <table class="table table-bordered" id="sim_card" style="display: none">
                                               <tr>
                                                   <td>Typ</td>
                                                   <td>Numer Telefonu</td>
-                                                  <td>ID Karty</td>
+                                                  <td>Numer IMEI</td>
                                                   <td>PIN</td>
                                                   <td>PUK</td>
                                                   <td>Internet</td>
@@ -123,19 +171,35 @@
                                                   <td>Akcja</td>
                                               </tr>
                                               @foreach($equipments_types->where('equipment_type_id',"=", 4) as $equipment)
-                                                  <td>{{$equipment->sim_type}}</td>
+                                                  @if($equipment->sim_type == 1)
+                                                      <td>Abonament</td>
+                                                  @else
+                                                      <td>Prepaid</td>
+                                                  @endif
                                                   <td>{{$equipment->sim_number_phone}}</td>
-                                                  <td>{{$equipment->sim_id}}</td>
+                                                  <td>{{$equipment->imei}}</td>
                                                   <td>{{$equipment->sim_pin}}</td>
                                                   <td>{{$equipment->sim_puk}}</td>
-                                                  <td>{{$equipment->sim_net}}</td>
+                                                  @if($equipment->sim_net == 1)
+                                                      <td>Tak</td>
+                                                  @else
+                                                      <td>Nie</td>
+                                                  @endif
                                                   <td>{{$equipment->description}}</td>
-                                                  <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                                  @if($equipment->department_info_id != 0)
+                                                      <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                                  @else
+                                                      <td>Brak</td>
+                                                  @endif
                                                   @if($equipment->user != null)
                                                       <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
                                                   @else
                                                       <td>Brak</td>
                                                   @endif
+                                                  <td>
+                                                      <a href="/edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
+                                                  </td>
+                                                </tr>
                                               @endforeach
                                           </table>
                                           <table class="table table-bordered" id="monitor" style="display: none">
@@ -152,15 +216,31 @@
                                               @foreach($equipments_types->where('equipment_type_id',"=", 5) as $equipment)
                                                   <td>{{$equipment->model}}</td>
                                                   <td>{{$equipment->serial_code}}</td>
-                                                  <td>{{$equipment->power_cable}}</td>
-                                                  <td>{{$equipment->signal_cable}}</td>
+                                                  @if($equipment->power_cable == 1)
+                                                      <td>Tak</td>
+                                                  @else
+                                                      <td>Nie</td>
+                                                  @endif
+                                                  @if($equipment->signal_cable == 1)
+                                                      <td>Tak</td>
+                                                  @else
+                                                      <td>Nie</td>
+                                                  @endif
                                                   <td>{{$equipment->description}}</td>
-                                                  <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                                  @if($equipment->department_info_id != 0)
+                                                      <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                                  @else
+                                                      <td>Brak</td>
+                                                  @endif
                                                   @if($equipment->user != null)
                                                       <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
                                                   @else
                                                       <td>Brak</td>
                                                   @endif
+                                                  <td>
+                                                      <a href="/edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
+                                                  </td>
+                                                </tr>
                                               @endforeach
                                           </table>
                                           <table class="table table-bordered" id="printer" style="display: none">
@@ -176,12 +256,20 @@
                                                   <td>{{$equipment->model}}</td>
                                                   <td>{{$equipment->serial_code}}</td>
                                                   <td>{{$equipment->description}}</td>
-                                                  <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                                  @if($equipment->department_info_id != 0)
+                                                      <td>{{$equipment->department_info->departments->name.' '.$equipment->department_info->department_type->name}}</td>
+                                                  @else
+                                                      <td>Brak</td>
+                                                  @endif
                                                   @if($equipment->user != null)
                                                       <td>{{$equipment->user->first_name.' '.$equipment->user->last_name}}</td>
                                                   @else
                                                       <td>Brak</td>
                                                   @endif
+                                                  <td>
+                                                      <a href="/edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
+                                                  </td>
+                                                </tr>
                                               @endforeach
                                           </table>
 

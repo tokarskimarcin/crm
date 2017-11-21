@@ -107,14 +107,6 @@ class UsersController extends Controller
         Session::flash('message_ok', "Użytkownik dodany pomyślnie!");
         return Redirect::back();
 
-        // if( $redirect = 1)
-        //
-        //     return view('hr.addConsultant')
-        //         ->with('saved',$user_data)
-        //         ->with('agencies',$agencies)
-        //         ->with('send_type',$send_type);
-        // else
-        //     return view('hr.addCadre')->with('saved', $user_data)->with('agencies',$agencies);
     }
     public function employee_managementGet()
     {
@@ -126,12 +118,6 @@ class UsersController extends Controller
     }
     public function edit_consultantGet($id)
     {
-        // $agencies = Agencies::all();
-        // $user = User::find($id);
-        // return view('hr.editConsultant')->with('agencies',$agencies)
-        //     ->with('user',$user);
-
-        //nowy widok
         $agencies = Agencies::all();
         $user = User::find($id);
         return view('hr.addConsultantTEST')->with('agencies',$agencies)
@@ -195,9 +181,6 @@ class UsersController extends Controller
 
         $penalty_bonuses = DB::select("SELECT event_date,SUM(CASE WHEN `type` = 2 AND `status` = 1 THEN `amount` ELSE 0 END) as premia , SUM(CASE WHEN `type` = 1 AND `status` = 1 THEN `amount` ELSE 0 END) as kara FROM
          `penalty_bonus` WHERE `id_user` = " . $id . " group by MONTH(`event_date`) LIMIT 2");
-
-        //dd($penalty_bonuses);
-
 
         return view('hr.addConsultantTEST')
             ->with('agencies', $agencies)

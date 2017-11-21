@@ -34,4 +34,8 @@ class Department_info extends Model
     public function summaryPayment() {
         return $this->hasMany('App\SummaryPayment', 'department_info_id');
     }
+
+    public function equipments() {
+        return $this->hasMany('App\Equipments', 'department_info_id');
+    }
 }
