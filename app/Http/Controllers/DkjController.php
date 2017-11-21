@@ -231,7 +231,7 @@ class DkjController extends Controller
                 ->leftjoin('users as manager', 'dkj.id_manager', '=', 'manager.id')
                 ->join('users as dkj_user', 'dkj.id_dkj', '=', 'dkj_user.id')
                 ->select(DB::raw(
-                    'dkj.id as id,                   
+                    'dkj.id as id,
                     user.id as id_user,
                     user.first_name as user_first_name,
                     user.last_name as user_last_name,
@@ -348,6 +348,18 @@ class DkjController extends Controller
                 return $query->where('users.user_type_id', '=', 1)->get();
             }else
             return 0;
+        }
+    }
+
+    public function getStats(Request $request) {
+        if($request->ajax()) {
+            $actual_day = date("Y-m-d") . " %";
+
+            $dkj_info1 = DB::select("SELECT count(dkj.id), users.department_info_id from dkj inner join users on users.id = dkj.id_user where dkj.add_date like '" . $actual_day ."' AND users.dating_type = 0 group by users.department_info_id");
+            $dkj_info2 = DB::select("SELECT count(dkj.id), users.department_info_id from dkj inner join users on users.id = dkj.id_user where dkj.add_date like '" . $actual_day ."' AND users.dating_type = 1 group by users.department_info_id");
+
+            $total_dkj = [$dkj_info1, $dkj_info2];
+          return $total_dkj;
         }
     }
 

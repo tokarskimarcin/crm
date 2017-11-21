@@ -6,6 +6,7 @@ use App\LinkGroups;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\DB;
+use App\Department_info;
 
 class NavComposerProvider extends ServiceProvider
 {
@@ -36,9 +37,13 @@ class NavComposerProvider extends ServiceProvider
             $filtered = $links->groupBy('group_link_id');
             $filtered = array_keys($filtered->toArray());
             $groups = LinkGroups::wherein('id',$filtered)->get();
+            $departments_for_dkj = Department_info::whereIn('id_dep_type', [1, 2])->get();
 
 
-            $view->with('groups', $groups)->with('links', $links);
+            $view
+                ->with('groups', $groups)
+                ->with('departments_for_dkj', $departments_for_dkj)
+                ->with('links', $links);
         });
     }
 

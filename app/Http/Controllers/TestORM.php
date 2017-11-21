@@ -24,10 +24,8 @@ class TestORM extends Controller
 {
     public function test() {
 
-        $equipments_types = Equipments::all();
 
-        return view('hr.showEquipment')
-            ->with('equipments_types', $equipments_types);
+      return view('dkj.messagesTop');
 
     }
 

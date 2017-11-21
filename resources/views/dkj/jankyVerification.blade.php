@@ -18,6 +18,10 @@
             height: 40px;
         }
 
+        .btn.btn-primary[disabled] {
+              background-color: #000;
+          }
+
     </style>
 
     {{--Header page --}}
@@ -45,7 +49,7 @@
                                         <form action="" method="post" action="dkjRaport">
                                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                             <label for="exampleInputPassword1" class="showhidetext">Wybierz Oddział</label>
-                                            <select class="form-control showhidetext" name="department_id_info" style="border-radius: 0px;">
+                                            <select class="form-control showhidetext" id="select_form" name="department_id_info" style="border-radius: 0px;">
                                                 <option value="0">Wybierz</option>
                                                 <option value="0">-------Wysyłka-------</option>
                                                 @foreach($departments as $department)
@@ -122,8 +126,8 @@
                                                 @endif
                                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                             </div>
-
-                                            <input type="submit" class="form-control showhidetext btn btn-primary" value="Wyświetl" style="
+                                            <br />
+                                            <input type="submit" disabled id="search_button" class="form-control showhidetext btn btn-primary" value="Wyświetl" style="
 						border-radius: 0px;" name="showjanki">
                                         </form>
                                     </div>
@@ -227,6 +231,22 @@
             <script src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.bootstrap.min.js"></script>
             <script src="https://cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
             <script>
+
+            var selected =$("select[id='select_form']").val();
+
+            if (selected != 0) {
+                $("#search_button").removeAttr('disabled');
+            }
+
+            $("#select_form").on('change', function() {
+                var selected =$("select[id='select_form']").val();
+
+                if (selected != 0) {
+                    $("#search_button").removeAttr('disabled');
+                } else {
+                    $("#search_button").attr('disabled', true);
+                }
+            });
 
                 var action = '';
                 var id = -1;

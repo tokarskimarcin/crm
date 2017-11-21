@@ -1,5 +1,5 @@
 <!-- Navigation -->
-<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
             <span class="sr-only">Toggle navigation</span>
@@ -16,6 +16,50 @@
 
      {{--Logout info change password--}}
     <ul class="nav navbar-top-links navbar-right">
+        @if(Auth::user()->department_info->department_type->id == 6)
+        <li class="dropdown">
+            <a id="check_messages" class="dropdown-toggle" data-toggle="dropdown" href="#">
+              (1)  <i class="fa fa-envelope fa-fw"></i> <i class="fa fa-caret-down"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-messages" style="width: 500px;">
+                <li class="divider"></li>
+                <li>
+                    <div class="table-responsive">
+                      <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Lp.</th>
+                                <th>Oddział</th>
+                                <th>Status</th>
+                                <th>Janki</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                          <?php $i = 1; ?>
+                          @foreach($departments_for_dkj as $department)
+                              <tr id="{{$department->id}}">
+                                  <td>{{$i}}</td>
+                                  <td>{{$department->departments->name . ' ' . $department->department_type->name}}</td>
+                                  <td name="status">Nieodsłuchany</td>
+                                  <td name="count_yanek">100</td>
+                              </tr>
+                              <?php $i++; ?>
+                          @endforeach
+                        </tbody>
+                      </table>
+                    </div>
+                </li>
+                <li class="divider"></li>
+                <li>
+                    <a class="text-center" href="#">
+                        <strong>Wszystkie wiadomości</strong>
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                </li>
+            </ul>
+            <!-- /.dropdown-messages -->
+        </li>
+        @endif
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{Auth::user()->first_name.' '.Auth::user()->last_name}}
                 <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
