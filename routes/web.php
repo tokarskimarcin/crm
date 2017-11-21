@@ -78,6 +78,8 @@ Route::middleware(['check-permission'])->group(function () {
     Route::Post('/view_hour_cadre','WorkHoursController@viewHourPostCadre');
 
     Route::get('/check_list_cadre','WorkHoursController@checkListCadre');
+
+    Route::get('/users_live','WorkHoursController@usersLive');
     // Work_hours --end--
 
     // Users --Start--
