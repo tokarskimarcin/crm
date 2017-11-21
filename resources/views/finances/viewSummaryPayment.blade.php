@@ -102,7 +102,7 @@
                                                     @endphp
                                                     <tr>
                                                         <td>1</td>
-                                                        <td>{{$item->department_info_id}}</td>
+                                                        <td>{{$item->department_info->departments->name.' '.$item->department_info->department_type->name}}</td>
                                                         <td>{{$item->payment}} PLN</td>
                                                         <td>{{round($item->hours/3600,2)}}</td>
                                                         <td>{{round($avg_per_hour,2)}}</td>
