@@ -54,7 +54,7 @@ class WorkHoursController extends Controller
         $date = date("W", strtotime( date('Y-m-d'))); // numer tygodnia
         $dayOfWeekArray= array('monday' ,'tuesday','wednesday','thursday','friday','saturday','sunday');
         $day_number = date('N', strtotime(date('Y-m-d')))-1; // numer dnia tygodnia 0-poniedzialek
-        $shedule = Schedule::where('week_num',45)
+        $shedule = Schedule::where('week_num',$date)
             ->where('year',date('Y'))
             ->where($dayOfWeekArray[$day_number].'_start','!=',null)->get();
 
