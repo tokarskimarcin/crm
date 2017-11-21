@@ -126,13 +126,13 @@
                                                                             else
                                                                                 $avg = number_format ( $item->success/($item->second/3600), 2 );
 
-                                                                            if($item->id_manager == null)
+                                                                            if($item->status == 3 && $item->id_manager == null)
                                                                                 $status = 'Oczekuje na akceptacje';
-                                                                            if($item->status == 2 && $item->id_manager != null)
+                                                                            if($item->status == 4 && $item->id_manager != null)
                                                                                 $status = 'Zaakceptowano przez:'."\n".$item->first_name.' '.$item->last_name;
-                                                                            elseif($item->status == 3)
+                                                                            elseif($item->status == 5)
                                                                                 $status = 'Zmodyfikowano przez:'."\n".$item->first_name.' '.$item->last_name;
-                                                                            elseif($item->status == 4)
+                                                                            elseif($item->status == 6)
                                                                                 $status = 'Usunięto przez:'."\n".$item->first_name.' '.$item->last_name;
                                                                             ?>
                                                                             <tr>
