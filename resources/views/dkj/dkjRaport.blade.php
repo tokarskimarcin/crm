@@ -27,7 +27,11 @@
             <h1 class="page-header">Raport DKJ</h1>
         </div>
     </div>
-
+    @if(isset($select_department_id_info))
+        <div class="form-group">
+              <input type="hidden" value="{{$select_department_id_info}}" id="select_department_id_info" >
+        </div>
+    @endif
 
     <div class="row">
         <div class="col-lg-12">
@@ -261,13 +265,15 @@
             var dkj_status =$("#dkj_status").val();
             var comment =$("#comment").val();
             var campaign =$("#campaign").val();
+            var select_department_id_info = $("#select_department_id_info").val();
             $.ajax({
                 type: "POST",
                 url: '{{ route('api.dkjRaportSave') }}',
                 data: {"id_user":id_user,
                     "phone":phone,"dkj_status":dkj_status,
                     "comment":comment,"campaign":campaign,
-                    "id":id,"action":action
+                    "id":id,"action":action,
+                    "select_department_id_info":select_department_id_info
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
