@@ -383,9 +383,11 @@
                 {
                     "data": function (data, type, dataToSet) {
                         if(data.manager_status == null)
-                            return 'brak';
+                            return '<b>Brak</b>';
                         else
-                            return data.manager_status + " " + data.comment_manager;
+                              var text_response = (data.manager_status) ? "<b>Tak</b>" : "<b>Nie</b>" ;
+                              var comment = (data.comment_manager != null) ? data.comment_manager : "Brak Komentarza" ;
+                              return text_response + " " + comment;
                     }, "name": " dkj.comment_manager"
                 }
             ],

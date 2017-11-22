@@ -11,15 +11,12 @@
     </div>
     <!-- /.navbar-header -->
 
-
-
-
      {{--Logout info change password--}}
     <ul class="nav navbar-top-links navbar-right">
-        @if(Auth::user()->department_info->department_type->id == 6)
+        @if(Auth::user()->department_info->department_type->id == 1)
         <li class="dropdown">
             <a id="check_messages" class="dropdown-toggle" data-toggle="dropdown" href="#">
-              (1)  <i class="fa fa-envelope fa-fw"></i> <i class="fa fa-caret-down"></i>
+                <i class="fa fa-envelope fa-fw"></i> <i class="fa fa-caret-down"></i>
             </a>
             <ul class="dropdown-menu dropdown-messages" style="width: 500px;">
                 <li class="divider"></li>
@@ -28,10 +25,10 @@
                       <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Lp.</th>
+                                <th style="width: 10%">Lp.</th>
                                 <th>Oddział</th>
                                 <th>Status</th>
-                                <th>Janki</th>
+                                <th style="width: 20%">Janki</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -40,8 +37,8 @@
                               <tr id="{{$department->id}}">
                                   <td>{{$i}}</td>
                                   <td>{{$department->departments->name . ' ' . $department->department_type->name}}</td>
-                                  <td name="status">Nieodsłuchany</td>
-                                  <td name="count_yanek">100</td>
+                                  <td name="status" class="alert alert-danger">Nieodsłuchany</td>
+                                  <td name="count_yanek">0</td>
                               </tr>
                               <?php $i++; ?>
                           @endforeach
@@ -49,15 +46,38 @@
                       </table>
                     </div>
                 </li>
-                <li class="divider"></li>
-                <li>
-                    <a class="text-center" href="#">
-                        <strong>Wszystkie wiadomości</strong>
-                        <i class="fa fa-angle-right"></i>
-                    </a>
-                </li>
             </ul>
-            <!-- /.dropdown-messages -->
+        </li>
+        <li class="dropdown">
+            <a id="check_users" class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-messages" style="width: 700px; ">
+              <div class="table-responsive" style="max-height: 500px;">
+                <table class="table table-bordered">
+                  <thead>
+                      <tr>
+                          <th style="width: 10%">Lp.</th>
+                          <th>Imie i nazwisko</th>
+                          <th>Ilość odsłuchanych</th>
+                          <th style="width: 20%">Janki</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                    <?php $i = 1; ?>
+                  @foreach($dkj_users as $dkj_user)
+                      <tr id="user{{$dkj_user->id}}">
+                        <td>{{$i}}</td>
+                        <td>{{$dkj_user->first_name . ' ' . $dkj_user->last_name}}</td>
+                        <td name="status" class="alert alert-danger">Nieodsłuchany</td>
+                        <td name="count_user_yanek">0</td>
+                      </tr>
+                      <?php $i++; ?>
+                  @endforeach
+                  </tbody>
+                </table>
+              </div>
+            </ul>
         </li>
         @endif
         <li class="dropdown">

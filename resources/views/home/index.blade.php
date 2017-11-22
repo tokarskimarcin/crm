@@ -45,9 +45,9 @@
                                     </div>
 
                                     <?php if($status == 0): ?>
-                                    <button id="start" class="button"> Zacznij Pracę </button>
+                                    <button id="start" class="button btn-success"> Zacznij Pracę </button>
                                     <?php elseif($status == 1): ?>
-                                    <button id="stop" class="button"> Zakończ Pracę </button>
+                                    <button id="stop" class="button btn-danger"> Zakończ Pracę </button>
                                     <?php elseif($status == 2): ?>
                                     <button id="done" class="button" data-toggle="modal" data-target="#registerModal">Rarejestruj Godziny</button>
                                      <?php elseif($status >=3): ?>
@@ -81,8 +81,10 @@
                 },
                 success: function(response) {
                     server = response;
-                    $("#start").text('Stop work');
+                    $("#start").text('Zakończ pracę');
                     $("#start").attr('id', 'stop');
+                    $("#stop").removeClass('btn-success');
+                    $("#stop").addClass('btn-danger');
                 }
             });
         });
@@ -97,8 +99,10 @@
                 server = response;
                 $("#stop").attr('data-toggle','modal');
                 $("#stop").attr('data-target','#registerModal');
-                $("#stop").text('Register hour');
+                $("#stop").text('Rejestruj godziny');
                 $("#stop").attr('id', 'done');
+                $("#done").removeClass('btn-danger');
+                $("#done").addClass('btn-default');
             }
         });
     });
