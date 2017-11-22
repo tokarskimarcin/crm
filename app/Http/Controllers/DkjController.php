@@ -274,7 +274,6 @@ class DkjController extends Controller
     }
     public function dkjRaportSave(Request $request)
     {
-
         if ($request->action == 'create') {
             $dkj = new DKJ();
             $dkj->id_dkj = Auth::user()->id;
@@ -291,6 +290,7 @@ class DkjController extends Controller
             $dkj->dkj_status = $request->dkj_status;
             $dkj->comment = $request->comment;
             $dkj->campaign = $request->campaign;
+            $dkj->department_info_id = $request->select_department_id_info;
             $dkj->save();
         }
         if ($request->action == 'remove') {
