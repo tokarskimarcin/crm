@@ -46,7 +46,7 @@
                                     <form action="" method="post" action="dkjRaport">
                                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                         <label for="exampleInputPassword1" class="showhidetext">Wybierz Oddział</label>
-                                        <select class="form-control showhidetext" name="department_id_info" style="border-radius: 0px;">
+                                        <select id="select_form" class="form-control showhidetext" name="department_id_info" style="border-radius: 0px;">
                                             <option value="0">Wybierz</option>
                                             <option value="0">-------Wysyłka-------</option>
                                             @foreach($departments as $department)
@@ -123,8 +123,8 @@
                                             @endif
                                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                         </div>
-
-                                        <input type="submit" class="form-control showhidetext btn btn-primary" value="Wyświetl" style="
+                                        <br />
+                                        <input id="search_button" disabled type="submit" class="form-control showhidetext btn btn-primary" value="Wyświetl" style="
 						border-radius: 0px;" name="showjanki">
                                     </form>
                                 </div>
@@ -226,6 +226,24 @@
 <script src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.bootstrap.min.js"></script>
 <script src="https://cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
 <script>
+
+    var selected =$("select[id='select_form']").val();
+
+    if (selected != 0) {
+        $("#search_button").removeAttr('disabled');
+    }
+
+    $("#select_form").on('change', function() {
+        var selected =$("select[id='select_form']").val();
+
+        if (selected != 0) {
+            $("#search_button").removeAttr('disabled');
+        } else {
+            $("#search_button").attr('disabled', true);
+        }
+    });
+
+
     var action = '';
     var id = -1;
     $(document).ready(function() {
@@ -365,9 +383,11 @@
                 {
                     "data": function (data, type, dataToSet) {
                         if(data.manager_status == null)
-                            return 'brak';
+                            return '<b>Brak</b>';
                         else
-                            return data.manager_status + " " + data.comment_manager;
+                              var text_response = (data.manager_status) ? "<b>Tak</b>" : "<b>Nie</b>" ;
+                              var comment = (data.comment_manager != null) ? data.comment_manager : "Brak Komentarza" ;
+                              return text_response + " " + comment;
                     }, "name": " dkj.comment_manager"
                 }
             ],

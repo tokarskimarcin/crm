@@ -84,6 +84,11 @@ class UsersController extends Controller
                 $user->dating_type =  $request->dating_type;
             }
         }
+        if ($request->user_type == null) {
+            $user->user_type_id = 1;
+        } else {
+            $user->user_type_id = $request->user_type;
+        }
         $user->start_work = $request->start_date;
         $user->status_work = 1;
         $user->phone = $request->phone;

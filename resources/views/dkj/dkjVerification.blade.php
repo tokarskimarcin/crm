@@ -127,7 +127,7 @@
             "columnDefs": [ {
                 "targets": -3,
                 "data": "manager_status",
-                "defaultContent": "<select class=form-control showhidetext name=manager_status style=border-radius: 0px;>"+
+                "defaultContent": "<select class='form-control my_manager' showhidetext name=manager_status style=border-radius: 0px;>"+
                             "<option value=-1>Wybierz</option>"+
                             "<option value=1>Tak</option>"+
                             "<option value=0>Nie</option>"
@@ -139,7 +139,7 @@
                 },{
                     "targets": -1,
                     "data": "id",
-                    "defaultContent": "<button class='button-save'>Zapisz</button>"
+                    "defaultContent": "<button disabled class='button-save btn btn-default my_button' >Zapisz</button>"
                 }
                 ],
         });
@@ -175,6 +175,8 @@
                             return "Anulowany"
                         else if(data.dkj_status == 1)
                             return "Zatwierdzony"
+                        else if(data.dkj_status == 0)
+                            return '???'
                     }, "name": "dkj_status"
                 },
                 {
@@ -190,6 +192,20 @@
         });
 
     });
+    $('#datatable tbody').on('change', '.my_manager', function () {
+        var data = table.row( $(this).parents('tr') ).data();
+        var manager_status = $(this).closest("tr").find("select[name='manager_status']").val();
+
+
+        if (manager_status != -1) {
+            $(this).closest("tr").find(".my_button").removeAttr('disabled');
+        } else {
+            $(this).closest("tr").find(".my_button").attr('disabled', true);
+        }
+
+
+    });
+
     $('#datatable tbody').on('click', '.button-save', function () {
         var data = table.row( $(this).parents('tr') ).data();
         var manager_coment = $(this).closest("tr").find(".manager_comment").val();
@@ -216,5 +232,7 @@
 
 
     });
+
+
 </script>
 @endsection

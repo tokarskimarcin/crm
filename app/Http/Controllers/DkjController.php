@@ -35,49 +35,6 @@ class DkjController extends Controller
         return view('dkj.jankyStatistics')->with('user_info', $user_dkj_info)
             ->with('janky_system', $janky_system);
     }
-
-    public function consultantStatisticsGet()
-    {
-        $departments = Department_info::
-        whereHas(
-            'department_type', function ($query) {
-            $query->whereIn('id',[1,2]);
-        })->get();
-        return view('dkj.consultantStatistics')
-            ->with('departments',$departments);
-    }
-
-    public function consultantStatisticsPOST(Request $request)
-    {
-        $departments = Department_info::
-        whereHas(
-            'department_type', function ($query) {
-            $query->whereIn('id',[1,2]);
-        })->get();
-        $month = $request->month;
-        $user_id = $request->users_id;
-        $department_info_id = $request->department_info_id;
-        $user_dkj_info = DB::table('dkj')
-            ->select(DB::raw(
-                'Date(add_date) as add_date,
-                SUM(CASE WHEN dkj_status = 0 or deleted = 1 THEN 1 ELSE 0 END) as good ,
-                SUM(CASE WHEN dkj_status = 1 AND deleted = 0 THEN 1 ELSE 0 END) as bad'))
-            ->where('id_user', $user_id)
-            ->where('add_date','like',$month.'%')
-            ->groupBy(DB::raw('Date(add_date)'))
-            ->get();
-        $all_users = $this->getUserDepartmentInfo($request);
-        return view('dkj.consultantStatistics')
-            ->with('departments',$departments)
-            ->with('user_dkj_info',$user_dkj_info)
-            ->with('month',$month)
-            ->with('user_id',$user_id)
-            ->with('department_info_id',$department_info_id)
-            ->with('all_users',$all_users);
-    }
-
-
-
     public function dkjVerificationGet()
     {
         return view('dkj.dkjVerification');
@@ -391,6 +348,46 @@ class DkjController extends Controller
                 return $query->where('users.user_type_id', '=', 1)->get();
             }else
             return 0;
+        }
+    }
+
+    public function getStats(Request $request) {
+        if($request->ajax()) {
+            $today = date("Y-m-d") . " %";
+
+            $dkj_info = DB::select("
+                SELECT count(dkj.id) as yanky_count,
+                SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad,
+                dkj.department_info_id FROM department_info
+                INNER JOIN users on users.department_info_id = department_info.id
+                INNER JOIN dkj on users.id = dkj.id_user
+                INNER JOIN department_type on department_type.id = department_info.id_dep_type
+                WHERE (department_type.id = 1 OR department_type.id = 2)
+                AND dkj.add_date LIKE '" . $today ."'
+                AND deleted = 0
+                GROUP BY dkj.department_info_id;
+            ");
+          return $dkj_info;
+        }
+    }
+
+    public function getUsers(Request $request) {
+        if($request->ajax()) {
+            $today = date("Y-m-d") . " %";
+
+            $dkj_users = DB::select("
+                SELECT count(dkj.id) as yanky_count,
+                SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad,
+                users.id
+                FROM users
+                INNER JOIN department_info on users.department_info_id = department_info.id
+                INNER JOIN department_type on department_type.id = department_info.id_dep_type
+                INNER JOIN dkj on dkj.id_dkj = users.id
+                WHERE department_type.id = 1
+                AND dkj.add_date LIKE '2017-11-22 %'
+                GROUP BY users.id
+            ");
+          return $dkj_users;
         }
     }
 

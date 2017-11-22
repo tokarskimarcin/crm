@@ -53,6 +53,10 @@ Route::POST('/deletePenaltyBonus','FinancesController@deletePenaltyBonus')->name
 Route::POST('/getUserDepartmentInfo','DkjController@getUserDepartmentInfo')->name('api.getUserDepartmentInfo');
 
 
+Route::POST('/get_stats','DkjController@getStats')->name('api.getStats');
+Route::POST('/get_users','DkjController@getUsers')->name('api.getUsers');
+
+
 
 
 

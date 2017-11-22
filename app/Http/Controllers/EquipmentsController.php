@@ -79,7 +79,7 @@ class EquipmentsController extends Controller
             ->with('users', $users);
     }
 
-    public function editEquipmentPost($id, Request $request) { // do poprawienia
+    public function editEquipmentPost($id, Request $request) { 
         $equipment = Equipments::find($id);
 
         $equipment->model = $request->model;
