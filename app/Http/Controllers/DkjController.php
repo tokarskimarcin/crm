@@ -70,6 +70,47 @@ class DkjController extends Controller
             ->with('users',$users)
             ->with('show_raport',1);
     }
+
+    public function consultantStatisticsGet()
+    {
+        $departments = Department_info::
+        whereHas(
+            'department_type', function ($query) {
+            $query->whereIn('id',[1,2]);
+        })->get();
+        return view('dkj.consultantStatistics')
+            ->with('departments',$departments);
+    }
+
+    public function consultantStatisticsPOST(Request $request)
+    {
+        $departments = Department_info::
+        whereHas(
+            'department_type', function ($query) {
+            $query->whereIn('id',[1,2]);
+        })->get();
+        $month = $request->month;
+        $user_id = $request->users_id;
+        $department_info_id = $request->department_info_id;
+        $user_dkj_info = DB::table('dkj')
+            ->select(DB::raw(
+                'Date(add_date) as add_date,
+                SUM(CASE WHEN dkj_status = 0 or deleted = 1 THEN 1 ELSE 0 END) as good ,
+                SUM(CASE WHEN dkj_status = 1 AND deleted = 0 THEN 1 ELSE 0 END) as bad'))
+            ->where('id_user', $user_id)
+            ->where('add_date','like',$month.'%')
+            ->groupBy(DB::raw('Date(add_date)'))
+            ->get();
+        $all_users = $this->getUserDepartmentInfo($request);
+        return view('dkj.consultantStatistics')
+            ->with('departments',$departments)
+            ->with('user_dkj_info',$user_dkj_info)
+            ->with('month',$month)
+            ->with('user_id',$user_id)
+            ->with('department_info_id',$department_info_id)
+            ->with('all_users',$all_users);
+    }
+
 // Statystyki oddziału (Konkretnego)
     public function departmentStatisticsGet()
     {
