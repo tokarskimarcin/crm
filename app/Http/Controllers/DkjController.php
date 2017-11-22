@@ -325,7 +325,7 @@ class DkjController extends Controller
                 if ($department_id_info < 0) {
                     $department_id_info = $department_id_info * (-1);
                 }
-                $type = Department_info::find($department_id_info);
+                $type = Department_infos::find($department_id_info);
                 $type = $type->type;
                 $query = DB::table('users')
                     ->join('department_info', 'department_info.id', '=', 'users.department_info_id')
