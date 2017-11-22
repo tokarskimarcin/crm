@@ -50,6 +50,8 @@ Route::POST('/editPenaltyBonus','FinancesController@editPenaltyBonus')->name('ap
 
 Route::POST('/deletePenaltyBonus','FinancesController@deletePenaltyBonus')->name('api.deletePenaltyBonus');
 
+Route::POST('/getUserDepartmentInfo','DkjController@getUserDepartmentInfo')->name('api.getUserDepartmentInfo');
+
 
 
 
@@ -117,8 +119,8 @@ Route::middleware(['check-permission'])->group(function () {
     Route::get('/departmentsStatistics','DkjController@departmentsStatisticsGet');
     Route::POST('/departmentsStatistics','DkjController@departmentsStatisticsPOST');
 
-    Route::get('/consultantStatistics','DkjController@consultantStatistics');
-    Route::POST('/consultantStatistics','DkjController@consultantStatistics');
+    Route::get('/consultantStatistics','DkjController@consultantStatisticsGet');
+    Route::POST('/consultantStatistics','DkjController@consultantStatisticsPOST');
     // DKJ -- STOP--
 
     // Schedule -- START --
