@@ -157,6 +157,12 @@ Route::middleware(['check-permission'])->group(function () {
     Route::Post('/add_equipment','EquipmentsController@addEquipmentPost');
     // Equipment -- STOP --
 
+    //Notification Start
+    Route::get('/add_notification', 'NotificationController@addNotificationGet');
+    Route::Post('/add_notification', 'NotificationController@addNotificationPost');
+
+    Route::get('/show_notification/{id}', 'NotificationController@showNotificationGet');
+
 
 });
 //////////////////////Testing ORM///////////////
