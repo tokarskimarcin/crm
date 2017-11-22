@@ -70,6 +70,47 @@ class DkjController extends Controller
             ->with('users',$users)
             ->with('show_raport',1);
     }
+
+    public function consultantStatisticsGet()
+    {
+        $departments = Department_info::
+        whereHas(
+            'department_type', function ($query) {
+            $query->whereIn('id',[1,2]);
+        })->get();
+        return view('dkj.consultantStatistics')
+            ->with('departments',$departments);
+    }
+
+    public function consultantStatisticsPOST(Request $request)
+    {
+        $departments = Department_info::
+        whereHas(
+            'department_type', function ($query) {
+            $query->whereIn('id',[1,2]);
+        })->get();
+        $month = $request->month;
+        $user_id = $request->users_id;
+        $department_info_id = $request->department_info_id;
+        $user_dkj_info = DB::table('dkj')
+            ->select(DB::raw(
+                'Date(add_date) as add_date,
+                SUM(CASE WHEN dkj_status = 0 or deleted = 1 THEN 1 ELSE 0 END) as good ,
+                SUM(CASE WHEN dkj_status = 1 AND deleted = 0 THEN 1 ELSE 0 END) as bad'))
+            ->where('id_user', $user_id)
+            ->where('add_date','like',$month.'%')
+            ->groupBy(DB::raw('Date(add_date)'))
+            ->get();
+        $all_users = $this->getUserDepartmentInfo($request);
+        return view('dkj.consultantStatistics')
+            ->with('departments',$departments)
+            ->with('user_dkj_info',$user_dkj_info)
+            ->with('month',$month)
+            ->with('user_id',$user_id)
+            ->with('department_info_id',$department_info_id)
+            ->with('all_users',$all_users);
+    }
+
 // Statystyki oddziału (Konkretnego)
     public function departmentStatisticsGet()
     {
@@ -231,7 +272,7 @@ class DkjController extends Controller
                 ->leftjoin('users as manager', 'dkj.id_manager', '=', 'manager.id')
                 ->join('users as dkj_user', 'dkj.id_dkj', '=', 'dkj_user.id')
                 ->select(DB::raw(
-                    'dkj.id as id,
+                    'dkj.id as id,                   
                     user.id as id_user,
                     user.first_name as user_first_name,
                     user.last_name as user_last_name,
@@ -325,7 +366,7 @@ class DkjController extends Controller
                 if ($department_id_info < 0) {
                     $department_id_info = $department_id_info * (-1);
                 }
-                $type = Department_info::find($department_id_info);
+                $type = Department_infos::find($department_id_info);
                 $type = $type->type;
                 $query = DB::table('users')
                     ->join('department_info', 'department_info.id', '=', 'users.department_info_id')
@@ -389,6 +430,29 @@ class DkjController extends Controller
             ");
           return $dkj_users;
         }
+    }
+
+    public function getUserDepartmentInfo(Request $request)
+    {
+         if($request->ajax() || $request->isMethod('post'))
+         {
+             $department_info_id = $request->department_info_id;
+             $department_info_id_save = $department_info_id;
+             if($department_info_id < 0)
+                 $department_info_id = $department_info_id * (-1);
+             $type = Department_info::find($department_info_id);
+             $type = $type->type;
+             $query = User::where('department_info_id',$department_info_id);
+             if ($type == 'Badania/Wysyłka') {
+                 if ($department_info_id_save < 0)
+                     $query->where('dating_type', 1);
+                 else
+                 {
+                     $query->where('dating_type', 0);
+                 }
+             }
+             return $query->where('user_type_id', '=', 1)->get();
+         }
     }
 
 }

@@ -77,7 +77,6 @@
                                                         @endif
                                                     @endif
                                                 @endforeach
-
                                                 <option value="0">-------Badania-------</option>
                                                 @foreach($departments as $department)
                                                     @if($department->type == 'Badania')
