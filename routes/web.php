@@ -164,6 +164,7 @@ Route::middleware(['check-permission'])->group(function () {
     Route::Post('/add_notification', 'NotificationController@addNotificationPost');
 
     Route::get('/show_notification/{id}', 'NotificationController@showNotificationGet');
+    Route::get('/show_all_notifications', 'NotificationController@showAllNotifications');
 
 
 });

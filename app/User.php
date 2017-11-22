@@ -69,4 +69,8 @@ class User extends Authenticatable
     public function equipments() {
         return $this->hasMany('App\Equipments', 'id_user');
     }
+
+    public function notifications() {
+        return $this->hasMany('App\Notifications', 'user_id');
+    }
 }

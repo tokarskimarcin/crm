@@ -38,4 +38,8 @@ class Department_info extends Model
     public function equipments() {
         return $this->hasMany('App\Equipments', 'department_info_id');
     }
+
+    public function notifications() {
+        return $this->hasMany('App\Notifications', 'department_info_id');
+    }
 }
