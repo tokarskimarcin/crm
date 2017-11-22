@@ -396,19 +396,20 @@ class DkjController extends Controller
         if($request->ajax()) {
             $today = date("Y-m-d") . " %";
 
-            $dkj_info = DB::select("
-                SELECT count(dkj.id) as yanky_count,
-                SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad,
-                dkj.department_info_id FROM department_info
-                INNER JOIN users on users.department_info_id = department_info.id
-                INNER JOIN dkj on users.id = dkj.id_user
-                INNER JOIN department_type on department_type.id = department_info.id_dep_type
-                WHERE (department_type.id = 1 OR department_type.id = 2)
-                AND dkj.add_date LIKE '" . $today ."'
-                AND deleted = 0
-                GROUP BY dkj.department_info_id;
-            ");
-          return $dkj_info;
+            $today = date("Y-m-d") . " %";
+            $departments = Department_info::where('type','!=','')->get();
+            $dkj_user = Dkj::select(DB::raw("
+                department_info_id,
+                count(id) as yanky_count,
+                SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad"))
+                ->where('add_date','like',$today)
+                ->groupBy('department_info_id')->get();
+
+            $result  = array();
+            $result['departments'] = $departments;
+            $result['dkj_employee'] = $dkj_user;
+
+          return $result;
         }
     }
 
