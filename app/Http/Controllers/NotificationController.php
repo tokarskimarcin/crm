@@ -65,28 +65,23 @@ class NotificationController extends Controller
             $notification->data_stop = $stop;
 
           $sec = DB::select("SELECT SEC_TO_TIME(TIME_TO_SEC('" . $stop . "') - TIME_TO_SEC(data_start) ) as time from notifications where id = ". $id);
-          $notification->sec= $sec[0]->time; // to gówno trzeba zmienić
-          //tutaj trzeba odjąc daty rozpoczecia i zakonczenia problemu
+          $notification->sec= $sec[0]->time;
         }
         $notification->save();
 
         $user = User::find($notification->displayed_by);
 
-        return view('notifications.showNotification')
-            ->with('message', "Zmiany zapisano pomyślnie!")
-            ->with('user', $user)
-            ->with('notification', $notification);
+        Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
+        return Redirect::back();
     }
 
-    public function showAllNotifications($type) {
+    public function showAllNotificationsGet($type) {
       if  ($type == 1) {
-          $notifications = Notifications::where('status', '=', 1)->orderBy('notification_type_id', 'asc')->paginate(2);
+          $notifications = Notifications::where('status', '=', 1)->orderBy('notification_type_id', 'asc')->paginate(1);
       } else if ($type == 2) {
-          $notifications = Notifications::where('status', '=', 2)->orderBy('notification_type_id', 'asc')->paginate(2);
+          $notifications = Notifications::where('status', '=', 2)->orderBy('notification_type_id', 'asc')->paginate(1);
       } else if ($type == 3) {
-          $notifications = Notifications::where('status', '=', 3)->orderBy('notification_type_id', 'asc')->paginate(2);
-      } else {
-        return 12;
+          $notifications = Notifications::where('status', '=', 3)->orderBy('notification_type_id', 'asc')->paginate(1);
       }
 
       return view('notifications.allNotifications')
