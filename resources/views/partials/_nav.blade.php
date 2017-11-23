@@ -88,16 +88,18 @@
             </ul>
         </li>
         @endif
+        @if($multiple_departments != null)
         <li>
             <label for="select_town">Wybierz oddział</label>
         </li>
         <li>
-            <select id="select_town" class="form-control">
-                <option>Lublin</option>
-                <option>New York</option>
-                <option>San Francisco</option>
+            <select id="change_department" class="form-control">
+              @foreach($multiple_departments as $department)
+                  <option value="{{$department->department_info_id}}">{{$department->department_info->departments->name . ' ' . $department->department_info->department_type->name}}</option>
+              @endforeach
             </select>
         </li>
+        @endif
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{Auth::user()->first_name.' '.Auth::user()->last_name}}
                 <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
@@ -118,24 +120,15 @@
                     </form>
                 </li>
             </ul>
-            <!-- /.dropdown-user -->
         </li>
-        <!-- /.dropdown -->
     </ul>
-    <!-- /.navbar-top-links -->
-
-
-
 
     <div class="navbar-default sidebar" role="navigation">
         <div class="sidebar-nav navbar-collapse">
             <ul class="nav" id="side-menu">
-
                 <li>
                     <a href="{{url('/')}}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                 </li>
-
-
                 @foreach($groups as $group)
                             <li>
                                 <a href="#"><i class="fa fa-files-o fa-fw"></i>{{$group->name}}<span class="fa arrow"></span></a>
@@ -155,12 +148,9 @@
                                 @endif
                             @endforeach
                                 </ul>
-                                <!-- /.nav-second-level -->
                             </li>
                             @endforeach
             </ul>
         </div>
-        <!-- /.sidebar-collapse -->
     </div>
-    <!-- /.navbar-static-side -->
 </nav>

@@ -42,6 +42,9 @@ class NavComposerProvider extends ServiceProvider
 
             $departments_for_dkj = Department_info::whereIn('id_dep_type', [1, 2])->get();
 
+            $user = User::find(Auth::user()->id);
+            $multiple_departments = $user->multiple_departments;
+
 
 
             $dkj_users = User::whereHas('work_hours', function ($query) {
@@ -55,6 +58,7 @@ class NavComposerProvider extends ServiceProvider
             $view
                 ->with('groups', $groups)
                 ->with('departments_for_dkj', $departments_for_dkj)
+                ->with('multiple_departments', $multiple_departments)
                 ->with('dkj_users', $dkj_users)
                 ->with('links', $links);
         });

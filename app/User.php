@@ -77,4 +77,8 @@ class User extends Authenticatable
     public function notification_taken() {
         return $this->hasMany('App\Notifications', 'displayed_by');
     }
+
+    public function multiple_departments() {
+        return $this->hasMany('App\MultipleDepartments', 'user_id');
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Work_Hour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\User;
 
 class HomeController extends Controller
 {
@@ -85,5 +86,15 @@ class HomeController extends Controller
     public function admin()
     {
         return view('admin');
+    }
+
+    public function changeDepartment(Request $request) {
+        if($request->ajax()) {
+            $user = User::find(Auth::user()->id);
+
+            $user->department_info_id = $request->department_info_id;
+            $user->save();
+            return 1;
+        }
     }
 }

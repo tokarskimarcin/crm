@@ -21,13 +21,17 @@ use App\EquipmentTypes;
 use App\Equipments;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\MultipleDepartments;
 
 class TestORM extends Controller
 {
     public function test() {
 
-      $sec = DB::select("SELECT SEC_TO_TIME(TIME_TO_SEC(data_stop) - TIME_TO_SEC(data_start) ) as time from notifications where id = 9");
-      var_dump($sec[0]->time);
+      $user = User::find(43);
+
+      return view('testorm')->with('multiple_departments', $user->multiple_departments);
+
+      //dojebac do nawigacji czy użutkownik ma jakies multiple_departments i jak ma pokazac mu mozliwosc wyboru departamentów
 
     }
 

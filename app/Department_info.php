@@ -42,4 +42,9 @@ class Department_info extends Model
     public function notifications() {
         return $this->hasMany('App\Notifications', 'department_info_id');
     }
+
+    public function multiple_departments(){
+        return $this->hasMany('App\MultipleDepartments', 'department_info_id');
+    }
+
 }
