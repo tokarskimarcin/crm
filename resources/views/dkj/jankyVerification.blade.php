@@ -221,6 +221,7 @@
                 </div>
             </div>
         </div>
+        @include('dkj.dkjJavaScript');
         @endif
 
         @endsection

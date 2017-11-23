@@ -27,6 +27,7 @@
     @yield('script.register')
     @yield('script.edithour')
     @yield('script.addhour')
+    @yield('script.dkjNotification')
     @yield('script')
 </body>
 
