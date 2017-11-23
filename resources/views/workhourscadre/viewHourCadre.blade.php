@@ -119,20 +119,23 @@
                                                                 ?>
                                                                     @foreach ($response_user_info as $item)
                                                                         @if($item->date == $date)
-                                                                            <?php $check++?>
+                                                                            <?php $check++;
+                                                                            $status ="";?>
                                                                             <?php
                                                                             if($item->second == 0)
                                                                                 $avg = number_format (0,2);
-                                                                            else
+                                                                            else{
                                                                                 $avg = number_format ( $item->success/($item->second/3600), 2 );
-
-                                                                            if($item->status == 3 && $item->id_manager == null)
+                                                                                }
+                                                                            if(($item->status == 2 || $item->status == 1) && $item->id_manager == null)
+                                                                                $status = 'Godziny niezarejestrowane';
+                                                                            else if($item->status == 3)
                                                                                 $status = 'Oczekuje na akceptacje';
-                                                                            if($item->status == 4 && $item->id_manager != null)
+                                                                            else if($item->status == 4)
                                                                                 $status = 'Zaakceptowano przez:'."\n".$item->first_name.' '.$item->last_name;
-                                                                            elseif($item->status == 5)
+                                                                            else if($item->status == 5)
                                                                                 $status = 'Zmodyfikowano przez:'."\n".$item->first_name.' '.$item->last_name;
-                                                                            elseif($item->status == 6)
+                                                                            else if($item->status == 6)
                                                                                 $status = 'Usunięto przez:'."\n".$item->first_name.' '.$item->last_name;
                                                                             ?>
                                                                             <tr>

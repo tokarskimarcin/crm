@@ -390,6 +390,7 @@ class WorkHoursController extends Controller
                     SUBSTRING(SEC_TO_TIME(TIME_TO_SEC(accept_stop) - TIME_TO_SEC(accept_start) ),1,5) as time,
                     TIME_TO_SEC(accept_stop) - TIME_TO_SEC(accept_start) as second'))
             ->where('work_hours.id_user', '=', $userid)
+            ->where('work_hours.status', '>', 2)
             ->where('date','like',$month.'%')->get();
     }
     private function getDepartment()
