@@ -1,5 +1,6 @@
 @extends('layouts.main')
 @section('style')
+    <link href="{{ asset('/css//buttons.dataTables.min.css')}}" rel="stylesheet">
     <style>
         button{
             width: 100%;
@@ -17,8 +18,6 @@
         }
     </style>
 @endsection
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.4.2/css/buttons.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
 @section('content')
 
 
@@ -185,10 +184,10 @@
 @endsection
 
 @section('script')
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
-    <script src="//cdn.datatables.net/buttons/1.4.2/js/buttons.html5.min.js"></script>
+    <script src="{{ asset('/js/dataTables.buttons.min.js')}}"></script>
+    <script src="{{ asset('/js/jszip.min.js')}}"></script>
+    <script src="{{ asset('/js/buttons.html5.min.js')}}"></script>
+
 @if(isset($payment_total))
     @if($payment_total !=0)
         <script>
