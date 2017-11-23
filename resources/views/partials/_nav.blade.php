@@ -88,6 +88,16 @@
             </ul>
         </li>
         @endif
+        <li>
+            <label for="select_town">Wybierz oddział</label>
+        </li>
+        <li>
+            <select id="select_town" class="form-control">
+                <option>Lublin</option>
+                <option>New York</option>
+                <option>San Francisco</option>
+            </select>
+        </li>
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{Auth::user()->first_name.' '.Auth::user()->last_name}}
                 <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
