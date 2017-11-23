@@ -10,7 +10,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                console.log(response);
+                console.log(response1);
 
 //                for (var i = 0; i < 6; i++) {
 //                    $("#user" + response[i].id + " td[name='status']").text("Odsłuchanych (" + response[i].yanky_count + ")");
