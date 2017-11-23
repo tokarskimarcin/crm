@@ -1,9 +1,10 @@
 @extends('layouts.main')
 @section('content')
-    <link href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/buttons/1.4.2/css/buttons.bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/select/1.2.3/css/select.bootstrap.min.css" rel="stylesheet">
-    <link href="https://editor.datatables.net/extensions/Editor/css/editor.bootstrap.min.css" rel="stylesheet">
+    <link href="{{ asset('/css/dataTables.bootstrap.min.css')}}" rel="stylesheet">
+    <link href="{{ asset('/css/buttons.bootstrap.min.css')}}" rel="stylesheet">
+    <link href="{{ asset('/css/buttons.bootstrap.min.css')}}" rel="stylesheet">
+    <link href="{{ asset('/css/select.bootstrap.min.css')}}" rel="stylesheet">
+    <link href="{{ asset('/css/editor.bootstrap.min.css')}}" rel="stylesheet">
     <style>
         .panel-heading a:after {
             font-family:'Glyphicons Halflings';
@@ -226,10 +227,10 @@
         @endif
 @endsection
 @section('script')
-<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.bootstrap.min.js"></script>
-<script src="https://cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
+            <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
+            <script src="{{ asset('/js/dataTables.buttons.min.js')}}"></script>
+            <script src="{{ asset('/js/buttons.bootstrap.min.js')}}"></script>
+            <script src="{{ asset('/js/dataTables.select.min.js')}}"></script>
 <script>
 
     var selected =$("select[id='select_form']").val();
