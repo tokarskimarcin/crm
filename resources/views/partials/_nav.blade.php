@@ -13,6 +13,12 @@
 
      {{--Logout info change password--}}
     <ul class="nav navbar-top-links navbar-right">
+        <li>
+          <select class="form-control">
+              <option>Lublin</option>
+              <option>Chełm</option>
+          </select>
+        </li>
         @if(Auth::user()->department_info->department_type->id == 1)
         <li class="dropdown">
             <a id="check_messages" class="dropdown-toggle" data-toggle="dropdown" href="#">
