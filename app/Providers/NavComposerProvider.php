@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Dkj;
 use App\LinkGroups;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
@@ -38,17 +39,18 @@ class NavComposerProvider extends ServiceProvider
             $filtered = $links->groupBy('group_link_id');
             $filtered = array_keys($filtered->toArray());
             $groups = LinkGroups::wherein('id',$filtered)->get();
+
             $departments_for_dkj = Department_info::whereIn('id_dep_type', [1, 2])->get();
-            $dkj_users = DB::select("
-                SELECT users.id, users.first_name, users.last_name FROM users
-                INNER JOIN department_info ON department_info.id = users.department_info_id
-                INNER JOIN department_type ON department_type.id = department_info.id_dep_type
-                INNER JOIN work_hours ON work_hours.id_user = users.id
-                WHERE department_type.id = 1
-                AND work_hours.status = 1
-                AND work_hours.date = '2017-11-22'
-                GROUP BY users.id
-            ");
+
+
+
+            $dkj_users = User::whereHas('work_hours', function ($query) {
+                $today = date("Y-m-d") . "%";
+                $query->where('status', 1)
+                ->where('date','like',$today);
+            })->whereHas('department_info', function ($query) {
+                $query->where('id_dep_type', 6);
+            })->groupBy('id')->get();
 
             $view
                 ->with('groups', $groups)

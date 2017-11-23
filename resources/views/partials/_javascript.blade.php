@@ -17,51 +17,22 @@
 <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 
 <script>
-
-
     $( "#check_messages" ).on('click', function() {
         $.ajax({
             type: "POST",
             url: '{{ route('api.getStats') }}',
-            data: {
-
-            },
+            data: {},
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-
-                for (var i = 0; i < 6; i++) {
-                    $("#" + response[i].department_info_id + " td[name='status']").text("Odsłuchany (" + response[i].yanky_count + ")");
-                    $("#" + response[i].department_info_id + " td[name='count_yanek']").text(response[i].bad);
-                    $("#" + response[i].department_info_id + " td[name='status']").removeClass("alert-danger");
-                    $("#" + response[i].department_info_id + " td[name='status']").addClass("alert-success");
+                console.log(response);
+                for (var i = 0; i < response.length; i++) {
+                    $("#" + response[i].department_info_id + "dkjstatus td[name='status']").text("Odsłuchany (" + response[i].yanky_count + ")");
+                    $("#" + response[i].department_info_id + "dkjstatus td[name='count_yanek']").text(response[i].bad);
+                    $("#" + response[i].department_info_id + "dkjstatus td[name='status']").removeClass("alert-danger");
+                    $("#" + response[i].department_info_id + "dkjstatus td[name='status']").addClass("alert-success");
                 }
-
-            }
-        });
-    });
-
-    $( "#check_users" ).on('click', function() {
-        $.ajax({
-            type: "POST",
-            url: '{{ route('api.getUsers') }}',
-            data: {
-
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-              console.log(response);
-
-              for (var i = 0; i < 6; i++) {
-                  $("#user" + response[i].id + " td[name='status']").text("Odsłuchanych (" + response[i].yanky_count + ")");
-                  $("#user" + response[i].id + " td[name='count_user_yanek']").text(response[i].bad);
-                  $("#user" + response[i].id + " td[name='status']").removeClass("alert-danger");
-                  $("#user" + response[i].id + " td[name='status']").addClass("alert-success");
-              }
-
             }
         });
     });

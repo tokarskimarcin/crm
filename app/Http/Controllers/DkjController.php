@@ -394,40 +394,67 @@ class DkjController extends Controller
 
     public function getStats(Request $request) {
         if($request->ajax()) {
-            $today = date("Y-m-d") . " %";
-
-            $dkj_info = DB::select("
-                SELECT count(dkj.id) as yanky_count,
-                SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad,
-                dkj.department_info_id FROM department_info
-                INNER JOIN users on users.department_info_id = department_info.id
-                INNER JOIN dkj on users.id = dkj.id_user
-                INNER JOIN department_type on department_type.id = department_info.id_dep_type
-                WHERE (department_type.id = 1 OR department_type.id = 2)
-                AND dkj.add_date LIKE '" . $today ."'
-                AND deleted = 0
-                GROUP BY dkj.department_info_id;
-            ");
-          return $dkj_info;
+            $today = date("Y-m-d") . "%";
+            $dkj_user = Dkj::select(DB::raw("
+                department_info_id,
+                count(id) as yanky_count,
+                SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad"))
+                ->where('add_date','like',$today)
+                ->groupBy('department_info_id')->get();
+          return $dkj_user;
         }
     }
 
     public function getUsers(Request $request) {
         if($request->ajax()) {
-            $today = date("Y-m-d") . " %";
+            $today = date("Y-m-d") . "%";
+            $department_id = $request->department_id_info;
+//            $dkj_users = Dkj::with('user')->select(DB::raw("
+//                count(id) as yanky_count,
+//                SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad"))
+//                ->where('add_date','like',$today)
+//                ->where('department_info_id1',$request->department_id_info)
+//                ->groupBy('id_user')->get();
+                $users = $this->getUserDepartmentInfo($request);
 
-            $dkj_users = DB::select("
-                SELECT count(dkj.id) as yanky_count,
-                SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad,
-                users.id
-                FROM users
-                INNER JOIN department_info on users.department_info_id = department_info.id
-                INNER JOIN department_type on department_type.id = department_info.id_dep_type
-                INNER JOIN dkj on dkj.id_dkj = users.id
-                WHERE department_type.id = 1
-                AND dkj.add_date LIKE '2017-11-22 %'
-                GROUP BY users.id
-            ");
+
+//
+//                $dkj_users = User::Join('work_hours', 'work_hours.id_user', '=', 'users.id')
+//                    ->leftJoin('dkj1', 'work_hours.id_user', '=', 'dkj.id_user')
+//                    ->where('dkj.department_info_id',$request->department_id_info)
+//                    ->where('dkj.add_date','like',$today)
+//                    ->where('work_hours.status', 1)
+//                    ->where('work_hours.date','like',$today)
+//                    ->get();
+
+
+
+//
+//            whereHas('work_hours', function ($query) {
+//                    $today = date("Y-m-d") . "%";
+//                    $query->where('status', 1)
+//                        ->where('date','like',$today);
+//                })->whereHas('dkj', function ($query) use($department_id,$today){
+//                    $query->where('add_date','like',$today)
+//                    ->where('department_info_id',$department_id);
+//                })
+//                    ->where('department_info_id',$request->department_id_info)
+//                    ->where('user_type_id','in',[1,2])
+//                    ->groupBy('id')->get();
+
+
+//            $dkj_users = DB::select("
+//                SELECT count(dkj.id) as yanky_count,
+//                SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad,
+//                users.id
+//                FROM users
+//                INNER JOIN department_info on users.department_info_id = department_info.id
+//                INNER JOIN department_type on department_type.id = department_info.id_dep_type
+//                INNER JOIN dkj on dkj.id_dkj = users.id
+//                WHERE department_type.id = 1
+//                AND dkj.add_date LIKE '2017-11-22 %'
+//                GROUP BY users.id
+//            ");
           return $dkj_users;
         }
     }
@@ -451,7 +478,7 @@ class DkjController extends Controller
                      $query->where('dating_type', 0);
                  }
              }
-             return $query->where('user_type_id', '=', 1)->get();
+             return $query->where('user_type_id', 'in', [1,2])->get();
          }
     }
 
