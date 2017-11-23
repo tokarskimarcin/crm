@@ -55,7 +55,8 @@
         <thead>
         <tr>
             <th>Data</th>
-            <th>Osoba</th>
+            <th>Imie</th>
+            <th>Nazwisko</th>
             <th>Start</th>
             <th>Zarejestrowane</th>
             <th>Suma</th>
@@ -124,19 +125,16 @@
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },
                 "columns":[
-                    {"data": "start_date"},
-
-                    {"data":function (data, type, dataToSet) {
-                        return data.first_name + " " + data.last_name;
-                    },"name": "users.last_name"},
-
+                    {"data": "start_date",searchable: false},
+                    {"data":"first_name"},
+                    {"data":"last_name"},
                     {"data": function (data, type, dataToSet) {
                         if(data.click_start == null)
                             data.click_start = "Brak infromacji";
                         if(data.click_stop == null)
                             data.click_stop = "Brak infromacji";
                         return data.click_start + "</br><span class='fa fa-arrow-circle-o-down fa-fw'></span> </br> " + data.click_stop;
-                    },"name": "click_start" },
+                    },"name": "work_hours.click_start"},
 
                     {"data": function (data, type, dataToSet) {
                         if(data.register_start == null)
@@ -144,10 +142,7 @@
                         if(data.register_stop == null)
                             data.register_stop = "Brak infromacji";
                         return data.register_start + "</br><span class='fa fa-arrow-circle-o-down fa-fw'></span> </br> " + data.register_stop;
-                    },"name": "register_start"},
-
-
-
+                    },"name": "work_hours.register_start"},
                     {"data":function (data, type, dataToSet) {
                         if(data.time == null)
                             data.time = "Brak infromacji";
