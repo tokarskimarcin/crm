@@ -72,6 +72,12 @@ Route::middleware(['check-permission'])->group(function () {
     Route::Post('/admin_privilage_edit/{id}','AdminController@admin_privilage_edit');
     // Admin_Panel --Stop--
 
+    // Password change --START--
+
+    Route::get('/password_change', 'UsersController@passwordChangeGet');
+    Route::Post('/password_change', 'UsersController@passwordChangePost');
+
+    // Password change --STOP--
     // Work_hours --Start--
     Route::get('/accept_hour','WorkHoursController@acceptHour');
     Route::get('/add_hour','WorkHoursController@addHour');

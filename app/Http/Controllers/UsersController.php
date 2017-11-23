@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Session;
+use Illuminate\Support\Facades\Hash;
 
 class UsersController extends Controller
 {
@@ -131,43 +132,6 @@ class UsersController extends Controller
 
     }
 
-    // public function edit_consultantPOST($id,Request $request)
-    // {
-    //     $agencies = Agencies::all();
-    //     $user = User::findOrFail($id);
-    //     $user->username = $request->username;
-    //     $user->first_name = $request->first_name;
-    //     $user->last_name = $request->last_name;
-    //     if($request->password != '')
-    //     {
-    //         $user->password = bcrypt($request->password);
-    //     }
-    //     $user->updated_at = date("Y-m-d H:i:s");
-    //     $user->password_date = date("Y-m-d");
-    //     $user->user_type_id = 1;
-    //     $user->department_info_id = Auth::user()->department_info_id;
-    //     $user->start_work = $request->start_date;
-    //     $user->status_work = $request->status_work;
-    //     $user->phone = $request->phone;
-    //     $user->description = $request->description;
-    //     $user->student = $request->student;
-    //     $user->salary_to_account = $request->salary_to_account;
-    //     $user->agency_id = $request->agency_id;
-    //     $user->login_phone = $request->login_phone;
-    //     $user->end_work = $request->end_work;
-    //     if($request->rate == 'Nie dotyczy')
-    //         $request->rate = 0;
-    //     $user->rate = $request->rate;
-    //     $user->id_manager = Auth::id();
-    //     $user->documents = $request->documents;
-    //     $user->save();
-    //     $user_data = array(
-    //         'first_name' => $user->first_name,
-    //         'last_name' => $user->last_name
-    //     );
-    //     return view('hr.employeeManagement')->with('saved', $user_data);
-    // }
-
     public function edit_cadreGet($id) {
         $user = User::find($id);
         $agencies = Agencies::all();
@@ -259,6 +223,27 @@ class UsersController extends Controller
                 ->where('users.user_type_id','!=',1)
                 ->where('users.status_work','=',1);
             return datatables($query)->make(true);
+        }
+    }
+
+    public function passwordChangeGet(){
+        return view('home.passChange');
+    }
+
+    public function passwordChangePost(Request $request){
+        $old_password = base64_decode(Auth::user()->guid);
+        if ($request->old_pass == $old_password) {
+            $user = User::find(Auth::user()->id);
+
+            $user->password = bcrypt($request->new_pass);
+            $user->guid = base64_encode($request->new_pass);
+            $user->save();
+
+            Session::flash('message_ok', "Hasło zmienione pomyślnie!");
+            return Redirect::back();
+        } else {
+            Session::flash('message_nok', "Podałeś nieprawidłowe stare hasło!");
+            return Redirect::back();
         }
     }
 
