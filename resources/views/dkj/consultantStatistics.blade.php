@@ -194,10 +194,14 @@
 
     $("#show").click(function () {
         var department_id  =$("select[name='department_info_id']").val();
-
+        var users_id  =$("select[name='users_id']").val();
         if(department_id == 0)
         {
             alert("Wybierz oddział");
+            return false;
+        }if(users_id == 0)
+        {
+            alert("Wybierz pracownika");
             return false;
         }
     });

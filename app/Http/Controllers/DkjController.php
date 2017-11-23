@@ -432,40 +432,10 @@ class DkjController extends Controller
                     $users->where('department_info_id',$department_id);
                 }
                 $users->whereIn('user_type_id',[1,2]);
-
-
                 $array = array();
                 $array['users'] = $users->get();
                 $array['users_statistic'] = $users_statistic->get();
                 return $array;
-
-//
-//            whereHas('work_hours', function ($query) {
-//                    $today = date("Y-m-d") . "%";
-//                    $query->where('status', 1)
-//                        ->where('date','like',$today);
-//                })->whereHas('dkj', function ($query) use($department_id,$today){
-//                    $query->where('add_date','like',$today)
-//                    ->where('department_info_id',$department_id);
-//                })
-//                    ->where('department_info_id',$request->department_id_info)
-//                    ->where('user_type_id','in',[1,2])
-//                    ->groupBy('id')->get();
-
-
-//            $dkj_users = DB::select("
-//                SELECT count(dkj.id) as yanky_count,
-//                SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad,
-//                users.id
-//                FROM users
-//                INNER JOIN department_info on users.department_info_id = department_info.id
-//                INNER JOIN department_type on department_type.id = department_info.id_dep_type
-//                INNER JOIN dkj on dkj.id_dkj = users.id
-//                WHERE department_type.id = 1
-//                AND dkj.add_date LIKE '2017-11-22 %'
-//                GROUP BY users.id
-//            ");
-
         }
     }
 
@@ -488,7 +458,7 @@ class DkjController extends Controller
                      $query->where('dating_type', 0);
                  }
              }
-             return $query->where('user_type_id', 'in', [1,2])->get();
+             return $query->whereIn('user_type_id', [1,2])->get();
          }
     }
 
