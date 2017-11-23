@@ -7,6 +7,7 @@ use App\Department_info;
 use App\Dkj;
 use App\JankyPenatlyProc;
 use App\User;
+use App\Work_Hour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -409,25 +410,34 @@ class DkjController extends Controller
         if($request->ajax()) {
             $today = date("Y-m-d") . "%";
             $department_id = $request->department_id_info;
-//            $dkj_users = Dkj::with('user')->select(DB::raw("
-//                count(id) as yanky_count,
-//                SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad"))
-//                ->where('add_date','like',$today)
-//                ->where('department_info_id1',$request->department_id_info)
-//                ->groupBy('id_user')->get();
-                $users = $this->getUserDepartmentInfo($request);
+
+            $users_statistic = Dkj::select(DB::raw("
+                id_user,
+                count(id) as count,
+                SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad"))
+                ->where('add_date','like',$today)
+                ->where('department_info_id',$request->department_id_info)
+                ->groupBy('id_user');
+
+                $users = User::select(DB::raw("users.first_name,users.last_name,users.id"))
+                    ->Join('work_hours', 'work_hours.id_user', '=', 'users.id')
+                    ->where('work_hours.status', 1)
+                    ->where('work_hours.date','like',$today);
+                if($department_id<0)
+                {
+                    $users->where('department_info_id',$department_id*(-1))
+                        ->where('dating_type',1);
+                }else
+                {
+                    $users->where('department_info_id',$department_id);
+                }
+                $users->whereIn('user_type_id',[1,2]);
 
 
-//
-//                $dkj_users = User::Join('work_hours', 'work_hours.id_user', '=', 'users.id')
-//                    ->leftJoin('dkj1', 'work_hours.id_user', '=', 'dkj.id_user')
-//                    ->where('dkj.department_info_id',$request->department_id_info)
-//                    ->where('dkj.add_date','like',$today)
-//                    ->where('work_hours.status', 1)
-//                    ->where('work_hours.date','like',$today)
-//                    ->get();
-
-
+                $array = array();
+                $array['users'] = $users->get();
+                $array['users_statistic'] = $users_statistic->get();
+                return $array;
 
 //
 //            whereHas('work_hours', function ($query) {
@@ -455,7 +465,7 @@ class DkjController extends Controller
 //                AND dkj.add_date LIKE '2017-11-22 %'
 //                GROUP BY users.id
 //            ");
-          return $dkj_users;
+
         }
     }
 

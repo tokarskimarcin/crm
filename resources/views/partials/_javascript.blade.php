@@ -26,7 +26,6 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                console.log(response);
                 for (var i = 0; i < response.length; i++) {
                     $("#" + response[i].department_info_id + "dkjstatus td[name='status']").text("Odsłuchany (" + response[i].yanky_count + ")");
                     $("#" + response[i].department_info_id + "dkjstatus td[name='count_yanek']").text(response[i].bad);
