@@ -72,7 +72,7 @@
             <ul class="dropdown-menu dropdown-messages" style="width: 700px; ">
                 <strong>Konsultanci</strong>
               <div class="table-responsive" style="max-height: 500px;">
-                <table class="table table-bordered">
+                <table class="table table-bordered" id="consultantTable">
                   <thead>
                       <tr>
                           <th style="width: 10%">Lp.</th>
@@ -81,17 +81,7 @@
                           <th style="width: 20%">Janki</th>
                       </tr>
                   </thead>
-                  <tbody>
-                    {{--<?php $i = 1; ?>--}}
-                  {{--@foreach($dkj_users as $dkj_user)--}}
-                      {{--<tr id="user{{$dkj_user->id}}">--}}
-                        {{--<td>{{$i}}</td>--}}
-                        {{--<td>{{$dkj_user->first_name . ' ' . $dkj_user->last_name}}</td>--}}
-                        {{--<td name="status" class="alert alert-danger">Nieodsłuchany</td>--}}
-                        {{--<td name="count_user_yanek">0</td>--}}
-                      {{--</tr>--}}
-                      {{--<?php $i++; ?>--}}
-                  {{--@endforeach--}}
+                  <tbody id="tableContent">
                   </tbody>
                 </table>
               </div>
