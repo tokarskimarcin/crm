@@ -42,9 +42,20 @@ class NavComposerProvider extends ServiceProvider
 
             $departments_for_dkj = Department_info::whereIn('id_dep_type', [1, 2])->get();
 
+
+
+            $dkj_users = User::whereHas('work_hours', function ($query) {
+                $today = date("Y-m-d") . "%";
+                $query->where('status', 1)
+                ->where('date','like',$today);
+            })->whereHas('department_info', function ($query) {
+                $query->where('id_dep_type', 6);
+            })->groupBy('id')->get();
+
             $view
                 ->with('groups', $groups)
                 ->with('departments_for_dkj', $departments_for_dkj)
+                ->with('dkj_users', $dkj_users)
                 ->with('links', $links);
         });
     }
