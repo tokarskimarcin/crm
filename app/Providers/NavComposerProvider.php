@@ -51,8 +51,6 @@ class NavComposerProvider extends ServiceProvider
                 $multiple_departments = $user->multiple_departments;
             }
 
-
-
             $dkj_users = User::whereHas('work_hours', function ($query) {
                 $today = date("Y-m-d") . "%";
                 $query->where('status', 1)
