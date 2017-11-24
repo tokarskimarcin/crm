@@ -69,7 +69,7 @@ class UsersController extends Controller
             $request->phone = 0;
         }
 
-        $user->guid = base64_encode($request->password); // tutaj hashujemy hasło do guid
+        $user->guid = base64_encode($request->password);
 
         if(isset($request->department_info) && isset($request->user_type))
         {
@@ -78,17 +78,16 @@ class UsersController extends Controller
             $user->department_info_id = $request->department_info;
         }else
         {
-            $user->user_type_id = 1;
+            if (Auth::user()->user_type_id == 13) {
+                $user->user_type_id = 2;
+            } else {
+                $user->user_type_id = 1;
+            }
             $user->department_info_id = Auth::user()->department_info_id;
             if(isset($request->dating_type))
             {
                 $user->dating_type =  $request->dating_type;
             }
-        }
-        if ($request->user_type == null) {
-            $user->user_type_id = 1;
-        } else {
-            $user->user_type_id = $request->user_type;
         }
         $user->start_work = $request->start_date;
         $user->status_work = 1;
