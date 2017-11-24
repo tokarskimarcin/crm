@@ -43,7 +43,13 @@ class NavComposerProvider extends ServiceProvider
             $departments_for_dkj = Department_info::whereIn('id_dep_type', [1, 2])->get();
 
             $user = User::find(Auth::user()->id);
-            $multiple_departments = $user->multiple_departments;
+            $count_departments = $user->multiple_departments->count();
+
+            if ($count_departments = 0) {
+                $multiple_departments = null;
+            } else {
+                $multiple_departments = $user->multiple_departments;
+            }
 
 
 
