@@ -141,7 +141,6 @@
 @endsection
 
 @section('script')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
 <script>
     function setTextField(ddl) {
         document.getElementById('year').value = ddl.options[ddl.selectedIndex].text;

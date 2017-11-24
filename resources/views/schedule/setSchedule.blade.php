@@ -147,7 +147,7 @@
 @endsection
 
 @section('script')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+    <script src="{{ asset('/js/moment.js')}}"></script>
 <script>
     moment().format();
     function format ( d ) {
