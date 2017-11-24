@@ -12,6 +12,10 @@
         </div>
     </div>
 
+@if (Session::has('message_ok'))
+    <div class="alert alert-success">{{ Session::get('message_ok') }}</div>
+@endif
+
 
     <div class="row">
         <div class="col-lg-12">
@@ -30,9 +34,8 @@
 
                                     <div class="well">
                                         <div class="form-group">
-                                            <form action="view_penalty_bonus" method="post">
+                                            <form action="create_penalty_bonus" method="post">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                <input type="hidden" name="show_pb" value="0">
                                                 <div class="col-md-6">
                                                     <label for="exampleInputPassword1">Pracownik:</label>
                                                     <select name="user_id" class="form-control" style="font-size:18px;">
@@ -90,7 +93,6 @@
 
                                             <form action="view_penalty_bonus" method="post">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                <input type="hidden" name="show_pb" value="1">
                                                 <label for="exampleInputPassword1">Pracownik:</label>
                                                 <select name="showuser" class="form-control" style="font-size:18px;">
 
@@ -359,7 +361,6 @@ $("#addpbsubmit").click(function () {
     // AJAX usuwanie kar/premii
     $( ".delete" ).click(function() {
         var id= $(this).data('id_penalty');
-        alert(id);
         $.ajax({
             type: "POST",
             url: '{{ route('api.deletePenaltyBonus') }}',
@@ -370,7 +371,7 @@ $("#addpbsubmit").click(function () {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-               console.log(response);
+               alert("Pomyślnie usunięto karę/premię!");
             }
         });
         $('tr[name=' + id + ']').fadeOut(0);

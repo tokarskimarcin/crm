@@ -81,69 +81,61 @@ class FinancesController extends Controller
 
         Session::flash('message', "Kara/premia dodana pomyślnie!");
         return Redirect::back();
-        //
-        // return view('hr.addConsultantTEST')
-        //     ->with('user', $user)
-        //     ->with('agencies', $agencies)
-        //     ->with('message', $message);
 
     }
+
+    public function createPenaltyBonusPOST(Request $request) {
+        $object = new PenaltyBonus();
+        $object->id_user = $request->user_id;
+        $object->type = $request->type_penalty;
+        $object->amount = $request->cost;
+        $object->event_date = $request->date_penalty;
+        $object->id_manager = Auth::user()->id;
+        $object->comment = $request->reason;
+        $object->save();
+
+        Session::flash('message_ok', "Kara/premia dodana pomyślnie!");
+        return Redirect::back();
+    }
+
     public function viewPenaltyBonusGet()
     {
-        $users =  User::where('department_info_id', Auth::user()->department_info_id)->get();
+        $users =  User::where('department_info_id', Auth::user()->department_info_id)->whereIn('user_type_id', [1, 2])->get();
         return view('finances.viewPenaltyBonus')
             ->with('users',$users);
     }
     public function viewPenaltyBonusPOST(Request $request)
     {
-        $users =  User::where('department_info_id', Auth::user()->department_info_id)->get();
+        $users =  User::where('department_info_id', Auth::user()->department_info_id)->whereIn('user_type_id', [1, 2])->get();
         $view = view('finances.viewPenaltyBonus')->with('users',$users);
-        if($request->show_pb == 0)
-        {
-            $id_user = $request->user_id;
-            $date_penalty = $request->date_penalty;
-            $type = $request->type_penalty;
-            $cost = $request->cost;
-            $reason = $request->reason;
 
-            $object = new PenaltyBonus();
-            $object->id_user = $id_user;
-            $object->type = $type;
-            $object->amount = $cost;
-            $object->event_date = $date_penalty;
-            $object->id_manager = Auth::user()->id;
-            $object->comment = $reason;
-            $object->save();
-        }else
+        $date_start = $request->date_penalty_show_start;
+        $date_stop = $request->date_penalty_show_stop;
+        $query = DB::table('penalty_bonus')
+            ->join('users as users', 'penalty_bonus.id_user', '=', 'users.id')
+            ->join('users as manager', 'penalty_bonus.id_manager', '=', 'manager.id')
+            ->select(DB::raw(
+                'users.first_name,
+                users.last_name,
+                manager.first_name as manager_first_name,
+                manager.last_name as manager_last_name,
+                penalty_bonus.*
+               '))->where('users.department_info_id',Auth::user()->department_info_id)
+                ->whereBetween('event_date', [$date_start, $date_stop])
+                ->whereIn('type', [1,2])
+                ->where('users.user_type_id',1)
+                ->where('status',1);
+        if($request->showuser != -1)
         {
-            $date_start = $request->date_penalty_show_start;
-            $date_stop = $request->date_penalty_show_stop;
-            $query = DB::table('penalty_bonus')
-                ->join('users as users', 'penalty_bonus.id_user', '=', 'users.id')
-                ->join('users as manager', 'penalty_bonus.id_manager', '=', 'manager.id')
-                ->select(DB::raw(
-                    'users.first_name,
-                    users.last_name,
-                    manager.first_name as manager_first_name,
-                    manager.last_name as manager_last_name,
-                    penalty_bonus.*
-                   '))->where('users.department_info_id',Auth::user()->department_info_id)
-                    ->whereBetween('event_date', [$date_start, $date_stop])
-                    ->whereIn('type', [1,2])
-                    ->where('users.user_type_id',1)
-                    ->where('status',1);
-            if($request->showuser != -1)
-            {
-                $query
-                  ->where('users.id' , $request->showuser)
-                  ->where('status', 1);
-            }
-            $view->with('users_show',$query->get())
-            ->with('date_start',$date_start)
-            ->with('date_stop',$date_stop)
-            ->with('showuser',$request->showuser);
+            $query
+              ->where('users.id' , $request->showuser)
+              ->where('status', 1);
         }
-
+        $view->with('users_show',$query->get())
+        ->with('date_start',$date_start)
+        ->with('date_stop',$date_stop)
+        ->with('showuser',$request->showuser);
+        
         return $view;
     }
 

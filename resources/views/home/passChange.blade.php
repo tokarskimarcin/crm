@@ -68,6 +68,11 @@ $("#change").on('click', function() {
         alert("Hasła nie są zgodne!");
         return false;
     }
+
+    if (new_pass == old_pass) {
+        alert("Podane hasło nie może być identyczne z poprzednim!");
+        return false;
+    }
 });
 
 </script>
