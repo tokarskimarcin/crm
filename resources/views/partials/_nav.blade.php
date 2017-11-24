@@ -12,8 +12,26 @@
     <!-- /.navbar-header -->
 
      {{--Logout info change password--}}
-    {{--ZABLOKOWANE DLA DKJ--}}
+
     <ul class="nav navbar-top-links navbar-right">
+      {{--ZABLOKOWANE DLA IT--}}
+        @if(Auth::user()->user_type->id != 1 && Auth::user()->user_type->id != 2)
+           <li class="dropdown">
+               <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="it_support">Zgłoszenia
+                   <i class="fa fa-bell fa-fw"></i> <i class="fa fa-caret-down"></i>
+               </a>
+               <ul id="babum" class="dropdown-menu dropdown-alerts" style="width: 500px">
+                   <div class="table-responsive" style="max-height: 500px;">
+                       <table id="it_table" class="table">
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                   </div>
+               </ul>
+           </li>
+        @endif
+          {{--ZABLOKOWANE DLA DKJ--}}
         @if(Auth::user()->department_info->department_type->id == 6)
         <li class="dropdown">
             <a id="check_messages" class="dropdown-toggle" data-toggle="dropdown" href="#">

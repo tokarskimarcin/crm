@@ -77,11 +77,11 @@ class NotificationController extends Controller
 
     public function showAllNotificationsGet($type) {
       if  ($type == 1) {
-          $notifications = Notifications::where('status', '=', 1)->orderBy('notification_type_id', 'asc')->paginate(1);
+          $notifications = Notifications::where('status', '=', 1)->orderBy('notification_type_id', 'asc')->paginate(10);
       } else if ($type == 2) {
-          $notifications = Notifications::where('status', '=', 2)->orderBy('notification_type_id', 'asc')->paginate(1);
+          $notifications = Notifications::where('status', '=', 2)->orderBy('notification_type_id', 'asc')->paginate(10);
       } else if ($type == 3) {
-          $notifications = Notifications::where('status', '=', 3)->orderBy('notification_type_id', 'asc')->paginate(1);
+          $notifications = Notifications::where('status', '=', 3)->orderBy('notification_type_id', 'asc')->paginate(10);
       }
 
       return view('notifications.allNotifications')

@@ -59,6 +59,8 @@ Route::POST('/get_users','DkjController@getUsers')->name('api.getUsers');
 
 Route::POST('/change_department','HomeController@changeDepartment')->name('api.changeDepartment');
 
+Route::POST('/it_support','HomeController@itSupport')->name('api.itSupport');
+
 
 
 
