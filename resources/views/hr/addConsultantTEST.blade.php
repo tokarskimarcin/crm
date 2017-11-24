@@ -493,8 +493,8 @@
             description = $("<tr><td><b>" + "Opis" + "</b></td><td>" + description + "</td></tr>");
         }
 
-        if(power_cable != '') {
-            power_cable = 'Tak'
+        if(power_cable != '' || power_cable == 0) {
+            power_cable = (power_cable == 0) ? "Nie" : "Tak" ;
             power_cable = $("<tr><td><b>" + "Kabel zasilający" + "</b></td><td>" + power_cable + "</td></tr>");
         }
 

@@ -153,8 +153,8 @@ Route::middleware(['check-permission'])->group(function () {
 
     Route::Post('/create_penalty_bonus','FinancesController@createPenaltyBonusPOST');
 
-    Route::get('/view_penalty_bonus_edit/{id}','FinancesController@viewPenaltyBonusGetEdit');//here
-    Route::Post('/view_penalty_bonus_edit','FinancesController@viewPenaltyBonusPostEdit');//here
+    Route::get('/view_penalty_bonus_edit/{id}','FinancesController@viewPenaltyBonusGetEdit');
+    Route::Post('/view_penalty_bonus_edit','FinancesController@viewPenaltyBonusPostEdit');
 
     Route::get('/view_summary_payment','FinancesController@viewSummaryPaymentGet');
     Route::Post('/view_summary_payment','FinancesController@viewSummaryPaymentPOST');
