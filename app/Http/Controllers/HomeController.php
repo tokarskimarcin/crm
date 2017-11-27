@@ -28,7 +28,7 @@ class HomeController extends Controller
 
     public function index()
     {
-        if ($this->checkStatusWork() == 3) {
+        if ($this->checkStatusWork() == 3 || $this->checkStatusWork() == 4) {
             $register_start = Work_Hour::where('date',$this->actuall_date)
                 ->where('id_user',Auth::id())
                 ->pluck('register_start')
