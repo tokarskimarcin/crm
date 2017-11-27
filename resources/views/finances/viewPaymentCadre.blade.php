@@ -113,8 +113,8 @@
                                                                                     $documents = ($item2->documents == 0) ? "Nie" : "Tak";
                                                                                     $salary = ($item2->salary == null) ? 0 : $item2->salary;
                                                                                     $additional_salary = ($item2->additional_salary == null) ? 0 : $item2->additional_salary;
-                                                                                    $bonus = 0;
-                                                                                    $penatly = 0;
+                                                                                    $bonus = ($item2->bonus == null) ? 0 : $item2->bonus;
+                                                                                    $penatly = ($item2->penalty == null) ? 0 : $item2->penalty;
                                                                                     $total_one_salary = $salary+$additional_salary+$bonus-$penatly;
                                                                                     $salary_total_all+=$total_one_salary;
                                                                                     $payment_total=+$salary_total_all;

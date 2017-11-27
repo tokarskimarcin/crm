@@ -28,8 +28,21 @@ class FinancesController extends Controller
     public function viewPaymentCadrePost(Request $request)
     {
         $date = $request->search_money_month;
-        $salary = User::whereNotIn('user_type_id',[1,2])->get();
         $agencies = Agencies::all();
+        $salary = DB::table(DB::raw("users"))
+            ->whereNotIn('users.user_type_id',[1,2])
+            ->selectRaw('
+            `users`.`id`,
+            `users`.`agency_id`,
+            `users`.`first_name`,
+            `users`.`last_name`,
+            `users`.`salary`,
+            `users`.`additional_salary`,
+            `users`.`student`,
+            `users`.`documents`,
+            (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "'.$date.'" AND `penalty_bonus`.`type`=1) as `penalty`,
+            (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$date.'" AND `penalty_bonus`.`type`=2) as `bonus`')
+            ->orderBy('users.last_name','users.first_name')->get();
         return view('finances.viewPaymentCadre')
             ->with('month',$date)
             ->with('salary',$salary->groupby('agency_id'))
@@ -210,7 +223,7 @@ class FinancesController extends Controller
         $query = DB::table(DB::raw("users"))
             ->join('work_hours', 'work_hours.id_user', 'users.id')
             ->where('users.department_info_id',Auth::user()->department_info_id)
-            ->where('users.user_type_id',1)
+            ->whereIn('users.user_type_id',[1,2])
             ->where('work_hours.date','like',$month)
             ->selectRaw('
             `users`.`id`,
