@@ -2,17 +2,23 @@
 
 @section('content')
 
+<button class="mybtn btn btn-danger">Click</button>
 
 
+@endsection
 
-@foreach($multiple_departments as $dep)
-{{$dep->id}}
-
-@endforeach
-
+@section('script')
 <script>
 
+$(".mybtn").on('click', function(){
+    var conf = confirm("sdf");
 
+    if (conf == true) {
+      alert("tak");
+    } else {
+      alert("nie");
+    }
+});
 
 </script>
 @endsection

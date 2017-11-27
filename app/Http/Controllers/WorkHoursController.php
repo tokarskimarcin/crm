@@ -330,8 +330,7 @@ class WorkHoursController extends Controller
             $id_manager = Auth::id();
             $work_hour = new Work_Hour;
             $work_hour->status = 4;
-            // $work_hour->accept_sec = 0;
-            $work_hour->accept_sec = 100;//$this->timeDiff($accept_stop, $accept_start);
+            $work_hour->accept_sec = 100;
             $work_hour->success = $succes;
             $work_hour->date = $date[1];
             $work_hour->accept_start = $accept_start;

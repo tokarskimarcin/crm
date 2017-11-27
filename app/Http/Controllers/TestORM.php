@@ -27,11 +27,7 @@ class TestORM extends Controller
 {
     public function test() {
 
-    $t1 = strtotime(substr('2017-12-12 12:12:12', 11, 20));
-    $t2 = strtotime(substr('2017-12-12 13:12:12', 11, 20));
-
-
-    echo $t2 - $t1;
+  return view('testorm');
 
     }
 

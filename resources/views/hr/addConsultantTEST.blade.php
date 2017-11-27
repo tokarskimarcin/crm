@@ -362,20 +362,24 @@
     $( ".delete" ).click(function() {
         var id = (this.id);
 
-        $.ajax({
-            type: "POST",
-            url: '{{ route('api.deletePenaltyBonus') }}',
-            data: {
-                "id": id
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                alert("Pomyślnie usunięto karę/premię!");
-            }
-        });
-        $('tr[name=' + this.id + ']').fadeOut(0);
+        var conf = confirm("Czy napewno chcesz usunąć karę/premię?");
+
+        if (conf == true) {
+            $.ajax({
+                type: "POST",
+                url: '{{ route('api.deletePenaltyBonus') }}',
+                data: {
+                    "id": id
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    alert("Pomyślnie usunięto karę/premię!");
+                }
+            });
+            $('tr[name=' + this.id + ']').fadeOut(0);
+        } 
     });
 
 

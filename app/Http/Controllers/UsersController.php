@@ -62,6 +62,7 @@ class UsersController extends Controller
         $user->email_off = $request->email;
         $user->password = bcrypt($request->password);
         $user->salary = $request->salary;
+        $user->additional_salary = $request->additional_salary;
         $user->created_at = date("Y-m-d H:i:s");
         $user->updated_at = date("Y-m-d H:i:s");
         $user->password_date = date("Y-m-d");

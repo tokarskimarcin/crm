@@ -291,7 +291,7 @@ $("#addpbsubmit").click(function () {
         pickTime: false,
     });
 
-    $( ".edit" ).click(function(){
+    $( ".edit" ).click(function(event){
         id_record = event.target.id;
         var tr = $(this).closest('tr');
          user_name = tr.find('.user_name_modal').text();
@@ -361,20 +361,25 @@ $("#addpbsubmit").click(function () {
     // AJAX usuwanie kar/premii
     $( ".delete" ).click(function() {
         var id= $(this).data('id_penalty');
-        $.ajax({
-            type: "POST",
-            url: '{{ route('api.deletePenaltyBonus') }}',
-            data: {
-                "id": id
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-               alert("Pomyślnie usunięto karę/premię!");
-            }
-        });
-        $('tr[name=' + id + ']').fadeOut(0);
+
+        var conf = confirm("Czy napewno chcesz usunąć karę/premię?");
+        if (conf == true) {
+            $.ajax({
+                type: "POST",
+                url: '{{ route('api.deletePenaltyBonus') }}',
+                data: {
+                    "id": id
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                   alert("Pomyślnie usunięto karę/premię!");
+                }
+            });
+            $('tr[name=' + id + ']').fadeOut(0);
+        }
+
     });
 
     {{--$( ".delete" ).click(function() {--}}

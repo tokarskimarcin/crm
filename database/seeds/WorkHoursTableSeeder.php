@@ -28,8 +28,6 @@ class WorkHoursTableSeeder extends Seeder
                 ]);
             }
         }
-        for($i = 6; $i <= 50000; $i++) {
-
-        }
+        
     }
 }

@@ -101,7 +101,7 @@ class HomeController extends Controller
 
     public function itSupport(Request $request) {
         if($request->ajax()) {
-            $notifications = Notifications::where('status', 1)->get();
+            $notifications = Notifications::where('status', 1)->orderBy('notification_type_id', 'asc')->get();
 
             return $notifications;
         }
