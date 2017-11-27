@@ -330,7 +330,8 @@ class WorkHoursController extends Controller
             $id_manager = Auth::id();
             $work_hour = new Work_Hour;
             $work_hour->status = 4;
-            $work_hour->accept_sec = 0;
+            // $work_hour->accept_sec = 0;
+            $work_hour->accept_sec = 100;//$this->timeDiff($accept_stop, $accept_start);
             $work_hour->success = $succes;
             $work_hour->date = $date[1];
             $work_hour->accept_start = $accept_start;
@@ -407,6 +408,14 @@ class WorkHoursController extends Controller
                     department_type.name as department_type_name
                    '))->get();
         return $departments;
+    }
+
+
+    private function timeDiff($start, $stop) {
+        $t1 = strtotime(substr($start, 11, 20));
+        $t2 = strtotime(substr($stop, 11, 20));
+
+        return $t2 - $t1;
     }
 
 }

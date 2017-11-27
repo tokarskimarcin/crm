@@ -214,7 +214,8 @@ class DkjController extends Controller
                 '))->where('dkj.dkj_status',1)
             ->where('dkj.deleted',0)
             ->where('dkj.manager_status','!=',null)
-            ->where('user.department_info_id',Auth::user()->department_info_id);
+            ->where('user.department_info_id',Auth::user()->department_info_id)
+            ->orderBy('dkj.date_manager', 'desc');
         return datatables($query)->make(true);
     }
 
@@ -273,7 +274,7 @@ class DkjController extends Controller
                 ->leftjoin('users as manager', 'dkj.id_manager', '=', 'manager.id')
                 ->join('users as dkj_user', 'dkj.id_dkj', '=', 'dkj_user.id')
                 ->select(DB::raw(
-                    'dkj.id as id,                   
+                    'dkj.id as id,
                     user.id as id_user,
                     user.first_name as user_first_name,
                     user.last_name as user_last_name,

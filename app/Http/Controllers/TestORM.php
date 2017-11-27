@@ -27,11 +27,11 @@ class TestORM extends Controller
 {
     public function test() {
 
-      $user = User::find(43);
+    $t1 = strtotime(substr('2017-12-12 12:12:12', 11, 20));
+    $t2 = strtotime(substr('2017-12-12 13:12:12', 11, 20));
 
-      return view('testorm')->with('multiple_departments', $user->multiple_departments);
 
-      //dojebac do nawigacji czy użutkownik ma jakies multiple_departments i jak ma pokazac mu mozliwosc wyboru departamentów
+    echo $t2 - $t1;
 
     }
 
