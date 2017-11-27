@@ -86,21 +86,38 @@
                                                         $total_documents = 0;
                                                         $total_students = 0;
                                                         $total_employee = 0;
+                                                        $lp = 1;
                                                     @endphp
+
+                                            @foreach($departments as $department)
+                                                @php($item = $summary_month->where('department_info_id',$department->id))
+                                                @if(empty(count($item)))
+                                                    <tr>
+                                                        <td>{{$lp++}}</td>
+                                                        <td>{{$department->departments->name.' '.$department->department_type->name}}</td>
+                                                        <td>0 PLN</td>
+                                                        <td>0</td>
+                                                        <td>0</td>
+                                                        <td>0}</td>
+                                                        <td>0</td>
+                                                        <td>0</td>
+                                                    </tr>
+                                                @endif
                                                 @foreach($summary_month as $item)
+                                                    @if($item->department_info->id == $department->id )
                                                     @php
                                                         $total_payment += $item->payment;
                                                         $total_hours += $item->hours;
                                                         if($item->hours == 0)
                                                             $avg_per_hour=0;
                                                         else
-                                                            $avg_per_hour = $item->payment/($item->hours/3600);
+                                                        $avg_per_hour = $item->payment/($item->hours/3600);
                                                         $total_documents += $item->documents;
                                                         $total_students += $item->students;
                                                         $total_employee += $item->employee_count;
                                                     @endphp
                                                     <tr>
-                                                        <td>1</td>
+                                                        <td>{{$lp++}}</td>
                                                         <td>{{$item->department_info->departments->name.' '.$item->department_info->department_type->name}}</td>
                                                         <td>{{$item->payment}} PLN</td>
                                                         <td>{{round($item->hours/3600,2)}}</td>
@@ -109,7 +126,9 @@
                                                         <td>{{$item->students}}</td>
                                                         <td>{{$item->employee_count}}</td>
                                                     </tr>
+                                                @endif
                                                 @endforeach
+                                            @endforeach
                                                     @php
                                                         if($total_hours == 0)
                                                             $total_avg_per_hour = 0;
