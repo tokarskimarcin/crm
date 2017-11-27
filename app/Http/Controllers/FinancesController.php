@@ -147,9 +147,11 @@ class FinancesController extends Controller
     {
         $month = $request->search_summary_money_month;
         $summary_month = SummaryPayment::where('month',$month)->get();
+        $departments = Department_info::where('type','!=','')->get();
         return view('finances.viewSummaryPayment')
             ->with('summary_month',$summary_month)
-            ->with('month',$month);
+            ->with('month',$month)
+            ->with('departments',$departments);
     }
 
 
