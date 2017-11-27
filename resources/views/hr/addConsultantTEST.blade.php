@@ -171,16 +171,24 @@
                                             <td>
                                                 <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
                                                     @if(isset($user->end_work))
-                                                        <input class="form-control" name="stop_date" type="text" value="{{$user->end_work}}" readonly >
+                                                        <input class="form-control stop_date" name="stop_date" type="text" value="{{$user->end_work}}" readonly >
                                                     @else
-                                                        <input class="form-control" name="stop_date" type="text" value="{{date('Y-m-d')}}" readonly >
+                                                        <input class="form-control stop_date" name="stop_date" type="text" value="{{date('Y-m-d')}}" readonly >
                                                     @endif
 
                                                     <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                                 </div>
                                             </td>
                                         </tr>
-
+                                        <tr>
+                                          <td class="td-class"><b>Aktualnie zatrudniony</b></td>
+                                          <td>
+                                              <select class="form-control"  style="font-size:18px;" name="status_work" id="status_work">
+                                                  <option @if($user->status_work == 1) selected @endif value="1">Tak</option>
+                                                  <option @if($user->status_work == 0) selected @endif value="0">Nie</option>
+                                              </select>
+                                          </td>
+                                        </tr>
                                         <tr>
                                             <td class="td-class"><b>Stawka na godzine:</b></td>
                                             <td>
@@ -322,6 +330,10 @@
 
 <script>
 
+    $("#status_work").on('change', function() {
+        $(".stop_date").removeAttr('readonly');
+    });
+
     $("#edit_button").on('click', function(){
 
 
@@ -379,7 +391,7 @@
                 }
             });
             $('tr[name=' + this.id + ']').fadeOut(0);
-        } 
+        }
     });
 
 

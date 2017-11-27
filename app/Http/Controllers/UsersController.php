@@ -182,6 +182,10 @@ class UsersController extends Controller
         $user->documents = $request->documents;
         $user->id_manager = $manager_id;
         $user->additional_salary = $request->additional_salary;
+        $user->status_work = $request->status_work;
+        if($request->status_work == 0) {
+            $user->end_work = $request->stop_date;
+        }
         if($request->password != '')
         {
             $user->password = bcrypt($request->password);
