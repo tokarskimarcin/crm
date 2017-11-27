@@ -121,12 +121,23 @@
                                                                                 if($item2->ods == 0)
                                                                                     $janky_proc = 0;
                                                                                 else
-                                                                                $janky_proc = round(($item2->janki*100)/$item2->ods ,2);
+                                                                                    $janky_proc = round(($item2->janki*100)/$item2->ods ,2);
+
+                                                                                // system liczenia janków
+                                                                                foreach ($janky_system as $system_item)
+                                                                                {
+                                                                                   $system_item->max_proc;
+                                                                                   if($janky_proc >= $system_item->min_proc && $janky_proc < $system_item->max_proc)
+                                                                                   {
+                                                                                        $janky_cost_per_price = $system_item->cost;
+                                                                                   }
+                                                                                }
+                                                                                $janky_cost = $item2->janki * $janky_cost_per_price;
                                                                                 $standart_salary = round($rbh * $item2->rate,2);
                                                                                 $bonus_penalty = $item2->premia -$item2->kara;
                                                                                 $student = ($item2->student == 0) ? "Nie" : "Tak";
                                                                                 $documents = ($item2->documents == 0) ? "Nie" : "Tak";
-                                                                                $salary_total = $standart_salary+$bonus_penalty;
+                                                                                $salary_total = $standart_salary+$bonus_penalty-$janky_cost;
                                                                                 $salary_total_all += $salary_total;
 
                                                                                 $payment_total += $salary_total_all;
@@ -145,7 +156,7 @@
                                                                                 <td>{{($bonus_penalty)}} PLN</td>
                                                                                 <td>{{($student)}}</td>
                                                                                 <td>{{($documents)}}</td>
-                                                                                <td>{{(round($salary_total,2))}} PLN</td>
+                                                                                <td>{{(round($salary_total,2))}}</td>
                                                                             </tr>
                                                                         @endforeach
                                                                         <tr>
