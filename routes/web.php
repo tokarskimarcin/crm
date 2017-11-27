@@ -150,6 +150,10 @@ Route::middleware(['check-permission'])->group(function () {
     Route::get('/view_payment','FinancesController@viewPaymentGet');
     Route::Post('/view_payment','FinancesController@viewPaymentPOST');
 
+    Route::get('/view_payment_cadre','FinancesController@viewPaymentCadreGet');
+    Route::Post('/view_payment_cadre','FinancesController@viewPaymentCadrePOST');
+
+
     Route::get('/view_penalty_bonus','FinancesController@viewPenaltyBonusGet');
     Route::Post('/view_penalty_bonus','FinancesController@viewPenaltyBonusPOST');
 
@@ -160,6 +164,7 @@ Route::middleware(['check-permission'])->group(function () {
 
     Route::get('/view_summary_payment','FinancesController@viewSummaryPaymentGet');
     Route::Post('/view_summary_payment','FinancesController@viewSummaryPaymentPOST');
+
     // Finances -- STOP --
 
     // Equipment -- START --
