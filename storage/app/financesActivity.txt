@@ -1,1 +1,3 @@
 : [Usunięcie kary/premii dla użytkownika : . data : 2017-11-28 09:37:28. Id kary/premii : 32. ]
+ID: [44] DATE: [2017-11-28 11:21:54] ACTION: [Dodanie kary/premii dla użytkownika : . Id użytkownika : 5056. typ : 1. amount : 100. event_date : 2017-11-28. comment : tak. ]
+ID: [44] DATE: [2017-11-28 11:21:59] ACTION: [Usunięcie kary/premii dla użytkownika : . data : 2017-11-28 11:21:59. Id kary/premii : 36. ]

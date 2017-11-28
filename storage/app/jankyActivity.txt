@@ -1,1 +1,5 @@
 10:17] ACTION: [Usunięce janka o id: 38202]
+ID: [44] DATE: [2017-11-28 10:36:16] ACTION: [Weryfikacja janka, status: , komentarz trenera: ]
+ID: [44] DATE: [2017-11-28 10:36:50] ACTION: [Dodanie janka przez dkj, status: 1, komentarz: dfg, numer telefonu: sdfg, kampania: sdfgs]
+ID: [44] DATE: [2017-11-28 10:37:22] ACTION: [Edycja janka przez dkj, status: 1, komentarz: dfg, numer telefonu: 234234, kampania: sdfgs]
+ID: [44] DATE: [2017-11-28 10:37:32] ACTION: [Usunięce janka o id: 38203]

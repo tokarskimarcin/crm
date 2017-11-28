@@ -16,7 +16,7 @@ class EquipmentsController extends Controller
 {
     public function showEquipment()
     {
-        $equipments_types = Equipments::all();
+        $equipments_types = Equipments::where('deleted', null)->get();
 
         return view('hr.showEquipment')
             ->with('equipments_types', $equipments_types);
@@ -92,6 +92,13 @@ class EquipmentsController extends Controller
     public function editEquipmentPost($id, Request $request) {
         $equipment = Equipments::find($id);
 
+        $equipment->deleted = $request->status_delete;
+        if ($request->status_delete == 1) {
+          new ActivityRecorder(6, 'Usunięcie sprzętu o Id: ' . $equipment->id);
+          $equipment->save();
+          Session::flash('message_ok', "Sprzęt usunięty pomyślnie!");
+          return redirect('/show_equipment');
+        }
         $equipment->model = $request->model;
         $equipment->serial_code = $request->serial_code;
         $equipment->description = $request->description;
@@ -145,6 +152,7 @@ class EquipmentsController extends Controller
             'signal_cable' => $request->signal_cable,
             'imei' => $request->imei,
             'tablet_modem' => $request->tablet_modem,
+            'deleted' => $request->deleted
         ];
 
         new ActivityRecorder(6, $data);

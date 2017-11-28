@@ -142,10 +142,13 @@
                         <div>
                         <br />
                         <div class="form-group">
-                            <input type="submit" value="Zapisz zmiany" class="btn btn-success" />
+                            <input type="submit" value="Zapisz zmiany" class="btn btn-success pull-left" />
+                            <button class="btn btn-danger pull-right" id="delete">Usuń sprzęt</button>
+                            <input type="hidden" name="status_delete" value="" id="status_delete"/>
                         </div>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
@@ -156,6 +159,20 @@
 
 @endsection
 @section('script')
+
+<script>
+
+$("#delete").on('click', () => {
+
+    var conf = confirm('Napewno chcesz usunąć ten sprzęt?');
+    if (conf) {
+        $('#status_delete').val(1);
+    } else {
+      return false;
+    }
+
+});
+</script>
 
 
 @endsection
