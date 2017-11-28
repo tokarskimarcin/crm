@@ -17,4 +17,8 @@ ID: [44] DATE: [2017-11-28 11:08:26] ACTION: [Edycja sprzętu firmowego : . Id s
 ID: [44] DATE: [2017-11-28 11:12:08] ACTION: [Dodanie sprzętu firmowego : . equipment_type : 5. serial_code : werwer. model : werwer. ]
 ID: [44] DATE: [2017-11-28 11:14:38] ACTION: [Dodanie sprzętu firmowego : . equipment_type : 5. serial_code : dfg. model : dfg. ]
 ID: [44] DATE: [2017-11-28 11:18:31] ACTION: [Usunięcie sprzętu o Id14]
+<<<<<<< HEAD
 ID: [44] DATE: [2017-11-28 11:46:58] ACTION: [Usunięcie sprzętu o Id: 6020]
+=======
+ID: [1] DATE: [2017-11-28 12:34:19] ACTION: [Dodanie sprzętu firmowego : . equipment_type : 1. serial_code : 123. model : 123. ]
+>>>>>>> 32b357a4cef3775ae795ae6b7a1babde4e73b6a6

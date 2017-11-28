@@ -17,9 +17,21 @@ class EquipmentsController extends Controller
     public function showEquipment()
     {
         $equipments_types = Equipments::where('deleted', null)->get();
+        $laptops = $equipments_types->where('equipment_type_id', "=", 1);
+        $phone = $equipments_types->where('equipment_type_id',"=", 3);
+        $tablet = $equipments_types->where('equipment_type_id',"=", 2);
 
+        $sim = $equipments_types->where('equipment_type_id',"=", 4);
+        $screen = $equipments_types->where('equipment_type_id',"=", 5);
+        $printer = $equipments_types->where('equipment_type_id',"=", 6);
         return view('hr.showEquipment')
-            ->with('equipments_types', $equipments_types);
+            ->with('equipments_types', $equipments_types)
+            ->with('laptops',$laptops)
+            ->with('phone',$phone)
+            ->with('sim',$sim)
+            ->with('screen',$screen)
+            ->with('printer',$printer)
+            ->with('tablet',$tablet);
     }
 
     public function addEquipmentGet($type) {

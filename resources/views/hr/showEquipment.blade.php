@@ -55,7 +55,7 @@
                                           <td>Pracownik</td>
                                           <td>Akcja</td>
                                       </tr>
-                                      @foreach($equipments_types->where('equipment_type_id', "=", 1) as $equipment)
+                                      @foreach($laptops as $equipment)
                                         <tr>
                                               <td>{{$equipment->model}}</td>
                                               <td>{{$equipment->serial_code}}</td>
@@ -90,7 +90,7 @@
                                               <td>Pracownik</td>
                                               <td>Akcja</td>
                                           </tr>
-                                          @foreach($equipments_types->where('equipment_type_id',"=", 3) as $equipment)
+                                          @foreach($tablet as $equipment)
                                               <td data-model="{{$equipment->model}}">{{$equipment->model}}</td>
                                               <td>{{$equipment->serial_code}}</td>
                                               <td>{{$equipment->imei}}</td>
@@ -127,7 +127,7 @@
                                                   <td>Pracownik</td>
                                                   <td>Akcja</td>
                                               </tr>
-                                              @foreach($equipments_types->where('equipment_type_id',"=", 2) as $equipment)
+                                              @foreach($phone as $equipment)
                                                   <td>{{$equipment->model}}</td>
                                                   <td>{{$equipment->imei}}</td>
                                                   @if($equipment->power_cable == 1)
@@ -170,7 +170,7 @@
                                                   <td>Pracownik</td>
                                                   <td>Akcja</td>
                                               </tr>
-                                              @foreach($equipments_types->where('equipment_type_id',"=", 4) as $equipment)
+                                              @foreach($sim as $equipment)
                                                   @if($equipment->sim_type == 1)
                                                       <td>Abonament</td>
                                                   @else
@@ -213,7 +213,7 @@
                                                   <td>Pracownik</td>
                                                   <td>Akcja</td>
                                               </tr>
-                                              @foreach($equipments_types->where('equipment_type_id',"=", 5) as $equipment)
+                                              @foreach($screen as $equipment)
                                                   <td>{{$equipment->model}}</td>
                                                   <td>{{$equipment->serial_code}}</td>
                                                   @if($equipment->power_cable == 1)
@@ -252,7 +252,7 @@
                                                   <td>Pracownik</td>
                                                   <td>Akcja</td>
                                               </tr>
-                                              @foreach($equipments_types->where('equipment_type_id',"=", 6) as $equipment)
+                                              @foreach($printer as $equipment)
                                                   <td>{{$equipment->model}}</td>
                                                   <td>{{$equipment->serial_code}}</td>
                                                   <td>{{$equipment->description}}</td>
