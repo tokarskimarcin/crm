@@ -28,19 +28,6 @@
       <link href="{{ asset('assets/ico/apple-touch-icon-72-precomposed.png') }}" sizes="72x72" rel="apple-touch-icon-precomposed">
       <link href="{{ asset('assets/ico/apple-touch-icon-57-precomposed.png') }}" rel="apple-touch-icon-precomposed">
 
-<!----
-        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
-        <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" href="assets/font-awesome/css/font-awesome.min.css">
-		    <link rel="stylesheet" href="assets/css/form-elements.css">
-        <link rel="stylesheet" href="assets/css/style.css">
-
-        <link rel="shortcut icon" href="assets/ico/favicon.png">
-        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
--->
     <!-- Scripts -->
     <script>
         window.Laravel = {!! json_encode([
@@ -70,7 +57,8 @@
                                <form class="form-horizontal" method="POST" action="{{ route('login') }}">
                                  <div class="form-bottom">
                              {{ csrf_field() }}
-       			                    	<div class="form-group">
+       			                    	<div class="form-group text-center ">
+                                    <label class="text-center"><h3>Login</h3></label>
                                     <input id="username" type="text" class="form-control form-username" name="username" value="{{ old('username') }}" required autofocus placeholder="Login...">
 
                                        @if ($errors->has('username'))
@@ -79,7 +67,8 @@
                                            </span>
                                        @endif
        			                        </div>
-       			                        <div class="form-group">
+       			                        <div class="form-group text-center">
+                                        <label class="text-center"><h3>Hasło</h3></label>
                                       <input id="password" type="password" class="form-control" name="password" required placeholder="Hasło...">
 
                                         @if ($errors->has('password'))

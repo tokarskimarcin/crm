@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\User;
 use App\Notifications;
+use App\MultipleDepartments;
 
 class HomeController extends Controller
 {
@@ -93,9 +94,20 @@ class HomeController extends Controller
         if($request->ajax()) {
             $user = User::find(Auth::user()->id);
 
-            $user->department_info_id = $request->department_info_id;
-            $user->save();
-            return 1;
+            $access = false;
+            $multiple_departments = MultipleDepartments::all();
+            foreach($multiple_departments as $department) {
+                if ($department->user_id == $user->id) {
+                    if ($department->department_info_id == $request->department_info_id) {
+                        $access = true;
+                    }
+                }
+            }
+            if ($access === true) {
+                $user->department_info_id = $request->department_info_id;
+                $user->save();
+                return 1;
+            }
         }
     }
 
