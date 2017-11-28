@@ -31,7 +31,7 @@ class User extends Authenticatable
     ];
 
     public function department_info() {
-        return $this->belongsTo('App\Department_info');
+        return $this->belongsTo('App\Department_info','department_info_id');
     }
 
     public function user_type() {
