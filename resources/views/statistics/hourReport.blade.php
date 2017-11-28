@@ -17,6 +17,11 @@
     </div>
 
 
+        @if (session()->has('add_hour_report'))
+        <div id="success_div" class='alert alert-success'>Raport został wysłany.</div>
+    @endif
+
+
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
@@ -40,18 +45,13 @@
                                                             @if ($godz == '9:00')
                                                                 @php($godz = '09:00')
                                                             @endif
-                                                            <option value={{$godz.':00'}}>{{$godz}}</option>
-                                                            {{--@if (!isset($_SESSION['raport_godzinny_nowy_show'][$godz1])) --}}
-                                                                {{--@if ($_POST['raportgodzinny_hour'] == $godz)--}}
-                                                                    {{--<option selected>--}}
-                                                                {{--@else--}}
-                                                                    {{--<option>--}}
-                                                                {{--@endif--}}
-                                                                    {{--$godz.'</option>';--}}
-                                                           {{--@endif--}}
+                                                            @if($reports->where('hour',$godz.':00')->isEmpty())
+                                                                <option value={{$godz.':00'}}>{{$godz}}</option>
+                                                            @endif
                                                         @endfor
                                                     </select>
                                                 </div>
+
 
                                                 <div class="col-md-3">
                                                     <label>Średnia:</label>
