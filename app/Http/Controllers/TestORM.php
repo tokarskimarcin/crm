@@ -29,16 +29,7 @@ class TestORM extends Controller
 {
     public function test() {
 
-      // $file = asset('storage/file.txt');
-      // var_dump($file);
-
-      // $visibility = Storage::getVisibility('activity.txt');
-      //
-      // Storage::setVisibility('activity.txt', 'public');
-
-      // $contents = Storage::get('activity.txt');
-      // echo $contents;
-    new ActivityRecorder('My new acctivityag rg rtg wrth wrht wrht wrht wrth  trhw rthw rht wrth wrht wrth hrwht wrht wr htwrht wwrt');
+    return view('404');
 
 
     }

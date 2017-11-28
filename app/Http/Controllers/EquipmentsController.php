@@ -92,6 +92,11 @@ class EquipmentsController extends Controller
 
     public function editEquipmentGet($id) {
         $equipment = Equipments::find($id);
+
+        if ($equipment->deleted == 1) {
+            return view('404');
+        }
+
         $users = User::all();
         $department_info = Department_info::all();
 

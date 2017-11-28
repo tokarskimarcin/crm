@@ -129,6 +129,11 @@ class UsersController extends Controller
     {
         $agencies = Agencies::all();
         $user = User::find($id);
+
+        if ($user->status_work != 1) {
+            return view('404');
+        }
+        
         return view('hr.addConsultantTEST')->with('agencies',$agencies)
           ->with('user',$user)
           ->with('type', 1);
@@ -137,6 +142,10 @@ class UsersController extends Controller
 
     public function edit_cadreGet($id) {
         $user = User::find($id);
+
+        if ($user->status_work != 1) {
+            return view('404');
+        }
         $agencies = Agencies::all();
 
         $month = date('m');
