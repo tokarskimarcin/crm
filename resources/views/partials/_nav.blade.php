@@ -21,7 +21,7 @@
                    <i class="fa fa-bell fa-fw"></i> <i class="fa fa-caret-down"></i>
                </a>
                <ul id="babum" class="dropdown-menu dropdown-alerts" style="width: 500px; overflow-y:scroll; max-height: 500px;">
-                 
+
                </ul>
            </li>
         @endif

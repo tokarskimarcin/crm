@@ -41,7 +41,7 @@
                                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                             <div class="form-group">
                                                 <label for ="ipadress">Pracownik:</label>
-                                                <select class="form-control" name="userid">
+                                                <select class="form-control" name="userid" id="userid">
                                                     @if(isset($response_userid))
                                                         <option value="-1">Wybierz</option>
                                                         @foreach ($users as $user)
@@ -78,11 +78,9 @@
 
                                             </div>
                                             <div class="form-group">
-                                                <div class="col-sm-10 col-sm-offset-2">
-                                                    <button class="btn btn-primary " name="submit" type="submit">
+                                                    <button id="form_submit" disabled class="btn btn-primary" name="submit" type="submit" style="width: 100%">
                                                         Generuj
                                                     </button>
-                                                </div>
                                             </div>
                                     </form>
                                 </div>
@@ -210,6 +208,18 @@
 @include('workhours.addHour');
 @section('script')
     <script>
+        var userid = $('#userid').val();
+        if (userid != -1) {
+            $("#form_submit").removeAttr('disabled');
+        }
+
+        $("#userid").on('change', () => {
+            var userid = $('#userid').val();
+            if (userid != -1) {
+                $("#form_submit").removeAttr('disabled');
+            }
+        });
+
         $( ".delete" ).click(function() {
             var id = (this.id);
             $.ajax({
