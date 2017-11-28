@@ -12,6 +12,7 @@ use Session;
 use App\CommentsNotifications;
 use App\User;
 use Illuminate\Support\Facades\DB;
+use App\ActivityRecorder;
 
 class NotificationController extends Controller
 {
@@ -67,9 +68,19 @@ class NotificationController extends Controller
           $sec = DB::select("SELECT SEC_TO_TIME(TIME_TO_SEC('" . $stop . "') - TIME_TO_SEC(data_start) ) as time from notifications where id = ". $id);
           $notification->sec= $sec[0]->time;
         }
-        $notification->save();
 
+        $data = [
+            'Edycja statusu powiadomienia o problemie' => '',
+            'Id problemu' => $notification->id,
+            'status' => $request->status,
+        ];
+        new ActivityRecorder(7, $data);
+
+        $notification->save();
         $user = User::find($notification->displayed_by);
+
+
+
 
         Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
         return Redirect::back();

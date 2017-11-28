@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Redirect;
 use Session;
 use Illuminate\Support\Facades\Auth;
 use App\Department_info;
+use App\ActivityRecorder;
 
 class EquipmentsController extends Controller
 {
@@ -64,6 +65,15 @@ class EquipmentsController extends Controller
         $equipment->created_at = date("Y-m-d H:i:s");
         $equipment->save();
 
+        $data = [
+            'Dodanie sprzętu firmowego' => '',
+            'equipment_type' => $request->equipment_type,
+            'serial_code' => $request->serial_code,
+            'model' => $request->model,
+        ];
+
+        new ActivityRecorder(6, $data);
+
         Session::flash('message_ok', "Sprzęt został dodany pomyślnie!");
         return redirect('/show_equipment');
     }
@@ -79,7 +89,7 @@ class EquipmentsController extends Controller
             ->with('users', $users);
     }
 
-    public function editEquipmentPost($id, Request $request) { 
+    public function editEquipmentPost($id, Request $request) {
         $equipment = Equipments::find($id);
 
         $equipment->model = $request->model;
@@ -112,6 +122,32 @@ class EquipmentsController extends Controller
         $equipment->id_manager = Auth::user()->id;
         $equipment->updated_at = date("Y-m-d H:i:s");
         $equipment->save();
+
+        $data = [
+            'Edycja sprzętu firmowego' => '',
+            'Id sprzętu: ' => $equipment->id,
+            'model' => $request->model,
+            'serial_code' => $request->serial_code,
+            'description' => $request->description,
+            'power_cable' => $request->power_cable,
+            'user_id' => $request->user_id,
+            'department_info_id' => $request->department_info_id,
+            'department_info_id' => $request->department_info_id,
+            'laptop_ram' => $request->laptop_ram,
+            'laptop_hard_drive' => $request->laptop_hard_drive,
+            'phone_box' => $request->phone_box,
+            'tablet_modem' => $request->tablet_modem,
+            'sim_number_phone' => $request->sim_number_phone,
+            'sim_type' => $request->sim_type,
+            'sim_pin' => $request->sim_pin,
+            'sim_puk' => $request->sim_puk,
+            'sim_net' => $request->sim_net,
+            'signal_cable' => $request->signal_cable,
+            'imei' => $request->imei,
+            'tablet_modem' => $request->tablet_modem,
+        ];
+
+        new ActivityRecorder(6, $data);
 
         $equipment = Equipments::find($id);
         $users = User::all();

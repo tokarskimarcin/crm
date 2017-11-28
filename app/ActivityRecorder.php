@@ -79,17 +79,17 @@ class ActivityRecorder extends Model
             break;
 
           case '6':
-            $contents = Storage::get('equiepmentActivity.txt');
-            Storage::append('equiepmentActivity.txt', $content);
+            $contents = Storage::get('equipmentActivity.txt');
+            Storage::append('equipmentActivity.txt', $content);
             break;
 
-          case '':
+          case '7':
             $contents = Storage::get('activity.txt');
             Storage::append('activity.txt', $content);
             break;
 
           default:
-            
+
             break;
         }
 

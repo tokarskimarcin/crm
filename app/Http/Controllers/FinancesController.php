@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Session;
+use App\ActivityRecorder;
 
 class FinancesController extends Controller
 {
@@ -100,6 +101,17 @@ class FinancesController extends Controller
         $object->id_manager = $id_manager;
         $object->comment = $request->reason;
         $object->save();
+
+        $data = [
+            'Dodanie kary/premii dla użytkownika' => '',
+            'Id użytkownika' => $request->user_id,
+            'typ' => $request->penalty_type,
+            'amount' => $request->cost,
+            'event_date' => date('Y-m-d'),
+            'comment' => $request->reason,
+        ];
+
+        new ActivityRecorder(2, $data);
 
         $message_type = ($request->penalty_type == 1) ? 'Kara' : 'Premia' ;
         $message = $message_type . ' została dodana pomyślnie';
@@ -270,6 +282,13 @@ class FinancesController extends Controller
             $object->status = 0;
             $object->updated_at = date('Y-m-d H:i:s');
             $object->save();
+
+            $data = [
+                'Usunięcie kary/premii dla użytkownika' => '',
+                'data' => date('Y-m-d H:i:s'),
+                'Id kary/premii' => $object->id,
+            ];
+            new ActivityRecorder(2, $data);
 
         }
 

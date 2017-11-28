@@ -1,1 +1,4 @@
 ﻿
+ID: [44] DATE: [2017-11-28 09:44:28] ACTION: [Edycja statusu powiadomienia o problemie : . Id problemu : 12. status : 1. ]
+ID: [44] DATE: [2017-11-28 09:44:53] ACTION: [Edycja statusu powiadomienia o problemie : . Id problemu : 512. status : 2. ]
+ID: [44] DATE: [2017-11-28 09:44:58] ACTION: [Edycja statusu powiadomienia o problemie : . Id problemu : 512. status : 3. ]
