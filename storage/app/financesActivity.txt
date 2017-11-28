@@ -1,6 +1,1 @@
-
-ID: [44] DATE: [2017-11-28 09:31:44] ACTION: [Dodanie kary/premii dla użytkownika : . typ : . amount : . event_date : . comment : . ]
-ID: [44] DATE: [2017-11-28 09:33:00] ACTION: [Dodanie kary/premii dla użytkownika : . Id użytkownika : 5055. typ : . amount : . event_date : . comment : . ]
-ID: [44] DATE: [2017-11-28 09:33:43] ACTION: [Dodanie kary/premii dla użytkownika : . Id użytkownika : 5055. typ : 1. amount : 234. event_date : . comment : . ]
-ID: [44] DATE: [2017-11-28 09:34:26] ACTION: [Dodanie kary/premii dla użytkownika : . Id użytkownika : 5055. typ : 1. amount : 26. event_date : 2017-11-28. comment : . ]
-ID: [44] DATE: [2017-11-28 09:37:28] ACTION: [Usunięcie kary/premii dla użytkownika : . data : 2017-11-28 09:37:28. Id kary/premii : 32. ]
+: [Usunięcie kary/premii dla użytkownika : . data : 2017-11-28 09:37:28. Id kary/premii : 32. ]

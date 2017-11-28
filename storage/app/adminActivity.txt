@@ -1,3 +1,1 @@
-
-ID: [5052] DATE: [2017-11-28 08:13:17] ACTION: [Zmiana hasła przez użytkonika, nowe hasło: dGVzdGFrdHl3bm9zY2l0ZXN0YWt0eXdub3NjaQ==]
-ID: [5052] DATE: [2017-11-28 08:13:47] ACTION: [Zmiana hasła przez użytkonika, nowe hasło: dGVzdGFrdHl3bm9zY2k=]
+we hasło: dGVzdGFrdHl3bm9zY2k=]

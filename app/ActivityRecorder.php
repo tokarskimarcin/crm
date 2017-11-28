@@ -5,12 +5,22 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 class ActivityRecorder extends Model
 {
     private $user;
     private $date;
     private $action;
+    private $logTypes = [
+        'hrActivity.txt',
+        'financesActivity.txt',
+        'adminActivity.txt',
+        'jankyActivity.txt',
+        'workHoursActivity.txt',
+        'equipmentActivity.txt',
+        'activity.txt'
+    ];
 
     /*
       you can pass strings, integers or Arrays
@@ -24,6 +34,8 @@ class ActivityRecorder extends Model
       it will output 'name : genowegfa. age : 69.'
 
       log should look like ID: [44] DATE: [2017-11-28 07:37:40] ACTION: [name : genowegfa. age : 69.]
+
+      files are stored in storage/app
 
       types of activity:
       1 - HR managment
@@ -93,8 +105,27 @@ class ActivityRecorder extends Model
             break;
         }
 
+        $day = date('d');
+        if ($day == 28) {
+            $this->clearLogs();
+        }
+    }
 
-        //var_dump($contents);
+    private function clearLogs() {
+      $checkIfCleared = File::get(storage_path('app/logData.txt'));
+      $pos = strpos($checkIfCleared, date('y-m'));
+      if (!$pos) {
+          foreach($this->logTypes as $type) {
+              $file = File::get(storage_path('app/' . $type));
+              $how_much = strlen($file);
+              $contents = substr($file, $how_much / 2 );
+              Storage::put($type, $contents);
+          }
+
+          $contents = Storage::get('logData.txt');
+          Storage::append('logData.txt', date('Y-m'));
+      }
+
 
     }
 
