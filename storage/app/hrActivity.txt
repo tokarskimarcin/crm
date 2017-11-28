@@ -1,0 +1,5 @@
+
+ID: [44] DATE: [2017-11-28 08:12:29] ACTION: [Edycja użytkownika: :  . username : testaktywnosci. first_name : testaktywnosci. last_name : testaktywnosci. phone : . email : testaktywnosci. private_phone : 234. description : . salary_to_account : 0. agency_id : 1. login_phone : testaktywnosci. rate : 7.50. salary : . documents : 1. additional_salary : . status_work : 1. guid : dGVzdGFrdHl3bm9zY2k=. ]
+ID: [44] DATE: [2017-11-28 08:23:48] ACTION: [Dodanie użytkownika: testcostam testcostam, login: testcostam]
+ID: [44] DATE: [2017-11-28 08:34:43] ACTION: [Dodanie użytkownika: blad blad, login: blad]
+ID: [44] DATE: [2017-11-28 08:36:01] ACTION: [Dodanie użytkownika: bladblad bladblad, login: bladblad]
