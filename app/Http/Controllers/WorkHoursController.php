@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use App\ActivityRecorder;
 
 class WorkHoursController extends Controller
 {
@@ -185,6 +186,16 @@ class WorkHoursController extends Controller
                         'status' => 4]);
             }
         }
+        $data = [
+            'Akceptacja godzin pracy' => '',
+            'Id czasu pracy' => $request->id,
+            'register_start' => $request->register_start,
+            'register_stop' => $request->register_stop,
+            'type_edit' => $request->type_edit,
+            'succes' => $request->succes,
+        ];
+
+        new ActivityRecorder(5, $data);
     }
     //******************acceptHour****************** Stop
 
@@ -299,6 +310,7 @@ class WorkHoursController extends Controller
                         'accept_start' => null,
                         'accept_stop' => null,
                         'status' => 6]);
+            new ActivityRecorder(5, 'Usunięcie godzin pracy, wpis id godzin pracy: ' . $id);
         }
     }
     public function editAcceptHour(Request $request)
@@ -316,6 +328,13 @@ class WorkHoursController extends Controller
                         'accept_start' => $accept_start,
                         'accept_stop' => $accept_stop,
                         'status' => 5]);
+            $data = [
+                'Edycja godzin pracy, wpis id godzin pracy:' => $id,
+                'accept_start' => $request->accept_start,
+                'accept_stop' => $request->accept_stop,
+                'success' => $request->success,
+            ];
+            new ActivityRecorder(5, $data);
         }
     }
     public function addAcceptHour(Request $request)
@@ -339,6 +358,16 @@ class WorkHoursController extends Controller
             $work_hour->id_manager = $id_manager;
             $work_hour->save();
             session(['add_hour_success' => true]);
+
+            $data = [
+                'Dodanie czasu pracy pracownika' => '',
+                'success' => $succes,
+                'accept_start' => $accept_start,
+                'accept_stop' => $accept_stop,
+                'id_user' => $date[0],
+                'date' => $date[1]
+            ];
+            new ActivityRecorder(5, $data);
         }
     }
     //******************ViewHour****************** Stop

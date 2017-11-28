@@ -105,6 +105,10 @@
                     success: function(response) {
                        location.reload();
 
+                    },
+                    error: function(response) {
+                        alert('Wystąpił problem z bazą danych. Prosimy spróbuj później.');
+                        location.reload();
                     }
                 });
             }

@@ -11,6 +11,7 @@ use App\PrivilageRelation;
 use App\UserTypes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\ActivityRecorder;
 
 class AdminController extends Controller
 {
@@ -82,6 +83,7 @@ class AdminController extends Controller
                 foreach ($user_tab as $item)
                     PrivilageRelation::updateOrCreate(array('user_type_id'=>$item,'link_id'=>$id));
             }
+            new ActivityRecorder(3, 'Zmiana uprawnień grup i użytkowników: link_adress: ' . $request->link_adress . ', link_name: ' . $request->link_name . ', link_goup: ' . $request->link_group);
         return redirect('/admin_privilage');
     }
 

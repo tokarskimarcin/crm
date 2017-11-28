@@ -11,6 +11,7 @@ use App\Work_Hour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\ActivityRecorder;
 
 class DkjController extends Controller
 {
@@ -230,6 +231,7 @@ class DkjController extends Controller
              $dkj_record->date_manager = date('Y-m-d H:i:s');
              $dkj_record->id_manager = Auth::user()->id;
              $dkj_record->save();
+             new ActivityRecorder(4, "Weryfikacja janka, status: " . $request->status . ', komentarz trenera: ' . $request->comment);
     }
     public function dkjRaportPost(Request $request)
     {
@@ -320,11 +322,15 @@ class DkjController extends Controller
         if ($request->action == 'create') {
             $dkj = new DKJ();
             $dkj->id_dkj = Auth::user()->id;
+            //Activity type
+            $activity = 'Dodanie janka przez dkj, status: ';
         }
         if ($request->action == 'edit') {
             $dkj =Dkj::find($request->id);
             $dkj->edit_dkj = Auth::user()->id;
             $dkj->edit_date = date('Y-m-d H:i:s');
+            //Activity type
+            $activity = 'Edycja janka przez dkj, status: ';
         }
         if($request->action == 'create' || $request->action == 'edit')
         {
@@ -338,10 +344,16 @@ class DkjController extends Controller
         }
         if ($request->action == 'remove') {
                 $dkj = Dkj::find($request->id);
+                new ActivityRecorder(4, 'Usunięce janka o id: ' . $request->id);
                 $dkj->deleted = 1;
                 $dkj->save();
         }
-        return 'ok';
+
+        if (isset($activity)) {
+          new ActivityRecorder(4, $activity . $request->dkj_status . ', komentarz: ' . $request->comment . ', numer telefonu: ' . $request->phone . ', kampania: ' . $request->campaign);
+        }
+          return 'ok';
+
     }
     private function getDepartment()
     {

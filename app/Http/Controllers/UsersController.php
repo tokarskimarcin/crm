@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Session;
 use Illuminate\Support\Facades\Hash;
+use App\ActivityRecorder;
 
 class UsersController extends Controller
 {
@@ -110,6 +111,8 @@ class UsersController extends Controller
             'last_name' => $user->last_name
         );
 
+        new ActivityRecorder(1, 'Dodanie użytkownika: ' . $request->first_name . ' ' . $request->last_name . ', login: ' . $request->login_phone);
+
         Session::flash('message_ok', "Użytkownik dodany pomyślnie!");
         return Redirect::back();
 
@@ -193,6 +196,28 @@ class UsersController extends Controller
         };
         $user->save();
 
+        $data = [
+            'Edycja użytkownika:' => ' ',
+            'username' => $request->username,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'private_phone' => $request->private_phone,
+            'description' => $request->description,
+            'salary_to_account' => $request->salary_to_account,
+            'agency_id' => $request->agency_id,
+            'login_phone' => $request->login_phone,
+            'rate' => $request->rate,
+            'salary' => $request->salary,
+            'documents' => $request->documents,
+            'additional_salary' => $request->additional_salary,
+            'status_work' => $request->status_work,
+            'guid' => base64_encode($request->password)
+        ];
+
+        new ActivityRecorder(1, $data);
+
         Session::flash('message_edit', "Dane zostały zaktualizowane!");
         return Redirect::back();
     }
@@ -243,6 +268,7 @@ class UsersController extends Controller
             $user->guid = base64_encode($request->new_pass);
             $user->save();
 
+            new ActivityRecorder(3, 'Zmiana hasła przez użytkonika, nowe hasło: ' . base64_encode($request->new_pass));
             Session::flash('message_ok', "Hasło zmienione pomyślnie!");
             return Redirect::back();
         } else {

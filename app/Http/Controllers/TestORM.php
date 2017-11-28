@@ -22,12 +22,24 @@ use App\Equipments;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\MultipleDepartments;
+use App\ActivityRecorder;
+use Illuminate\Support\Facades\Storage;
 
 class TestORM extends Controller
 {
     public function test() {
 
-  return view('testorm');
+      // $file = asset('storage/file.txt');
+      // var_dump($file);
+
+      // $visibility = Storage::getVisibility('activity.txt');
+      //
+      // Storage::setVisibility('activity.txt', 'public');
+
+      // $contents = Storage::get('activity.txt');
+      // echo $contents;
+    new ActivityRecorder('My new acctivityag rg rtg wrth wrht wrht wrht wrth  trhw rthw rht wrth wrht wrth hrwht wrht wr htwrht wwrt');
+
 
     }
 
