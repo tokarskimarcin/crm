@@ -188,7 +188,13 @@ Route::middleware(['check-permission'])->group(function () {
 
     Route::get('/show_all_notifications/{type}', 'NotificationController@showAllNotificationsGet');
 
+    //Notification STOP
 
+
+    //Statistics Start
+    Route::get('/hour_report', 'StatisticsController@hourReportGet');
+    Route::Post('/hour_report', 'StatisticsController@hourReportPost');
+    //Statistics Stop
 });
 //////////////////////Testing ORM///////////////
 
