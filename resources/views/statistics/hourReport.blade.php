@@ -128,9 +128,12 @@
                                     <td>{{$godz}}</td>
                                     @foreach($reports as $report)
                                         @if($report->hour ==  $godz.':00')
-                                            @php($is_set = 1)
+                                            @php
+                                                $is_set = 1;
+                                                $old_aim = 0;
+                                            @endphp
                                             <td class="average">{{$report->average}}</td>
-                                            <td class="success">{{$report->success}}</td>
+                                            <td class="success_count">{{$report->success}}</td>
                                             <td class="employee_count">{{$report->employee_count}}</td>
                                             <td class="janky_count">{{$report->janky_count}} %</td>
                                             <td class="wear_base">{{$report->wear_base}} %</td>
@@ -236,7 +239,7 @@
             //$("#cafeId").val($(this).data('id'));
             var record_id = $(this).data('id');
             var row = $(this).closest("tr");
-            var success = row.find(".success").text();
+            var success = row.find(".success_count").text();
             var average = row.find(".average").text();
             var employee_count = row.find(".employee_count").text();
             var janky_count = row.find(".janky_count").text().slice(0,-1);
