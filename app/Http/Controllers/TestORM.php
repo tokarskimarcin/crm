@@ -24,13 +24,20 @@ use Illuminate\Support\Facades\DB;
 use App\MultipleDepartments;
 use App\ActivityRecorder;
 use Illuminate\Support\Facades\Storage;
+// use Illuminate\Support\Facades\Mail;
+use App\Mail\RaportMail;
+use Mail;
 
 class TestORM extends Controller
 {
     public function test() {
 
-    return view('404');
-
+        //Mail::to('jarzyna.varona@gmail.com')->send(new RaportMail());
+        Mail::send(['text'=>'mail'],['name', 'Konrad'], function($message){
+            $message->to('konradja100@wp.pl', 'Konead')
+                ->subject('Test email')
+                ->from('jarzyna.verona@gmail.com');
+        });
 
     }
 
