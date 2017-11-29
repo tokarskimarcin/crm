@@ -7,3 +7,4 @@ ID: [44] DATE: [2017-11-28 11:24:20] ACTION: [Usunięcie godzin pracy, wpis id g
 ID: [44] DATE: [2017-11-28 11:24:30] ACTION: [Edycja godzin pracy, wpis id godzin pracy: : 98372. accept_start : 01:00. accept_stop : 12:24. success : 0. ]
 ID: [44] DATE: [2017-11-28 11:24:34] ACTION: [Usunięcie godzin pracy, wpis id godzin pracy: 98372]
 ID: [1] DATE: [2017-11-28 12:27:58] ACTION: [Dodanie czasu pracy pracownika : . success : 12. accept_start : 04:20. accept_stop : 08:40. id_user : 5040. date : 2017-11-01. ]
+ID: [44] DATE: [2017-11-28 14:26:37] ACTION: [Akceptacja godzin pracy : . Id czasu pracy : 98374. register_start : 00:00. register_stop : 15:50. type_edit : 1. succes : 0. ]

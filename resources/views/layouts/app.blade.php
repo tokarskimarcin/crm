@@ -28,6 +28,11 @@
       <link href="{{ asset('assets/ico/apple-touch-icon-72-precomposed.png') }}" sizes="72x72" rel="apple-touch-icon-precomposed">
       <link href="{{ asset('assets/ico/apple-touch-icon-57-precomposed.png') }}" rel="apple-touch-icon-precomposed">
 
+      <style>
+        .white-color {
+          color: #fff;
+        }
+      </style>
     <!-- Scripts -->
     <script>
         window.Laravel = {!! json_encode([
@@ -37,57 +42,31 @@
 </head>
 <body>
   <!-- Top content -->
-         <div class="top-content">
-
-             <div class="inner-bg">
-                 <div class="container">
-                     <div class="row">
-                         <div class="col-sm-8 col-sm-offset-2 text">
-                             <h1><strong>Y-desing</strong> logowanie</h1>
-                             <div class="description">
-                             	<p>
- 	                            	Zaloguj sie
-                             	</p>
-                             </div>
-                         </div>
-                     </div>
-                     <div class="row">
-                         <div class="col-sm-6 col-sm-offset-3 form-box">
-
-                               <form class="form-horizontal" method="POST" action="{{ route('login') }}">
-                                 <div class="form-bottom">
-                             {{ csrf_field() }}
-       			                    	<div class="form-group text-center ">
-                                    <label class="text-center"><h3>Login</h3></label>
-                                    <input id="username" type="text" class="form-control form-username" name="username" value="{{ old('username') }}" required autofocus placeholder="Login...">
-
-                                       @if ($errors->has('username'))
-                                           <span class="help-block">
-                                               <strong>{{ $errors->first('username') }}</strong>
-                                           </span>
-                                       @endif
-       			                        </div>
-       			                        <div class="form-group text-center">
-                                        <label class="text-center"><h3>Hasło</h3></label>
-                                      <input id="password" type="password" class="form-control" name="password" required placeholder="Hasło...">
-
-                                        @if ($errors->has('password'))
-                                            <span class="help-block">
-                                                <strong>{{ $errors->first('password') }}</strong>
-                                            </span>
-                                        @endif
-       			                        </div>
-       			                        <button style="width: 100%" type="submit" class="btn">Zaloguj!</button>
-                                  </div>
- 			                          </form>
-
-                         </div>
-                     </div>
-                 </div>
-             </div>
-
-         </div>
-
+<div class="wrapper">
+    <form class="form-signin col-md-4 " style="margin-left: 33%" method="POST" action="{{ route('login') }}">
+      {{ csrf_field() }}
+        <h2 class="form-signin-heading white-color" >Zaloguj się</h2>
+            <div class="form-group">
+                <label for="username" class="white-color">Login</label>
+                <input type="text" class="form-control" name="username" id="username" placeholder="Login..." value="{{ old('username') }}" required="" autofocus="" />
+                @if ($errors->has('username'))
+                    <span class="help-block">
+                        <strong class="white-color">{{ $errors->first('username') }}</strong>
+                    </span>
+                @endif
+            </div>
+            <div class="form-group">
+              <label for="password" class="white-color">Hasło</label>
+              <input type="password" id="password" class="form-control" name="password" placeholder="Hasło..." required=""/>
+              @if ($errors->has('password'))
+                  <span class="help-block">
+                      <strong>{{ $errors->first('password') }}</strong>
+                  </span>
+              @endif
+            </div>
+              <button class="btn btn-lg btn-primary btn-block" type="submit">Zaloguj</button>
+    </form>
+</div>
 <!-- @yield('content') -->
 <!-- Scripts -->
 <script src="{{ asset('js/app.js') }}"></script>
