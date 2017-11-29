@@ -106,8 +106,8 @@
                                                                 <th>Godz.</th>
                                                                 <th>Pod.</th>
                                                                 @if($agreement == 1)
-                                                                    <th>Zap</th>
-                                                                    <th>Śr</th>
+                                                                    <th>Zogdy</th>
+                                                                    <th>Średnia</th>
                                                                 @endif
                                                                 <th>Status</th>
                                                                 <th>Akcja</th>
@@ -142,23 +142,21 @@
                                                                                 $status = 'Usunięto przez:'."\n".$item->first_name.' '.$item->last_name;
                                                                             ?>
                                                                             <tr>
-                                                                                <td >{{$item->date}}</td>
+                                                                                <td>{{$item->date}}</td>
                                                                                 <td>
-                                                                                    {{$item->register_start}}
-                                                                                    <br>
+                                                                                    <div>{{substr($item->register_start,0,-3)}}</div>
                                                                                     <span class='fa fa-arrow-circle-o-down fa-fw'></span>
-                                                                                    {{$item->register_stop}}
+                                                                                    <div>{{substr($item->register_stop,0,-3)}}</div>
                                                                                 </td>
-                                                                                <td>
-                                                                                    {{$item->accept_start}}
-                                                                                    <br>
-                                                                                    <span class='fa fa-arrow-circle-o-down fa-fw'></span>
-                                                                                    {{$item->accept_stop}}
+                                                                                <td class="accept_hour">
+                                                                                    <div class="accept_hour_start" >{{substr($item->accept_start,0,-3)}}</div>
+                                                                                        <span class='fa fa-arrow-circle-o-down fa-fw'></span>
+                                                                                    <div class="accept_hour_stop" >{{substr($item->accept_stop,0,-3)}}</div>
                                                                                 </td>
                                                                                 <td>{{$item->time}}</td>
                                                                                 <td>{{number_format ( ($item->second/3600)*$item->rate, 2 )}} PLN</td>
                                                                                 @if($agreement == 1)
-                                                                                    <td>{{$item->success}}</td>
+                                                                                    <td class="succes_count">{{$item->success}}</td>
                                                                                     <td>{{$avg}}</td>
                                                                                 @endif
                                                                                 <td>{{$status}}</td>

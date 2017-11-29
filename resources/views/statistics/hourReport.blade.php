@@ -235,10 +235,9 @@
 @section('script')
 <script>
     $(document).ready(function(){
-        $(".edit").click(function(){ // Click to only happen on announce links
-            //$("#cafeId").val($(this).data('id'));
+        $(".edit").click(function(){
             var record_id = $(this).data('id');
-            var row = $(this).closest("tr");
+            var row = $(this).closest(".accept_hour_start");
             var success = row.find(".success_count").text();
             var average = row.find(".average").text();
             var employee_count = row.find(".employee_count").text();

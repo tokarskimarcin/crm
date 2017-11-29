@@ -54,12 +54,24 @@
 
             var id = 0;
             var load = 0;
+            var session = {{Session::get('count_agreement')}};
         $('#editHourModal').on('show.bs.modal', function(e) {
             if(load == 0) {
                 var $modal = $(this),
                     esseyId = e.relatedTarget.id;
                 id = esseyId;
-                load++;
+                load++
+                var object_button = $("#"+id).closest("tr").find(".accept_hour");
+                var accept_hour_start = object_button.find(".accept_hour_start").html();
+                var accept_hour_stop = object_button.find(".accept_hour_stop").html();
+                if(session == 1)
+                {
+                    var count_succes = $("#"+id).closest("tr").find(".succes_count").html();
+                    $('#success').val(count_succes);
+                }
+                $('#accept_start').val(accept_hour_start);
+                $('#accept_stop').val(accept_hour_stop);
+
             }
         });
 
