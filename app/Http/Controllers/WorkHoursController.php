@@ -249,8 +249,7 @@ class WorkHoursController extends Controller
         $month = $request->month;
         $userid = $request->userid;
         $myDepartment_info = Department_info::find(Auth::user()->department_info_id);
-        $count_agreement = Department_types::find($myDepartment_info->id_dep_type);
-        $count_agreement= $count_agreement->count_agreement;
+        $count_agreement= 0;
         Session::put('count_agreement', $count_agreement);
         $user_info = $this->user_info($userid,$month);
         $users = User::where('user_type_id', "!=", 1)->get();

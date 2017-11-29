@@ -141,16 +141,14 @@
                                                                             <tr>
                                                                                 <td >{{$item->date}}</td>
                                                                                 <td>
-                                                                                    {{$item->register_start}}
-                                                                                    <br>
-                                                                                    <span class='fa fa-arrow-circle-o-down fa-fw'></span>
-                                                                                    {{$item->register_stop}}
+                                                                                    <div>{{substr($item->register_start,0,-3)}}</div>
+                                                                                        <span class='fa fa-arrow-circle-o-down fa-fw'></span>
+                                                                                    <div>{{substr($item->register_stop,0,-3)}}</div>
                                                                                 </td>
-                                                                                <td>
-                                                                                    {{$item->accept_start}}
-                                                                                    <br>
+                                                                                <td class="accept_hour">
+                                                                                    <div class="accept_hour_start" >{{substr($item->accept_start,0,-3)}}</div>
                                                                                     <span class='fa fa-arrow-circle-o-down fa-fw'></span>
-                                                                                    {{$item->accept_stop}}
+                                                                                    <div class="accept_hour_stop" >{{substr($item->accept_stop,0,-3)}}</div>
                                                                                 </td>
                                                                                 <td>{{$item->time}}</td>
                                                                                 <td>{{$status}}</td>
