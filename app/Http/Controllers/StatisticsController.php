@@ -10,7 +10,8 @@ class StatisticsController extends Controller
 {
     public function hourReportGet()
     {
-        $reports = HourReport::where('report_date','like','2017-11-28')
+        $today = date('Y-m-d');
+        $reports = HourReport::where('report_date','like',$today)
             ->where('department_info_id',Auth::user()->department_info_id)->get();
         return view('statistics.hourReport')
             ->with('reports',$reports);
