@@ -17,9 +17,13 @@
     </div>
 
 
-        @if (session()->has('add_hour_report'))
-        <div id="success_div" class='alert alert-success'>Raport został wysłany.</div>
-    @endif
+        @if (session()->has('status'))
+            @if(Session::get('status') == 1)
+                <div id="success_div" class='alert alert-success'>{{Session::get('message')}}</div>
+            @elseif(Session::get('status') == 0)
+                <div id="success_div" class='alert alert-danger'>{{Session::get('message')}}</div>
+            @endif
+        @endif
 
 
     <div class="row">
@@ -38,7 +42,7 @@
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <div class="col-md-3">
                                                     <label>Godzina:</label>
-                                                    <select name="hour" class="form-control" style="font-size:18px;">
+                                                    <select id="hour" name="hour" class="form-control" style="font-size:18px;">
                                                         <option>Wybierz</option>
                                                         @for ($i=9; $i < 22; $i++)
                                                             @php($godz = $i.':00')
@@ -55,7 +59,7 @@
 
                                                 <div class="col-md-3">
                                                     <label>Średnia:</label>
-                                                    <input class="form-control numeric" name="average" type="text">
+                                                    <input class="form-control numeric" name="average" type="number">
                                                 </div>
 
                                                 <div class="col-md-3">
@@ -65,23 +69,23 @@
 
                                                 <div class="col-md-3">
                                                     <label>Liczba Osób:</label>
-                                                    <input class="form-control" name="employee_count" type="text" value="">
+                                                    <input class="form-control" name="employee_count" type="number" value="">
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label>% Janków:</label>
-                                                    <input class="form-control" name="janky_count" type="text" value="">
+                                                    <input class="form-control" name="janky_count" type="number" value="">
                                                 </div>
 
                                                 <div class="col-md-3">
                                                     <label>% Wykorzystania Bazy</label>
-                                                    <input class="form-control" name="wear_base" type="text" value="">
+                                                    <input class="form-control" name="wear_base" type="number" value="">
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label>Czas Rozmów:</label>
-                                                    <input class="form-control" name="call_Time" type="text" value=""></br>
+                                                    <input class="form-control" name="call_Time" type="number" value=""></br>
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <button type="submit" class="btn btn-primary" name="hour_report_send" id="send_button">Wyślij</button>
+                                                    <button type="submit" class="btn btn-primary add_report" name="hour_report_send" id="send_button">Wyślij</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -125,16 +129,16 @@
                                     @foreach($reports as $report)
                                         @if($report->hour ==  $godz.':00')
                                             @php($is_set = 1)
-                                            <td>{{$report->average}}</td>
-                                            <td>{{$report->success}}</td>
-                                            <td>{{$report->employee_count}}</td>
-                                            <td>{{$report->janky_count}} %</td>
-                                            <td>{{$report->wear_base}} %</td>
-                                            <td>{{$report->call_time}} %</td>
+                                            <td class="average">{{$report->average}}</td>
+                                            <td class="success">{{$report->success}}</td>
+                                            <td class="employee_count">{{$report->employee_count}}</td>
+                                            <td class="janky_count">{{$report->janky_count}} %</td>
+                                            <td class="wear_base">{{$report->wear_base}} %</td>
+                                            <td class="call_time">{{$report->call_time}} %</td>
                                             @if(date('N', strtotime(date('Y-m-d'))) >= 6)
-                                                <td>{{round(($report->success*100)/$report->department_info->dep_aim_week,2)}}</td>
+                                                <td>{{round(($report->success*100)/$report->department_info->dep_aim_week,2)}} %</td>
                                             @else
-                                                <td>{{round(($report->success*100)/$report->department_info->dep_aim,2)}}</td>
+                                                <td>{{round(($report->success*100)/$report->department_info->dep_aim,2)}} %</td>
                                             @endif
                                             <td id="status_{{$i}}">{{ $report->is_send == 1 ? "Wysłany" : "Oczekuje na wysłanie" }}</td>
                                             @if($report->is_send == 1)
@@ -143,7 +147,7 @@
                                             </td>
                                             @else
                                                 <td>
-                                                    <button name={{$i}} class="btn btn-primary active" type="button" data-toggle="modal" data-target="#edit" id={{$report->id}}>Edycja</button>
+                                                    <button name={{$i}} class="btn btn-primary active edit" type="button" data-toggle="modal"  data-id={{$report->id}}>Edycja</button>
                                                 </td>
                                             @endif
                                         @endif
@@ -169,10 +173,162 @@
             </div>
         </div>
     </div>
+
+
+
+<!-- Modal -->
+<div id="edit" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Edycja Raportu Godzinnego</h4>
+            </div>
+            <form method="post" action="hour_report_edit">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" id="record_id" name="record_id">
+            <div class="modal-body">
+                <div>
+                    <label>Średnia:</label>
+                    <input class="form-control numeric" id="average"  name="average" type="number">
+                </div>
+
+                <div>
+                    <label>Liczba Zaproszeń:</label>
+                    <input class="form-control" id="success" type="number" name="success" value="">
+                </div>
+
+                <div>
+                    <label>Liczba Osób:</label>
+                    <input class="form-control" id="employee_count" name="employee_count" type="number" value="">
+                </div>
+                <div>
+                    <label>% Janków:</label>
+                    <input class="form-control" id="janky_count" name="janky_count" type="number" value="">
+                </div>
+
+                <div>
+                    <label>% Wykorzystania Bazy</label>
+                    <input class="form-control" id="wear_base" name="wear_base" type="number" value="">
+                </div>
+                <div>
+                    <label>Czas Rozmów:</label>
+                    <input class="form-control" id="call_time" name="call_Time" type="number" value=""></br>
+                </div>
+                <button id="edit_hour" class="btn btn-primary" style="font-size:18px; width:100%;">Edytuj</button>
+            </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default close" data-dismiss="modal">Anuluj</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 @endsection
 
 @section('script')
 <script>
+    $(document).ready(function(){
+        $(".edit").click(function(){ // Click to only happen on announce links
+            //$("#cafeId").val($(this).data('id'));
+            var record_id = $(this).data('id');
+            var row = $(this).closest("tr");
+            var success = row.find(".success").text();
+            var average = row.find(".average").text();
+            var employee_count = row.find(".employee_count").text();
+            var janky_count = row.find(".janky_count").text().slice(0,-1);
+            var wear_base = row.find(".wear_base").text().slice(0,-1);
+            var call_time = row.find(".call_time").text().slice(0,-1);
+            $("input[name=record_id]:hidden").val(record_id);
+            $(".modal-body #average").val(average);
+            $(".modal-body #success").val(success);
+            $(".modal-body #employee_count").val(employee_count);
+            $(".modal-body #janky_count").val(parseInt(janky_count));
+            $(".modal-body #wear_base").val(parseInt(wear_base));
+            $(".modal-body #call_time").val(parseInt(call_time));
+            $('#edit').modal('show');
+        });
+        $("#edit_hour").click(function () {
+            if($(".modal-body #average").val() == '')
+            {
+                alert('Średnia nie może być pusta');
+                return false;
+            }
+            if($(".modal-body #success").val() == '')
+            {
+                alert('Zgody nie mogą być puste');
+                return false;
+            }
+            if($(".modal-body #employee_count").val() == '')
+            {
+                alert('Liczba pracowników nie może być pusta');
+                return false;
+            }
+            if($(".modal-body #janky_count").val() == '')
+            {
+                alert('Ilość janków nie może być puste');
+                return false;
+            }
+            if($(".modal-body #wear_base").val() == '')
+            {
+                alert('Wykorzystanie bazy nie może być puste');
+                return false;
+            }
+            if($(".modal-body #call_time").val() == '')
+            {
+                alert('Czas rozmów nie może być puste');
+                return false;
+            }
+        });
+
+        $(".add_report").click(function(){
+            var success = $("input[name='success']" ).val();
+            var average = $("input[name='average']" ).val();
+            var employee_count = $("input[name='employee_count']" ).val();
+            var janky_count = $("input[name='janky_count']" ).val();
+            var wear_base = $("input[name='wear_base']" ).val();
+            var call_time = $("input[name='call_Time']" ).val();
+            var hour = $( "#hour" ).val();
+            if(hour == '' || hour=='Wybierz')
+            {
+                alert('Wybierz godzinę');
+                return false;
+            }
+            if(average == '')
+            {
+                alert('Średnia nie może być pusta');
+                return false;
+            }
+            if(success == '')
+            {
+                alert('Zgody nie mogą być puste');
+                return false;
+            }
+            if(employee_count == '')
+            {
+                alert('Liczba pracowników nie może być pusta');
+                return false;
+            }
+            if(janky_count == '')
+            {
+                alert('Ilość janków nie może być puste');
+                return false;
+            }
+            if(wear_base == '')
+            {
+                alert('Wykorzystanie bazy nie może być puste');
+                return false;
+            }
+            if(call_time == '')
+            {
+                alert('Czas rozmów nie może być puste');
+                return false;
+            }
+        });
+    });
 
     (function () {
         function checkTime(i) {

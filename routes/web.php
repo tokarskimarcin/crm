@@ -194,6 +194,8 @@ Route::middleware(['check-permission'])->group(function () {
     //Statistics Start
     Route::get('/hour_report', 'StatisticsController@hourReportGet');
     Route::Post('/hour_report', 'StatisticsController@hourReportPost');
+
+    Route::Post('/hour_report_edit', 'StatisticsController@hourReportEditPost');
     //Statistics Stop
 });
 //////////////////////Testing ORM///////////////
