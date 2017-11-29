@@ -1,0 +1,6 @@
+: [Usunięcie kary/premii dla użytkownika : . data : 2017-11-28 09:37:28. Id kary/premii : 32. ]
+ID: [44] DATE: [2017-11-28 11:21:54] ACTION: [Dodanie kary/premii dla użytkownika : . Id użytkownika : 5056. typ : 1. amount : 100. event_date : 2017-11-28. comment : tak. ]
+ID: [44] DATE: [2017-11-28 11:21:59] AsdfsdCTION: [Usunięcie kary/premii dla użytkownika : . data : 2017-11-28 11:21:59. Id kary/premii : 36. ]
+
+ID: [44] DATE: [2017-11-29 08:29:08] ACTION: [Dodanie kary/premii dla użytkownika : . Id użytkownika : 5058. typ : 1. amount : 1000. event_date : 2017-11-29. comment : tak. ]
+ID: [44] DATE: [2017-11-29 08:32:23] ACTION: [Usunięcie kary/premii dla użytkownika : . data : 2017-11-29 08:32:23. Id kary/premii : 40. ]

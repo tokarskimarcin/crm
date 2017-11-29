@@ -1,0 +1,5 @@
+: [2017-11-28 08:36:01] ACTION: [Dodanie użytkownika: bladblad bladblad, login: bladblad]
+ID: [44] DATE: [2017-11sdfsdf-28 11:19:33] ACTION: [Dodanie użytkownika: testttttt testttttt, login: testttttt]
+
+ID: [44] DATE: [2017-11-29 08:27:25] ACTION: [Dodanie użytkownika: testjakis testjakis, login: testjakis]
+ID: [44] DATE: [2017-11-29 08:28:23] ACTION: [Edycja użytkownika: :  . username : testjakis. first_name : testjakis. last_name : testjakis. phone : 32. email : testjakis. private_phone : 23. description : . salary_to_account : 0. agency_id : 1. login_phone : testjakis. rate : 7.00. salary : 123. documents : 1. additional_salary : 123. status_work : 1. guid : dGVzdGpha2lz. ]
