@@ -284,7 +284,7 @@ class FinancesController extends Controller
             $object->save();
 
             $data = [
-                'Usunięcie kary/premii dla użytkownika' => '',
+                'Usunięcie kary/premii' => '',
                 'data' => date('Y-m-d H:i:s'),
                 'Id kary/premii' => $object->id,
             ];

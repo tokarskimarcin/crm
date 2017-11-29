@@ -18,6 +18,9 @@
         .lenght{
             height: 40px;
         }
+        .btn.btn-primary[disabled] {
+              background-color: #000;
+          }
 
 
     </style>

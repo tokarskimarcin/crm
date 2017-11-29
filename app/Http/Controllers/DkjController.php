@@ -231,7 +231,7 @@ class DkjController extends Controller
              $dkj_record->date_manager = date('Y-m-d H:i:s');
              $dkj_record->id_manager = Auth::user()->id;
              $dkj_record->save();
-             new ActivityRecorder(4, "Weryfikacja janka, status: " . $request->status . ', komentarz trenera: ' . $request->comment);
+             new ActivityRecorder(4, "Weryfikacja janka, status: " . $request->manager_status . ', komentarz trenera: ' . $request->manager_coment);
     }
     public function dkjRaportPost(Request $request)
     {
