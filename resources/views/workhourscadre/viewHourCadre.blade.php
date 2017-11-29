@@ -36,7 +36,7 @@
                                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                             <div class="form-group">
                                                 <label for ="ipadress">Pracownik:</label>
-                                                <select class="form-control" name="userid">
+                                                <select class="form-control" name="userid" id="userid">
                                                     @if(isset($response_userid))
                                                         <option value="-1">Wybierz</option>
                                                         @foreach ($users as $user)
@@ -73,8 +73,8 @@
 
                                             </div>
                                             <div class="form-group">
-                                                <div class="col-sm-10 col-sm-offset-2">
-                                                    <button class="btn btn-primary " name="submit" type="submit">
+                                                <div class="col-sm-12">
+                                                    <button class="btn btn-primary" disabled style="width: 100%" name="submit" type="submit" id="generic_submit">
                                                         Generuj
                                                     </button>
                                                 </div>
@@ -199,6 +199,23 @@
 @include('workhours.addHour');
 @section('script')
     <script>
+
+        var userid = $('#userid').val();
+        if (userid != -1) {
+            $('#generic_submit').removeAttr('disabled');
+        }
+
+        $("#userid").on('change', function(){
+            var userid = $('#userid').val();
+            if (userid != -1) {
+                $('#generic_submit').removeAttr('disabled');
+            }
+            if (userid == -1) {
+                $('#generic_submit').attr('disabled', true);
+            }
+        });
+
+
         $( ".delete" ).click(function() {
             var id = (this.id);
             $.ajax({
