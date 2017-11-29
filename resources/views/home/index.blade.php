@@ -89,22 +89,28 @@
             });
         });
     $("#start_stop").on('click', '#stop',function () {
-        $.ajax({
-            type: "POST",
-            url: '{{ url('stopWork') }}',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                server = response;
-                $("#stop").attr('data-toggle','modal');
-                $("#stop").attr('data-target','#registerModal');
-                $("#stop").text('Rejestruj godziny');
-                $("#stop").attr('id', 'done');
-                $("#done").removeClass('btn-danger');
-                $("#done").addClass('btn-default');
-            }
-        });
+
+        var stop_conf = confirm("Czy napewno chcesz zakończyć pracę?");
+
+        if (stop_conf == true) {
+            $.ajax({
+                type: "POST",
+                url: '{{ url('stopWork') }}',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    server = response;
+                    $("#stop").attr('data-toggle','modal');
+                    $("#stop").attr('data-target','#registerModal');
+                    $("#stop").text('Rejestruj godziny');
+                    $("#stop").attr('id', 'done');
+                    $("#done").removeClass('btn-danger');
+                    $("#done").addClass('btn-default');
+                }
+            });
+        }
+
     });
 
 </script>
