@@ -38,7 +38,7 @@
                             <div id="start_stop">
                                 <div class="well">
                                 <div class="panel-body">
-                                            <form method="post" action="hour_report">
+                                            <form method="post" action="hour_report" id="form_add">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <div class="col-md-3">
                                                     <label>Godzina:</label>
@@ -84,8 +84,8 @@
                                                     <label>Czas Rozmów:</label>
                                                     <input class="form-control" name="call_Time" type="number" value=""></br>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <button type="submit" class="btn btn-primary add_report" name="hour_report_send" id="send_button">Wyślij</button>
+                                                <div class="form-group col-md-3">
+                                                    <input type="submit" class="btn btn-primary add_report " name="hour_report_send" id="send_button"  value="Wyślij raport"/>
                                                 </div>
                                             </form>
                                         </div>
@@ -188,7 +188,7 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Edycja Raportu Godzinnego</h4>
             </div>
-            <form method="post" action="hour_report_edit">
+            <form method="post" action="hour_report_edit" id="form_edit">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <input type="hidden" id="record_id" name="record_id">
             <div class="modal-body">
@@ -237,7 +237,7 @@
     $(document).ready(function(){
         $(".edit").click(function(){
             var record_id = $(this).data('id');
-            var row = $(this).closest(".accept_hour_start");
+            var row = $(this).closest("tr");
             var success = row.find(".success_count").text();
             var average = row.find(".average").text();
             var employee_count = row.find(".employee_count").text();
@@ -254,34 +254,43 @@
             $('#edit').modal('show');
         });
         $("#edit_hour").click(function () {
+            var check = true;
             if($(".modal-body #average").val() == '')
             {
                 alert('Średnia nie może być pusta');
-                return false;
+                check = false;
             }
-            if($(".modal-body #success").val() == '')
+            else if($(".modal-body #success").val() == '')
             {
                 alert('Zgody nie mogą być puste');
-                return false;
+                check = false;
             }
-            if($(".modal-body #employee_count").val() == '')
+            else if($(".modal-body #employee_count").val() == '')
             {
                 alert('Liczba pracowników nie może być pusta');
-                return false;
+                check = false;
             }
-            if($(".modal-body #janky_count").val() == '')
+            else if($(".modal-body #janky_count").val() == '')
             {
                 alert('Ilość janków nie może być puste');
-                return false;
+                check = false;
             }
-            if($(".modal-body #wear_base").val() == '')
+            else if($(".modal-body #wear_base").val() == '')
             {
                 alert('Wykorzystanie bazy nie może być puste');
-                return false;
+                check = false;
             }
-            if($(".modal-body #call_time").val() == '')
+            else if($(".modal-body #call_time").val() == '')
             {
                 alert('Czas rozmów nie może być puste');
+                check = false;
+            }
+            if(check)
+            {
+                $('#form_edit').submit(function(){
+                    $(this).find(':submit').attr('disabled','disabled');
+                });
+            }else{
                 return false;
             }
         });
@@ -294,39 +303,48 @@
             var wear_base = $("input[name='wear_base']" ).val();
             var call_time = $("input[name='call_Time']" ).val();
             var hour = $( "#hour" ).val();
+            var check = true;
             if(hour == '' || hour=='Wybierz')
             {
                 alert('Wybierz godzinę');
-                return false;
+                check = false;
             }
-            if(average == '')
+            else if(average == '')
             {
                 alert('Średnia nie może być pusta');
-                return false;
+                check = false;
             }
-            if(success == '')
+            else if(success == '')
             {
                 alert('Zgody nie mogą być puste');
-                return false;
+                check = false;
             }
-            if(employee_count == '')
+            else if(employee_count == '')
             {
                 alert('Liczba pracowników nie może być pusta');
-                return false;
+                check = false;
             }
-            if(janky_count == '')
+            else if(janky_count == '')
             {
                 alert('Ilość janków nie może być puste');
-                return false;
+                check = false;
             }
-            if(wear_base == '')
+            else if(wear_base == '')
             {
                 alert('Wykorzystanie bazy nie może być puste');
-                return false;
+                check = false;
             }
-            if(call_time == '')
+            else if(call_time == '')
             {
                 alert('Czas rozmów nie może być puste');
+                check = false;
+            }
+            if(check)
+            {
+                $('#form_add').submit(function(){
+                    $(this).find(':submit').attr('disabled','disabled');
+                });
+            }else{
                 return false;
             }
         });

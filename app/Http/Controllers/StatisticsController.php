@@ -65,7 +65,7 @@ class StatisticsController extends Controller
         $employee_count = $request->employee_count;
         $janky_count = $request->janky_count;
         $wear_base = $request->wear_base;
-        $call_Time = $request->call_time;
+        $call_Time = $request->call_Time;
         $newRaport = HourReport::find($record_id);
         if($newRaport->is_send == 0)
         {
