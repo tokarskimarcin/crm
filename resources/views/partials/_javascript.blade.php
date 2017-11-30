@@ -111,8 +111,9 @@
 
         $("#it_support").on('click', function() {
             var department_info_id = $("#change_department").val();
-            $("#it_table tr").remove();
-                $.ajax({
+            $("#babum").empty();
+            $("#it_support").css("pointer-events", "none");
+            $.ajax({
                     type: "POST",
                     url: '{{ route('api.itSupport') }}',
                     data: {
@@ -122,12 +123,15 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
+                        clickDisabled = true;
+                        setTimeout(function(){clickDisabled = false;}, 2000);
                         if(response.length == 0) {
                             $("#it_table tbody").append("<tr><td><li><div class='alert alert-success'>Brak nowych zgłoszeń!</div></li></td></tr>");
                         }
                         for (var i = 0; i < response.length; i++) {
                             $("#babum").append("<li><a href='/show_notification/" + response[i].id + "'><div><i class='fa fa-comment fa-fw'></i><span> " + response[i].title + "</span></div></a></li><li class='divider'></li>");
                         }
+                        $("#it_support").css("pointer-events", "auto");
 
                     }
                 });
