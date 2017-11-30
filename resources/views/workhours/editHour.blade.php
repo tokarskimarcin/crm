@@ -108,6 +108,7 @@
                 alert('Brak godziny zakączenia pracy');
             else
             {
+                $(this).attr('disabled',true);
                 $.ajax({
                     type: "POST",
                     url: '{{ route('api.editAcceptHour') }}',
