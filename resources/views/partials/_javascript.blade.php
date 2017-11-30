@@ -36,6 +36,39 @@
         });
     });
 
+    //ajax do ding ding
+
+    setInterval(function(){
+      $.ajax({
+          type: "POST",
+          url: '{{ route('api.getStatsDkj') }}',
+          data: {},
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          success: function(response) {
+            console.log(response);
+              for (var i = 0; i < response.length; i++) {
+
+                  var countMe = $("#" + response[i].department_info_id + "dkjstatus td[name='undone']").text();
+                  if (countMe != response[i].manager_disagreement) {
+                      console.log('niezgoda');
+                      //tutaj ding
+                      var snd = new Audio("asset('storage/1.mp3')");
+                      snd.play();
+                  }
+
+
+                  $("#" + response[i].department_info_id + "dkjstatus td[name='status']").text("Odsłuchany (" + response[i].yanky_count + ")");
+                  $("#" + response[i].department_info_id + "dkjstatus td[name='count_yanek']").text(response[i].bad);
+                  $("#" + response[i].department_info_id + "dkjstatus td[name='undone']").text(response[i].manager_disagreement);
+                  $("#" + response[i].department_info_id + "dkjstatus td[name='status']").removeClass("alert-danger");
+                  $("#" + response[i].department_info_id + "dkjstatus td[name='status']").addClass("alert-success");
+              }
+          }
+      });
+    }, 5000);
+
     $( "#check_messages_dkj" ).on('click', function() {
         $.ajax({
             type: "POST",
