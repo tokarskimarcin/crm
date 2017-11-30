@@ -206,20 +206,25 @@
 @include('workhours.addHour');
 @section('script')
     <script>
+
         var userid = $('#userid').val();
         if (userid != -1) {
             $("#form_submit").removeAttr('disabled');
+        }else if (userid == -1) {
+            $("#form_submit").attr('disabled',true);
         }
-
-        $("#userid").on('change', () => {
+        $("#userid").change(function () {
             var userid = $('#userid').val();
             if (userid != -1) {
                 $("#form_submit").removeAttr('disabled');
+            }else if (userid == -1) {
+                $("#form_submit").attr('disabled',true);
             }
         });
 
         $( ".delete" ).click(function() {
             var id = (this.id);
+            $(this).attr('disabled',true);
             $.ajax({
                 type: "POST",
                 url: '{{ route('api.deleteAcceptHour') }}',
