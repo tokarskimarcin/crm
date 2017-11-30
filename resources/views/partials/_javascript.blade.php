@@ -37,7 +37,7 @@
     });
 
     //ajax do ding ding
-
+@if(Auth::user()->user_type_id == 13)
     setInterval(function(){
       $.ajax({
           type: "POST",
@@ -48,14 +48,16 @@
           },
           success: function(response) {
             console.log(response);
+
+            var sound = true;
               for (var i = 0; i < response.length; i++) {
 
                   var countMe = $("#" + response[i].department_info_id + "dkjstatus td[name='undone']").text();
-                  if (countMe != response[i].manager_disagreement) {
-                      console.log('niezgoda');
+                  if (countMe != response[i].manager_disagreement && sound == true) {
                       //tutaj ding
-                      var snd = new Audio("asset('storage/1.mp3')");
+                      var snd = new Audio("{{asset('assets/1.mp3')}}");
                       snd.play();
+                      sound = false;
                   }
 
 
@@ -67,8 +69,8 @@
               }
           }
       });
-    }, 5000);
-
+    }, 60000);
+@endif
     $( "#check_messages_dkj" ).on('click', function() {
         $.ajax({
             type: "POST",
