@@ -9,7 +9,7 @@
 
 <div class="row">
   <div class="col-lg-12">
-    <a class="btn btn-info" href="/show_equipment">Powrót</a>
+    <a class="btn btn-info" href="{{URL::to('/show_equipment/')}}">Powrót</a>
   </div>
 </div>
 <br />
@@ -21,7 +21,7 @@
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-body">
-                <form method="POST" action="/edit_equipment/{{$equipment->id}}" id="add_equipment">
+                <form method="POST" action="{{URL::to('/edit_equipment/')}}/{{$equipment->id}}" id="add_equipment">
                   <input type="hidden" name="equipment_type" value="{{$equipment->equipment_type_id}}">
                   <input type="hidden" name="user_set" value="{{$equipment->user_id}}">
                   <input type="hidden" name="_token" value="{{ csrf_token() }}">

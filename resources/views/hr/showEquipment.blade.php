@@ -24,12 +24,12 @@
                                   <br />
                                   <div class="row">
                                     <div class="col-lg-12">
-                                      <a class="btn btn-default" href="/add_equipment/1">Dodaj laptop</a>
-                                      <a class="btn btn-default" href="/add_equipment/3">Dodaj tablet</a>
-                                      <a class="btn btn-default" href="/add_equipment/2">Dodaj telefon</a>
-                                      <a class="btn btn-default" href="/add_equipment/4">Dodaj kartę SIM</a>
-                                      <a class="btn btn-default" href="/add_equipment/5">Dodaj Monitor</a>
-                                      <a class="btn btn-default" href="/add_equipment/6">Dodaj drukarkę</a>
+                                      <a class="btn btn-default" href="add_equipment/1">Dodaj laptop</a>
+                                      <a class="btn btn-default" href="add_equipment/3">Dodaj tablet</a>
+                                      <a class="btn btn-default" href="add_equipment/2">Dodaj telefon</a>
+                                      <a class="btn btn-default" href="add_equipment/4">Dodaj kartę SIM</a>
+                                      <a class="btn btn-default" href="add_equipment/5">Dodaj Monitor</a>
+                                      <a class="btn btn-default" href="add_equipment/6">Dodaj drukarkę</a>
                                     </div>
                                   </div>
                                   <br/>
@@ -74,7 +74,7 @@
                                                   <td>Brak</td>
                                               @endif
                                               <td>
-                                                  <a href="/edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
+                                                  <a href="edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
                                               </td>
                                           </tr>
                                       @endforeach
@@ -111,7 +111,7 @@
                                                   <td>Brak</td>
                                               @endif
                                               <td>
-                                                  <a href="/edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
+                                                  <a href="edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
                                               </td>
                                               </tr>
                                           @endforeach
@@ -152,7 +152,7 @@
                                                       <td>Brak</td>
                                                   @endif
                                                   <td>
-                                                      <a href="/edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
+                                                      <a href="edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
                                                   </td>
                                                 </tr>
                                               @endforeach
@@ -197,7 +197,7 @@
                                                       <td>Brak</td>
                                                   @endif
                                                   <td>
-                                                      <a href="/edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
+                                                      <a href="edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
                                                   </td>
                                                 </tr>
                                               @endforeach
@@ -238,7 +238,7 @@
                                                       <td>Brak</td>
                                                   @endif
                                                   <td>
-                                                      <a href="/edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
+                                                      <a href="edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
                                                   </td>
                                                 </tr>
                                               @endforeach
@@ -267,7 +267,7 @@
                                                       <td>Brak</td>
                                                   @endif
                                                   <td>
-                                                      <a href="/edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
+                                                      <a href="edit_equipment/{{$equipment->id}}" class="btn btn-info">Edytuj</a>
                                                   </td>
                                                 </tr>
                                               @endforeach

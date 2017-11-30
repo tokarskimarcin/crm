@@ -19,9 +19,9 @@
 <div class="row">
     <div class="col-md-12">
         <ul class="nav nav-tabs">
-          <li @if($type == 1) class="active" @endif><a href="/show_all_notifications/1">Aktualnie zgłoszone</a></li>
-          <li @if($type == 2) class="active" @endif><a href="/show_all_notifications/2">W trakcie realizacji</a></li>
-          <li @if($type == 3) class="active" @endif><a href="/show_all_notifications/3">Zrealizowane</a></li>
+          <li @if($type == 1) class="active" @endif><a href="{{URL::to('/show_all_notifications/1')}}">Aktualnie zgłoszone</a></li>
+          <li @if($type == 2) class="active" @endif><a href="{{URL::to('/show_all_notifications/2')}}">W trakcie realizacji</a></li>
+          <li @if($type == 3) class="active" @endif><a href="{{URL::to('/show_all_notifications/3')}}">Zrealizowane</a></li>
         </ul>
         <br />
         <div class="col-md-12">
@@ -45,7 +45,7 @@
                               <td>{{$notification->created_at}}</td>
                               <td>{{$notification->department_info->departments->name . ' ' . $notification->department_info->department_type->name}}</td>
                               <td>{{$notification->user->first_name . ' ' . $notification->user->last_name}}</td>
-                              <td><a class="btn btn-info" href="/show_notification/{{$notification->id}}">Zobacz zgłoszenie</a></td>
+                              <td><a class="btn btn-info" href="{{URL::to('/show_notification/')}}/{{$notification->id}}">Zobacz zgłoszenie</a></td>
                           </tr>
                       @endforeach
                     </tbody>

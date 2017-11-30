@@ -80,8 +80,6 @@ class NotificationController extends Controller
         $user = User::find($notification->displayed_by);
 
 
-
-
         Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
         return Redirect::back();
     }

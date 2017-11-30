@@ -25,7 +25,7 @@
                                 </table>
                             </div>
                         </div>
-                        <form class="form-horizontal" method="post" action="/admin_privilage_edit/{{$link_info->id}}">
+                        <form class="form-horizontal" method="post" action="{{URL::to('/admin_privilage_edit/')}}/{{$link_info->id}}">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <div class="col-lg-12">
                             <div id="start_stop">

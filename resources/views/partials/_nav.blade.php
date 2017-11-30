@@ -179,7 +179,7 @@
                 <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
             </a>
             <ul class="dropdown-menu dropdown-user">
-                <li><a href="/password_change"><i class="fa fa-user fa-fw"></i>Zmiana hasła</a>
+                <li><a href="password_change"><i class="fa fa-user fa-fw"></i>Zmiana hasła</a>
                 </li>
                 <li class="divider"></li>
                 <li>
@@ -210,7 +210,7 @@
                                 @if($group->id == $link->group_link_id)
                                     @if($link->link == 'show_all_notifications')
                                         <li>
-                                              <a href="/show_all_notifications/1">{{$link->name}}</a>
+                                              <a href="{{URL::to('/show_all_notifications/1')}}">{{$link->name}}</a>
                                         </li>
                                     @else
                                         <li>

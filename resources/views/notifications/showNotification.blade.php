@@ -59,7 +59,7 @@
             <br />
             <br />
             <p>
-              <form method="POST" action="/show_notification/{{$notification->id}}">
+              <form method="POST" action="{{URL::to('/show_notification/')}}/{{$notification->id}}">
                   <input type="hidden" name="_token" value="{{ csrf_token() }}">
                   <div class="col-md-3">
                       <div class="form-group ">
@@ -78,7 +78,7 @@
             </p>
             <p>
               <div class="col-md-6">
-              <form method="POST" action="/add_comment_notifications/{{$notification->id}}" id="form_comment">
+              <form method="POST" action="{{URL::to('/add_comment_notifications/')}}/{{$notification->id}}" id="form_comment">
                   <input type="hidden" name="_token" value="{{ csrf_token() }}">
                   <div class="form-group">
                       <label for="content">Dodaj komentarz:</label>

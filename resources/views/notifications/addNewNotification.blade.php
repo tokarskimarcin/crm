@@ -14,7 +14,7 @@
 <div class="row">
   <div class="col-md-12">
       <div class="col-md-6">
-        <form method="POST" action="/add_notification" id="form">
+        <form method="POST" action="add_notification" id="form">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <div class="form-group">
                 <label for="title">Problem</label>

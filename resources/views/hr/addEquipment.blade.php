@@ -11,7 +11,7 @@
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-body">
-                <form method="POST" action="/add_equipment" id="add_equipment">
+                <form method="POST" action="{{URL::to('/add_equipment/')}}" id="add_equipment">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="equipment_type" value="{{$equipments_types->id}}">
                     <div class="col-md-6">

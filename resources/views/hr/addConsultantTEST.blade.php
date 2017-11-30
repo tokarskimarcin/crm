@@ -69,7 +69,7 @@
 
                     <div class="panel-body">
                         <!-- <div class="col-md-2 col-lg-2 " align="center"> <img alt="User Pic" src="http://saintgeorgelaw.com/wp-content/uploads/2015/01/male-formal-business-hi.png" class="img-circle img-responsive" style="border:2px solid #222;"> </div> -->
-                        <form class="form-horizontal" method="post" action="/edit_cadre/{{$user->id}}" id="edit_user"><!-- Formularz edycji kadry -->
+                        <form class="form-horizontal" method="post" action="{{URL::to('/edit_cadre/')}}/{{$user->id}}" id="edit_user"><!-- Formularz edycji kadry -->
                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
                             <div class="col-md-10">
 
@@ -297,7 +297,7 @@
                               @endif
 
     							            <tr>
-                                  <form method="POST" action="/view_penalty_bonus_edit" id="pb">
+                                  <form method="POST" action="{{URL::to('/view_penalty_bonus_edit/')}}" id="pb">
                                       <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                       <input type="hidden" name="user_id" value="{{$user->id}}">
           		                        <td colspan="2"><select class="form-control" name="penalty_type">

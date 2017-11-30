@@ -86,7 +86,7 @@
                 {"data": "phone"},
                 {"data": function (data, type, dataToSet) {
                   console.log(data);
-                    return '<a href="/edit_cadre/'+data.id+'" >Edytuj</a>'
+                    return '<a href="edit_cadre/'+data.id+'" >Edytuj</a>'
                 },"orderable": false, "searchable": false }
                 ]
         });

@@ -34,7 +34,7 @@
 
                                     <div class="well">
                                         <div class="form-group">
-                                            <form action="create_penalty_bonus" method="post">
+                                            <form action="create_penalty_bonus" method="post" id="create">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <div class="col-md-6">
                                                     <label for="exampleInputPassword1">Pracownik:</label>
@@ -208,16 +208,15 @@
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
-                                <label for="dtp_input3" class="col-md-5 control-label">Pracownik:</label>
-                                <div id="userDetails" class="modal-body">
-                                </div>
+                                <label for="userDetails" class="col-md-5 control-label">Pracownik:</label>
+                                <div id="userDetails"></div>
                             </div>
                             <div class="form-group">
-                                <label for="dtp_input3" class="col-md-5 control-label">Data dodania</label>
-                                <div id="dateDetails" class="modal-body"></div>
+                                <label for="dateDetails" class="col-md-5 control-label">Data dodania</label>
+                                <div id="dateDetails"></div>
                             </div>
                             <div class="form-group">
-                                <label for="dtp_input3" class="col-md-5 control-label">Typ:Kara/Premia</label>
+                                <label for="statusDetails" class="col-md-5 control-label">Typ:Kara/Premia</label>
                                 <div id="statusDetails" class="modal-body"></div>
                             </div>
                             <div class="form-group">
@@ -249,12 +248,24 @@ $('#editinfo').on('hidden.bs.modal', function () {
       $("#reason_modal_error").fadeOut(0);
 })
 
+var validation = false;
+
 $("#addpbsubmit").click(function () {
 
     var user_id = $("select[name='user_id']").val();
     var type_penalty = $("select[name='type_penalty']").val();
     var cost = $("input[name='cost']").val();
     var reason = $("input[name='reason']").val();
+
+    $('#create').submit(function(){
+        validation = true;
+        $(this).find(':submit').attr('disabled','disabled');
+    });
+
+    if (validation == true) {
+        $("#addpbsubmit").attr('disabled', true);
+    }
+
 
     if (user_id == 'Wybierz') {
         alert("Wybierz użytkownika!");
@@ -341,6 +352,7 @@ $("#addpbsubmit").click(function () {
         }
 
         if (validation_error == 0) {
+            $( "#edit_user_modal" ).attr('disabled', true);
             $.ajax({
                 type: "POST",
                 url: '{{ route('api.editPenaltyBonus') }}',
