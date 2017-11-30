@@ -96,7 +96,11 @@
                                                     <td align="center"><b>Godzina</b></td>
                                                     <?php $week_array = ['Pon','Wt','Śr','Czw','Pt','Sob','Nie']; ?>
                                                     @for($i=8;$i<21;$i++)
-                                                    <td align="center"><b>{{$i}}</b></td>
+                                                        @if($i <=9)
+                                                            <td align="center"><b>0{{$i}}</b></td>
+                                                        @else
+                                                            <td align="center"><b>{{$i}}</b></td>
+                                                        @endif
                                                     @endfor
                                                 </tr>
                                                 @foreach($schedule_analitics as $item =>$key)
@@ -108,7 +112,13 @@
                                                                 <td>{{$week_array[$number_day_of_week++]}}</td>
                                                         @endif
                                                         @if($lp<= 21)
-                                                         <td align="center"><b>{{$key2}}</b></td>
+                                                            @if($key2 > Auth::user()->department_info->size)
+                                                                <td align="center" style="background-color: #ffee29"><b>{{$key2}}</b></td>
+                                                            @elseif($key2 < Auth::user()->department_info->size*0.8 && $key2!=0)
+                                                                <td align="center" style="background-color: #ff7070"><b>{{$key2}}</b></td>
+                                                            @else
+                                                                <td align="center"><b>{{$key2}}</b></td>
+                                                            @endif
                                                                     <?php $lp++; ?>
                                                         @endif
                                                         @if($lp >20)
