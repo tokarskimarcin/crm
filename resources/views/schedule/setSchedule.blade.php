@@ -339,9 +339,9 @@
                         $stop_hour_array[i] = null;
                     }
                 }
-                console.log(valid);
                 if(valid == true)
                 {
+                    $(this).attr('disabled',true);
                     $.ajax({
                         type: "POST",
                         url: '{{ route('api.saveSchedule') }}',
