@@ -111,7 +111,7 @@
                     return data.status_work;
                 },"name": "status_work"},
                 {"data": function (data, type, dataToSet) {
-                    return '<a href="/edit_consultant/'+data.id+'" >Edytuj</a>'
+                    return '<a href="edit_consultant/'+data.id+'" >Edytuj</a>'
                 },"orderable": false, "searchable": false }
                 ]
         });

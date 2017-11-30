@@ -362,7 +362,9 @@
             if(m>=8)
             {
                 var button = document.getElementsByName(h).item(0);
-                document.getElementById('status_'+h).innerHTML = "Wysłany";
+                var text = document.getElementById('status_'+h)
+                    if(text != null)
+                        text.innerHTML = "Wysłany";
                 if(button != null)
                     button.setAttribute('disabled', true);
             }
