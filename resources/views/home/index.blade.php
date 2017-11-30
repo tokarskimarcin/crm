@@ -65,7 +65,7 @@
         </div>
     </div>
 
-@include('workhours.registerHour');
+@include('workhours.registerHour')
 @endsection
 
 @section('script')

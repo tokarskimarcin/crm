@@ -18,8 +18,60 @@ class DkjController extends Controller
     public function dkjRaportGet()
     {
         $departments =  $this->getDepartment();
-        return view('dkj.dkjRaport')->with('departments',$departments);
+
+        $today = date('Y-m-d') . "%";
+        $dkj_user = Dkj::where('id_dkj', Auth::user()->id)
+            ->where('add_date', 'like', $today)
+            ->count();
+
+        $user_yanek = Dkj::where('id_dkj', Auth::user()->id)
+            ->where('add_date', 'like', $today)
+            ->where('dkj_status', 1)
+            ->count();
+
+
+        return view('dkj.dkjRaport')
+            ->with('departments',$departments)
+            ->with('user_yanek',$user_yanek)
+            ->with('dkj_user', $dkj_user);
     }
+
+    public function dkjRaportPost(Request $request)
+    {
+        $today = date('Y-m-d') . "%";
+        $dkj_user = Dkj::where('id_dkj', Auth::user()->id)
+            ->where('add_date', 'like', $today)
+            ->count();
+
+          $user_yanek = Dkj::where('id_dkj', Auth::user()->id)
+              ->where('add_date', 'like', $today)
+              ->where('dkj_status', 1)
+              ->count();
+
+        $departments = $this->getDepartment();
+        $department_id_info = $request->department_id_info;
+        $dating_type = 0;
+        if($department_id_info<0)
+        {
+            $department_id_info = $department_id_info*(-1);
+            $dating_type = 1;
+        }
+        $users = User::where('department_info_id',$department_id_info)
+            ->where('user_type_id',1)
+            ->where('dating_type',$dating_type)
+            ->get();
+
+        return view('dkj.dkjRaport')
+        ->with('departments',$departments)
+        ->with('select_department_id_info',$request->department_id_info)
+        ->with('select_start_date',$request->start_date)
+        ->with('select_stop_date',$request->stop_date)
+        ->with('users',$users)
+        ->with('dkj_user', $dkj_user)
+        ->with('user_yanek',$user_yanek)
+        ->with('show_raport',1);
+    }
+
     public function jankyStatistics()
     {
         $actual_month = date("Y-m");
@@ -233,29 +285,7 @@ class DkjController extends Controller
              $dkj_record->save();
              new ActivityRecorder(4, "Weryfikacja janka, status: " . $request->manager_status . ', komentarz trenera: ' . $request->manager_coment);
     }
-    public function dkjRaportPost(Request $request)
-    {
-        $departments = $this->getDepartment();
-        $department_id_info = $request->department_id_info;
-        $dating_type = 0;
-        if($department_id_info<0)
-        {
-            $department_id_info = $department_id_info*(-1);
-            $dating_type = 1;
-        }
-        $users = User::where('department_info_id',$department_id_info)
-            ->where('user_type_id',1)
-            ->where('dating_type',$dating_type)
-            ->get();
 
-        return view('dkj.dkjRaport')
-        ->with('departments',$departments)
-        ->with('select_department_id_info',$request->department_id_info)
-        ->with('select_start_date',$request->start_date)
-        ->with('select_stop_date',$request->stop_date)
-        ->with('users',$users)
-        ->with('show_raport',1);
-    }
 
     public function datatableDkjRaport(Request $request)
     {
@@ -416,6 +446,21 @@ class DkjController extends Controller
                 ->where('add_date','like',$today)
                 ->groupBy('department_info_id')->get();
           return $dkj_user;
+        }
+    }
+
+    public function getStatsDkjMaster(Request $request) {
+        if ($request->ajax()) {
+            $today = date("Y-m-d") . "%";
+            $dkj_user = Dkj::select(DB::raw("
+                department_info_id,
+                count(id) as yanky_count,
+                SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad,
+                SUM(CASE WHEN dkj_status = 1 AND manager_status = 0 THEN 1 ELSE 0 END) as manager_disagreement"))
+                ->where('add_date','like',$today)
+                ->groupBy('department_info_id')
+                ->get();
+            return $dkj_user;
         }
     }
 

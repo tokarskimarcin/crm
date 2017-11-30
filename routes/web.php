@@ -54,6 +54,7 @@ Route::POST('/getUserDepartmentInfo','DkjController@getUserDepartmentInfo')->nam
 
 
 Route::POST('/get_stats','DkjController@getStats')->name('api.getStats');
+Route::POST('/get_stats_dkj','DkjController@getStatsDkjMaster')->name('api.getStatsDkj');
 Route::POST('/get_users','DkjController@getUsers')->name('api.getUsers');
 
 

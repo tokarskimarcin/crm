@@ -27,9 +27,16 @@
 
 {{--Header page --}}
     <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Raport DKJ</h1>
+        <div class="col-md-6">
+            <h1>Raport DKJ</h1>
+
         </div>
+        <div class="col-md-6">
+          <div class="panel panel-default" style="margin-top: 3%">
+              <div class="panel-body">Odsłuchanych rozmów: {{$dkj_user}}, ilość wystawionych janków: {{$user_yanek}}</div>
+          </div>
+        </div>
+        <hr>
     </div>
     @if(isset($select_department_id_info))
         <div class="form-group">
