@@ -3,6 +3,13 @@
         Options -MultiViews
     </IfModule>
 
+
+    <Files ".env">
+    Order Allow,Deny
+    Deny from all
+    Allow from 127.0.0.1
+    </Files>
+
     RewriteEngine On
 
     RewriteCond %{REQUEST_FILENAME} !-d
