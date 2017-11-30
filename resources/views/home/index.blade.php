@@ -1,9 +1,15 @@
 @extends('layouts.main')
 @section('content')
 <style>
-    button{
+    #start, #stop{
         width: 100%;
         height: 50px;
+    }
+    #done{
+        width: 100%;
+        height: 50px;
+        background-color: #286090;
+        color:white;
     }
 </style>
 
@@ -52,7 +58,7 @@
                                     <button id="done" class="button" data-toggle="modal" data-target="#registerModal">Rarejestruj Godziny</button>
                                      <?php elseif($status >=3): ?>
                                        <div class="alert alert-success">
-                                            Godziny zostały zarejestrowane w przedziale: {{$register_start}} - {{$register_stop}}
+                                           Godziny zostały zarejestrowane w przedziale: <span id="register_hour_done_start">{{substr($register_start,0,-3)}}</span> - <span id="register_hour_done_stop">{{substr($register_stop,0,-3)}}</span>
                                        </div>
                                     <button id="done" class="button" data-toggle="modal" data-target="#registerModal">Edytuj godziny pracy</button>
                                     <?php endif?>
