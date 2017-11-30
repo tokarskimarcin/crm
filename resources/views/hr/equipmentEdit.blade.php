@@ -21,7 +21,7 @@
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-body">
-                <form method="POST" action="/edit_equipment/{{$equipment->id}}">
+                <form method="POST" action="/edit_equipment/{{$equipment->id}}" id="add_equipment">
                   <input type="hidden" name="equipment_type" value="{{$equipment->equipment_type_id}}">
                   <input type="hidden" name="user_set" value="{{$equipment->user_id}}">
                   <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -142,7 +142,7 @@
                         <div>
                         <br />
                         <div class="form-group">
-                            <input type="submit" value="Zapisz zmiany" class="btn btn-success pull-left" />
+                            <input type="submit" value="Zapisz zmiany" id="save" class="btn btn-success pull-left" />
                             <button class="btn btn-danger pull-right" id="delete">Usuń sprzęt</button>
                             <input type="hidden" name="status_delete" value="" id="status_delete"/>
                         </div>
@@ -162,16 +162,124 @@
 
 <script>
 
-$("#delete").on('click', () => {
+    $("#delete").on('click', () => {
 
-    var conf = confirm('Napewno chcesz usunąć ten sprzęt?');
-    if (conf) {
-        $('#status_delete').val(1);
-    } else {
-      return false;
-    }
+        var conf = confirm('Napewno chcesz usunąć ten sprzęt?');
+        if (conf) {
+            $('#status_delete').val(1);
+        } else {
+          return false;
+        }
 
-});
+    });
+
+
+    var send = false;
+
+    $("#save").on('click', function() {
+        var model = $("input[name='model']").val();
+        var serial_code = $("input[name='serial_code']").val();
+        var description = $("input[name='description']").val();
+        var laptop_processor = $("input[name='laptop_processor']").val();
+        var laptop_ram = $("input[name='laptop_ram']").val();
+        var laptop_hard_drive = $("input[name='laptop_hard_drive']").val();
+        var power_cable = $("select[name='power_cable']").val();
+        var phone_box = $("select[name='phone_box']").val();
+        var tablet_modem = $("select[name='tablet_modem']").val();
+        var signal_cable = $("select[name='signal_cable']").val();
+        var sim_type = $("select[name='sim_type']").val();
+        var sim_net = $("select[name='sim_net']").val();
+        var sim_pin = $("input[name='sim_pin']").val();
+        var sim_puk = $("input[name='sim_puk']").val();
+        var imei = $("input[name='imei']").val();
+
+        $('#add_equipment').submit(function(){
+            send = true;
+            $(this).find(':submit').attr('disabled','disabled');
+        });
+
+        if (send == true) {
+            $('#add_button').attr('disabled', 'disabled');
+        }
+
+        if (model == '') {
+            alert("Podaj nazwę modelu!");
+            return false;
+        }
+
+        if (serial_code == '') {
+            alert("Podaj numer seryjny!");
+            return false;
+        }
+
+        if (description == '') {
+            alert("Dodaj opis!");
+            return false;
+        }
+
+        if (imei == '') {
+            alert("Podaj nazwę IMEI!");
+            return false;
+        }
+
+        if (laptop_ram == '') {
+            alert("Podaj ilość pamięci RAM!");
+            return false;
+        }
+
+        if (laptop_processor == '') {
+            alert("Podaj nazwę procesora!");
+            return false;
+        }
+
+        if (laptop_hard_drive == '') {
+            alert("Podaj dane dysku twardego!");
+            return false;
+        }
+
+        if (power_cable == 'Wybierz') {
+            alert("Zaznacz czy sprzęt posiada kabel zasilający!");
+            return false;
+        }
+
+        if (phone_box == 'Wybierz') {
+            alert("Zaznacz czy telefon posiada opakowanie!");
+            return false;
+        }
+
+        if (tablet_modem == 'Wybierz') {
+            alert("Zaznacz czy tablet posiada modem 3G!");
+            return false;
+        }
+
+        if (sim_net == 'Wybierz') {
+            alert("Zaznacz czy telefon posiada dostęp do internetu!");
+            return false;
+        }
+
+        if (sim_type == 'Wybierz') {
+            alert("Zaznacz typ umowy!");
+            return false;
+        }
+
+        if (sim_pin == '') {
+            alert("Podaj numer PIN!");
+            return false;
+        }
+
+        if (sim_puk == '') {
+            alert("Podaj numer PUK!");
+            return false;
+        }
+
+        if (signal_cable == 'Wybierz') {
+            alert("Zaznacz czy monitor posiada kabel sygnałowy!");
+            return false;
+        }
+
+
+    });
+
 </script>
 
 

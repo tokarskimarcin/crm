@@ -11,7 +11,7 @@
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-body">
-                <form method="POST" action="/add_equipment">
+                <form method="POST" action="/add_equipment" id="add_equipment">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="equipment_type" value="{{$equipments_types->id}}">
                     <div class="col-md-6">
@@ -157,6 +157,8 @@
 
 <script>
 
+    var send = false;
+
     $("#add_button").on('click', function() {
         var model = $("input[name='model']").val();
         var serial_code = $("input[name='serial_code']").val();
@@ -172,6 +174,18 @@
         var sim_net = $("select[name='sim_net']").val();
         var sim_pin = $("input[name='sim_pin']").val();
         var sim_puk = $("input[name='sim_puk']").val();
+        var imei = $("input[name='imei']").val();
+
+        var validation_ok = true;
+
+        $('#add_equipment').submit(function(){
+          send = true;
+            $(this).find(':submit').attr('disabled','disabled');
+        });
+
+        if (send == true) {
+            $('#add_button').attr('disabled', 'disabled');
+        }
 
         if (model == '') {
             alert("Podaj nazwę modelu!");
@@ -247,6 +261,9 @@
             alert("Zaznacz czy monitor posiada kabel sygnałowy!");
             return false;
         }
+
+
+
 
     });
 
