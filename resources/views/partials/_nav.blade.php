@@ -8,6 +8,7 @@
             <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="{{url('/')}}">CRM Verona</a>
+
     </div>
     <!-- /.navbar-header -->
 
@@ -180,8 +181,6 @@
             <ul class="dropdown-menu dropdown-user">
                 <li><a href="/password_change"><i class="fa fa-user fa-fw"></i>Zmiana hasła</a>
                 </li>
-                <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
-                </li>
                 <li class="divider"></li>
                 <li>
                     <a  href="{{ route('logout') }}" onclick="event.preventDefault();
@@ -196,7 +195,7 @@
         </li>
     </ul>
 
-    <div class="navbar-default sidebar pre-scrollable" role="navigation" style="min-height: 93vh">
+    <div class="navbar-default sidebar pre-scrollable" role="navigation" style="min-height: 93vh"  id="my_left_menu">
         <div class="sidebar-nav navbar-collapse">
             <ul class="nav" id="side-menu">
                 <li>

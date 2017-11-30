@@ -50,6 +50,19 @@ class UsersController extends Controller
            echo 1;
     }
 
+    public function uniqueEmail(Request $request)
+    {
+       if($request->ajax())
+       {
+          $user = User::where('email_off',$request->email)->get();
+       }
+       if($user->isEmpty())
+            echo 0;
+       else
+           echo 1;
+    }
+
+
     public function add_userPOST(Request $request)
     {
         $redirect = 0;
@@ -60,7 +73,9 @@ class UsersController extends Controller
         $user->username = $request->username;
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
-        $user->email_off = $request->email;
+        if ($request->email != '') {
+            $user->email_off = $request->email . '.verona@gmail.com';
+        }
         $user->password = bcrypt($request->password);
         $user->salary = $request->salary;
         $user->additional_salary = $request->additional_salary;
@@ -133,7 +148,7 @@ class UsersController extends Controller
         if ($user->status_work != 1) {
             return view('404');
         }
-        
+
         return view('hr.addConsultantTEST')->with('agencies',$agencies)
           ->with('user',$user)
           ->with('type', 1);

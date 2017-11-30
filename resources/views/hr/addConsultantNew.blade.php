@@ -19,7 +19,7 @@
 
         <div class="panel-body">
             <!-- <div class="col-md-2 col-lg-2 " align="center"> <img alt="User Pic" src="http://saintgeorgelaw.com/wp-content/uploads/2015/01/male-formal-business-hi.png" class="img-circle img-responsive" style="border:2px solid #222;"> </div> -->
-            <form class="form-horizontal" method="post" action="add_consultant"><!-- Formularz edycji kadry -->
+            <form class="form-horizontal" method="post" action="add_consultant" id="consultant_add"><!-- Formularz edycji kadry -->
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <div class="col-md-10">
 
@@ -39,13 +39,16 @@
                                     <input type="text" class="form-control" placeholder="Nazwisko" name="last_name"  value="">
                                 </td>
                             </tr>
+                            @if($type == 2)
                             <tr>
-                                <td style="width: 170px;height:52px;"><b>E-mail:</b></td>
+                                <td class="td-class"><b>E-mail:</b></td>
                                 <td>
-                                    <input type="mail" class="form-control" placeholder="Email" name="email"  value="">
+                                    <div class="input-group">
+                                        <input type="mail" class="form-control" placeholder="Email" name="email"  value="">
+                                        <span class="input-group-addon" style="padding: 0px"><small><b>.verona@gmail.com</b></small></span>
+                                    </div>
                                 </td>
                             </tr>
-                            @if($type == 2)
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Telefon służbowy:</b></td>
                                 <td>
@@ -219,6 +222,8 @@
             pickTime: false,
         });
 
+        var validation_user = false;
+
         $("#add_consultant").click(function () {
             //tutaj var dating_type
             var first_name = $("input[name='first_name']").val();
@@ -234,6 +239,19 @@
             var rate =$("select[name='rate']").val();
             var agency =$("select[name='agency_id']").val();
             var start_date =$("input[name='start_date']").val();
+            var email =$("input[name='email']").val();
+            var user_type =$("select[name='user_type']").val();
+            var department_info =$("select[name='department_info']").val();
+
+            $('#consultant_add').submit(function(){
+                validation_user = true;
+                $(this).find(':submit').attr('disabled','disabled');
+            });
+
+            if (validation_user == true) {
+                $("#add_consultant").attr('disabled', true);
+            }
+
 
             if (username == '') {
                 alert("Pole Login nie może być puste!");
@@ -258,6 +276,34 @@
                     alert("Użytkownik o podanej nazwie już istnieje");
                     return false;
                 }
+            }
+
+            if (email == '') {
+                alert("Pole e-mail nie może być puste!");
+                return false;
+            }else
+            {
+                var check = 0;
+                if(email.length > 0) {
+                    $.ajax({
+                        type: "POST",
+                        async: false,
+                        url: '{{ route('api.uniqueEmail') }}',
+                        data: {"email":email},
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            if(response == '1')
+                                check = 1;
+                        }
+                    });
+                    if(check == 1) {
+                        alert("Adres email jest zajęty!");
+                        return false;
+                    }
+                }
+
             }
 
             //tutaj if() dating type
@@ -308,6 +354,14 @@
             }
             if (username == '') {
                 alert("Musisz wprowadzić login pracownika z programu do dzwonienia!");
+                return false;
+            }
+            if (user_type == 'Wybierz') {
+                alert("Musisz wybrać uprawnienia!");
+                return false;
+            }
+            if (department_info == 'Wybierz') {
+                alert("Musisz wybrać oddział!");
                 return false;
             }
 

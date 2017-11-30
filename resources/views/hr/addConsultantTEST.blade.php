@@ -69,7 +69,7 @@
 
                     <div class="panel-body">
                         <!-- <div class="col-md-2 col-lg-2 " align="center"> <img alt="User Pic" src="http://saintgeorgelaw.com/wp-content/uploads/2015/01/male-formal-business-hi.png" class="img-circle img-responsive" style="border:2px solid #222;"> </div> -->
-                        <form class="form-horizontal" method="post" action="/edit_cadre/{{$user->id}}"><!-- Formularz edycji kadry -->
+                        <form class="form-horizontal" method="post" action="/edit_cadre/{{$user->id}}" id="edit_user"><!-- Formularz edycji kadry -->
                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
                             <div class="col-md-10">
 
@@ -89,13 +89,13 @@
                                                 <input type="text" class="form-control" placeholder="Nazwisko" name="last_name"  value="{{$user->last_name}}">
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td class="td-class"><b>E-mail:</b></td>
-                                            <td>
-                                                <input type="mail" class="form-control" placeholder="Email" name="email"  value="{{$user->email_off}}">
-                                            </td>
-                                        </tr>
                                         @if($type == 2)
+                                            <tr>
+                                                <td class="td-class"><b>E-mail:</b></td>
+                                                <td>
+                                                    <input type="mail" class="form-control" placeholder="Email" name="email"  value="{{$user->email_off}}">
+                                                </td>
+                                            </tr>
                                             <tr>
                                                 <td class="td-class"><b>Telefon służbowy:</b></td>
                                                 <td>
@@ -297,7 +297,7 @@
                               @endif
 
     							            <tr>
-                                  <form method="POST" action="/view_penalty_bonus_edit">
+                                  <form method="POST" action="/view_penalty_bonus_edit" id="pb">
                                       <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                       <input type="hidden" name="user_id" value="{{$user->id}}">
           		                        <td colspan="2"><select class="form-control" name="penalty_type">
@@ -334,14 +334,24 @@
         $(".stop_date").removeAttr('readonly');
     });
 
-    $("#edit_button").on('click', function(){
+    var validation_user = false;
 
+    $("#edit_button").on('click', function(){
 
         var first_name = $("input[name='first_name']").val();
         var last_name = $("input[name='last_name']").val();
         var private_phone = $("input[name='private_phone']").val();
         var username = $("input[name='username']").val();
         var password = $("input[name='password']").val();
+
+        $('#edit_user').submit(function(){
+            validation_user = true;
+            $(this).find(':submit').attr('disabled','disabled');
+        });
+
+        if (validation_user == true) {
+            $("#addpbsubmit").attr('disabled', true);
+        }
 
         if (first_name == '') {
             alert("Pole imie nie może być puste!");
@@ -394,25 +404,37 @@
         }
     });
 
-
+    var validation = false;
     $("#addpbsubmit").click(function () {
 
         var penalty_type = $("select[name='penalty_type']").val();
         var cost = $("input[name='cost']").val();
         var reason = $("input[name='reason']").val();
 
+        $('#pb').submit(function(){
+            validation = true;
+            $(this).find(':submit').attr('disabled','disabled');
+        });
+
+        if (validation == true) {
+            $("#addpbsubmit").attr('disabled', true);
+        }
+
         if (penalty_type == "Wybierz") {
             alert("Wybierz rodzaj kary/nagrody!");
+            validation = false;
             return false;
         }
 
         if (cost == '') {
             alert("Podaj kwotę!");
+            validation = false;
             return false;
         }
 
         if (reason == '') {
             alert("Podaj powód!");
+            validation = false;
             return false;
         }
 
