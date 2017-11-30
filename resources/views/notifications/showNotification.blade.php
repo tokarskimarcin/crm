@@ -78,7 +78,7 @@
             </p>
             <p>
               <div class="col-md-6">
-              <form method="POST" action="/add_comment_notifications/{{$notification->id}}">
+              <form method="POST" action="/add_comment_notifications/{{$notification->id}}" id="form_comment">
                   <input type="hidden" name="_token" value="{{ csrf_token() }}">
                   <div class="form-group">
                       <label for="content">Dodaj komentarz:</label>
@@ -118,6 +118,10 @@
       if(content == '') {
           alert('Podaj treść komentarza!');
           return false;
+      } else {
+          $('#form_comment').submit(function(){
+              $(this).find(':submit').attr('disabled','disabled');
+          });
       }
   });
 
