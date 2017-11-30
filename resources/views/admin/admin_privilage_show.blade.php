@@ -83,7 +83,6 @@
         </div>
     </div>
 
-@include('workhours.registerHour');
 @endsection
 
 @section('script')

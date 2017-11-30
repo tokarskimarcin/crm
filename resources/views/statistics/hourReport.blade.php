@@ -102,7 +102,7 @@
                     Raport z Dnia
                 </div>
                 <div class="panel-body">
-                    <div class="row">
+                    <div class="row table-responsive">
                         <table class="table table-bordered">
                             <thead>
                             <tr align="center">

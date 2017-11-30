@@ -20,7 +20,7 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-lg-6">
-                            <div id="start_stop">
+                            <div id="start_stop" class="table-responsive">
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -41,7 +41,7 @@
                         </div>
 
                         <div class="col-lg-6">
-                            <div id="start_stop">
+                            <div id="start_stop" class="table-responsive">
                                 <table class="table table-bordered">
                                     <thead>
                                     <tr>
@@ -62,7 +62,7 @@
                         </div>
 
                         <div class="col-lg-6">
-                            <div id="start_stop">
+                            <div id="start_stop" class="table-responsive">
                                 <table class="table table-bordered">
                                     <thead>
                                     <tr>
@@ -83,7 +83,7 @@
                         </div>
 
                         <div class="col-lg-12">
-                            <div id="start_stop">
+                            <div id="start_stop" class="table-responsive">
                                 <table class="table table-bordered">
                                     <thead>
                                     <tr>
@@ -122,7 +122,7 @@
 
 
                         <div class="col-lg-12">
-                            <div id="start_stop">
+                            <div id="start_stop" class="table-responsive">
                                 <table class="table table-bordered">
                                     <thead>
                                     <tr>
@@ -151,7 +151,7 @@
         </div>
     </div>
 
-@include('workhours.registerHour');
+
 @endsection
 
 @section('script')

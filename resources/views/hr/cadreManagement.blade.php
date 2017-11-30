@@ -32,7 +32,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div id="start_stop">
-                                <div class="panel-body">
+                                <div class="panel-body table-responsive">
                                     <table id="datatable">
                                         <thead>
                                         <tr>

@@ -63,7 +63,6 @@
                                                     <button class="btn btn-primary" id="show_load_data_info" style="width:100%;">Wyświetl</button>
                                                 </div></br></br>
                                             </form>
-
                                             @if(isset($summary_month))
                                                 <table class="table table-striped table-bordered dt-responsive nowrap"cellspacing="0"  width="100%" id="datatable">
                                                     <thead>
