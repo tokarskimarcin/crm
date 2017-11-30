@@ -85,6 +85,7 @@
             accept_start = $('#accept_start_add').val();
             accept_stop = $('#accept_stop_add').val();
             success = $('#success_add').val();
+            $(this).attr('disabled',true);
             if(accept_start == null || accept_start =='')
             {
                 alert('Brak godziny rozpoczęcia pracy');

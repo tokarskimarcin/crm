@@ -216,6 +216,7 @@
 
         $( ".delete" ).click(function() {
             var id = (this.id);
+            $(this).attr('disabled',true);
             $.ajax({
                 type: "POST",
                 url: '{{ route('api.deleteAcceptHour') }}',
