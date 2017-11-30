@@ -272,6 +272,10 @@
         });
 
         $("#save_dkj").click(function () {
+            //add blocking button
+
+            $("#save_dkj").attr('disabled', true);
+
             var id_user = $("#users_select").val();
             var phone =$("#phone").val();
             var dkj_status =$("#dkj_status").val();
