@@ -201,7 +201,7 @@
                 <li>
                     <a href="{{url('/')}}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                 </li>
-                @foreach($groups as $group)
+                @foreach($groups->where('id','!=',8) as $group)
                             <li>
                                 <a href="#"><i class="fa fa-files-o fa-fw"></i>{{$group->name}}<span class="fa arrow"></span></a>
                                 <ul class="nav nav-second-level">

@@ -20,15 +20,15 @@
           <input type="hidden" name="_token" value="{{ csrf_token() }}">
           <div class="form-group">
               <label for="old_pass">Podaj stare hasło:</label>
-              <input name="old_pass" id="old_pass" type="password" class="form-control" placeholder="********"/>
+              <input name="old_pass" id="old_pass" type="password" class="form-control" placeholder="Stare hasło"/>
           </div>
           <div class="form-group">
               <label for="new_pass">Podaj nowe hasło:</label>
-              <input name="new_pass" id="new_pass" type="password" class="form-control" placeholder="********"/>
+              <input name="new_pass" id="new_pass" type="password" class="form-control" placeholder="Nowe hasło"/>
           </div>
           <div class="form-group">
               <label for="new_pass_confirm">Powtórz nowe hasło:</label>
-              <input name="new_pass_confirm" id="new_pass_confirm" type="password" class="form-control" placeholder="********"/>
+              <input name="new_pass_confirm" id="new_pass_confirm" type="password" class="form-control" placeholder="Nowe hasło"/>
           </div>
           <div class="form-group">
               <input id="change" type="submit" class="btn btn-success" value="Zmień hasło" />

@@ -30,17 +30,22 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Anuluj</button>
-
+                <button type="button" class="btn btn-default close" data-dismiss="modal">Anuluj</button>
             </div>
         </div>
-
     </div>
 </div>
 
 
 @section('script.register')
     <script>
+
+        $("#registerModal").on('shown.bs.modal', function(){
+            register_start = $('#register_hour_done_start').text();
+            register_stop = $('#register_hour_done_stop').text();
+            $('#register_start').val(register_start);
+            $('#register_stop').val(register_stop);
+        });
 
         $(function() {
             $('.form_time').datetimepicker({
@@ -55,6 +60,7 @@
                 forceParse: 0
             });
         });
+
         $( "#register_hour" ).click(function() {
             var register_start = 0;
             var register_stop = 0;
@@ -67,6 +73,7 @@
                 alert('Brak godziny zakończenia pracy');
             else
             {
+                $(this).attr('disabled',true);
                 $.ajax({
                     type: "POST",
                     url: '{{ url('register_hour') }}',

@@ -210,6 +210,7 @@
             }
             if(validate == 1)
             {
+                $(this).attr('disabled',true);
                 $.ajax({
                     type: "POST",
                     url: '{{ route('api.saveAcceptHour') }}',
