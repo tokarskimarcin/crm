@@ -69,11 +69,9 @@ Route::POST('/locker','AdminController@lockerPost')->name('api.locker');
 Auth::routes();
 
 
+
+Route::middleware(['check-permission','check-firewall'])->group(function () {
     Route::get('/', 'HomeController@index');
-
-
-Route::middleware(['check-permission'])->group(function () {
-
     Route::POST('/startWork', 'HomeController@startWork');
     Route::POST('/stopWork', 'HomeController@stopWork');
     Route::POST('/register_hour','WorkHoursController@registerHour');

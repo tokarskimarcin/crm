@@ -49,13 +49,18 @@ class CheckPermissionMiddleware
                   return redirect()->to('/login')->with('warning', 'Nastąpiło przelogowanie :)');
                 }
             }
-
+            if($route =='')
+            {
+                return $next($request);
+            }
             if ($link_key->isEmpty() || !Auth::user()) {
                 Auth::logout();
                 return redirect()->to('/login')->with('warning', 'Your session has expired because your account is deactivated.');
             } else if (!$link_key->isEmpty() && Auth::user()) {
                 return $next($request);
             }
+
+
         }else{
             return redirect('login');
         }

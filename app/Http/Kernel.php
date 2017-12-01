@@ -57,6 +57,7 @@ class Kernel extends HttpKernel
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'check-permission' => \App\Http\Middleware\CheckPermissionMiddleware::class,
+        'check-firewall' => \App\Http\Middleware\CheckFirewall::class,
         'fw-only-whitelisted' => \PragmaRX\Firewall\Middleware\FirewallWhitelist::class,
         'fw-block-blacklisted' => \PragmaRX\Firewall\Middleware\FirewallBlacklist::class,
         'fw-block-attacks' => \PragmaRX\Firewall\Middleware\BlockAttacks::class,
