@@ -130,4 +130,48 @@ class AdminController extends Controller
         }
     }
 
+    public function addDepartmentGet() {
+        $department_types = Department_types::all();
+
+        return view('admin.addDepartment')
+            ->with('department_types', $department_types);
+    }
+
+    public function addDepartmentPost(Request $request) {
+        $department = new Departments();
+
+        $department->name = $request->city;
+        $department->desc = $request->desc;
+        $department->save();
+
+        $departments = DB::table('departments')
+            ->orderBy('id', 'desc')
+            ->limit(1)
+            ->get();
+
+        $id_dep = $departments[0]->id;
+
+        $department_info = new Department_info();
+
+        $department_info->id_dep = $id_dep;
+        $department_info->id_dep_type = $request->id_dep_type;
+        $department_info->size = ($request->size != null) ? $request->size : 0 ;
+        $department_info->commission_avg = ($request->commission_avg) ? $request->commission_avg : 0 ;
+        $department_info->commission_hour = ($request->commission_hour) ? $request->commission_hour : 0 ;
+        $department_info->commission_step = ($request->commission_step) ? $request->commission_step : 0 ;
+        $department_info->commission_start_money = ($request->commission_start_money) ? $request->commission_start_money : 0 ;
+        $department_info->commission_janky = ($request->commission_janky) ? $request->commission_janky : 0 ;
+        $department_info->dep_aim = ($request->dep_aim) ? $request->dep_aim : 0 ;
+        $department_info->dep_aim_week = ($request->dep_aim_week) ? $request->dep_aim_week : 0 ;
+        $department_info->type = ($request->type != 'Wybierz') ? $request->type : 0 ;
+        $department_info->janky_system_id = ($request->janky_system_id) ? $request->janky_system_id : 0 ;
+        $department_info->blocked = 0;
+
+        $department_info->save();
+
+        Session::flash('message_ok', "Oddział został dodany!");
+        return Redirect::back();
+
+    }
+
 }

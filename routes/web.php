@@ -57,7 +57,8 @@ Route::POST('/change_department','HomeController@changeDepartment')->name('api.c
 
 Route::POST('/it_support','HomeController@itSupport')->name('api.itSupport');
 
-
+//locker
+Route::POST('/locker','AdminController@lockerPost')->name('api.locker');
 
 
 
@@ -82,6 +83,9 @@ Route::middleware(['check-permission','fw-only-whitelisted'])->group(function ()
     Route::get('/admin_privilage','AdminController@admin_privilage');
     Route::get('/admin_privilage_show/{id}','AdminController@admin_privilage_show');
     Route::Post('/admin_privilage_edit/{id}','AdminController@admin_privilage_edit');
+    Route::get('/locker','AdminController@lockerGet');
+    Route::get('/add_department','AdminController@addDepartmentGet');
+    Route::Post('/add_department','AdminController@addDepartmentPost');
     // Admin_Panel --Stop--
 
     // Password change --START--
