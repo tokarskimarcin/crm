@@ -115,4 +115,19 @@ class AdminController extends Controller
         return $departments;
     }
 
+    public function lockerGet() {
+        $department_info = Department_info::all();
+
+        return view('admin.locker')
+            ->with('department_info', $department_info);
+    }
+
+    public function lockerPost(Request $request) {
+        if($request->ajax()) {
+            $department_info_id = Department_info::find($request->department_info_id);
+            $department_info_id->blocked = $request->type;
+            $department_info_id->save();
+        }
+    }
+
 }

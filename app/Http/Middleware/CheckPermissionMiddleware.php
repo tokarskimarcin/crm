@@ -43,6 +43,13 @@ class CheckPermissionMiddleware
                         ->orwhere('privilage_user_relation.user_id', Auth::user()->id);
                 })->get();
 
+            if (Auth::user()->department_info->blocked != 0) {
+                if ($link_key != '/') {
+                  Auth::logout();
+                  return redirect()->to('/login')->with('warning', 'Nastąpiło przelogowanie :)');
+                }
+            }
+
             if ($link_key->isEmpty() || !Auth::user()) {
                 Auth::logout();
                 return redirect()->to('/login')->with('warning', 'Your session has expired because your account is deactivated.');

@@ -15,6 +15,7 @@
      {{--Logout info change password--}}
 
     <ul class="nav navbar-top-links navbar-right">
+@if(Auth::user()->department_info->blocked == 0)
       {{--ZABLOKOWANE DLA IT--}}
         @foreach($links as $link)
             @if($link->link == 'view_notification_table')
@@ -179,7 +180,7 @@
             </select>
         </li>
         @endif
-
+@endif
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{Auth::user()->first_name.' '.Auth::user()->last_name}}
                 <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
@@ -207,27 +208,30 @@
                 <li>
                     <a href="{{url('/')}}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                 </li>
-                @foreach($groups->where('id','!=',8) as $group)
-                            <li>
-                                <a href="#"><i class="fa fa-files-o fa-fw"></i>{{$group->name}}<span class="fa arrow"></span></a>
-                                <ul class="nav nav-second-level">
+                @if(Auth::user()->department_info->blocked == 0)
+                  @foreach($groups->where('id','!=',8) as $group)
+                              <li>
+                                  <a href="#"><i class="fa fa-files-o fa-fw"></i>{{$group->name}}<span class="fa arrow"></span></a>
+                                  <ul class="nav nav-second-level">
 
-                            @foreach($links as $link)
-                                @if($group->id == $link->group_link_id)
-                                    @if($link->link == 'show_all_notifications')
-                                        <li>
-                                              <a href="{{URL::to('/show_all_notifications/1')}}">{{$link->name}}</a>
-                                        </li>
-                                    @else
-                                        <li>
-                                            <a href="{{url($link->link)}}">{{$link->name}}</a>
-                                        </li>
-                                    @endif
-                                @endif
-                            @endforeach
-                                </ul>
-                            </li>
-                            @endforeach
+                              @foreach($links as $link)
+                                  @if($group->id == $link->group_link_id)
+                                      @if($link->link == 'show_all_notifications')
+                                          <li>
+                                                <a href="{{URL::to('/show_all_notifications/1')}}">{{$link->name}}</a>
+                                          </li>
+                                      @else
+                                          <li>
+                                              <a href="{{url($link->link)}}">{{$link->name}}</a>
+                                          </li>
+                                      @endif
+                                  @endif
+                              @endforeach
+                                  </ul>
+                              </li>
+                              @endforeach
+                @endif
+
             </ul>
         </div>
     </div>

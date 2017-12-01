@@ -206,7 +206,7 @@
                 table+='</select>';
                 table+='<span class="glyphicon glyphicon-arrow-down"></span>';
 
-                time = moment('08'+':'+'00','HH:mm');
+                time = moment('07'+':'+'45','HH:mm');
                 table+='<select name='+week_array[i]+'_stop_work class="form-control">'+
                     '<option>Wybierz</option>';
                 while(time.format("HH")!='21')
@@ -236,7 +236,7 @@
                     table+='<input type="checkbox" class="checkbox '+week_array[i]+'_reasonCheck">Wolne';
 
                     '</p></td>';
-                time = moment('08'+':'+'00','HH:mm');
+                time = moment('07'+':'+'45','HH:mm');
             }
         table+=
             '<td>'+
