@@ -163,11 +163,13 @@ class AdminController extends Controller
         $department_info->commission_janky = ($request->commission_janky) ? $request->commission_janky : 0 ;
         $department_info->dep_aim = ($request->dep_aim) ? $request->dep_aim : 0 ;
         $department_info->dep_aim_week = ($request->dep_aim_week) ? $request->dep_aim_week : 0 ;
-        $department_info->type = ($request->type != 'Wybierz') ? $request->type : 0 ;
+        $department_info->type = ($request->type != 'Wybierz') ? $request->type : '' ;
         $department_info->janky_system_id = ($request->janky_system_id) ? $request->janky_system_id : 0 ;
         $department_info->blocked = 0;
 
         $department_info->save();
+
+        new ActivityRecorder(3, "Dodano oddział o numerze ID: " . $id_dep);
 
         Session::flash('message_ok', "Oddział został dodany!");
         return Redirect::back();
