@@ -56,7 +56,7 @@ class ActivityRecorder extends Model
 
         if (is_array($this->action)) {
             foreach($this->action as $key => $value) {
-                $string .= $key . ' : ' . $value . '. ';
+                $string .= $key . ' : ' . $value . ', ';
             }
         } else {
             $string = $this->action;
@@ -106,7 +106,7 @@ class ActivityRecorder extends Model
         }
 
         $day = date('d');
-        if ($day == 28) {
+        if ($day == 1) {
             $this->clearLogs();
         }
     }

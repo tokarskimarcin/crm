@@ -296,6 +296,7 @@
                 },
                 success: function(response) {
                     $('#edit_dkj').modal('toggle');
+                    $("#save_dkj").removeAttr('disabled');
                     table.ajax.reload();
                 }
             });

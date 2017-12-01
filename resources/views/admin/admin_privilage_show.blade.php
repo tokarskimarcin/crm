@@ -9,6 +9,9 @@
         </div>
     </div>
 
+    @if (Session::has('message_ok'))
+       <div class="alert alert-success">{{ Session::get('message_ok') }}</div>
+    @endif
 
     <div class="row">
         <div class="col-lg-12">

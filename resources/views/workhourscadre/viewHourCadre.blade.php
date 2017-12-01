@@ -215,22 +215,26 @@
 
 
         $( ".delete" ).click(function() {
-            var id = (this.id);
-            $(this).attr('disabled',true);
-            $.ajax({
-                type: "POST",
-                url: '{{ route('api.deleteAcceptHour') }}',
-                data: {
-                    "id": id
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                    alert("Godziny zostały usunięte");
-                    location.reload();
-                }
-            });
+            var conf = confirm('Czy napewno chcesz usunąć godziny pracy?');
+
+            if (conf == true) {
+                var id = (this.id);
+                $(this).attr('disabled',true);
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.deleteAcceptHour') }}',
+                    data: {
+                        "id": id
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        alert("Godziny zostały usunięte");
+                        location.reload();
+                    }
+                });
+            }
         });
     </script>
 @endsection

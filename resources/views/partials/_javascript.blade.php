@@ -48,9 +48,7 @@
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
           },
           success: function(response) {
-            console.log(response);
-
-            var sound = true;
+              var sound = true;
               for (var i = 0; i < response.length; i++) {
 
                   var countMe = $("#" + response[i].department_info_id + "dkjstatus td[name='undone']").text();
@@ -59,6 +57,7 @@
                       var snd = new Audio("{{asset('assets/1.mp3')}}");
                       snd.play();
                       sound = false;
+                      $('#check_messages_dkj').html('(!) <i class="fa fa-envelope fa-fw"></i><i class="fa fa-caret-down"></i>');
                   }
 
 
@@ -70,7 +69,7 @@
               }
           }
       });
-    }, 60000);
+    }, 20000);
 @endif
     $( "#check_messages_dkj" ).on('click', function() {
         $.ajax({
@@ -81,7 +80,6 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-              console.log(response);
                 for (var i = 0; i < response.length; i++) {
                     $("#" + response[i].department_info_id + "dkjstatus td[name='status']").text("Odsłuchany (" + response[i].yanky_count + ")");
                     $("#" + response[i].department_info_id + "dkjstatus td[name='count_yanek']").text(response[i].bad);
@@ -89,6 +87,7 @@
                     $("#" + response[i].department_info_id + "dkjstatus td[name='status']").removeClass("alert-danger");
                     $("#" + response[i].department_info_id + "dkjstatus td[name='status']").addClass("alert-success");
                 }
+                $('#check_messages_dkj').html('<i class="fa fa-envelope fa-fw"></i><i class="fa fa-caret-down"></i>');
             }
         });
     });

@@ -12,6 +12,8 @@ use App\UserTypes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\ActivityRecorder;
+use Illuminate\Support\Facades\Redirect;
+use Session;
 
 class AdminController extends Controller
 {
@@ -66,6 +68,7 @@ class AdminController extends Controller
     }
     public function admin_privilage_edit($id,Request $request)
     {
+            $data = [];
             $link = Links::findOrFail($id);
             $link->link = $request->link_adress;
             $link->name = $request->link_name;
@@ -80,11 +83,21 @@ class AdminController extends Controller
                 PrivilageRelation::where('link_id', $id)
                 ->wherenotin('link_id',$request->link_privilages)
                 ->delete();
-                foreach ($user_tab as $item)
+                foreach ($user_tab as $item) {
                     PrivilageRelation::updateOrCreate(array('user_type_id'=>$item,'link_id'=>$id));
+                    $data['item' . $item] = 'id' . $id;
+                }
+
             }
-            new ActivityRecorder(3, 'Zmiana uprawnień grup i użytkowników: link_adress: ' . $request->link_adress . ', link_name: ' . $request->link_name . ', link_goup: ' . $request->link_group);
-        return redirect('/admin_privilage');
+            $data['Zmiana uprawnień grup i użytkowników'] = '';
+            $data['Link name'] = $request->link_name;
+            $data['Link adress'] = $request->link_adress;
+            $data['Link group'] = $request->link_goup;
+
+            new ActivityRecorder(3, $data);
+
+            Session::flash('message_ok', "Zmiany zapisano!");
+            return Redirect::back();
     }
 
 
