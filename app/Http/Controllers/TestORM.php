@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+// use Illuminate\Http\Request;
 use App\User;
 use App\Department_info;
 use App\Department_types;
@@ -27,18 +27,15 @@ use Illuminate\Support\Facades\Storage;
 // use Illuminate\Support\Facades\Mail;
 use App\Mail\RaportMail;
 use Mail;
+use Request;
 
 class TestORM extends Controller
 {
     public function test() {
-
-        //Mail::to('jarzyna.varona@gmail.com')->send(new RaportMail());
-        Mail::send(['text'=>'mail'],['name', 'Konrad'], function($message){
-            $message->to('konradja100@wp.pl', 'Konead')
-                ->subject('Test email')
-                ->from('jarzyna.verona@gmail.com');
+        Mail::send(['text' => 'mail.raport'], ['name'=>'konrad'], function($message){
+          $message->to('jarzyna.verona@gmail.com', 'To konrad')->subject('test email');
+          $message->from('jarzyna.verona@gmail.com', 'Konrad');
         });
-
     }
 
 }

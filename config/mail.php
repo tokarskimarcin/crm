@@ -56,7 +56,7 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'jarzya.verona@gmail.com'),
+        'address' => env('MAIL_FROM_ADDRESS', 'jarzyna.verona@gmail.com'),
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
@@ -71,7 +71,7 @@ return [
     |
     */
 
-    'encryption' => env('MAIL_ENCRYPTION', 'ssl'),
+    'encryption' => env('MAIL_ENCRYPTION', 'tls'),
 
     /*
     |--------------------------------------------------------------------------
@@ -119,7 +119,6 @@ return [
             resource_path('views/vendor/mail'),
         ],
     ],
-
 
 
 
