@@ -68,12 +68,11 @@ Route::POST('/locker','AdminController@lockerPost')->name('api.locker');
 
 Auth::routes();
 
-Route::group(['middleware' => 'fw-only-whitelisted'], function ()
-{
-    Route::get('/', 'HomeController@index');
-});
 
-Route::middleware(['check-permission','fw-only-whitelisted'])->group(function () {
+    Route::get('/', 'HomeController@index');
+
+
+Route::middleware(['check-permission'])->group(function () {
 
     Route::POST('/startWork', 'HomeController@startWork');
     Route::POST('/stopWork', 'HomeController@stopWork');
