@@ -11,12 +11,6 @@
 |
 */
 
-Route::get('/', 'HomeController@index');
-
-Route::POST('/startWork', 'HomeController@startWork');
-Route::POST('/stopWork', 'HomeController@stopWork');
-Route::POST('/register_hour','WorkHoursController@registerHour');
-
 
 //********************AJAX*********************** */
 Route::POST('/datatableAcceptHour','WorkHoursController@datatableAcceptHour')->name('api.acceptHour');
@@ -69,9 +63,20 @@ Route::POST('/it_support','HomeController@itSupport')->name('api.itSupport');
 
 //********************AJAX*********************** */
 
+
+
 Auth::routes();
 
-Route::middleware(['check-permission'])->group(function () {
+Route::group(['middleware' => 'fw-only-whitelisted'], function ()
+{
+    Route::get('/', 'HomeController@index');
+});
+
+Route::middleware(['check-permission','fw-only-whitelisted'])->group(function () {
+
+    Route::POST('/startWork', 'HomeController@startWork');
+    Route::POST('/stopWork', 'HomeController@stopWork');
+    Route::POST('/register_hour','WorkHoursController@registerHour');
 
     // Admin_Panel --Start--
     Route::get('/admin_privilage','AdminController@admin_privilage');
