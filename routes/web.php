@@ -10,7 +10,9 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+Route::POST('/startWork', 'HomeController@startWork');
+Route::POST('/stopWork', 'HomeController@stopWork');
+Route::POST('/register_hour','WorkHoursController@registerHour');
 
 //********************AJAX*********************** */
 Route::POST('/datatableAcceptHour','WorkHoursController@datatableAcceptHour')->name('api.acceptHour');
@@ -72,10 +74,6 @@ Auth::routes();
 
 Route::middleware(['check-permission','check-firewall'])->group(function () {
     Route::get('/', 'HomeController@index');
-    Route::POST('/startWork', 'HomeController@startWork');
-    Route::POST('/stopWork', 'HomeController@stopWork');
-    Route::POST('/register_hour','WorkHoursController@registerHour');
-
     // Admin_Panel --Start--
     Route::get('/admin_privilage','AdminController@admin_privilage');
     Route::get('/admin_privilage_show/{id}','AdminController@admin_privilage_show');
