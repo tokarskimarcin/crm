@@ -24,11 +24,16 @@ class CheckFirewall
         } else {
             $ip = $_SERVER['REMOTE_ADDR'];
         }
-        $acces = Firewall::where('ip_address',$ip)->first();
+        $acces = Firewall::where('ip_address', $ip)->first();
 
-        if(is_null($acces)) {
-            Auth::logout();
-            return redirect('login');
+        if (Auth::user()->user_type_id != 3)
+        {
+            if(is_null($acces)) {
+                Auth::logout();
+                return redirect('login');
+            }else{
+                return $next($request);
+            }
         }else{
             return $next($request);
         }
