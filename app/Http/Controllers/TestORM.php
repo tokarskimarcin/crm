@@ -32,10 +32,17 @@ use Request;
 class TestORM extends Controller
 {
     public function test() {
-        Mail::send(['text' => 'mail.raport'], ['name'=>'konrad'], function($message){
-          $message->to('jarzyna.verona@gmail.com', 'To konrad')->subject('test email');
-          $message->from('jarzyna.verona@gmail.com', 'Konrad');
+
+
+        Mail::send('404', array('key' => 'value'), function($message)
+        {
+            //MAIL_DRIVER=mail w env
+            // 'sendmail' => '/usr/sbin/sendmail -bs', na
+           // -> mail.php  'sendmail' => "C:\xampp\sendmail\sendmail.exe\ -t",
+            $message->from('skobry123on@gmail.com');
+            $message->to('skobry123on@gmail.com', 'John Smith')->subject('Welcome!');
         });
+
     }
 
 }
