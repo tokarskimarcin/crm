@@ -274,7 +274,7 @@
         $("#save_dkj").click(function () {
             //add blocking button
 
-            $("#save_dkj").attr('disabled', true);
+
 
             var id_user = $("#users_select").val();
             var phone =$("#phone").val();
@@ -282,24 +282,39 @@
             var comment =$("#comment").val();
             var campaign =$("#campaign").val();
             var select_department_id_info = $("#select_department_id_info").val();
-            $.ajax({
-                type: "POST",
-                url: '{{ route('api.dkjRaportSave') }}',
-                data: {"id_user":id_user,
-                    "phone":phone,"dkj_status":dkj_status,
-                    "comment":comment,"campaign":campaign,
-                    "id":id,"action":action,
-                    "select_department_id_info":select_department_id_info
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                    $('#edit_dkj').modal('toggle');
-                    $("#save_dkj").removeAttr('disabled');
-                    table.ajax.reload();
-                }
-            });
+            var check = 1;
+            if(phone == '')
+            {
+                alert('Podaj telefon');
+                check = 0;
+            }
+            else if(campaign == '')
+            {
+                alert('Podaj nazwę kampanii');
+                check = 0;
+            }
+            if(check == 1) {
+                $("#save_dkj").attr('disabled', true);
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.dkjRaportSave') }}',
+                    data: {
+                        "id_user": id_user,
+                        "phone": phone, "dkj_status": dkj_status,
+                        "comment": comment, "campaign": campaign,
+                        "id": id, "action": action,
+                        "select_department_id_info": select_department_id_info
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (response) {
+                        $('#edit_dkj').modal('toggle');
+                        $("#save_dkj").removeAttr('disabled');
+                        table.ajax.reload();
+                    }
+                });
+            }
         });
 
         table = $('#datatable').DataTable({
@@ -320,9 +335,8 @@
                     action: function ( e, dt, node, config ) {
                         action = 'create';
                         $('#edit_dkj').modal('show');
-                        $("#users_select").val(0);
                         $("#phone").val('');
-                        $("#dkj_status").val('');
+                        $("#dkj_status").val(0);
                         $("#comment").val('');
                         $("#campaign").val('');
                     }

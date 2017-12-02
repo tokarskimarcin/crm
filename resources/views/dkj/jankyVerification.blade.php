@@ -277,6 +277,7 @@
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
                             success: function(response) {
+                                $("#save_dkj").removeAttr('disabled');
                                 $('#edit_dkj').modal('toggle');
                                 table.ajax.reload();
                             }
