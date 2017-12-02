@@ -104,8 +104,7 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                       location.reload();
-
+                        window.location.reload(true);
                     },
                     error: function(response) {
                         alert('Wystąpił problem z bazą danych. Prosimy spróbuj później.');

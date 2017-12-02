@@ -238,8 +238,7 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        alert("Godziny zostały usunięte");
-                        location.reload();
+                        window.location.reload(true);
                     }
                 });
             }
