@@ -82,7 +82,7 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        location.reload();
+                        window.location.reload(true);
                     }
                 });
             }
