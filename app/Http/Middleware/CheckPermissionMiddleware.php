@@ -44,9 +44,12 @@ class CheckPermissionMiddleware
                 })->get();
 
             if (Auth::user()->department_info->blocked != 0) {
-                if ($link_key != '/') {
+                if ($route != '') {
                   Auth::logout();
                   return redirect()->to('/login')->with('warning', 'Nastąpiło przelogowanie :)');
+                }else
+                {
+                    return $next($request);
                 }
             }
             if($route =='')
