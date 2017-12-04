@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\HourReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Mail;
 
 class StatisticsController extends Controller
 {
@@ -88,5 +89,36 @@ class StatisticsController extends Controller
         return redirect()->back()
             ->with('message',$message)
             ->with('status',$status);
+    }
+
+    public function hourReportTelemarketing() {
+        $date = date('Y-m-d');
+        $hour = date('H') . ':00:00'; //tutaj zmienic przy wydawaniu na produkcję na  date('H') - 1
+
+        $reports = HourReport::where('report_date', '=', $date)
+            ->where('hour', $hour)
+            ->get();
+
+
+            $data = [
+                'hour' => $hour,
+                'date' => $date,
+                'reports' => $reports
+            ];
+
+
+            Mail::send('mail.hourReportTelemarketing', $data, function($message)
+            {
+                //MAIL_DRIVER=mail w env
+                // 'sendmail' => '/usr/sbin/sendmail -bs', na
+               // -> mail.php  'sendmail' => "C:\xampp\sendmail\sendmail.exe\ -t",
+                $message->from('jarzyna.verona@gmail.com');
+                $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
+            });
+
+        // return view('mail.hourReportTelemarketing')
+        //     ->with('reports', $reports)
+        //     ->with('hour', $hour)
+        //     ->with('date', $date);
     }
 }

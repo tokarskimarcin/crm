@@ -66,6 +66,11 @@ Route::POST('/locker','AdminController@lockerPost')->name('api.locker');
 
 //********************AJAX*********************** */
 
+//Emails
+
+Route::get('/hourReportTelemarketing', 'StatisticsController@hourReportTelemarketing');
+
+//End emails
 
 
 Auth::routes();
