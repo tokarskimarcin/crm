@@ -115,7 +115,10 @@ class StatisticsController extends Controller
                 $message->from('jarzyna.verona@gmail.com');
                 $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
             });
-
+        foreach ($reports as $report) {
+            $report->is_send = 1;
+            $report->save();
+        }
         // return view('mail.hourReportTelemarketing')
         //     ->with('reports', $reports)
         //     ->with('hour', $hour)

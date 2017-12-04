@@ -59,30 +59,30 @@
 
                                                 <div class="col-md-3">
                                                     <label>Średnia:</label>
-                                                    <input class="form-control numeric" name="average" type="number">
+                                                    <input class="form-control numeric" name="average" type="text" required>
                                                 </div>
 
                                                 <div class="col-md-3">
                                                     <label>Liczba Zaproszeń:</label>
-                                                    <input class="form-control" name="success" type="number" value="">
+                                                    <input class="form-control" name="success" type="text" value="" required>
                                                 </div>
 
                                                 <div class="col-md-3">
                                                     <label>Liczba Osób:</label>
-                                                    <input class="form-control" name="employee_count" type="number" value="">
+                                                    <input class="form-control" name="employee_count" type="text" value="" required>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label>% Janków:</label>
-                                                    <input class="form-control" name="janky_count" type="number" value="">
+                                                    <input class="form-control" name="janky_count" type="text" value="" required>
                                                 </div>
 
                                                 <div class="col-md-3">
                                                     <label>% Wykorzystania Bazy</label>
-                                                    <input class="form-control" name="wear_base" type="number" value="">
+                                                    <input class="form-control" name="wear_base" type="text" value="" required>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label>Czas Rozmów:</label>
-                                                    <input class="form-control" name="call_Time" type="number" value=""></br>
+                                                    <input class="form-control" name="call_Time" type="text" value="" required></br>
                                                 </div>
                                                 <div class="form-group col-md-3">
                                                     <input type="submit" class="btn btn-primary add_report " name="hour_report_send" id="send_button"  value="Wyślij raport"/>
@@ -309,34 +309,34 @@
                 alert('Wybierz godzinę');
                 check = false;
             }
-            else if(average == '')
+            else if(average == '' || isNaN(average))
             {
-                alert('Średnia nie może być pusta');
+                alert('Podaj prawidłową średnią!');
                 check = false;
             }
-            else if(success == '')
+            else if(success == '' || isNaN(success))
             {
-                alert('Zgody nie mogą być puste');
+                alert('Podaj ilość zgód!');
                 check = false;
             }
-            else if(employee_count == '')
+            else if(employee_count == '' || isNaN(employee_count))
             {
-                alert('Liczba pracowników nie może być pusta');
+                alert('Podaj liczbę pracowników kadry!');
                 check = false;
             }
-            else if(janky_count == '')
+            else if(janky_count == '' || isNaN(janky_count))
             {
-                alert('Ilość janków nie może być puste');
+                alert('Podaj ilość janków!');
                 check = false;
             }
-            else if(wear_base == '')
+            else if(wear_base == '' || isNaN(wear_base))
             {
-                alert('Wykorzystanie bazy nie może być puste');
+                alert('Podaj wartość wykorzystania bazy!');
                 check = false;
             }
-            else if(call_time == '')
+            else if(call_time == '' || isNaN(call_time))
             {
-                alert('Czas rozmów nie może być puste');
+                alert('Podaj czas rozmów!');
                 check = false;
             }
             if(check)
