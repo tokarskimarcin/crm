@@ -203,11 +203,100 @@ class StatisticsController extends Controller
               $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
           });
 
-        return view('mail.weekReportTelemarketing')
-            ->with('work_hours', $work_hours)
-            ->with('sum_hours', $sum_hours)
-            ->with('reports', $reports)
-            ->with('date_start', $date_start)
-            ->with('date_stop', $date_stop);
+        // return view('mail.weekReportTelemarketing')
+        //     ->with('work_hours', $work_hours)
+        //     ->with('sum_hours', $sum_hours)
+        //     ->with('reports', $reports)
+        //     ->with('date_start', $date_start)
+        //     ->with('date_stop', $date_stop);
+    }
+
+    public function monthReportTelemarketing() {
+        function monthReverseName($month) {
+            $month_names = array( 'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień' );
+            $month -= 2;
+            $month = ($month < 0) ? 11 : $month ;
+            return $month_names[$month];
+        }
+
+        $month = date('m');
+        $year = date('Y');
+        $month_name = monthReverseName($month);
+        function monthReverse($month) {
+            $month -= 1;
+            return ($month < 1) ? 12 : $month ;
+        }
+
+        if ($month == 1) {
+            $date = ($year - 1) . "-" . monthReverse($month) . '-%';
+        } else {
+            $date = $year . "-" . $month . "-%";
+        }
+
+        $reports = DB::table('hour_report')
+                ->select(DB::raw(
+                    'SUM(call_time) as sum_call_time,
+                    AVG(average) as avg_average,
+                    SUM(success) as sum_success,
+                    AVG(wear_base) as avg_wear_base,
+                    SUM(janky_count) as sum_janky_count,
+                    department_type.name as dep_name,
+                    departments.name as dep_type_name,
+                    department_info.*
+                     '))
+                ->join('department_info', 'department_info.id', '=', 'hour_report.department_info_id')
+                ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+                ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+                ->whereIn('hour_report.id', function($query) use($date){
+                    $query->select(DB::raw(
+                        'MAX(hour_report.id)'
+                        ))
+                        ->from('hour_report')
+                        ->where('report_date', 'like', $date)
+                        ->groupBy('department_info_id');
+                })
+                ->groupBy('hour_report.department_info_id')
+                ->get();
+
+            $work_hours = DB::table('work_hours')
+                ->select(DB::raw(
+                  'sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as realRBH,
+                  department_info.id
+                  '))
+                ->join('users', 'users.id', '=', 'work_hours.id_user')
+                ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
+                ->whereIn('work_hours.id', function($query) use($date){
+                    $query->select(DB::raw('
+                        work_hours.id
+                    '))
+                    ->where('date', 'like', $date);
+                })
+                ->groupBy('department_info.id')
+                ->get();
+
+            $sum_hours = DB::table('work_hours')
+                ->select(DB::raw(
+                  'sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as realRBH
+                  '))
+                ->join('users', 'users.id', '=', 'work_hours.id_user')
+                ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
+                ->whereIn('work_hours.id', function($query) use($date){
+                    $query->select(DB::raw('
+                        work_hours.id
+                    '))
+                    ->from('work_hours')
+                    ->join('users', 'users.id', '=', 'work_hours.id_user')
+                    ->where('date', 'like', $date);
+                })
+                
+                ->get();
+                dd($sum_hours);
+
+
+        return view('mail.monthReportTelemarketing')
+          ->with('work_hours', $work_hours)
+          ->with('sum_hours', $sum_hours)
+          ->with('month_name', $month_name)
+          ->with('reports', $reports);
     }
 }
