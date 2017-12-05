@@ -149,6 +149,9 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
 
     Route::get('/consultantStatistics','DkjController@consultantStatisticsGet');
     Route::POST('/consultantStatistics','DkjController@consultantStatisticsPOST');
+
+    Route::get('/showDkjEmployee','DkjController@showDkjEmployeeGet');
+    Route::POST('/showDkjEmployee','DkjController@showDkjEmployeePOST');
     // DKJ -- STOP--
 
     // Schedule -- START --
