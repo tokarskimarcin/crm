@@ -478,7 +478,7 @@ class DkjController extends Controller
             return 0;
         }
     }
-
+//dating_type [ 0 -> Badania 1-> Wysyłka ]
     public function getStats(Request $request) {
         if($request->ajax()) {
             $today = date("Y-m-d") . "%";
@@ -488,10 +488,12 @@ class DkjController extends Controller
                 ->select(DB::raw("
                 dkj.department_info_id,
                 department_info.type,
-                count(dkj.id) as yanky_count,
-                sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as wysylka,
-                sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as badania, 
-                SUM(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as bad"))
+                count(dkj.id) as all_check_talk,
+                sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as shipping_all,
+                sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as research_all,
+                sum(CASE WHEN users.dating_type = 0 and  dkj.dkj_status = 1  THEN 1 ELSE 0 END) as research_janky_count,
+                sum(CASE WHEN users.dating_type = 1 and  dkj.dkj_status = 1  THEN 1 ELSE 0 END) as shipping_janky_count, 
+                SUM(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as all_bad"))
                 ->where('dkj.add_date','like',$today)
                 ->groupBy('dkj.department_info_id','department_info.type')->get();
           return $dkj_user;
