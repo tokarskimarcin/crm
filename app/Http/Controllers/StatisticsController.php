@@ -186,12 +186,22 @@ class StatisticsController extends Controller
           })
           ->get();
 
+          $time_sum_array = 0;
+          foreach($work_hours as $work_hour) {
+            if ($work_hour->realRBH != null) {
+                $time = explode(':', $work_hour->realRBH);
+                $time_sum_array += ($time[0]*3600) + ($time[1]*60) + $time[2];
+            }
+          }
+          $hours = round($time_sum_array / 3600, 2);
+
+
           $data = [
               'date_start' => $date_start,
               'date_stop' => $date_stop,
               'reports' => $reports,
               'work_hours' => $work_hours,
-              'sum_hours' => $sum_hours,
+              'hours' => $hours,
           ];
 
           Mail::send('mail.weekReportTelemarketing', $data, function($message)
@@ -204,6 +214,7 @@ class StatisticsController extends Controller
           });
 
         // return view('mail.weekReportTelemarketing')
+        //     ->with('hours', $hours)
         //     ->with('work_hours', $work_hours)
         //     ->with('sum_hours', $sum_hours)
         //     ->with('reports', $reports)
@@ -212,6 +223,31 @@ class StatisticsController extends Controller
     }
 
     public function monthReportTelemarketing() {
+      //ilosc dni pracujących w mieisącu z podziałem na dni normalne/weekendowe
+      $list=array();
+      $month = 11;
+      $year = 2017;
+
+      for($d=1; $d<=31; $d++)
+      {
+      $time=mktime(12, 0, 0, $month, $d, $year);
+      if (date('m', $time)==$month)
+          $list[]=date('N-D', $time);
+      }
+      $normal_day = 0;
+      $weekend_day = 0;
+
+      foreach($list as $item) {
+          if ($item >= 1 || $item <= 5) {
+              $normal_day++;
+          } else if ($item == 6) {
+              $weekend_day++;
+          }
+      }
+
+      $days_list = ['normal_day' => $normal_day, 'weekend_day' => $weekend_day];
+
+      //zwracanie nazwy miesiąca którego dotyczy statystyka
         function monthReverseName($month) {
             $month_names = array( 'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień' );
             $month -= 2;
@@ -219,7 +255,7 @@ class StatisticsController extends Controller
             return $month_names[$month];
         }
 
-        $month = date('m');
+        $month = date('m') - 1;
         $year = date('Y');
         $month_name = monthReverseName($month);
         function monthReverse($month) {
@@ -232,6 +268,7 @@ class StatisticsController extends Controller
         } else {
             $date = $year . "-" . $month . "-%";
         }
+
 
         $reports = DB::table('hour_report')
                 ->select(DB::raw(
@@ -258,6 +295,7 @@ class StatisticsController extends Controller
                 ->groupBy('hour_report.department_info_id')
                 ->get();
 
+            //pobieranie sumy godzin pracy dla poszczególnych oddziałów
             $work_hours = DB::table('work_hours')
                 ->select(DB::raw(
                   'sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as realRBH,
@@ -274,6 +312,7 @@ class StatisticsController extends Controller
                 ->groupBy('department_info.id')
                 ->get();
 
+            //pobieranie sumy godzin (całościowo)
             $sum_hours = DB::table('work_hours')
                 ->select(DB::raw(
                   'sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as realRBH
@@ -284,19 +323,42 @@ class StatisticsController extends Controller
                     $query->select(DB::raw('
                         work_hours.id
                     '))
-                    ->from('work_hours')
-                    ->join('users', 'users.id', '=', 'work_hours.id_user')
                     ->where('date', 'like', $date);
                 })
-                
                 ->get();
-                dd($sum_hours);
 
+            $time_sum_array = 0;
+            foreach($work_hours as $work_hour) {
+              if ($work_hour->realRBH != null) {
+                  $time = explode(':', $work_hour->realRBH);
+                  $time_sum_array += ($time[0]*3600) + ($time[1]*60) + $time[2];
+              }
+            }
+            $hours = round($time_sum_array / 3600, 2);
 
-        return view('mail.monthReportTelemarketing')
-          ->with('work_hours', $work_hours)
-          ->with('sum_hours', $sum_hours)
-          ->with('month_name', $month_name)
-          ->with('reports', $reports);
+            $data = [
+                'month_name' => $month_name,
+                'reports' => $reports,
+                'work_hours' => $work_hours,
+                'hours' => $hours,
+                'days_list' => $days_list,
+            ];
+
+            Mail::send('mail.monthReportTelemarketing', $data, function($message)
+            {
+                //MAIL_DRIVER=mail w env
+                // 'sendmail' => '/usr/sbin/sendmail -bs', na
+               // -> mail.php  'sendmail' => "C:\xampp\sendmail\sendmail.exe\ -t",
+                $message->from('jarzyna.verona@gmail.com');
+                $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
+            });
+
+        // return view('mail.monthReportTelemarketing')
+        //   ->with('hours', $hours)
+        //   ->with('work_hours', $work_hours)
+        //   ->with('sum_hours', $sum_hours)
+        //   ->with('month_name', $month_name)
+        //   ->with('days_list', $days_list)
+        //   ->with('reports', $reports);
     }
 }

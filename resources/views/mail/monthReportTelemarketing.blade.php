@@ -28,7 +28,7 @@
       @php($total_sum_call_time = 0)
       @php($count = 0)
       @php($total_goal = 0)
-      @php($goal = 6500)
+      @php($goal = ($days_list['normal_day']) * 1200 +($days_list['weekend_day'] * 500))
 
 
         @foreach($reports as $report)
@@ -65,7 +65,7 @@
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>Total:</b></td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_avg_average / $count, 2)}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$sum_hours[0]->realRBH}}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$hours}} godzin</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_sum_success}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_janky / $count, 2)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_avg_wear_base / $count, 2)}} %</td>
