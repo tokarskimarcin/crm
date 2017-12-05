@@ -488,6 +488,7 @@ class DkjController extends Controller
                 SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad"))
                 ->where('add_date','like',$today)
                 ->groupBy('department_info_id')->get();
+
           return $dkj_user;
         }
     }
