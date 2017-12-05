@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\ActivityRecorder;
+use Illuminate\Support\Facades\Redirect;
 
 class DkjController extends Controller
 {
@@ -34,6 +35,42 @@ class DkjController extends Controller
             ->with('departments',$departments)
             ->with('user_yanek',$user_yanek)
             ->with('dkj_user', $dkj_user);
+    }
+    public function showDkjEmployeeGet()
+    {
+        $dkjEmployee = User::where('user_type_id',2)
+            ->where('status_work',1)->get();
+        return view('dkj.showDkjEmployee')->with('dkjEmployee',$dkjEmployee);
+    }
+    public function showDkjEmployeePOST(Request $request)
+    {
+        $janky_status = $request->janky_status;
+        $date_start = $request->start_date;
+        $date_stop = $request->stop_date;
+        $user_dkj_id = $request->user_dkj_id;
+        $employee_info = Dkj::where('id_dkj',$user_dkj_id)
+            ->where('deleted',0)
+            ->whereBetween('add_date',[$date_start.=' 00:00:00',$date_stop.=' 23:00:00'])->get();
+        if($janky_status == 1)
+        {
+            $employee_info = $employee_info->where('dkj_status',1);
+        }else if($janky_status == 2)
+        {
+            $employee_info = $employee_info->where('dkj_status',1)
+            ->where('manager_status',0);
+        }else if($janky_status == 3)
+        {
+            $employee_info = $employee_info->where('dkj_status',0)
+                ->where('manager_status',0);
+        }
+        $dkjEmployee = User::where('user_type_id',2)
+            ->where('status_work',1)->get();
+
+        return view('dkj.showDkjEmployee')->with('dkjEmployee',$dkjEmployee)
+            ->with('employee_info',$employee_info)
+            ->with('old_start_date',$request->start_date)
+            ->with('old_stop_date',$request->stop_date)
+            ->with('employee_id',$user_dkj_id);
     }
 
     public function dkjRaportPost(Request $request)
