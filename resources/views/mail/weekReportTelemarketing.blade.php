@@ -31,6 +31,7 @@
 
       @foreach($reports as $report)
       @php($add_column = true)
+        @php($goal = (5 * $report->dep_aim) + $report->dep_aim_week)
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->dep_name . ' ' . $report->dep_type_name}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->avg_average, 2)}}</td>

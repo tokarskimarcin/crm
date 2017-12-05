@@ -204,22 +204,22 @@ class StatisticsController extends Controller
               'hours' => $hours,
           ];
 
-          Mail::send('mail.weekReportTelemarketing', $data, function($message)
-          {
-              //MAIL_DRIVER=mail w env
-              // 'sendmail' => '/usr/sbin/sendmail -bs', na
-             // -> mail.php  'sendmail' => "C:\xampp\sendmail\sendmail.exe\ -t",
-              $message->from('jarzyna.verona@gmail.com');
-              $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-          });
-
-        // return view('mail.weekReportTelemarketing')
-        //     ->with('hours', $hours)
-        //     ->with('work_hours', $work_hours)
-        //     ->with('sum_hours', $sum_hours)
-        //     ->with('reports', $reports)
-        //     ->with('date_start', $date_start)
-        //     ->with('date_stop', $date_stop);
+          // Mail::send('mail.weekReportTelemarketing', $data, function($message)
+          // {
+          //     //MAIL_DRIVER=mail w env
+          //     // 'sendmail' => '/usr/sbin/sendmail -bs', na
+          //    // -> mail.php  'sendmail' => "C:\xampp\sendmail\sendmail.exe\ -t",
+          //     $message->from('jarzyna.verona@gmail.com');
+          //     $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
+          // });
+dd($reports);
+        return view('mail.weekReportTelemarketing')
+            ->with('hours', $hours)
+            ->with('work_hours', $work_hours)
+            ->with('sum_hours', $sum_hours)
+            ->with('reports', $reports)
+            ->with('date_start', $date_start)
+            ->with('date_stop', $date_stop);
     }
 
     public function monthReportTelemarketing() {
@@ -312,21 +312,6 @@ class StatisticsController extends Controller
                 ->groupBy('department_info.id')
                 ->get();
 
-            //pobieranie sumy godzin (całościowo)
-            $sum_hours = DB::table('work_hours')
-                ->select(DB::raw(
-                  'sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as realRBH
-                  '))
-                ->join('users', 'users.id', '=', 'work_hours.id_user')
-                ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
-                ->whereIn('work_hours.id', function($query) use($date){
-                    $query->select(DB::raw('
-                        work_hours.id
-                    '))
-                    ->where('date', 'like', $date);
-                })
-                ->get();
-
             $time_sum_array = 0;
             foreach($work_hours as $work_hour) {
               if ($work_hour->realRBH != null) {
@@ -335,7 +320,7 @@ class StatisticsController extends Controller
               }
             }
             $hours = round($time_sum_array / 3600, 2);
-
+// dd($reports);
             $data = [
                 'month_name' => $month_name,
                 'reports' => $reports,
@@ -343,23 +328,22 @@ class StatisticsController extends Controller
                 'hours' => $hours,
                 'days_list' => $days_list,
             ];
+            //
+            // Mail::send('mail.monthReportTelemarketing', $data, function($message)
+            // {
+            //     //MAIL_DRIVER=mail w env
+            //     // 'sendmail' => '/usr/sbin/sendmail -bs', na
+            //    // -> mail.php  'sendmail' => "C:\xampp\sendmail\sendmail.exe\ -t",
+            //     $message->from('jarzyna.verona@gmail.com');
+            //     $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
+            // });
 
-            Mail::send('mail.monthReportTelemarketing', $data, function($message)
-            {
-                //MAIL_DRIVER=mail w env
-                // 'sendmail' => '/usr/sbin/sendmail -bs', na
-               // -> mail.php  'sendmail' => "C:\xampp\sendmail\sendmail.exe\ -t",
-                $message->from('jarzyna.verona@gmail.com');
-                $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-            });
-
-        // return view('mail.monthReportTelemarketing')
-        //   ->with('hours', $hours)
-        //   ->with('work_hours', $work_hours)
-        //   ->with('sum_hours', $sum_hours)
-        //   ->with('month_name', $month_name)
-        //   ->with('days_list', $days_list)
-        //   ->with('reports', $reports);
+        return view('mail.monthReportTelemarketing')
+          ->with('hours', $hours)
+          ->with('work_hours', $work_hours)
+          ->with('month_name', $month_name)
+          ->with('days_list', $days_list)
+          ->with('reports', $reports);
     }
 
     public function weekReportJanky() {

@@ -32,6 +32,7 @@
 
 
         @foreach($reports as $report)
+        @php($goal = (($days_list['normal_day'] * $report->dep_aim) + ($days_list['weekend_day'] * $report->dep_aim_week)))
         @php($add_column = true)
             <tr>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->dep_name . ' ' . $report->dep_type_name}}</td>
