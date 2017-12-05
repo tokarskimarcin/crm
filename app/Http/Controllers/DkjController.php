@@ -407,7 +407,12 @@ class DkjController extends Controller
             $dkj->dkj_status = $request->dkj_status;
             $dkj->comment = $request->comment;
             $dkj->campaign = $request->campaign;
-            $dkj->department_info_id = $request->select_department_id_info;
+            $department = $request->select_department_id_info;
+            if($department < 0)
+            {
+                $department = $department * (-1);
+            }
+            $dkj->department_info_id = $department;
             $dkj->save();
         }
         if ($request->action == 'remove') {
