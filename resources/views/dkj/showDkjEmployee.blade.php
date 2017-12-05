@@ -60,16 +60,16 @@
                                         </select>
                                         <label>Typ rozmowy</label>
                                         <div class="radio">
-                                            <label><input type="radio" name="janky_status" value="0">Wyszystkie</label>
+                                            <label><input type="radio" name="janky_status" value="0" @if (isset($janky_status) &&  $janky_status == 0) checked='checked' @endif>Wyszystkie</label>
                                         </div>
                                         <div class="radio">
-                                            <label><input type="radio" name="janky_status" value="1">Janki</label>
+                                            <label><input type="radio" name="janky_status" value="1" @if (isset($janky_status) &&  $janky_status == 1) checked='checked' @endif>Janki</label>
                                         </div>
                                         <div class="radio">
-                                            <label><input type="radio" name="janky_status" value="2">Janki podważone </label>
+                                            <label><input type="radio" name="janky_status" value="2" @if (isset($janky_status) &&  $janky_status == 2) checked='checked' @endif>Janki podważone </label>
                                         </div>
                                         <div class="radio">
-                                            <label><input type="radio" name="janky_status" value="3">Janki usunięte</label>
+                                            <label><input type="radio" name="janky_status" value="3" @if (isset($janky_status) &&  $janky_status == 3) checked='checked' @endif>Janki usunięte</label>
                                         </div>
 
                                         <label>Data od:<span style="color:red;">*</span></label>

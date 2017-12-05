@@ -70,7 +70,8 @@ class DkjController extends Controller
             ->with('employee_info',$employee_info)
             ->with('old_start_date',$request->start_date)
             ->with('old_stop_date',$request->stop_date)
-            ->with('employee_id',$user_dkj_id);
+            ->with('employee_id',$user_dkj_id)
+            ->with('janky_status',$janky_status);
     }
 
     public function dkjRaportPost(Request $request)
