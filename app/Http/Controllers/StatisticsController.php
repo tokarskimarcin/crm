@@ -361,4 +361,58 @@ class StatisticsController extends Controller
         //   ->with('days_list', $days_list)
         //   ->with('reports', $reports);
     }
+
+    public function weekReportJanky() {
+
+      $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+      $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+
+
+        return view('mail.weekReportJanky')
+            ->with('date_start', $date_start)
+            ->with('date_stop', $date_stop);
+    }
+
+    public function dayReportMissedRepo() {
+        $today = date('Y-m-d');
+        $day_type = (date('N') > 5) ? 7 : 13 ;
+
+        $reports = DB::table('hour_report')
+            ->select(DB::raw(
+              'department_info.id,
+              departments.name as dep_name,
+              department_type.name as dep_name_type,
+              sum(CASE WHEN hour_report.is_send = 1 THEN 1 ELSE 0 END) as send,
+              sum(CASE WHEN hour_report.is_send = 0 THEN 1 ELSE 0 END) as missed
+              '))
+            ->join('department_info', 'department_info.id', '=', 'hour_report.department_info_id')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->where('report_date', '=', '2017-12-04')
+            ->groupBy('department_info_id')
+            ->get();
+
+        foreach ($reports as $report) {
+            $missed = $day_type - ($report->send + $report->missed);
+            $report->missed += $missed;
+        }
+
+        $data = [
+            'reports' => $reports,
+            'today' => $today
+        ];
+        //
+        // Mail::send('mail.dayReportMissedRepo', $data, function($message)
+        // {
+        //     //MAIL_DRIVER=mail w env
+        //     // 'sendmail' => '/usr/sbin/sendmail -bs', na
+        //    // -> mail.php  'sendmail' => "C:\xampp\sendmail\sendmail.exe\ -t",
+        //     $message->from('jarzyna.verona@gmail.com');
+        //     $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
+        // });
+
+        return view('mail.dayReportMissedRepo')
+            ->with('reports', $reports)
+            ->with('today', $today);
+    }
 }

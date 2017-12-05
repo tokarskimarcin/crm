@@ -71,6 +71,8 @@ Route::POST('/locker','AdminController@lockerPost')->name('api.locker');
 Route::get('/hourReportTelemarketing', 'StatisticsController@hourReportTelemarketing');
 Route::get('/weekReportTelemarketing', 'StatisticsController@weekReportTelemarketing');
 Route::get('/monthReportTelemarketing', 'StatisticsController@monthReportTelemarketing');
+Route::get('/weekReportJanky', 'StatisticsController@weekReportJanky');
+Route::get('/dayReportMissedRepo', 'StatisticsController@dayReportMissedRepo');
 
 //End emails
 
