@@ -28,10 +28,20 @@
             },
             success: function(response) {
                 for (var i = 0; i < response.length; i++) {
-                    $("#" + response[i].department_info_id + "dkjstatus td[name='status']").text("Odsłuchany (" + response[i].yanky_count + ")");
-                    $("#" + response[i].department_info_id + "dkjstatus td[name='count_yanek']").text(response[i].bad);
-                    $("#" + response[i].department_info_id + "dkjstatus td[name='status']").removeClass("alert-danger");
-                    $("#" + response[i].department_info_id + "dkjstatus td[name='status']").addClass("alert-success");
+                    if(response[i].type = 'Badania/Wysyłka')
+                    {
+                        $("#" + response[i].department_info_id + "dkjstatus td[name='status']").text("Odsłuchany (" + response[i].yanky_count + ")");
+                        $("#" + response[i].department_info_id + "dkjstatus td[name='count_yanek']").text(response[i].bad);
+                        $("#" + response[i].department_info_id + "dkjstatus td[name='status']").removeClass("alert-danger");
+                        $("#" + response[i].department_info_id + "dkjstatus td[name='status']").addClass("alert-success");
+                    }else
+                    {
+                        $("#" + response[i].department_info_id + "dkjstatus td[name='status']").text("Odsłuchany (" + response[i].yanky_count + ")");
+                        $("#" + response[i].department_info_id + "dkjstatus td[name='count_yanek']").text(response[i].bad);
+                        $("#" + response[i].department_info_id + "dkjstatus td[name='status']").removeClass("alert-danger");
+                        $("#" + response[i].department_info_id + "dkjstatus td[name='status']").addClass("alert-success");
+                    }
+
                 }
             }
         });
