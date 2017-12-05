@@ -23,4 +23,8 @@ class Dkj extends Model
     public function user() {
         return $this->belongsTo('App\User', 'id_user');
     }
+
+    public function dkj_user() {
+        return $this->belongsTo('App\User', 'id_dkj');
+    }
 }
