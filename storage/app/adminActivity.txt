@@ -4,3 +4,9 @@ ID: [5056] DATE: [2017-11-28 11:20:11] ACTION: [Zmiana hasła przeZXz użytkonik
 
 ID: [1] DATE: [2017-12-05 09:58:26] ACTION: [item2 : id52, Zmiana uprawnień grup i użytkowników : , Link name : Podgląd pracowników DKJ, Link adress : showDkjEmployee, Link group : , ]
 ID: [1] DATE: [2017-12-05 09:58:54] ACTION: [item3 : id52, Zmiana uprawnień grup i użytkowników : , Link name : Podgląd pracowników DKJ, Link adress : showDkjEmployee, Link group : , ]
+ID: [1] DATE: [2017-12-06 09:37:57] ACTION: [item3 : id56, Zmiana uprawnień grup i użytkowników : , Link name : Raport Godzinny Telemarketing (Podgląd), Link adress : pageHourReportTelemarketing, Link group : , ]
+ID: [1] DATE: [2017-12-06 09:38:10] ACTION: [item3 : id57, Zmiana uprawnień grup i użytkowników : , Link name : Raport miesięczny Telemarketing (Podgląd), Link adress : pageMonthReportTelemarketing, Link group : , ]
+ID: [1] DATE: [2017-12-06 09:38:13] ACTION: [item3 : id58, Zmiana uprawnień grup i użytkowników : , Link name : Raport Tygodniowy Telemarketing (Podgląd), Link adress : pageWeekReportJanky, Link group : , ]
+ID: [1] DATE: [2017-12-06 11:44:16] ACTION: [item3 : id61, Zmiana uprawnień grup i użytkowników : , Link name : Raport Miesięczny DKJ, Link adress : pageMonthReportDKJ, Link group : , ]
+ID: [1] DATE: [2017-12-06 11:44:19] ACTION: [item3 : id60, Zmiana uprawnień grup i użytkowników : , Link name : Raport Tygodniowy DKJ, Link adress : pageWeekReportDKJ, Link group : , ]
+ID: [1] DATE: [2017-12-06 11:44:22] ACTION: [item3 : id59, Zmiana uprawnień grup i użytkowników : , Link name : Raport Godzinny DKJ, Link adress : pageHourReportDKJ, Link group : , ]
