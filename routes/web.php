@@ -220,10 +220,17 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
     //Statistics Stop
 
     //Report Page Start
-    Route::get('/pageHourReportTelemarketing', 'ReportPageController@PageHourReportTelemarketing');
-    Route::get('/pageWeekReportTelemarketing', 'ReportPageController@PageWeekReportTelemarketing');
-    Route::get('/pageMonthReportTelemarketing', 'ReportPageController@PageMonthReportTelemarketing');
-    Route::get('/pageWeekReportJanky', 'ReportPageController@PageWeekReportJanky');
+    Route::get('/pageHourReportTelemarketing', 'ReportPageController@pageHourReportTelemarketing');
+    Route::get('/pageWeekReportTelemarketing', 'ReportPageController@pageWeekReportTelemarketing');
+    Route::get('/pageMonthReportTelemarketing', 'ReportPageController@pageMonthReportTelemarketing');
+
+
+    Route::get('/pageHourReportDKJ', 'ReportPageController@pageHourReportDKJ');
+    Route::get('/pageWeekReportDKJ', 'ReportPageController@pageWeekReportDKJ');
+    Route::get('/pageMonthReportDKJ', 'ReportPageController@pageMonthReportDKJ');
+
+    Route::get('/pageWeekReportJanky', 'ReportPageController@pageWeekReportJanky');
+
     //Report Page STOP
 });
 //////////////////////Testing ORM///////////////

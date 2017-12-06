@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class ReportPageController extends Controller
 {
-    public function PageHourReportTelemarketing()
+    public function pageHourReportTelemarketing()
     {
         $date = date('Y-m-d');
         $hour = date('H') . ':00:00'; //tutaj zmienic przy wydawaniu na produkcję na  date('H') - 1
@@ -33,7 +33,7 @@ class ReportPageController extends Controller
         return ($month < 1) ? 12 : $month ;
     }
 
-    public function PageWeekReportTelemarketing()
+    public function pageWeekReportTelemarketing()
     {
 
         $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
@@ -113,7 +113,7 @@ class ReportPageController extends Controller
                  ->with('date_stop', $date_stop);
     }
 
-    public function PageMonthReportTelemarketing()
+    public function pageMonthReportTelemarketing()
     {
         //ilosc dni pracujących w mieisącu z podziałem na dni normalne/weekendowe
         $list=array();
@@ -209,12 +209,16 @@ class ReportPageController extends Controller
             ->with('reports', $reports);;
     }
 
-    public function PageWeekReportJanky()
+    public function pageHourReportDKJ()
     {
         return view('reportpage.WeekReportJanky');
     }
 
-    public function PageDayReportMissedRepo()
+    public function pageWeekReportDKJ()
+    {
+        return view('reportpage.DayReportMissedRepo');
+    }
+    public function pageMonthReportDKJ()
     {
         return view('reportpage.DayReportMissedRepo');
     }
