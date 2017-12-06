@@ -283,6 +283,11 @@
             var campaign =$("#campaign").val();
             var select_department_id_info = $("#select_department_id_info").val();
             var check = 1;
+
+            if (comment == '' && dkj_status == 1) {
+                alert('Podaj komentarz!');
+                return false;
+            }
             if(phone == '')
             {
                 alert('Podaj telefon');

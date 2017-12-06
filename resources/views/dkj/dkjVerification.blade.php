@@ -130,8 +130,8 @@
                 "data": "manager_status",
                 "defaultContent": "<select class='form-control my_manager' showhidetext name=manager_status style=border-radius: 0px;>"+
                             "<option value=-1>Wybierz</option>"+
-                            "<option value=1>Tak</option>"+
-                            "<option value=0>Nie</option>"
+                            "<option value=0>Tak</option>"+
+                            "<option value=1>Nie</option>"
             },
                 {
                     "targets": -2,
@@ -182,9 +182,9 @@
                 },
                 {
                     "data": function (data, type, dataToSet) {
-                        if(data.manager_status == 0)
+                        if(data.manager_status == 1)
                             return "Brak Janka"
-                        else if(data.manager_status == 1)
+                        else if(data.manager_status == 0)
                             return "Janek"
                     }, "name": "manager_status"
                 },

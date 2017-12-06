@@ -133,10 +133,14 @@
                                                 <td>{{$item->add_date}}</td>
                                                 <td>{{$item->dkj_user->first_name.' '.$item->dkj_user->last_name}}</td>
                                                 <td>{{$item->phone}}</td>
-                                                <td style=" word-wrap: break-word; max-width: 200px" >{{$item->campain}}</td>
+                                                <td style=" word-wrap: break-word; max-width: 200px" >{{$item->campaign}}</td>
                                                 <td style=" word-wrap: break-word; max-width: 100px">{{$item->comment}}</td>
                                                 <td>{{ $item->dkj_status == 1 ? "Tak" : "Nie" }}</td>
-                                                <td>{{ $item->manager_status == 1 ? "Tak" : "Nie" }}</td>
+                                                @if($item->manager_status == null)
+                                                    <td>Brak</td>
+                                                @else
+                                                    <td>{{ $item->manager_status == 0 ? "Tak" : "Nie" }}</td>
+                                                @endif
                                                 <td>{{ $item->user->department_info->departments->name}} {{ $item->user->dating_type == 1 ? "Wysyłka" : "Badania" }}</td>
                                             </tr>
                                         @endforeach

@@ -49,19 +49,20 @@ class DkjController extends Controller
         $date_stop = $request->stop_date;
         $user_dkj_id = $request->user_dkj_id;
         $employee_info = Dkj::where('id_dkj',$user_dkj_id)
-            ->where('deleted',0)
+            //->where('deleted',0)
             ->whereBetween('add_date',[$date_start.=' 00:00:00',$date_stop.=' 23:00:00'])->get();
         if($janky_status == 1)
         {
-            $employee_info = $employee_info->where('dkj_status',1);
+            $employee_info = $employee_info->where('dkj_status',1)
+              ->where('deleted',0);
         }else if($janky_status == 2)
         {
             $employee_info = $employee_info->where('dkj_status',1)
-            ->where('manager_status',0);
+              ->where('manager_status',1);
         }else if($janky_status == 3)
         {
-            $employee_info = $employee_info->where('dkj_status',0)
-                ->where('manager_status',0);
+            $employee_info = $employee_info//->where('dkj_status',0)
+                ->where('deleted',1);
         }
         $dkjEmployee = User::where('user_type_id',2)
             ->where('status_work',1)->get();
@@ -514,8 +515,8 @@ class DkjController extends Controller
               sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as research_all,
               sum(CASE WHEN users.dating_type = 0 and  dkj.dkj_status = 1  THEN 1 ELSE 0 END) as research_janky_count,
               sum(CASE WHEN users.dating_type = 1 and  dkj.dkj_status = 1  THEN 1 ELSE 0 END) as shipping_janky_count,
-              sum(CASE WHEN users.dating_type = 0 and  dkj.dkj_status = 1 and manager_status = 0 THEN 1 ELSE 0 END) as manager_research_janky_count,
-              sum(CASE WHEN users.dating_type = 1 and  dkj.dkj_status = 1 and manager_status = 0 THEN 1 ELSE 0 END) as manager_shipping_janky_count,
+              sum(CASE WHEN users.dating_type = 0 and  dkj.dkj_status = 1 and manager_status = 1 THEN 1 ELSE 0 END) as manager_research_janky_count,
+              sum(CASE WHEN users.dating_type = 1 and  dkj.dkj_status = 1 and manager_status = 1 THEN 1 ELSE 0 END) as manager_shipping_janky_count,
               SUM(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as all_bad"))
               ->where('dkj.add_date','like',$today)
               ->groupBy('dkj.department_info_id','department_info.type')->get();

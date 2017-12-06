@@ -370,7 +370,7 @@
                             }, "name": "dkj_status"},
                             {
                                 "data": function (data, type, dataToSet) {
-                                    if(data.manager_status == 0)
+                                    if(data.manager_status == 1)
                                     {
                                         return "Nie " + " " + data.comment_manager;
                                     }else
