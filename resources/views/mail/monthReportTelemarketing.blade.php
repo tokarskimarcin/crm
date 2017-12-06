@@ -29,9 +29,7 @@
       @php($count = 0)
       @php($total_goal = 0)
       @php($goal = ($days_list['normal_day']) * 1200 +($days_list['weekend_day'] * 500))
-
-
-        @foreach($reports as $report)
+      @foreach($reports as $report)
         @php($goal = (($days_list['normal_day'] * $report->dep_aim) + ($days_list['weekend_day'] * $report->dep_aim_week)))
         @php($add_column = true)
             <tr>
