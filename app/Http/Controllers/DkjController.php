@@ -49,7 +49,6 @@ class DkjController extends Controller
         $date_stop = $request->stop_date;
         $user_dkj_id = $request->user_dkj_id;
         $employee_info = Dkj::where('id_dkj',$user_dkj_id)
-            //->where('deleted',0)
             ->whereBetween('add_date',[$date_start.=' 00:00:00',$date_stop.=' 23:00:00'])->get();
         if($janky_status == 1)
         {
@@ -61,8 +60,7 @@ class DkjController extends Controller
               ->where('manager_status',1);
         }else if($janky_status == 3)
         {
-            $employee_info = $employee_info//->where('dkj_status',0)
-                ->where('deleted',1);
+            $employee_info = $employee_info->where('deleted',1);
         }
         $dkjEmployee = User::where('user_type_id',2)
             ->where('status_work',1)->get();

@@ -212,7 +212,7 @@ class StatisticsController extends Controller
           //     $message->from('jarzyna.verona@gmail.com');
           //     $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
           // });
-dd($reports);
+dd($work_hours);
         return view('mail.weekReportTelemarketing')
             ->with('hours', $hours)
             ->with('work_hours', $work_hours)
@@ -320,7 +320,7 @@ dd($reports);
               }
             }
             $hours = round($time_sum_array / 3600, 2);
-// dd($reports);
+
             $data = [
                 'month_name' => $month_name,
                 'reports' => $reports,
@@ -371,7 +371,7 @@ dd($reports);
             ->join('department_info', 'department_info.id', '=', 'hour_report.department_info_id')
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-            ->where('report_date', '=', '2017-12-04')
+            ->where('report_date', '=', $today)
             ->groupBy('department_info_id')
             ->get();
 
@@ -382,9 +382,6 @@ dd($reports);
 
         Mail::send('mail.dayReportMissedRepo', $data, function($message)
         {
-            //MAIL_DRIVER=mail w env
-            // 'sendmail' => '/usr/sbin/sendmail -bs', na
-           // -> mail.php  'sendmail' => "C:\xampp\sendmail\sendmail.exe\ -t",
             $message->from('jarzyna.verona@gmail.com');
             $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
         });
@@ -392,5 +389,88 @@ dd($reports);
         return view('mail.dayReportMissedRepo')
             ->with('reports', $reports)
             ->with('today', $today);
+    }
+
+    public function hourReportDkj() {
+      $hour = date('H');
+      $hour_ago = date('H', time() - 3600);
+      $date_start = date('Y-m-d') . ' ' . $hour_ago . '%' ;
+      $date_stop = date('Y-m-d') . ' ' . $hour . '%' ;
+
+      $dkj = DB::table('dkj')
+          ->select(DB::raw('
+              dkj.department_info_id,
+              departments.name as dep_name,
+              department_type.name as dep_name_type,
+              department_info.type,
+              count(dkj.id) as liczba_odsluchanych,
+              sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as wysylka,
+              sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as badania,
+              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 1 THEN 1 ELSE 0 END) as bad_wysylka,
+              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 0 THEN 1 ELSE 0 END) as bad_badania
+          '))
+          ->join('users', 'users.id', '=', 'dkj.id_user')
+          ->join('department_info', 'department_info.id', '=', 'dkj.department_info_id')
+          ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+          ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+          ->whereBetween('add_date', [$date_start, $date_stop])
+          ->groupBy('dkj.department_info_id')
+          ->groupBy('department_info.type')
+          ->get();
+
+      $data = [
+          'dkj' => $dkj,
+          'date_stop' => date('H') . ':00:00'
+      ];
+
+      Mail::send('mail.hourReportDkj', $data, function($message)
+      {
+          $message->from('jarzyna.verona@gmail.com');
+          $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
+      });
+
+      return view('mail.hourReportDkj')
+          ->with('date_stop', date('H') . ':00:00')
+          ->with('dkj', $dkj);
+    }
+
+    public function dayReportDkj() {
+      $today = date('Y-m-d') . "%";
+
+      $dkj = DB::table('dkj')
+          ->select(DB::raw('
+              dkj.department_info_id,
+              departments.name as dep_name,
+              department_type.name as dep_name_type,
+              department_info.type,
+              count(dkj.id) as liczba_odsluchanych,
+              sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as wysylka,
+              sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as badania,
+              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 1 THEN 1 ELSE 0 END) as bad_wysylka,
+              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 0 THEN 1 ELSE 0 END) as bad_badania
+          '))
+          ->join('users', 'users.id', '=', 'dkj.id_user')
+          ->join('department_info', 'department_info.id', '=', 'dkj.department_info_id')
+          ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+          ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+          ->where('add_date', 'like', $today)
+          ->groupBy('dkj.department_info_id')
+          ->groupBy('department_info.type')
+          ->get();
+
+        $data = [
+            'dkj' => $dkj,
+            'today' => date('Y-m-d')
+        ];
+
+        Mail::send('mail.dayReportDkj', $data, function($message)
+        {
+            $message->from('jarzyna.verona@gmail.com');
+            $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
+        });
+
+        return view('mail.dayReportDkj')
+            ->with('dkj', $dkj)
+            ->with('today', date('Y-m-d'));
     }
 }
