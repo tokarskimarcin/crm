@@ -54,16 +54,28 @@
               @php($sum++)
           </tr>
       @endforeach
+      @php
+        if($sum == 0)
+        {
+            $total_success_proc = 0;
+            $total_wear_proc = 0;
+            $total_avg_proc = 0;
+        }else
+          {
+          $total_success_proc = round($total_success_proc / $sum, 2);
+          $total_wear_proc =round($total_wear_base / $sum, 2);
+          $total_avg_proc =round($total_average / $sum, 2);
+          }
+      @endphp
       <tr>
-          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px"></td>
-          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px"><b>Total</b></td>
-          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round($total_average / $sum, 2)}}</td>
+          <td colspan="2" style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px"><b>Total</b></td>
+          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_avg_proc}}</td>
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_success}}</td>
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_employee_count}}</td>
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_janky_count}}</td>
-          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round($total_wear_base / $sum, 2)}}</td>
+          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_wear_proc}}</td>
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_call_time}}</td>
-          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round($total_success_proc / $sum, 2)}}</td>
+          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_success_proc}}</td>
       </tr>
     </tbody>
 </table>

@@ -217,6 +217,13 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
 
     Route::Post('/hour_report_edit', 'StatisticsController@hourReportEditPost');
     //Statistics Stop
+
+    //Report Page Start
+    Route::get('/pageHourReportTelemarketing', 'ReportPageController@PageHourReportTelemarketing');
+    Route::get('/pageWeekReportTelemarketing', 'ReportPageController@PageWeekReportTelemarketing');
+    Route::get('/pageMonthReportTelemarketing', 'ReportPageController@PageMonthReportTelemarketing');
+    Route::get('/pageWeekReportJanky', 'ReportPageController@PageWeekReportJanky');
+    //Report Page STOP
 });
 //////////////////////Testing ORM///////////////
 
