@@ -498,6 +498,8 @@ dd($work_hours);
 
 
         return view('mail.weekReportDkj')
+            ->with('date_start', $date_start)
+            ->with('date_stop', $date_stop)
             ->with('dkj', $dkj);
     }
 }
