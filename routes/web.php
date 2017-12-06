@@ -75,6 +75,7 @@ Route::get('/weekReportJanky', 'StatisticsController@weekReportJanky');
 Route::get('/dayReportMissedRepo', 'StatisticsController@dayReportMissedRepo');
 Route::get('/hourReportDkj', 'StatisticsController@hourReportDkj');
 Route::get('/dayReportDkj', 'StatisticsController@dayReportDkj');
+Route::get('/weekReportDkj', 'StatisticsController@weekReportDkj');
 
 //End emails
 
