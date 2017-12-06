@@ -473,4 +473,31 @@ dd($work_hours);
             ->with('dkj', $dkj)
             ->with('today', date('Y-m-d'));
     }
+
+    public function weekReportDkj() {
+      $date_start = '2017-11-29';
+      $date_stop = '2017-12-07';
+
+        $dkj = DB::table('dkj')
+            ->select(DB::raw('
+                users.first_name,
+                users.last_name,
+                users.dating_type,
+                count(dkj.id) as user_sum,
+                sum(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as user_janek,
+                sum(CASE WHEN dkj.dkj_status = 0 THEN 1 ELSE 0 END) as user_not_janek,
+                sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as work_time
+            '))
+            ->join('users', 'users.id', '=', 'dkj.id_dkj')
+            ->join('work_hours', 'work_hours.id_user', '=', 'users.id')
+            ->whereBetween('dkj.add_date', [$date_start, $date_stop])
+            ->whereBetween('work_hours.date', [$date_start, $date_stop])
+            ->groupBy('dkj.id_dkj')
+            ->get();
+
+
+
+        return view('mail.weekReportDkj')
+            ->with('dkj', $dkj);
+    }
 }
