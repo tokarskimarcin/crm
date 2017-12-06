@@ -73,6 +73,8 @@ Route::get('/weekReportTelemarketing', 'StatisticsController@weekReportTelemarke
 Route::get('/monthReportTelemarketing', 'StatisticsController@monthReportTelemarketing');
 Route::get('/weekReportJanky', 'StatisticsController@weekReportJanky');
 Route::get('/dayReportMissedRepo', 'StatisticsController@dayReportMissedRepo');
+Route::get('/hourReportDkj', 'StatisticsController@hourReportDkj');
+Route::get('/dayReportDkj', 'StatisticsController@dayReportDkj');
 
 //End emails
 
