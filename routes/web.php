@@ -73,7 +73,8 @@ Route::get('/weekReportTelemarketing', 'StatisticsController@MailweekReportTelem
 Route::get('/monthReportTelemarketing', 'StatisticsController@MailmonthReportTelemarketing'); // ok
 Route::get('/weekReportJanky', 'StatisticsController@weekReportJanky');
 Route::get('/dayReportMissedRepo', 'StatisticsController@dayReportMissedRepo');
-Route::get('/hourReportDkj', 'StatisticsController@hourReportDkj');
+
+Route::get('/hourReportDkj', 'StatisticsController@MailhourReportDkj'); // ok
 Route::get('/dayReportDkj', 'StatisticsController@dayReportDkj');
 Route::get('/weekReportDkj', 'StatisticsController@weekReportDkj');
 
@@ -225,7 +226,7 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
     Route::get('/pageMonthReportTelemarketing', 'StatisticsController@pageMonthReportTelemarketing');
 
 
-    Route::get('/pageHourReportDKJ', 'ReportPageController@pageHourReportDKJ');
+    Route::get('/pageHourReportDKJ', 'StatisticsController@pageHourReportDKJ');
     Route::get('/pageWeekReportDKJ', 'ReportPageController@pageWeekReportDKJ');
     Route::get('/pageMonthReportDKJ', 'ReportPageController@pageMonthReportDKJ');
 

@@ -55,8 +55,7 @@
 @endforeach
 
 <tr>
-    <td style="border:1px solid #231f20;text-align:center;padding:3px;"></td>
-    <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>Total</b></td>
+    <td colspan="2" style="border:1px solid #231f20;text-align:center;padding:3px;"><b>Total</b></td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$date_stop}}</td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_badania}}</td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_badania - $total_bad_badania}}</td>
@@ -127,8 +126,7 @@
 @endforeach
 
 <tr>
-    <td style="border:1px solid #231f20;text-align:center;padding:3px;"></td>
-    <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>Total</b></td>
+    <td colspan="2" style="border:1px solid #231f20;text-align:center;padding:3px;"><b>Total</b></td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$date_stop}}</td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_wysylka}}</td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_wysylka - $total_bad_wysylka}}</td>
@@ -143,8 +141,4 @@
 
 </tbody>
 </table>
-<div style="width:10px;height:20px;"></div>
-<div style="display: block;">
-Wiadomość została wygenerowana automatycznie, prosimy na nią nie odpowiadać.</div>
-<div style="display: block;">
-Wszelkie uwagi oraz sugestie proszę kierować na adres: wojciech.mazur@veronaconsulting.pl</div>
+

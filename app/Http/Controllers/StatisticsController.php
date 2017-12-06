@@ -248,14 +248,14 @@ class StatisticsController extends Controller
     }
 
     //zwracanie nazwy miesiąca którego dotyczy statystyka
-    function monthReverseName($month) {
+    private function monthReverseName($month) {
         $month_names = array( 'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień' );
         $month -= 1;
         $month = ($month < 0) ? 11 : $month ;
         return $month_names[$month];
     }
 
-    function monthReverse($month) {
+    private function monthReverse($month) {
         $month -= 1;
         return ($month < 1) ? 12 : $month ;
     }
@@ -427,15 +427,14 @@ public function pageMonthReportTelemarketing()
             ->with('reports', $reports)
             ->with('today', $today);
     }
-
-    public function hourReportDkj() {
-      $hour = date('H');
-      $hour_ago = date('H', time() - 3600);
-      $date_start = date('Y-m-d') . ' ' . $hour_ago . '%' ;
-      $date_stop = date('Y-m-d') . ' ' . $hour . '%' ;
-
-      $dkj = DB::table('dkj')
-          ->select(DB::raw('
+    // Przygotowanie danych do raportu godzinnego DKJ
+    private function hourReportDkj() {
+        $hour = date('H');
+        $hour_ago = date('H', time() - 3600);
+        $date_start = date('Y-m-d') . ' ' . $hour_ago . '%' ;
+        $date_stop = date('Y-m-d') . ' ' . $hour . '%' ;
+        $dkj = DB::table('dkj')
+            ->select(DB::raw('
               dkj.department_info_id,
               departments.name as dep_name,
               department_type.name as dep_name_type,
@@ -446,20 +445,25 @@ public function pageMonthReportTelemarketing()
               SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 1 THEN 1 ELSE 0 END) as bad_wysylka,
               SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 0 THEN 1 ELSE 0 END) as bad_badania
           '))
-          ->join('users', 'users.id', '=', 'dkj.id_user')
-          ->join('department_info', 'department_info.id', '=', 'dkj.department_info_id')
-          ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-          ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-          ->whereBetween('add_date', [$date_start, $date_stop])
-          ->groupBy('dkj.department_info_id')
-          ->groupBy('department_info.type')
-          ->get();
+            ->join('users', 'users.id', '=', 'dkj.id_user')
+            ->join('department_info', 'department_info.id', '=', 'dkj.department_info_id')
+            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+            ->whereBetween('add_date', [$date_start, $date_stop])
+            ->groupBy('dkj.department_info_id')
+            ->groupBy('department_info.type')
+            ->get();
+        $data = [
+            'dkj' => $dkj,
+            'date_stop' => date('H') . ':00:00'
+        ];
+        return $data;
 
-      $data = [
-          'dkj' => $dkj,
-          'date_stop' => date('H') . ':00:00'
-      ];
+    }
 
+    // Mail do godzinnego raportu DKJ
+    public function MailhourReportDkj() {
+        $data = $this::hourReportDkj();
       Mail::send('mail.hourReportDkj', $data, function($message)
       {
           $message->from('jarzyna.verona@gmail.com');
@@ -468,7 +472,14 @@ public function pageMonthReportTelemarketing()
 
       return view('mail.hourReportDkj')
           ->with('date_stop', date('H') . ':00:00')
-          ->with('dkj', $dkj);
+          ->with('dkj', $data['dkj']);
+    }
+    public function pageHourReportDKJ()
+    {
+        $data = $this::hourReportDkj();
+        return view('reportpage.hourReportDkj')
+            ->with('date_stop', date('H') . ':00:00')
+            ->with('dkj', $data['dkj']);
     }
 
     public function dayReportDkj() {
