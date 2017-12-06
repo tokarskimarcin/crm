@@ -55,8 +55,7 @@
           </tr>
       @endforeach
       <tr>
-          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px"></td>
-          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px"><b>Total</b></td>
+          <td colspan="2" style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px"><b>Total</b></td>
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round($total_average / $sum, 2)}}</td>
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_success}}</td>
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_employee_count}}</td>

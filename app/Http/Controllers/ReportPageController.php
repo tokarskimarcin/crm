@@ -2,11 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\HourReport;
+
 class ReportPageController extends Controller
 {
     public function PageHourReportTelemarketing()
     {
-        return view('reportpage.HourReportTelemarketing');
+        $date = date('Y-m-d');
+        $hour = date('H') . ':00:00'; //tutaj zmienic przy wydawaniu na produkcję na  date('H') - 1
+
+        $reports = HourReport::where('report_date', '=', $date)
+            ->where('hour', $hour)
+            ->get();
+
+        return view('reportpage.HourReportTelemarketing')
+            ->with('date',$date)
+            ->with('hour',$hour)
+            ->with('reports',$reports);
     }
 
     public function PageWeekReportTelemarketing()

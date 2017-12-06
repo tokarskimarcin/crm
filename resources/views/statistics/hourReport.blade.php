@@ -139,9 +139,17 @@
                                             <td class="wear_base">{{$report->wear_base}} %</td>
                                             <td class="call_time">{{$report->call_time}} %</td>
                                             @if(date('N', strtotime(date('Y-m-d'))) >= 6)
-                                                <td>{{round(($report->success*100)/$report->department_info->dep_aim_week,2)}} %</td>
+                                                @if($report->department_info->dep_aim_week == 0)
+                                                    <td>Brak Danych o oddziale</td>
+                                                @else
+                                                    <td>{{round(($report->success*100)/$report->department_info->dep_aim_week,2)}} %</td>
+                                                @endif
                                             @else
-                                                <td>{{round(($report->success*100)/$report->department_info->dep_aim,2)}} %</td>
+                                                @if($report->department_info->dep_aim == 0)
+                                                    <td>Brak Danych o oddziale</td>
+                                                @else
+                                                    <td>{{round(($report->success*100)/$report->department_info->dep_aim,2)}} %</td>
+                                                @endif
                                             @endif
                                             <td id="status_{{$i}}">{{ $report->is_send == 1 ? "Wysłany" : "Oczekuje na wysłanie" }}</td>
                                             @if($report->is_send == 1)
