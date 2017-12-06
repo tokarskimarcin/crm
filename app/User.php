@@ -58,6 +58,10 @@ class User extends Authenticatable
         return $this->hasMany('App\Dkj', 'id_user');
     }
 
+    public function dkj_employe() {
+        return $this->hasMany('App\Dkj', 'id_dkj');
+    }
+
     public function privilages() {
         return $this->belongsToMany('App\Links', 'privilage_relation', 'user_type_id', 'link_id');
     }
