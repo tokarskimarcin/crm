@@ -492,7 +492,7 @@ class DkjController extends Controller
                 sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as shipping_all,
                 sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as research_all,
                 sum(CASE WHEN users.dating_type = 0 and  dkj.dkj_status = 1  THEN 1 ELSE 0 END) as research_janky_count,
-                sum(CASE WHEN users.dating_type = 1 and  dkj.dkj_status = 1  THEN 1 ELSE 0 END) as shipping_janky_count, 
+                sum(CASE WHEN users.dating_type = 1 and  dkj.dkj_status = 1  THEN 1 ELSE 0 END) as shipping_janky_count,
                 SUM(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as all_bad"))
                 ->where('dkj.add_date','like',$today)
                 ->groupBy('dkj.department_info_id','department_info.type')->get();
@@ -500,17 +500,25 @@ class DkjController extends Controller
         }
     }
 
-    public function getStatsDkjMaster(Request $request) {
+    public function getStatsDkjMaster(Request $request) { //dodac to u góry + 2 kolumny gdzie liczymy status_manager = 1 lub 0
         if ($request->ajax()) {
-            $today = date("Y-m-d") . "%";
-            $dkj_user = Dkj::select(DB::raw("
-                department_info_id,
-                count(id) as yanky_count,
-                SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad,
-                SUM(CASE WHEN dkj_status = 1 AND manager_status = 0 THEN 1 ELSE 0 END) as manager_disagreement"))
-                ->where('add_date','like',$today)
-                ->groupBy('department_info_id')
-                ->get();
+          $today = date("Y-m-d") . "%";
+          $dkj_user = Dkj::
+              join('users', 'dkj.id_user', '=', 'users.id')
+              ->join('department_info', 'dkj.department_info_id', '=', 'department_info.id')
+              ->select(DB::raw("
+              dkj.department_info_id,
+              department_info.type,
+              count(dkj.id) as all_check_talk,
+              sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as shipping_all,
+              sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as research_all,
+              sum(CASE WHEN users.dating_type = 0 and  dkj.dkj_status = 1  THEN 1 ELSE 0 END) as research_janky_count,
+              sum(CASE WHEN users.dating_type = 1 and  dkj.dkj_status = 1  THEN 1 ELSE 0 END) as shipping_janky_count,
+              sum(CASE WHEN users.dating_type = 0 and  dkj.dkj_status = 1 and manager_status = 0 THEN 1 ELSE 0 END) as manager_research_janky_count,
+              sum(CASE WHEN users.dating_type = 1 and  dkj.dkj_status = 1 and manager_status = 0 THEN 1 ELSE 0 END) as manager_shipping_janky_count,
+              SUM(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as all_bad"))
+              ->where('dkj.add_date','like',$today)
+              ->groupBy('dkj.department_info_id','department_info.type')->get();
             return $dkj_user;
         }
     }

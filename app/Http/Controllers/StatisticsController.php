@@ -359,7 +359,6 @@ dd($reports);
 
     public function dayReportMissedRepo() {
         $today = date('Y-m-d');
-        $day_type = (date('N') > 5) ? 7 : 13 ;
 
         $reports = DB::table('hour_report')
             ->select(DB::raw(
@@ -376,24 +375,19 @@ dd($reports);
             ->groupBy('department_info_id')
             ->get();
 
-        foreach ($reports as $report) {
-            $missed = $day_type - ($report->send + $report->missed);
-            $report->missed += $missed;
-        }
-
         $data = [
             'reports' => $reports,
             'today' => $today
         ];
-        //
-        // Mail::send('mail.dayReportMissedRepo', $data, function($message)
-        // {
-        //     //MAIL_DRIVER=mail w env
-        //     // 'sendmail' => '/usr/sbin/sendmail -bs', na
-        //    // -> mail.php  'sendmail' => "C:\xampp\sendmail\sendmail.exe\ -t",
-        //     $message->from('jarzyna.verona@gmail.com');
-        //     $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-        // });
+
+        Mail::send('mail.dayReportMissedRepo', $data, function($message)
+        {
+            //MAIL_DRIVER=mail w env
+            // 'sendmail' => '/usr/sbin/sendmail -bs', na
+           // -> mail.php  'sendmail' => "C:\xampp\sendmail\sendmail.exe\ -t",
+            $message->from('jarzyna.verona@gmail.com');
+            $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
+        });
 
         return view('mail.dayReportMissedRepo')
             ->with('reports', $reports)
