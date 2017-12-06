@@ -4,7 +4,7 @@
 {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Panel zarządzania</h1>
+            <h1 class="page-header">Raport Godzinny Telemarketing</h1>
         </div>
     </div>
 
