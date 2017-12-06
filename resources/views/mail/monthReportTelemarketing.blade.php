@@ -63,6 +63,25 @@
             @php($count++)
         @endforeach
 
+      @php
+          if($count == 0)
+          {
+
+                  $total_goal_proc = 0;
+                  $total_avg_wear_base_proc = 0;
+                  $total_janky_proc = 0;
+                  $total_avg_average_proc = 0;
+                  $total_sum_call_time_poc = 0;
+          }else
+            {
+                  $total_goal_proc = round($total_goal / $count, 2);
+                  $total_avg_wear_base_proc = round($total_avg_wear_base / $count, 2);
+                  $total_janky_proc = round($total_janky / $count, 2);
+                  $total_avg_average_proc = round($total_avg_average / $count, 2);
+                  $total_sum_call_time_poc = round($total_sum_call_time, 2);
+            }
+      @endphp
+
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>Total:</b></td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_avg_average / $count, 2)}}</td>

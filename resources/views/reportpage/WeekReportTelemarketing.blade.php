@@ -4,7 +4,7 @@
     {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Panel zarządzania</h1>
+            <h1 class="page-header">Raport Tygodniowy Telemarketing</h1>
         </div>
     </div>
 
@@ -21,10 +21,7 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <div class="panel-body">
-                                    <div class="well">
-
-
-                                    </div>
+                                        @include('mail.weekReportTelemarketing')
                                 </div>
                             </div>
                         </div>
