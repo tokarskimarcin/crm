@@ -429,10 +429,7 @@ public function pageMonthReportTelemarketing()
     }
     // Przygotowanie danych do raportu godzinnego DKJ
     private function hourReportDkj() {
-        $hour = date('H');
-        $hour_ago = date('H', time() - 3600);
-        $date_start = date('Y-m-d') . ' ' . $hour_ago . '%' ;
-        $date_stop = date('Y-m-d') . ' ' . $hour . '%' ;
+        $date_start = date('Y-m-d');
         $dkj = DB::table('dkj')
             ->select(DB::raw('
               dkj.department_info_id,
@@ -449,7 +446,7 @@ public function pageMonthReportTelemarketing()
             ->join('department_info', 'department_info.id', '=', 'dkj.department_info_id')
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-            ->whereBetween('add_date', [$date_start, $date_stop])
+            ->where('add_date','like',$date_start.'%')
             ->groupBy('dkj.department_info_id')
             ->groupBy('department_info.type')
             ->get();
