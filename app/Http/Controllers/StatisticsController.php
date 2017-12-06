@@ -369,7 +369,7 @@ class StatisticsController extends Controller
           ->with('days_list', $data['days_list'])
           ->with('reports', $data['reports']);
     }
-
+// wyswietlenie raportu miesiecznego
 public function pageMonthReportTelemarketing()
 {
     $month = date('m');
