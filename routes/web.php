@@ -68,9 +68,9 @@ Route::POST('/locker','AdminController@lockerPost')->name('api.locker');
 
 //Emails
 
-Route::get('/hourReportTelemarketing', 'StatisticsController@hourReportTelemarketing');
-Route::get('/weekReportTelemarketing', 'StatisticsController@weekReportTelemarketing');
-Route::get('/monthReportTelemarketing', 'StatisticsController@monthReportTelemarketing');
+Route::get('/hourReportTelemarketing', 'StatisticsController@MailhourReportTelemarketing'); // ok
+Route::get('/weekReportTelemarketing', 'StatisticsController@MailweekReportTelemarketing'); // ok
+Route::get('/monthReportTelemarketing', 'StatisticsController@MailmonthReportTelemarketing'); // ok
 Route::get('/weekReportJanky', 'StatisticsController@weekReportJanky');
 Route::get('/dayReportMissedRepo', 'StatisticsController@dayReportMissedRepo');
 Route::get('/hourReportDkj', 'StatisticsController@hourReportDkj');
@@ -220,9 +220,9 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
     //Statistics Stop
 
     //Report Page Start
-    Route::get('/pageHourReportTelemarketing', 'ReportPageController@pageHourReportTelemarketing');
-    Route::get('/pageWeekReportTelemarketing', 'ReportPageController@pageWeekReportTelemarketing');
-    Route::get('/pageMonthReportTelemarketing', 'ReportPageController@pageMonthReportTelemarketing');
+    Route::get('/pageHourReportTelemarketing', 'StatisticsController@pageHourReportTelemarketing');
+    Route::get('/pageWeekReportTelemarketing', 'StatisticsController@pageWeekReportTelemarketing');
+    Route::get('/pageMonthReportTelemarketing', 'StatisticsController@pageMonthReportTelemarketing');
 
 
     Route::get('/pageHourReportDKJ', 'ReportPageController@pageHourReportDKJ');
