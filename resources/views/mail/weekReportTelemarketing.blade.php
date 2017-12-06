@@ -36,7 +36,7 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->dep_name . ' ' . $report->dep_type_name}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->avg_average, 2)}}</td>
             @foreach($work_hours as $work_hour)
-                @if($work_hour->id == $report->id)
+                @if($work_hour->id == $report->id && $work_hour->realRBH != null)
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$work_hour->realRBH}}</td>
                     @php($add_column = false)
                 @endif
@@ -62,15 +62,34 @@
 
       @endforeach
 
+      @php
+          if($count == 0)
+          {
+
+                  $total_goal_proc = 0;
+                  $total_avg_wear_base_proc = 0;
+                  $total_janky_proc = 0;
+                  $total_avg_average_proc = 0;
+                  $total_sum_call_time_poc = 0;
+          }else
+            {
+                  $total_goal_proc = round($total_goal / $count, 2);
+                  $total_avg_wear_base_proc = round($total_avg_wear_base / $count, 2);
+                  $total_janky_proc = round($total_janky / $count, 2);
+                  $total_avg_average_proc = round($total_avg_average / $count, 2);
+                  $total_sum_call_time_poc = round($total_sum_call_time, 2);
+            }
+      @endphp
+
       <tr>
           <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>Total:</b></td>
-          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_avg_average / $count, 2)}}</td>
+          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_avg_average_proc}}</td>
           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$hours}} godzin</td>
           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_sum_success}}</td>
-          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_janky / $count, 2)}} %</td>
-          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_avg_wear_base / $count, 2)}} %</td>
-          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_sum_call_time, 2)}}</td>
-          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_goal / $count, 2)}} %</td>
+          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_janky_proc}} %</td>
+          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_avg_wear_base_proc}} %</td>
+          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_sum_call_time_poc}}</td>
+          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_goal_proc}} %</td>
       </tr>
   </tbody>
 </table>
