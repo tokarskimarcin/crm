@@ -14,7 +14,7 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <div class="panel-body">
-                                        @include('mail.monthReportDkj')
+                                        @include('mail.weekReportDkj')
                                     </div>
                                 </div>
                             </div>
