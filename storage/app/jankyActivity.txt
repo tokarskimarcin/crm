@@ -33,3 +33,4 @@ ID: [1] DATE: [2017-12-06 13:43:25] ACTION: [Dodanie janka przez dkj, status: 1,
 ID: [1] DATE: [2017-12-06 14:20:25] ACTION: [Dodanie janka przez dkj, status: 0, komentarz: 123, numer telefonu: 1231, kampania: 123123]
 ID: [1] DATE: [2017-12-06 14:20:59] ACTION: [Dodanie janka przez dkj, status: 1, komentarz: 123, numer telefonu: 123, kampania: 123]
 ID: [1] DATE: [2017-12-07 07:33:10] ACTION: [Dodanie janka przez dkj, status: 1, komentarz: 234, numer telefonu: 234, kampania: 234]
+ID: [1] DATE: [2017-12-07 07:44:13] ACTION: [Dodanie janka przez dkj, status: 1, komentarz: 12, numer telefonu: 12, kampania: 12]
