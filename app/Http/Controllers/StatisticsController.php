@@ -712,21 +712,116 @@ public function pageMonthReportTelemarketing()
     private function dayReportCheckedData() {
         $today = date('Y-m-d');
 
+
+        $hour_reports = DB::table('hour_report')
+            ->select(DB::raw('
+                department_info_id,
+                success,
+                departments.name as dep_name,
+                department_type.name as dep_name_type
+            '))
+            ->join('department_info', 'department_info.id', '=', 'hour_report.department_info_id')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->whereIn('hour_report.id', function($query) use($today){
+                $query->select(DB::raw('
+                  MAX(hour_report.id)
+                '))
+                ->from('hour_report')
+                ->where('hour_report.report_date', '=', $today)
+                ->groupBy('hour_report.department_info_id');
+            })
+            ->get();
+
+        $dkj = DB::table('dkj')
+            ->select(DB::raw('
+                department_info_id,
+                count(*) as dkj_sum
+            '))
+            ->where('add_date', 'like', $today . '%')
+            ->groupBy('department_info_id')
+            ->get();
+
         $data = [
-            'today' => $today
+            'today' => $today,
+            'hour_reports' => $hour_reports,
+            'dkj' => $dkj
         ];
         return $data;
     }
 
+    //wysyłanie emaili (raport dzienny odłsuchanych rozmów)
     public function dayReportChecked() {
+      $data = $this->dayReportCheckedData();
 
-
+      Mail::send('mail.dayReportChecked', $data, function($message)
+      {
+          $message->from('jarzyna.verona@gmail.com');
+          $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
+      });
     }
 
+    //wyświetlanie raportu odsłuchanych rozmów (raport dzienny)
     public function pageDayReportChecked() {
         $data = $this->dayReportCheckedData();
 
         return view('reportpage.DayReportChecked')
+            ->with('hour_reports', $data['hour_reports'])
+            ->with('dkj', $data['dkj'])
             ->with('today', $data['today']);
+    }
+
+    private function weekReportCheckedData() {
+          /* Pobrac max(id) z kazdego dnia tygodnia z podzialem na oddziały, potem skurwic razem ilosc zgód z podziałem na departmamenty*/
+          // $date_start = '2017-12-01';
+          // $date_stop = '2017-12-30';
+
+          $month = $this->monthReverse(date('m'));
+          $year = date('Y');
+          if ($month == 12) {
+              $year -= 1;
+          }
+          $selected_date = $year . '-' . $month . '%';
+
+          $hour_reports = DB::table('hour_report')
+              ->select(DB::raw('
+                department_info_id,
+                sum(success),
+                departments.name as dep_name,
+                department_type.name as dep_name_type
+              '))
+              ->join('department_info', 'department_info.id', '=', 'hour_report.department_info_id')
+              ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+              ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+              ->whereIn('hour_report.id', function($query) use($selected_date){
+                  $query->select(DB::raw('
+                    MAX(hour_report.id)
+                  '))
+                  ->from('hour_report')
+                  ->where('hour_report.report_date', '=', $selected_date)
+                  ->groupBy('hour_report.department_info_id')
+                  ->groupBy('hour_report.report_date');
+              })
+              ->where('department_info.id_dep_type', '=', 2)
+              ->groupBy('hour_report.department_info_id')
+              ->get();
+
+          $data = [
+              'month_name' => $this->monthReverseName($month),
+              'hour_reports' => $hour_reports
+          ];
+          return $data;
+    }
+
+    public function weekReportChecked() {
+        $data = $this->weekReportCheckedData();
+    }
+
+    public function pageWeekReportChecked() {
+        $data = $this->weekReportCheckedData();
+
+        return view('reportpage.WeekReportChecked')
+            ->with('hour_reports', $data['hour_reports'])
+            ->with('month_name', $data['month_name']);
     }
 }
