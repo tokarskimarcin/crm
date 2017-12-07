@@ -97,7 +97,7 @@
                                                         <td>0 PLN</td>
                                                         <td>0</td>
                                                         <td>0</td>
-                                                        <td>0}</td>
+                                                        <td>0</td>
                                                         <td>0</td>
                                                         <td>0</td>
                                                     </tr>
