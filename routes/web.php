@@ -75,9 +75,14 @@ Route::get('/weekReportJanky', 'StatisticsController@weekReportJanky');
 Route::get('/dayReportMissedRepo', 'StatisticsController@dayReportMissedRepo');
 
 Route::get('/hourReportDkj', 'StatisticsController@MailhourReportDkj'); // ok
-Route::get('/dayReportDkj', 'StatisticsController@dayReportDkj');
-Route::get('/weekReportDkj', 'StatisticsController@MailWeekReportDkj');
-Route::get('/monthReportDkj', 'StatisticsController@monthReportDkj');
+Route::get('/dayReportDkj', 'StatisticsController@dayReportDkj');// ok
+Route::get('/weekReportDkj', 'StatisticsController@MailWeekReportDkj');// ok
+Route::get('/monthReportDkj', 'StatisticsController@monthReportDkj');// ok
+
+
+Route::get('/hourReportChecked', 'StatisticsController@hourReportChecked');
+Route::get('/dayReportChecked', 'StatisticsController@dayReportChecked');
+Route::get('/weekReportChecked', 'StatisticsController@weekReportChecked');
 
 //End emails
 
@@ -230,6 +235,11 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
     Route::get('/pageHourReportDKJ', 'StatisticsController@pageHourReportDKJ');
     Route::get('/pageWeekReportDKJ', 'StatisticsController@pageWeekReportDKJ');
     Route::get('/pageMonthReportDKJ', 'StatisticsController@pageMonthReportDKJ');
+
+
+    Route::get('/pageHourReportChecked', 'StatisticsController@pageHourReportChecked');
+    Route::get('/pageDayReportChecked', 'StatisticsController@pageDayReportChecked');
+    Route::get('/pageWeekReportChecked', 'StatisticsController@pageWeekReportChecked');
 
     Route::get('/pageWeekReportJanky', 'ReportPageController@pageWeekReportJanky');
 

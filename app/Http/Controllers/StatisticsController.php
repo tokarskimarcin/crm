@@ -519,32 +519,214 @@ public function pageMonthReportTelemarketing()
             ->with('today', date('Y-m-d'));
     }
 
-    public function weekReportDkj() {
-      $date_start = '2017-11-29';
-      $date_stop = '2017-12-07';
+    //przygotowanie danych do raportu tygodniowego dkj
+    private function weekReportDkjData() {
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
 
-        $dkj = DB::table('dkj')
+        $dkj = DB::table('users')
             ->select(DB::raw('
+                users.id,
                 users.first_name,
                 users.last_name,
                 users.dating_type,
-                count(dkj.id) as user_sum,
+                count(*) as user_sum,
                 sum(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as user_janek,
-                sum(CASE WHEN dkj.dkj_status = 0 THEN 1 ELSE 0 END) as user_not_janek,
-                sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as work_time
+                sum(CASE WHEN dkj.dkj_status = 0 THEN 1 ELSE 0 END) as user_not_janek
             '))
-            ->join('users', 'users.id', '=', 'dkj.id_dkj')
-            ->join('work_hours', 'work_hours.id_user', '=', 'users.id')
+            ->join('dkj', 'users.id', '=', 'dkj.id_dkj')
             ->whereBetween('dkj.add_date', [$date_start, $date_stop])
-            ->whereBetween('work_hours.date', [$date_start, $date_stop])
             ->groupBy('dkj.id_dkj')
             ->get();
 
+        $work_hours = DB::table('users')
+            ->select(DB::raw('
+                users.id,
+                sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as work_time
+            '))
+            ->join('work_hours', 'users.id', '=', 'work_hours.id_user')
+            ->whereBetween('work_hours.date', [$date_start, $date_stop])
+            ->where('users.user_type_id', '=', 2)
+            ->groupBy('users.id')
+            ->get();
+
+        $data = [
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'dkj' => $dkj,
+            'work_hours' => $work_hours
+        ];
+        return $data;
+    }
+
+    //wyswietlanie danych raportu tygodniowego dla DKJ
+    public function pageWeekReportDKJ() {
+      $data = $this->weekReportDkjData();
+
+        return view('reportpage.WeekReportDkj')
+            ->with('date_start', $data['date_start'])
+            ->with('date_stop', $data['date_stop'])
+            ->with('work_hours', $data['work_hours'])
+            ->with('dkj', $data['dkj']);
+    }
+
+    //wysyłanie email (raport tygodniowy dkj)
+    public function MailWeekReportDkj() {
+      $data = $this->weekReportDkjData();
+
+      Mail::send('mail.weekReportDkj', $data, function($message)
+      {
+          $message->from('jarzyna.verona@gmail.com');
+          $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
+      });
+    }
+
+    //przygotowanie danych do raportu miesięcznego dkj
+    public function MonthReportDkjData() {
+        $month = $this->monthReverse(date('m'));
+        $year = date('Y');
+        if ($month == 12) {
+            $year -= 1;
+        }
+        $selected_date = $year . '-' . $month . '%';
+
+        $dkj = DB::table('users')
+            ->select(DB::raw('
+                users.id,
+                users.first_name,
+                users.last_name,
+                users.dating_type,
+                count(*) as user_sum,
+                sum(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as user_janek,
+                sum(CASE WHEN dkj.dkj_status = 0 THEN 1 ELSE 0 END) as user_not_janek
+            '))
+            ->join('dkj', 'users.id', '=', 'dkj.id_dkj')
+            ->where('dkj.add_date', 'like', $selected_date)
+            ->groupBy('dkj.id_dkj')
+            ->get();
+
+        $work_hours = DB::table('users')
+            ->select(DB::raw('
+                users.id,
+                sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as work_time
+            '))
+            ->join('work_hours', 'users.id', '=', 'work_hours.id_user')
+            ->where('work_hours.date', 'like', $selected_date)
+            ->groupBy('users.id')
+            ->where('users.user_type_id', '=', 2)
+            ->get();
 
 
-        return view('mail.weekReportDkj')
-            ->with('date_start', $date_start)
-            ->with('date_stop', $date_stop)
-            ->with('dkj', $dkj);
+        $data = [
+            'month_name' => $this->monthReverseName($month),
+            'dkj' => $dkj,
+            'work_hours' => $work_hours
+        ];
+        return $data;
+    }
+
+    //wysyłanie raportu miesięcznego pracownicy dkj
+    public function monthReportDkj() {
+      $data = $this->MonthReportDkjData();
+
+
+      Mail::send('mail.monthReportDkj', $data, function($message)
+      {
+          $message->from('jarzyna.verona@gmail.com');
+          $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
+      });
+
+    }
+
+    //wyswietlanie raoprtu miesiecznego pracownicy dkj
+    public function pageMonthReportDKJ(){
+        $data = $this->MonthReportDkjData();
+
+        return view('reportpage.MonthReportDkj')
+            ->with('month_name', $data['month_name'])
+            ->with('dkj', $data['dkj'])
+            ->with('work_hours', $data['work_hours']);
+    }
+
+    /****************** RAPORTY ODSŁUCH ***********************/
+
+    private function hourReportCheckedData() {
+        $date = date('Y-m-d');
+        $hour = date('H') . ':00:00'; //tutaj zmienic przy wydawaniu na produkcję na  date('H') - 1
+        $hour_start = date("H", time() - 3600) . ':00:00';
+
+        $reports = DB::table('hour_report')
+            ->select(DB::raw('
+                hour_report.department_info_id,
+                hour_report.success,
+                departments.name as dep_name,
+                department_type.name as dep_name_type
+            '))
+            ->join('department_info', 'department_info.id', '=', 'hour_report.department_info_id')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->where('hour_report.report_date', '=', $date)
+            ->where('hour_report.hour', '=', $hour)
+            ->get();
+
+        $dkj = DB::table('dkj')
+            ->select(DB::raw('
+                department_info_id,
+                count(*) as dkj_sum
+            '))
+            ->whereBetween('add_date', [$date . ' ' . $hour_start, $date . ' ' . $hour])
+            ->groupBy('department_info_id')
+            ->get();
+
+        $data = [
+            'date'    => $date,
+            'hour'    => $hour,
+            'reports' => $reports,
+            'dkj'     => $dkj
+        ];
+        return $data;
+    }
+
+    //wysyłanie emaili - raport godzinny odsłuchanych rozmów
+    public function hourReportChecked() {
+        $data = $this->hourReportCheckedData();
+        Mail::send('mail.hourReportChecked', $data, function($message)
+        {
+            $message->from('jarzyna.verona@gmail.com');
+            $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
+        });
+    }
+
+    //wyswietlanie widoku odsłuchu godzinnego
+    public function pageHourReportChecked() {
+        $data = $this->hourReportCheckedData();
+
+        return view('reportpage.HourReportChecked')
+          ->with('date', $data['date'])
+          ->with('hour', $data['hour'])
+          ->with('dkj', $data['dkj'])
+          ->with('reports', $data['reports']);
+    }
+
+    //dane do raportu dziennego odsłuchancyh rozmow
+    private function dayReportCheckedData() {
+        $today = date('Y-m-d');
+
+        $data = [
+            'today' => $today
+        ];
+        return $data;
+    }
+
+    public function dayReportChecked() {
+
+
+    }
+
+    public function pageDayReportChecked() {
+        $data = $this->dayReportCheckedData();
+
+        return view('reportpage.DayReportChecked')
+            ->with('today', $data['today']);
     }
 }
