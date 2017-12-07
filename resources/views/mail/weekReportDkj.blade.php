@@ -25,11 +25,11 @@
 @php($total_user_not_janek = 0)
 @php($total_work_hour = 0)
 @php($total_avg = 0)
+@php($user_avg = 0)
+@php($user_time_sum = 0)
 @foreach($dkj as $item)
     @if($item->dating_type == 0)
         @php($create_total_up = true)
-
-
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->first_name . ' ' . $item->last_name}}</td>
@@ -38,6 +38,7 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_janek}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_not_janek}}</td>
             @foreach($work_hours as $hour)
+
                 @if($hour->id == $item->id)
                 @php($time_sum_array = explode(":", $hour->work_time))
                 @php($user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2))
@@ -101,8 +102,6 @@
 @foreach($dkj as $item)
     @if($item->dating_type == 1)
         @php($create_total_down = true)
-
-
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$y}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->first_name . ' ' . $item->last_name}}</td>
@@ -112,9 +111,15 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_not_janek}}</td>
             @foreach($work_hours as $hour)
                 @if($hour->id == $item->id)
-                @php($time_sum_array = explode(":", $hour->work_time))
-                @php($user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2))
-                @php($user_avg = round($item->user_sum / $user_time_sum, 2))
+                    {{dd($hour)}}
+                @php
+                    $time_sum_array = explode(":", $hour->work_time);
+                    $user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2);
+                    if($user_time_sum != 0)
+                        $user_avg = round($item->user_sum / $user_time_sum, 2);
+                    else
+                        $user_avg = 0;
+                @endphp
                     <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$hour->work_time}}</td>
                 @endif
             @endforeach
@@ -145,8 +150,3 @@
 
 </tbody>
 </table>
-<div style="width:10px;height:20px;"></div>
-<div style="display: block;">
-Wiadomość została wygenerowana automatycznie, prosimy na nią nie odpowiadać.</div>
-<div style="display: block;">
-Wszelkie uwagi oraz sugestie proszę kierować na adres: wojciech.mazur@veronaconsulting.pl</div>
