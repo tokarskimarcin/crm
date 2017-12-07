@@ -92,15 +92,15 @@
                                         @endif
 
                                     </tr>
-                                    <tr>
-                                        <td colspan="3"></td>
-                                        <td>Kara:</td>
-                                        @foreach($janky_system as $janky)
-                                            @if(($proc_sum >= $janky->min_proc) && $proc_sum< $janky->max_proc )
-                                                <td>{{$janky->cost * $bad_sum}} PLN</td>
-                                            @endif
-                                        @endforeach
-                                    </tr>
+                                    {{--<tr>--}}
+                                        {{--<td colspan="3"></td>--}}
+                                        {{--<td>Kara:</td>--}}
+                                        {{--@foreach($janky_system as $janky)--}}
+                                            {{--@if(($proc_sum >= $janky->min_proc) && $proc_sum< $janky->max_proc )--}}
+                                                {{--<td>{{$janky->cost * $bad_sum}} PLN</td>--}}
+                                            {{--@endif--}}
+                                        {{--@endforeach--}}
+                                    {{--</tr>--}}
                                     </tbody>
                                     </table>
                                 </div>
