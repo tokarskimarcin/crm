@@ -50,15 +50,15 @@ class DkjController extends Controller
         $user_dkj_id = $request->user_dkj_id;
         $employee_info = Dkj::where('id_dkj',$user_dkj_id)
             ->whereBetween('add_date',[$date_start.=' 00:00:00',$date_stop.=' 23:00:00'])->get();
-        if($janky_status == 1)
+        if($janky_status == 1) // tylko janki
         {
             $employee_info = $employee_info->where('dkj_status',1)
               ->where('deleted',0);
-        }else if($janky_status == 2)
+        }else if($janky_status == 2)// tylko podwazone
         {
             $employee_info = $employee_info->where('dkj_status',1)
               ->where('manager_status',1);
-        }else if($janky_status == 3)
+        }else if($janky_status == 3)//usuniete
         {
             $employee_info = $employee_info->where('deleted',1);
         }
