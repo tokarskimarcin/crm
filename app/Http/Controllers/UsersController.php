@@ -287,7 +287,7 @@ class UsersController extends Controller
         $old_password = base64_decode(Auth::user()->guid);
         if ($request->old_pass == $old_password) {
             $user = User::find(Auth::user()->id);
-
+            $user->password_date = date('Y-m-d');
             $user->password = bcrypt($request->new_pass);
             $user->guid = base64_encode($request->new_pass);
             $user->save();

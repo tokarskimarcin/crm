@@ -104,7 +104,7 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
 
     // Password change --START--
 
-    Route::get('/password_change', 'UsersController@passwordChangeGet');
+    Route::get('/password_change', 'UsersController@passwordChangeGet')->name('changePassword');
     Route::Post('/password_change', 'UsersController@passwordChangePost');
 
     // Password change --STOP--

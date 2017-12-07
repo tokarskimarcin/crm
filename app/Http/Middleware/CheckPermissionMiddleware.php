@@ -22,6 +22,8 @@ class CheckPermissionMiddleware
     {
 
         if(Auth::check()) {
+
+            $expired_date = date('Y-m-d', strtotime("+3 months", strtotime(Auth::user()->password_date)));
             // Pobranie instancji modelu
             $links = new Links;
             // Pobranie ścieżki adresu url
@@ -43,8 +45,11 @@ class CheckPermissionMiddleware
                         ->orwhere('privilage_user_relation.user_id', Auth::user()->id);
                 })->get();
 
-            if (Auth::user()->department_info->blocked != 0) {
-                if ($route != '') {
+
+
+
+            if (Auth::user()->department_info->blocked != 0) { // gdy jest inspecja pracy
+                if ($route != '') { // nie pozwalaj do innej strony niz domowa
                   Auth::logout();
                   return redirect()->to('/login')->with('warning', 'Nastąpiło przelogowanie :)');
                 }else
@@ -52,19 +57,32 @@ class CheckPermissionMiddleware
                     return $next($request);
                 }
             }
-            if($route =='')
+
+            if($expired_date <= date('Y-m-d') && $route == 'password_change')
             {
                 return $next($request);
             }
-            if ($link_key->isEmpty() || !Auth::user()) {
+
+            if($expired_date > date('Y-m-d')) {
+                if ($route == '') // pozwól do storny głównej
+                {
+                    return $next($request);
+                }
+                if (!$link_key->isEmpty() && Auth::user()) { // gdy jest dostęp
+                    return $next($request);
+                }
+            }else
+            {
+                return redirect()->route('changePassword');
+            }
+
+            if ($link_key->isEmpty() || !Auth::user()) { // gdy brak dostępu
                 Auth::logout();
-                return redirect()->to('/login')->with('warning', 'Your session has expired because your account is deactivated.');
-            } else if (!$link_key->isEmpty() && Auth::user()) {
-                return $next($request);
+                return redirect()->to('/login')->with('warning', 'Brak Dostępu.');
             }
 
 
-        }else{
+        }else{ // Brak sesji zalogowania
             return redirect('login');
         }
 
