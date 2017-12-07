@@ -29,3 +29,7 @@ ID: [1] DATE: [2017-12-05 12:47:00] ACTION: [Weryfikacja janka, status: 1, komen
 ID: [1] DATE: [2017-12-05 12:47:04] ACTION: [Weryfikacja janka, status: 1, komentarz trenera: 123]
 ID: [1] DATE: [2017-12-05 12:47:07] ACTION: [Weryfikacja janka, status: 0, komentarz trenera: 123]
 ID: [1] DATE: [2017-12-05 12:47:51] ACTION: [Edycja janka przez dkj, status: 0, komentarz: , numer telefonu: 7894563, kampania: 789456]
+ID: [1] DATE: [2017-12-06 13:43:25] ACTION: [Dodanie janka przez dkj, status: 1, komentarz: 1, numer telefonu: 1, kampania: 1]
+ID: [1] DATE: [2017-12-06 14:20:25] ACTION: [Dodanie janka przez dkj, status: 0, komentarz: 123, numer telefonu: 1231, kampania: 123123]
+ID: [1] DATE: [2017-12-06 14:20:59] ACTION: [Dodanie janka przez dkj, status: 1, komentarz: 123, numer telefonu: 123, kampania: 123]
+ID: [1] DATE: [2017-12-07 07:33:10] ACTION: [Dodanie janka przez dkj, status: 1, komentarz: 234, numer telefonu: 234, kampania: 234]

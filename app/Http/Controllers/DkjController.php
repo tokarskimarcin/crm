@@ -50,15 +50,15 @@ class DkjController extends Controller
         $user_dkj_id = $request->user_dkj_id;
         $employee_info = Dkj::where('id_dkj',$user_dkj_id)
             ->whereBetween('add_date',[$date_start.=' 00:00:00',$date_stop.=' 23:00:00'])->get();
-        if($janky_status == 1)
+        if($janky_status == 1) // tylko janki
         {
             $employee_info = $employee_info->where('dkj_status',1)
               ->where('deleted',0);
-        }else if($janky_status == 2)
+        }else if($janky_status == 2)// tylko podwazone
         {
             $employee_info = $employee_info->where('dkj_status',1)
               ->where('manager_status',1);
-        }else if($janky_status == 3)
+        }else if($janky_status == 3)//usuniete
         {
             $employee_info = $employee_info->where('deleted',1);
         }
@@ -259,6 +259,7 @@ class DkjController extends Controller
 
     public function datatableDkjVerification(Request $request)
     {
+        $date_actual = date('Y-m-d');
         $query = DB::table('dkj')
             ->join('users as user', 'dkj.id_user', '=', 'user.id')
             ->leftjoin('users as manager', 'dkj.id_manager', '=', 'manager.id')
@@ -278,6 +279,7 @@ class DkjController extends Controller
                 '))->where('dkj.dkj_status',1)
                  ->where('dkj.deleted',0)
                  ->where('dkj.manager_status',null)
+                ->where(DB::raw('DATE_ADD(dkj.add_date, INTERVAL 2 DAY)'),'>=',$date_actual.' 00:00:00')
                  ->where('user.department_info_id',Auth::user()->department_info_id);
         return datatables($query)->make(true);
     }
