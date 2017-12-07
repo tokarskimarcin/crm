@@ -105,7 +105,7 @@
                                                                                 <th>Student</th>
                                                                                 <th>Dokumenty</th>
                                                                                 <th>Całość na konto</th>
-                                                                                <th>Total</th>
+                                                                                <th>Wypłata</th>
                                                                             </tr>
                                                                             </thead>
                                                                             <tbody>
@@ -175,7 +175,7 @@
                                                                                 <td>{{($item2->rate.'('.$bonus_per_hour.')')}} PLN</td>
                                                                                 <td>{{($avg)}}</td>
                                                                                 <td>{{$rbh}}</td>
-                                                                                <td>{{($janky_proc)}}%</td>
+                                                                                <td>{{($janky_proc)}} %</td>
                                                                                 <td>{{($janky_cost*(-1))}} PLN</td>
                                                                                 <td>{{($standart_salary)}} PLN</td>
                                                                                 <td>{{($bonus_penalty)}} PLN</td>

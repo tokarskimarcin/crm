@@ -95,11 +95,13 @@
                                                                                 <th>Stawka</th>
                                                                                 <th>RBH</th>
                                                                                 <th>%Janków</th>
+                                                                                <th>Kara(Janki)</th>
                                                                                 <th>Podstawa</th>
-                                                                                <th>Premia</th>
-                                                                                <th>Stu.</th>
-                                                                                <th>Dok.</th>
-                                                                                <th>Total</th>
+                                                                                <th>Premia - Kara</th>
+                                                                                <th>Student</th>
+                                                                                <th>Dokumenty</th>
+                                                                                <th>Całość na konto</th>
+                                                                                <th>Wypłata</th>
                                                                             </tr>
                                                                             </thead>
                                                                             <tbody>
@@ -134,7 +136,7 @@
                                                                                 }
                                                                                 $janky_cost = $item2->janki * $janky_cost_per_price;
                                                                                 $standart_salary = round($rbh * $item2->rate,2);
-                                                                                $bonus_penalty = $item2->premia -$item2->kara;
+                                                                                $bonus_penalty = $item2->premia - $item2->kara;
                                                                                 $student = ($item2->student == 0) ? "Nie" : "Tak";
                                                                                 $documents = ($item2->documents == 0) ? "Nie" : "Tak";
                                                                                 $salary_total = $standart_salary+$bonus_penalty-$janky_cost;
@@ -149,19 +151,20 @@
                                                                                 <td>{{$row_number++}}</td>
                                                                                 <td>{{($item2->first_name)}}</td>
                                                                                 <td>{{($item2->last_name)}}</td>
-                                                                                <td>{{($item2->rate)}} zł/RBH</td>
+                                                                                <td>{{($item2->rate)}} PLN</td>
                                                                                 <td>{{$rbh}}</td>
-                                                                                <td>{{($janky_proc)}}%</td>
+                                                                                <td>{{($janky_proc)}} %</td>
+                                                                                <td>{{($janky_cost*(-1))}} PLN</td>
                                                                                 <td>{{($standart_salary)}} PLN</td>
                                                                                 <td>{{($bonus_penalty)}} PLN</td>
                                                                                 <td>{{($student)}}</td>
                                                                                 <td>{{($documents)}}</td>
+                                                                                <td>{{(($item2->salary_to_account == 0) ? "Nie" : "Tak")}}</td>
                                                                                 <td>{{(round($salary_total,2))}}</td>
                                                                             </tr>
                                                                         @endforeach
                                                                         <tr>
-                                                                            <td colspan="9"></td>
-                                                                            <td style="display: none;"></td>
+                                                                            <td colspan="11"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
@@ -233,7 +236,41 @@
             buttons: [
                 {
                     extend: 'excelHtml5',
-                    title: 'Umowy Szkoleniowe'
+                    title: 'Umowy Szkoleniowe',
+                    customize: function( xlsx ) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        $('row c', sheet).attr('s', '25');
+                        $('row c[r^="A"]', sheet).attr( 's', '30' );
+                        $('row c[r^="B"]', sheet).attr( 's', '30' );
+                        $('row c[r^="C"]', sheet).attr( 's', '30' );
+                        $('row c[r^="G"]', sheet).each( function () {
+                            if($('is t', this).text() != 'Kara(Janki)')
+                            {
+                                $text = $('is t', this).text();
+                                var penatly_bonus = $text.split(" ");
+                                if(penatly_bonus[0] < 0)
+                                {
+                                    $(this).attr( 's', '35' );
+                                }
+                            }
+
+                        });
+                        $('row c[r^="I"]', sheet).each( function () {
+                            if($('is t', this).text() != 'Premia - Kara')
+                            {
+                                $text = $('is t', this).text();
+                                var penatly_bonus = $text.split(" ");
+                                if(penatly_bonus[0] < 0)
+                                {
+                                    $(this).attr( 's', '35' );
+                                }
+                            }
+                        });
+                        $('row:nth-child(2) c', sheet).attr( 's', '42' );
+                        $('row:first c', sheet).attr( 's', '51','1','2' );
+                        $('row:last c', sheet).attr( 's', '2' );
+
+                    }
                 }
             ],
             responsive: true,
