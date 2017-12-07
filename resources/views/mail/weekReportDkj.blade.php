@@ -12,7 +12,7 @@
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Zakres Dat</th>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba odsłuchanych rozmów</th>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba poprawnych rozmów</th>
-<th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba nie poprawnych rozmów</th>
+<th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba niepoprawnych rozmów</th>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Czas Pracy</th>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Średnia na godzinę</th>
 </tr>
@@ -29,9 +29,7 @@
     @if($item->dating_type == 0)
         @php($create_total_up = true)
 
-        @php($time_array_user = explode(":", $item->work_time))
-        @php($user_time = round((($time_array_user[0] * 3600) + ($time_array_user[1] * 60) + $time_array_user[2]) / 3600, 2))
-        @php($user_avg = round(intval($item->user_sum) / $user_time, 2))
+
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->first_name . ' ' . $item->last_name}}</td>
@@ -39,15 +37,21 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_sum}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_janek}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_not_janek}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->work_time}}</td>
+            @foreach($work_hours as $hour)
+                @if($hour->id == $item->id)
+                @php($time_sum_array = explode(":", $hour->work_time))
+                @php($user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2))
+                @php($user_avg = round($item->user_sum / $user_time_sum, 2))
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$hour->work_time}}</td>
+                @endif
+            @endforeach
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$user_avg}}</td>
         </tr>
 
         @php($total_user_sum += $item->user_sum)
         @php($total_user_janek += $item->user_janek)
         @php($total_user_not_janek += $item->user_not_janek)
-        @php($total_work_hour += $user_time)
-        @php($total_avg += $user_avg)
+        @php($total_work_hour += $user_time_sum)
         @php($i++)
     @endif
 @endforeach
@@ -81,7 +85,7 @@
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Zakres Dat</th>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba odsłuchanych rozmów</th>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba poprawnych rozmów</th>
-<th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba nie poprawnych rozmów</th>
+<th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba niepoprawnych rozmów</th>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Czas Pracy</th>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Średnia na godzinę</th>
 </tr>
@@ -98,9 +102,7 @@
     @if($item->dating_type == 1)
         @php($create_total_down = true)
 
-        @php($time_array_user = explode(":", $item->work_time))
-        @php($user_time = round((($time_array_user[0] * 3600) + ($time_array_user[1] * 60) + $time_array_user[2]) / 3600, 2))
-        @php($user_avg = round(intval($item->user_sum) / $user_time, 2))
+
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$y}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->first_name . ' ' . $item->last_name}}</td>
@@ -108,15 +110,21 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_sum}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_janek}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_not_janek}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->work_time}}</td>
+            @foreach($work_hours as $hour)
+                @if($hour->id == $item->id)
+                @php($time_sum_array = explode(":", $hour->work_time))
+                @php($user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2))
+                @php($user_avg = round($item->user_sum / $user_time_sum, 2))
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$hour->work_time}}</td>
+                @endif
+            @endforeach
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$user_avg}}</td>
         </tr>
 
         @php($total_user_sum += $item->user_sum)
         @php($total_user_janek += $item->user_janek)
         @php($total_user_not_janek += $item->user_not_janek)
-        @php($total_work_hour += $user_time)
-        @php($total_avg += $user_avg)
+        @php($total_work_hour += $user_time_sum)
         @php($y++)
     @endif
 @endforeach

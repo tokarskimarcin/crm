@@ -76,7 +76,8 @@ Route::get('/dayReportMissedRepo', 'StatisticsController@dayReportMissedRepo');
 
 Route::get('/hourReportDkj', 'StatisticsController@MailhourReportDkj'); // ok
 Route::get('/dayReportDkj', 'StatisticsController@dayReportDkj');
-Route::get('/weekReportDkj', 'StatisticsController@weekReportDkj');
+Route::get('/weekReportDkj', 'StatisticsController@MailWeekReportDkj');
+Route::get('/monthReportDkj', 'StatisticsController@monthReportDkj');
 
 //End emails
 
@@ -227,8 +228,8 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
 
 
     Route::get('/pageHourReportDKJ', 'StatisticsController@pageHourReportDKJ');
-    Route::get('/pageWeekReportDKJ', 'ReportPageController@pageWeekReportDKJ');
-    Route::get('/pageMonthReportDKJ', 'ReportPageController@pageMonthReportDKJ');
+    Route::get('/pageWeekReportDKJ', 'StatisticsController@pageWeekReportDKJ');
+    Route::get('/pageMonthReportDKJ', 'StatisticsController@pageMonthReportDKJ');
 
     Route::get('/pageWeekReportJanky', 'ReportPageController@pageWeekReportJanky');
 
