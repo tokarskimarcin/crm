@@ -29,8 +29,6 @@
 @foreach($dkj as $item)
     @if($item->dating_type == 0)
         @php($create_total_up = true)
-
-
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->first_name . ' ' . $item->last_name}}</td>
