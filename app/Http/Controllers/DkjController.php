@@ -259,6 +259,7 @@ class DkjController extends Controller
 
     public function datatableDkjVerification(Request $request)
     {
+        $date_actual = date('Y-m-d');
         $query = DB::table('dkj')
             ->join('users as user', 'dkj.id_user', '=', 'user.id')
             ->leftjoin('users as manager', 'dkj.id_manager', '=', 'manager.id')
@@ -278,6 +279,7 @@ class DkjController extends Controller
                 '))->where('dkj.dkj_status',1)
                  ->where('dkj.deleted',0)
                  ->where('dkj.manager_status',null)
+                ->where(DB::raw('DATE_ADD(dkj.add_date, INTERVAL 2 DAY)'),'>=',$date_actual.' 00:00:00')
                  ->where('user.department_info_id',Auth::user()->department_info_id);
         return datatables($query)->make(true);
     }
