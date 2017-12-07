@@ -98,12 +98,13 @@
                                                                                 <th>Średnia</th>
                                                                                 <th>RBH</th>
                                                                                 <th>%Janków</th>
-                                                                                <th>Kara/Janki</th>
+                                                                                <th>Kara(Janki)</th>
                                                                                 <th>Podstawa</th>
-                                                                                <th>Premia</th>
+                                                                                <th>Premia - Kara</th>
                                                                                 <th>Prowizja</th>
-                                                                                <th>Stu.</th>
-                                                                                <th>Dok.</th>
+                                                                                <th>Student</th>
+                                                                                <th>Dokumenty</th>
+                                                                                <th>Całość na konto</th>
                                                                                 <th>Total</th>
                                                                             </tr>
                                                                             </thead>
@@ -140,7 +141,7 @@
                                                                                 }
                                                                                 $janky_cost = $item2->janki * $janky_cost_per_price;
                                                                                 $standart_salary = round($rbh * $item2->rate,2);
-                                                                                $bonus_penalty = $item2->premia -$item2->kara;
+                                                                                $bonus_penalty = $item2->premia - $item2->kara;
                                                                                 $student = ($item2->student == 0) ? "Nie" : "Tak";
                                                                                 $documents = ($item2->documents == 0) ? "Nie" : "Tak";
                                                                                 //System prowizyjny
@@ -158,7 +159,7 @@
                                                                                          $bonus_per_hour = 0;
                                                                                       }
                                                                                 $bonus_salary = $rbh * $bonus_per_hour;
-                                                                                $salary_total = $standart_salary+$bonus_salary-$janky_cost;
+                                                                                $salary_total = $standart_salary+$bonus_salary-$janky_cost+$bonus_penalty;
                                                                                 $salary_total_all += $salary_total;
 
                                                                                 $payment_total += $salary_total_all;
@@ -171,21 +172,23 @@
                                                                                 <td>{{$row_number++}}</td>
                                                                                 <td>{{($item2->first_name)}}</td>
                                                                                 <td>{{($item2->last_name)}}</td>
-                                                                                <td>{{($item2->rate.'('.$bonus_per_hour.')')}}</td>
+                                                                                <td>{{($item2->rate.'('.$bonus_per_hour.')')}} PLN</td>
                                                                                 <td>{{($avg)}}</td>
                                                                                 <td>{{$rbh}}</td>
                                                                                 <td>{{($janky_proc)}}%</td>
-                                                                                <td>{{($janky_cost)}} PLN</td>
+                                                                                <td>{{($janky_cost*(-1))}} PLN</td>
                                                                                 <td>{{($standart_salary)}} PLN</td>
                                                                                 <td>{{($bonus_penalty)}} PLN</td>
                                                                                 <td>{{($bonus_salary)}} PLN</td>
                                                                                 <td>{{($student)}}</td>
                                                                                 <td>{{($documents)}}</td>
+                                                                                <td>{{(($item2->salary_to_account == 0) ? "Nie" : "Tak")}}</td>
                                                                                 <td>{{(round($salary_total,2))}} PLN</td>
                                                                             </tr>
                                                                         @endforeach
                                                                         <tr>
-                                                                            <td colspan="12"></td>
+                                                                            <td colspan="13"></td>
+                                                                            <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
@@ -259,7 +262,42 @@
             buttons: [
                 {
                     extend: 'excelHtml5',
-                    title: 'Umowy Szkoleniowe'
+                    title: 'Umowy Szkoleniowe',
+                    fontSize : '15',
+                    customize: function( xlsx ) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        $('row c', sheet).attr('s', '25');
+                        $('row c[r^="A"]', sheet).attr( 's', '30' );
+                        $('row c[r^="B"]', sheet).attr( 's', '30' );
+                        $('row c[r^="C"]', sheet).attr( 's', '30' );
+                        $('row c[r^="H"]', sheet).each( function () {
+                                if($('is t', this).text() != 'Kara(Janki)')
+                                {
+                                    $text = $('is t', this).text();
+                                    var penatly_bonus = $text.split(" ");
+                                    if(penatly_bonus[0] < 0)
+                                    {
+                                        $(this).attr( 's', '35' );
+                                    }
+                                }
+
+                        });
+                        $('row c[r^="J"]', sheet).each( function () {
+                            if($('is t', this).text() != 'Premia - Kara')
+                            {
+                                $text = $('is t', this).text();
+                                var penatly_bonus = $text.split(" ");
+                                if(penatly_bonus[0] < 0)
+                                {
+                                    $(this).attr( 's', '35' );
+                                }
+                            }
+                        });
+                        $('row:nth-child(2) c', sheet).attr( 's', '42' );
+                        $('row:first c', sheet).attr( 's', '51','1','2' );
+                        $('row:last c', sheet).attr( 's', '2' );
+
+                    }
                 }
             ],
             responsive: true,
@@ -274,7 +312,41 @@
             buttons: [
                 {
                     extend: 'excelHtml5',
-                    title: 'APT Job Center Service'
+                    title: 'APT Job Center Service',
+                    customize: function( xlsx ) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        $('row c', sheet).attr('s', '25');
+                        $('row c[r^="A"]', sheet).attr( 's', '30' );
+                        $('row c[r^="B"]', sheet).attr( 's', '30' );
+                        $('row c[r^="C"]', sheet).attr( 's', '30' );
+                        $('row c[r^="H"]', sheet).each( function () {
+                            if($('is t', this).text() != 'Kara(Janki)')
+                            {
+                                $text = $('is t', this).text();
+                                var penatly_bonus = $text.split(" ");
+                                if(penatly_bonus[0] < 0)
+                                {
+                                    $(this).attr( 's', '35' );
+                                }
+                            }
+
+                        });
+                        $('row c[r^="J"]', sheet).each( function () {
+                            if($('is t', this).text() != 'Premia - Kara')
+                            {
+                                $text = $('is t', this).text();
+                                var penatly_bonus = $text.split(" ");
+                                if(penatly_bonus[0] < 0)
+                                {
+                                    $(this).attr( 's', '35' );
+                                }
+                            }
+                        });
+                        $('row:nth-child(2) c', sheet).attr( 's', '42' );
+                        $('row:first c', sheet).attr( 's', '51','1','2' );
+                        $('row:last c', sheet).attr( 's', '2' );
+
+                    }
                 }
             ],
             "autoWidth": false,
@@ -288,7 +360,41 @@
             buttons: [
                 {
                     extend: 'excelHtml5',
-                    title: 'Fruit Garden'
+                    title: 'Fruit Garden',
+                    customize: function( xlsx ) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        $('row c', sheet).attr('s', '25');
+                        $('row c[r^="A"]', sheet).attr( 's', '30' );
+                        $('row c[r^="B"]', sheet).attr( 's', '30' );
+                        $('row c[r^="C"]', sheet).attr( 's', '30' );
+                        $('row c[r^="H"]', sheet).each( function () {
+                            if($('is t', this).text() != 'Kara(Janki)')
+                            {
+                                $text = $('is t', this).text();
+                                var penatly_bonus = $text.split(" ");
+                                if(penatly_bonus[0] < 0)
+                                {
+                                    $(this).attr( 's', '35' );
+                                }
+                            }
+
+                        });
+                        $('row c[r^="J"]', sheet).each( function () {
+                            if($('is t', this).text() != 'Premia - Kara')
+                            {
+                                $text = $('is t', this).text();
+                                var penatly_bonus = $text.split(" ");
+                                if(penatly_bonus[0] < 0)
+                                {
+                                    $(this).attr( 's', '35' );
+                                }
+                            }
+                        });
+                        $('row:nth-child(2) c', sheet).attr( 's', '42' );
+                        $('row:first c', sheet).attr( 's', '51','1','2' );
+                        $('row:last c', sheet).attr( 's', '2' );
+
+                    }
                 }
             ],
             "autoWidth": false,
