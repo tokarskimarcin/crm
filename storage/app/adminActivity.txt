@@ -10,3 +10,6 @@ ID: [1] DATE: [2017-12-06 09:38:13] ACTION: [item3 : id58, Zmiana uprawnień gru
 ID: [1] DATE: [2017-12-06 11:44:16] ACTION: [item3 : id61, Zmiana uprawnień grup i użytkowników : , Link name : Raport Miesięczny DKJ, Link adress : pageMonthReportDKJ, Link group : , ]
 ID: [1] DATE: [2017-12-06 11:44:19] ACTION: [item3 : id60, Zmiana uprawnień grup i użytkowników : , Link name : Raport Tygodniowy DKJ, Link adress : pageWeekReportDKJ, Link group : , ]
 ID: [1] DATE: [2017-12-06 11:44:22] ACTION: [item3 : id59, Zmiana uprawnień grup i użytkowników : , Link name : Raport Godzinny DKJ, Link adress : pageHourReportDKJ, Link group : , ]
+ID: [1] DATE: [2017-12-07 13:18:09] ACTION: [Zmiana hasła przez użytkownika, nowe hasło: c2VkZXMxMjM=]
+ID: [1] DATE: [2017-12-07 13:20:28] ACTION: [Zmiana hasła przez użytkownika, nowe hasło: bm9raWExMjM=]
+ID: [1] DATE: [2017-12-07 14:39:21] ACTION: [Zmiana hasła przez użytkownika, nowe hasło: c2VkZXMxMjM=]

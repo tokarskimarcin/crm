@@ -24,6 +24,8 @@
 @php($total_user_not_janek = 0)
 @php($total_work_hour = 0)
 @php($total_avg = 0)
+@php($user_avg = 0)
+@php($user_time_sum = 0)
 @foreach($dkj as $item)
     @if($item->dating_type == 0)
         @php($create_total_up = true)
@@ -37,9 +39,14 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_not_janek}}</td>
             @foreach($work_hours as $hour)
                 @if($hour->id == $item->id)
-                @php($time_sum_array = explode(":", $hour->work_time))
-                @php($user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2))
-                @php($user_avg = round($item->user_sum / $user_time_sum, 2))
+                @php
+                $time_sum_array = explode(":", $hour->work_time);
+                $user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2);
+                if($user_time_sum != 0)
+                        $user_avg = round($item->user_sum / $user_time_sum, 2);
+                    else
+                        $user_avg = 0;
+                @endphp
                     <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$hour->work_time}}</td>
                 @endif
             @endforeach
@@ -108,9 +115,15 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_not_janek}}</td>
             @foreach($work_hours as $hour)
                 @if($hour->id == $item->id)
-                @php($time_sum_array = explode(":", $hour->work_time))
-                @php($user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2))
-                @php($user_avg = round($item->user_sum / $user_time_sum, 2))
+                @php
+                $time_sum_array = explode(":", $hour->work_time);
+                $user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2);
+                if($user_time_sum != 0)
+                        $user_avg = round($item->user_sum / $user_time_sum, 2);
+                    else
+                        $user_avg = 0;
+                @endphp
+                @endphp
                     <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$hour->work_time}}</td>
                 @endif
             @endforeach
