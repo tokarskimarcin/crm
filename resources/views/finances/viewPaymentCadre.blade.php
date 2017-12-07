@@ -100,8 +100,8 @@
                                                                                 <th>Dodatek</th>
                                                                                 <th>Premia</th>
                                                                                 <th>Kara</th>
-                                                                                <th>Stu.</th>
-                                                                                <th>Dok.</th>
+                                                                                <th>Student</th>
+                                                                                <th>Dokument</th>
                                                                                 <th>Wynagrodzenie</th>
                                                                             </tr>
                                                                             </thead>
@@ -123,13 +123,13 @@
                                                                                 <td>{{$row_number++}}</td>
                                                                                 <td>{{($item2->first_name)}}</td>
                                                                                 <td>{{($item2->last_name)}}</td>
-                                                                                <td>{{$salary}}</td>
-                                                                                <td>{{$additional_salary}}</td>
-                                                                                <td>{{$bonus}}</td>
-                                                                                <td>{{$penatly}}</td>
+                                                                                <td>{{$salary}} PLN</td>
+                                                                                <td>{{$additional_salary}} PLN</td>
+                                                                                <td>{{$bonus}} PLN</td>
+                                                                                <td>{{$penatly*(-1)}} PLN</td>
                                                                                 <td>{{$student}}</td>
                                                                                 <td>{{$documents}}</td>
-                                                                                <td>{{$total_one_salary}}</td>
+                                                                                <td>{{$total_one_salary}} PLN</td>
                                                                             </tr>
                                                                         @endforeach
                                                                         <tr>
@@ -141,12 +141,8 @@
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
-                                                                            <td style="display: none;"></td>
-                                                                            <td style="display: none;"></td>
-                                                                            <td style="display: none;"></td>
-                                                                            <td style="display: none;"></td>
                                                                             <td> Suma:</td>
-                                                                            <td>{{$salary_total_all}}</td>
+                                                                            <td>{{$salary_total_all}} PLN</td>
 
                                                                         </tr>
                                                                             </tbody>
