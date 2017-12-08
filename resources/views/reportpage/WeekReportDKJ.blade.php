@@ -4,7 +4,7 @@
     {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Raport Godzinny DKJ</h1>
+            <h1 class="page-header">Tygodniowy Raport DKJ</h1>
         </div>
     </div>
     <div class="row">
