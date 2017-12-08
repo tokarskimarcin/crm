@@ -37,6 +37,9 @@
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->avg_average, 2)}}</td>
                 @foreach($work_hours as $work_hour)
                     @if($work_hour->id == $report->id && $work_hour->realRBH != null)
+                    @php($time = explode(":", $work_hour->realRBH))
+                    @php($time = ($time[0] * 3600) + ($time[1] * 60) + $time[2])
+                    @php($total_sum_call_time += $time)
                         <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$work_hour->realRBH}}</td>
                         @php($add_column = false)
                     @endif
@@ -56,7 +59,6 @@
             @php($total_sum_janky_count += $report->sum_janky_count)
             @php($total_janky += round(($report->sum_janky_count / $report->sum_success) * 100, 2))
             @php($total_avg_wear_base += $report->avg_wear_base)
-            @php($total_sum_call_time += $report->sum_call_time)
             @php($total_goal += round(($report->sum_success / $goal) * 100, 2))
             @php($count++)
         @endforeach
@@ -76,14 +78,14 @@
                   $total_avg_wear_base_proc = round($total_avg_wear_base / $count, 2);
                   $total_janky_proc = round($total_janky / $count, 2);
                   $total_avg_average_proc = round($total_avg_average / $count, 2);
-                  $total_sum_call_time_poc = round($total_sum_call_time, 2);
+                  $total_sum_call_time_poc = round($total_sum_call_time / 3600, 2);
             }
       @endphp
 
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>Total:</b></td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_avg_average / $count, 2)}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$hours}} godzin</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_sum_call_time_poc}} godzin</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_sum_success}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_janky / $count, 2)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_avg_wear_base / $count, 2)}} %</td>

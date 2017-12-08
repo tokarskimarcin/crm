@@ -27,7 +27,6 @@
       @php($total_sum_call_time = 0)
       @php($count = 0)
       @php($total_goal = 0)
-      @php($goal = 6500)
 
       @foreach($reports as $report)
       @php($add_column = true)
@@ -37,8 +36,11 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->avg_average, 2)}}</td>
             @foreach($work_hours as $work_hour)
                 @if($work_hour->id == $report->id && $work_hour->realRBH != null)
+                @php($time = explode(":", $work_hour->realRBH))
+                @php($time = ($time[0] * 3600) + ($time[1] * 60) + $time[2])
+                @php($total_sum_call_time += $time)
+                @php($add_column = false)
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$work_hour->realRBH}}</td>
-                    @php($add_column = false)
                 @endif
             @endforeach
             @if($add_column == true)
@@ -56,7 +58,6 @@
         @php($total_sum_janky_count += $report->sum_janky_count)
         @php($total_janky += round(($report->sum_janky_count / $report->sum_success) * 100, 2))
         @php($total_avg_wear_base += $report->avg_wear_base)
-        @php($total_sum_call_time += $report->sum_call_time)
         @php($total_goal += round(($report->sum_success / $goal) * 100, 2))
         @php($count++)
 
@@ -84,7 +85,7 @@
       <tr>
           <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>Total:</b></td>
           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_avg_average_proc}}</td>
-          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$hours}} godzin</td>
+          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_sum_call_time_poc}} godzin</td>
           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_sum_success}}</td>
           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_janky_proc}} %</td>
           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_avg_wear_base_proc}} %</td>
