@@ -111,7 +111,7 @@ class AdminController extends Controller
                     departments.name as department_name,
                     department_info.type,
                     department_type.name as department_type_name
-                   '))->orderBy('department_name', 'asc')->get();
+                   '))->orderBy('department_info.id', 'asc')->get();
         return $departments;
     }
 
