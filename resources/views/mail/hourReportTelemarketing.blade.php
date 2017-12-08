@@ -29,6 +29,7 @@
       @php($total_success_proc = 0)
       @php($sum = 0)
       @foreach($reports as $report)
+        @if($report->department_info->id_dep_type == 2)
           <tr>
               <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->department_info->departments->name}}</td>
               <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$hour}}</td>
@@ -39,11 +40,11 @@
               <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->wear_base}}</td>
               <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->call_time}}</td>
               @if(date('N') <= 5)
-                  <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->success / 1200) * 100, 2)}}</td>
-                  @php($total_success_proc += round(($report->success / 1200) * 100, 2))
+                  <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->success / $report->department_info->dep_aim) * 100, 2)}}</td>
+                  @php($total_success_proc += round(($report->success / $report->department_info->dep_aim) * 100, 2))
               @else
-                  <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->success / 500) * 100, 2)}}</td>
-                  @php($total_success_proc += round(($report->success / 500) * 100, 2))
+                  <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->success / $report->department_info->dep_aim_week) * 100, 2)}}</td>
+                  @php($total_success_proc += round(($report->success / $report->department_info->dep_aim_week) * 100, 2))
               @endif
               @php($total_average += $report->average)
               @php($total_success += $report->success)
@@ -53,6 +54,7 @@
               @php($total_wear_base += $report->wear_base)
               @php($sum++)
           </tr>
+        @endif
       @endforeach
       @php
         if($sum == 0)

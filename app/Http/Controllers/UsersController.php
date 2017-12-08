@@ -101,11 +101,8 @@ class UsersController extends Controller
                 $user->user_type_id = 1;
             }
             $user->department_info_id = Auth::user()->department_info_id;
-            if(isset($request->dating_type))
-            {
-                $user->dating_type =  $request->dating_type;
-            }
         }
+        $user->dating_type = $request->dating_type;
         $user->start_work = $request->start_date;
         $user->status_work = 1;
         $user->phone = $request->phone;
@@ -210,6 +207,7 @@ class UsersController extends Controller
         $user->id_manager = $manager_id;
         $user->additional_salary = $request->additional_salary;
         $user->status_work = $request->status_work;
+        $user->dating_type = $request->dating_type;
         if($request->status_work == 0) {
             $user->end_work = $request->stop_date;
         }

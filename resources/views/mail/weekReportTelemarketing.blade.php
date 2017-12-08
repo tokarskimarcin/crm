@@ -38,7 +38,7 @@
                 @if($work_hour->id == $report->id && $work_hour->realRBH != null)
                 @php($time = explode(":", $work_hour->realRBH))
                 @php($time = ($time[0] * 3600) + ($time[1] * 60) + $time[2])
-                @php($total_sum_call_time += $time)
+                @php($total_realRBH += $time)
                 @php($add_column = false)
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$work_hour->realRBH}}</td>
                 @endif
@@ -59,6 +59,7 @@
         @php($total_janky += round(($report->sum_janky_count / $report->sum_success) * 100, 2))
         @php($total_avg_wear_base += $report->avg_wear_base)
         @php($total_goal += round(($report->sum_success / $goal) * 100, 2))
+        @php($total_sum_call_time += $report->sum_call_time)
         @php($count++)
 
       @endforeach
@@ -79,13 +80,14 @@
                   $total_janky_proc = round($total_janky / $count, 2);
                   $total_avg_average_proc = round($total_avg_average / $count, 2);
                   $total_sum_call_time_poc = round($total_sum_call_time, 2);
+                  $total_realRBH = round($total_realRBH / 3600, 2);
             }
       @endphp
 
       <tr>
           <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>Total:</b></td>
           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_avg_average_proc}}</td>
-          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_sum_call_time_poc}} godzin</td>
+          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_realRBH}} godzin</td>
           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_sum_success}}</td>
           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_janky_proc}} %</td>
           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_avg_wear_base_proc}} %</td>

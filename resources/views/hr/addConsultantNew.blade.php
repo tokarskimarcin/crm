@@ -188,6 +188,18 @@
                                 </td>
                             </tr>
                             @endif
+                            @if($type == 1)
+                            <tr>
+                                <td style="width: 170px;height:52px;"><b>Typ:</b></td>
+                                <td style="width: 170px;height:52px;">
+                                  <select class="form-control" style="font-size:18px;" name="dating_type" id="dating_type">
+                                      <option>Wybierz</option>
+                                      <option value="0">Badania</option>
+                                      <option value="1">Wysyłka</option>
+                                  </select>
+                                </td>
+                            </tr>
+                            @endif
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Opis</b></td>
                                 <td>
@@ -241,6 +253,7 @@
             var start_date =$("input[name='start_date']").val();
             var email =$("input[name='email']").val();
             var user_type =$("select[name='user_type']").val();
+            var dating_type =$("select[name='dating_type']").val();
             var department_info =$("select[name='department_info']").val();
 
             $('#consultant_add').submit(function(){
@@ -362,6 +375,10 @@
             }
             if (department_info == 'Wybierz') {
                 alert("Musisz wybrać oddział!");
+                return false;
+            }
+            if (dating_type == 'Wybierz') {
+                alert("Musisz wybrać typ użytkownika!");
                 return false;
             }
 

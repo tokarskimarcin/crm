@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Mail;
+use App\Department_info;
 
 class StatisticsController extends Controller
 {
@@ -104,6 +105,7 @@ class StatisticsController extends Controller
         $reports = HourReport::where('report_date', '=', $date)
             ->where('hour', $hour)
             ->get();
+
         $data = [
             'hour' => $hour,
             'date' => $date,
@@ -125,6 +127,7 @@ class StatisticsController extends Controller
         }
          return view('mail.hourReportTelemarketing')
              ->with('reports', $data['reports'])
+             ->with('department_info', $data['department_info'])
              ->with('hour', $data['hour'])
              ->with('date', $data['date']);
     }
@@ -132,6 +135,7 @@ class StatisticsController extends Controller
     public function pageHourReportTelemarketing()
     {
         $data = $this::hourReportTelemarketing();
+
         return view('reportpage.HourReportTelemarketing')
             ->with('reports', $data['reports'])
             ->with('hour', $data['hour'])
@@ -166,6 +170,7 @@ class StatisticsController extends Controller
                     ->whereBetween('report_date', [$date_start, $date_stop])
                     ->groupBy('department_info_id');
             })
+            ->where('department_info.id_dep_type', '=', 2)
             ->groupBy('hour_report.department_info_id')
             ->get();
 
@@ -313,6 +318,7 @@ class StatisticsController extends Controller
                     ->where('report_date', 'like', $date)
                     ->groupBy('department_info_id');
             })
+            ->where('department_info.id_dep_type', '=', 2)
             ->groupBy('hour_report.department_info_id')
             ->get();
 
@@ -430,7 +436,14 @@ public function pageMonthReportTelemarketing()
     }
     // Przygotowanie danych do raportu godzinnego DKJ
     private function hourReportDkj() {
-        $date_start = date('Y-m-d');
+        //w users.dating_type nie ustala sie czy jest to badanie czy wysyłka
+        //dlatego zczytuje wszystkich jako "Badania"
+        //kilka users.dating_type jes ustawione recznie na 1???
+        $today = date('Y-m-d');
+
+        $hour_stop = $today . ' ' . date('H', time() + 36000) . ':00:00'; //tutaj zmienic przy wydawaniu na produkcję na  date('H') - 1
+        $hour_start = $today . ' ' . date("H", time() - 3600) . ':00:00';
+
         $dkj = DB::table('dkj')
             ->select(DB::raw('
               dkj.department_info_id,
@@ -438,18 +451,18 @@ public function pageMonthReportTelemarketing()
               department_type.name as dep_name_type,
               department_info.type,
               count(dkj.id) as liczba_odsluchanych,
-              sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as wysylka,
               sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as badania,
-              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 1 THEN 1 ELSE 0 END) as bad_wysylka,
-              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 0 THEN 1 ELSE 0 END) as bad_badania
+              sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as wysylka,
+              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 0 THEN 1 ELSE 0 END) as bad_badania,
+              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 1 THEN 1 ELSE 0 END) as bad_wysylka
           '))
             ->join('users', 'users.id', '=', 'dkj.id_user')
             ->join('department_info', 'department_info.id', '=', 'dkj.department_info_id')
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-            ->where('add_date','like',$date_start.'%')
+            ->whereBetween('add_date', [$hour_start, $hour_stop])
             ->groupBy('dkj.department_info_id')
-            ->groupBy('department_info.type')
+            ->groupBy('users.dating_type')
             ->get();
         $data = [
             'dkj' => $dkj,
@@ -475,6 +488,7 @@ public function pageMonthReportTelemarketing()
     public function pageHourReportDKJ()
     {
         $data = $this::hourReportDkj();
+// dd($data);
         return view('reportpage.hourReportDkj')
             ->with('date_stop', date('H') . ':00:00')
             ->with('dkj', $data['dkj']);
@@ -682,6 +696,7 @@ public function pageMonthReportTelemarketing()
         $data = [
             'date'    => $date,
             'hour'    => $hour,
+            'hour_start'    => $hour_start,
             'reports' => $reports,
             'dkj'     => $dkj
         ];
@@ -765,7 +780,7 @@ public function pageMonthReportTelemarketing()
     //wyświetlanie raportu odsłuchanych rozmów (raport dzienny)
     public function pageDayReportChecked() {
         $data = $this->dayReportCheckedData();
-// dd($data);
+
         return view('reportpage.DayReportChecked')
             ->with('hour_reports', $data['hour_reports'])
             ->with('dkj', $data['dkj'])
