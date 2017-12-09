@@ -15,7 +15,172 @@
      {{--Logout info change password--}}
 
     <ul class="nav navbar-top-links navbar-right">
+@if(Auth::user()->department_info->blocked == 0)
+      {{--ZABLOKOWANE DLA IT--}}
+        @foreach($links as $link)
+            @if($link->link == 'view_notification_table')
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="it_support">Zgłoszenia
+                    <i class="fa fa-bell fa-fw"></i> <i class="fa fa-caret-down"></i>
+                </a>
+                <ul id="babum" class="dropdown-menu dropdown-alerts" style="width: 500px; overflow-y:scroll; max-height: 500px;">
 
+                </ul>
+            </li>
+            @endif
+      {{--ZABLOKOWANE DLA DKJ--}}
+            @if($link->link == 'view_dkj_table_small')
+            <li class="dropdown">
+                <a id="check_messages" class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="fa fa-envelope fa-fw"></i> <i class="fa fa-caret-down"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-messages" style="width: 500px;">
+                        <strong>Oddziały</strong>
+                    <li>
+                        <div class="table-responsive">
+                          <table class="table table-bordered" style="margin-bottom:0px">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10%">Lp.</th>
+                                    <th>Oddział</th>
+                                    <th>Status</th>
+                                    <th style="width: 20%">Janki</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                              @php($i = 1)
+                              @foreach($departments_for_dkj as $department)
+                                  @if($department->type == 'Badania/Wysyłka')
+                                      <tr id="{{$department->id}}dkjstatus">
+                                          <td>{{$i}}</td>
+                                          <td>{{$department->departments->name . ' ' . $department->department_type->name.' Badania '}}</td>
+                                          <td name="status" class="alert alert-danger">Nieodsłuchany</td>
+                                          <td name="count_yanek">0</td>
+                                      </tr>
+                                      @php($i++)
+                                      <tr id="{{$department->id*(-1)}}dkjstatus">
+                                          <td>{{$i}}</td>
+                                          <td>{{$department->departments->name . ' ' . $department->department_type->name.' Wysyłka '}}</td>
+                                          <td name="status" class="alert alert-danger">Nieodsłuchany</td>
+                                          <td name="count_yanek">0</td>
+                                      </tr>
+                                      @elseif($department->type == 'Badania' || $department->type == 'Wysyłka')
+                                      <tr id="{{$department->id}}dkjstatus">
+                                          <td>{{$i}}</td>
+                                          <td>{{$department->departments->name . ' ' . $department->department_type->name.' '.$department->type}}</td>
+                                          <td name="status" class="alert alert-danger">Nieodsłuchany</td>
+                                          <td name="count_yanek">0</td>
+                                      </tr>
+                                  @endif
+                                  @php($i++)
+                              @endforeach
+                            </tbody>
+                          </table>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a id="check_users" class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-messages" style="width: 700px;">
+                    <strong>Konsultanci</strong>
+                  <div class="table-responsive" style="max-height: 500px;">
+                    <table class="table table-bordered" id="consultantTable">
+                      <thead>
+                          <tr>
+                              <th style="width: 10%">Lp.</th>
+                              <th>Imie i nazwisko</th>
+                              <th>Ilość odsłuchanych</th>
+                              <th style="width: 20%">Janki</th>
+                          </tr>
+                      </thead>
+                      <tbody id="tableContent">
+                      </tbody>
+                    </table>
+                  </div>
+                </ul>
+            </li>
+            @endif
+        {{--ZABLOKOWANE DLA Kierownik DKJ--}}
+            @if($link->link == 'view_dkj_table_big')
+            <li class="dropdown">
+                <a id="check_messages_dkj" class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="fa fa-envelope fa-fw"></i><i class="fa fa-caret-down"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-messages" style="width: 800px;">
+                        <strong>Oddziały</strong>
+                    <li>
+                        <div class="table-responsive">
+                          <table class="table table-bordered" style="margin-bottom:0px">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10%">Lp.</th>
+                                    <th>Oddział</th>
+                                    <th>Status</th>
+                                    <th style="width: 20%">Janki</th>
+                                    <th style="width: 10%">Odrzuconych</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                              @php($i = 1)
+                              @foreach($departments_for_dkj as $department)
+                                  @if($department->type == 'Badania/Wysyłka')
+                                      <tr id="{{$department->id}}dkjstatus">
+                                          <td>{{$i}}</td>
+                                          <td>{{$department->departments->name . ' ' . $department->department_type->name.' Badania '}}</td>
+                                          <td name="status" class="alert alert-danger">Nieodsłuchany</td>
+                                          <td name="count_yanek">0</td>
+                                          <td name="undone">0</td>
+                                      </tr>
+                                      @php($i++)
+                                      <tr id="{{$department->id*(-1)}}dkjstatus">
+                                          <td>{{$i}}</td>
+                                          <td>{{$department->departments->name . ' ' . $department->department_type->name.' Wysyłka '}}</td>
+                                          <td name="status" class="alert alert-danger">Nieodsłuchany</td>
+                                          <td name="count_yanek">0</td>
+                                          <td name="undone">0</td>
+                                      </tr>
+                                  @elseif($department->type == 'Badania' || $department->type == 'Wysyłka')
+                                      <tr id="{{$department->id}}dkjstatus">
+                                          <td>{{$i}}</td>
+                                          <td>{{$department->departments->name . ' ' . $department->department_type->name.' '.$department->type}}</td>
+                                          <td name="status" class="alert alert-danger">Nieodsłuchany</td>
+                                          <td name="count_yanek">0</td>
+                                          <td name="undone">0</td>
+                                      </tr>
+                                  @endif
+                                  @php($i++)
+                              @endforeach
+                            </tbody>
+                          </table>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            @endif
+        @endforeach
+
+
+        <!-- start new section-->
+
+        <!-- Endo of new section -->
+
+
+        @if($multiple_departments->count() != 0)
+        <li>
+            <label for="select_town">Wybierz oddział</label>
+        </li>
+        <li>
+            <select id="change_department" class="form-control">
+              @foreach($multiple_departments as $department)
+                  <option @if(Auth::user()->department_info_id == $department->department_info_id) selected @endif value="{{$department->department_info_id}}">{{$department->department_info->departments->name . ' ' . $department->department_info->department_type->name}}</option>
+              @endforeach
+            </select>
+        </li>
+        @endif
+@endif
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{Auth::user()->first_name.' '.Auth::user()->last_name}}
                 <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>

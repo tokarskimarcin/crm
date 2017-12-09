@@ -427,7 +427,7 @@
                         if(data.manager_status == null)
                             return '<b>Brak</b>';
                         else
-                              var text_response = (data.manager_status) ? "<b>Tak</b>" : "<b>Nie</b>" ;
+                              var text_response = (data.manager_status == 0) ? "<b>Tak</b>" : "<b>Nie</b>" ;
                               var comment = (data.comment_manager != null) ? data.comment_manager : "Brak Komentarza" ;
                               return text_response + " " + comment;
                     }, "name": " dkj.comment_manager"
