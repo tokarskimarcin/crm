@@ -174,53 +174,53 @@ class StatisticsController extends Controller
             ->groupBy('hour_report.department_info_id')
             ->get();
 
+
+
+            //tu był zmiana z godzin na liczbę
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
-                'sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as realRBH,
-            department_info.id
+                'sum(time_to_sec(register_stop) - time_to_sec(register_start))/3600 as realRBH,
+                department_info.id
             '))
             ->join('users', 'users.id', '=', 'work_hours.id_user')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
-            ->whereIn('work_hours.id', function($query) use($date_start, $date_stop){
-                $query->select(DB::raw('
-                  work_hours.id
-              '))
-                    ->whereBetween('date', [$date_start, $date_stop]);
-            })
+            ->whereBetween('date', [$date_start, $date_stop])
+            ->where('department_info.id_dep_type', '=', 2)
+            ->where('users.user_type_id', '=', 1)
             ->groupBy('department_info.id')
             ->get();
 
-        $sum_hours = DB::table('work_hours')
-            ->select(DB::raw(
-                'sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as realRBH,
-            department_info.id
-            '))
-            ->join('users', 'users.id', '=', 'work_hours.id_user')
-            ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
-            ->whereIn('work_hours.id', function($query) use($date_start, $date_stop){
-                $query->select(DB::raw('
-                  work_hours.id
-              '))
-                    ->whereBetween('date', [$date_start, $date_stop]);
-            })
-            ->get();
-
-        $time_sum_array = 0;
-        foreach($work_hours as $work_hour) {
-            if ($work_hour->realRBH != null) {
-                $time = explode(':', $work_hour->realRBH);
-                $time_sum_array += ($time[0]*3600) + ($time[1]*60) + $time[2];
-            }
-        }
-        $hours = round($time_sum_array / 3600, 2);
+        // $sum_hours = DB::table('work_hours')
+        //     ->select(DB::raw(
+        //         'sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as realRBH,
+        //     department_info.id
+        //     '))
+        //     ->join('users', 'users.id', '=', 'work_hours.id_user')
+        //     ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
+        //     ->whereIn('work_hours.id', function($query) use($date_start, $date_stop){
+        //         $query->select(DB::raw('
+        //           work_hours.id
+        //       '))
+        //             ->whereBetween('date', [$date_start, $date_stop]);
+        //     })
+        //     ->get();
+        //
+        // $time_sum_array = 0;
+        // foreach($work_hours as $work_hour) {
+        //     if ($work_hour->realRBH != null) {
+        //         $time = explode(':', $work_hour->realRBH);
+        //         $time_sum_array += ($time[0]*3600) + ($time[1]*60) + $time[2];
+        //     }
+        // }
+        // $hours = round($time_sum_array / 3600, 2);
 
         $data = [
             'date_start' => $date_start,
             'date_stop' => $date_stop,
             'reports' => $reports,
             'work_hours' => $work_hours,
-            'hours' => $hours,
-            'sum_hours' => $sum_hours,
+          //  'hours' => $hours,
+            //'sum_hours' => $sum_hours,
         ];
         return $data;
     }
@@ -235,7 +235,7 @@ class StatisticsController extends Controller
         return view('mail.weekReportTelemarketing')
             ->with('hours', $data['hours'])
             ->with('work_hours', $data['work_hours'])
-            ->with('sum_hours', $data['sum_hours'])
+          //  ->with('sum_hours', $data['sum_hours'])
             ->with('reports', $data['reports'])
             ->with('date_start', $data['date_start'])
             ->with('date_stop', $data['date_stop']);
@@ -243,11 +243,11 @@ class StatisticsController extends Controller
     // Wyswietlenie raportu tygodniowego na stronie 'telemarketing'
     public function pageWeekReportTelemarketing() {
         $data = $this::weekReportTelemarketing();
-
+//
         return view('reportpage.WeekReportTelemarketing')
-            ->with('hours', $data['hours'])
+            //->with('hours', $data['hours'])
             ->with('work_hours', $data['work_hours'])
-            ->with('sum_hours', $data['sum_hours'])
+          //  ->with('sum_hours', $data['sum_hours'])
             ->with('reports', $data['reports'])
             ->with('date_start', $data['date_start'])
             ->with('date_stop', $data['date_stop']);
@@ -422,14 +422,14 @@ class StatisticsController extends Controller
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
             ->where('department_info.dep_aim','!=',0)
-            ->whereIn('hour_report.id', function($query) use($date){
-                $query->select(DB::raw(
-                    'MAX(hour_report.id)'
-                ))
-                    ->from('hour_report')
-                    ->where('report_date', 'like', $date)
-                    ->groupBy('department_info_id','report_date');
-            })
+            // ->whereIn('hour_report.id', function($query) use($date){
+            //     $query->select(DB::raw(
+            //         'MAX(hour_report.id)'
+            //     ))
+            //         ->from('hour_report')
+            //         ->where('report_date', 'like', $date)
+            //         ->groupBy('department_info_id','report_date');
+            // })
             ->where('department_info.id_dep_type', '=', 2)
             ->groupBy('hour_report.department_info_id')
             ->get();
@@ -437,35 +437,36 @@ class StatisticsController extends Controller
         //pobieranie sumy godzin pracy dla poszczególnych oddziałów
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
-                'sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as realRBH,
+                'sum(time_to_sec(register_stop) - time_to_sec(register_start))/3600 as realRBH,
                   department_info.id
                   '))
             ->join('users', 'users.id', '=', 'work_hours.id_user')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
-            ->whereIn('work_hours.id', function($query) use($date){
-                $query->select(DB::raw('
-                        work_hours.id
-                    '))
-                    ->where('date', 'like', $date);
-            })
+            // ->whereIn('work_hours.id', function($query) use($date){
+            //     $query->select(DB::raw('
+            //             work_hours.id
+            //         '))
+            //         ->where('date', 'like', $date);
+            // })
+            ->where('work_hours.date', 'like', $date)
             ->groupBy('department_info.id')
             ->get();
 
-
-        $time_sum_array = 0;
-        foreach($work_hours as $work_hour) {
-            if ($work_hour->realRBH != null) {
-                $time = explode(':', $work_hour->realRBH);
-                $time_sum_array += ($time[0]*3600) + ($time[1]*60) + $time[2];
-            }
-        }
-        $hours = round($time_sum_array / 3600, 2);
+        //
+        // $time_sum_array = 0;
+        // foreach($work_hours as $work_hour) {
+        //     if ($work_hour->realRBH != null) {
+        //         $time = explode(':', $work_hour->realRBH);
+        //         $time_sum_array += ($time[0]*3600) + ($time[1]*60) + $time[2];
+        //     }
+        // }
+        // $hours = round($time_sum_array / 3600, 2);
 
         $data = [
             'month_name' => $month_name,
             'reports' => $reports,
             'work_hours' => $work_hours,
-            'hours' => $hours,
+            //'hours' => $hours,
             'days_list' => $days_list,
         ];
         return $data;
@@ -482,7 +483,7 @@ class StatisticsController extends Controller
              });
 
         return view('mail.monthReportTelemarketing')
-          ->with('hours', $data['hours'])
+        //  ->with('hours', $data['hours'])
           ->with('work_hours', $data['work_hours'])
           ->with('month_name', $data['month_name'])
           ->with('days_list', $data['days_list'])
@@ -495,7 +496,7 @@ public function pageMonthReportTelemarketing()
     $year = date('Y');
     $data = $this::monthReportTelemarketing($month,$year);
     return view('reportpage.MonthReportTelemarketing')
-        ->with('hours', $data['hours'])
+//->with('hours', $data['hours'])
         ->with('work_hours', $data['work_hours'])
         ->with('month_name', $data['month_name'])
         ->with('days_list', $data['days_list'])
