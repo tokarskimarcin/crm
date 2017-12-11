@@ -34,8 +34,8 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->first_name . ' ' . $item->last_name}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_sum}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_janek}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_not_janek}}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_janek}}</td>
             @foreach($work_hours as $hour)
                 @if($hour->id == $item->id)
                     @php
@@ -71,8 +71,8 @@
     <tr>
         <td colspan="2" style="border:1px solid #231f20;text-align:center;padding:3px;"><b>Total</b></td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_user_sum}}</td>
-        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_user_janek}}</td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_user_not_janek}}</td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_user_janek}}</td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_work_hour}}</td>
         @if($total_work_hour > 0)
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($total_user_sum / $total_work_hour, 2)}}</td>
@@ -121,8 +121,8 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$y}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->first_name . ' ' . $item->last_name}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_sum}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_janek}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_not_janek}}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_janek}}</td>
             @foreach($work_hours as $hour)
                 @if($hour->id == $item->id)
                 @php
@@ -159,8 +159,8 @@
     <tr>
         <td colspan="2" style="border:1px solid #231f20;text-align:center;padding:3px;"><b>Total</b></td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_user_sum}}</td>
-        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_user_janek}}</td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_user_not_janek}}</td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_user_janek}}</td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_work_hour}}</td>
         @if($total_work_hour > 0)
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($total_user_sum / $total_work_hour, 2)}}</td>

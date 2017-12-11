@@ -663,7 +663,7 @@ public function pageMonthReportTelemarketing()
                 sum(CASE WHEN dkj.dkj_status = 0 THEN 1 ELSE 0 END) as user_not_janek
             '))
             ->join('dkj', 'users.id', '=', 'dkj.id_dkj')
-            ->whereBetween('dkj.add_date', [$date_start, $date_stop])
+            ->whereBetween('dkj.add_date', [$date_start.' 00:00:00', $date_stop.' 23:00:00'])
             ->groupBy('dkj.id_dkj')
             ->get();
 
