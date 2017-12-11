@@ -176,4 +176,57 @@ class AdminController extends Controller
 
     }
 
+    //edycja oddziałów
+    public function editDepartmentGet() {
+        $department_info = Department_info::all();
+
+        return view('admin.editDepartment')
+            ->with('department_info', $department_info);
+    }
+
+    //edycja oddziałów
+    public function editDepartmentPost(Request $request) {
+        //$request->type okkreśla czy oddział jest wyberany czy edytowany
+        //1 - wybranie oddziału
+        //2 - edycja oddziału
+        $department_info = Department_info::all();
+        $department_types = Department_types::all();
+        $selected_department = Department_info::find($request->selected_department_info_id);
+
+        if ($request->post_type == 1) {
+
+
+          return view('admin.editDepartment')
+              ->with('selected_department', $selected_department)
+              ->with('department_types', $department_types)
+              ->with('department_info', $department_info);
+        }
+
+        if ($request->post_type == 2) {
+            //Edycja opisu oddziału znajsuje sie w Departments
+            $departments = Departments::find($selected_department->departments->id);
+            $departments->desc = $request->desc;
+            $departments->save();
+
+            $selected_department->size = ($request->size != null) ? $request->size : 0 ;
+            $selected_department->commission_avg = ($request->commission_avg) ? $request->commission_avg : 0 ;
+            $selected_department->commission_hour = ($request->commission_hour) ? $request->commission_hour : 0 ;
+            $selected_department->commission_step = ($request->commission_step) ? $request->commission_step : 0 ;
+            $selected_department->commission_start_money = ($request->commission_start_money) ? $request->commission_start_money : 0 ;
+            $selected_department->commission_janky = ($request->commission_janky) ? $request->commission_janky : 0 ;
+            $selected_department->dep_aim = ($request->dep_aim) ? $request->dep_aim : 0 ;
+            $selected_department->dep_aim_week = ($request->dep_aim_week) ? $request->dep_aim_week : 0 ;
+            $selected_department->type = ($request->type != 'Wybierz') ? $request->type : '' ;
+            $selected_department->janky_system_id = ($request->janky_system_id) ? $request->janky_system_id : 0 ;
+
+            $selected_department->save();
+        }
+
+        // new ActivityRecorder(3, "Dodano oddział o numerze ID: " . $id_dep);
+
+        Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
+        return Redirect::back();
+
+    }
+
 }

@@ -47,7 +47,7 @@
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">Brak pracowników</td>
             @endif
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->sum_success, 2)}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->sum_janky_count / $report->sum_success) * 100, 2)}} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->sum_janky_count}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->avg_wear_base, 2)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->sum_call_time, 2)}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->sum_success / $goal) * 100, 2)}} %</td>
@@ -56,7 +56,7 @@
         @php($total_avg_average += $report->avg_average)
         @php($total_sum_success += $report->sum_success)
         @php($total_sum_janky_count += $report->sum_janky_count)
-        @php($total_janky += round(($report->sum_janky_count / $report->sum_success) * 100, 2))
+        @php($total_janky += $report->sum_janky_count)
         @php($total_avg_wear_base += $report->avg_wear_base)
         @php($total_goal += round(($report->sum_success / $goal) * 100, 2))
         @php($total_sum_call_time += $report->sum_call_time)

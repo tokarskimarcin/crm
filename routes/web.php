@@ -71,6 +71,8 @@ Route::POST('/locker','AdminController@lockerPost')->name('api.locker');
 Route::get('/hourReportTelemarketing', 'StatisticsController@MailhourReportTelemarketing'); // ok
 Route::get('/weekReportTelemarketing', 'StatisticsController@MailweekReportTelemarketing'); // ok
 Route::get('/monthReportTelemarketing', 'StatisticsController@MailmonthReportTelemarketing'); // ok
+Route::get('/dayReportTelemarketing', 'StatisticsController@DayReportTelemarketing'); // tutaj dodac
+
 Route::get('/weekReportJanky', 'StatisticsController@weekReportJanky');
 Route::get('/dayReportMissedRepo', 'StatisticsController@dayReportMissedRepo');
 
@@ -100,6 +102,8 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
     Route::get('/locker','AdminController@lockerGet');
     Route::get('/add_department','AdminController@addDepartmentGet');
     Route::Post('/add_department','AdminController@addDepartmentPost');
+    Route::get('/edit_department','AdminController@editDepartmentGet');
+    Route::Post('/edit_department','AdminController@editDepartmentPost');
     // Admin_Panel --Stop--
 
     // Password change --START--
@@ -230,6 +234,7 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
     Route::get('/pageHourReportTelemarketing', 'StatisticsController@pageHourReportTelemarketing');
     Route::get('/pageWeekReportTelemarketing', 'StatisticsController@pageWeekReportTelemarketing');
     Route::get('/pageMonthReportTelemarketing', 'StatisticsController@pageMonthReportTelemarketing');
+    Route::get('/pageDayReportTelemarketing', 'StatisticsController@pageDayReportTelemarketing');
 
 
     Route::get('/pageHourReportDKJ', 'StatisticsController@pageHourReportDKJ');
