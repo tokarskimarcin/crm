@@ -243,7 +243,7 @@ class StatisticsController extends Controller
     // Wyswietlenie raportu tygodniowego na stronie 'telemarketing'
     public function pageWeekReportTelemarketing() {
         $data = $this::weekReportTelemarketing();
-        // dd($data);
+
         return view('reportpage.WeekReportTelemarketing')
             ->with('hours', $data['hours'])
             ->with('work_hours', $data['work_hours'])
@@ -488,7 +488,7 @@ public function pageMonthReportTelemarketing()
     public function pageHourReportDKJ()
     {
         $data = $this::hourReportDkj();
-// dd($data);
+
         return view('reportpage.hourReportDkj')
             ->with('date_stop', date('H') . ':00:00')
             ->with('dkj', $data['dkj']);
@@ -597,7 +597,7 @@ public function pageMonthReportTelemarketing()
     }
 
     //przygotowanie danych do raportu miesięcznego dkj
-    public function MonthReportDkjData() {
+    private function MonthReportDkjData() {
         $month = $this->monthReverse(date('m'));
         $year = date('Y');
         if ($month == 12) {
