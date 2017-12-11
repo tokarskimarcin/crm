@@ -47,7 +47,7 @@
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">Brak pracowników</td>
             @endif
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->sum_success, 2)}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->sum_janky_count}} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->sum_janky_count,2)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->avg_wear_base, 2)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->sum_call_time, 2)}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->sum_success / $goal) * 100, 2)}} %</td>
