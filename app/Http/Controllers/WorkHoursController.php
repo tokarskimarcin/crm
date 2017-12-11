@@ -225,13 +225,14 @@ class WorkHoursController extends Controller
         $department_id = Auth::user()->department_info_id;
 
         $department = Department_info::find($department_id);
-        $users = $department->users;
+        $users = $department->users->where('status_work',1);
         return view('workhours.viewHour')
             ->with('users',$users);
     }
     public function viewHourGetCadre()
     {
-        $users = User::where('user_type_id', "!=", 1)->get();
+        $users = User::wherenotin('user_type_id', [1,2])
+            ->where('status_work',1)->get();
 
         return view('workhourscadre.viewHourCadre')
             ->with('users',$users);
@@ -239,7 +240,7 @@ class WorkHoursController extends Controller
     public function viewHourPostCadre(Request $request)
     {
         if($request->userid == "-1") {
-              $users = User::where('user_type_id', "!=", 1)->get();
+              $users = User::wherenoin('user_type_id', [1,2])->get();
               return view('workhourscadre.viewHourCadre')
                   ->with('users',$users);
         }
