@@ -409,11 +409,11 @@ class StatisticsController extends Controller
 
         $reports = DB::table('hour_report')
             ->select(DB::raw(
-                'SUM(call_time) as sum_call_time,
-                    AVG(average) as avg_average,
-                    SUM(success) as sum_success,
-                    AVG(wear_base) as avg_wear_base,
-                    SUM(janky_count) as sum_janky_count,
+                    'SUM(call_time)/count(`call_time`) as sum_call_time,
+                      SUM(average)/count(`call_time`) as avg_average,
+                      SUM(success) as sum_success,
+                      SUM(wear_base)/count(`call_time`) as avg_wear_base,
+                      SUM(janky_count)/count(`call_time`)  as sum_janky_count,
                     department_type.name as dep_name,
                     departments.name as dep_type_name,
                     department_info.*
@@ -428,7 +428,7 @@ class StatisticsController extends Controller
                 ))
                     ->from('hour_report')
                     ->where('report_date', 'like', $date)
-                    ->groupBy('department_info_id');
+                    ->groupBy('department_info_id','report_date');
             })
             ->where('department_info.id_dep_type', '=', 2)
             ->groupBy('hour_report.department_info_id')
