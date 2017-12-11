@@ -2,7 +2,7 @@
 <thead style="color:#efd88f">
 <tr>
 <td colspan="5" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
-<font size="6" face="Calibri">Raport Tygodniowy Telemarketing {{$date_start . ' - ' . $date_stop}}</font></td>
+<font size="6" face="Calibri">Raport Dzienny Telemarketing </font></td>
 <td colspan="4" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20">
 <img src="https://ci3.googleusercontent.com/proxy/2Yaz8WsJ34uYOsanmpfkEZKbZDP2-sOQDVLB5TQdLCq6R7YzBCfaGc6K2bNRItA=s0-d-e1-ft#http://xdes.pl/logovc.png" class="CToWUd"></td>
 </tr>
@@ -36,16 +36,15 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->avg_average, 2)}}</td>
             @foreach($work_hours as $work_hour)
                 @if($work_hour->id == $report->id && $work_hour->realRBH != null)
-                @php($total_realRBH += $work_hour->realRBH)
                 @php($add_column = false)
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($work_hour->realRBH, 2)}}</td>
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$work_hour->realRBH}}</td>
                 @endif
             @endforeach
             @if($add_column == true)
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">Brak pracowników</td>
             @endif
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->sum_success, 2)}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->sum_janky_count,2)}} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->sum_janky_count, 2)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->avg_wear_base, 2)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->sum_call_time, 2)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->sum_success / $goal) * 100, 2)}} %</td>
@@ -78,7 +77,7 @@
                   $total_janky_proc = round($total_janky / $count, 2);
                   $total_avg_average_proc = round($total_avg_average / $count, 2);
                   $total_sum_call_time_poc = round($total_sum_call_time / $count, 2);
-                  $total_realRBH = round($total_realRBH, 2);
+                  $total_realRBH = round($total_realRBH / 3600, 2);
             }
       @endphp
 

@@ -21,7 +21,7 @@
 
     <tr>
         <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->dep_name . ' ' . $report->dep_name_type}}</td>
-        <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->success}}</td>
+
         @foreach($dkj as $item)
             @if($item->department_info_id == $report->department_info_id)
             @php($dep_avg = round($item->department_sum/ $report->success * 100, 2))
@@ -29,6 +29,7 @@
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->department_sum}}</td>
             @endif
         @endforeach
+          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->success}}</td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$dep_avg}} %</td>
     </tr>
     @php($total_success += $report->success)
@@ -36,8 +37,8 @@
 @endforeach
 <tr>
     <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>Total</b></td>
-    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_success}}</td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_sum}}</td>
+      <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_success}}</td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_sum / $total_success * 100, 2)}} %</td>
 </tr>
   </tbody>

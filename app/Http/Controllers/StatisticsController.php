@@ -189,38 +189,12 @@ class StatisticsController extends Controller
             ->where('users.user_type_id', '=', 1)
             ->groupBy('department_info.id')
             ->get();
-
-        // $sum_hours = DB::table('work_hours')
-        //     ->select(DB::raw(
-        //         'sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as realRBH,
-        //     department_info.id
-        //     '))
-        //     ->join('users', 'users.id', '=', 'work_hours.id_user')
-        //     ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
-        //     ->whereIn('work_hours.id', function($query) use($date_start, $date_stop){
-        //         $query->select(DB::raw('
-        //           work_hours.id
-        //       '))
-        //             ->whereBetween('date', [$date_start, $date_stop]);
-        //     })
-        //     ->get();
-        //
-        // $time_sum_array = 0;
-        // foreach($work_hours as $work_hour) {
-        //     if ($work_hour->realRBH != null) {
-        //         $time = explode(':', $work_hour->realRBH);
-        //         $time_sum_array += ($time[0]*3600) + ($time[1]*60) + $time[2];
-        //     }
-        // }
-        // $hours = round($time_sum_array / 3600, 2);
-
+            
         $data = [
             'date_start' => $date_start,
             'date_stop' => $date_stop,
             'reports' => $reports,
             'work_hours' => $work_hours,
-          //  'hours' => $hours,
-            //'sum_hours' => $sum_hours,
         ];
         return $data;
     }
@@ -235,7 +209,6 @@ class StatisticsController extends Controller
         return view('mail.weekReportTelemarketing')
             ->with('hours', $data['hours'])
             ->with('work_hours', $data['work_hours'])
-          //  ->with('sum_hours', $data['sum_hours'])
             ->with('reports', $data['reports'])
             ->with('date_start', $data['date_start'])
             ->with('date_stop', $data['date_stop']);
@@ -245,9 +218,7 @@ class StatisticsController extends Controller
         $data = $this::weekReportTelemarketing();
 //
         return view('reportpage.WeekReportTelemarketing')
-            //->with('hours', $data['hours'])
             ->with('work_hours', $data['work_hours'])
-          //  ->with('sum_hours', $data['sum_hours'])
             ->with('reports', $data['reports'])
             ->with('date_start', $data['date_start'])
             ->with('date_stop', $data['date_stop']);
@@ -256,8 +227,8 @@ class StatisticsController extends Controller
     //dane do raportu dziennego telemarketing
     private function dayReportTelemarketing()
     {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date = date('Y-m-d');
+        $date = '2017-12-10';
 
         $reports = DB::table('hour_report')
             ->select(DB::raw(
@@ -274,12 +245,12 @@ class StatisticsController extends Controller
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
             ->where('department_info.dep_aim','!=',0)
-            ->whereIn('hour_report.id', function($query) use($date_start, $date_stop){
+            ->whereIn('hour_report.id', function($query) use($date){
                 $query->select(DB::raw(
                     'MAX(hour_report.id)'
                 ))
                     ->from('hour_report')
-                    ->whereBetween('report_date', [$date_start, $date_stop])
+                    ->where('report_date', '=',$date)
                     ->groupBy('department_info_id');
             })
             ->where('department_info.id_dep_type', '=', 2)
@@ -293,52 +264,24 @@ class StatisticsController extends Controller
             '))
             ->join('users', 'users.id', '=', 'work_hours.id_user')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
-            ->whereIn('work_hours.id', function($query) use($date_start, $date_stop){
+            ->whereIn('work_hours.id', function($query) use($date){
                 $query->select(DB::raw('
                   work_hours.id
               '))
-                    ->whereBetween('date', [$date_start, $date_stop]);
+                    ->where('date', 'like', $date . '%');
             })
             ->groupBy('department_info.id')
             ->get();
 
-        $sum_hours = DB::table('work_hours')
-            ->select(DB::raw(
-                'sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as realRBH,
-            department_info.id
-            '))
-            ->join('users', 'users.id', '=', 'work_hours.id_user')
-            ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
-            ->whereIn('work_hours.id', function($query) use($date_start, $date_stop){
-                $query->select(DB::raw('
-                  work_hours.id
-              '))
-                    ->whereBetween('date', [$date_start, $date_stop]);
-            })
-            ->get();
-
-        $time_sum_array = 0;
-        foreach($work_hours as $work_hour) {
-            if ($work_hour->realRBH != null) {
-                $time = explode(':', $work_hour->realRBH);
-                $time_sum_array += ($time[0]*3600) + ($time[1]*60) + $time[2];
-            }
-        }
-        $hours = round($time_sum_array / 3600, 2);
-
         $data = [
-            'date_start' => $date_start,
-            'date_stop' => $date_stop,
             'reports' => $reports,
             'work_hours' => $work_hours,
-            'hours' => $hours,
-            'sum_hours' => $sum_hours,
         ];
         return $data;
     }
 //Mail do raportu dziennego Telemarketing
     public function MailDayReportTelemarketing() {
-        $data = $this::weekReportTelemarketing();
+        $data = $this::dayReportTelemarketing();
            Mail::send('mail.dayReportTelemarketing', $data, function($message)
            {
                $message->from('jarzyna.verona@gmail.com');
@@ -348,21 +291,15 @@ class StatisticsController extends Controller
             ->with('hours', $data['hours'])
             ->with('work_hours', $data['work_hours'])
             ->with('sum_hours', $data['sum_hours'])
-            ->with('reports', $data['reports'])
-            ->with('date_start', $data['date_start'])
-            ->with('date_stop', $data['date_stop']);
+            ->with('reports', $data['reports']);
     }
     // Wyswietlenie raportu dziennego na stronie 'telemarketing'
     public function pageDayReportTelemarketing() {
-        $data = $this::weekReportTelemarketing();
+        $data = $this::dayReportTelemarketing();
 
         return view('reportpage.dayReportTelemarketing')
-            ->with('hours', $data['hours'])
             ->with('work_hours', $data['work_hours'])
-            ->with('sum_hours', $data['sum_hours'])
-            ->with('reports', $data['reports'])
-            ->with('date_start', $data['date_start'])
-            ->with('date_stop', $data['date_stop']);
+            ->with('reports', $data['reports']);
     }
 
     //zwracanie nazwy miesiąca którego dotyczy statystyka
@@ -928,13 +865,17 @@ public function pageMonthReportTelemarketing()
               ->groupBy('hour_report.department_info_id')
               ->get();
 
+          $date_start .= ' 00:00:00';
+          $date_stop .= ' 23:00:00';
+
           $dkj = DB::table('dkj')
               ->select(DB::raw('
-                  department_info_id,
+                  users.department_info_id,
                   count(*) as department_sum
               '))
+              ->join('users', 'users.id', '=', 'dkj.id_user')
               ->whereBetween('add_date', [$date_start, $date_stop])
-              ->groupBy('department_info_id')
+              ->groupBy('users.department_info_id')
               ->get();
 
           $data = [
