@@ -96,7 +96,7 @@ class DkjController extends Controller
         $users = User::where('department_info_id',$department_id_info)
             ->where('status_work',1)
             ->where('user_type_id',1);
-            if ($department_id_info<0) {
+            if ($request->department_id_info<0) {
               $users = $users->where('dating_type',$dating_type);
             }
             $users = $users->get();
