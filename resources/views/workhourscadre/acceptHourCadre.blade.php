@@ -59,22 +59,23 @@
             </select>
         </div>
     </div>
-    <table id="datatable">
-        <thead>
-        <tr>
-            <th>Data</th>
-            <th>Osoba</th>
-            <th>Start</th>
-            <th>Zarejestrowane</th>
-            <th>Modyfikacja</th>
-            <th>Suma</th>
-            <th>Akcja</th>
-        </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-
+    <div class="table-responsive col-md-12">
+        <table id="datatable">
+            <thead>
+            <tr>
+                <th>Data</th>
+                <th>Osoba</th>
+                <th>Start</th>
+                <th>Zarejestrowane</th>
+                <th>Modyfikacja</th>
+                <th>Suma</th>
+                <th>Akcja</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
     <div class="row">
         <div class="col-lg-12">
             </br> <span class="fa fa-user fa-fw"></span> </br>

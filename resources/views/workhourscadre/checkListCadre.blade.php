@@ -51,6 +51,7 @@
             </select>
         </div>
     </div>
+    <div class="col-md-12 table-responsive">
     <table id="datatable">
         <thead>
         <tr>
@@ -65,7 +66,7 @@
         <tbody>
         </tbody>
     </table>
-
+</div>
     <div class="row">
         <div class="col-lg-12">
             </br> <span class="fa fa-user fa-fw"></span> </br>

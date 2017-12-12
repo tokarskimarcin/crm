@@ -43,6 +43,7 @@
                                   </ul>
 
                                   <br />
+                                  <div class="table-responsive"> 
                                   <table class="table table-bordered" id="laptop">
                                       <tr>
                                           <td>Model</td>
@@ -79,6 +80,8 @@
                                           </tr>
                                       @endforeach
                                       </table>
+                                      </div>
+                                      <div class="table-responsive">
                                       <table class="table table-bordered" id="tablet" style="display: none">
                                           <tr>
                                               <td>Model</td>
@@ -116,6 +119,8 @@
                                               </tr>
                                           @endforeach
                                           </table>
+                                          </div>
+                                          <div class="table-responsive">
                                           <table class="table table-bordered" id="phone" style="display: none">
                                               <tr>
                                                   <td>Model</td>
@@ -157,6 +162,8 @@
                                                 </tr>
                                               @endforeach
                                           </table>
+                                          </div>
+                                          <div class="table-responsive">
                                           <table class="table table-bordered" id="sim_card" style="display: none">
                                               <tr>
                                                   <td>Typ</td>
@@ -202,6 +209,8 @@
                                                 </tr>
                                               @endforeach
                                           </table>
+                                          </div>
+                                          <div class="table-responsive">
                                           <table class="table table-bordered" id="monitor" style="display: none">
                                               <tr>
                                                   <td>Model</td>
@@ -243,6 +252,8 @@
                                                 </tr>
                                               @endforeach
                                           </table>
+                                          </div>
+                                          <div class="table-responsive">
                                           <table class="table table-bordered" id="printer" style="display: none">
                                               <tr>
                                                   <td>Model</td>
@@ -272,7 +283,7 @@
                                                 </tr>
                                               @endforeach
                                           </table>
-
+                                          </div>
                                 </div>
                             </div>
                         </div>

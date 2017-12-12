@@ -252,7 +252,7 @@ class UsersController extends Controller
                 'end_work', 'phone',
                 'documents', 'student',
                 'status_work','last_login')
-                ->where('user_type_id', 1)
+                ->whereIn('user_type_id', [1,2])
                 ->where('department_info_id', Auth::user()->department_info_id);
         }
         return datatables($query)->make(true);

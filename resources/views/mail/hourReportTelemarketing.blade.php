@@ -67,7 +67,7 @@
           $total_success_proc = round($total_success_proc / $sum, 2);
           $total_wear_proc = round($total_wear_base / $sum, 2);
           $total_avg_proc = round($total_average / $sum, 2);
-          $total_janky_count = round($total_janky_count / $total_success * 100, 2);
+          $total_janky_count = round($total_janky_count / $sum, 2);
           $total_call_time = round($total_call_time / $sum, 2);
           }
       @endphp
