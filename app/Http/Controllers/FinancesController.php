@@ -251,7 +251,7 @@ class FinancesController extends Controller
             SUM(`work_hours`.`success`) as `success`,
             `salary_to_account`')
             ->groupBy('users.id')
-            ->orderBy('users.last_name','users.first_name');
+            ->orderBy('users.last_name');
 
             $r = DB::table(DB::raw('('.$query->toSql().') as r'))
                 ->mergeBindings($query)
@@ -269,7 +269,7 @@ class FinancesController extends Controller
                 ->selectRaw('`agency_id`,`first_name`,`last_name`,`rate`,`sum`,`student`,`documents`,`kara`,`premia`,`success`,
             `f`.`ods`,
             `h`.`janki`,
-            `salary_to_account` ')->get();
+            `salary_to_account`')->get();
             $final_salary = $r->groupBy('agency_id');
             return $final_salary;
     }
