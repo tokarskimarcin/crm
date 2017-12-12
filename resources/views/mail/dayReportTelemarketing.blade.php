@@ -1,3 +1,4 @@
+<div class="table-responsive">
 <table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px">
 <thead style="color:#efd88f">
 <tr>
@@ -98,3 +99,4 @@
       </tr>
   </tbody>
 </table>
+</div>

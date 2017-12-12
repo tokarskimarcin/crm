@@ -125,11 +125,6 @@ class StatisticsController extends Controller
             $report->is_send = 1;
             $report->save();
         }
-         return view('mail.hourReportTelemarketing')
-             ->with('reports', $data['reports'])
-             ->with('department_info', $data['department_info'])
-             ->with('hour', $data['hour'])
-             ->with('date', $data['date']);
     }
 // Wyswietlenie raportu godzinnego na stronie
     public function pageHourReportTelemarketing()
@@ -174,8 +169,6 @@ class StatisticsController extends Controller
             ->groupBy('hour_report.department_info_id')
             ->get();
 
-
-
             //tu był zmiana z godzin na liczbę
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
@@ -206,12 +199,6 @@ class StatisticsController extends Controller
                $message->from('jarzyna.verona@gmail.com');
                $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
            });
-        return view('mail.weekReportTelemarketing')
-            ->with('hours', $data['hours'])
-            ->with('work_hours', $data['work_hours'])
-            ->with('reports', $data['reports'])
-            ->with('date_start', $data['date_start'])
-            ->with('date_stop', $data['date_stop']);
     }
     // Wyswietlenie raportu tygodniowego na stronie 'telemarketing'
     public function pageWeekReportTelemarketing() {
@@ -228,7 +215,6 @@ class StatisticsController extends Controller
     private function dayReportTelemarketing()
     {
         $date = date('Y-m-d');
-        $date = '2017-12-07';
 
         $reports = DB::table('hour_report')
             ->select(DB::raw(
@@ -284,10 +270,6 @@ class StatisticsController extends Controller
                $message->from('jarzyna.verona@gmail.com');
                $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
            });
-        return view('mail.dayReportTelemarketing')
-            ->with('date', $data['date'])
-            ->with('work_hours', $data['work_hours'])
-            ->with('reports', $data['reports']);
     }
     // Wyswietlenie raportu dziennego na stronie 'telemarketing'
     public function pageDayReportTelemarketing() {
@@ -391,35 +373,47 @@ class StatisticsController extends Controller
                  $message->from('jarzyna.verona@gmail.com');
                  $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
              });
-
-        return view('mail.monthReportTelemarketing')
-        //  ->with('hours', $data['hours'])
-          ->with('work_hours', $data['work_hours'])
-          ->with('month_name', $data['month_name'])
-          ->with('days_list', $data['days_list'])
-          ->with('reports', $data['reports']);
     }
-// wyswietlenie raportu miesiecznego
-public function pageMonthReportTelemarketing()
-{
-    $month = date('m');
-    $year = date('Y');
-    $data = $this::monthReportTelemarketing($month,$year);
-    return view('reportpage.MonthReportTelemarketing')
-//->with('hours', $data['hours'])
-        ->with('work_hours', $data['work_hours'])
-        ->with('month_name', $data['month_name'])
-        ->with('days_list', $data['days_list'])
-        ->with('reports', $data['reports']);
-}
+    // wyswietlenie raportu miesiecznego
+    public function pageMonthReportTelemarketing()
+    {
+        $month = date('m');
+        $year = date('Y');
+        $data = $this::monthReportTelemarketing($month,$year);
+        return view('reportpage.MonthReportTelemarketing')
+            ->with('work_hours', $data['work_hours'])
+            ->with('month_name', $data['month_name'])
+            ->with('days_list', $data['days_list'])
+            ->with('reports', $data['reports']);
+    }
 
+    /*********** tygodniowy raport podwazonych janków *****************/
     public function weekReportJanky() {
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
 
-      $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-      $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
-
+        $dkj = DB::table('dkj')
+            ->select(DB::raw('
+                users.department_info_id,
+                departments.name as dep_name,
+                department_type.name as dep_name_type,
+                SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as janky_sum,
+                SUM(CASE WHEN dkj_status = 1 AND manager_status = 0 AND deleted = 0 THEN 1 ELSE 0 END) as confirmed_janky,
+                SUM(CASE WHEN dkj_status = 1 AND manager_status = 1 AND deleted = 0 THEN 1 ELSE 0 END) as unconfirmed_janky,
+                SUM(CASE WHEN dkj_status = 1 AND manager_status is null AND deleted = 0 THEN 1 ELSE 0 END) as unchecked_janky,
+                SUM(CASE WHEN dkj_status = 0 AND manager_status = 1 AND deleted = 0 THEN 1 ELSE 0 END) as anulled_janky,
+                SUM(CASE WHEN deleted = 1 THEN 1 ELSE 0 END) as deleted_janky
+            '))
+            ->join('users', 'users.id', '=', 'dkj.id_user')
+            ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->whereBetween('add_date', [$date_start, $date_stop])
+            ->groupBy('users.department_info_id')
+            ->get();
 
         return view('mail.weekReportJanky')
+            ->with('dkj', $dkj)
             ->with('date_start', $date_start)
             ->with('date_stop', $date_stop);
     }
@@ -452,10 +446,6 @@ public function pageMonthReportTelemarketing()
             $message->from('jarzyna.verona@gmail.com');
             $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
         });
-
-        return view('mail.dayReportMissedRepo')
-            ->with('reports', $reports)
-            ->with('today', $today);
     }
     // Przygotowanie danych do raportu godzinnego DKJ
     private function hourReportDkj() {
@@ -500,10 +490,6 @@ public function pageMonthReportTelemarketing()
           $message->from('jarzyna.verona@gmail.com');
           $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
       });
-
-      return view('mail.hourReportDkj')
-          ->with('date_stop', date('H') . ':00:00')
-          ->with('dkj', $data['dkj']);
     }
     public function pageHourReportDKJ()
     {
@@ -548,10 +534,6 @@ public function pageMonthReportTelemarketing()
             $message->from('jarzyna.verona@gmail.com');
             $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
         });
-
-        return view('mail.dayReportDkj')
-            ->with('dkj', $dkj)
-            ->with('today', date('Y-m-d'));
     }
 
     //przygotowanie danych do raportu tygodniowego dkj
@@ -683,10 +665,9 @@ public function pageMonthReportTelemarketing()
 
     /****************** RAPORTY ODSŁUCH ***********************/
 
-
     /**************** Dane z hour report*******************************/
 
-    private function getHourReportData($type, $date = null, $hour = null, $hour_start = null, $date_start = null, $date_stop = null) {
+    private function getHourReportData($type, $date = null, $hour = null, $hour_start = null) {
 
         $reports = DB::table('hour_report')
               ->select(DB::raw('
@@ -699,7 +680,7 @@ public function pageMonthReportTelemarketing()
               ->join('departments', 'departments.id', '=', 'department_info.id_dep')
               ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type');
 
-        if ($type == 'hourReport') {//tutaj dodac dane
+        if ($type == 'hourReport') {
             $reports->where('hour_report.report_date', '=', $date)
                 ->where('hour_report.hour', '=', $hour);
         } else if ($type == 'dayReport') {
@@ -711,26 +692,11 @@ public function pageMonthReportTelemarketing()
                   ->where('hour_report.report_date', '=', $date)
                   ->groupBy('hour_report.department_info_id');
               });
-        } else if ($type == 'weekReport') {
-            $reports->whereIn('hour_report.id', function($query) use($date_start, $date_stop){
-                  $query->select(DB::raw('
-                    MAX(hour_report.id)
-                  '))
-                  ->from('hour_report')
-                  ->whereBetween('hour_report.report_date', [$date_start, $date_stop])
-                  ->groupBy('hour_report.department_info_id')
-                  ->groupBy('hour_report.report_date');
-              })
-              ->where('department_info.id_dep_type', '=', 2)
-              ->groupBy('hour_report.department_info_id');
         }
 
         $reports = $reports->get();
         return $reports;
     }
-
-
-
 
     private function hourReportCheckedData() {
         $date = date('Y-m-d');
@@ -851,7 +817,8 @@ public function pageMonthReportTelemarketing()
               ->groupBy('hour_report.department_info_id')
               ->get();
 
-          //$hour_reports = $this->getHourReportData('weekReport', null, null, null, $date_start, $date_stop); // tutaj sprawdic dlaczego wypeirdala gówno odwrotne
+          $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+          $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
 
           $date_start .= ' 00:00:00';
           $date_stop .= ' 23:00:00';
