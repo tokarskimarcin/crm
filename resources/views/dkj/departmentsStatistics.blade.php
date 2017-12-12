@@ -73,7 +73,8 @@
                                             </thead>
                                             <tbody>
                                             @php
-                                            $today = date("Y-m-d H:i:s");
+                                            $today = DateTime::createFromFormat('Y-m-d', $month.'-01');
+                                            $today = $today->format('Y-m-d H:i:s');
                                             $dateexplode = explode("-", $today);
                                             $daysinmonth = date("t",mktime(0,0,0,$dateexplode[1],1,$dateexplode[0]));
                                             $good_sum = 0;
