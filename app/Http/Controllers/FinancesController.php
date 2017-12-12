@@ -141,7 +141,10 @@ class FinancesController extends Controller
 
     public function viewPenaltyBonusGet()
     {
-        $users =  User::where('department_info_id', Auth::user()->department_info_id)->whereIn('user_type_id', [1, 2])->get();
+        $users =  User::where('department_info_id', Auth::user()->department_info_id)
+            ->whereIn('user_type_id', [1, 2])
+            ->groupBy('last_name')
+            ->get();
         return view('finances.viewPenaltyBonus')
             ->with('users',$users);
     }
@@ -150,6 +153,7 @@ class FinancesController extends Controller
         $users =  User::where('department_info_id', Auth::user()->department_info_id)
             ->whereIn('user_type_id', [1, 2])
             ->where('status_work', '=', 1)
+            ->groupBy('last_name')
             ->get();
         $view = view('finances.viewPenaltyBonus')->with('users',$users);
 

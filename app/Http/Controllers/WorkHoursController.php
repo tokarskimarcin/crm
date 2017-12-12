@@ -231,7 +231,9 @@ class WorkHoursController extends Controller
     public function viewHourGetCadre()
     {
         $users = User::wherenotin('user_type_id', [1,2])
-            ->where('status_work',1)->get();
+            ->where('status_work',1)
+            ->groupBy('last_name')
+            ->get();
 
         return view('workhourscadre.viewHourCadre')
             ->with('users',$users);
@@ -239,7 +241,9 @@ class WorkHoursController extends Controller
     public function viewHourPostCadre(Request $request)
     {
         if($request->userid == "-1") {
-              $users = User::wherenoin('user_type_id', [1,2])->get();
+              $users = User::wherenoin('user_type_id', [1,2])
+                  ->groupBy('last_name')
+                  ->get();
               return view('workhourscadre.viewHourCadre')
                   ->with('users',$users);
         }
