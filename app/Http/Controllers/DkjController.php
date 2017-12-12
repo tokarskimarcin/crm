@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\ActivityRecorder;
 use Illuminate\Support\Facades\Redirect;
+use Yajra\DataTables\Facades\DataTables;
 
 class DkjController extends Controller
 {
@@ -45,14 +46,25 @@ class DkjController extends Controller
         return view('dkj.showDkjEmployee')
             ->with('dkjEmployee',$dkjEmployee);
     }
-    public function showDkjEmployeePOST(Request $request)
+
+    public function datatableDkjShowEmployee(Request $request)
     {
         $janky_status = $request->janky_status;
         $date_start = $request->start_date;
         $date_stop = $request->stop_date;
         $user_dkj_id = $request->user_dkj_id;
-        $employee_info = Dkj::where('id_dkj',$user_dkj_id)
-            ->whereBetween('add_date',[$date_start.=' 00:00:00',$date_stop.=' 23:00:00'])->get();
+
+
+
+
+        $employee_info =  DB::table('dkj')
+            ->join('users', 'dkj.id_user', '=', 'users.id')
+            ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
+            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+            ->select(DB::raw('dkj.*,users.first_name,users.last_name,department_type.name as type_name,departments.name'))
+            ->where('id_dkj',$user_dkj_id)
+            ->whereBetween('add_date',[$date_start.=' 00:00:00',$date_stop.=' 23:00:00']);
         if($janky_status == 1) // tylko janki
         {
             $employee_info = $employee_info->where('dkj_status',1)
@@ -65,17 +77,10 @@ class DkjController extends Controller
         {
             $employee_info = $employee_info->where('deleted',1);
         }
-        $dkjEmployee = User::where('user_type_id',2)
-            ->where('status_work',1)
-            ->groupBy('last_name')
-            ->get();
+        return datatables($employee_info)->make(true);
 
-        return view('dkj.showDkjEmployee')->with('dkjEmployee',$dkjEmployee)
-            ->with('employee_info',$employee_info)
-            ->with('old_start_date',$request->start_date)
-            ->with('old_stop_date',$request->stop_date)
-            ->with('employee_id',$user_dkj_id)
-            ->with('janky_status',$janky_status);
+
+
     }
 
     public function dkjRaportPost(Request $request)

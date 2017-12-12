@@ -37,6 +37,8 @@ Route::POST('/dkjRaportSave','DkjController@dkjRaportSave')->name('api.dkjRaport
 Route::POST('/datatableDkjVerification','DkjController@datatableDkjVerification')->name('api.datatableDkjVerification');
 Route::POST('/saveDkjVerification','DkjController@saveDkjVerification')->name('api.saveDkjVerification');
 Route::POST('/datatableShowDkjVerification','DkjController@datatableShowDkjVerification')->name('api.datatableShowDkjVerification');
+Route::POST('/datatableDkjShowEmployee','DkjController@datatableDkjShowEmployee')->name('api.datatableDkjShowEmployee');
+
 
 Route::POST('/datatableShowUserSchedule','ScheduleController@datatableShowUserSchedule')->name('api.datatableShowUserSchedule');
 Route::POST('/saveSchedule','ScheduleController@saveSchedule')->name('api.saveSchedule');
