@@ -223,9 +223,8 @@ class WorkHoursController extends Controller
     public function viewHourGet()
     {
         $department_id = Auth::user()->department_info_id;
-
-        $department = Department_info::find($department_id);
-        $users = $department->users->where('status_work',1);
+        $users = User::where('status_work',1)->wherein('user_type_id',[1,2])
+            ->where('department_info_id',$department_id)->orderBy('last_name')->get();
         return view('workhours.viewHour')
             ->with('users',$users);
     }
@@ -266,8 +265,8 @@ class WorkHoursController extends Controller
     {
         if ($request->userid == "-1") {
           $department_id = Auth::user()->department_info_id;
-          $department = Department_info::find($department_id);
-          $users = $department->users;
+            $users = User::where('status_work',1)->wherein('user_type_id',[1,2])
+                ->where('department_info_id',$department_id)->orderBy('last_name')->get();
           return view('workhours.viewHour')
               ->with('users',$users);
         }
@@ -281,7 +280,8 @@ class WorkHoursController extends Controller
         $user_info = $this->user_info($userid,$month);
         $department_id = Auth::user()->department_info_id;
         $department = Department_info::find($department_id);
-        $users = $department->users;
+        $users = User::where('status_work',1)->wherein('user_type_id',[1,2])
+            ->where('department_info_id',$department_id)->orderBy('last_name')->get();
         $user = User::find($userid);
 
         $add_hour_success = false;
