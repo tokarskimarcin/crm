@@ -92,7 +92,7 @@ class NotificationController extends Controller
       } else if ($type == 3) {
           $notifications = Notifications::where('status', '=', 3)->orderBy('notification_type_id', 'asc')->paginate(10);
       }
-
+// dd($notifications);
       return view('notifications.allNotifications')
           ->with('type', $type)
           ->with('notifications', $notifications);

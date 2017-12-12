@@ -39,8 +39,10 @@ class DkjController extends Controller
     public function showDkjEmployeeGet()
     {
         $dkjEmployee = User::where('user_type_id',2)
-            ->where('status_work',1)->get();
-        return view('dkj.showDkjEmployee')->with('dkjEmployee',$dkjEmployee);
+            ->where('status_work', '=', 1)
+            ->get();
+        return view('dkj.showDkjEmployee')
+            ->with('dkjEmployee',$dkjEmployee);
     }
     public function showDkjEmployeePOST(Request $request)
     {
@@ -579,7 +581,9 @@ class DkjController extends Controller
                      $query->where('dating_type', 0);
                  }
              }
-             return $query->whereIn('user_type_id', [1,2])->get();
+             return $query->whereIn('user_type_id', [1,2])
+                ->where('status_work', '=', 1)
+                ->get();
          }
     }
 

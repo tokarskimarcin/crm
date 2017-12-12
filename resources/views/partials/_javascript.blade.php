@@ -191,7 +191,7 @@
                             $("#babum").append("<li>Brak nowych zgłoszeń!</li>");
                         }
                         for (var i = 0; i < response.length; i++) {
-                            $("#babum").append("<li><a href='/show_notification/" + response[i].id + "'><div><i class='fa fa-comment fa-fw'></i><span> " + response[i].title + "</span></div></a></li><li class='divider'></li>");
+                            $("#babum").append("<li><a href='{{URL::to('/show_notification/')}}/" + response[i].id + "'><div><i class='fa fa-comment fa-fw'></i><span> " + response[i].title + "</span></div></a></li><li class='divider'></li>");
                         }
                         $("#it_support").css("pointer-events", "auto");
 
