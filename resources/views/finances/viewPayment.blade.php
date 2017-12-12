@@ -172,7 +172,7 @@
                                                                                 <td>{{$row_number++}}</td>
                                                                                 <td>{{($item2->first_name)}}</td>
                                                                                 <td>{{($item2->last_name)}}</td>
-                                                                                <td>{{($item2->rate.'('.$bonus_per_hour.')')}} PLN</td>
+                                                                                <td>{{($item2->rate.'( +'.$bonus_per_hour.')')}} PLN</td>
                                                                                 <td>{{($avg)}}</td>
                                                                                 <td>{{$rbh}}</td>
                                                                                 <td>{{($janky_proc)}} %</td>

@@ -160,7 +160,7 @@
                                                                                 <td>{{($student)}}</td>
                                                                                 <td>{{($documents)}}</td>
                                                                                 <td>{{(($item2->salary_to_account == 0) ? "Nie" : "Tak")}}</td>
-                                                                                <td>{{(round($salary_total,2))}}</td>
+                                                                                <td>{{(round($salary_total,2))}} PLN</td>
                                                                             </tr>
                                                                         @endforeach
                                                                         <tr>
