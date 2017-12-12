@@ -81,11 +81,13 @@
                                                                         @php $salary_total_all = 0; $row_number = 1;@endphp
 
                                                                     {{--Typ Umowy--}}
+                                                                <div style="float:left;">
+                                                                    <h4 style="margin-top:20px;"><b>Tabela Wypłat - {{$agency->name}}:</b></h4>
+                                                                </div>
+                                                                <br />
                                                                 <div class="panel panel-default">
-                                                                    <div class="panel-body">
-                                                                        <div style="float:left;">
-                                                                        <h4 style="margin-top:20px;"><b>Tabela Wypłat - {{$agency->name}}:</b></h4>
-                                                                        </div>
+                                                                    <div style="margin-top: 18px;" class="panel-body">
+                                                                        <div class="table-responsive">
                                                                         <table class="table table-striped table-bordered dt-responsive nowrap"cellspacing="0"  width="100%" id="datatable{{$agency->id}}">
                                                                             <thead>
                                                                             <tr>
@@ -180,6 +182,7 @@
                                                                         </tr>
                                                                             </tbody>
                                                                         </table>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                                 @endif

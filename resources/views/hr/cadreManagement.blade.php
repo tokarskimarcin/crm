@@ -42,7 +42,9 @@
                                             <th>Dział</th>
                                             <th>Stanowisko</th>
                                             <th>Nr. Tel.</th>
-                                            <th>Akcja</th>
+                                            @if(Auth::user()->user_type->all_departments == 1)
+                                                <th>Akcja</th>
+                                            @endif
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -63,6 +65,7 @@
 <script>
 
     $(document).ready( function () {
+        var show_action = {{Auth::user()->user_type->all_departments}};
 
         table = $('#datatable').DataTable({
             "autoWidth": false,
@@ -85,8 +88,9 @@
                 {"data": "user_type_name","name":"user_types.name"},
                 {"data": "phone"},
                 {"data": function (data, type, dataToSet) {
-                  console.log(data);
-                    return '<a href="edit_cadre/'+data.id+'" >Edytuj</a>'
+                    if(show_action == 1)
+                        return '<a href="edit_cadre/'+data.id+'" >Edytuj</a>';
+                    else return null;
                 },"orderable": false, "searchable": false }
                 ]
         });
