@@ -229,7 +229,12 @@ class AdminController extends Controller
             $selected_department->save();
         }
 
-        // new ActivityRecorder(3, "Dodano oddział o numerze ID: " . $id_dep);
+        $data = [
+            'Edycja danych oddziału' => '',
+            'Id oddziału' => $request->selected_department_info_id
+        ];
+
+        new ActivityRecorder(3, $data);
 
         Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
         return Redirect::back();

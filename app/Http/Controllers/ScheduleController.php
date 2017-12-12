@@ -18,7 +18,6 @@ class ScheduleController extends Controller
         $number_of_week = $request->show_schedule;
         $request->session()->put('number_of_week', $number_of_week);
         $schedule_analitics = $this->setWeekDays($number_of_week,$request);
-        //dd($schedule_analitics);
         return view('schedule.setSchedule')
             ->with('number_of_week',$number_of_week)
             ->with('schedule_analitics',$schedule_analitics);
@@ -40,6 +39,7 @@ class ScheduleController extends Controller
             ->leftjoin("schedule", function ($join) use ($number_of_week,$year) {
                 $join->on("schedule.id_user", "=", "users.id")
                     ->where("schedule.week_num", "=", $number_of_week)
+                    ->groupBy('users.last_name')
                     ->where("schedule.year", "=", $year);
             })
             ->select(DB::raw(
@@ -55,8 +55,11 @@ class ScheduleController extends Controller
                 users.first_name as user_first_name,
                 users.last_name as user_last_name
                 '))
-            ->where('users.department_info_id',Auth::user()->department_info_id)->get();
-        //dd($query);
+            ->where('users.department_info_id',Auth::user()->department_info_id)
+            ->where('users.status_work', '=', 1)
+            ->groupBy('users.last_name')
+            ->get();
+
         return view('schedule.viewSchedule')
             ->with('number_of_week',$number_of_week)
             ->with('schedule_user',$query);

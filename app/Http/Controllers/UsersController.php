@@ -74,7 +74,7 @@ class UsersController extends Controller
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
         if ($request->email != '') {
-            $user->email_off = $request->email . '.verona@gmail.com';
+            $user->email_off = strtolower($request->first_name) . '.' . strtolower($request->last_name) . '@veronaconsulting.pl';
         }
         $user->password = bcrypt($request->password);
         $user->salary = $request->salary;

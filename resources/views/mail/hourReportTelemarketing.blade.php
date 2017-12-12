@@ -36,14 +36,14 @@
               <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->average}}</td>
               <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->success}}</td>
               <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->employee_count}}</td>
-              <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->janky_count}}</td>
-              <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->wear_base}}</td>
-              <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->call_time}}</td>
+              <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->janky_count}} %</td>
+              <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->wear_base}} %</td>
+              <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->call_time}} %</td>
               @if(date('N') <= 5)
-                  <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->success / $report->department_info->dep_aim) * 100, 2)}}</td>
+                  <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->success / $report->department_info->dep_aim) * 100, 2)}} %</td>
                   @php($total_success_proc += round(($report->success / $report->department_info->dep_aim) * 100, 2))
               @else
-                  <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->success / $report->department_info->dep_aim_week) * 100, 2)}}</td>
+                  <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->success / $report->department_info->dep_aim_week) * 100, 2)}} %</td>
                   @php($total_success_proc += round(($report->success / $report->department_info->dep_aim_week) * 100, 2))
               @endif
               @php($total_average += $report->average)
@@ -65,8 +65,10 @@
         }else
           {
           $total_success_proc = round($total_success_proc / $sum, 2);
-          $total_wear_proc =round($total_wear_base / $sum, 2);
-          $total_avg_proc =round($total_average / $sum, 2);
+          $total_wear_proc = round($total_wear_base / $sum, 2);
+          $total_avg_proc = round($total_average / $sum, 2);
+          $total_janky_count = round($total_janky_count / $total_success * 100, 2);
+          $total_call_time = round($total_call_time / $sum, 2);
           }
       @endphp
       <tr>
@@ -74,10 +76,10 @@
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_avg_proc}}</td>
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_success}}</td>
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_employee_count}}</td>
-          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_janky_count}}</td>
-          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_wear_proc}}</td>
-          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_call_time}}</td>
-          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_success_proc}}</td>
+          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_janky_count}} %</td>
+          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_wear_proc}} %</td>
+          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_call_time}} %</td>
+          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_success_proc}} %</td>
       </tr>
     </tbody>
 </table>

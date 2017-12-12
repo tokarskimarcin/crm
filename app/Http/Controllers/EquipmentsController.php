@@ -36,7 +36,9 @@ class EquipmentsController extends Controller
 
     public function addEquipmentGet($type) {
         $equipments_types = EquipmentTypes::find($type);
-        $users = User::all();
+        $users = User::where('status_work', '=', 1)
+            ->groupBy('last_name')
+            ->get();
         $department_info = Department_info::all();
 
         return view('hr.addEquipment')
