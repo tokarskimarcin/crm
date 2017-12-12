@@ -40,6 +40,7 @@ class DkjController extends Controller
     {
         $dkjEmployee = User::where('user_type_id',2)
             ->where('status_work', '=', 1)
+            ->groupBy('last_name')
             ->get();
         return view('dkj.showDkjEmployee')
             ->with('dkjEmployee',$dkjEmployee);
@@ -65,7 +66,9 @@ class DkjController extends Controller
             $employee_info = $employee_info->where('deleted',1);
         }
         $dkjEmployee = User::where('user_type_id',2)
-            ->where('status_work',1)->get();
+            ->where('status_work',1)
+            ->groupBy('last_name')
+            ->get();
 
         return view('dkj.showDkjEmployee')->with('dkjEmployee',$dkjEmployee)
             ->with('employee_info',$employee_info)
@@ -101,7 +104,7 @@ class DkjController extends Controller
             if ($request->department_id_info<0) {
               $users = $users->where('dating_type',$dating_type);
             }
-            $users = $users->get();
+            $users = $users->groupBy('users.last_name')->get();
 
         return view('dkj.dkjRaport')
         ->with('departments',$departments)
@@ -391,6 +394,7 @@ class DkjController extends Controller
             return datatables($query)->make(true);
         }
     }
+
     public function dkjRaportSave(Request $request)
     {
         if ($request->action == 'create') {
@@ -479,7 +483,9 @@ class DkjController extends Controller
                 } else {
                     $query->where('department_info.id', '=', $department_id_info);
                 }
-                return $query->where('users.user_type_id', '=', 1)->get();
+                return $query->where('users.user_type_id', '=', 1)
+                    ->groupBy('last_name')
+                    ->get();
             }else
             return 0;
         }
@@ -540,12 +546,14 @@ class DkjController extends Controller
                 SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad"))
                 ->where('add_date','like',$today)
                 ->where('department_info_id',$request->department_id_info)
+                ->groupBy('last_name')
                 ->groupBy('id_user');
 
                 $users = User::select(DB::raw("users.first_name,users.last_name,users.id"))
                     ->Join('work_hours', 'work_hours.id_user', '=', 'users.id')
                     ->where('work_hours.status', 1)
-                    ->where('work_hours.date','like',$today);
+                    ->where('work_hours.date','like',$today)
+                    ->groupBy('last_name');
                 if($department_id<0)
                 {
                     $users->where('department_info_id',$department_id*(-1))
@@ -583,6 +591,7 @@ class DkjController extends Controller
              }
              return $query->whereIn('user_type_id', [1,2])
                 ->where('status_work', '=', 1)
+                ->groupBy('last_name')
                 ->get();
          }
     }
