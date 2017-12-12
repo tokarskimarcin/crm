@@ -142,7 +142,7 @@ class UsersController extends Controller
         $agencies = Agencies::all();
         $user = User::find($id);
 
-        if ($user->status_work != 1) {
+        if ($user->department_info_id != Auth::user()->department_info_id) {
             return view('404');
         }
 

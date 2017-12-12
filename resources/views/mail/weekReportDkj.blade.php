@@ -52,8 +52,6 @@
                         $user_avg = 0;
                 @endphp
                     <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$hour->work_time}}</td>
-                @else
-                    @php($user_avg = 0)
                 @endif
             @endforeach
             @if($create_column == true)
@@ -140,8 +138,6 @@
                         $user_avg = 0;
                 @endphp
                     <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$hour->work_time}}</td>
-                @else
-                    @php($user_avg = 0)
                 @endif
             @endforeach
             @if($create_column == true)
