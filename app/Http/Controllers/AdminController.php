@@ -132,26 +132,33 @@ class AdminController extends Controller
 
     public function addDepartmentGet() {
         $department_types = Department_types::all();
+        $departments = Departments::all();
 
         return view('admin.addDepartment')
+            ->with('departments', $departments)
             ->with('department_types', $department_types);
     }
 
     public function addDepartmentPost(Request $request) {
-        $department = new Departments();
-
-        $department->name = $request->city;
-        $department->desc = $request->desc;
-        $department->save();
-
-        $departments = DB::table('departments')
-            ->orderBy('id', 'desc')
-            ->limit(1)
-            ->get();
-
-        $id_dep = $departments[0]->id;
-
         $department_info = new Department_info();
+
+        //tutaj sprawdzenie czy oddział jest dodawany do istniejącego miasta czy stworzono  nowy
+        if ($request->department != '-1') {
+            $id_dep = $request->department;
+        } else {
+            $department = new Departments();
+
+            $department->name = $request->city;
+            $department->desc = $request->desc;
+            $department->save();
+
+            $departments = DB::table('departments')
+                ->orderBy('id', 'desc')
+                ->limit(1)
+                ->get();
+
+            $id_dep = $departments[0]->id;
+        }
 
         $department_info->id_dep = $id_dep;
         $department_info->id_dep_type = $request->id_dep_type;

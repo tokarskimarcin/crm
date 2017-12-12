@@ -30,14 +30,19 @@
 
       @foreach($reports as $report)
       @php($add_column = true)
-        @php($goal = (5 * $report->dep_aim) + $report->dep_aim_week)
+      @if(date('N') < 6)
+          @php($goal = $report->dep_aim)
+      @else
+          @php($goal = $report->dep_aim_week)
+      @endif
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->dep_name . ' ' . $report->dep_type_name}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->avg_average, 2)}}</td>
             @foreach($work_hours as $work_hour)
                 @if($work_hour->id == $report->id && $work_hour->realRBH != null)
+                @php($total_realRBH += $work_hour->realRBH)
                 @php($add_column = false)
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$work_hour->realRBH}}</td>
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($work_hour->realRBH, 2)}}</td>
                 @endif
             @endforeach
             @if($add_column == true)
@@ -77,7 +82,7 @@
                   $total_janky_proc = round($total_janky / $count, 2);
                   $total_avg_average_proc = round($total_avg_average / $count, 2);
                   $total_sum_call_time_poc = round($total_sum_call_time / $count, 2);
-                  $total_realRBH = round($total_realRBH / 3600, 2);
+                  $total_realRBH = round($total_realRBH, 2);
             }
       @endphp
 

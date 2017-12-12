@@ -18,9 +18,21 @@
         <form method="POST" action="{{URL::to('/add_department')}}">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <div class="form-group">
-                <label for="city">Podaj miasto:</label>
-                <input type="text" class="form-control" placeholder="Miasto..." name="city" id="city" />
+                <label for="department">Wybierz oddział:</label>
+                <select id="department" name="department" class="form-control">
+                    <option value="-1">Wybierz</option>
+                    @foreach($departments as $dep)
+                        <option value="{{$dep->id}}">{{$dep->name}}</option>
+                    @endforeach
+                </select>
             </div>
+
+            <div class="form-group">
+                <label name="city" for="city">Lub dodaj nowy:</label>
+                <input type="text" class="form-control" placeholder="Miasto..." name="city" id="city"/>
+            </div>
+
+
             <div class="form-group">
                 <label for="desc">Dodaj opis:</label>
                 <input type="text" class="form-control" placeholder="Opis..." name="desc" id="desc" />
@@ -99,17 +111,28 @@
 <script>
 
 $('#add_department_submit').on('click', function() {
-    var city = $("#city").val();
     var id_dep_type = $("#id_dep_type").val();
+    var department = $('#department').val();
+    var city = $('#city').val();
 
-    if (city == '') {
-        alert('Podaj nazwę miasta!');
+    if (department == '-1' && city == '') {
+        alert('Wybierz oddział lub dodaj nowy!');
         return false;
     }
 
     if (id_dep_type == 'Wybierz') {
         alert('Wybierz typ oddziału!');
         return false;
+    }
+});
+
+$('#department').on('change', function(){
+    var department = $('#department').val();
+
+    if (department != '-1') {
+        $('#city').attr('disabled', true);
+    } else {
+        $('#city').removeAttr('disabled');
     }
 });
 

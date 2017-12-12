@@ -189,7 +189,7 @@ class StatisticsController extends Controller
             ->where('users.user_type_id', '=', 1)
             ->groupBy('department_info.id')
             ->get();
-            
+
         $data = [
             'date_start' => $date_start,
             'date_stop' => $date_stop,
@@ -259,17 +259,12 @@ class StatisticsController extends Controller
 
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
-                'sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as realRBH,
-            department_info.id
+                'sum(time_to_sec(register_stop) - time_to_sec(register_start))/3600 as realRBH,
+                 department_info.id
             '))
             ->join('users', 'users.id', '=', 'work_hours.id_user')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
-            ->whereIn('work_hours.id', function($query) use($date){
-                $query->select(DB::raw('
-                  work_hours.id
-              '))
-                    ->where('date', 'like', $date . '%');
-            })
+            ->where('date', 'like', $date . '%')
             ->groupBy('department_info.id')
             ->get();
 
@@ -287,7 +282,7 @@ class StatisticsController extends Controller
                $message->from('jarzyna.verona@gmail.com');
                $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
            });
-        return view('mail.weekReportTelemarketing')
+        return view('mail.dayReportTelemarketing')
             ->with('hours', $data['hours'])
             ->with('work_hours', $data['work_hours'])
             ->with('sum_hours', $data['sum_hours'])
