@@ -552,7 +552,6 @@ class DkjController extends Controller
                 SUM(CASE WHEN dkj_status = 1 THEN 1 ELSE 0 END) as bad"))
                 ->where('add_date','like',$today)
                 ->where('department_info_id',$request->department_id_info)
-                ->groupBy('last_name')
                 ->groupBy('id_user');
 
                 $users = User::select(DB::raw("users.first_name,users.last_name,users.id"))
