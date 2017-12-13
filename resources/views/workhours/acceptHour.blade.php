@@ -1,5 +1,6 @@
 @extends('layouts.main')
 @section('style')
+    <link href="{{ asset('/css/dataTables.bootstrap.min.css')}}" rel="stylesheet">
     <style>
         td{
             text-align: center;
@@ -18,6 +19,7 @@
         .modifydate{
             margin-bottom: 0px;
             height: 41px;
+            display: flow-root !important;
         }
 
     </style>
@@ -34,52 +36,83 @@
 
     <div id="success_div" style="display: none;" class='alert alert-success'>Godziny zostały zaakceptowane!</div>
 
-    <div class="col-lg-3">
-        <label for ="ipadress">Zakres wyszukiwania:</label>
-        <div class="form-group">
-            <label for ="ipadress">Od:</label>
-            <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                <input  onchange="myFunction()"  id="start_date" class="form-control" name="od" type="text" value="{{date("Y-m-d")}}" readonly >
 
-                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for ="ipadress">Do:</label>
-            <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                <input onchange="myFunction()" id="stop_date" class="form-control" name="do" type="text" value="{{date("Y-m-d")}}"readonly >
-
-                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-            </div>
-        </div>
-    </div>
-    <table id="datatable">
-        <thead>
-        <tr>
-            <th>Data</th>
-            <th>Osoba</th>
-            <th>Start</th>
-            <th>Zarejestrowane</th>
-            <th>Modyfikacja</th>
-            <th>Suma</th>
-            <th>Akcja</th>
-        </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
 
     <div class="row">
         <div class="col-lg-12">
-            </br> <span class="fa fa-user fa-fw"></span> </br>
+            <div class="panel panel-default"  id="panel1">
+                <div class="panel-heading">
+                    <a data-toggle="collapse" data-target="#collapseOne">
+                        Zakres wyszukiwania:
+                    </a>
+                </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div id="start_stop">
+                                    <div id="collapseOne" class="panel-collapse collapse in">
+                                        <div class="panel-body">
+                                            <div class="form-group">
+                                                <label for ="ipadress">Data od:<span style="color:red;">*</span></label>
+                                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                                    <input  onchange="myFunction()"  id="start_date" class="form-control" name="od" type="text" value="{{date("Y-m-d")}}" readonly >
+                                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for ="ipadress">Data do:<span style="color:red;">*</span></label>
+                                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                                    <input onchange="myFunction()" id="stop_date" class="form-control" name="do" type="text" value="{{date("Y-m-d")}}"readonly >
+
+                                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+
+            <div class="panel panel-default"  id="panel2">
+                <div class="panel-heading">
+                    Raport
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                                    <table id="datatable"class="table table-striped table-bordered" cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Osoba</th>
+                                            <th>Start</th>
+                                            <th>Zarejestrowane</th>
+                                            <th>Modyfikacja</th>
+                                            <th>Suma</th>
+                                            <th>Akcja</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            </br> <span class="fa fa-user fa-fw"></span> </br>
+                                        </div>
+                                    </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-
 @endsection
 
 @section('script')
-
+    <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
 
         var table;
@@ -98,6 +131,7 @@
         $(document).ready( function () {
 
             table = $('#datatable').DataTable({
+                "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
                 "drawCallback": function( settings ) {
@@ -147,7 +181,7 @@
                             data.register_start = "Brak infromacji";
                         if(data.register_stop == null)
                             data.register_stop = "Brak infromacji";
-                        return data.register_start + "</br><span class='fa fa-arrow-circle-o-down fa-fw'></span> </br> " + data.register_stop;
+                        return "<span name='user_register_start'>"+data.register_start+"</span></br><span class='fa fa-arrow-circle-o-down fa-fw'></span> </br> <span name='user_register_stop'>" + data.register_stop + "</span>";
                     },"name": "register_start"},
 
                     {"data":null,"targets": -3,"orderable": false, "searchable": false },
@@ -191,6 +225,8 @@
             var data = table.row( $(this).parents('tr') ).data();
             var modify_start = $(this).closest("tr").find("input[id='register_start']").val();
             var modify_stop = $(this).closest("tr").find("input[id='register_stop']").val();
+            var register_start = $(this).closest("tr").find("[name='user_register_start']").text();
+            var register_stopt = $(this).closest("tr").find("[name='user_register_stop']").text();
             var succes = 0;
             var id = data.id;
             var type_edit = 0;
@@ -206,7 +242,16 @@
                     alert("Godziny są ustawione niepoprawnie");
                     validate = 0;
                 }else
+                {
                     type_edit = 1;
+                }
+            }else if(register_start == 'Brak infromacji' || register_stopt == 'Brak infromacji')
+            {
+                alert("Brak wszystkich godzin w modyfikacji");
+                validate = 0;
+            }else
+            {
+                validate = 1;
             }
             if(validate == 1)
             {
@@ -235,8 +280,6 @@
                     }
                 });
             }
-
-
         });
     </script>
 
