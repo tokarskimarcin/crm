@@ -39,6 +39,14 @@ Route::POST('/saveDkjVerification','DkjController@saveDkjVerification')->name('a
 Route::POST('/datatableShowDkjVerification','DkjController@datatableShowDkjVerification')->name('api.datatableShowDkjVerification');
 Route::POST('/datatableDkjShowEmployee','DkjController@datatableDkjShowEmployee')->name('api.datatableDkjShowEmployee');
 
+/* Equipment start */
+Route::POST('/datatableShowLaptop','EquipmentsController@datatableShowLaptop')->name('api.datatableShowLaptop');
+Route::POST('/datatableShowTablet','EquipmentsController@datatableShowTablet')->name('api.datatableShowTablet');
+Route::POST('/datatableShowPhone','EquipmentsController@datatableShowPhone')->name('api.datatableShowPhone');
+Route::POST('/datatableShowSimCard','EquipmentsController@datatableShowSimCard')->name('api.datatableShowSimCard');
+Route::POST('/datatableShowMonitor','EquipmentsController@datatableShowMonitor')->name('api.datatableShowMonitor');
+Route::POST('/datatableShowPrinter','EquipmentsController@datatableShowPrinter')->name('api.datatableShowPrinter');
+/* Equipment stop */
 
 Route::POST('/datatableShowUserSchedule','ScheduleController@datatableShowUserSchedule')->name('api.datatableShowUserSchedule');
 Route::POST('/saveSchedule','ScheduleController@saveSchedule')->name('api.saveSchedule');
