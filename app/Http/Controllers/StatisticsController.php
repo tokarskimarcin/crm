@@ -614,8 +614,8 @@ class StatisticsController extends Controller
 
       Mail::send('mail.weekReportDkj', $data, function($message)
       {
-          $message->from('jarzyna.verona@gmail.com');
-          $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
+          $message->from('policja@gov.pl');
+          $message->to('skobry123on@gmail.com', 'John Smith')->subject('Welcome!');
       });
     }
 
