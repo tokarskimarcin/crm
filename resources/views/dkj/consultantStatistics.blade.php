@@ -90,7 +90,7 @@
                                 @if(isset($all_users))
                                 <div class="col-md-12">
                                   <div class="well">
-                                    <div class="panel-body">
+                                    <div class="panel-body table-responsive">
                                         <table class="table table-bordered">
                                             <thead>
                                             <tr>
