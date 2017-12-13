@@ -98,7 +98,6 @@
       <tr>
           <td>Typ</td>
           <td>Numer Telefonu</td>
-          <td>Numer IMEI</td>
           <td>PIN</td>
           <td>PUK</td>
           <td>Internet</td>
@@ -321,7 +320,6 @@ table = $('#sim_card').DataTable({
             else return 'Prepaid'
         }, "name": "sim_type"},
         {"data": 'sim_number_phone'},
-        {"data": 'imei'},
         {"data": 'sim_pin'},
         {"data": 'sim_puk'},
         {"data": function (data, type, dataToSet) {

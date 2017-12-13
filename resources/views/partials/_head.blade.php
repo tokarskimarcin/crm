@@ -20,6 +20,27 @@
     <!-- Custom Fonts -->
     <link href="{{ asset('/vendor/font-awesome/css/font-awesome.min.css')}}" rel="stylesheet" type="text/css">
     <link href="{{ asset('/vendor/datatables/css/jquery.dataTables.min.css')}}" rel="stylesheet">
+    <style type="text/css">
+		.wrapper1, .wrapper2, .wrapper3, .wrapper4, .wrapper5, .wrapper6 {
+			  width: 100%;
+			  overflow-x: scroll;
+			  overflow-y:hidden;
+			}
+
+			.wrapper1, .wrapper3, .wrapper5, {height: 20px; }
+			.wrapper2, .wrapper4, .wrapper6, {height: auto; }
+
+      .div1, .div3, .div5 {
+			  min-width:120%;
+			  height: 20px;
+			}
+
+			.div2, .div4, .div6 {
+			  width:120%;
+			  height: auto;
+			}
+
+	</style>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>

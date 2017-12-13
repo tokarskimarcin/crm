@@ -75,6 +75,7 @@
                                                                 $students_total = 0;
                                                                 $users_total = 0;
                                                             @endphp
+                                                            @php($wrapper_scroll = 0)
                                                             @foreach($salary as $item => $key)
                                                                 @foreach($agencies as $agency)
                                                                     @if($agency->id == $item)
@@ -87,7 +88,11 @@
                                                                     <br />
                                                                 <div class="panel panel-default">
                                                                     <div class="panel-body">
-                                                                        <div class="table-responsive">
+                                                                    	<div class="wrapper{{++$wrapper_scroll}}">
+                                                                      <div class="div{{$wrapper_scroll}}"></div>
+                                                                    	</div>
+                                                                    	<div class="wrapper{{++$wrapper_scroll}}">
+                                                                    	  <div class="div{{$wrapper_scroll}}">
                                                                         <table class="table table-striped table-bordered dt-responsive nowrap"cellspacing="0"  width="100%" id="datatable{{$agency->id}}">
                                                                             <thead>
                                                                             <tr>
@@ -209,6 +214,8 @@
                                                                         </tr>
                                                                             </tbody>
                                                                         </table>
+                                                                        </div>
+                                                                        </div>
                                                                       </div>
                                                                     </div>
                                                                 </div>

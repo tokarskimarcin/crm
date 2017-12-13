@@ -33,6 +33,7 @@ class EquipmentsController extends Controller
           ->leftJoin('departments', 'departments.id', '=', 'department_info.id_dep')
           ->leftJoin('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
           ->where('equipment_type_id', '=', $type)
+          ->where('equipments.deleted', '=', null)
           ->get();
 
           return $data;
@@ -57,7 +58,7 @@ class EquipmentsController extends Controller
     public function datatableShowSimCard(Request $request) {
           $data = $this->datatableEquipmentData(4);
 
-          return datatables($data)->make(true); 
+          return datatables($data)->make(true);
     }
 
     public function datatableShowMonitor(Request $request) {
