@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('content')
-
+    <link href="{{ asset('/css/dataTables.bootstrap.min.css')}}" rel="stylesheet">
     <style>
         table{
             font-size: 12px;
@@ -33,7 +33,7 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <div class="panel-body table-responsive">
-                                    <table id="datatable">
+                                    <table id="datatable"   class="table table-striped table-bordered" cellspacing="0" width="100%">
                                         <thead>
                                         <tr>
                                             <th>Imię</th>
@@ -61,6 +61,7 @@
 
 @endsection
 @section('script')
+    <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
 
 <script>
 
