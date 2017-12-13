@@ -1,5 +1,7 @@
 @extends('layouts.main')
 @section('style')
+    <link href="{{ asset('/css/dataTables.bootstrap.min.css')}}" rel="stylesheet">
+
     <style>
         td{
             text-align: center;
@@ -32,51 +34,86 @@
         </div>
     </div>
 
-    <div class="col-lg-3">
-        <label for ="ipadress">Zakres wyszukiwania:</label>
-        <div class="form-group">
-            <label for ="ipadress">Dzień:</label>
-            <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                <input  onchange="myFunction()"  id="start_date" class="form-control" name="od" type="text" value="{{date("Y-m-d")}}" readonly >
-
-                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-            </div>
-        </div>
-        <div class="form-group">
-            <select onchange="myFunction()" class="form-control showhidetext" name="department_id_info" style="border-radius: 0px;">
-                <option value="*" selected>Wszystkie oddziały</option>
-                @foreach($departments as $department)
-                    <option value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name}}</option>
-                @endforeach
-            </select>
-        </div>
-    </div>
-    <div class="col-md-12 table-responsive">
-    <table id="datatable">
-        <thead>
-        <tr>
-            <th>Data</th>
-            <th>Imie</th>
-            <th>Nazwisko</th>
-            <th>Start</th>
-            <th>Zarejestrowane</th>
-            <th>Suma</th>
-        </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-</div>
     <div class="row">
         <div class="col-lg-12">
-            </br> <span class="fa fa-user fa-fw"></span> </br>
+            <div class="panel panel-default"  id="panel1">
+                <div class="panel-heading">
+                    <a data-toggle="collapse" data-target="#collapseOne">
+                        Zakres wyszukiwania:
+                    </a>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div id="start_stop">
+                                <div id="collapseOne" class="panel-collapse collapse in">
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <label for ="ipadress">Dzień:</label>
+                                            <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                                <input  onchange="myFunction()"  id="start_date" class="form-control" name="od" type="text" value="{{date("Y-m-d")}}" readonly >
+
+                                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <select onchange="myFunction()" class="form-control showhidetext" name="department_id_info" style="border-radius: 0px;">
+                                                <option value="*" selected>Wszystkie oddziały</option>
+                                                @foreach($departments as $department)
+                                                    <option value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default"  id="panel2">
+                <div class="panel-heading">
+                    Raport
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="col-md-12 table-responsive">
+                                <table id="datatable"  class="table table-striped table-bordered" cellspacing="0" width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Imie</th>
+                                        <th>Nazwisko</th>
+                                        <th>Start</th>
+                                        <th>Zarejestrowane</th>
+                                        <th>Suma</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    </br> <span class="fa fa-user fa-fw"></span> </br>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+
 
 
 @endsection
 
 @section('script')
+    <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
 
     <script>
         var table;
