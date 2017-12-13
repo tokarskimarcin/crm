@@ -57,6 +57,7 @@ class ScheduleController extends Controller
                 '))
             ->where('users.department_info_id',Auth::user()->department_info_id)
             ->where('users.status_work', '=', 1)
+            ->wherein('users.user_type_id',[1,2])
             ->groupBy('users.last_name')
             ->get();
 
