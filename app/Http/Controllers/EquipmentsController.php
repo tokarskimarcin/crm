@@ -57,7 +57,7 @@ class EquipmentsController extends Controller
     public function datatableShowSimCard(Request $request) {
           $data = $this->datatableEquipmentData(4);
 
-          return datatables($data)->make(true);
+          return datatables($data)->make(true); 
     }
 
     public function datatableShowMonitor(Request $request) {
