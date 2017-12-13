@@ -51,7 +51,7 @@ class User extends Authenticatable
     }
 
     public function work_hours() {
-        return $this->hasMany('App\Work_hour', 'id_user');
+        return $this->hasMany('App\Work_Hour', 'id_user');
     }
 
     public function dkj() {
