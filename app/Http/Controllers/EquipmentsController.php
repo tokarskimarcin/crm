@@ -9,6 +9,7 @@ use App\User;
 use Illuminate\Support\Facades\Redirect;
 use Session;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Department_info;
 use App\ActivityRecorder;
 
@@ -16,22 +17,58 @@ class EquipmentsController extends Controller
 {
     public function showEquipment()
     {
-        $equipments_types = Equipments::where('deleted', null)->get();
-        $laptops = $equipments_types->where('equipment_type_id', "=", 1);
-        $phone = $equipments_types->where('equipment_type_id',"=", 3);
-        $tablet = $equipments_types->where('equipment_type_id',"=", 2);
+        return view('hr.showEquipment');
+    }
+    private function datatableEquipmentData($type) {
+      $data = DB::table('equipments')
+          ->select(DB::raw('
+              equipments.*,
+              departments.name as dep_name,
+              department_type.name as dep_name_type,
+              users.first_name,
+              users.last_name
+          '))
+          ->leftJoin('users', 'users.id', '=', 'equipments.id_user')
+          ->leftJoin('department_info', 'department_info.id', '=', 'equipments.department_info_id')
+          ->leftJoin('departments', 'departments.id', '=', 'department_info.id_dep')
+          ->leftJoin('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+          ->where('equipment_type_id', '=', $type)
+          ->get();
 
-        $sim = $equipments_types->where('equipment_type_id',"=", 4);
-        $screen = $equipments_types->where('equipment_type_id',"=", 5);
-        $printer = $equipments_types->where('equipment_type_id',"=", 6);
-        return view('hr.showEquipment')
-            ->with('equipments_types', $equipments_types)
-            ->with('laptops',$laptops)
-            ->with('phone',$phone)
-            ->with('sim',$sim)
-            ->with('screen',$screen)
-            ->with('printer',$printer)
-            ->with('tablet',$tablet);
+          return $data;
+    }
+
+    public function datatableShowLaptop(Request $request) {
+          $data = $this->datatableEquipmentData(1);
+
+          return datatables($data)->make(true);
+    }
+
+    public function datatableShowTablet(Request $request) {
+          $data = $this->datatableEquipmentData(2);
+
+          return datatables($data)->make(true);
+    }
+    public function datatableShowPhone(Request $request) {
+          $data = $this->datatableEquipmentData(3);
+
+          return datatables($data)->make(true);
+    }
+    public function datatableShowSimCard(Request $request) {
+          $data = $this->datatableEquipmentData(4);
+
+          return datatables($data)->make(true);
+    }
+
+    public function datatableShowMonitor(Request $request) {
+          $data = $this->datatableEquipmentData(5);
+
+          return datatables($data)->make(true);
+    }
+    public function datatableShowPrinter(Request $request) {
+          $data = $this->datatableEquipmentData(6);
+
+          return datatables($data)->make(true);
     }
 
     public function addEquipmentGet($type) {
