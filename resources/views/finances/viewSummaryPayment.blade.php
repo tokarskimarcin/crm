@@ -64,8 +64,7 @@
                                                 </div></br></br>
                                             </form>
                                             @if(isset($summary_month))
-                                              <div class="table-responsive col-md-12">
-                                                <table class="table table-striped table-bordered dt-responsive nowrap"cellspacing="0"  width="100%" id="datatable">
+                                                <table class="table table-striped table-bordered dt-responsive nowrap" cellspacing="0"  width="100%" id="datatable" style="margin-top: 30px;">
                                                     <thead>
                                                     <tr>
                                                         <th>Lp.</th>
@@ -150,16 +149,13 @@
                                             @endif
                                         </div>
                                     </div>
-
-
-
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+
 
 @endsection
 
