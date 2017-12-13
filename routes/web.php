@@ -75,7 +75,7 @@ Route::get('/weekReportTelemarketing', 'StatisticsController@MailweekReportTelem
 Route::get('/monthReportTelemarketing', 'StatisticsController@MailmonthReportTelemarketing'); // ok
 Route::get('/dayReportTelemarketing', 'StatisticsController@MailDayReportTelemarketing'); // tutaj dodac
 
-Route::get('/weekReportJanky', 'StatisticsController@weekReportJanky');
+Route::get('/weekReportJanky', 'StatisticsController@MailweekReportJanky');
 Route::get('/dayReportMissedRepo', 'StatisticsController@dayReportMissedRepo');
 
 Route::get('/hourReportDkj', 'StatisticsController@MailhourReportDkj'); // ok
@@ -248,7 +248,7 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
     Route::get('/pageDayReportChecked', 'StatisticsController@pageDayReportChecked');
     Route::get('/pageWeekReportChecked', 'StatisticsController@pageWeekReportChecked');
 
-    Route::get('/pageWeekReportJanky', 'ReportPageController@pageWeekReportJanky');
+    Route::get('/pageWeekReportJanky', 'StatisticsController@pageWeekReportJanky');
 
     //Report Page STOP
 });

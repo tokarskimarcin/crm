@@ -67,43 +67,71 @@ class ActivityRecorder extends Model
         switch ($type) {
           case '1':
             $contents = Storage::get('hrActivity.txt');
-            Storage::append('hrActivity.txt', $content);
+            $size = File::size(storage_path('app/hrActivity.txt'));
+            if ($size < 104857600) {
+                Storage::append('hrActivity.txt', $content);
+            }
             break;
 
           case '2':
             $contents = Storage::get('financesActivity.txt');
-            Storage::append('financesActivity.txt', $content);
+            $size = File::size(storage_path('app/financesActivity.txt'));
+            if ($size < 104857600) {
+                Storage::append('financesActivity.txt', $content);
+            }
             break;
 
           case '3':
             $contents = Storage::get('adminActivity.txt');
-            Storage::append('adminActivity.txt', $content);
+            $size = File::size(storage_path('app/adminActivity.txt'));
+            if ($size < 104857600) {
+                Storage::append('adminActivity.txt', $content);
+            }
             break;
 
           case '4':
             $contents = Storage::get('jankyActivity.txt');
-            Storage::append('jankyActivity.txt', $content);
+            $size = File::size(storage_path('app/jankyActivity.txt'));
+            if ($size < 104857600) {
+                Storage::append('jankyActivity.txt', $content);
+            }
             break;
 
           case '5':
             $contents = Storage::get('workHoursActivity.txt');
-            Storage::append('workHoursActivity.txt', $content);
+            $size = File::size(storage_path('app/workHoursActivity.txt'));
+            if ($size < 104857600) {
+                Storage::append('workHoursActivity.txt', $content);
+            }
             break;
 
           case '6':
             $contents = Storage::get('equipmentActivity.txt');
-            Storage::append('equipmentActivity.txt', $content);
+            $size = File::size(storage_path('app/equipmentActivity.txt'));
+            if ($size < 104857600) {
+                Storage::append('equipmentActivity.txt', $content);
+            }
             break;
 
           case '7':
             $contents = Storage::get('activity.txt');
-            Storage::append('activity.txt', $content);
+            $size = File::size(storage_path('app/activity.txt'));
+            if ($size < 104857600) {
+                Storage::append('activity.txt', $content);
+            }
             break;
 
           default:
 
             break;
         }
+
+        // foreach($this->logTypes as $type) {
+        //     $file = File::get(storage_path('app/' . $type));
+        //     $how_much = strlen($file);
+        //     $contents = substr($file, $how_much / 2 );
+        //     Storage::put($type, $contents);
+        // }
 
         $day = date('d');
         if ($day == 1) {

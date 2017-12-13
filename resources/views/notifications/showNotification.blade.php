@@ -59,7 +59,7 @@
             <br />
             <br />
             <p>
-              <form method="POST" action="{{URL::to('/show_notification/')}}/{{$notification->id}}">
+              <form method="POST" action="{{URL::to('/show_notification/')}}/{{$notification->id}}" id="form_status">
                   <input type="hidden" name="_token" value="{{ csrf_token() }}">
                   <div class="col-md-3">
                       <div class="form-group ">
@@ -123,6 +123,13 @@
               $(this).find(':submit').attr('disabled','disabled');
           });
       }
+  });
+
+  $("#change_status").on('click', function() {
+
+      $('#form_status').submit(function(){
+          $(this).find(':submit').attr('disabled','disabled');
+      });
   });
 
 </script>
