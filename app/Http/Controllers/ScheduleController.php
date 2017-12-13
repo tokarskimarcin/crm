@@ -83,6 +83,7 @@ class ScheduleController extends Controller
                 users.last_name as user_last_name,
                 users.phone as user_phone
                 '))
+            ->wherein('users.user_type_id',[1,2])
             ->where('users.status_work', '=', 1)
             ->where('users.department_info_id',Auth::user()->department_info_id);
         return datatables($query)->make(true);

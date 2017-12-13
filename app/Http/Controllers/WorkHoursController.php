@@ -142,9 +142,10 @@ class WorkHoursController extends Controller
                     SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time"));
             if($dep_info != '*')
             {
-                $query->where('users.department_info_id', '=', $dep_info);
+                $query = $query->where('users.department_info_id', '=', $dep_info);
             }
-            $query->where('users.user_type_id','!=',1);
+            $query = $query->wherenotin('users.user_type_id',[1,2])
+            ->where('users.status_work',1);
             return datatables($query)->make(true);
         }
     }
