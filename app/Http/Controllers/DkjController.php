@@ -453,7 +453,8 @@ class DkjController extends Controller
                     departments.name as department_name,
                     department_info.type,
                     department_type.name as department_type_name
-                   '))->get();
+                   '))
+            ->where('department_info.janky_system_id','!=',0)->get();
         return $departments;
     }
 
