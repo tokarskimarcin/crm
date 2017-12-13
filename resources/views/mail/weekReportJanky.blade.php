@@ -77,6 +77,36 @@
 
     <tr>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>TOTAL</b></td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{$total_confirmed_janky}}</b></td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{$total_unconfirmed_janky}}</b></td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{$total_unchecked_janky}}</b></td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{$total_anulled_janky}}</b></td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{$total_deleted_janky}}</b></td>
+        @if($total_confirmed_janky != 0)
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round($total_confirmed_janky / $total_janky_sum * 100, 2)}} %</b></td>
+        @else
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>0 %</b></td>
+        @endif
+        @if($total_unconfirmed_janky != 0)
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round($total_unconfirmed_janky / $total_janky_sum * 100, 2)}} %</b></td>
+        @else
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>0 %</b></td>
+        @endif
+        @if($total_unchecked_janky != 0)
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round($total_unchecked_janky / $total_janky_sum * 100, 2)}} %</b></td>
+        @else
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>0 %</b></td>
+        @endif
+        @if($total_anulled_janky != 0)
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round($total_anulled_janky / $total_janky_sum * 100, 2)}} %</b></td>
+        @else
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>0 %</b></td>
+        @endif
+        @if($total_deleted_janky != 0)
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round($total_deleted_janky / $total_janky_sum * 100, 2)}} %</b></td>
+        @else
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>0 %</b></td>
+        @endif
     </tr>
 
     <tbody>

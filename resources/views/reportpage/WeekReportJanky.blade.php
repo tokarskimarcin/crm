@@ -14,7 +14,7 @@
 
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Status Pracy
+                   Rapotr tygodniowy podważonych janków
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -22,8 +22,7 @@
                             <div id="start_stop">
                                 <div class="panel-body">
                                     <div class="well">
-
-
+                                          @include('mail.weekReportJanky')
                                     </div>
                                 </div>
                             </div>

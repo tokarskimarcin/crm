@@ -368,11 +368,11 @@ class StatisticsController extends Controller
     $month = date('m')-1;
     $year = date('Y');
     $data = $this::monthReportTelemarketing($month,$year);
-             Mail::send('mail.monthReportTelemarketing', $data, function($message)
-             {
-                 $message->from('jarzyna.verona@gmail.com');
-                 $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-             });
+     Mail::send('mail.monthReportTelemarketing', $data, function($message)
+     {
+         $message->from('jarzyna.verona@gmail.com');
+         $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
+     });
     }
     // wyswietlenie raportu miesiecznego
     public function pageMonthReportTelemarketing()
@@ -388,7 +388,7 @@ class StatisticsController extends Controller
     }
 
     /*********** tygodniowy raport podwazonych janków *****************/
-    public function weekReportJanky() {
+    private function weekReportJankyData() {
         $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
         $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
 
@@ -412,10 +412,31 @@ class StatisticsController extends Controller
             ->groupBy('users.department_info_id')
             ->get();
 
-        return view('mail.weekReportJanky')
-            ->with('dkj', $dkj)
-            ->with('date_start', $date_start)
-            ->with('date_stop', $date_stop);
+            $data = [
+                'dkj' => $dkj,
+                'date_start' => $date_start,
+                'date_stop' => $date_stop
+            ];
+            return $data;
+    }
+    public function MailweekReportJanky() {
+        $data = $this->weekReportJankyData();
+        
+        Mail::send('mail.weekReportJanky', $data, function($message)
+        {
+            $message->from('jarzyna.verona@gmail.com');
+            $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
+        });
+
+    }
+
+    public function pageWeekReportJanky(){
+        $data = $this->weekReportJankyData();
+
+        return view('reportpage.WeekReportJanky')
+            ->with('dkj', $data['dkj'])
+            ->with('date_start', $data['date_start'])
+            ->with('date_stop', $data['date_stop']);
     }
 
     public function dayReportMissedRepo() {
