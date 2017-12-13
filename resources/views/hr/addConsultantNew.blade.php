@@ -193,9 +193,15 @@
                                 <td style="width: 170px;height:52px;"><b>Typ:</b></td>
                                 <td style="width: 170px;height:52px;">
                                   <select class="form-control" style="font-size:18px;" name="dating_type" id="dating_type">
-                                      <option>Wybierz</option>
-                                      <option value="0">Badania</option>
-                                      <option value="1">Wysyłka</option>
+                                     @if(Auth::user()->department_info->type == 'Badania')
+                                          <option value="0">Badania</option>
+                                     @elseif(Auth::user()->department_info->type == 'Wysyłka')
+                                          <option value="1">Wysyłka</option>
+                                     @else
+                                          <option>Wybierz</option>
+                                          <option value="0">Badania</option>
+                                          <option value="1">Wysyłka</option>
+                                     @endif
                                   </select>
                                 </td>
                             </tr>

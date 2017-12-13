@@ -232,8 +232,16 @@
                                             <td style="width: 170px;height:52px;"><b>Typ:</b></td>
                                             <td style="width: 170px;height:52px;">
                                               <select class="form-control" style="font-size:18px;" name="dating_type" id="dating_type">
-                                                  <option value="0" @if($user->dating_type == 0) selected @endif>Badania</option>
-                                                  <option value="1" @if($user->dating_type == 1) selected @endif>Wysyłka</option>
+                                                  @if(Auth::user()->department_info->type == 'Badania')
+                                                      <option value="0">Badania</option>
+                                                  @elseif(Auth::user()->department_info->type == 'Wysyłka')
+                                                      <option value="1">Wysyłka</option>
+                                                  @else
+                                                      <option value="0" @if($user->dating_type == 0) selected @endif>Badania</option>
+                                                      <option value="1" @if($user->dating_type == 1) selected @endif>Wysyłka</option>
+                                                  @endif
+
+
                                               </select>
                                             </td>
                                         </tr>
