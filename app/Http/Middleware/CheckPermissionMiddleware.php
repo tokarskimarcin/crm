@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Facades\Auth;
 use App\Links;
 use Illuminate\Support\Facades\DB;
+use Session;
 
 class CheckPermissionMiddleware
 {
@@ -22,6 +23,12 @@ class CheckPermissionMiddleware
     {
 
         if(Auth::check()) {
+            //Sprawdzenie czy pracownik jest zatrudniony
+            if (Auth::user()->status_work == 0) {
+                Auth::logout();
+                Session::flash('message', 'Twoje konto jest nieaktywne!');
+                return redirect('/login');
+            }
 
             $expired_date = date('Y-m-d', strtotime("+3 months", strtotime(Auth::user()->password_date)));
             // Pobranie instancji modelu
