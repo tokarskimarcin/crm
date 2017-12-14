@@ -35,7 +35,7 @@ class CheckFirewall
         {
             if(is_null($acces)) {
                 Auth::logout();
-                Session::flash('message', 'Twoje konto jest nieaktywne!');
+                Session::flash('message', 'Logujesz się ze złej lokalizacji!');
                 return redirect('login');
             }else{
                 return $next($request);
