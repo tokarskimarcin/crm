@@ -241,6 +241,9 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
     //Statistics Stop
 
     //Report Page Start
+    Route::get('/pageDayReportMissedRepo', 'StatisticsController@dayReportMissedRepo');
+
+
     Route::get('/pageHourReportTelemarketing', 'StatisticsController@pageHourReportTelemarketing');
     Route::get('/pageWeekReportTelemarketing', 'StatisticsController@pageWeekReportTelemarketing');
     Route::get('/pageMonthReportTelemarketing', 'StatisticsController@pageMonthReportTelemarketing');
@@ -248,6 +251,7 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
 
 
     Route::get('/pageHourReportDKJ', 'StatisticsController@pageHourReportDKJ');
+    Route::get('/pageDayReportDKJ', 'StatisticsController@pageDayReportDKJ');
     Route::get('/pageWeekReportDKJ', 'StatisticsController@pageWeekReportDKJ');
     Route::get('/pageMonthReportDKJ', 'StatisticsController@pageMonthReportDKJ');
 

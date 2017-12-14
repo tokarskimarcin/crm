@@ -508,7 +508,7 @@ class StatisticsController extends Controller
             ->with('dkj', $data['dkj']);
     }
 
-    public function dayReportDkj() {
+    private function dayReportDkjData() {
       $today = date('Y-m-d') . "%";
 
       $dkj = DB::table('dkj')
@@ -536,8 +536,21 @@ class StatisticsController extends Controller
             'dkj' => $dkj,
             'today' => date('Y-m-d')
         ];
+        return $data;
+    }
+
+    public function dayReportDkj() {
+        $data = $this->dayReportDkjData();
 
         $this->sendMailByVerona('dayReportDkj', $data);
+    }
+
+    public function pageDayReportDKJ() {
+        $data = $this->dayReportDkjData();
+
+        return view('reportpage.DayReportDkj')
+            ->with('today', $data['today'])
+            ->with('dkj', $data['dkj']);
     }
 
     //przygotowanie danych do raportu tygodniowego dkj
@@ -857,6 +870,7 @@ class StatisticsController extends Controller
     */
 
     private function sendMailByVerona($mail_type, $data) {
+      $email = [];
 
       $mail_type = ucfirst($mail_type);
       $mail_type = 'page' . $mail_type;
@@ -864,21 +878,23 @@ class StatisticsController extends Controller
       $accepted_users = DB::table('users')
           ->select(DB::raw('
           users.first_name,
-          users.last_name
+          users.last_name,
+          users.username
           '))
           ->join('privilage_relation', 'privilage_relation.user_type_id', '=', 'users.user_type_id')
           ->join('links', 'privilage_relation.link_id', '=', 'links.id')
           ->where('links.link', '=', $mail_type)
+          ->where('users.status_work', '=', 1)
           ->get();
 dd($accepted_users);
 
-
-      // $emails = ['jarzyna.verona@gmail.com'];
-      //
-      // Mail::send('mail.' . $mail_type, $data, function($message) use ($emails)
+      /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
+      // Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users)
       // {
       //     $message->from('jarzyna.verona@gmail.com');
-      //     $message->to($emails)->subject('Welcome!');
+      //     foreach($accepted_users as $user) {
+      //       $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject('Welcome!');
+      //     }
       // });
 
     }
