@@ -34,10 +34,10 @@
                 <a id="check_messages" class="dropdown-toggle" data-toggle="dropdown" href="#">
                     <i class="fa fa-envelope fa-fw"></i> <i class="fa fa-caret-down"></i>
                 </a>
-                <ul class="dropdown-menu dropdown-messages" style="width: 500px;">
+                <ul class="dropdown-menu dropdown-messages" style="width: 500px; max-height: 550px">
                         <strong>Oddziały</strong>
                     <li>
-                        <div class="table-responsive">
+                        <div class="table-responsive"  style="max-height: 500px">
                           <table class="table table-bordered" style="margin-bottom:0px">
                             <thead>
                                 <tr>
@@ -109,10 +109,10 @@
                 <a id="check_messages_dkj" class="dropdown-toggle" data-toggle="dropdown" href="#">
                     <i class="fa fa-envelope fa-fw"></i><i class="fa fa-caret-down"></i>
                 </a>
-                <ul class="dropdown-menu dropdown-messages" style="width: 800px;">
+                <ul class="dropdown-menu dropdown-messages" style="width: 800px; max-height: 350px">
                         <strong>Oddziały</strong>
                     <li>
-                        <div class="table-responsive">
+                        <div class="table-responsive" style="max-height: 300px">
                           <table class="table table-bordered" style="margin-bottom:0px">
                             <thead>
                                 <tr>
@@ -186,7 +186,7 @@
                 <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
             </a>
             <ul class="dropdown-menu dropdown-user">
-                <li><a href="password_change"><i class="fa fa-user fa-fw"></i>Zmiana hasła</a>
+                <li><a href="{{URL::to('/password_change')}}"><i class="fa fa-user fa-fw"></i>Zmiana hasła</a>
                 </li>
                 <li class="divider"></li>
                 <li>

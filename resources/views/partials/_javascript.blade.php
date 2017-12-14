@@ -17,6 +17,7 @@
 <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 
 <script>
+
 $(function(){
 	  $(".wrapper1").scroll(function(){
 	    $(".wrapper2").scrollLeft($(".wrapper1").scrollLeft());
@@ -67,12 +68,12 @@ $(function(){
                         $("#" + response[i].department_info_id + "dkjstatus td[name='status']").removeClass("alert-danger");
                         $("#" + response[i].department_info_id + "dkjstatus td[name='status']").addClass("alert-success");
                     }
-
                 }
             }
         });
     });
 
+$(document).ready(function(){
     $( "#check_messages_dkj" ).on('click', function() {
         $.ajax({
             type: "POST",
@@ -97,7 +98,6 @@ $(function(){
                       $("#" + response[i].department_info_id*(-1) + "dkjstatus td[name='status']").removeClass("alert-danger");
                       $("#" + response[i].department_info_id*(-1) + "dkjstatus td[name='status']").addClass("alert-success");
 
-
                   } else { // tutaj jezeli nie ma oddział nie jest podzielony na badania/wysyłkę
                       $("#" + response[i].department_info_id + "dkjstatus td[name='status']").text("Odsłuchany (" + response[i].all_check_talk + ")");
                       $("#" + response[i].department_info_id + "dkjstatus td[name='count_yanek']").text(response[i].all_bad);
@@ -105,14 +105,12 @@ $(function(){
                       $("#" + response[i].department_info_id + "dkjstatus td[name='status']").removeClass("alert-danger");
                       $("#" + response[i].department_info_id + "dkjstatus td[name='status']").addClass("alert-success");
                   }
-
-
                 }
                 $('#check_messages_dkj').html('<i class="fa fa-envelope fa-fw"></i><i class="fa fa-caret-down"></i>');
             }
         });
     });
-
+});
 
     //ajax do ding ding
 @if(Auth::user()->user_type_id == 13)
@@ -170,7 +168,6 @@ $(function(){
 												$("#" + response[i].department_info_id*(-1) + "dkjstatus td[name='status']").removeClass("alert-danger");
 												$("#" + response[i].department_info_id*(-1) + "dkjstatus td[name='status']").addClass("alert-success");
 
-
 										} else { // tutaj jezeli nie ma oddział nie jest podzielony na badania/wysyłkę
 												$("#" + response[i].department_info_id + "dkjstatus td[name='status']").text("Odsłuchany (" + response[i].all_check_talk + ")");
 												$("#" + response[i].department_info_id + "dkjstatus td[name='count_yanek']").text(response[i].all_bad);
@@ -184,7 +181,6 @@ $(function(){
       });
     }, 60000);
 @endif
-
 
     $("#change_department").on('change', function() {
         var department_info_id = $("#change_department").val();
@@ -204,7 +200,6 @@ $(function(){
     });
 
     $(document).ready(function(){
-
         $("#it_support").on('click', function() {
             var department_info_id = $("#change_department").val();
             $("#babum").empty();
@@ -228,11 +223,9 @@ $(function(){
                             $("#babum").append("<li><a href='{{URL::to('/show_notification/')}}/" + response[i].id + "'><div><i class='fa fa-comment fa-fw'></i><span> " + response[i].title + "</span></div></a></li><li class='divider'></li>");
                         }
                         $("#it_support").css("pointer-events", "auto");
-
                     }
                 });
         });
-
     });
     var department_id_info  =$("select[name='department_id_info']").val();
     $( "#check_users" ).on('click', function() {
@@ -263,11 +256,7 @@ $(function(){
                       tr+="</tr>";
                 }
               }
-
-
               $("#consultantTable").find('tbody').html( tr );
-
-
             }
         });
     });

@@ -49,21 +49,19 @@
         @if (Session::has('message'))
            <div class="alert alert-danger">{{ Session::get('message') }}</div>
         @endif
+        @if ($errors->has('username'))
+                 <div class="alert alert-danger">{{ $errors->first('username') }}</div>
+        @endif
+        @if ($errors->has('password'))
+                 <div class="alert alert-danger">{{ $errors->first('password') }}</div>
+        @endif
             <div class="form-group">
                 <input type="text" class="form-control" name="username" id="username" placeholder="Login..." value="{{ old('username') }}" required="" autofocus="" />
-                @if ($errors->has('username'))
-                    <span class="help-block">
-                        <strong class="white-color">{{ $errors->first('username') }}</strong>
-                    </span>
-                @endif
+
             </div>
             <div class="form-group">
               <input type="password" id="password" class="form-control" name="password" placeholder="Hasło..." required=""/>
-              @if ($errors->has('password'))
-                  <span class="help-block">
-                      <strong>{{ $errors->first('password') }}</strong>
-                  </span>
-              @endif
+
             </div>
               <button class="btn btn-lg btn-primary btn-block" type="submit">Zaloguj</button>
     </form>

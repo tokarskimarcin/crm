@@ -14,6 +14,6 @@ return [
     */
 
     'failed' => 'Zły login lub hasło!',
-    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+    'throttle' => 'Zbyt wiele prób logowania, spróbuj później!',
 
 ];
