@@ -27,7 +27,7 @@
                                                 <form action="" method="post" action="departmentsStatistics">
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <label for ="dep">Miesiac:</label>
-                                                <select class="form-control" name="month">
+                                                <select class="form-control" style="font-size:18px;" name="month">
                                                     @for ($i=0; $i < 2; $i++)
                                                         @php
                                                             $date = date("Y-m",mktime(0,0,0,date("m")-$i,1,date("Y")));
@@ -40,7 +40,7 @@
                                                     @endfor
                                                 </select>
                                                     <label>Oddział:</label>
-                                                    <select class="form-control" name="department_info_id">
+                                                    <select class="form-control" style="font-size:18px;" name="department_info_id">
                                                         @foreach($departments_info as $department)
                                                             @if(isset($department_info_id) && $department_info_id == $department->id)
                                                                 <option selected value={{$department->id}}>{{$department->departments->name.' '.$department->department_type->name}}</option>

@@ -47,7 +47,6 @@
       {{ csrf_field() }}
         <h2 class="form-signin-heading white-color" >Zaloguj się</h2>
             <div class="form-group">
-                <label for="username" class="white-color">Login</label>
                 <input type="text" class="form-control" name="username" id="username" placeholder="Login..." value="{{ old('username') }}" required="" autofocus="" />
                 @if ($errors->has('username'))
                     <span class="help-block">
@@ -56,7 +55,6 @@
                 @endif
             </div>
             <div class="form-group">
-              <label for="password" class="white-color">Hasło</label>
               <input type="password" id="password" class="form-control" name="password" placeholder="Hasło..." required=""/>
               @if ($errors->has('password'))
                   <span class="help-block">

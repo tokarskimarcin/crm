@@ -218,7 +218,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="">Janek:</label>
-                                <select class="form-control showhidetext" name="dkj_status" id="dkj_status" style="border-radius: 0px;">
+                                <select class="form-control showhidetext" style="font-size:18px;" name="dkj_status" id="dkj_status" style="border-radius: 0px;">
                                     <option value="0">Nie</option>
                                     <option value="1">Tak</option>
                                 </select>

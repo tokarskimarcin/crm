@@ -323,6 +323,8 @@ class StatisticsController extends Controller
             $date = $year . "-" . $month . "-%";
         }
 
+        $month = '2017-11%';
+
         $reports = DB::table('hour_report')
             ->select(DB::raw(
                     'SUM(call_time)/count(`call_time`) as sum_call_time,
@@ -339,6 +341,14 @@ class StatisticsController extends Controller
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
             ->where('department_info.dep_aim','!=',0)
             ->where('department_info.id_dep_type', '=', 2)
+            ->whereIn('hour_report.id', function($query) use($month){
+                $query->select(DB::raw(
+                    'MAX(hour_report.id)'
+                ))
+                    ->from('hour_report')
+                    ->where('report_date', 'like', '2017-11%')
+                    ->groupBy('department_info_id','report_date');
+            })
             ->groupBy('hour_report.department_info_id')
             ->get();
 
@@ -351,6 +361,7 @@ class StatisticsController extends Controller
             ->join('users', 'users.id', '=', 'work_hours.id_user')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
             ->where('work_hours.date', 'like', $date)
+            ->where('users.user_type_id', 1)
             ->groupBy('department_info.id')
             ->get();
 
@@ -365,7 +376,7 @@ class StatisticsController extends Controller
     }
 // Wysłanie maila z raportem miesiecznym
     public function MailmonthReportTelemarketing() {
-    $month = date('m')-1;
+    $month = date('m') -1;
     $year = date('Y');
     $data = $this::monthReportTelemarketing($month,$year);
      Mail::send('mail.monthReportTelemarketing', $data, function($message)
@@ -377,7 +388,7 @@ class StatisticsController extends Controller
     // wyswietlenie raportu miesiecznego
     public function pageMonthReportTelemarketing()
     {
-        $month = date('m');
+        $month = date('m') -1;
         $year = date('Y');
         $data = $this::monthReportTelemarketing($month,$year);
         return view('reportpage.MonthReportTelemarketing')
@@ -421,7 +432,7 @@ class StatisticsController extends Controller
     }
     public function MailweekReportJanky() {
         $data = $this->weekReportJankyData();
-        
+
         Mail::send('mail.weekReportJanky', $data, function($message)
         {
             $message->from('jarzyna.verona@gmail.com');

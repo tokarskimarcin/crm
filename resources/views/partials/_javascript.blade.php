@@ -49,7 +49,7 @@ $(function(){
             success: function(response) {
               console.log(response);
                 for (var i = 0; i < response.length; i++) {
-                    if(response[i].type = 'Badania/Wysyłka')
+                    if(response[i].type == 'Badania/Wysyłka')
                     {
                         $("#" + response[i].department_info_id + "dkjstatus td[name='status']").text("Odsłuchany (" + response[i].research_all + ")");
                         $("#" + response[i].department_info_id + "dkjstatus td[name='count_yanek']").text(response[i].research_janky_count);
@@ -84,7 +84,7 @@ $(function(){
             success: function(response) {
               console.log(response);
                 for (var i = 0; i < response.length; i++) {
-                  if(response[i].type = 'Badania/Wysyłka') { // tutaj jezeli sa 2 rodzaje oddziału (badania/wysyłka)
+                  if(response[i].type == 'Badania/Wysyłka') { // tutaj jezeli sa 2 rodzaje oddziału (badania/wysyłka)
                       $("#" + response[i].department_info_id + "dkjstatus td[name='status']").text("Odsłuchany (" + response[i].research_all + ")");
                       $("#" + response[i].department_info_id + "dkjstatus td[name='count_yanek']").text(response[i].research_janky_count);
                       $("#" + response[i].department_info_id + "dkjstatus td[name='undone']").text(response[i].manager_research_janky_count);

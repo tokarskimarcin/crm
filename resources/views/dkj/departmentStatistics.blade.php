@@ -27,7 +27,7 @@
                                                 <form action="" method="post" action="departmentStatistics">
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <label for ="dep">Miesiac:</label>
-                                                <select class="form-control" name="month">
+                                                <select class="form-control" style="font-size:18px;" name="month">
                                                     @for ($i=0; $i < 2; $i++)
                                                         @php
                                                             $date = date("Y-m",mktime(0,0,0,date("m")-$i,1,date("Y")));

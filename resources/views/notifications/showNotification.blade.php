@@ -64,7 +64,7 @@
                   <div class="col-md-3">
                       <div class="form-group ">
                         <label for="status_change">Zmień status:</label>
-                        <select @if(($notification->status == 2 &&  $notification->displayed_by != Auth::user()->id) || $notification->status == 3) disabled @endif class="form-control" name="status" id="status_change">
+                        <select style="font-size:18px;" @if(($notification->status == 2 &&  $notification->displayed_by != Auth::user()->id) || $notification->status == 3) disabled @endif class="form-control" name="status" id="status_change">
                             <option value="1" @if($notification->status == 1) selected @endif >Zgłoszono</option>
                             <option value="2" @if($notification->status == 2) selected @endif >Przyjęto do realizacji</option>
                             <option value="3" @if($notification->status == 3) selected @elseif($notification->status == 1) disabled @endif >Zakończono</option>
