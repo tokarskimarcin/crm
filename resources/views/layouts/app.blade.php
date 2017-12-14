@@ -46,6 +46,9 @@
     <form class="form-signin col-md-4 " style="margin-left: 33%" method="POST" action="{{ route('login') }}">
       {{ csrf_field() }}
         <h2 class="form-signin-heading white-color" >Zaloguj się</h2>
+        @if (Session::has('message'))
+           <div class="alert alert-danger">{{ Session::get('message') }}</div>
+        @endif
             <div class="form-group">
                 <input type="text" class="form-control" name="username" id="username" placeholder="Login..." value="{{ old('username') }}" required="" autofocus="" />
                 @if ($errors->has('username'))
