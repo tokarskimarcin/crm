@@ -115,12 +115,9 @@ class StatisticsController extends Controller
     }
 // Mail do raportu godzinnego telemarketing
     public function MailhourReportTelemarketing() {
-            $data = $this::hourReportTelemarketing();
-            Mail::send('mail.hourReportTelemarketing', $data, function($message)
-            {
-                $message->from('jarzyna.verona@gmail.com');
-                $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-            });
+        $data = $this::hourReportTelemarketing();
+
+        $this->sendMailByVerona('hourReportTelemarketing', $data);
         foreach ($data['reports'] as $report) {
             $report->is_send = 1;
             $report->save();
@@ -194,11 +191,8 @@ class StatisticsController extends Controller
 //Mail do raportu Tygodniowego Telemarketing
     public function MailweekReportTelemarketing() {
         $data = $this::weekReportTelemarketing();
-           Mail::send('mail.weekReportTelemarketing', $data, function($message)
-           {
-               $message->from('jarzyna.verona@gmail.com');
-               $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-           });
+
+        $this->sendMailByVerona('weekReportTelemarketing', $data);
     }
     // Wyswietlenie raportu tygodniowego na stronie 'telemarketing'
     public function pageWeekReportTelemarketing() {
@@ -265,11 +259,8 @@ class StatisticsController extends Controller
 //Mail do raportu dziennego Telemarketing
     public function MailDayReportTelemarketing() {
         $data = $this::dayReportTelemarketing();
-           Mail::send('mail.dayReportTelemarketing', $data, function($message)
-           {
-               $message->from('jarzyna.verona@gmail.com');
-               $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-           });
+
+        $this->sendMailByVerona('dayReportTelemarketing', $data);
     }
     // Wyswietlenie raportu dziennego na stronie 'telemarketing'
     public function pageDayReportTelemarketing() {
@@ -379,11 +370,8 @@ class StatisticsController extends Controller
     $month = date('m') -1;
     $year = date('Y');
     $data = $this::monthReportTelemarketing($month,$year);
-     Mail::send('mail.monthReportTelemarketing', $data, function($message)
-     {
-         $message->from('jarzyna.verona@gmail.com');
-         $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-     });
+
+    $this->sendMailByVerona('monthReportTelemarketing', $data);
     }
     // wyswietlenie raportu miesiecznego
     public function pageMonthReportTelemarketing()
@@ -433,12 +421,7 @@ class StatisticsController extends Controller
     public function MailweekReportJanky() {
         $data = $this->weekReportJankyData();
 
-        Mail::send('mail.weekReportJanky', $data, function($message)
-        {
-            $message->from('jarzyna.verona@gmail.com');
-            $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-        });
-
+        $this->sendMailByVerona('weekReportJanky', $data);
     }
 
     public function pageWeekReportJanky(){
@@ -473,11 +456,7 @@ class StatisticsController extends Controller
             'today' => $today
         ];
 
-        Mail::send('mail.dayReportMissedRepo', $data, function($message)
-        {
-            $message->from('jarzyna.verona@gmail.com');
-            $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-        });
+        $this->sendMailByVerona('dayReportMissedRepo', $data);
     }
     // Przygotowanie danych do raportu godzinnego DKJ
     private function hourReportDkj() {
@@ -517,11 +496,8 @@ class StatisticsController extends Controller
     // Mail do godzinnego raportu DKJ
     public function MailhourReportDkj() {
         $data = $this::hourReportDkj();
-      Mail::send('mail.hourReportDkj', $data, function($message)
-      {
-          $message->from('jarzyna.verona@gmail.com');
-          $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-      });
+
+        $this->sendMailByVerona('hourReportDkj', $data);
     }
     public function pageHourReportDKJ()
     {
@@ -561,11 +537,7 @@ class StatisticsController extends Controller
             'today' => date('Y-m-d')
         ];
 
-        Mail::send('mail.dayReportDkj', $data, function($message)
-        {
-            $message->from('jarzyna.verona@gmail.com');
-            $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-        });
+        $this->sendMailByVerona('dayReportDkj', $data);
     }
 
     //przygotowanie danych do raportu tygodniowego dkj
@@ -623,11 +595,7 @@ class StatisticsController extends Controller
     public function MailWeekReportDkj() {
       $data = $this->weekReportDkjData();
 
-      Mail::send('mail.weekReportDkj', $data, function($message)
-      {
-          $message->from('policja@gov.pl');
-          $message->to('skobry123on@gmail.com', 'John Smith')->subject('Welcome!');
-      });
+      $this->sendMailByVerona('weekReportDkj', $data);
     }
 
     //przygotowanie danych do raportu miesięcznego dkj
@@ -678,11 +646,7 @@ class StatisticsController extends Controller
     public function monthReportDkj() {
       $data = $this->MonthReportDkjData();
 
-      Mail::send('mail.monthReportDkj', $data, function($message)
-      {
-          $message->from('jarzyna.verona@gmail.com');
-          $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-      });
+      $this->sendMailByVerona('monthReportDkj', $data);
     }
 
     //wyswietlanie raoprtu miesiecznego pracownicy dkj
@@ -759,11 +723,8 @@ class StatisticsController extends Controller
     //wysyłanie emaili - raport godzinny odsłuchanych rozmów
     public function hourReportChecked() {
         $data = $this->hourReportCheckedData();
-        Mail::send('mail.hourReportChecked', $data, function($message)
-        {
-            $message->from('jarzyna.verona@gmail.com');
-            $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-        });
+
+        $this->sendMailByVerona('hourReportChecked', $data);
     }
 
     //wyswietlanie widoku odsłuchu godzinnego
@@ -804,11 +765,7 @@ class StatisticsController extends Controller
     public function dayReportChecked() {
       $data = $this->dayReportCheckedData();
 
-      Mail::send('mail.dayReportChecked', $data, function($message)
-      {
-          $message->from('jarzyna.verona@gmail.com');
-          $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-      });
+      $this->sendMailByVerona('dayReportChecked', $data);
     }
 
     //wyświetlanie raportu odsłuchanych rozmów (raport dzienny)
@@ -877,11 +834,8 @@ class StatisticsController extends Controller
     //Wysyłanie maila raport tygodniowy odsłuchane rozmowy
     public function weekReportChecked() {
         $data = $this->weekReportCheckedData();
-        Mail::send('mail.weekReportChecked', $data, function($message)
-        {
-            $message->from('jarzyna.verona@gmail.com');
-            $message->to('jarzyna.verona@gmail.com', 'John Smith')->subject('Welcome!');
-        });
+
+        $this->sendMailByVerona('weekReportChecked', $data);
     }
 
     //wyświetlanie widoku raport tygodniowy odsłuchane rozmowy
@@ -893,5 +847,39 @@ class StatisticsController extends Controller
             ->with('date_stop', $data['date_stop'])
             ->with('dkj', $data['dkj'])
             ->with('hour_reports', $data['hour_reports']);
+    }
+
+    /******** Główna funkcja do wysyłania emaili*************/
+    /*
+    * $mail_type - jaki mail ma być wysłany - typ to nazwa ścieżki z web.php
+    * $data - $dane przekazane z metody
+    *
+    */
+
+    private function sendMailByVerona($mail_type, $data) {
+
+      $mail_type = ucfirst($mail_type);
+      $mail_type = 'page' . $mail_type;
+
+      $accepted_users = DB::table('users')
+          ->select(DB::raw('
+          users.first_name,
+          users.last_name
+          '))
+          ->join('privilage_relation', 'privilage_relation.user_type_id', '=', 'users.user_type_id')
+          ->join('links', 'privilage_relation.link_id', '=', 'links.id')
+          ->where('links.link', '=', $mail_type)
+          ->get();
+dd($accepted_users);
+
+
+      // $emails = ['jarzyna.verona@gmail.com'];
+      //
+      // Mail::send('mail.' . $mail_type, $data, function($message) use ($emails)
+      // {
+      //     $message->from('jarzyna.verona@gmail.com');
+      //     $message->to($emails)->subject('Welcome!');
+      // });
+
     }
 }

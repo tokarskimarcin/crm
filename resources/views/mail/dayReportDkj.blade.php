@@ -30,54 +30,72 @@
               <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
               <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dep_name . ' ' . $item->dep_name_type}} Wysyłka</td>
               <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$today}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->badania}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->badania - $item->bad_badania}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->bad_badania}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($item->bad_badania / $item->badania * 100, 2)}} %</td>
+              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->wysylka}}</td>
+              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->wysylka - $item->bad_wysylka}}</td>
+              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->bad_wysylka}}</td>
+              @if($item->bad_wysylka > 0)
+                  <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($item->bad_wysylka / $item->wysylka * 100, 2)}} %</td>
+              @else
+                  <td style="border:1px solid #231f20;text-align:center;padding:3px;">0 %</td>
+              @endif
 
-              @php($total_all += $item->badania)
-              @php($total_good += $item->badania - $item->bad_badania)
-              @php($total_bad += $item->bad_badania)
+              @php($total_all += $item->wysylka)
+              @php($total_good += $item->wysylka - $item->bad_wysylka)
+              @php($total_bad += $item->bad_wysylka)
               @php($i++)
         </tr>
-    @elseif($item->type == 'Badania/Wysyłka' && $item->badania != 0)
+    @endif
+    @if($item->type == 'Badania/Wysyłka' && $item->badania != 0)
       <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dep_name . ' ' . $item->dep_name_type}} Badania</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$today}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->wysylka}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->wysylka - $item->bad_wysylka}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->bad_wysylka}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($item->bad_wysylka / $item->wysylka * 100, 2)}} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->badania}}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->badania - $item->bad_badania}}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->bad_badania}}</td>
+            @if($item->bad_badania > 0)
+                <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($item->bad_badania / $item->badania * 100, 2)}} %</td>
+            @else
+                <td style="border:1px solid #231f20;text-align:center;padding:3px;">0 %</td>
+            @endif
 
-            @php($total_all += $item->wysylka)
-            @php($total_good += $item->wysylka - $item->bad_wysylka)
-            @php($total_bad += $item->bad_wysylka)
+            @php($total_all += $item->badania)
+            @php($total_good += $item->badania - $item->bad_badania)
+            @php($total_bad += $item->bad_badania)
             @php($i++)
       </tr>
-    @elseif($item->type = 'Badania')
+    @endif
+    @if($item->type == 'Badania')
         <tr>
               <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dep_name . ' ' . $item->dep_name_type}}</td>
+              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dep_name . ' ' . $item->dep_name_type}} Badania</td>
               <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$today}}</td>
               <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->badania}}</td>
               <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->badania - $item->bad_badania}}</td>
               <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->bad_badania}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($item->bad_badania / $item->badania * 100, 2)}} %</td>
+              @if($item->bad_badania > 0)
+                  <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($item->bad_badania / $item->badania * 100, 2)}} %</td>
+              @else
+                  <td style="border:1px solid #231f20;text-align:center;padding:3px;">0 %</td>
+              @endif
         </tr>
         @php($total_all += $item->badania)
         @php($total_good += $item->badania - $item->bad_badania)
         @php($total_bad += $item->bad_badania)
         @php($i++)
-    @else
+    @elseif($item->type == 'Wysyłka')
         <tr>
               <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dep_name . ' ' . $item->dep_name_type}}</td>
+              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dep_name . ' ' . $item->dep_name_type}} Wysyłka</td>
               <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$today}}</td>
               <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->wysylka}}</td>
               <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->wysylka - $item->bad_wysylka}}</td>
               <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->bad_wysylka}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($item->bad_wysylka / $item->wysylka * 100, 2)}} %</td>
+              @if($item->bad_wysylka > 0)
+                  <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($item->bad_wysylka / $item->wysylka * 100, 2)}} %</td>
+              @else
+                  <td style="border:1px solid #231f20;text-align:center;padding:3px;">0 %</td>
+              @endif
         </tr>
         @php($total_all += $item->wysylka)
         @php($total_good += $item->wysylka - $item->bad_wysylka)
@@ -92,14 +110,14 @@
       <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_all}}</td>
       <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_good}}</td>
       <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_bad}}</td>
-      <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($total_bad / $total_all * 100, 2)}} %</td>
+      @if($total_all > 0)
+          <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($total_bad / $total_all * 100, 2)}} %</td>
+      @else
+          <td style="border:1px solid #231f20;text-align:center;padding:3px;">0 %</td>
+      @endif
+
 </tr>
 
 
   <tbody>
 </table>
-<div style="width:10px;height:20px;"></div>
-<div style="display: block;">
-Wiadomość została wygenerowana automatycznie, prosimy na nią nie odpowiadać.</div>
-<div style="display: block;">
-Wszelkie uwagi oraz sugestie proszę kierować na adres: wojciech.mazur@veronaconsulting.pl</div>
