@@ -24,6 +24,7 @@ class CheckFirewall
         } else {
             $ip = $_SERVER['REMOTE_ADDR'];
         }
+        dd($ip);
         $acces = Firewall::where('ip_address', $ip)->first();
 
         if (Auth::user()->user_type_id != 3)
