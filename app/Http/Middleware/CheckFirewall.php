@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Firewall;
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Session;
 
 class CheckFirewall
 {
@@ -28,16 +29,13 @@ class CheckFirewall
 
         if (preg_match('/^10\.200\.46\..*$/', $ip))  {
         	   $acces = 1;
-        } else {
-            Auth::logout();
-            Session::flash('message', 'Logujesz się z niedozwolonej lokalizacji!');
-            return redirect('/login');
         }
 
         if (Auth::user()->user_type_id != 3)
         {
             if(is_null($acces)) {
                 Auth::logout();
+                Session::flash('message', 'Twoje konto jest nieaktywne!');
                 return redirect('login');
             }else{
                 return $next($request);
