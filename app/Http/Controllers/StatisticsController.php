@@ -323,7 +323,7 @@ class StatisticsController extends Controller
             $date = $year . "-" . $month . "-%";
         }
 
-        $month = '2017-11%';
+        $month = date('Y') . '-' . $month . '%';
 
         $reports = DB::table('hour_report')
             ->select(DB::raw(
@@ -346,7 +346,7 @@ class StatisticsController extends Controller
                     'MAX(hour_report.id)'
                 ))
                     ->from('hour_report')
-                    ->where('report_date', 'like', '2017-11%')
+                    ->where('report_date', 'like', $month)
                     ->groupBy('department_info_id','report_date');
             })
             ->groupBy('hour_report.department_info_id')
@@ -388,7 +388,7 @@ class StatisticsController extends Controller
     // wyswietlenie raportu miesiecznego
     public function pageMonthReportTelemarketing()
     {
-        $month = date('m') -1;
+        $month = date('m');
         $year = date('Y');
         $data = $this::monthReportTelemarketing($month,$year);
         return view('reportpage.MonthReportTelemarketing')
