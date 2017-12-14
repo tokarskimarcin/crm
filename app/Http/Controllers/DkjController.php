@@ -103,12 +103,14 @@ class DkjController extends Controller
             $department_id_info = $department_id_info*(-1);
             $dating_type = 1;
         }
+        $department_type = Department_info::find($department_id_info);
         $users = User::where('department_info_id',$department_id_info)
             ->where('status_work',1)
             ->where('user_type_id',1);
             if ($request->department_id_info<0) {
               $users = $users->where('dating_type',$dating_type);
-            }
+            }else if($department_type->type == 'Badania/Wysyłka')
+                $users = $users->where('dating_type',$dating_type);
             $users = $users->groupBy('users.last_name')->get();
 
         return view('dkj.dkjRaport')
