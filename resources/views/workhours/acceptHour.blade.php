@@ -97,12 +97,6 @@
                                         <tbody>
                                         </tbody>
                                     </table>
-
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            </br> <span class="fa fa-user fa-fw"></span> </br>
-                                        </div>
-                                    </div>
                         </div>
                     </div>
                 </div>
