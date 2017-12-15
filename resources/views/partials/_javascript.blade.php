@@ -18,6 +18,30 @@
 
 <script>
 
+//    $(function (){
+//
+//        $('.simple-marquee-container').SimpleMarquee();
+//
+//    });
+
+    $(document).ready(function() {
+        setInterval(function () {
+            {{--$.ajax({--}}
+                {{--type: "POST",--}}
+                {{--url: '{{ route('api.getStatsDkj') }}',--}}
+                {{--data: {},--}}
+                {{--headers: {--}}
+                    {{--'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
+                {{--},--}}
+                {{--success: function (response) {--}}
+                    {{--console.log(response);--}}
+                {{--}--}}
+            {{--});--}}
+            //alert('123');
+        },60000);
+    });
+
+
 $(function(){
 	  $(".wrapper1").scroll(function(){
 	    $(".wrapper2").scrollLeft($(".wrapper1").scrollLeft());
