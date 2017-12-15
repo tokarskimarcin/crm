@@ -19,7 +19,16 @@
         width: 101px;
     }
 </style>
+<?php
 
+function getStartAndEndDate($week, $year) {
+    $dto = new DateTime();
+    $dto->setISODate($year, $week);
+    $ret['week_start'] = $dto->format('Y-m-d');
+    $dto->modify('+6 days');
+    $ret['week_end'] = $dto->format('Y-m-d');
+    return $ret;}
+?>
 {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
@@ -46,12 +55,16 @@
                                             <form class="form-horizontal" method="post" action="set_schedule">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <select class="form-control" name="show_schedule" id="week_text">
+                                                    @php($date = new DateTime())
                                                     @for ($i=0; $i < 5; $i++)
                                                         @php
-                                                        $przelicznik = 7*$i;
-                                                        $data = date("W",mktime(0,0,0,date("m"),date("d")+$przelicznik,date("Y"))); // numer tygodnia.
-                                                        $data_czytelna =  date("Y.m.d", mktime(0,0,0,1,1+($data*7)-6,date("Y"))); // poniedziałek
-                                                        $data_czytelna2 =  date("Y.m.d", mktime(0,0,0,1,(1+($data*7)-4)+4,date("Y"))); // niedziela
+                                                                $date->modify('last monday');//poniedziałek
+                                                                $data_czytelna = $date->format('Y.m.d');
+                                                                $data = $date->format("W"); // numer tygodnia
+                                                                $date->modify("next sunday"); // niedziela
+                                                                $data_czytelna2 =   $date->format('Y.m.d');
+                                                                $date->modify("+7 day");
+
                                                         @endphp
                                                         @if (isset($number_of_week))
                                                             @if ($data == $number_of_week)
