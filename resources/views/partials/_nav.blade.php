@@ -7,7 +7,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="{{url('/')}}">CRM Verona</a>
+        <a class="navbar-brand" href="{{url('/')}}">TeamBox</a>
 
     </div>
     <!-- /.navbar-header -->

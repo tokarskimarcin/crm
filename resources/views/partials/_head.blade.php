@@ -4,7 +4,7 @@
     <meta name="description" content="">
     <meta name="author" content="Sebastian Cytawa">
 
-    <title>CRM Verona</title>
+    <title>TeamBox</title>
 
     <link href="{{ asset('/css/bootstrap-datetimepicker.min.css')}}" rel="stylesheet">
     <link href="{{ asset('/css/bootstrap-select.min.css')}}" rel="stylesheet">
