@@ -235,4 +235,13 @@
             </ul>
         </div>
     </div>
+    <div class="simple-marquee-container" style="margin-top: 2px">
+        <div class="marquee">
+            <ul class="marquee-content-items" style="color: black;">
+                <li style="color: black;" > Masz Jednego Niezweryfikowanego janka</li>
+            </ul>
+        </div>
+    </div>
 </nav>
+
+

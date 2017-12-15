@@ -6,9 +6,9 @@
 {{--<script src="{{ asset('/vendor/bootstrap/js/bootstrap.min.js')}}"></script>--}}
 <script src="{{ asset('/js/bootstrap-datetimepicker.min.js')}}"></script>
 <script src="{{ asset('/js/bootstrapLanguage.js')}}"></script>
+<script src="{{ asset('/js/marquee.js')}}"></script>
 <!-- Metis Menu Plugin JavaScript -->
 <script src="{{ asset('/vendor/metisMenu/metisMenu.min.js')}}"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
 
 <!-- Custom Theme JavaScript -->
