@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use App\ActivityRecorder;
 use Illuminate\Support\Facades\Redirect;
 use Session;
+use App\User;
 
 class AdminController extends Controller
 {
@@ -238,7 +239,65 @@ class AdminController extends Controller
 
         Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
         return Redirect::back();
+    }
 
+    public function multipleDepartmentGet() {
+        $users = User::where('status_work', '=', 1)
+            ->groupBy('last_name')
+            ->get();
+
+        return view('admin.multipleDepartments')
+            ->with('users', $users);
+    }
+
+    public function multipleDepartmentPost(Request $request) {
+        if($request->request_type == 'select_user'){
+          $users = User::where('status_work', '=', 1)
+              ->groupBy('last_name')
+              ->get();
+
+          $user = User::find($request->user_department);
+          $user_id_post = $user->id;
+
+          $user_dep = DB::table('multiple_departments')
+              ->select(DB::raw('
+                  department_info_id
+              '))
+              ->where('user_id', '=', $user->id)
+              ->get();
+
+          $department_info = Department_info::all();
+
+          return view('admin.multipleDepartments')
+              ->with('department_info', $department_info)
+              ->with('user_id_post', $user_id_post)
+              ->with('user_dep', $user_dep)
+              ->with('users', $users);
+
+        } else if ($request->request_type == 'save_changes') {
+          $department_info = Department_info::orderBy('id', 'desc')->limit(1)->get();
+          $last_id = $department_info[0]->id;
+
+          DB::table('multiple_departments')
+              ->where('user_id', '=', $request->user_department_post)
+              ->delete();
+
+          for($i = 1; $i <= $last_id; $i++) {
+              $actual_dep = 'dep' . $i;
+              if($request->$actual_dep == $i){
+                DB::table('multiple_departments')->insert(
+                  ['user_id' => $request->user_department_post, 'department_info_id' => $request->$actual_dep]
+                );
+              }
+          }
+          $users = User::where('status_work', '=', 1)
+              ->groupBy('last_name')
+              ->get();
+
+          return view('admin.multipleDepartments')
+              ->with('success', 'Zmiany zapisano pomyślnie!')
+              ->with('users', $users);
+        }
     }
 
 }

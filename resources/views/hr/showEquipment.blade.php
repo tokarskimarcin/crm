@@ -15,8 +15,8 @@
 <div class="row">
   <div class="col-lg-12">
     <a class="btn btn-default" href="add_equipment/1">Dodaj laptop</a>
-    <a class="btn btn-default" href="add_equipment/3">Dodaj tablet</a>
-    <a class="btn btn-default" href="add_equipment/2">Dodaj telefon</a>
+    <a class="btn btn-default" href="add_equipment/2">Dodaj tablet</a>
+    <a class="btn btn-default" href="add_equipment/3">Dodaj telefon</a>
     <a class="btn btn-default" href="add_equipment/4">Dodaj kartę SIM</a>
     <a class="btn btn-default" href="add_equipment/5">Dodaj Monitor</a>
     <a class="btn btn-default" href="add_equipment/6">Dodaj drukarkę</a>
