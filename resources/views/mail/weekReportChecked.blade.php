@@ -18,7 +18,8 @@
 @php($total_success = 0)
 @php($total_sum = 0)
 @foreach($hour_reports as $report)
-
+@php($add_column = true)
+@php($dep_avg = 0)
     <tr>
         <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->dep_name . ' ' . $report->dep_name_type}}</td>
 
@@ -32,9 +33,15 @@
             }
             @endphp
             @php($total_sum += $item->department_sum)
-                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->department_sum}}</td>
+                @if($item->department_sum != 0)
+                @php($add_column = false)
+                  <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->department_sum}}</td>
+                @endif
             @endif
         @endforeach
+        @if($add_column == true)
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">0</td>
+        @endif
           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->success}}</td>
         @if(isset($dep_avg))
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$dep_avg}} %</td>
