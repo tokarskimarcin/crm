@@ -886,14 +886,31 @@ class StatisticsController extends Controller
           ->where('links.link', '=', $mail_type)
           ->where('users.status_work', '=', 1)
           ->get();
-dd($accepted_users);
-
+var_dump($accepted_users);
+/* TEST WALIDACJI
+    $accepted_users = [
+        'testmaila12345@wp.pl',
+        'sdfsdfsdf',
+        123123123123,
+        'jarzyna.verona@gmail.com',
+        'jarzyna.verona@gmail.com',
+        123123123,
+        'jarzyna.verona@gmail.com'
+    ];
+    foreach ($accepted_users as $key => $user) {
+      if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
+          $message->to($user)->subject('Welcome!');
+      }
+    }
+*/
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
       // Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users)
       // {
       //     $message->from('jarzyna.verona@gmail.com');
       //     foreach($accepted_users as $user) {
-      //       $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject('Welcome!');
+      //      if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
+      //          $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject('Welcome!');
+      //        }
       //     }
       // });
 

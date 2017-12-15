@@ -15,7 +15,7 @@
                   @foreach($user->equipments as $equipment)
                       <tr>
                         <td style="width: 10px;"><b>{{$i}}</b></td>
-                        <td>{{$equipment->created_at}}</td>
+                        <td>{{$equipment->to_user}}</td>
                         <td>{{$equipment->equipment_type->name}}</td>
                         <td style="width: 10px;">
                             <button  type="button" id="{{$equipment->id}}" class="btn btn-info equipment_data" data-toggle="modal" data-target="#myModal"

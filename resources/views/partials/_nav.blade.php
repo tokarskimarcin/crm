@@ -23,7 +23,7 @@
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="it_support">Zgłoszenia
                     <i class="fa fa-bell fa-fw"></i> <i class="fa fa-caret-down"></i>
                 </a>
-                <ul id="babum" class="dropdown-menu dropdown-alerts" style="width: 80vh; overflow-y:scroll; max-height: 500px;">
+                <ul id="babum" class="dropdown-menu dropdown-alerts" style="width: 80vh; overflow-y:scroll; max-height: 500px; margin-right: -200px">
 
                 </ul>
             </li>
@@ -34,7 +34,7 @@
                 <a id="check_messages" class="dropdown-toggle" data-toggle="dropdown" href="#">
                     <i class="fa fa-envelope fa-fw"></i> <i class="fa fa-caret-down"></i>
                 </a>
-                <ul class="dropdown-menu dropdown-messages" style="width: 80vh; max-height: 550px">
+                <ul class="dropdown-menu dropdown-messages" style="width: 80vh; max-height: 550px; margin-right: -200px">
                         <strong>Oddziały</strong>
                     <li>
                         <div class="table-responsive"  style="max-height: 500px">
@@ -84,7 +84,7 @@
                 <a id="check_users" class="dropdown-toggle" data-toggle="dropdown" href="#">
                     <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
                 </a>
-                <ul class="dropdown-menu dropdown-messages" style="width: 80vh;">
+                <ul class="dropdown-menu dropdown-messages" style="width: 80vh; margin-right: -200px">
                     <strong>Konsultanci</strong>
                   <div class="table-responsive" style="max-height: 500px;">
                     <table class="table table-bordered" id="consultantTable">
@@ -109,7 +109,7 @@
                 <a id="check_messages_dkj" class="dropdown-toggle" data-toggle="dropdown" href="#">
                     <i class="fa fa-envelope fa-fw"></i><i class="fa fa-caret-down"></i>
                 </a>
-                <ul class="dropdown-menu dropdown-messages" style="width: 150vh; max-height: 350px">
+                <ul class="dropdown-menu dropdown-messages" style="width: 150vh; max-height: 350px; margin-right: -200px">
                         <strong>Oddziały</strong>
                     <li>
                         <div class="table-responsive" style="max-height: 300px">
@@ -243,5 +243,3 @@
         </div>
     </div>
 </nav>
-
-

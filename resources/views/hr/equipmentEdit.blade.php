@@ -35,7 +35,7 @@
                             <select class="form-control" name="user_id">
                                 <option value="-1">Wybierz</option>
                                 @foreach($users as $user)
-                                    <option value="{{$user->id}}" @if($user->id == $equipment->id_user) selected @endif >{{$user->first_name . ' ' . $user->last_name}}</option>
+                                    <option value="{{$user->id}}" @if($user->id == $equipment->id_user) selected @endif >{{$user->last_name . ' ' . $user->first_name}}</option>
                                 @endforeach
                             </select>
                         </div>
