@@ -121,6 +121,8 @@
                                                                                     $bonus = ($item2->bonus == null) ? 0 : $item2->bonus;
                                                                                     $penatly = ($item2->penalty == null) ? 0 : $item2->penalty;
                                                                                     $total_one_salary = $salary+$additional_salary+$bonus-$penatly;
+                                                                                    if($total_one_salary < 0)
+                                                                                        $total_one_salary = 0;
                                                                                     $salary_total_all+=$total_one_salary;
                                                                                     $payment_total=+$salary_total_all;
                                                                             @endphp
