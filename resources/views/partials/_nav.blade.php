@@ -236,15 +236,15 @@
         </div>
     </div>
 
-    {{--@if($link->link == 'janky_notification' || 1 == 1)--}}
-        {{--<div id="janky_notyfication">--}}
-            {{--<div class="simple-marquee-container" style="margin-top: 2px">--}}
-                {{--<div class="marquee">--}}
-                    {{--<ul class="marquee-content-items">--}}
-                        {{--<li style="font-family: inherit;"> Masz Jednego Niezweryfikowanego janka</li>--}}
-                    {{--</ul>--}}
-                {{--</div>--}}
-            {{--</div>--}}
-        {{--</div>--}}
-    {{--@endif--}}
+    @if($link->link == 'janky_notification' || 1 == 1)
+        <div id="janky_notyfication">
+            <div class="simple-marquee-container" style="margin-top: 2px">
+                <div class="marquee">
+                    <ul class="marquee-content-items">
+                        <li style="font-family: inherit;"> Masz Jednego Niezweryfikowanego janka</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    @endif
 </nav>

@@ -18,11 +18,11 @@
 
 <script>
 
-//    $(function (){
-//
-//        $('.simple-marquee-container').SimpleMarquee();
-//
-//    });
+    $(function (){
+
+        $('.simple-marquee-container').SimpleMarquee();
+
+    });
 
     $(document).ready(function() {
         setInterval(function () {
