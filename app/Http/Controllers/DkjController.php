@@ -519,7 +519,14 @@ class DkjController extends Controller
           return $dkj_user;
         }
     }
-
+    // wyświetlenie informacji czy jest niezweryfikowany janek i ich ilość
+//    public function getInfoJankyVerification(Request $request) {
+//        $today = date('Y-m-d');
+//        $count_janky_verification = DKJ::where('manager_status',null)
+//            ->where('add_date','like',$today.'%');
+//
+//
+//    }
     public function getStatsDkjMaster(Request $request) { //dodac to u góry + 2 kolumny gdzie liczymy status_manager = 1 lub 0
         if ($request->ajax()) {
           $today = date("Y-m-d") . "%";
