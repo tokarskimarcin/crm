@@ -142,7 +142,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td style="width: 170px;height:52px;"><b>Dodatel służbowy:</b></td>
+                                <td style="width: 170px;height:52px;"><b>Dodatek służbowy:</b></td>
                                 <td>
                                     <input type="number" class="form-control" placeholder="0" name="additional_salary" value="">
                                 </td>
