@@ -165,6 +165,8 @@
                                                                                       }
                                                                                 $bonus_salary = $rbh * $bonus_per_hour;
                                                                                 $salary_total = $standart_salary+$bonus_salary-$janky_cost+$bonus_penalty;
+                                                                                if($salary_total <0)
+                                                                                    $salary_total = 0;
                                                                                 $salary_total_all += $salary_total;
 
                                                                                 $payment_total += $salary_total_all;
