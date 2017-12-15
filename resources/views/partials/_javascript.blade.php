@@ -18,13 +18,13 @@
 
 <script>
 
-    $(function (){
-
-        $('.simple-marquee-container').SimpleMarquee();
-
-    });
 
     $(document).ready(function() {
+        $(function (){
+
+            $('.simple-marquee-container').SimpleMarquee();
+
+        });
         setInterval(function () {
             {{--$.ajax({--}}
                 {{--type: "POST",--}}
