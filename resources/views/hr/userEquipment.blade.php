@@ -13,6 +13,7 @@
                   </tr>
                   <?php $i = 1; ?>
                   @foreach($user->equipments as $equipment)
+                  @if($equipment->deleted != 1)
                       <tr>
                         <td style="width: 10px;"><b>{{$i}}</b></td>
                         <td>{{$equipment->to_user}}</td>
@@ -42,6 +43,7 @@
                         </td>
                       </tr>
                       <?php $i++; ?>
+                  @endif
                   @endforeach
               </tbody>
           </table>

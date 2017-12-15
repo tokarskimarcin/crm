@@ -297,33 +297,36 @@
                 }
             }
 
-            if (email == '') {
-                alert("Pole e-mail nie może być puste!");
-                return false;
-            }else
-            {
-                var check = 0;
-                if(email.length > 0) {
-                    $.ajax({
-                        type: "POST",
-                        async: false,
-                        url: '{{ route('api.uniqueEmail') }}',
-                        data: {"email":email},
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            if(response == '1')
-                                check = 1;
-                        }
-                    });
-                    if(check == 1) {
-                        alert("Adres email jest zajęty!");
-                        return false;
-                    }
-                }
+            if (email != null) {
+              if (email == '') {
+                  alert("Pole e-mail nie może być puste!");
+                  return false;
+              }else
+              {
+                  var check = 0;
+                  if(email.length > 0) {
+                      $.ajax({
+                          type: "POST",
+                          async: false,
+                          url: '{{ route('api.uniqueEmail') }}',
+                          data: {"email":email},
+                          headers: {
+                              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                          },
+                          success: function(response) {
+                              if(response == '1')
+                                  check = 1;
+                          }
+                      });
+                      if(check == 1) {
+                          alert("Adres email jest zajęty!");
+                          return false;
+                      }
+                  }
 
+              }
             }
+
 
             //tutaj if() dating type
 

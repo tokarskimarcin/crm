@@ -73,8 +73,10 @@ class UsersController extends Controller
         $user->username = $request->username;
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
-        if ($request->email != '') {
+        if ($request->email == null) {
             $user->email_off = strtolower($request->first_name) . '.' . strtolower($request->last_name) . '@veronaconsulting.pl';
+        } else {
+            $user->email_off = $request->email;
         }
         $user->password = bcrypt($request->password);
         $user->salary = $request->salary;
@@ -102,7 +104,7 @@ class UsersController extends Controller
             }
             $user->department_info_id = Auth::user()->department_info_id;
         }
-        $user->dating_type = $request->dating_type;
+        $user->dating_type = ($request->dating_type != null)? $request->dating_type : 0 ;
         $user->start_work = $request->start_date;
         $user->status_work = 1;
         $user->phone = $request->phone;

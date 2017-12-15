@@ -879,14 +879,15 @@ class StatisticsController extends Controller
           ->select(DB::raw('
           users.first_name,
           users.last_name,
-          users.username
+          users.username,
+          users.email_off
           '))
           ->join('privilage_relation', 'privilage_relation.user_type_id', '=', 'users.user_type_id')
           ->join('links', 'privilage_relation.link_id', '=', 'links.id')
           ->where('links.link', '=', $mail_type)
           ->where('users.status_work', '=', 1)
           ->get();
-var_dump($accepted_users);
+dd($accepted_users);
 /* TEST WALIDACJI
     $accepted_users = [
         'testmaila12345@wp.pl',
@@ -910,7 +911,9 @@ var_dump($accepted_users);
       //     foreach($accepted_users as $user) {
       //      if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
       //          $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject('Welcome!');
-      //        }
+      //       } else if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
+      //          $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject('Welcome!');
+      //       }
       //     }
       // });
 
