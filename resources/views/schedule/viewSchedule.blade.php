@@ -45,12 +45,15 @@
                                             <form class="form-horizontal" method="post" action="view_schedule">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <select class="form-control" name="show_schedule" id="week_text" onchange="setTextField(this)" onload="setTextField(this)">
+                                                    @php($date = new DateTime())
                                                     @for ($i=0; $i < 5; $i++)
                                                         @php
-                                                        $przelicznik = 7*$i;
-                                                        $data = date("W",mktime(0,0,0,date("m"),date("d")+$przelicznik,date("Y"))); // numer tygodnia.
-                                                        $data_czytelna =  date("Y.m.d", mktime(0,0,0,1,1+($data*7)-6,date("Y"))); // poniedziałek
-                                                        $data_czytelna2 =  date("Y.m.d", mktime(0,0,0,1,(1+($data*7)-4)+4,date("Y"))); // niedziela
+                                                                    $date->modify('last monday');//poniedziałek
+                                                                    $data_czytelna = $date->format('Y.m.d');
+                                                                    $data = $date->format("W"); // numer tygodnia
+                                                                    $date->modify("next sunday"); // niedziela
+                                                                    $data_czytelna2 =   $date->format('Y.m.d');
+                                                                    $date->modify("+7 day");
                                                         @endphp
                                                         @if (isset($number_of_week))
                                                             @if ($data == $number_of_week)
