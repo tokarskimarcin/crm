@@ -16,7 +16,7 @@
         text-align: center;
     }
     .reason{
-        width: 101px;
+        width: 70px;
     }
 </style>
 <?php
@@ -205,7 +205,7 @@ function getStartAndEndDate($week, $year) {
                 else
                     table+='<div class="hour">';
 
-                table+= '<select name='+week_array[i]+'_start_work class="form-control">'+
+                table+= '<select name='+week_array[i]+'_start_work class="form-control" style="font-size:12px">'+
                 '<option value='+null+'>Wybierz</option>';
                 while(time.format("HH")!='21')
                 {
@@ -220,7 +220,7 @@ function getStartAndEndDate($week, $year) {
                 table+='<span class="glyphicon glyphicon-arrow-down"></span>';
 
                 time = moment('07'+':'+'45','HH:mm');
-                table+='<select name='+week_array[i]+'_stop_work class="form-control">'+
+                table+='<select name='+week_array[i]+'_stop_work class="form-control" style="font-size:12px">'+
                     '<option>Wybierz</option>';
                 while(time.format("HH")!='21')
                 {
