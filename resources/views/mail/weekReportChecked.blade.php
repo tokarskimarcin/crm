@@ -30,7 +30,12 @@
             @endif
         @endforeach
           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->success}}</td>
-        <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$dep_avg}} %</td>
+        @if(isset($dep_avg))
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$dep_avg}} %</td>
+        @else
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">0 %</td>
+        @endif
+
     </tr>
     @php($total_success += $report->success)
 
