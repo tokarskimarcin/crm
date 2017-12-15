@@ -329,7 +329,7 @@
             }
             else if(employee_count == '' || isNaN(employee_count))
             {
-                alert('Podaj liczbę pracowników kadry!');
+                alert('Podaj liczbę pracowników!');
                 check = false;
             }
             else if(janky_count == '' || isNaN(janky_count))
