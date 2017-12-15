@@ -106,7 +106,14 @@
                 alert('Brak godziny rozpoczęcia pracy');
             }else if (accept_stop == null || accept_stop =='')
                 alert('Brak godziny zakączenia pracy');
-            else
+            else if(success <0)
+            {
+                alert('Liczba zgód nie może być mniejsza niż zero');
+            }
+            else if(accept_start >= accept_stop)
+            {
+                alert('Godziny są ustawione niepoprawnie');
+            }else
             {
                 $(this).attr('disabled',true);
                 $.ajax({
