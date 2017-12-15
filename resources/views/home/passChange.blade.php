@@ -3,10 +3,12 @@
 
 <div class="row">
   <div class="col-md-12">
-    <h1>Zmiana hasła</h1>
+    <div class="page-header">
+      <h1>Zmiana hasła</h1>
+    </div>
   </div>
 </div>
-<hr>
+
 
 @if (Session::has('message_ok'))
    <div class="alert alert-success">{{ Session::get('message_ok') }}</div>

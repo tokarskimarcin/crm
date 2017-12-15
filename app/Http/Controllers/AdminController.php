@@ -243,7 +243,7 @@ class AdminController extends Controller
 
     public function multipleDepartmentGet() {
         $users = User::where('status_work', '=', 1)
-            ->groupBy('last_name')
+            ->orderBy('last_name')
             ->get();
 
         return view('admin.multipleDepartments')
@@ -253,7 +253,7 @@ class AdminController extends Controller
     public function multipleDepartmentPost(Request $request) {
         if($request->request_type == 'select_user'){
           $users = User::where('status_work', '=', 1)
-              ->groupBy('last_name')
+              ->orderBy('last_name')
               ->get();
 
           $user = User::find($request->user_department);
@@ -291,7 +291,7 @@ class AdminController extends Controller
               }
           }
           $users = User::where('status_work', '=', 1)
-              ->groupBy('last_name')
+              ->orderBy('last_name')
               ->get();
 
           return view('admin.multipleDepartments')
