@@ -69,8 +69,12 @@
             if(register_start == null || register_start =='')
             {
                 alert('Brak godziny rozpoczęcia pracy');
-            }else if (register_stop == null || register_stop =='')
+            }else if (register_stop == null || register_stop =='') {
                 alert('Brak godziny zakończenia pracy');
+            }else if(register_stop < register_start)
+            {
+                alert('Błędne godziny.')
+            }
             else
             {
                 $(this).attr('disabled',true);
