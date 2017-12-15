@@ -357,6 +357,11 @@ function getStartAndEndDate($week, $year) {
                         valid = false;
                         time = false;
                     }
+                    else if($start_hour_array[i] == "Wybierz" ||  $stop_hour_array[i] == "Wybierz" && !checkbox.is(':checked'))
+                    {
+                        valid = false;
+                        time = false;
+                    }
                     if(checkbox.is(':checked'))
                     {
                         $start_hour_array[i] = null;
