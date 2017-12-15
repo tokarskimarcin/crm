@@ -69,7 +69,7 @@ Route::POST('/change_department','HomeController@changeDepartment')->name('api.c
 
 Route::POST('/it_support','HomeController@itSupport')->name('api.itSupport');
 
-//locker
+//locker / Multiple departments
 Route::POST('/locker','AdminController@lockerPost')->name('api.locker');
 
 
@@ -114,6 +114,8 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
     Route::Post('/add_department','AdminController@addDepartmentPost');
     Route::get('/edit_department','AdminController@editDepartmentGet');
     Route::Post('/edit_department','AdminController@editDepartmentPost');
+    Route::get('/set_multiple_department','AdminController@multipleDepartmentGet');
+    Route::Post('/set_multiple_department','AdminController@multipleDepartmentPost');
     // Admin_Panel --Stop--
 
     // Password change --START--
