@@ -87,7 +87,7 @@
                 {"data": "username"},
                 {"data": "start_work"},
                 {"data": "end_work"},
-                {"data": "phone"},
+                {"data": "private_phone"},
                 {"data": function (data, type, dataToSet) {
                     if(data.documents == 1)
                         data.documents = "Tak";

@@ -251,7 +251,7 @@ class UsersController extends Controller
         if($request->ajax()) {
             $query = User::select('id', 'first_name','last_name',
                 'username', 'start_work',
-                'end_work', 'phone',
+                'end_work', 'private_phone',
                 'documents', 'student',
                 'status_work','last_login')
                 ->whereIn('user_type_id', [1,2])
