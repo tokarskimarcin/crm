@@ -62,8 +62,7 @@
                                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                         <label for="exampleInputPassword1" class="showhidetext">Wybierz Oddział</label>
                                         <select id="select_form" class="form-control showhidetext" name="department_id_info" style="border-radius: 0px;">
-                                            <option value="0">Wybierz</option>
-                                            <option value="0">-------Wysyłka-------</option>
+                                            <optgroup label="-------Wysyłka-------">
                                             @foreach($departments as $department)
                                                 @if($department->type == 'Wysyłka')
                                                     @if(isset($select_department_id_info))
@@ -89,8 +88,9 @@
                                                     @endif
                                                 @endif
                                             @endforeach
+                                            </optgroup>
 
-                                            <option value="0">-------Badania-------</option>
+                                            <optgroup label="-------Badania-------">
                                             @foreach($departments as $department)
                                                 @if($department->type == 'Badania')
                                                     @if(isset($select_department_id_info))
@@ -116,7 +116,7 @@
                                                     @endif
                                                 @endif
                                             @endforeach
-
+                                            </optgroup>
                                         </select>
 
                                         <label>Data od:<span style="color:red;">*</span></label>
