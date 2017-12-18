@@ -93,7 +93,6 @@ class HomeController extends Controller
     public function changeDepartment(Request $request) {
         if($request->ajax()) {
             $user = User::find(Auth::user()->id);
-
             $access = false;
             $multiple_departments = MultipleDepartments::all();
             foreach($multiple_departments as $department) {
@@ -113,7 +112,9 @@ class HomeController extends Controller
 
     public function itSupport(Request $request) {
         if($request->ajax()) {
-            $notifications = Notifications::where('status', 1)->orderBy('notification_type_id', 'asc')->get();
+            $notifications = Notifications::with('user')
+            ->with('notification_type')
+                ->where('status', 1)->orderBy('notification_type_id', 'asc')->get();
 
             return $notifications;
         }

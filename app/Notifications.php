@@ -18,6 +18,10 @@ class Notifications extends Model
         return $this->belongsTo('App\User', 'displayed_by');
     }
 
+    public function notification_type() {
+        return $this->belongsTo('App\NotificationTypes', 'notification_type_id');
+    }
+
     public function comments() {
         return $this->hasMany('App\CommentsNotifications', 'notification_id');
     }

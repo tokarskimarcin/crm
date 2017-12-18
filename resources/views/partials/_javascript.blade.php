@@ -222,7 +222,9 @@ $(document).ready(function(){
             }
         });
     });
-
+    setInterval(function () {
+        countNotifications();
+    },60000);
     function countNotifications() {
       $.ajax({
               type: "POST",
@@ -232,7 +234,17 @@ $(document).ready(function(){
                   'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
               },
               success: function(response) {
-                $('#show_notification_count').text(response);
+                  console.log(1);
+                  var container = document.getElementById('show_notification_count');
+                  container.style.visibility = "hidden";
+                  if(response != 0){
+                      container.style.visibility = "visible";
+                      container.setAttribute('data-count',response);
+                  }
+
+                  else{
+                      container.style.visibility = "hidden";
+                  }
               }
           });
     }
@@ -252,6 +264,7 @@ $(document).ready(function(){
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
+                        console.log(response);
                         countNotifications();
                         clickDisabled = true;
                         setTimeout(function(){clickDisabled = false;}, 2000);
@@ -259,7 +272,7 @@ $(document).ready(function(){
                             $("#babum").append("<li>Brak nowych zgłoszeń!</li>");
                         }
                         for (var i = 0; i < response.length; i++) {
-                            $("#babum").append("<li><a href='{{URL::to('/show_notification/')}}/" + response[i].id + "'><div><i class='fa fa-comment fa-fw'></i><span> " + response[i].title + "</span></div></a></li><li class='divider'></li>");
+                            $("#babum").append("<li><a href='{{URL::to('/show_notification/')}}/" + response[i].id + "'><div><i class='fa fa-comment fa-fw'></i><span> " +response[i].notification_type.name+": "+ response[i].title +" ("+response[i].user.last_name+")"+ "</span></div></a></li><li class='divider'></li>");
                         }
                         $("#it_support").css("pointer-events", "auto");
                     }
