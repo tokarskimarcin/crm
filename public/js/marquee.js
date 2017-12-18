@@ -130,14 +130,14 @@
         	$(window).on('focus',function(){
         		plugin.documentHasFocus = true;
         		for (var key in plugin.marqueeSpawned){
-      	          plugin.marqueeManager(plugin.marqueeSpawned[key]);   
-      	      	} 
+      	          //plugin.marqueeManager(plugin.marqueeSpawned[key]);
+      	      	}
         	});
         	$(window).on('blur',function(){
-        		plugin.documentHasFocus = true;
+                plugin.documentHasFocus = true;
         		for (var key in plugin.marqueeSpawned){
-        	        plugin.marqueeSpawned[key].el.clearQueue().stop(); 
-        	        plugin.marqueeSpawned[key].hovered = true;
+        	        // plugin.marqueeSpawned[key].el.clearQueue().stop();
+        	        // plugin.marqueeSpawned[key].hovered = true;
         	    }
         	});
 
@@ -193,14 +193,13 @@
                   .mouseenter(function() {
 
 
-                    if ((plugin.documentHasFocus == true) && (plugin.marqueeHovered == false)){
+                    if ((plugin.documentHasFocus == true) && (plugin.marqueeHovered == true)){
                       plugin.marqueeHovered = true;
 
                       for (var key in plugin.marqueeSpawned){
-                        plugin.marqueeSpawned[key].el.clearQueue().stop(); 
+                        plugin.marqueeSpawned[key].el.clearQueue().stop();
                         plugin.marqueeSpawned[key].hovered = true;
                       }
-                      
 
                     }
 
@@ -229,14 +228,14 @@
                 $(config.container_class).append(newElement);
 
                 plugin.marqueeSpawned[i].currentPos = (widthToIgnore + (contentWidth*i))+(config.padding*i);  //initial positioning
-                plugin.marqueeSpawned[i].name = '.marquee-'+(i+1); 
+                plugin.marqueeSpawned[i].name = '.marquee-'+(i+1);
 
-                plugin.marqueeSpawned[i].totalDistance = totalDistance;  
-                plugin.marqueeSpawned[i].containerWidth = containerWidth;  
-                plugin.marqueeSpawned[i].contentWidth = contentWidth;  
-                plugin.marqueeSpawned[i].endPoint = endPoint;  
-                plugin.marqueeSpawned[i].duration = config.duration;  
-                plugin.marqueeSpawned[i].padding = config.padding;  
+                plugin.marqueeSpawned[i].totalDistance = totalDistance;
+                plugin.marqueeSpawned[i].containerWidth = containerWidth;
+                plugin.marqueeSpawned[i].contentWidth = contentWidth;
+                plugin.marqueeSpawned[i].endPoint = endPoint;
+                plugin.marqueeSpawned[i].duration = config.duration;
+                plugin.marqueeSpawned[i].padding = config.padding;
 
                 plugin.marqueeSpawned[i].el.css('left', plugin.marqueeSpawned[i].currentPos+config.padding +'px'); //setting left according to postition
 
@@ -250,7 +249,7 @@
             if(document.hasFocus()){
 	        	 plugin.documentHasFocus = true;
         	}else{
-	        	plugin.documentHasFocus = false;
+	        	plugin.documentHasFocus = true;
 	        }
             
         },
