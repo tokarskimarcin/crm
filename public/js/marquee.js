@@ -214,7 +214,7 @@
                           plugin.marqueeManager(plugin.marqueeSpawned[key]);
                         }
 
-                        plugin.marqueeHovered = false;
+                        plugin.marqueeHovered = true;
                       }
                   });
 
