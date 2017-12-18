@@ -134,7 +134,7 @@
       	      	} 
         	});
         	$(window).on('blur',function(){
-        		plugin.documentHasFocus = false;
+        		plugin.documentHasFocus = true;
         		for (var key in plugin.marqueeSpawned){
         	        plugin.marqueeSpawned[key].el.clearQueue().stop(); 
         	        plugin.marqueeSpawned[key].hovered = true;
@@ -211,11 +211,11 @@
                       if ((plugin.documentHasFocus == true) && (plugin.marqueeHovered == true)){
 
                         for (var key in plugin.marqueeSpawned){
-                          plugin.marqueeManager(plugin.marqueeSpawned[key]);   
-                        } 
+                          plugin.marqueeManager(plugin.marqueeSpawned[key]);
+                        }
 
                         plugin.marqueeHovered = false;
-                      } 
+                      }
                   });
 
                 } else {

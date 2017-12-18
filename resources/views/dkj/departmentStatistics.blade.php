@@ -39,6 +39,7 @@
                                                           @endif
                                                     @endfor
                                                 </select>
+                                                    </br>
                                                     <input type="submit" class="form-control showhidetext btn btn-primary" value="Wyświetl" style="
 						border-radius: 0px;">
                                                 </form>

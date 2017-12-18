@@ -25,13 +25,13 @@
 
     </style>
 
-{{--Header page --}}
+    {{--Header page --}}
     <div class="row">
-        <div class="col-md-6">
-            <h3>Podgląd pracowników DKJ</h3>
+        <div class="col-lg-12">
+            <h1 class="page-header">Podgląd pracowników DKJ</h1>
         </div>
-        <hr>
     </div>
+
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default"  id="panel1">
