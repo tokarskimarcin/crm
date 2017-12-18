@@ -202,7 +202,7 @@
             <div class="modal-body">
                 <div>
                     <label>Średnia:</label>
-                    <input class="form-control numeric" id="average"  name="average" type="number">
+                    <input class="form-control numeric" id="average"  name="average" type="text">
                 </div>
 
                 <div>
@@ -211,21 +211,21 @@
                 </div>
 
                 <div>
-                    <label>Liczba Osób:</label>
+                     <label>Liczba Osób:</label>
                     <input class="form-control" id="employee_count" name="employee_count" type="number" value="">
                 </div>
                 <div>
                     <label>% Janków:</label>
-                    <input class="form-control" id="janky_count" name="janky_count" type="number" value="">
+                    <input class="form-control" id="janky_count" name="janky_count" type="text" value="">
                 </div>
 
                 <div>
                     <label>% Wykorzystania Bazy</label>
-                    <input class="form-control" id="wear_base" name="wear_base" type="number" value="">
+                    <input class="form-control" id="wear_base" name="wear_base" type="text" value="">
                 </div>
                 <div>
                     <label>Czas Rozmów:</label>
-                    <input class="form-control" id="call_time" name="call_Time" type="number" value=""></br>
+                    <input class="form-control" id="call_time" name="call_Time" type="text" value=""></br>
                 </div>
                 <button id="edit_hour" class="btn btn-primary" style="font-size:18px; width:100%;">Edytuj</button>
             </div>
@@ -263,34 +263,34 @@
         });
         $("#edit_hour").click(function () {
             var check = true;
-            if($(".modal-body #average").val() == '')
+            if($(".modal-body #average").val() == '' || isNaN($(".modal-body #average").val()))
             {
-                alert('Średnia nie może być pusta');
+                alert('Podaj prawidłową średnią!');
                 check = false;
             }
-            else if($(".modal-body #success").val() == '')
+            else if($(".modal-body #success").val() == '' || isNaN($(".modal-body #success").val()))
             {
-                alert('Zgody nie mogą być puste');
+                alert('Podaj prawidłową ilość zgód!');
                 check = false;
             }
-            else if($(".modal-body #employee_count").val() == '')
+            else if($(".modal-body #employee_count").val() == '' || isNaN($(".modal-body #employee_count").val()))
             {
-                alert('Liczba pracowników nie może być pusta');
+                alert('Podaj prawidłową ilość pracowników!');
                 check = false;
             }
-            else if($(".modal-body #janky_count").val() == '')
+            else if($(".modal-body #janky_count").val() == '' || isNaN($(".modal-body #janky_count").val()))
             {
-                alert('Ilość janków nie może być puste');
+                alert('Podaj prawidłową ilość janków!');
                 check = false;
             }
-            else if($(".modal-body #wear_base").val() == '')
+            else if($(".modal-body #wear_base").val() == '' || isNaN($(".modal-body #wear_base").val()))
             {
-                alert('Wykorzystanie bazy nie może być puste');
+                alert('Podaj prawidłową ilość wykorzystania bazy!');
                 check = false;
             }
-            else if($(".modal-body #call_time").val() == '')
+            else if($(".modal-body #call_time").val() == '' || isNaN($(".modal-body #call_time").val()))
             {
-                alert('Czas rozmów nie może być puste');
+                alert('Podaj prawidłowy czas!');
                 check = false;
             }
             if(check)
