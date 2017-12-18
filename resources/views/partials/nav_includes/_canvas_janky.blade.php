@@ -15,23 +15,23 @@
         position:absolute;
         margin:0;
         white-space:nowrap;
-        animation:przesun 30s linear infinite;
-        -webkit-animation:przesun 30s linear infinite; /* dla Google Chrome, Safari, Opera 15+ */
+        animation:przesun 15s linear infinite;
+        -webkit-animation:przesun 15s linear infinite; /* dla Google Chrome, Safari, Opera 15+ */
       }
 
       /* ------------ANIMACJA-PRZESUN------------ */
       @keyframes przesun
       {
-        0% { transform:translateX(0); padding-left:110%; }
-        100% { transform:translateX(-100%); padding-left:110%; }
+        0% { transform:translateX(0); padding-left:100%; }
+        50% { transform:translateX(-100%); padding-left:100%; }
       }
 
       @-webkit-keyframes przesun /* dla Google Chrome, Safari, Opera 15+ */
       {
-        0% { -webkit-transform:translateX(0); padding-left:110%; }
-        100% { -webkit-transform:translateX(-100%); padding-left:110%; }
+        0% { -webkit-transform:translateX(0); padding-left:100%; }
+        50% { -webkit-transform:translateX(-100%); padding-left:100%; }
       }
     </style>
 <div id="blok">
-    <p>Ten tekst w tym elemencie - p - będzie poruszał się, gdy dodamy do niego odpowiednią animację oraz właściwości CSS.</p>
+    <p>Liczba nieodsłuchanych janków: 3 </p>
 </div>

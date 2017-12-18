@@ -95,6 +95,8 @@
                 },"orderable": false, "searchable": false }
                 ]
         });
+
+        $('#datatable_info').text('');
     });
 
 </script>

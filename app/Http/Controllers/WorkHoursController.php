@@ -233,7 +233,7 @@ class WorkHoursController extends Controller
     {
         $users = User::wherenotin('user_type_id', [1,2])
             ->where('status_work',1)
-            ->groupBy('last_name')
+            ->orderBy('last_name')
             ->get();
 
         return view('workhourscadre.viewHourCadre')
@@ -243,7 +243,7 @@ class WorkHoursController extends Controller
     {
         if($request->userid == "-1") {
               $users = User::wherenoin('user_type_id', [1,2])
-                  ->groupBy('last_name')
+                  ->orderBy('last_name')
                   ->get();
               return view('workhourscadre.viewHourCadre')
                   ->with('users',$users);
