@@ -105,7 +105,7 @@
             {
                 alert('Brak godziny rozpoczęcia pracy');
             }else if (accept_stop == null || accept_stop =='')
-                alert('Brak godziny zakączenia pracy');
+                alert('Brak godziny zakończenia pracy');
             else if(success <0)
             {
                 alert('Liczba zgód nie może być mniejsza niż zero');
