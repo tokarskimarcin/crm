@@ -223,6 +223,20 @@ $(document).ready(function(){
         });
     });
 
+    function countNotifications() {
+      $.ajax({
+              type: "POST",
+              url: '{{ route('api.itCountNotifications') }}',
+              data: {},
+              headers: {
+                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+              },
+              success: function(response) {
+                $('#show_notification_count').text(response);
+              }
+          });
+    }
+
     $(document).ready(function(){
         $("#it_support").on('click', function() {
             var department_info_id = $("#change_department").val();
@@ -238,6 +252,7 @@ $(document).ready(function(){
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
+                        countNotifications();
                         clickDisabled = true;
                         setTimeout(function(){clickDisabled = false;}, 2000);
                         if(response.length == 0) {
@@ -283,5 +298,9 @@ $(document).ready(function(){
               $("#consultantTable").find('tbody').html( tr );
             }
         });
+    });
+
+    $(document).ready(function(){
+        countNotifications();
     });
 </script>

@@ -118,4 +118,12 @@ class HomeController extends Controller
             return $notifications;
         }
     }
+
+    public function itCountNotifications(Request $request) {
+        if($request->ajax()) {
+            $notifications_count = Notifications::where('status', 1)->count();
+
+            return $notifications_count;
+        }
+    }
 }
