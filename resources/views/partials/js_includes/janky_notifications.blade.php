@@ -1,0 +1,22 @@
+<script>
+
+$(document).ready(function(){
+    $.ajax({
+        type: "POST",
+        url: '{{ route('api.getNotficationsJanky') }}',
+        data: {},
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+          var count = response[0].sum_janky;
+
+          if (count != 0) {
+              $('#notification_janky_count').text(count);
+          }
+        }
+    });
+});
+
+
+</script>

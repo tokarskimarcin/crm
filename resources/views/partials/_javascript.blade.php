@@ -16,8 +16,12 @@
 <!-- Bootstrap Core JavaScript -->
 <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 
+@include('partials.js_includes.janky_notifications')
 <script>
 
+$('#blok').on('click', () => {
+    window.location.replace("{{URL::to('/dkjVerification/')}}");
+});
 
     $(document).ready(function() {
         $(function (){
@@ -313,4 +317,6 @@ $(document).ready(function(){
     $(document).ready(function(){
         countNotifications();
     });
+
+
 </script>

@@ -82,8 +82,8 @@
             </ul>
         </div>
     </div>
-@include('partials.nav_includes._canvas_janky')
+
     @if($link->link == 'janky_notification' || 1 == 1)
-        
+        @include('partials.nav_includes._canvas_janky')
     @endif
 </nav>

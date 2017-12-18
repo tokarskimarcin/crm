@@ -76,6 +76,9 @@ Route::POST('/datatableShowFinishedNotifications','NotificationController@datata
 //locker / Multiple departments
 Route::POST('/locker','AdminController@lockerPost')->name('api.locker');
 
+//notifications moving
+Route::POST('/getNotficationsJanky','NotificationController@getNotficationsJanky')->name('api.getNotficationsJanky');
+
 
 
 //********************AJAX*********************** */

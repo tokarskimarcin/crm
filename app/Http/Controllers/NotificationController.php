@@ -143,4 +143,22 @@ class NotificationController extends Controller
         Session::flash('message_ok', "Komentarz dodany pomyślnie!");
         return Redirect::back();
     }
+
+    public function getNotficationsJanky(Request $request) {
+        if($request->ajax()) {
+            $yesterday = date("Y-m-d", time() - 60 * 60 * 24) . ' 01:00:00';
+            $today = date('Y-m-d') . ' 23:00:00';
+
+            $data = DB::table('dkj')
+              ->select(DB::raw('
+                  count(*) as sum_janky
+              '))
+              ->whereBetween('add_date', [$yesterday, $today])
+              ->whereNull('manager_status')
+              ->where('dkj_status', '=', 1)
+              ->get();
+
+            return $data;
+        }
+    }
 }

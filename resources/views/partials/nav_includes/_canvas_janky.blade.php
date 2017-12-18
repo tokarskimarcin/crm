@@ -22,16 +22,16 @@
       /* ------------ANIMACJA-PRZESUN------------ */
       @keyframes przesun
       {
-        0% { transform:translateX(0); padding-left:100%; }
-        50% { transform:translateX(-100%); padding-left:100%; }
+        0% { transform:translateX(0); padding-left:110%; }
+        100% { transform:translateX(-100%); padding-left:110%; }
       }
 
       @-webkit-keyframes przesun /* dla Google Chrome, Safari, Opera 15+ */
       {
-        0% { -webkit-transform:translateX(0); padding-left:100%; }
-        50% { -webkit-transform:translateX(-100%); padding-left:100%; }
+        0% { -webkit-transform:translateX(0); padding-left:110%; }
+        100% { -webkit-transform:translateX(-100%); padding-left:110%; }
       }
     </style>
-<div id="blok">
-    <p>Liczba nieodsłuchanych janków: 3 </p>
+<div id="blok" >
+    <p>Liczba nieodsłuchanych janków: <span id="notification_janky_count">0</span></p>
 </div>
