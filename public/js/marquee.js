@@ -130,6 +130,7 @@
         	$(window).on('focus',function(){
         		plugin.documentHasFocus = true;
         		for (var key in plugin.marqueeSpawned){
+        		    //
       	          //plugin.marqueeManager(plugin.marqueeSpawned[key]);
       	      	}
         	});
