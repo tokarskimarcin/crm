@@ -69,15 +69,9 @@
 
                               @foreach($links as $link)
                                   @if($group->id == $link->group_link_id)
-                                      @if($link->link == 'show_all_notifications')
-                                          <li>
-                                                <a href="{{URL::to('/show_all_notifications/1')}}">{{$link->name}}</a>
-                                          </li>
-                                      @else
-                                          <li>
-                                              <a href="{{url($link->link)}}">{{$link->name}}</a>
-                                          </li>
-                                      @endif
+                                      <li>
+                                          <a href="{{url($link->link)}}">{{$link->name}}</a>
+                                      </li>
                                   @endif
                               @endforeach
                                   </ul>

@@ -64,8 +64,14 @@ class NotificationController extends Controller
         } else if ($request->status == 3) {
             $stop = date("Y-m-d H:i:s");
             $notification->data_stop = $stop;
+            $notification->save();
 
-          $sec = DB::select("SELECT SEC_TO_TIME(TIME_TO_SEC('" . $stop . "') - TIME_TO_SEC(data_start) ) as time from notifications where id = ". $id);
+            $sec = DB::table('notifications')
+                ->select(DB::raw('
+                    SEC_TO_TIME(TIME_TO_SEC(data_stop) - TIME_TO_SEC(data_start)) as time
+                '))
+                ->where('id', '=', $id)
+                ->get();
           $notification->sec= $sec[0]->time;
         }
 
@@ -84,18 +90,46 @@ class NotificationController extends Controller
         return Redirect::back();
     }
 
-    public function showAllNotificationsGet($type) {
-      if  ($type == 1) {
-          $notifications = Notifications::where('status', '=', 1)->orderBy('notification_type_id', 'asc')->paginate(10);
-      } else if ($type == 2) {
-          $notifications = Notifications::where('status', '=', 2)->orderBy('notification_type_id', 'asc')->paginate(10);
-      } else if ($type == 3) {
-          $notifications = Notifications::where('status', '=', 3)->orderBy('notification_type_id', 'asc')->paginate(10);
-      }
-// dd($notifications);
-      return view('notifications.allNotifications')
-          ->with('type', $type)
-          ->with('notifications', $notifications);
+  public function showAllNotificationsGet() {
+      return view('notifications.allNotifications');
+    }
+
+    private function datatableDataForNotifications($type) {
+        $data = DB::table('notifications')
+            ->select(DB::raw('
+                notifications.id as notification_id,
+                notifications.title,
+                notifications.created_at,
+                departments.name as dep_name,
+                department_type.name as dep_name_type,
+                users.first_name,
+                users.last_name
+            '))
+            ->join('users', 'users.id', '=', 'notifications.user_id')
+            ->join('department_info', 'department_info.id', '=', 'notifications.department_info_id')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->where('notifications.status', '=', $type)
+            ->get();
+
+        return $data;
+    }
+
+    public function datatableShowNewNotifications(Request $request){
+            $data = $this->datatableDataForNotifications(1);
+
+            return datatables($data)->make(true);
+    }
+
+    public function datatableShowInProgressNotifications(Request $request){
+        $data = $this->datatableDataForNotifications(2);
+
+        return datatables($data)->make(true);
+    }
+    public function datatableShowFinishedNotifications(Request $request){
+        $data = $this->datatableDataForNotifications(3);
+
+        return datatables($data)->make(true);
     }
 
     public function addCommentNotificationPost($id, Request $request) {
