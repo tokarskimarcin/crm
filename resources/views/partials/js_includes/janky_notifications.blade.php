@@ -12,6 +12,7 @@ $(document).ready(function(){
           var count = response[0].sum_janky;
 
           if (count != 0) {
+              $('#blok').css('display', 'block');
               $('#notification_janky_count').text(count);
           }
         }

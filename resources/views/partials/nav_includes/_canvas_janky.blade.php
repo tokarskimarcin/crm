@@ -32,6 +32,6 @@
         100% { -webkit-transform:translateX(-100%); padding-left:110%; }
       }
     </style>
-<div id="blok" >
+<div id="blok" style="display: none">
     <p>Liczba nieodsłuchanych janków: <span id="notification_janky_count">0</span></p>
 </div>
