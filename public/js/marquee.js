@@ -67,18 +67,18 @@
         this.init();
     }
     function marqueeObj(newElement){
-    	this.el=newElement;
-    	this.counter=0;
-    	this.name="";
-    	this.timeTop=0;
-    	this.currentPos=0;
-    	this.distanceTop=0;
-    	this.totalDistance=0;
-    	this.contentWidth=0;
-    	this.endPoint=0;
-    	this.duration=0;
-    	this.hovered=false;
-    	this.padding=0;
+    	// this.el=newElement;
+    	// this.counter=0;
+    	// this.name="";
+    	// this.timeTop=0;
+    	// this.currentPos=0;
+    	// this.distanceTop=0;
+    	// this.totalDistance=0;
+    	// this.contentWidth=0;
+    	// this.endPoint=0;
+    	// this.duration=0;
+    	// this.hovered=false;
+    	// this.padding=0;
     }
     //methods for plugin
     $.extend(Plugin.prototype, {
