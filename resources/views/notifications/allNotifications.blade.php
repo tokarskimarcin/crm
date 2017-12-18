@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-lg-12">
         <h1 class="page-header">
-          Tutaj zmienic typ
+            <span id="page_title">Nowe zgłoszenia</span>
         </h1>
     </div>
 </div>
@@ -95,18 +95,21 @@ $('.menu_item').on('click', function(){
         deletePrevious();
         $("#menu_new_notifications").addClass('active');
         $("#div_new_notifications").fadeIn(0);
+        $('#page_title').text('Nowe zgłoszenia');
     }
 
     if(id == "menu_in_progress") {
         deletePrevious();
         $("#menu_in_progress").addClass('active');
         $("#div_in_progress").fadeIn(0);
+        $('#page_title').text('Przyjęte zgłoszenia');
     }
 
     if(id == "menu_finished") {
         deletePrevious();
         $("#menu_finished").addClass('active');
         $("#div_finished").fadeIn(0);
+        $('#page_title').text('Zrealizowane zgłoszenia');
     }
 
 });
