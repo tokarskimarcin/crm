@@ -69,6 +69,9 @@ Route::POST('/change_department','HomeController@changeDepartment')->name('api.c
 
 Route::POST('/it_support','HomeController@itSupport')->name('api.itSupport');
 Route::POST('/count_notifications','HomeController@itCountNotifications')->name('api.itCountNotifications');
+Route::POST('/datatableShowNewNotifications','NotificationController@datatableShowNewNotifications')->name('api.datatableShowNewNotifications'); //tu zmienic z ORM
+Route::POST('/datatableShowInProgressNotifications','NotificationController@datatableShowInProgressNotifications')->name('api.datatableShowInProgressNotifications'); //tu zmienic z ORM
+Route::POST('/datatableShowFinishedNotifications','NotificationController@datatableShowFinishedNotifications')->name('api.datatableShowFinishedNotifications'); //tu zmienic z ORM
 
 //locker / Multiple departments
 Route::POST('/locker','AdminController@lockerPost')->name('api.locker');
@@ -231,7 +234,7 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
 
     Route::Post('add_comment_notifications/{id}', 'NotificationController@addCommentNotificationPost');
 
-    Route::get('/show_all_notifications/{type}', 'NotificationController@showAllNotificationsGet');
+    Route::get('/show_all_notifications', 'NotificationController@showAllNotificationsGet');
 
     //Notification STOP
 
