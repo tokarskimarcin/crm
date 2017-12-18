@@ -234,14 +234,12 @@ $(document).ready(function(){
                   'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
               },
               success: function(response) {
-                  console.log(1);
                   var container = document.getElementById('show_notification_count');
                   container.style.visibility = "hidden";
-                  if(response != 0){
+                  if(!isNaN(response)){
                       container.style.visibility = "visible";
                       container.setAttribute('data-count',response);
                   }
-
                   else{
                       container.style.visibility = "hidden";
                   }
@@ -264,7 +262,6 @@ $(document).ready(function(){
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        console.log(response);
                         countNotifications();
                         clickDisabled = true;
                         setTimeout(function(){clickDisabled = false;}, 2000);
