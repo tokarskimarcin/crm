@@ -68,22 +68,22 @@
             form_ok = false;
         }
 
-        if (content == '') {
+        else if (content == '') {
             alert("Dodaj treść problemu!");
             form_ok = false;
         }
 
-        if (notification_type_id == 'Wybierz') {
+        else if (notification_type_id == 'Wybierz') {
             alert("Wybierz rodzaj problemu!");
             form_ok = false;
         }
 
-        if (department_info_id == 'Wybierz') {
+        else if (department_info_id == 'Wybierz') {
             alert("Wybierz oddział!");
             form_ok = false;
         }
 
-        if (form_ok == true) {
+        else if (form_ok == true) {
           $('#form').submit(function(){
               $(this).find(':submit').attr('disabled','disabled');
           });
