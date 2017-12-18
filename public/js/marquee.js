@@ -49,7 +49,7 @@
         this.settings = $.extend( {}, this._defaults, options );
         this.marqueeSpawned = [];
         this.marqueeHovered = false;
-        this.documentHasFocus = false;        
+        this.documentHasFocus = true;
         //
         this.counter = 0;
 
@@ -315,7 +315,7 @@
             property: 'value',
             onComplete: null,
             duration: 20000,
-            padding: 10,
+            padding: 0,
             marquee_class: '.marquee',
             container_class: '.simple-marquee-container',
             sibling_class: 0,
