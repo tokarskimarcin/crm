@@ -236,7 +236,7 @@ $(document).ready(function(){
               success: function(response) {
                   var container = document.getElementById('show_notification_count');
                   container.style.visibility = "hidden";
-                  if(!isNaN(response)){
+                  if(!isNaN(response) && response > 0){
                       container.style.visibility = "visible";
                       container.setAttribute('data-count',response);
                   }
