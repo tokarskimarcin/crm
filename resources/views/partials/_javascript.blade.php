@@ -19,11 +19,7 @@
 
 
     $(document).ready(function() {
-        $(function (){
 
-            $('.simple-marquee-container').SimpleMarquee();
-
-        });
         setInterval(function () {
             {{--$.ajax({--}}
                 {{--type: "POST",--}}
