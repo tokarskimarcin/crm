@@ -13,7 +13,6 @@
         <i class="fa fa-caret-down"></i>
     </a>
     <ul id="it_notifications" class="dropdown-menu dropdown-alerts" style="width: 80vh; overflow-y:scroll; max-height: 500px; margin-right: -200px">
-
     </ul>
 </li>
 @endif

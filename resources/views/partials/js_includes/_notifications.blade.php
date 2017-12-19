@@ -9,13 +9,15 @@ function countNotifications() {
           },
           success: function(response) {
               var container = document.getElementById('show_notification_count');
-              container.style.visibility = "hidden";
-              if(!isNaN(response) && response > 0){
-                  container.style.visibility = "visible";
-                  container.setAttribute('data-count',response);
-              }
-              else{
-                  container.style.visibility = "hidden";
+              if (container != null) {
+                container.style.visibility = "hidden";
+                if(!isNaN(response) && response > 0){
+                    container.style.visibility = "visible";
+                    container.setAttribute('data-count',response);
+                }
+                else{
+                    container.style.visibility = "hidden";
+                }
               }
           }
       });

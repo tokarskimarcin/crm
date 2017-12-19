@@ -9,7 +9,6 @@ $(document).ready(function(){
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-              console.log(response);
                 for (var i = 0; i < response.length; i++) {
                   if(response[i].type == 'Badania/Wysyłka') { // tutaj jezeli sa 2 rodzaje oddziału (badania/wysyłka)
                       $("#" + response[i].department_info_id + "dkjstatus td[name='status']").text("Odsłuchany (" + response[i].research_all + ")");
@@ -24,10 +23,17 @@ $(document).ready(function(){
                       $("#" + response[i].department_info_id*(-1) + "dkjstatus td[name='status']").removeClass("alert-danger");
                       $("#" + response[i].department_info_id*(-1) + "dkjstatus td[name='status']").addClass("alert-success");
 
-                  } else { // tutaj jezeli nie ma oddział nie jest podzielony na badania/wysyłkę
+                  } else if(response[i].type == 'Badania') { // tutaj jezeli nie ma oddział nie jest podzielony na badania/wysyłkę
                       $("#" + response[i].department_info_id + "dkjstatus td[name='status']").text("Odsłuchany (" + response[i].all_check_talk + ")");
                       $("#" + response[i].department_info_id + "dkjstatus td[name='count_yanek']").text(response[i].all_bad);
                       $("#" + response[i].department_info_id + "dkjstatus td[name='undone']").text(response[i].manager_research_janky_count);
+                      $("#" + response[i].department_info_id + "dkjstatus td[name='status']").removeClass("alert-danger");
+                      $("#" + response[i].department_info_id + "dkjstatus td[name='status']").addClass("alert-success");
+                      
+                  } else if (response[i].type == 'Wysyłka') {
+                      $("#" + response[i].department_info_id + "dkjstatus td[name='status']").text("Odsłuchany (" + response[i].all_check_talk + ")");
+                      $("#" + response[i].department_info_id + "dkjstatus td[name='count_yanek']").text(response[i].all_bad);
+                      $("#" + response[i].department_info_id + "dkjstatus td[name='undone']").text(response[i].manager_shipping_janky_count);
                       $("#" + response[i].department_info_id + "dkjstatus td[name='status']").removeClass("alert-danger");
                       $("#" + response[i].department_info_id + "dkjstatus td[name='status']").addClass("alert-success");
                   }
