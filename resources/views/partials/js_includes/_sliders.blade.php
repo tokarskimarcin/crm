@@ -1,0 +1,22 @@
+<script>
+$(function(){
+	  $(".wrapper1").scroll(function(){
+	    $(".wrapper2").scrollLeft($(".wrapper1").scrollLeft());
+	  });
+	  $(".wrapper2").scroll(function(){
+	    $(".wrapper1").scrollLeft($(".wrapper2").scrollLeft());
+	  });
+    $(".wrapper3").scroll(function(){
+	    $(".wrapper4").scrollLeft($(".wrapper3").scrollLeft());
+	  });
+	  $(".wrapper4").scroll(function(){
+	    $(".wrapper3").scrollLeft($(".wrapper4").scrollLeft());
+	  });
+    $(".wrapper5").scroll(function(){
+      $(".wrapper6").scrollLeft($(".wrapper5").scrollLeft());
+    });
+    $(".wrapper6").scroll(function(){
+      $(".wrapper5").scrollLeft($(".wrapper6").scrollLeft());
+    });
+	});
+</script>

@@ -85,5 +85,10 @@
 
     @if($link->link == 'janky_notification' || 1 == 1)
         @include('partials.nav_includes._canvas_janky')
+    @else
+    <div id="blok" style="display: none; width: 0px; height: 0px">
+        <p><span id="notification_janky_count" style="display: none"></span></p>
+    </div>
+
     @endif
 </nav>
