@@ -74,6 +74,10 @@
             }else if(register_stop < register_start)
             {
                 alert('Błędne godziny.')
+            }else if(register_start < '07:00'){
+                alert('Pracę możesz rozpocząć najwcześniej o godzinie 7!');
+            }else if(register_stop > '21:00'){
+                alert('Pracę możesz zakończyć najpóźniej o godzinie 21!');
             }
             else
             {
