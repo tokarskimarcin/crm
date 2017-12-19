@@ -210,7 +210,7 @@
 
                         "<div class='form-group modifydate' >" +
                         "<div class='input-group date form_time col-md-5' data-date='' data-date-format=hh:ii data-link-field='dtp_input3' data-link-format='hh:ii'>"+
-                        "<input id='register_stop' class='form-control' size='16' type='text' value='' readonly>"+
+                        "<input id='register_stop' class='form-control' size='16' type='text' value='' readonly style='margin-top: 0px; min-height: 34px'>"+
                         "<span class='input-group-addon'><span class='glyphicon glyphicon-remove'></span></span>"+
                         "<span class='input-group-addon'><span class='glyphicon glyphicon-time'></span></span>"+
                         "</div>"+

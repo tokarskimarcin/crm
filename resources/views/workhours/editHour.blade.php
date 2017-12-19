@@ -28,7 +28,7 @@
                 </div>
                 @if( Session::get('count_agreement')==1)
                 <div class="form-group">
-                    <label for="dtp_input3" class="col-md-5 control-label">Liczna Sukcesów: </label>
+                    <label for="dtp_input3" class="col-md-5 control-label">Liczba Sukcesów: </label>
                     <div class="input-group date col-md-5">
                         <input id="success" class="form-control" size="16" type="number" value="0">
                     </div>
