@@ -123,6 +123,8 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
     Route::Post('/edit_department','AdminController@editDepartmentPost');
     Route::get('/set_multiple_department','AdminController@multipleDepartmentGet');
     Route::Post('/set_multiple_department','AdminController@multipleDepartmentPost');
+    Route::get('/create_link','AdminController@createLinkGet');
+    Route::Post('/create_link','AdminController@createLinkPost');
     // Admin_Panel --Stop--
 
     // Password change --START--

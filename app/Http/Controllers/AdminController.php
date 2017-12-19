@@ -67,6 +67,7 @@ class AdminController extends Controller
             ->with('users_type',$users_type)
             ->with('link_info',$link_info);
     }
+
     public function admin_privilage_edit($id,Request $request)
     {
             $data = [];
@@ -298,6 +299,26 @@ class AdminController extends Controller
               ->with('success', 'Zmiany zapisano pomyślnie!')
               ->with('users', $users);
         }
+    }
+
+    public function createLinkGet(){
+        $link_groups = LinkGroups::all();
+
+        return view('admin.create_link')
+            ->with('link_groups', $link_groups);
+    }
+
+    public function createLinkPost(Request $request){
+        $link = new Links();
+
+        $link->name = $request->name;
+        $link->link = $request->link;
+        $link->group_link_id = $request->group_link_id;
+
+        $link->save();
+
+        Session::flash('message_ok', "Link został dodany!");
+        return Redirect::back();
     }
 
 }
