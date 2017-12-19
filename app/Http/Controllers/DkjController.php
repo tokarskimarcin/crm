@@ -164,9 +164,18 @@ class DkjController extends Controller
             $department_id_info = $department_id_info*(-1);
             $dating_type = 1;
         }
+        $departments_type = Department_info::where('id',$department_id_info)->first();
+        if($departments_type->type == 'Badania')
+        {
+            $dating_type = 0;
+        }else if($departments_type->type == 'Wysyłka')
+        {
+            $dating_type = 1;
+        }
         $users = User::where('department_info_id',$department_id_info)
-                ->where('user_type_id',1)
                 ->where('dating_type',$dating_type)
+                ->where('user_type_id',1)
+                ->where('status_work',1)
                 ->get();
         return view('dkj.jankyVerification')
             ->with('departments',$departments)
@@ -391,6 +400,12 @@ class DkjController extends Controller
                 {
                     $query->where('user.dating_type', '=', 0);
                 }
+            }else if($type == "Badania")
+            {
+                $query->where('user.dating_type', '=', 0);
+            }else if($type == "Wysyłka")
+            {
+                $query->where('user.dating_type', '=', 1);
             }
             if($request->type_verification == 1)
             {
