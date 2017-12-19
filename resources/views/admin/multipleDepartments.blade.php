@@ -27,8 +27,11 @@
                       @endforeach
                   </select>
               </div>
+              <div class="alert alert-danger" style="display: none" id="alert_user_select">
+                  Wybierz użytkonika!
+              </div>
               <div class="form-group">
-                <input type="submit" class="btn btn-default"  value="Wybierz"/>
+                <input type="submit" class="btn btn-default"  value="Wybierz" id="select_user_btn"/>
               </div>
 
         </form>
@@ -66,6 +69,18 @@
 @section('script')
 
 <script>
+
+$('#select_user_btn').on('click', () => {
+    let select_user = $('#user_department').val();
+
+    if (select_user == 'Wybierz') {
+        $('#alert_user_select').slideDown(1000);
+        return false;
+    } else {
+        $('#alert_user_select').slideUp(1000);
+    }
+
+});
 
 $(document).ready(function(){
     var user_department = $('#user_department').val();

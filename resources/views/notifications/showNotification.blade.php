@@ -84,6 +84,9 @@
                       <label for="content">Dodaj komentarz:</label>
                       <textarea id="content" name="content" placeholder="Tutaj wpisz treść komentarza" class="form-control"></textarea>
                   </div>
+                  <div class="alert alert-danger" style="display: none" id="alert_comment">
+                      Podaj treść komentarza!
+                  </div>
                   <div class="form-group">
                       <input id="add_comment" type="submit" class="btn btn-default" value="Dodaj komentarz" />
                   </div>
@@ -116,9 +119,10 @@
       var content = $("#content").val();
 
       if(content == '') {
-          alert('Podaj treść komentarza!');
+          $('#alert_comment').slideDown(1000);
           return false;
       } else {
+          $('#alert_comment').slideUp(1000);
           $('#form_comment').submit(function(){
               $(this).find(':submit').attr('disabled','disabled');
           });

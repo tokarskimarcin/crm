@@ -24,6 +24,9 @@
               <label for="old_pass">Podaj stare hasło:</label>
               <input name="old_pass" id="old_pass" type="password" class="form-control" placeholder="Stare hasło"/>
           </div>
+          <div class="alert alert-danger" style="display: none" id="alert_old_pass">
+              Podaj stare hasło!
+          </div>
           <div class="form-group">
               <label for="new_pass">Podaj nowe hasło:</label>
               <input name="new_pass" id="new_pass" type="password" class="form-control" placeholder="Nowe hasło"/>
@@ -31,6 +34,15 @@
           <div class="form-group">
               <label for="new_pass_confirm">Powtórz nowe hasło:</label>
               <input name="new_pass_confirm" id="new_pass_confirm" type="password" class="form-control" placeholder="Nowe hasło"/>
+          </div>
+          <div class="alert alert-danger" style="display: none" id="alert_pass_not_equal">
+              Podane hasła nie są zgodne!
+          </div>
+          <div class="alert alert-danger" style="display: none" id="alert_pass_equal_old">
+              Nowe hasło nie może być identyczne z poprzednim!
+          </div>
+          <div class="alert alert-danger" style="display: none" id="alert_pass_empty">
+              Podaj nowe hasło!
           </div>
           <div class="form-group">
               <input id="change" type="submit" class="btn btn-success" value="Zmień hasło" />
@@ -63,28 +75,31 @@ $("#change").on('click', function() {
     }
 
     if (old_pass == '') {
-        alert("Podaj stare hasło!");
+        $('#alert_old_pass').slideDown(1000);
         return false;
+    } else {
+        $('#alert_old_pass').slideUp(1000);
     }
 
     if (new_pass == '') {
-        alert("Podaj nowe hasło!");
+        $('#alert_pass_empty').slideDown(1000);
         return false;
-    }
-
-    if (new_pass_confirm == '') {
-        alert("Powtórz nowe hasło!");
-        return false;
+    } else {
+        $('#alert_pass_empty').slideUp(1000);
     }
 
     if (new_pass != new_pass_confirm) {
-        alert("Hasła nie są zgodne!");
+        $('#alert_pass_not_equal').slideDown(1000);
         return false;
+    } else {
+        $('#alert_pass_not_equal').slideUp(1000);
     }
 
     if (new_pass == old_pass) {
-        alert("Podane hasło nie może być identyczne z poprzednim!");
+        $('#alert_pass_equal_old').slideDown(1000);
         return false;
+    } else {
+        $('#alert_pass_equal_old').slideUp(1000);
     }
 });
 
