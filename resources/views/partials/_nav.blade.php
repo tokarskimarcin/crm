@@ -74,9 +74,15 @@
 
                               @foreach($links as $link)
                                   @if($group->id == $link->group_link_id)
-                                      <li>
-                                          <a href="{{url($link->link)}}">{{$link->name}}</a>
-                                      </li>
+                                      @if($link->group_link_id == 12)
+                                          <li>
+                                              <a href="{{url($link->link)}}" target="_blank">{{$link->name}}</a>
+                                          </li>
+                                      @else
+                                          <li>
+                                              <a href="{{url($link->link)}}">{{$link->name}}</a>
+                                          </li>
+                                      @endif
                                   @endif
                               @endforeach
                                   </ul>
