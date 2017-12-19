@@ -67,7 +67,7 @@
                                                 <td>{{$item->good + $item->bad}}</td>
                                                 <td>{{$item->good}}</td>
                                                 <td>{{$item->bad}}</td>
-                                                <td>{{($item->bad*100)/($item->good + $item->bad)}}%</td>
+                                                <td>{{round(($item->bad*100)/($item->good + $item->bad), 2)}}%</td>
                                             @endif
                                         @endforeach
                                             @if($check == 0)
@@ -88,7 +88,7 @@
                                             <td>0 %</td>
                                         @else
                                             <?php $proc_sum = ($bad_sum*100)/$all_sum ?>
-                                            <td>{{$proc_sum}}%</td>
+                                            <td>{{round($proc_sum, 2)}}%</td>
                                         @endif
 
                                     </tr>

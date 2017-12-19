@@ -19,6 +19,11 @@
 
       @foreach($links as $link)
 
+          {{-- Flag for janky moving notifications--}}
+          @if($link->link == 'janky_notification')
+              @php($show_moving_notifications = true)
+          @endif
+
           {{-- Including IT notifications --}}
           @include('partials.nav_includes._blocked_for_it')
 
@@ -83,12 +88,11 @@
         </div>
     </div>
 
-    @if($link->link == 'janky_notification' || 1 == 1)
+    @if(isset($show_moving_notifications) && $show_moving_notifications == true)
         @include('partials.nav_includes._canvas_janky')
     @else
-    <div id="blok" style="display: none; width: 0px; height: 0px">
-        <p><span id="notification_janky_count" style="display: none"></span></p>
-    </div>
-
+        <div id="blok" style="display: none; width: 0px; height: 0px">
+            <p><span id="notification_janky_count" style="display: none"></span></p>
+        </div>
     @endif
 </nav>

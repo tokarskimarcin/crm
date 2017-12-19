@@ -23,7 +23,7 @@ function countNotifications() {
 $(document).ready(function(){
     $("#it_support").on('click', function() {
         var department_info_id = $("#change_department").val();
-        $("#babum").empty();
+        $("#it_notifications").empty();
         $("#it_support").css("pointer-events", "none");
         $.ajax({
                 type: "POST",
@@ -39,10 +39,10 @@ $(document).ready(function(){
                     clickDisabled = true;
                     setTimeout(function(){clickDisabled = false;}, 2000);
                     if(response.length == 0) {
-                        $("#babum").append("<li>Brak nowych zgłoszeń!</li>");
+                        $("#it_notifications").append("<li>Brak nowych zgłoszeń!</li>");
                     }
                     for (var i = 0; i < response.length; i++) {
-                        $("#babum").append("<li><a href='{{URL::to('/show_notification/')}}/" + response[i].id + "'><div><i class='fa fa-comment fa-fw'></i><span> " +response[i].notification_type.name+": "+ response[i].title +" ("+response[i].user.last_name+")"+ "</span></div></a></li><li class='divider'></li>");
+                        $("#it_notifications").append("<li><a href='{{URL::to('/show_notification/')}}/" + response[i].id + "'><div><i class='fa fa-comment fa-fw'></i><span> " +response[i].notification_type.name+": "+ response[i].title +" ("+response[i].user.last_name+")"+ "</span></div></a></li><li class='divider'></li>");
                     }
                     $("#it_support").css("pointer-events", "auto");
                 }

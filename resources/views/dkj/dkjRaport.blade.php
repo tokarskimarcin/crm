@@ -28,8 +28,9 @@
 {{--Header page --}}
     <div class="row">
         <div class="col-md-6">
-            <h1>Raport DKJ</h1>
-
+            <div class="page-header">
+                <h1>Raport DKJ</h1>
+            </div>
         </div>
         <div class="col-md-6">
           <div class="panel panel-default" style="margin-top: 3%">
