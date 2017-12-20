@@ -74,6 +74,9 @@ class EquipmentsController extends Controller
 
     public function addEquipmentGet($type) {
         $equipments_types = EquipmentTypes::find($type);
+        if ($equipments_types == null) {
+            return view('errors.404');
+        }
         $users = User::where('status_work', '=', 1)
             ->groupBy('last_name')
             ->get();
@@ -110,9 +113,18 @@ class EquipmentsController extends Controller
         if($request->user_id == -1) {
               $equipment->id_user = 0;
         } else {
+              $userCheck = User::find($request->user_id);
+              if ($userCheck == null) {
+                  return view('errors.404');
+              }
               $equipment->id_user = $request->user_id;
               $equipment->status = 1;
               $equipment->to_user = date('Y-m-d H:i:s');
+        }
+        $departmentCheck = Department_info::find($request->department_info_id);
+        if ($departmentCheck == null && $request->department_info_id != "-1") {
+
+            return view('errors.404');
         }
         $equipment->department_info_id = $request->department_info_id;
         $equipment->created_at = date("Y-m-d H:i:s");
@@ -134,7 +146,7 @@ class EquipmentsController extends Controller
     public function editEquipmentGet($id) {
         $equipment = Equipments::find($id);
 
-        if ($equipment->deleted == 1) {
+        if ($equipment == null || $equipment->deleted == 1) {
             return view('404');
         }
 
@@ -151,6 +163,15 @@ class EquipmentsController extends Controller
 
     public function editEquipmentPost($id, Request $request) {
         $equipment = Equipments::find($id);
+
+        if ($equipment == null) {
+            return view('errors.404');
+        }
+        
+        $typeCheck = EquipmentTypes::find($request->equipment_type);
+        if ($typeCheck == null) {
+            return view('errors.404');
+        }
 
         $equipment->deleted = $request->status_delete;
         if ($request->status_delete == 1) {
