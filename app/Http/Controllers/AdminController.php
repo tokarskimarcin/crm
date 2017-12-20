@@ -200,15 +200,17 @@ class AdminController extends Controller
 
     //edycja oddziałów
     public function editDepartmentPost(Request $request) {
-        //$request->type okkreśla czy oddział jest wyberany czy edytowany
+        //$request->type okkreśla czy oddział jest wybierany czy edytowany
         //1 - wybranie oddziału
         //2 - edycja oddziału
         $department_info = Department_info::all();
         $department_types = Department_types::all();
         $selected_department = Department_info::find($request->selected_department_info_id);
 
-        if ($request->post_type == 1) {
-
+        if ($selected_department == null || ($request->post_type != 1 && $request->post_type != 2)) {
+            return view('errors.404');
+        }
+        if ($request->post_type == 1 ) {
 
           return view('admin.editDepartment')
               ->with('selected_department', $selected_department)
@@ -263,6 +265,9 @@ class AdminController extends Controller
               ->get();
 
           $user = User::find($request->user_department);
+          if ($user == null) {
+              return view('errors.404');
+          }
           $user_id_post = $user->id;
 
           $user_dep = DB::table('multiple_departments')
@@ -281,6 +286,10 @@ class AdminController extends Controller
               ->with('users', $users);
 
         } else if ($request->request_type == 'save_changes') {
+          $userCheck = User::find($request->user_department_post);
+          if ($userCheck == null) {
+              return view('errors.404');
+          }
           $department_info = Department_info::orderBy('id', 'desc')->limit(1)->get();
           $last_id = $department_info[0]->id;
 
@@ -315,6 +324,10 @@ class AdminController extends Controller
 
     public function createLinkPost(Request $request){
         $link = new Links();
+        $linkGroupCheck = LinkGroups::find($request->group_link_id);
+        if ($linkGroupCheck == null) {
+            return view('errors.404');
+        }
 
         $link->name = $request->name;
         $link->link = $request->link;
