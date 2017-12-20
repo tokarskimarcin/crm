@@ -48,13 +48,13 @@
                                         @endphp
                                     @foreach($shedule as $item)
                                         @php
-                                                $work_hour = $item->user->work_hours->where('date','like','2017-10-01')->first();
-                                            $start_work_click  =0;
+                                            $work_hour = $item->user->work_hours->where('date','=', date('Y-m-d'))->first();
+                                            $start_work_click = 0;
                                         @endphp
                                         <tr id={{$item->id.'w'}}>
                                             <td>{{$lp++}}</td>
                                             <td>{{$item->user->first_name.' '.$item->user->last_name}}</td>
-                                            <td>{{$item->user->phone == 0 ? "Brak" : $item->user->phone}}</td>
+                                            <td>{{$item->user->phone == 0 ? "Brak" : $item->user->private_phone}}</td>
                                             @if($day_number == 0)
                                                <td>
                                                    {{$item->monday_start}}
