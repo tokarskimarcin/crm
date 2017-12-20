@@ -52,7 +52,7 @@ function getStartAndEndDate($week, $year) {
                                     <div class="col-md-6">
                                         <div class="well">
                                             <h1 style ="font-family: 'bebas_neueregular',sans-serif; margin-top:0px;text-shadow: 2px 2px 2px rgba(150, 150, 150, 0.8); font-size:25px;">Wybierz tydzień:</h1>
-                                            <form class="form-horizontal" method="post" action="set_schedule">
+                                            <form class="form-horizontal" method="post" action="{{URL::to('/set_schedule')}}">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <select class="form-control" name="show_schedule" id="week_text">
                                                     @php($date = new DateTime())

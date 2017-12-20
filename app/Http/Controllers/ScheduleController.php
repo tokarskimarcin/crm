@@ -17,6 +17,13 @@ class ScheduleController extends Controller
     {
         $number_of_week = $request->show_schedule;
         $request->session()->put('number_of_week', $number_of_week);
+        //temporary solution
+        if ($request->show_schedule < 20) {
+            $request->session()->put('year', date('Y') + 1 );
+        } else {
+          $request->session()->put('year', date('Y'));
+        }
+        //endoftemporary
         $schedule_analitics = $this->setWeekDays($number_of_week,$request);
         return view('schedule.setSchedule')
             ->with('number_of_week',$number_of_week)
