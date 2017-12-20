@@ -45,49 +45,62 @@ class NotificationController extends Controller
     public function showNotificationGet($id) {
         $notification = Notifications::find($id);
 
-        $user = User::find($notification->displayed_by);
+        if ($notification == null) {
+            return view('errors.404');
+        } else {
+            $user = User::find($notification->displayed_by);
 
-        return view('notifications.showNotification')
-            ->with('user', $user)
-            ->with('notification', $notification);
+            return view('notifications.showNotification')
+                ->with('user', $user)
+                ->with('notification', $notification);
+        }
+
+
     }
 
     public function showNotificationPost($id, Request $request) {
         $notification = Notifications::find($id);
 
-        $notification->status = $request->status;
-        $notification->displayed_by = Auth::user()->id;
-        $notification->updated_at = date("Y-m-d H:i:s");
+        if ($notification == null) {
+            return view('errors.404');
+        } else {
+            $status = $request->status;
+            if ($status != 1 && $status != 2 && $status != 3) {
+                return view('errors.404');
+            }
+            $notification->status = $status;
+            $notification->displayed_by = Auth::user()->id;
+            $notification->updated_at = date("Y-m-d H:i:s");
 
-        if($request->status == 2) {
-            $notification->data_start = date("Y-m-d H:i:s");
-        } else if ($request->status == 3) {
-            $stop = date("Y-m-d H:i:s");
-            $notification->data_stop = $stop;
+            if($request->status == 2) {
+                $notification->data_start = date("Y-m-d H:i:s");
+            } else if ($request->status == 3) {
+                $stop = date("Y-m-d H:i:s");
+                $notification->data_stop = $stop;
+                $notification->save();
+
+                $sec = DB::table('notifications')
+                    ->select(DB::raw('
+                        SEC_TO_TIME(TIME_TO_SEC(data_stop) - TIME_TO_SEC(data_start)) as time
+                    '))
+                    ->where('id', '=', $id)
+                    ->get();
+              $notification->sec= $sec[0]->time;
+            }
+
+            $data = [
+                'Edycja statusu powiadomienia o problemie' => '',
+                'Id problemu' => $notification->id,
+                'status' => $request->status,
+            ];
+            new ActivityRecorder(7, $data);
+
             $notification->save();
+            $user = User::find($notification->displayed_by);
 
-            $sec = DB::table('notifications')
-                ->select(DB::raw('
-                    SEC_TO_TIME(TIME_TO_SEC(data_stop) - TIME_TO_SEC(data_start)) as time
-                '))
-                ->where('id', '=', $id)
-                ->get();
-          $notification->sec= $sec[0]->time;
+            Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
+            return Redirect::back();
         }
-
-        $data = [
-            'Edycja statusu powiadomienia o problemie' => '',
-            'Id problemu' => $notification->id,
-            'status' => $request->status,
-        ];
-        new ActivityRecorder(7, $data);
-
-        $notification->save();
-        $user = User::find($notification->displayed_by);
-
-
-        Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
-        return Redirect::back();
     }
 
   public function showAllNotificationsGet() {
