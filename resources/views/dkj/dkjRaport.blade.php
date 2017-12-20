@@ -243,7 +243,7 @@
                     </div>
                 </div>
             </div>
-            @include('dkj.dkjJavaScript');
+            @include('dkj.dkjJavaScript')
         @endif
 @endsection
 @section('script')
