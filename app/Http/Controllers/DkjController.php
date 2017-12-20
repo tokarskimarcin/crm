@@ -78,9 +78,6 @@ class DkjController extends Controller
             $employee_info = $employee_info->where('deleted',1);
         }
         return datatables($employee_info)->make(true);
-
-
-
     }
 
     public function dkjRaportPost(Request $request)
@@ -104,6 +101,9 @@ class DkjController extends Controller
             $dating_type = 1;
         }
         $department_type = Department_info::find($department_id_info);
+        if ($department_type == null) {
+            return view('errors.404');
+        }
         $users = User::where('department_info_id',$department_id_info)
             ->where('status_work',1)
             ->where('user_type_id',1);
@@ -165,6 +165,9 @@ class DkjController extends Controller
             $dating_type = 1;
         }
         $departments_type = Department_info::where('id',$department_id_info)->first();
+        if ($departments_type == null) {
+            return view('errors.404');
+        }
         if($departments_type->type == 'Badania')
         {
             $dating_type = 0;
@@ -337,16 +340,19 @@ class DkjController extends Controller
 
     public function saveDkjVerification(Request $request)
     {
-             $dkj_id = $request->id;
-             $manager_comment = $request->manager_coment;
-             $manager_status = $request->manager_status;
-             $dkj_record = Dkj::find($dkj_id);
-             $dkj_record->comment_manager = $manager_comment;
-             $dkj_record->manager_status = $manager_status;
-             $dkj_record->date_manager = date('Y-m-d H:i:s');
-             $dkj_record->id_manager = Auth::user()->id;
-             $dkj_record->save();
-             new ActivityRecorder(4, "Weryfikacja janka, status: " . $request->manager_status . ', komentarz trenera: ' . $request->manager_coment);
+        if($request->manager_status != 0 && $request->manager_status!= 1){
+            die;
+        }
+        $dkj_id = $request->id;
+        $manager_comment = $request->manager_coment;
+        $manager_status = $request->manager_status;
+        $dkj_record = Dkj::find($dkj_id);
+        $dkj_record->comment_manager = $manager_comment;
+        $dkj_record->manager_status = $manager_status;
+        $dkj_record->date_manager = date('Y-m-d H:i:s');
+        $dkj_record->id_manager = Auth::user()->id;
+        $dkj_record->save();
+        new ActivityRecorder(4, "Weryfikacja janka, status: " . $request->manager_status . ', komentarz trenera: ' . $request->manager_coment);
     }
 
 
@@ -426,7 +432,10 @@ class DkjController extends Controller
             $activity = 'Dodanie janka przez dkj, status: ';
         }
         if ($request->action == 'edit') {
-            $dkj =Dkj::find($request->id);
+            $dkj = Dkj::find($request->id);
+            if ($dkj == null) {
+                die;
+            }
             $dkj->edit_dkj = Auth::user()->id;
             $dkj->edit_date = date('Y-m-d H:i:s');
             //Activity type
@@ -434,6 +443,10 @@ class DkjController extends Controller
         }
         if($request->action == 'create' || $request->action == 'edit')
         {
+            $userCheck = User::find($request->id_user);
+            if ($userCheck == null) {
+                die;
+            }
             $dkj->id_user = $request->id_user;
             $dkj->phone = $request->phone;
             $dkj->dkj_status = $request->dkj_status;
@@ -449,6 +462,9 @@ class DkjController extends Controller
         }
         if ($request->action == 'remove') {
                 $dkj = Dkj::find($request->id);
+                if  ($dkj == null) {
+                    die;
+                }
                 new ActivityRecorder(4, 'Usunięce janka o id: ' . $request->id);
                 $dkj->deleted = 1;
                 $dkj->save();

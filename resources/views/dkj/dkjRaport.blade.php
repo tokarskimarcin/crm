@@ -273,9 +273,6 @@
         });
 
         $("#save_dkj").click(function () {
-            //add blocking button
-
-
 
             var id_user = $("#users_select").val();
             var phone =$("#phone").val();
