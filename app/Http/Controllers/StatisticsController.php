@@ -894,8 +894,7 @@ class StatisticsController extends Controller
 
     $accepted_users = [
         'testmaila12345@wp.pl',
-        'sdfsdfsdf',
-        123123123,
+        'cytawa.verona@gmail.com',
         'jarzyna.verona@gmail.com'
     ];
 
