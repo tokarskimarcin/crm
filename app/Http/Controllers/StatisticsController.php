@@ -72,29 +72,32 @@ class StatisticsController extends Controller
         $wear_base = $request->wear_base;
         $call_Time = $request->call_Time;
         $newRaport = HourReport::find($record_id);
-        if($newRaport->is_send == 0)
-        {
-            $newRaport->user_id = Auth::user()->id;
-            $newRaport->department_info_id = Auth::user()->department_info_id;
-            $newRaport->average = $average;
-            $newRaport->success = $success;
-            $newRaport->employee_count = $employee_count;
-            $newRaport->janky_count = $janky_count;
-            $newRaport->wear_base = $wear_base;
-            $newRaport->call_Time = $call_Time;
-            $newRaport->save();
-            $message = "Raport został zmieniony";
-            $status = 1;
-        }else
-        {
-            $message = "Raport nie został zmienione, ponieważ jest już wysłany.";
-            $status = 0;
+        if ($newRaport != null) {
+            if($newRaport->is_send == 0)
+            {
+                $newRaport->user_id = Auth::user()->id;
+                $newRaport->department_info_id = Auth::user()->department_info_id;
+                $newRaport->average = $average;
+                $newRaport->success = $success;
+                $newRaport->employee_count = $employee_count;
+                $newRaport->janky_count = $janky_count;
+                $newRaport->wear_base = $wear_base;
+                $newRaport->call_Time = $call_Time;
+                $newRaport->save();
+                $message = "Raport został zmieniony";
+                $status = 1;
+            }else
+            {
+                $message = "Raport nie został zmienione, ponieważ jest już wysłany.";
+                $status = 0;
+            }
+            return redirect()->back()
+                ->with('message',$message)
+                ->with('status',$status);
+        } else {
+          return view('errors.404');
         }
-        return redirect()->back()
-            ->with('message',$message)
-            ->with('status',$status);
     }
-
 
     // Dane do raportu godzinnego Telemarketing
     private function hourReportTelemarketing()
