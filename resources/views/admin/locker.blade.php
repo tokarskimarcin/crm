@@ -58,8 +58,12 @@ $('.block').on('click', function() {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                alert('Oddział został zablokowany!');
-                location.reload();
+                if (response == 0) {
+                    alert('Ups! Coś poszło nie tak. Skontaktuj się z administratorem!');
+                } else {
+                    alert('Oddział został zablokowany!');
+                    location.reload();
+                }
             }
         });
     }
@@ -81,8 +85,12 @@ $('.unblock').on('click', function() {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                alert('Oddział został odblokowany!');
-                location.reload();
+                if (response == 0) {
+                    alert('Ups! Coś poszło nie tak. Skontaktuj się z administratorem!');
+                } else {
+                    alert('Oddział został odblokowany!');
+                    location.reload();
+                }
             }
         });
     }

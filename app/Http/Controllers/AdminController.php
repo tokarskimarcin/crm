@@ -127,8 +127,13 @@ class AdminController extends Controller
     public function lockerPost(Request $request) {
         if($request->ajax()) {
             $department_info_id = Department_info::find($request->department_info_id);
-            $department_info_id->blocked = $request->type;
-            $department_info_id->save();
+            if ($department_info_id == null) {
+                return 0;
+            } else {
+                $department_info_id->blocked = $request->type;
+                $department_info_id->save();
+                return 1;
+            }
         }
     }
 
