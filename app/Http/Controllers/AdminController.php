@@ -11,10 +11,12 @@ use App\PrivilageRelation;
 use App\UserTypes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\ActivityRecorder;
 use Illuminate\Support\Facades\Redirect;
 use Session;
 use App\User;
+use App\Notifications;
 
 class AdminController extends Controller
 {
@@ -337,6 +339,36 @@ class AdminController extends Controller
 
         Session::flash('message_ok', "Link został dodany!");
         return Redirect::back();
+    }
+
+    public function myNotifications() {
+        // $notifications = Notifications::where('user_id', '=', Auth::user()->id)->get();
+
+        $notifications = DB::table('notifications')
+            ->select(DB::raw('
+                notifications.*,
+                users.first_name as first_name,
+                users.last_name as last_name
+            '))
+            ->leftJoin('users', 'users.id', '=', 'notifications.displayed_by')
+            ->where('user_id', '=', Auth::user()->id)
+            ->get();
+
+        return view('admin.myNotifications')
+            ->with('notifications', $notifications);
+    }
+
+    public function judgeNotificationGet($id){
+        $notification = Notifications::find($id);
+
+        if($notification == null || $notification->user_id != Auth::user()->id) {
+            return view('errors.404');
+        }
+        return view('admin.judgeNotification');
+    }
+
+    public function judgeNotificationPost(Request $request){
+        return 1;
     }
 
 }

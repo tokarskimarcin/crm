@@ -44,6 +44,9 @@
 {{-- End of includes --}}
 
 <script>
+    $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip();
+    });
 
     $('#blok').on('click', () => {
         window.location.replace("{{URL::to('/dkjVerification/')}}");

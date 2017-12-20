@@ -28,6 +28,13 @@ class NotificationController extends Controller
     public function addNotificationPost(Request $request) {
         $notification = new Notifications();
 
+        $departmentCheck = Department_info::find($request->department_info_id);
+        $notificationCheck = NotificationTypes::find($request->notification_type_id);
+
+        if ($departmentCheck == null || $notificationCheck == null) {
+            return view('errors.404');
+        }
+
         $notification->user_id = Auth::user()->id;
         $notification->title = $request->title;
         $notification->content = $request->content;
