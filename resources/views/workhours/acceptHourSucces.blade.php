@@ -190,7 +190,7 @@
                 "columnDefs": [ {
                     "targets": -1,
                     "data": "id",
-                    "defaultContent": "<button class='button-save'>Zapisz</button>"
+                    "defaultContent": "<button class='button-save btn btn-default'>Zapisz</button>"
                 },{
                     "targets": -3,
                     "data": "id",

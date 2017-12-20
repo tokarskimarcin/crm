@@ -205,8 +205,13 @@ class ScheduleController extends Controller
             }
         }
         $query->select(DB::raw($sql))
-            ->where('week_num',$number_week)
-            ->where('year',$request->session()->get('year'));
+->join('users','users.id','schedule.id_user')
+->where('week_num',$number_week)
+->where('year',$request->session()->get('year'))
+->where('users.department_info_id',Auth::user()->department_info_id);
+        // $query->select(DB::raw($sql))
+        //     ->where('week_num',$number_week)
+        //     ->where('year',$request->session()->get('year'));
         return $query->get();
     }
 

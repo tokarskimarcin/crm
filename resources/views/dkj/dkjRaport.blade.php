@@ -192,7 +192,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">Dodaj Godzin pracownika</h4>
+                            <h4 class="modal-title">Dodaj raport odsłuchanej rozmowy</h4>
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
@@ -200,7 +200,7 @@
                                 <div id="employee_list">
                                     <select class="form-control showhidetext" name="users_select" id="users_select" style="border-radius: 0px;">
                                         @foreach($users as $user)
-                                            <option value={{$user->id}}>{{$user->first_name.' '.$user->last_name}}</option>
+                                            <option value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
                                         @endforeach;
                                     </select>
                                 </div>
@@ -209,13 +209,22 @@
                                 <label for="">Telefon:</label>
                                 <input type="text" class="form-control" placeholder="Telefon" name="phone" id="phone" value="">
                             </div>
+                            <div class="alert alert-danger" style="display: none" id="alert_phone">
+                                Podaj prawidłowy numer telefonu!
+                            </div>
                             <div class="form-group">
                                 <label for="">Kampania:</label>
                                 <input type="text" class="form-control" placeholder="Kampania" name="campaign" id="campaign"  value="">
                             </div>
+                            <div class="alert alert-danger" style="display: none" id="alert_campaign">
+                                Podaj nazwę kampanii!
+                            </div>
                             <div class="form-group">
                                 <label for="">Komentarz:</label>
                                 <input type="text" class="form-control" placeholder="Komentarz" name="comment" id="comment"  value="">
+                            </div>
+                            <div class="alert alert-danger" style="display: none" id="alert_comment">
+                                Podaj komentarz!
                             </div>
                             <div class="form-group">
                                 <label for="">Janek:</label>
@@ -282,19 +291,27 @@
             var select_department_id_info = $("#select_department_id_info").val();
             var check = 1;
 
+
+            if(phone == '' || isNaN(phone)) {
+                $('#alert_phone').fadeIn(1000);
+                check = 0;
+            } else {
+                $('#alert_phone').fadeOut(1000);
+            }
+            if(campaign == '') {
+                $('#alert_campaign').fadeIn(1000);
+                check = 0;
+            } else {
+                $('#alert_campaign').fadeOut(1000);
+            }
             if (comment == '' && dkj_status == 1) {
-                alert('Podaj komentarz!');
+                $('#alert_comment').fadeIn(1000);
+                check = 0;
+            } else {
+                $('#alert_comment').fadeOut(1000);
+            }
+            if (check == 0) {
                 return false;
-            }
-            if(phone == '')
-            {
-                alert('Podaj telefon');
-                check = 0;
-            }
-            else if(campaign == '')
-            {
-                alert('Podaj nazwę kampanii');
-                check = 0;
             }
             if(check == 1) {
                 $("#save_dkj").attr('disabled', true);

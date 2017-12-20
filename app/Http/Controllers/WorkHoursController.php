@@ -57,7 +57,18 @@ class WorkHoursController extends Controller
         $day_number = date('N', strtotime(date('Y-m-d')))-1; // numer dnia tygodnia 0-poniedzialek
         $shedule = Schedule::where('week_num',$date)
             ->where('year',date('Y'))
-            ->where($dayOfWeekArray[$day_number].'_start','!=',null)->get();
+            ->where($dayOfWeekArray[$day_number].'_start','!=',null)
+            ->get();
+        // $shedule = DB::table('schedule')
+        //     ->select(DB::raw('
+        //         schedule.*
+        //     '))
+        //     ->join('users', 'users.id', '=', 'schedule.id_user')
+        //     ->where('year',date('Y'))
+        //     ->where($dayOfWeekArray[$day_number].'_start','!=',null)
+        //     ->where('week_num',$date)
+        //     ->where('users.department_info_id', '=', Auth::user()->department_info_id)
+        //     ->get();
 
         return view('workhours.usersLive')
             ->with('shedule',$shedule)
@@ -160,6 +171,10 @@ class WorkHoursController extends Controller
             $type_edit = $request->type_edit;
             $succes = $request->succes;
             $id_manager = Auth::id();
+            $checkWorkHours = Work_Hour::find($id);
+            if ($checkWorkHours == null) {
+                die;
+            }
             if($type_edit == 0)
             {
                 $work_data = Work_Hour::where('id',$id)->select('register_start'
@@ -328,12 +343,16 @@ class WorkHoursController extends Controller
             $accept_stop = $request->accept_stop;
             $succes = $request->success;
             $id_manager = Auth::id();
-                Work_Hour::where('id', $id)
-                    ->update(['id_manager' => $id_manager,
-                        'success' => $succes,
-                        'accept_start' => $accept_start,
-                        'accept_stop' => $accept_stop,
-                        'status' => 5]);
+            $checkWorkHour = Work_Hour::find($id);
+            if ($checkWorkHour == null) {
+                die;
+            }
+            Work_Hour::where('id', $id)
+                ->update(['id_manager' => $id_manager,
+                    'success' => $succes,
+                    'accept_start' => $accept_start,
+                    'accept_stop' => $accept_stop,
+                    'status' => 5]);
             $data = [
                 'Edycja godzin pracy, wpis id godzin pracy:' => $id,
                 'accept_start' => $request->accept_start,

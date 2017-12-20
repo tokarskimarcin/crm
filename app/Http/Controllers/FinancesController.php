@@ -122,6 +122,11 @@ class FinancesController extends Controller
     }
 
     public function createPenaltyBonusPOST(Request $request) {
+        $checkUser = User::find($request->user_id);
+        if($checkUser == null){
+            return view('errors.404');
+        }
+
         $object = new PenaltyBonus();
         $object->id_user = $request->user_id;
         $object->type = $request->type_penalty;
@@ -224,12 +229,15 @@ class FinancesController extends Controller
         if($request->ajax())
         {
             $object = PenaltyBonus::find($request->id);
+            if ($object == null) {
+                return 0;
+            }
             $object->type = $request->type;
             $object->amount = $request->amount;
             $object->comment = $request->comment;
             $object->id_manager_edit = Auth::user()->id;
             $object->save();
-            return 0;
+            return 1;
         }
     }
 

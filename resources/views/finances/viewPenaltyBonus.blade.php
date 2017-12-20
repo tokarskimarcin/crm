@@ -362,7 +362,12 @@ $("#addpbsubmit").click(function () {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
-                    location.reload();
+                    if (response == 0) {
+                        alert('Ups, coś poszło nie tak. Skontaktuj się z administratorem!');
+                    } else {
+                        location.reload();
+                    }
+
                 }
             });
         }
