@@ -1,6 +1,5 @@
 @if($user->equipments->count() > 0)
 
-
     <div class=" col-md-10 col-lg-10 ">
           <table class="table table-user-information">
               <tbody>
@@ -49,9 +48,7 @@
           </table>
     </div>
 @else
-
     <div class="alert alert-info">Ten użytkownik nie posiada jeszcze własnego sprzętu!</div>
-
 @endif
 
 <div id="myModal" class="modal fade" role="dialog">

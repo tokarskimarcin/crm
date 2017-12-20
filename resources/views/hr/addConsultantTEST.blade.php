@@ -283,55 +283,7 @@
                             </div>
                         </form>
                         <div class=" col-md-10 col-lg-10 ">
-    		                  <table class="table table-user-information">
-    		                    <tbody>
-    		                    <b style="font-size: 20px; font-family: sans-serif;">Kary i Premie</b>
-                              @if(($user->penalty_bonuses->where('status', '!=', 0)->count()) > 0)
-          		                      <tr>
-          		                        <td><b>Data</b></td>
-          		                        <td><b>Kara/Premia</b></td>
-          		                        <td><b>Dodał</b></td>
-          		                        <td><b>Powód</b></td>
-          		                        <td></td>
-          		                      </tr>
-
-                              @else
-                                  <div class="alert alert-info">Ten użytkownik nie ma jeszcze kar/premii!</div>
-                              @endif
-                              @foreach($user->penalty_bonuses->where('status', '!=', 0) as $penalty)
-                                  <tr name={{$penalty->id}}>
-        		                        <td nowrap="nowrap">{{$penalty->event_date}}</td>
-                                    @if($penalty->type == 2)
-                                        <td nowrap="nowrap"><span style="background-color: #70ff5c; padding: 4px 10px;border-radius: 5px;border:1px solid #33ff36; color:#4b5c44;">Premia: {{$penalty->amount}} zł</span></td>
-                                    @else
-                                        <td nowrap="nowrap"><span style="background-color: #ff7b7b; padding: 4px 10px;border-radius: 5px;border:1px solid #ff6a6a; color:#7f2222;">Kara: {{$penalty->amount}} zł</span></td>
-                                    @endif
-        		                        <td nowrap="nowrap"><span style="background-color: #d9edf7; padding: 4px 10px;border-radius: 5px;border:1px solid #bce8f1; color:#31708f;">{{$penalty->manager->first_name . ' ' . $penalty->manager->last_name}}</span></td>
-        		                        <td>{{$penalty->comment}}</td>
-                                    <td><button class="btn btn-danger btn-sm action delete" id="{{$penalty->id}}">Usuń</button></td>
-        		                      </tr>
-                              @endforeach
-                              @if (Session::has('message'))
-                                 <div class="alert alert-success">{{ Session::get('message') }}</div>
-                              @endif
-
-    							            <tr>
-                                  <form method="POST" action="{{URL::to('/view_penalty_bonus_edit/')}}" id="pb">
-                                      <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                      <input type="hidden" name="user_id" value="{{$user->id}}">
-          		                        <td colspan="2"><select class="form-control" name="penalty_type">
-          		                        	<option>Wybierz</option>
-          		                        	<option value="1">Kara</option>
-          		                        	<option value="2">Premia</option>
-          		                        </select></td>
-          		                        <td><input type="number" placeholder="0" name="cost" class="form-control"></td>
-          		                        <td colspan="2"><input type="text" placeholder="Powód" name="reason" class="form-control"></td>
-          		                        <td><input value="Dodaj" type="submit" id="addpbsubmit" class="btn btn-info"></td>
-                                  </form>
-    		                      </tr>
-
-    		                    </tbody>
-    		                  </table>
+    		                  @include('hr.userPenaltyBonus')
                           @include('hr.userEquipment')
     		                </div>
 
@@ -416,7 +368,11 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
-                    alert("Pomyślnie usunięto karę/premię!");
+                  if (response == 1) {
+                      alert("Pomyślnie usunięto karę/premię!");
+                  } else {
+                      alert('Ups! Coś poszło nie tak. Skontaktuj się z administratorem!');
+                  }
                 }
             });
             $('tr[name=' + this.id + ']').fadeOut(0);
@@ -440,21 +396,35 @@
         }
 
         if (penalty_type == "Wybierz") {
-            alert("Wybierz rodzaj kary/nagrody!");
+            $('#alert_select').slideDown(1000);
             validation = false;
             return false;
+        } else {
+            $('#alert_select').slideUp(1000);
         }
 
         if (cost == '') {
-            alert("Podaj kwotę!");
+            $('#alert_value').slideDown(1000);
             validation = false;
             return false;
+        } else {
+            $('#alert_value').slideUp(1000);
+        }
+
+        if (cost <= 0) {
+            $('#alert_value_plus').slideDown(1000);
+            validation = false;
+            return false;
+        } else {
+            $('#alert_value_plus').slideUp(1000);
         }
 
         if (reason == '') {
-            alert("Podaj powód!");
+            $('#alert_reason').slideDown(1000);
             validation = false;
             return false;
+        } else {
+            $('#alert_select').slideUp(1000);
         }
 
     });
@@ -463,8 +433,6 @@
     $('#myModal').on('hidden.bs.modal', function () {
         $("#modal_content").empty();
     });
-
-
 
     $(".equipment_data").on('click', function(){
         var id = this.id;
@@ -491,15 +459,16 @@
             equipment_type_id = $("<tr><td><b>" + "Rodzaj sprzętu" + "</b></td><td>" + equipment_type_id + "</td></tr>");
         }
 
-        if(laptop_processor != '') {
+        if(laptop_processor != '' || !isNaN(laptop_processor)) {
             laptop_processor = $("<tr><td><b>" + "Rodzaj procesora" + "</b></td><td>" + laptop_processor + "</td></tr>");
         }
 
-        if(laptop_ram != '') {
+        if(laptop_ram != '' || !isNaN(laptop_ram)) {
+
             laptop_ram = $("<tr><td><b>" + "Pamięć RAM" + "</b></td><td>" + laptop_ram + "</td></tr>");
         }
 
-        if(laptop_hard_drive != '') {
+        if(laptop_hard_drive != '' || !isNaN(laptop_hard_drive)) {
             laptop_hard_drive = $("<tr><td><b>" + "Dysk twardy" + "</b></td><td>" + laptop_hard_drive + "</td></tr>");
         }
 
@@ -538,15 +507,15 @@
             sim_net = $("<tr><td><b>" + "Numer NET" + "</b></td><td>" + sim_net + "</td></tr>");
         }
 
-        if(model != '') {
+        if(model != '' || !isNaN(model)) {
             model = $("<tr><td><b>" + "Model" + "</b></td><td>" + model + "</td></tr>");
         }
 
-        if(serial_code != '') {
+        if(serial_code != '' || !isNaN(serial_code)) {
             serial_code = $("<tr><td><b>" + "Numer seryjny" + "</b></td><td>" + serial_code + "</td></tr>");
         }
 
-        if(description != '') {
+        if(description != '' || !isNaN(description)) {
             description = $("<tr><td><b>" + "Opis" + "</b></td><td>" + description + "</td></tr>");
         }
 

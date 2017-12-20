@@ -112,6 +112,7 @@ class EquipmentsController extends Controller
         } else {
               $equipment->id_user = $request->user_id;
               $equipment->status = 1;
+              $equipment->to_user = date('Y-m-d H:i:s');
         }
         $equipment->department_info_id = $request->department_info_id;
         $equipment->created_at = date("Y-m-d H:i:s");

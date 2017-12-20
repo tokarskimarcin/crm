@@ -144,6 +144,10 @@ class UsersController extends Controller
         $agencies = Agencies::all();
         $user = User::find($id);
 
+        if ($user == null || ($user->user_type_id != 1 && $user->user_type_id != 2)) {
+            return view('errors.404');
+        }
+
         if ($user->department_info_id != Auth::user()->department_info_id) {
             return view('404');
         }
@@ -157,13 +161,15 @@ class UsersController extends Controller
     public function edit_cadreGet($id) {
         $user = User::find($id);
 
+        if ($user == null || $user->user_type_id == 1 || $user->user_type_id == 2) {
+            return view('errors.404');
+        }
+
         if ($user->status_work != 1) {
             return view('404');
         }
         $agencies = Agencies::all();
-
         $month = date('m');
-
         $months_names = ['Styczeń', 'Luty', 'Marzec', 'Kwiecien', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Padziernik', 'Listopad', 'Grudzień'];
 
         function month_reverse($mnt) {
@@ -189,6 +195,10 @@ class UsersController extends Controller
         $manager_id = Auth::user()->id;
 
         $user = User::find($id);
+
+        if ($user == null) {
+            return view('errors.404');
+        }
 
         $user->username = $request->username;
         $user->email_off = $request->username;

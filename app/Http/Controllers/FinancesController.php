@@ -79,20 +79,16 @@ class FinancesController extends Controller
                 ->with('janky_system',$janky_system)
                 ->with('agencies',$agencies);
         }
-
-
-    }
-
-    public function viewPenaltyBonusGetEdit($id) {
-      $user = User::find($id);
-      $agencies = Agencies::all();
-      return view('hr.addConsultantTEST')
-          ->with('user', $user)
-          ->with('agencies', $agencies);
     }
 
     public function viewPenaltyBonusPostEdit(Request $request) {
         $id_manager = Auth::user()->id;
+
+        $user = User::find($request->user_id);
+
+        if ($user == null || ($request->penalty_type != 1 && $request->penalty_type != 2)) {
+            return view('errors.404');
+        }
 
         $object = new PenaltyBonus();
         $object->id_user = $request->user_id;
@@ -287,21 +283,24 @@ class FinancesController extends Controller
         if($request->ajax())
         {
             $object = PenaltyBonus::find($request->id);
-            $object->id_manager_edit = Auth::user()->id;
-            $object->status = 0;
-            $object->updated_at = date('Y-m-d H:i:s');
-            $object->save();
 
-            $data = [
-                'Usunięcie kary/premii' => '',
-                'data' => date('Y-m-d H:i:s'),
-                'Id kary/premii' => $object->id,
-            ];
-            new ActivityRecorder(2, $data);
+            if ($object != null) {
+                $object->id_manager_edit = Auth::user()->id;
+                $object->status = 0;
+                $object->updated_at = date('Y-m-d H:i:s');
+                $object->save();
 
+                $data = [
+                    'Usunięcie kary/premii' => '',
+                    'data' => date('Y-m-d H:i:s'),
+                    'Id kary/premii' => $object->id,
+                ];
+                new ActivityRecorder(2, $data);
+                return 1;
+            } else {
+                return 0;
+            }
         }
-
-
     }
 
 }
