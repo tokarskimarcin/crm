@@ -13,7 +13,8 @@
     @else
         <div class="alert alert-info">Ten użytkownik nie ma jeszcze kar/premii!</div>
     @endif
-    @foreach($user->penalty_bonuses->where('status', '!=', 0) as $penalty)
+    @php($limit_event_date = date("Y-m", strtotime("-2 months")))
+    @foreach($user->penalty_bonuses->where('status', '!=', 0)->where('event_date', '>=', $limit_event_date.'-01') as $penalty)
         <tr name={{$penalty->id}}>
           <td nowrap="nowrap">{{$penalty->event_date}}</td>
           @if($penalty->type == 2)
@@ -21,6 +22,10 @@
           @else
               <td nowrap="nowrap"><span style="background-color: #ff7b7b; padding: 4px 10px;border-radius: 5px;border:1px solid #ff6a6a; color:#7f2222;">Kara: {{$penalty->amount}} zł</span></td>
           @endif
+            @if($penalty->manager == null)
+                {
+                    {{dd($penalty->manager)}};
+            }@endif;
           <td nowrap="nowrap"><span style="background-color: #d9edf7; padding: 4px 10px;border-radius: 5px;border:1px solid #bce8f1; color:#31708f;">{{$penalty->manager->first_name . ' ' . $penalty->manager->last_name}}</span></td>
           <td>{{$penalty->comment}}</td>
           <td><button class="btn btn-danger btn-sm action delete" id="{{$penalty->id}}">Usuń</button></td>
