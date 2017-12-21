@@ -208,6 +208,11 @@ class NotificationController extends Controller
     }
 
     public function judgeNotificationPost(Request $request){
+        $checkNotification = JudgeResult::where('notification_id', $request->notification_id)->count();
+        if ($checkNotification > 0) {
+            return view('errors.404');
+        }
+
         $result = new JudgeResult();
 
         $notification = Notifications::find($request->notification_id);

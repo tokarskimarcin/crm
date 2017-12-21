@@ -129,12 +129,13 @@
     <div class="form-group">
         <h4>Oceń jakość wykonania zgłoszenia:</h4></br>
         <div data-toggle="buttons">
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q2" value="1">1</label>
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q2" value="2">2</label>
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q2" value="3">3</label>
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q2" value="4">4</label>
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q2" value="5">5</label>
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q2" value="6">6</label>
+            <label class="btn btn-default btn-circle btn-lg q2"><input type="radio" name="q2" value="1">1</label>
+            <label class="btn btn-default btn-circle btn-lg q2"><input type="radio" name="q2" value="2">2</label>
+            <label class="btn btn-default btn-circle btn-lg q2"><input type="radio" name="q2" value="3">3</label>
+            <label class="btn btn-default btn-circle btn-lg q2"><input type="radio" name="q2" value="4">4</label>
+            <label class="btn btn-default btn-circle btn-lg q2"><input type="radio" name="q2" value="5">5</label>
+            <label class="btn btn-default btn-circle btn-lg q2"><input type="radio" name="q2" value="6">6</label>
+            <label style="margin-left: 50px; font-size: 20px" id="q2_span">0/6</label>
         </div>
     </div>
     <div class="alert alert-danger" style="display: none" id="alert_quality">
@@ -143,12 +144,13 @@
     <div class="form-group">
         <h4>Oceń kontakt serwisantem:</h4></br>
         <div data-toggle="buttons">
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q3" value="1">1</label>
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q3" value="2">2</label>
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q3" value="3">3</label>
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q3" value="4">4</label>
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q3" value="5">5</label>
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q3" value="6">6</label>
+            <label class="btn btn-default btn-circle btn-lg q3"><input type="radio" name="q3" value="1">1</label>
+            <label class="btn btn-default btn-circle btn-lg q3"><input type="radio" name="q3" value="2">2</label>
+            <label class="btn btn-default btn-circle btn-lg q3"><input type="radio" name="q3" value="3">3</label>
+            <label class="btn btn-default btn-circle btn-lg q3"><input type="radio" name="q3" value="4">4</label>
+            <label class="btn btn-default btn-circle btn-lg q3"><input type="radio" name="q3" value="5">5</label>
+            <label class="btn btn-default btn-circle btn-lg q3"><input type="radio" name="q3" value="6">6</label>
+            <label style="margin-left: 50px; font-size: 20px" id="q3_span">0/6</label>
         </div>
     </div>
     <div class="alert alert-danger" style="display: none" id="alert_contact">
@@ -157,12 +159,13 @@
     <div class="form-group">
         <h4>Oceń czas wykonywania zgłoszenia:</h4></br>
         <div data-toggle="buttons">
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q4" value="1">1</label>
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q4" value="2">2</label>
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q4" value="3">3</label>
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q4" value="4">4</label>
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q4" value="5">5</label>
-            <label class="btn btn-default btn-circle btn-lg"><input type="radio" name="q4" value="6">6</label>
+            <label class="btn btn-default btn-circle btn-lg q4"><input type="radio" name="q4" value="1">1</label>
+            <label class="btn btn-default btn-circle btn-lg q4"><input type="radio" name="q4" value="2">2</label>
+            <label class="btn btn-default btn-circle btn-lg q4"><input type="radio" name="q4" value="3">3</label>
+            <label class="btn btn-default btn-circle btn-lg q4"><input type="radio" name="q4" value="4">4</label>
+            <label class="btn btn-default btn-circle btn-lg q4"><input type="radio" name="q4" value="5">5</label>
+            <label class="btn btn-default btn-circle btn-lg q4"><input type="radio" name="q4" value="6">6</label>
+            <label style="margin-left: 50px; font-size: 20px" id="q4_span">0/6</label>
         </div>
     </div>
     <div class="alert alert-danger" style="display: none" id="alert_time">
@@ -175,6 +178,9 @@
             <label id="q5_no" class="btn btn-danger btn-circle btn-lg"><input type="radio" name="q5" value="2"><i class="glyphicon glyphicon-remove"></i></label>
             <span class="selected-span" id="q5_span"></span>
         </div>
+    </div>
+    <div class="form-group">
+        <h3>Średnia opinia:</3> <span id="total_span" class="selected-span">0</span>
     </div>
     <div class="alert alert-danger" style="display: none" id="alert_after">
         Zaznacz odpowiednią wartość!
@@ -253,6 +259,39 @@ $('#send_opinion').on('click', function() {
 
     return validation;
 
+});
+
+let qualityValueCount = 0;
+let contactValueCount = 0;
+let timeValueCount = 0;
+let totalCount = 0;
+function countTotal() {
+    totalCount = (parseInt(qualityValueCount) + parseInt(contactValueCount) + parseInt(timeValueCount)) / 3;
+    $('#total_span').text(parseFloat(totalCount).toFixed(2));
+}
+
+$('.q2').click(function(){
+    $(this).find('input[type=radio]').each(function(){
+        qualityValueCount = $(this).val();
+        $('#q2_span').text(qualityValueCount + "/6");
+        countTotal();
+    });
+});
+
+$('.q3').click(function(){
+    $(this).find('input[type=radio]').each(function(){
+        contactValueCount = $(this).val();
+        $('#q3_span').text(contactValueCount + "/6");
+        countTotal();
+    });
+});
+
+$('.q4').click(function(){
+    $(this).find('input[type=radio]').each(function(){
+        timeValueCount = $(this).val();
+        $('#q4_span').text(timeValueCount + "/6");
+        countTotal();
+    });
 });
 
 </script>
