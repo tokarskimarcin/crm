@@ -13,6 +13,7 @@ use App\CommentsNotifications;
 use App\User;
 use Illuminate\Support\Facades\DB;
 use App\ActivityRecorder;
+use App\JudgeResult;
 
 class NotificationController extends Controller
 {
@@ -181,6 +182,54 @@ class NotificationController extends Controller
 
             return $data;
         }
+    }
+    public function myNotifications() {
+
+        return view('admin.myNotifications');
+    }
+
+    public function judgeNotificationGet($id){
+        $notification = Notifications::find($id);
+
+        if($notification == null || $notification->user_id != Auth::user()->id) {
+            return view('errors.404');
+        }
+
+        $judgeResult = JudgeResult::where('notification_id', $id)->get();
+
+        if ($judgeResult == null || $judgeResult->count() == 0) {
+            return view('admin.judgeNotification')
+                ->with('notification', $notification);
+        } else {
+            return view('admin.judgeNotification')
+                ->with('judgeResult', $judgeResult)
+                ->with('notification', $notification);
+        }
+    }
+
+    public function judgeNotificationPost(Request $request){
+        $result = new JudgeResult();
+
+        $notification = Notifications::find($request->notification_id);
+
+        if ($notification == null || $notification->user_id != Auth::user()->id) {
+            return view('errors.404');
+        }
+
+        $result->user_id = Auth::user()->id;
+        $result->it_id = $notification->displayed_by;
+        $result->notification_id = $notification->id;
+        $result->repaired = $request->q1;
+        $result->judge_quality = $request->q2;
+        $result->judge_contact = $request->q3;
+        $result->judge_time = $request->q4;
+        $result->response_after = $request->q5;
+        $result->comment = $request->judge_comment;
+        $result->judge_sum = round(($request->q2 + $request->q3 + $request->q4) / 3);
+        $result->save();
+
+        return view('admin.myNotifications')
+            ->with('message_ok', 'Twoja opinia została przesłana!');
     }
 
     public function datatableMyNotifications(Request $request) {

@@ -40,6 +40,7 @@ Route::POST('/datatableShowDkjVerification','DkjController@datatableShowDkjVerif
 Route::POST('/datatableDkjShowEmployee','DkjController@datatableDkjShowEmployee')->name('api.datatableDkjShowEmployee');
 
 Route::POST('/datatableCadreHR','UsersController@datatableCadreHR')->name('api.datatableCadreHR');
+Route::POST('/datatableMyNotifications','NotificationController@datatableMyNotifications')->name('api.datatableMyNotifications');
 
 /* Equipment start */
 Route::POST('/datatableShowLaptop','EquipmentsController@datatableShowLaptop')->name('api.datatableShowLaptop');
@@ -127,9 +128,9 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
     Route::Post('/set_multiple_department','AdminController@multipleDepartmentPost');
     Route::get('/create_link','AdminController@createLinkGet');
     Route::Post('/create_link','AdminController@createLinkPost');
-    Route::get('/my_notifications','AdminController@myNotifications');
-    Route::get('/judge_notification/{id}','AdminController@judgeNotificationGet');
-    Route::Post('/judge_notification','AdminController@judgeNotificationPost');
+    Route::get('/my_notifications','NotificationController@myNotifications');
+    Route::get('/judge_notification/{id}','NotificationController@judgeNotificationGet');
+    Route::Post('/judge_notification','NotificationController@judgeNotificationPost');
     // Admin_Panel --Stop--
 
     // Password change --START--

@@ -9,6 +9,12 @@
     </div>
 </div>
 
+@if(isset($message_ok))
+    <div class="alert alert-success">
+        {{$message_ok}}
+    </div>
+@endif
+
     <div class="table-responsive">
         <table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
             <thead>
