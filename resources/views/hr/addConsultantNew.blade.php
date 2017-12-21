@@ -217,7 +217,7 @@
                     </div>
                 </div>
                 <div class="col-md-12">
-                    <input type="submit" value="Zapisz zmiany" class="btn btn-success" id="add_consultant"/>
+                    <input type="submit" value="Dodaj pracownika" class="btn btn-success" id="add_consultant"/>
                 </div>
             </form>
             </div>

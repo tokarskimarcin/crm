@@ -46,15 +46,15 @@
                                                         <option value="-1">Wybierz</option>
                                                         @foreach ($users as $user)
                                                             @if($response_userid == $user->id)
-                                                                <option  selected value={{$user->id}} >{{ $user->first_name. ' '.$user->last_name}}</option>
+                                                                <option  selected value={{$user->id}} >{{ $user->last_name. ' '.$user->first_name}}</option>
                                                             @else
-                                                                <option value={{$user->id}}>{{ $user->first_name. ' '.$user->last_name}}</option>
+                                                                <option value={{$user->id}}>{{ $user->last_name. ' '.$user->first_name}}</option>
                                                             @endif
                                                          @endforeach
                                                     @else
                                                     <option selected value="-1">Wybierz</option>
                                                         @foreach ($users as $user)
-                                                            <option value={{$user->id}}>{{ $user->first_name. ' '.$user->last_name}}</option>
+                                                            <option value={{$user->id}}>{{ $user->last_name. ' '.$user->first_name}}</option>
                                                         @endforeach
                                                     @endif
                                                 </select>

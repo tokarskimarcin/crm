@@ -182,4 +182,18 @@ class NotificationController extends Controller
             return $data;
         }
     }
+
+    public function datatableMyNotifications(Request $request) {
+        $data = DB::table('notifications')
+            ->select(DB::raw('
+                notifications.*,
+                users.first_name as first_name,
+                users.last_name as last_name
+            '))
+            ->leftJoin('users', 'users.id', '=', 'notifications.displayed_by')
+            ->where('user_id', '=', Auth::user()->id)
+            ->get();
+
+        return datatables($data)->make(true);
+    }
 }

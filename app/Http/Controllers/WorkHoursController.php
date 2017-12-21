@@ -304,6 +304,9 @@ class WorkHoursController extends Controller
         $users = User::where('status_work',1)->wherein('user_type_id',[1,2])
             ->where('department_info_id',$department_id)->orderBy('last_name')->get();
         $user = User::find($userid);
+        if ($user == null) {
+            return view('errors.404');
+        }
 
         $add_hour_success = false;
         if ($request->session()->has('add_hour_success')) {

@@ -9,47 +9,69 @@
     </div>
 </div>
 
-
     <div class="table-responsive">
-        <table class="table table-bordered">
+        <table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
             <thead>
                 <tr>
                     <th style="width: 10%">Data:</th>
                     <th style="width: 40%">Tytuł:</th>
-                    <th style="width: 30%">Zgłoszenie przyjęte przez:</th>
+                    <th style="width: 30%">Stan realizacji</th>
                     <th style="width: 10%">Szczegóły</th>
                     <th style="width: 10%">Oceń</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($notifications as $notification)
-                    <tr>
-                        <td>{{$notification->created_at}}</td>
-                        <td>{{$notification->title}}</td>
-                        @if($notification->displayed_by != null)
-                            <td>{{$notification->first_name . ' ' . $notification->last_name}}</td>
-                        @else
-                            <td>Oczekiwanie na przyjęcie zgłoszenia</td>
-                        @endif
-                        <td><a class="btn btn-default" href="{{URL::to('/show_notification/')}}/{{$notification->id}}">Szczegóły</a></td>
-                        @if($notification->status == 3)
-                            <td><a class="btn btn-default" data-toggle="tooltip" title="Ocenić wykonanie możesz po zakończonej realizacji!" data-placement="left" disabled>Oceń</a></td>
-                        @else
-                            <td><a class="btn btn-default" href="{{URL::to('/judge_notification/')}}/{{$notification->id}}">Oceń</a></td>
-                        @endif
-                    </tr>
-                @endforeach
+
             </tbody>
         </table>
     </div>
 
-
-
 @endsection
 @section('script')
-
+<script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
 <script>
 
+table = $('#datatable').DataTable({
+    "autoWidth": false,
+    "processing": true,
+    "serverSide": true,
+    "drawCallback": function( settings ) {
+    },
+    "ajax": {
+        'url': "{{ route('api.datatableMyNotifications') }}",
+        'type': 'POST',
+        'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+    },
+    "language": {
+        "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+    },"columns":[
+        {"data": "created_at"},
+        {"data": "title"},
+        {"data": function (data, type, dataToSet) {
+            var status = data.status;
+            if (status == 1) {
+                return 'Zgłoszono';
+            } else if (status == 2) {
+                return 'Przyjęto do realizacji';
+            } else if (status == 3) {
+                return 'Zakończono';
+            }
+          }
+        },
+        {"data": function (data, type, dataToSet) {
+              return '<a class="btn btn-default" href="show_notification/'+data.id+'" >Szczegóły</a>';
+        },"orderable": false, "searchable": false },
+        {"data": function (data, type, dataToSet) {
+            var status = data.status;
+            if (status != 3) {
+                return '<a class="btn btn-default" href="#" data-toggle="tooltip" title="Ocenić wykonanie możesz po zakończonej realizacji!" data-placement="left" disabled>Oceń</a>';
+            } else {
+                return '<a class="btn btn-default" href="judge_notification/'+data.id+'" >Oceń</a>';
+            }
+
+        },"orderable": false, "searchable": false }
+        ]
+});
 
 </script>
 @endsection
