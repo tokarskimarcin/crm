@@ -183,8 +183,11 @@ class UsersController extends Controller
         $penalty_bonuses = DB::select("SELECT event_date,SUM(CASE WHEN `type` = 2 AND `status` = 1 THEN `amount` ELSE 0 END) as premia , SUM(CASE WHEN `type` = 1 AND `status` = 1 THEN `amount` ELSE 0 END) as kara FROM
          `penalty_bonus` WHERE `id_user` = " . $id . " group by MONTH(`event_date`) LIMIT 2");
 
+         $userTypes = UserTypes::all();
+
         return view('hr.addConsultantTEST')
             ->with('agencies', $agencies)
+            ->with('userTypes', $userTypes)
             ->with('user', $user)
             ->with('penalty_bonuses', $penalty_bonuses)
             ->with('month', $months)
@@ -195,8 +198,9 @@ class UsersController extends Controller
         $manager_id = Auth::user()->id;
 
         $user = User::find($id);
+        $check_user_type = UserTypes::find($request->user_type);
 
-        if ($user == null) {
+        if ($user == null || $check_user_type == null) {
             return view('errors.404');
         }
 
@@ -220,6 +224,7 @@ class UsersController extends Controller
         $user->additional_salary = $request->additional_salary;
         $user->status_work = $request->status_work;
         $user->dating_type = $request->dating_type;
+        $user->user_type_id = $request->user_type;
         if($request->status_work == 0) {
             $user->end_work = $request->stop_date;
         }

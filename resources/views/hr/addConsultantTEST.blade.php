@@ -1,54 +1,6 @@
 @extends('layouts.main')
 @section('content')
 
-
-    <style>
-        .edit{
-            background-color: #FFFFFF;
-            border:0;
-        }
-        .edit:hover{
-            color:#a7a7a7;
-        }
-        .edit:active{
-            border:0;
-        }
-        .edit-name{
-            display:none;
-        }
-        .edit-surname{
-            display:none;
-        }
-        .edit-doc{
-            display:none;
-        }
-        .edit-stu{
-            display:none;
-        }
-        .edit-statuswork{
-            display:none;
-        }
-        .edit-phonework{
-            display:none;
-        }
-        .edit-phonepriv{
-            display:none;
-        }
-        .edit-datework{
-            display:none;
-        }
-        .edit-money{
-            display:none;
-        }
-        .edit-addmoney{
-            display:none;
-        }
-        .td-class {
-            width: 170px;
-            height:52px;
-        }
-    </style>
-
     <!-- Main -->
     <div class="container">
         <div class="row">
@@ -65,10 +17,7 @@
                         <h3 class="panel-title">Profil Pracownika</h3>
                     </div>
 
-
-
                     <div class="panel-body">
-                        <!-- <div class="col-md-2 col-lg-2 " align="center"> <img alt="User Pic" src="http://saintgeorgelaw.com/wp-content/uploads/2015/01/male-formal-business-hi.png" class="img-circle img-responsive" style="border:2px solid #222;"> </div> -->
                         <form class="form-horizontal" method="post" action="{{URL::to('/edit_cadre/')}}/{{$user->id}}" id="edit_user"><!-- Formularz edycji kadry -->
                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
                             <div class="col-md-10">
@@ -215,6 +164,16 @@
                                                 <td class="td-class"><b>Dodatek slużbowy:</b></td>
                                                 <td>
                                                     <input type="number" class="form-control" placeholder="0" name="additional_salary" value="{{$user->additional_salary}}">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="td-class"><b>Uprawnienia:</b></td>
+                                                <td>
+                                                    <select class="form-control" style="font-size:18px;" name="user_type" >
+                                                        @foreach($userTypes as $user_type)
+                                                            <option value="{{$user_type->id}}" @if($user_type->id == $user->user_type_id) selected @endif>{{$user_type->name}}</option>
+                                                        @endforeach
+                                                    </select>
                                                 </td>
                                             </tr>
                                         @endif
