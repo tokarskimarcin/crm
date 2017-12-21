@@ -28,7 +28,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Oceń wykonanie zgłoszenia</h1>
+            <h1>Ocena wykonania zgłoszenia</h1>
         </div>
     </div>
 </div>
@@ -52,26 +52,62 @@
 @php($judgeResult = $judgeResult[0])
 
 <div class="row col-md-12">
-  <p>
-      <h4>Czy problem został naprawiony:
-          @if($judgeResult->repaired == 1)
-              TAK
-          @else
-              NIE
-          @endif
-      </h4>
-      <h4>Jakość wykonania zgłoszenia: {{$judgeResult->judge_quality}}</h4>
-      <h4>Kontakt z serwisantem: {{$judgeResult->judge_contact}}</h4>
-      <h4>Czas wykonywania zgłoszenia: {{$judgeResult->judge_time}}</h4>
-      <h4>Technik kontaktował się po zakończeniu zgłoszenia:
-          @if($judgeResult->repaired == 1)
-              TAK
-          @else
-              NIE
-          @endif
-      </h4>
-      <h4>Ogólna ocena: {{$judgeResult->judge_sum}}</h4>
-  </p>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+              <tr>
+                <td style="width: 50%"></td>
+                <td style="width: 50%"></td>
+              </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Serwisant:</td>
+                    <td>{{$judgeResult->user_it->first_name . ' ' . $judgeResult->user_it->last_name}}</td>
+                </tr>
+                <tr>
+                    <td>Czy problem został naprawiony:</td>
+                    <td>
+                        @if($judgeResult->repaired == 1)
+                            TAK
+                        @else
+                            NIE
+                        @endif
+                    </td>
+                </tr>
+                <tr>
+                    <td>Jakość wykonania zgłoszenia:</td>
+                    <td>{{$judgeResult->judge_quality}}/6</td>
+                </tr>
+                <tr>
+                    <td>Kontakt z serwisantem:</td>
+                    <td>{{$judgeResult->judge_contact}}/6</td>
+                </tr>
+                <tr>
+                    <td>Czas wykonywania zgłoszenia:</td>
+                    <td>{{$judgeResult->judge_time}}/6</td>
+                </tr>
+                <tr>
+                    <td>Technik kontaktował się po zakończeniu zgłoszenia:</td>
+                    <td>
+                        @if($judgeResult->repaired == 1)
+                            TAK
+                        @else
+                            NIE
+                        @endif
+                    </td>
+                </tr>
+                <tr>
+                    <td>Ogólna ocena:</td>
+                    <td>{{$judgeResult->judge_sum}}/6</td>
+                </tr>
+                <tr>
+                    <td>Komentarz:</td>
+                    <td>{{$judgeResult->comment}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 @else

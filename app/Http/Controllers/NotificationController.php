@@ -224,8 +224,8 @@ class NotificationController extends Controller
         $result->judge_contact = $request->q3;
         $result->judge_time = $request->q4;
         $result->response_after = $request->q5;
-        $result->comment = $request->judge_comment;
-        $result->judge_sum = round(($request->q2 + $request->q3 + $request->q4) / 3);
+        $result->comment = ($request->judge_comment != null) ? $request->judge_comment : "Brak komentarza";
+        $result->judge_sum = round(($request->q2 + $request->q3 + $request->q4) / 3, 2);
         $result->save();
 
         return view('admin.myNotifications')
