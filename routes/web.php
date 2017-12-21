@@ -128,9 +128,6 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
     Route::Post('/set_multiple_department','AdminController@multipleDepartmentPost');
     Route::get('/create_link','AdminController@createLinkGet');
     Route::Post('/create_link','AdminController@createLinkPost');
-    Route::get('/my_notifications','NotificationController@myNotifications');
-    Route::get('/judge_notification/{id}','NotificationController@judgeNotificationGet');
-    Route::Post('/judge_notification','NotificationController@judgeNotificationPost');
     // Admin_Panel --Stop--
 
     // Password change --START--
@@ -248,6 +245,12 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
 
     Route::get('/show_all_notifications', 'NotificationController@showAllNotificationsGet');
 
+    Route::get('/my_notifications','NotificationController@myNotifications');
+    
+    Route::get('/judge_notification/{id}','NotificationController@judgeNotificationGet');
+    Route::Post('/judge_notification','NotificationController@judgeNotificationPost');
+
+    Route::get('/it_cadre','NotificationController@ITCadreGet');
     //Notification STOP
 
 

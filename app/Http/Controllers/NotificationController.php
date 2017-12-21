@@ -191,7 +191,7 @@ class NotificationController extends Controller
     public function judgeNotificationGet($id){
         $notification = Notifications::find($id);
 
-        if($notification == null || $notification->user_id != Auth::user()->id) {
+        if($notification == null || $notification->user_id != Auth::user()->id || $notification->displayed_by == null) {
             return view('errors.404');
         }
 
@@ -214,10 +214,8 @@ class NotificationController extends Controller
         }
 
         $result = new JudgeResult();
-
         $notification = Notifications::find($request->notification_id);
-
-        if ($notification == null || $notification->user_id != Auth::user()->id) {
+        if ($notification == null || $notification->user_id != Auth::user()->id || $notification->displayed_by == null) {
             return view('errors.404');
         }
 
@@ -249,5 +247,29 @@ class NotificationController extends Controller
             ->get();
 
         return datatables($data)->make(true);
+    }
+
+    public function ITCadreGet() {
+      /*NIE TESTOWANE*/
+        $judge_result = DB::table('judge_results')
+            ->select(DB::raw('
+                first_name,
+                last_name,
+                count(*) as user_sum,
+                SUM(CASE WHEN repaired = 2 THEN 1 ELSE 0 END) as user_sum_repaired,
+                AVG(judge_quality) as user_quality,
+                AVG(judge_contact) as user_contact,
+                AVG(judge_time) as user_time,
+                AVG(judge_sum) as user_judge_sum,
+                SUM(CASE WHEN response_after = 1 THEN 0 ELSE 1 END) as response_after,
+                AVG(notifications.sec) as notifications_time_sum
+            '))
+            ->join('users', 'users.id', '=', 'judge_results.it_id')
+            ->join('notifications', 'notifications.id', '=', 'judge_results.notification_id')
+            ->groupBy('users.id')
+            ->get();
+
+        return view('notifications.itCadre')
+            ->with('judge_results', $judge_result);
     }
 }
