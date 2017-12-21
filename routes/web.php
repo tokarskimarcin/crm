@@ -39,6 +39,8 @@ Route::POST('/saveDkjVerification','DkjController@saveDkjVerification')->name('a
 Route::POST('/datatableShowDkjVerification','DkjController@datatableShowDkjVerification')->name('api.datatableShowDkjVerification');
 Route::POST('/datatableDkjShowEmployee','DkjController@datatableDkjShowEmployee')->name('api.datatableDkjShowEmployee');
 
+Route::POST('/datatableCadreHR','UsersController@datatableCadreHR')->name('api.datatableCadreHR');
+
 /* Equipment start */
 Route::POST('/datatableShowLaptop','EquipmentsController@datatableShowLaptop')->name('api.datatableShowLaptop');
 Route::POST('/datatableShowTablet','EquipmentsController@datatableShowTablet')->name('api.datatableShowTablet');
@@ -167,6 +169,8 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
     Route::get('/cadre_management','UsersController@cadre_managementGet');
     Route::get('/add_cadre','UsersController@add_cadreGet');
     Route::POST('/add_cadre','UsersController@add_userPOST');
+
+    Route::get('/cadre_hr', 'UsersController@cadreHRGet');
     // Users -- STOP--
 
 

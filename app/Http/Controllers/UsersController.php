@@ -311,4 +311,25 @@ class UsersController extends Controller
         }
     }
 
+    public function cadreHRGet() {
+        return view('hr.cadreHR');
+    }
+
+    public function datatableCadreHR(Request $request) {
+        //$data = User::where('user_type_id', '=', 3) //zmienic na 5 dla kadry
+        $data = DB::table('users')
+            ->select(DB::raw('
+                users.*,
+                departments.name as dep_name,
+                department_type.name as dep_name_type
+            '))
+            ->join('department_info', 'department_info.id', '=', 'users.department_info_id')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->where('users.user_type_id', '=', 3)
+            ->get();
+
+        return datatables($data)->make(true);
+    }
+
 }
