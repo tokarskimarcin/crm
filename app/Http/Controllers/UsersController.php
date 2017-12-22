@@ -161,9 +161,9 @@ class UsersController extends Controller
     public function edit_cadreGet($id) {
         $user = User::find($id);
 
-        if ($user == null || $user->user_type_id == 1 || $user->user_type_id == 2) {
-            return view('errors.404');
-        }
+        // if ($user == null || $user->user_type_id == 1 || $user->user_type_id == 2) {
+        //     return view('errors.404');
+        // }
         $agencies = Agencies::all();
         $month = date('m');
         $months_names = ['Styczeń', 'Luty', 'Marzec', 'Kwiecien', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Padziernik', 'Listopad', 'Grudzień'];
@@ -194,9 +194,9 @@ class UsersController extends Controller
         $manager_id = Auth::user()->id;
 
         $user = User::find($id);
-        $check_user_type = UserTypes::find($request->user_type);
+        // $check_user_type = UserTypes::find($request->user_type);
 
-        if ($user == null || $check_user_type == null) {
+        if ($user == null) {
             return view('errors.404');
         }
 
@@ -220,7 +220,9 @@ class UsersController extends Controller
         $user->additional_salary = $request->additional_salary;
         $user->status_work = $request->status_work;
         $user->dating_type = $request->dating_type;
-        $user->user_type_id = $request->user_type;
+        if ($request->user_type != null && $request->user_type != 0) {
+            $user->user_type_id = $request->user_type;
+        }
         if($request->status_work == 0) {
             $user->end_work = $request->stop_date;
         }
@@ -317,7 +319,6 @@ class UsersController extends Controller
     }
 
     public function datatableCadreHR(Request $request) {
-        //$data = User::where('user_type_id', '=', 3) //zmienic na 5 dla kadry
         $data = DB::table('users')
             ->select(DB::raw('
                 users.*,
@@ -327,7 +328,7 @@ class UsersController extends Controller
             ->join('department_info', 'department_info.id', '=', 'users.department_info_id')
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-            ->where('users.user_type_id', '=', 3)
+            ->where('users.user_type_id', '=', 5)
             ->get();
 
         return datatables($data)->make(true);

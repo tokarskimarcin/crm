@@ -157,7 +157,7 @@ Route::middleware(['check-permission','check-firewall'])->group(function () {
     Route::POST('/add_consultant','UsersController@add_userPOST');
 
     Route::get('/edit_consultant/{id}','UsersController@edit_consultantGet');
-    Route::POST('/edit_consultant/{id}','UsersController@edit_consultantPOST');
+    //Route::POST('/edit_consultant/{id}','UsersController@edit_consultantPOST');
 
     Route::get('/edit_cadre/{id}','UsersController@edit_cadreGet');
     Route::POST('/edit_cadre/{id}','UsersController@edit_cadrePOST');
