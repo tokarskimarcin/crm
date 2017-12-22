@@ -85,7 +85,7 @@ class AdminController extends Controller
                 ->delete();
             }else{
                 PrivilageRelation::where('link_id', $id)
-                ->wherenotin('link_id',$request->link_privilages)
+                ->whereNotIn('user_type_id',$request->link_privilages)
                 ->delete();
                 foreach ($user_tab as $item) {
                     PrivilageRelation::updateOrCreate(array('user_type_id'=>$item,'link_id'=>$id));
@@ -341,6 +341,6 @@ class AdminController extends Controller
         return Redirect::back();
     }
 
-  
+
 
 }
