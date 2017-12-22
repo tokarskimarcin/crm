@@ -194,13 +194,22 @@
                             <label for="">Telefon:</label>
                             <input type="text" class="form-control" placeholder="Telefon" name="phone" id="phone" value="">
                         </div>
+                        <div class="alert alert-danger" style="display: none" id="alert_phone">
+                            Podaj prawidłowy numer telefonu!
+                        </div>
                         <div class="form-group">
                             <label for="">Kampania:</label>
                             <input type="text" class="form-control" placeholder="Kampania" name="campaign" id="campaign"  value="">
                         </div>
+                        <div class="alert alert-danger" style="display: none" id="alert_campaign">
+                            Podaj nazwę kampanii!
+                        </div>
                         <div class="form-group">
                             <label for="">Komentarz:</label>
                             <input type="text" class="form-control" placeholder="Komentarz" name="comment" id="comment"  value="">
+                        </div>
+                        <div class="alert alert-danger" style="display: none" id="alert_comment">
+                            Podaj komentarz!
                         </div>
                         <div class="form-group">
                             <label for="">Janek:</label>
@@ -256,13 +265,41 @@
                     });
                     $("#save_dkj").click(function () {
 
-                        $("#save_dkj").attr('disabled', true);
+
 
                         var id_user = $("#users_select").val();
                         var phone =$("#phone").val();
                         var dkj_status =$("#dkj_status").val();
                         var comment =$("#comment").val();
                         var campaign =$("#campaign").val();
+                        var validation = true;
+                        
+                        if (phone == '' || isNaN(phone)) {
+                            $('#alert_phone').fadeIn(1000);
+                            validation = false;
+                        } else {
+                            $('#alert_phone').fadeOut(1000);
+                        }
+
+                        if (comment == '') {
+                            $('#alert_comment').fadeIn(1000);
+                            validation = false;
+                        } else {
+                            $('#alert_comment').fadeOut(1000);
+                        }
+
+                        if (campaign == '') {
+                            $('#alert_campaign').fadeIn(1000);
+                            validation = false;
+                        } else {
+                            $('#alert_campaign').fadeOut(1000);
+                        }
+
+                        if (validation == false) {
+                            return validation;
+                        }
+
+                        $("#save_dkj").attr('disabled', true);
                         $.ajax({
                             type: "POST",
                             url: '{{ route('api.dkjRaportSave') }}',
