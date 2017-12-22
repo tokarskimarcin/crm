@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Redirect;
 use Session;
 use Illuminate\Support\Facades\Hash;
 use App\ActivityRecorder;
+use Illuminate\Support\Facades\URL;
 
 class UsersController extends Controller
 {
@@ -192,6 +193,11 @@ class UsersController extends Controller
 
     public function edit_cadrePOST($id, Request $request) {
         $manager_id = Auth::user()->id;
+        $url_array = explode('/',URL::previous());
+        $urlValidation = end($url_array);
+        if ($urlValidation != $id) {
+            return view('errors.404');
+        }
 
         $user = User::find($id);
         // $check_user_type = UserTypes::find($request->user_type);

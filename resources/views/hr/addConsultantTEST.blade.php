@@ -11,7 +11,6 @@
                     <br />
                     <div class="alert alert-success">{{ Session::get('message_edit') }}</div>
                 @endif
-                <!-- <div class="alert alert-danger" role="alert">Niestety ta funkcja nie jest jeszcze dostępna.</div> -->
                 <div class="panel panel-info">
                     <div class="panel-heading">
                         <h3 class="panel-title">Profil Pracownika</h3>
@@ -431,38 +430,34 @@
             laptop_hard_drive = $("<tr><td><b>" + "Dysk twardy" + "</b></td><td>" + laptop_hard_drive + "</td></tr>");
         }
 
-        if(phone_box != '') {
+        if(phone_box != '' || !isNaN(phone_box)) {
             phone_box = 'Tak';
             phone_box = $("<tr><td><b>" + "Opakowanie na telefon" + "</b></td><td>" + phone_box + "</td></tr>");
         }
 
-        if(tablet_modem != '') {
+        if(tablet_modem != '' || !isNaN(tablet_modem)) {
             tablet_modem = 'Tak';
             tablet_modem = $("<tr><td><b>" + "Modem" + "</b></td><td>" + tablet_modem + "</td></tr>");
         }
 
-        if(sim_number_phone != '') {
+        if(sim_number_phone != '' || !isNaN(sim_number_phone)) {
             sim_number_phone = $("<tr><td><b>" + "Numer telefonu" + "</b></td><td>" + sim_number_phone + "</td></tr>");
         }
 
-        if(sim_type != '') {
-          if (sim_type == 1) {
-              sim_type = 'Prepaid';
-          } else {
-              sim_type = 'Abonament';
-          }
+        if(sim_type != '' || !isNaN(sim_type)) {
+            sim_type = (sim_type == 1) ? 'Prepaid' : 'Abonament' ;
             sim_type = $("<tr><td><b>" + "Rodzaj karty SIM" + "</b></td><td>" + sim_type + "</td></tr>");
         }
 
-        if(sim_pin != '') {
+        if(sim_pin != '' || !isNaN(sim_pin)) {
             sim_pin = $("<tr><td><b>" + "Numer PIN" + "</b></td><td>" + sim_pin + "</td></tr>");
         }
 
-        if(sim_puk != '') {
+        if(sim_puk != '' || !isNaN(sim_puk)) {
             sim_puk = $("<tr><td><b>" + "Numer PUK" + "</b></td><td>" + sim_puk + "</td></tr>");
         }
 
-        if(sim_net != '') {
+        if(sim_net != '' || !isNaN(sim_net)) {
             sim_net = $("<tr><td><b>" + "Numer NET" + "</b></td><td>" + sim_net + "</td></tr>");
         }
 
@@ -478,13 +473,13 @@
             description = $("<tr><td><b>" + "Opis" + "</b></td><td>" + description + "</td></tr>");
         }
 
-        if(power_cable != '' || power_cable == 0) {
+        if(power_cable != '' || !isNaN(power_cable)) {
             power_cable = (power_cable == 0) ? "Nie" : "Tak" ;
             power_cable = $("<tr><td><b>" + "Kabel zasilający" + "</b></td><td>" + power_cable + "</td></tr>");
         }
 
-        if(signal_cable != '') {
-            signal_cable = 'Tak'
+        if(signal_cable != '' || !isNaN(signal_cable)) {
+            signal_cable = (signal_cable == 0) ? 'Nie' : 'Tak' ;
             signal_cable = $("<tr><td><b>" + "Antena" + "</b></td><td>" + signal_cable + "</td></tr>");
         }
 

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Redirect;
 use Session;
 use App\User;
 use App\Notifications;
+use Illuminate\Support\Facades\URL;
 
 class AdminController extends Controller
 {
@@ -76,36 +77,41 @@ class AdminController extends Controller
 
     public function admin_privilage_edit($id,Request $request)
     {
-            $data = [];
-            $link = Links::findOrFail($id);
-            $link->link = $request->link_adress;
-            $link->name = $request->link_name;
-            $link->group_link_id = $request->link_group;
-            $link->save();
-            $user_tab = $request->link_privilages;
-            if($request->link_privilages == null )
-            {
-                PrivilageRelation::where('link_id', $id)
-                ->delete();
-            }else{
-                PrivilageRelation::where('link_id', $id)
-                ->whereNotIn('user_type_id',$request->link_privilages)
-                ->delete();
-                foreach ($user_tab as $item) {
-                    PrivilageRelation::updateOrCreate(array('user_type_id'=>$item,'link_id'=>$id));
-                    $data['item' . $item] = 'id' . $id;
-                }
+        $url_array = explode('/',URL::previous());
+        $urlValidation = end($url_array);
+        if ($urlValidation != $id) {
+            return view('errors.404');
+        }
+        $data = [];
+        $link = Links::findOrFail($id);
+        $link->link = $request->link_adress;
+        $link->name = $request->link_name;
+        $link->group_link_id = $request->link_group;
+        $link->save();
+        $user_tab = $request->link_privilages;
+        if($request->link_privilages == null )
+        {
+            PrivilageRelation::where('link_id', $id)
+            ->delete();
+        }else{
+            PrivilageRelation::where('link_id', $id)
+            ->whereNotIn('user_type_id',$request->link_privilages)
+            ->delete();
+            foreach ($user_tab as $item) {
+                PrivilageRelation::updateOrCreate(array('user_type_id'=>$item,'link_id'=>$id));
+                $data['item' . $item] = 'id' . $id;
+            }
 
             }
-            $data['Zmiana uprawnień grup i użytkowników'] = '';
-            $data['Link name'] = $request->link_name;
-            $data['Link adress'] = $request->link_adress;
-            $data['Link group'] = $request->link_goup;
+        $data['Zmiana uprawnień grup i użytkowników'] = '';
+        $data['Link name'] = $request->link_name;
+        $data['Link adress'] = $request->link_adress;
+        $data['Link group'] = $request->link_goup;
 
-            new ActivityRecorder(3, $data);
+        new ActivityRecorder(3, $data);
 
-            Session::flash('message_ok', "Zmiany zapisano!");
-            return Redirect::back();
+        Session::flash('message_ok', "Zmiany zapisano!");
+        return Redirect::back();
     }
 
 

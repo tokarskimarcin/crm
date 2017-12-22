@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Department_info;
 use App\ActivityRecorder;
+use Illuminate\Support\Facades\URL;
 
 class EquipmentsController extends Controller
 {
@@ -78,7 +79,7 @@ class EquipmentsController extends Controller
             return view('errors.404');
         }
         $users = User::where('status_work', '=', 1)
-            ->groupBy('last_name')
+            ->orderBy('last_name')
             ->get();
         $department_info = Department_info::all();
 
@@ -151,7 +152,7 @@ class EquipmentsController extends Controller
         }
 
         $users = User::where('status_work', '=', 1)
-            ->groupBy('last_name')
+            ->orderBy('last_name')
             ->get();
         $department_info = Department_info::all();
 
@@ -163,11 +164,16 @@ class EquipmentsController extends Controller
 
     public function editEquipmentPost($id, Request $request) {
         $equipment = Equipments::find($id);
+        $url_array = explode('/',URL::previous());
+        $urlValidation = end($url_array);
+        if ($urlValidation != $id) {
+            return view('errors.404');
+        }
 
         if ($equipment == null) {
             return view('errors.404');
         }
-        
+
         $typeCheck = EquipmentTypes::find($request->equipment_type);
         if ($typeCheck == null) {
             return view('errors.404');

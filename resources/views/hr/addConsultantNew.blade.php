@@ -43,10 +43,7 @@
                             <tr>
                                 <td class="td-class"><b>E-mail:</b></td>
                                 <td>
-                                    <div class="input-group">
-                                        <input type="mail" class="form-control" placeholder="Email" name="email"  value="">
-                                        <span class="input-group-addon" style="padding: 0px"><small><b>@veronaconsulting.pl</b></small></span>
-                                    </div>
+                                    <input class="form-control" type="mail" class="form-control" placeholder="Email" name="email"  value="">
                                 </td>
                             </tr>
                             <tr>

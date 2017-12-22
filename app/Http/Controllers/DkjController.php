@@ -624,6 +624,9 @@ class DkjController extends Controller
              if($department_info_id < 0)
                  $department_info_id = $department_info_id * (-1);
              $type = Department_info::find($department_info_id);
+             if ($type == null) {
+                die;
+             }
              $type = $type->type;
              $query = User::where('department_info_id',$department_info_id);
              if ($type == 'Badania/Wysyłka') {

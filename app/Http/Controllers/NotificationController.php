@@ -14,6 +14,7 @@ use App\User;
 use Illuminate\Support\Facades\DB;
 use App\ActivityRecorder;
 use App\JudgeResult;
+use Illuminate\Support\Facades\URL;
 
 class NotificationController extends Controller
 {
@@ -68,6 +69,11 @@ class NotificationController extends Controller
 
     public function showNotificationPost($id, Request $request) {
         $notification = Notifications::find($id);
+        $url_array = explode('/',URL::previous());
+        $urlValidation = end($url_array);
+        if ($urlValidation != $id) {
+            return view('errors.404');
+        }
 
         if ($notification == null) {
             return view('errors.404');
@@ -155,6 +161,13 @@ class NotificationController extends Controller
 
     public function addCommentNotificationPost($id, Request $request) {
         $comment = new CommentsNotifications();
+
+        $url_array = explode('/',URL::previous());
+        $urlValidation = end($url_array);
+        $checkNotification = Notifications::find($id);
+        if ($checkNotification == null || ($urlValidation != $id)) {
+            return view('errors.404');
+        }
 
         $comment->user_id = Auth::user()->id;
         $comment->content = $request->content;
