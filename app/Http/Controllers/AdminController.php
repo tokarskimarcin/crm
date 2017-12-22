@@ -45,6 +45,10 @@ class AdminController extends Controller
     }
     public function admin_privilage_show($id)
     {
+        $checkLink = Links::find($id);
+        if ($checkLink == null) {
+            return view('errors.404');
+        }
         $link_groups = LinkGroups::all();
         $users_type = UserTypes::all();
         $link =  DB::table('links')

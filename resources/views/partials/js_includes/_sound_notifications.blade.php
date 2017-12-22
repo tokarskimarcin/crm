@@ -1,5 +1,6 @@
 @if(Auth::user()->user_type_id == 13)
 <script>
+let blockFirstSound = true;
     setInterval(function(){
       $.ajax({
           type: "POST",
@@ -15,7 +16,7 @@
 											var countMeShipping = $("#" + response[i].department_info_id*(-1) + "dkjstatus td[name='undone']").text();
 											var countMeResearch = $("#" + response[i].department_info_id + "dkjstatus td[name='undone']").text();
 											if ((response[i].manager_research_janky_count != countMeResearch && response[i].manager_research_janky_count > countMeResearch)
-												|| response[i].manager_shipping_janky_count != countMeShipping && response[i].manager_shipping_janky_count > countMeShipping) {
+												|| (response[i].manager_shipping_janky_count != countMeShipping && response[i].manager_shipping_janky_count > countMeShipping)) {
 													var sound = true;
 											}
 									} else if (response[i].type == 'Badania') {
@@ -32,9 +33,10 @@
               }
 							//tutaj ding
 							if (sound == true) {
-									var snd = new Audio("{{asset('assets/1.mp3')}}");
-                  snd.play();
-                  sound = false;
+                  if (sound == true && blockFirstSound == false) {
+                    var snd = new Audio("{{asset('assets/1.mp3')}}");
+                    snd.play();
+                  }
                   $('#check_messages_dkj').html('(!) <i class="fa fa-envelope fa-fw"></i><i class="fa fa-caret-down"></i>');
 
 									for (var i = 0; i < response.length; i++) {
@@ -67,8 +69,12 @@
 										}
 									}
 							}
+              if (sound == true) {
+                  blockFirstSound = false;
+                  sound = false;
+              }
           }
       });
-    }, 60000);
+    }, 10000);
 </script>
 @endif

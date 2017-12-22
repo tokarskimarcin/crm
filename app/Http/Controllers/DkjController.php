@@ -41,7 +41,7 @@ class DkjController extends Controller
     {
         $dkjEmployee = User::where('user_type_id',2)
             ->where('status_work', '=', 1)
-            ->groupBy('last_name')
+            ->orderBy('last_name')
             ->get();
         return view('dkj.showDkjEmployee')
             ->with('dkjEmployee',$dkjEmployee);
@@ -636,7 +636,7 @@ class DkjController extends Controller
              }
              return $query->whereIn('user_type_id', [1,2])
                 ->where('status_work', '=', 1)
-                ->groupBy('last_name')
+                ->orderBy('last_name')
                 ->get();
          }
     }

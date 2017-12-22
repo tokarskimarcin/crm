@@ -33,7 +33,7 @@ array("y" => round($data->user_time, 2), "label" => "Ocena czasu wykonania")
           <div class="panel-body">
               <div class="list-group">
                   <div class="list-group-item">Liczba ocen pozytywnych: <b>{{$data->user_sum_repaired . '/' . $data->user_sum}}</b></div>
-                  <div class="list-group-item">Średni czas realizacji: {{round($data->notifications_time_sum /3600, 2)}} h</div>
+                  <div class="list-group-item">Średni czas realizacji: <b>{{round($data->notifications_time_sum /3600, 2)}} h</b></div>
                   <div class="list-group-item">Oddzwonienia: <b>{{$data->response_after . '/' . $data->user_sum}}</b></div>
               </div>
           </div>

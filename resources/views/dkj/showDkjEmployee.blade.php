@@ -52,9 +52,9 @@
                                         <select id="select_form" class="form-control showhidetext" name="user_dkj_id" style="border-radius: 0px;">
                                                 @foreach($dkjEmployee as $item)
                                                     @if(isset($employee_id) && $employee_id == $item->id)
-                                                    <option selected value={{$item->id}}>{{$item->first_name.' '.$item->last_name}}</option>
+                                                    <option selected value={{$item->id}}>{{$item->last_name.' '.$item->first_name}}</option>
                                                     @else
-                                                    <option value={{$item->id}}>{{$item->first_name.' '.$item->last_name}}</option>
+                                                    <option value={{$item->id}}>{{$item->last_name.' '.$item->first_name}}</option>
                                                     @endif;
                                                 @endforeach
                                         </select>

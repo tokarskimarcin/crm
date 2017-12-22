@@ -164,10 +164,6 @@ class UsersController extends Controller
         if ($user == null || $user->user_type_id == 1 || $user->user_type_id == 2) {
             return view('errors.404');
         }
-
-        if ($user->status_work != 1) {
-            return view('404');
-        }
         $agencies = Agencies::all();
         $month = date('m');
         $months_names = ['Styczeń', 'Luty', 'Marzec', 'Kwiecien', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Padziernik', 'Listopad', 'Grudzień'];

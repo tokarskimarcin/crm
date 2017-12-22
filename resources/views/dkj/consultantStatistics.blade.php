@@ -223,7 +223,7 @@
                     var select_body = '';
                     for(var i=0;i<response.length;i++)
                     {
-                        select_body += "<option value="+response[i].id+">"+response[i].first_name+" "+response[i].last_name+"</option>";
+                        select_body += "<option value="+response[i].id+">"+response[i].last_name+" "+response[i].first_name+"</option>";
                     }
                     if(response.length == 0)
                         select_body += "<option value=0>Brak</option>";
