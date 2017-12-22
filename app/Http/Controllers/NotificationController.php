@@ -249,10 +249,10 @@ class NotificationController extends Controller
         return datatables($data)->make(true);
     }
 
-    public function ITCadreGet() {
-      /*NIE TESTOWANE*/
-        $judge_result = DB::table('judge_results')
+    private function judgeData($start = null, $stop = null) {
+        $data = DB::table('judge_results')
             ->select(DB::raw('
+                users.id as user_id,
                 first_name,
                 last_name,
                 count(*) as user_sum,
@@ -264,12 +264,75 @@ class NotificationController extends Controller
                 SUM(CASE WHEN response_after = 1 THEN 0 ELSE 1 END) as response_after,
                 AVG(notifications.sec) as notifications_time_sum
             '))
-            ->join('users', 'users.id', '=', 'judge_results.it_id')
-            ->join('notifications', 'notifications.id', '=', 'judge_results.notification_id')
-            ->groupBy('users.id')
-            ->get();
+            ->leftJoin('users', 'users.id', '=', 'judge_results.it_id')
+            ->leftJoin('notifications', 'notifications.id', '=', 'judge_results.notification_id')
+            ->where('users.status_work', '=', 1)
+            ->groupBy('users.id');
+          if ($start && !$stop) {
+              $data->where('judge_results.created_at', 'like', $start . '%');
+          } else if ($start && $stop) {
+              $data->whereBetween('judge_results.created_at', [$start . '%', $stop . '%']);
+          }
+          $data = $data->get();
+
+          return $data;
+    }
+
+    public function ITCadreGet() {
+      /*NIE TESTOWANE*/
+        $today = date('Y-m-d');
+        $week_start = date('Y-m-d', time() - 604800);
+        $month_start = date('Y-m-d', time() - 2592000);
+
+        $results_total = $this->judgeData();
+        $results_month = $this->judgeData($month_start, $today);
+        $results_week = $this->judgeData($week_start, $today);
+        $results_today = $this->judgeData($today);
 
         return view('notifications.itCadre')
-            ->with('judge_results', $judge_result);
+            ->with('results_total', $results_total)
+            ->with('results_month', $results_month)
+            ->with('results_week', $results_week)
+            ->with('results_today', $results_today);
+    }
+
+    public function ITWorkerGet($id){
+      $checkUser = User::find($id);
+      if ($checkUser == null || $checkUser->status_work == 0) {
+          return view('errors.404');
+      }
+      $data = DB::table('judge_results')
+          ->select(DB::raw('
+              first_name,
+              last_name,
+              count(*) as user_sum,
+              SUM(CASE WHEN repaired = 2 THEN 1 ELSE 0 END) as user_sum_repaired,
+              AVG(judge_quality) as user_quality,
+              AVG(judge_contact) as user_contact,
+              AVG(judge_time) as user_time,
+              AVG(judge_sum) as user_judge_sum,
+              SUM(CASE WHEN response_after = 1 THEN 0 ELSE 1 END) as response_after,
+              AVG(notifications.sec) as notifications_time_sum
+          '))
+          ->leftJoin('users', 'users.id', '=', 'judge_results.it_id')
+          ->leftJoin('notifications', 'notifications.id', '=', 'judge_results.notification_id')
+          ->where('users.id', '=', $id)
+          ->get();
+
+        $comments = DB::table('judge_results')
+            ->select(DB::raw('
+                first_name,
+                last_name,
+                comment,
+                judge_results.created_at as add_time
+            '))
+            ->leftJoin('users', 'users.id', '=', 'judge_results.user_id')
+            ->where('judge_results.it_id', '=', $id)
+            ->where('comment', 'not like', 'Brak komentarza')
+            ->get();
+
+        return view('notifications.it_worker')
+            ->with('user_results', $data)
+            ->with('comments', $comments);
     }
 }
