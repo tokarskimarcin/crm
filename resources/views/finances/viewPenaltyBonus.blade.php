@@ -30,8 +30,7 @@
 
 
                                 <div class="col-md-12">
-                                    <h1 style ="font-family: 'bebas_neueregular'; text-shadow: 2px 2px 2px rgba(150, 150, 150, 0.8); font-size:25px; margin-top: 0;">Przydziel Karę/Premię</h1>
-
+                                    <h1>Przydziel Karę/Premię</h1>
                                     <div class="well">
                                         <div class="form-group">
                                             <form action="create_penalty_bonus" method="post" id="create">
@@ -82,7 +81,7 @@
 
 
                                 <div class="col-md-12">
-                                    <h1 style ="font-family: 'bebas_neueregular'; text-shadow: 2px 2px 2px rgba(150, 150, 150, 0.8); font-size:30px;">Sprawdź Karę/Premię</h1>
+                                    <h1>Sprawdź Karę/Premię</h1>
                                 </div>
 
                                 <div class="col-md-12">
@@ -214,21 +213,21 @@
                                 <label for="userDetails" class="col-md-5 control-label">Pracownik:</label>
                                 <div id="userDetails"></div>
                             </div>
-                            <div class="form-group">
-                                <label for="dateDetails" class="col-md-5 control-label">Data dodania</label>
+                            <div class="form-group form-inline">
+                                <label for="dateDetails" class="col-md-5 control-label">Data dodania:</label>
                                 <div id="dateDetails"></div>
                             </div>
                             <div class="form-group">
-                                <label for="statusDetails" class="col-md-5 control-label">Typ:Kara/Premia</label>
+                                <label for="statusDetails" class="col-md-5 control-label">Typ: Kara/Premia</label>
                                 <div id="statusDetails" class="modal-body"></div>
                             </div>
                             <div class="form-group">
-                                <label for="dtp_input3" class="col-md-5 control-label">Kwota</label>
+                                <label for="amountDetails" class="col-md-5 control-label">Kwota:</label>
                                 <div id="amountDetails" class="modal-body"></div>
                                 <div class="alert alert-danger" style="display: none" id="amount_modal_error">Podaj kwotę!</div>
                             </div>
                             <div class="form-group">
-                                <label for="dtp_input3" class="col-md-5 control-label">Powód</label>
+                                <label for="reasonDetails" class="col-md-5 control-label">Powód:</label>
                                 <div id="reasonDetails" class="modal-body"></div>
                                 <div class="alert alert-danger" id="reason_modal_error" style="display: none">Podaj powód!</div>
                             </div>
