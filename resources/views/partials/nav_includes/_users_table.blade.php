@@ -3,7 +3,7 @@
     <a id="check_users" class="dropdown-toggle" data-toggle="dropdown" href="#">
         <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
     </a>
-    <ul class="dropdown-menu dropdown-messages" style="width: 80vh; margin-right: -200px">
+    <ul class="dropdown-menu dropdown-messages" style="width: 80vh;">
         <strong>Konsultanci</strong>
       <div class="table-responsive" style="max-height: 500px;">
         <table class="table table-bordered" id="consultantTable">

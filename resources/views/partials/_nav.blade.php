@@ -17,6 +17,8 @@
     <ul class="nav navbar-top-links navbar-right">
 @if(Auth::user()->department_info->blocked == 0)
 
+      {{-- Including multiple departments selector --}}
+      @include('partials.nav_includes._multiple_departments')
       @foreach($links as $link)
 
           {{-- Flag for janky moving notifications--}}
@@ -38,8 +40,6 @@
 
       @endforeach
 
-      {{-- Including multiple departments selector --}}
-      @include('partials.nav_includes._multiple_departments')
 
 @endif
         <li class="dropdown">
