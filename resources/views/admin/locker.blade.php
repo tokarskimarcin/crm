@@ -43,57 +43,105 @@
 <script>
 
 $('.block').on('click', function() {
-    var conf_block = confirm('Napewno chcesz zablokować ten oddział?');
-    var department_info_id = $(this).prop('id');
+  swal({
+      title: '',
+      text: "Zablokować oddział?",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Tak'
+      }).then((result) => {
+      if (result.value) {
+          var department_info_id = $(this).prop('id');
+          $.ajax({
+              type: "POST",
+              url: '{{ route('api.locker') }}',
+              data: {
+                "department_info_id":department_info_id,
+                "type":1
+              },
+              headers: {
+                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+              },
+              success: function(response) {
+                  if (response == 0) {
+                    swal(
+                      'Błąd!',
+                      'Coś poszło nie tak, skontaktuj się z administratorem!',
+                      'warning'
+                    )
+                  } else {
 
-    if (conf_block == true) {
-        $.ajax({
-            type: "POST",
-            url: '{{ route('api.locker') }}',
-            data: {
-              "department_info_id":department_info_id,
-              "type":1
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                if (response == 0) {
-                    alert('Ups! Coś poszło nie tak. Skontaktuj się z administratorem!');
-                } else {
-                    alert('Oddział został zablokowany!');
-                    location.reload();
-                }
-            }
-        });
-    }
+                    swal({
+                        title: 'Sukces',
+                        text: 'Oddział został zablokowany!',
+                        timer: 2000,
+                        onOpen: () => {
+                          swal.showLoading()
+                        }
+                      }).then((result) => {
+                          location.reload();
+                      })
+
+                  }
+              }
+          });
+
+      }
+      })
+
 });
 
 $('.unblock').on('click', function() {
-    var conf_unblock = confirm('Napewno chcesz odblokować ten oddział?');
-    var department_info_id = $(this).prop('id');
+  swal({
+      title: '',
+      text: "Odblokować oddział?",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Tak'
+      }).then((result) => {
+      if (result.value) {
+          var department_info_id = $(this).prop('id');
+          $.ajax({
+              type: "POST",
+              url: '{{ route('api.locker') }}',
+              data: {
+                "department_info_id":department_info_id,
+                "type":0
+              },
+              headers: {
+                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+              },
+              success: function(response) {
+                  if (response == 0) {
+                    swal(
+                      'Błąd!',
+                      'Coś poszło nie tak, skontaktuj się z administratorem!',
+                      'warning'
+                    )
+                  } else {
 
-    if (conf_unblock == true) {
-        $.ajax({
-            type: "POST",
-            url: '{{ route('api.locker') }}',
-            data: {
-              "department_info_id":department_info_id,
-              "type":0
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                if (response == 0) {
-                    alert('Ups! Coś poszło nie tak. Skontaktuj się z administratorem!');
-                } else {
-                    alert('Oddział został odblokowany!');
-                    location.reload();
-                }
-            }
-        });
-    }
+                    swal({
+                        title: 'Sukces',
+                        text: 'Oddział został odblokowany!',
+                        timer: 2000,
+                        onOpen: () => {
+                          swal.showLoading()
+                        }
+                      }).then((result) => {
+                          location.reload();
+                      })
+
+                  }
+              }
+          });
+
+      }
+      })
+
 });
 
 </script>

@@ -265,32 +265,32 @@
             var check = true;
             if($(".modal-body #average").val() == '' || isNaN($(".modal-body #average").val()))
             {
-                alert('Podaj prawidłową średnią!');
+                swal('Podaj prawidłową średnią!')
                 check = false;
             }
             else if($(".modal-body #success").val() == '' || isNaN($(".modal-body #success").val()))
             {
-                alert('Podaj prawidłową ilość zgód!');
+                swal('Podaj prawidłową ilość zgód!')
                 check = false;
             }
             else if($(".modal-body #employee_count").val() == '' || isNaN($(".modal-body #employee_count").val()))
             {
-                alert('Podaj prawidłową ilość pracowników!');
+                swal('Podaj prawidłową ilość pracowników!')
                 check = false;
             }
             else if($(".modal-body #janky_count").val() == '' || isNaN($(".modal-body #janky_count").val()))
             {
-                alert('Podaj prawidłową ilość janków!');
+                swal('Podaj prawidłową ilość janków!')
                 check = false;
             }
             else if($(".modal-body #wear_base").val() == '' || isNaN($(".modal-body #wear_base").val()))
             {
-                alert('Podaj prawidłową ilość wykorzystania bazy!');
+                swal('Podaj prawidłową ilość wykorzystania bazy!')
                 check = false;
             }
             else if($(".modal-body #call_time").val() == '' || isNaN($(".modal-body #call_time").val()))
             {
-                alert('Podaj prawidłowy czas!');
+                swal('Podaj prawidłowy czas!')
                 check = false;
             }
             if(check)
@@ -314,37 +314,37 @@
             var check = true;
             if(hour == '' || hour=='Wybierz')
             {
-                alert('Wybierz godzinę');
+                swal('Wybierz godzinę')
                 check = false;
             }
             else if(average == '' || isNaN(average))
             {
-                alert('Podaj prawidłową średnią!');
+                swal('Podaj prawidłową średnią!')
                 check = false;
             }
             else if(success == '' || isNaN(success))
             {
-                alert('Podaj ilość zgód!');
+                swal('Podaj ilość zgód!')
                 check = false;
             }
             else if(employee_count == '' || isNaN(employee_count))
             {
-                alert('Podaj liczbę pracowników!');
+                swal('Podaj liczbę pracowników!')
                 check = false;
             }
             else if(janky_count == '' || isNaN(janky_count))
             {
-                alert('Podaj ilość janków!');
+                swal('Podaj ilość janków!')
                 check = false;
             }
             else if(wear_base == '' || isNaN(wear_base))
             {
-                alert('Podaj wartość wykorzystania bazy!');
+                swal('Podaj wartość wykorzystania bazy!')
                 check = false;
             }
             else if(call_time == '' || isNaN(call_time))
             {
-                alert('Podaj czas rozmów!');
+                swal('Podaj czas rozmów!')
                 check = false;
             }
             if(check)

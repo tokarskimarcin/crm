@@ -270,22 +270,22 @@ $("#addpbsubmit").click(function () {
 
 
     if (user_id == 'Wybierz') {
-        alert("Wybierz użytkownika!");
+        swal("Wybierz użytkownika!")
         return false;
     }
 
     if (type_penalty == 'Wybierz') {
-        alert("Wybierz rodzaj kary/nagrody!");
+        swal("Wybierz rodzaj kary/nagrody!")
         return false;
     }
 
     if (cost == '') {
-        alert("Podaj kwotę!");
+        swal("Podaj kwotę!")
         return false;
     }
 
     if (reason == '') {
-        alert("Podaj powód!");
+        swal("Podaj powód!")
         return false;
     }
 
@@ -365,7 +365,7 @@ $("#addpbsubmit").click(function () {
                 },
                 success: function(response) {
                     if (response == 0) {
-                        alert('Ups, coś poszło nie tak. Skontaktuj się z administratorem!');
+                        swal('Ups, coś poszło nie tak. Skontaktuj się z administratorem!')
                         $( "#edit_user_modal" ).removeAttr('disabled');
                     } else {
                         location.reload();
@@ -382,60 +382,38 @@ $("#addpbsubmit").click(function () {
     $( ".delete" ).click(function() {
         var id= $(this).data('id_penalty');
 
-        var conf = confirm("Czy napewno chcesz usunąć karę/premię?");
-        if (conf == true) {
-            $.ajax({
-                type: "POST",
-                url: '{{ route('api.deletePenaltyBonus') }}',
-                data: {
-                    "id": id
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                   alert("Pomyślnie usunięto karę/premię!");
-                }
-            });
-            $('tr[name=' + id + ']').fadeOut(0);
-        }
+        swal({
+            title: '',
+            text: "Czy napewno chcesz usunąć karę/premię?",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Tak'
+          }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.deletePenaltyBonus') }}',
+                    data: {
+                        "id": id
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response == 1) {
+                            swal("Pomyślnie usunięto karę/premię!")
+                        } else {
+                            swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
+                        }
 
+                    }
+                });
+                $('tr[name=' + id + ']').fadeOut(0);
+            }
+          })
     });
-
-    {{--$( ".delete" ).click(function() {--}}
-        {{--var id = (this.id);--}}
-        {{--$.ajax({--}}
-            {{--type: "POST",--}}
-            {{--url: '{{ route('api.deleteAcceptHour') }}',--}}
-            {{--data: {--}}
-                {{--"id": id--}}
-            {{--},--}}
-            {{--headers: {--}}
-                {{--'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
-            {{--},--}}
-            {{--success: function(response) {--}}
-                {{--alert("Godziny zostały usunięte");--}}
-                {{--location.reload();--}}
-            {{--}--}}
-        {{--});--}}
-    {{--});--}}
-    {{--$( ".delete" ).click(function() {--}}
-        {{--var id = (this.id);--}}
-        {{--$.ajax({--}}
-            {{--type: "POST",--}}
-            {{--url: '{{ route('api.deleteAcceptHour') }}',--}}
-            {{--data: {--}}
-                {{--"id": id--}}
-            {{--},--}}
-            {{--headers: {--}}
-                {{--'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
-            {{--},--}}
-            {{--success: function(response) {--}}
-                {{--alert("Godziny zostały usunięte");--}}
-                {{--location.reload();--}}
-            {{--}--}}
-        {{--});--}}
-    {{--});--}}
 
 </script>
 @endsection
