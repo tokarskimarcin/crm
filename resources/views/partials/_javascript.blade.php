@@ -44,12 +44,13 @@
 {{-- End of includes --}}
 
 <script>
+<<<<<<< HEAD
     $(document).ready(function(){
 
     
+=======
+>>>>>>> 53ac8df41b988c05ec2d32ab160896b00dad4d6f
 
-        $('[data-toggle="tooltip"]').tooltip();
-    });
 
     $('#blok').on('click', () => {
         window.location.replace("{{URL::to('/dkjVerification/')}}");
