@@ -9,17 +9,12 @@
         <br />
         <div class="alert alert-success">{{ Session::get('message_ok') }}</div>
     @endif
-    <!-- <div class="alert alert-danger" role="alert">Niestety ta funkcja nie jest jeszcze dostępna.</div> -->
     <div class="panel panel-info">
         <div class="panel-heading">
             <h3 class="panel-title">Profil Pracownika</h3>
         </div>
-
-
-
         <div class="panel-body">
-            <!-- <div class="col-md-2 col-lg-2 " align="center"> <img alt="User Pic" src="http://saintgeorgelaw.com/wp-content/uploads/2015/01/male-formal-business-hi.png" class="img-circle img-responsive" style="border:2px solid #222;"> </div> -->
-            <form class="form-horizontal" method="post" action="add_consultant" id="consultant_add"><!-- Formularz edycji kadry -->
+            <form class="form-horizontal" method="post" action="add_consultant" id="consultant_add">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <div class="col-md-10">
 
@@ -33,11 +28,19 @@
                                     <input type="text" class="form-control" name="first_name" placeholder="Imię" value="">
                                 </td>
                             </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_name">
+                                <td colspan="1">Podaj imie!</td>
+                                <td></td>
+                            </tr>
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Nazwisko:</b></td>
                                 <td>
                                     <input type="text" class="form-control" placeholder="Nazwisko" name="last_name"  value="">
                                 </td>
+                            </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_last_name">
+                                <td colspan="1">Podaj nazwisko!</td>
+                                <td></td>
                             </tr>
                             @if($type == 2)
                             <tr>
@@ -45,6 +48,10 @@
                                 <td>
                                     <input class="form-control" type="mail" class="form-control" placeholder="Email" name="email"  value="">
                                 </td>
+                            </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_email">
+                                <td colspan="1">Podaj adres email!</td>
+                                <td></td>
                             </tr>
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Telefon służbowy:</b></td>
@@ -59,17 +66,31 @@
                                     <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="private_phone" value="">
                                 </td>
                             </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_user_phone">
+                                <td colspan="1">Podaj telefon pracownika!</td>
+                                <td></td>
+                            </tr>
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Login(Godzinówka):</b></td>
                                 <td><input type="text" class="form-control" placeholder="Login" name="username" value=""></td>
-
+                            </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_user_name">
+                                <td colspan="1">Podaj login!</td>
+                                <td></td>
+                            </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_user_name_checked">
+                                <td colspan="1">Użytkownik o podanej nazwie już istnieje!</td>
+                                <td></td>
                             </tr>
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Hasło:</b></td>
                                 <td>
                                     <input type="text" class="form-control" placeholder="Hasło" name="password"  value="">
                                 </td>
-
+                            </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_pass">
+                                <td colspan="1">Podaj hasło!</td>
+                                <td></td>
                             </tr>
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Dokumenty:</b></td>
@@ -81,6 +102,10 @@
                                     </select>
                                 </td>
                             </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_documents">
+                                <td colspan="1">Wybierz jedną z opcji!</td>
+                                <td></td>
+                            </tr>
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Student:</b></td>
                                 <td>
@@ -90,6 +115,10 @@
                                         <option value="0">Nie</option>
                                     </select>
                                 </td>
+                            </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_student">
+                                <td colspan="1">Wybierz status studenta!</td>
+                                <td></td>
                             </tr>
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Agencja:</b></td>
@@ -101,6 +130,10 @@
                                         @endforeach
                                     </select>
                                 </td>
+                            </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_agency">
+                                <td colspan="1">Wybierz agencję!</td>
+                                <td></td>
                             </tr>
                             </tbody>
                         </table>
@@ -155,11 +188,19 @@
                                     </select>
                                 </td>
                             </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_ck">
+                                <td colspan="1">Wybierz wartość CK!</td>
+                                <td></td>
+                            </tr>
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Login PBX:</b></td>
                                 <td>
                                     <input type="text" class="form-control" placeholder="Login z programu do dzwonienia" name="login_phone" value="">
                                 </td>
+                            </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_pbx">
+                                <td colspan="1">Podaj login programu PBX!</td>
+                                <td></td>
                             </tr>
                             @if($type == 2)
                             <tr>
@@ -173,6 +214,10 @@
                                   </select>
                                 </td>
                             </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_user_type">
+                                <td colspan="1">Wybierz uprawnienia!</td>
+                                <td></td>
+                            </tr>
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Oddział:</b></td>
                                 <td style="width: 170px;height:52px;">
@@ -183,6 +228,10 @@
                                       @endforeach
                                   </select>
                                 </td>
+                            </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_department">
+                                <td colspan="1">Wybierz oddział!</td>
+                                <td></td>
                             </tr>
                             @endif
                             @if($type == 1)
@@ -208,6 +257,10 @@
                                 <td>
                                     <textarea class="form-control" name="description" placeholder="Opis dodawany do pracownika np. z jakiego ogłoszenia o pracę"></textarea>
                                 </td>
+                            </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_desc">
+                                <td colspan="1">Podaj dowolny opis!</td>
+                                <td></td>
                             </tr>
                             </tbody>
                         </table>
@@ -245,7 +298,7 @@
             var last_name = $("input[name='last_name']").val();
             var password =$("input[name='password']").val();
             var username =$("input[name='username']").val();
-            var phone =$("input[name='phone']").val();
+            var private_phone =$("input[name='private_phone']").val();
             var login_phone =$("input[name='login_phone']").val();
             var description =$("textarea[name='description']").val();
             var documents =$("select[name='documents']").val();
@@ -270,7 +323,7 @@
 
 
             if (username == '') {
-                alert("Pole Login nie może być puste!");
+                $('#alert_user_name').fadeIn(1000);
                 return false;
             }else
             {
@@ -289,14 +342,17 @@
                     }
                 });
                 if(check == 1) {
-                    alert("Użytkownik o podanej nazwie już istnieje");
+                    $('#alert_user_name_checked').fadeIn(1000);
                     return false;
+                } else {
+                    $('#alert_user_name').fadeOut(1000);
+                    $('#alert_user_name_checked').fadeOut(1000);
                 }
             }
 
             if (email != null) {
               if (email == '') {
-                  alert("Pole e-mail nie może być puste!");
+                  $('#alert_email').fadeIn(1000);
                   return false;
               }else
               {
@@ -316,8 +372,11 @@
                           }
                       });
                       if(check == 1) {
-                          alert("Adres email jest zajęty!");
+                          $('#alert_email_checked').fadeIn(1000)
                           return false;
+                      } else {
+                          $('#alert_email').fadeOut(1000);
+                          $('#alert_email_checked').fadeOut(1000);
                       }
                   }
 
@@ -328,60 +387,84 @@
             //tutaj if() dating type
 
             if (first_name == '') {
-                alert("Pole Imię nie może być puste!");
+                $('#alert_name').fadeIn(1000);
                 return false;
+            } else {
+                $('#alert_name').fadeOut(1000);
             }
             if (last_name == '') {
-                alert("Pole Nazwisko nie może być puste!");
+                $('#alert_last_name').fadeIn(1000);
                 return false;
+            } else {
+                $('#alert_last_name').fadeOut(1000);
             }
             if (password== '') {
-                alert("Pole Hasło nie może być puste!");
+                $('#alert_pass').fadeIn(1000);
                 return false;
+            } else {
+                $('#alert_pass').fadeOut(1000);
             }
             if (documents == 'Wybierz') {
-                alert("Musisz wybrać Dokument!");
+                $('#alert_documents').fadeIn(1000);
                 return false;
+            } else {
+                $('#alert_documents').fadeOut(1000);
             }
             if (agency == 'Wybierz') {
-                alert("Musisz wybrać Agencję!");
+                $('#alert_agency').fadeIn(1000);
                 return false;
+            } else {
+                $('#alert_agency').fadeOut(1000);
             }
             if (student == 'Wybierz') {
-                alert("Musisz wybrać status Studenta!");
+                $('#alert_student').fadeIn(1000);
                 return false;
+            } else {
+                $('#alert_student').fadeOut(1000);
             }
             if (salary_to_account == 'Wybierz') {
-                alert("Musisz wybrać wartość CK!");
+                $('#alert_ck').fadeIn(1000);
                 return false;
+            } else {
+                $('#alert_ck').fadeOut(1000);
             }
             if (rate == 'Wybierz') {
                 alert("Musisz wybrać Stawkę!");
                 return false;
             }
             if (login_phone == '') {
-                alert("Musisz wpisać login do programu dzwoniącego");
+                $('#alert_pbx').fadeIn(1000);
                 return false;
+            } else {
+                $('#alert_pbx').fadeOut();
             }
-            if (phone == '') {
-                alert("Wprowadź telefon pracownika! Jeśli nie posiadasz telefonu wprowadź 0.");
+            if (private_phone == '' || isNaN(private_phone)) {
+                $('#alert_user_phone').fadeIn(1000);
                 return false;
+            } else {
+                $('#alert_user_phone').fadeOut(1000);
             }
             if (description == '') {
-                alert("Musisz wprowadzić dowolny opis!");
+                $('#alert_desc').fadeIn(1000);
                 return false;
+            } else {
+                $('#alert_desc').fadeOut(1000);
             }
             if (username == '') {
                 alert("Musisz wprowadzić login pracownika z programu do dzwonienia!");
                 return false;
             }
             if (user_type == 'Wybierz') {
-                alert("Musisz wybrać uprawnienia!");
+                $('#alert_user_type').fadeIn(1000);
                 return false;
+            } else {
+                $('#alert_user_type').fadeOut(1000);
             }
             if (department_info == 'Wybierz') {
-                alert("Musisz wybrać oddział!");
+                $('#alert_department').fadeIn(1000);
                 return false;
+            } else {
+                $('#alert_department').fadeOut(1000);
             }
             if (dating_type == 'Wybierz') {
                 alert("Musisz wybrać typ użytkownika!");

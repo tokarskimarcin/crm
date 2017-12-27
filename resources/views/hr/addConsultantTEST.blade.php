@@ -2,22 +2,21 @@
 @section('content')
 
     <!-- Main -->
-    <div class="container">
+
         <div class="row">
             <!-- center left-->
-            <div class="col-md-12">
                 <hr>
                 @if (Session::has('message_edit'))
                     <br />
                     <div class="alert alert-success">{{ Session::get('message_edit') }}</div>
                 @endif
-                <div class="panel panel-info">
+                <div class="panel panel-info" style="width: 100%">
                     <div class="panel-heading">
                         <h3 class="panel-title">Profil Pracownika</h3>
                     </div>
 
                     <div class="panel-body">
-                        <form class="form-horizontal" method="post" action="{{URL::to('/edit_cadre/')}}/{{$user->id}}" id="edit_user"><!-- Formularz edycji kadry -->
+                        <form class="form-horizontal" method="post" action="{{URL::to('/edit_cadre/')}}/{{$user->id}}" id="edit_user">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
                             <div class="col-md-10">
 
@@ -247,7 +246,6 @@
 
             </div>
         </div>
-    </div>
     <!--/container-->
     <!-- /Main -->
     <div class="modal">
