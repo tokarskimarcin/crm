@@ -258,6 +258,7 @@ class WorkHoursController extends Controller
     {
         if($request->userid == "-1") {
               $users = User::wherenoin('user_type_id', [1,2])
+                  ->where('status_work',1)
                   ->orderBy('last_name')
                   ->get();
               return view('workhourscadre.viewHourCadre')
