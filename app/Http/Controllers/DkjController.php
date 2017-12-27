@@ -535,17 +535,18 @@ class DkjController extends Controller
             $today = date("Y-m-d") . "%";
             $dkj_user = Dkj::
                 join('users', 'dkj.id_user', '=', 'users.id')
-                ->join('department_info', 'dkj.department_info_id', '=', 'department_info.id')
+                ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
                 ->select(DB::raw("
                 department_info.id as department_info_id,
                 department_info.type,
                 count(dkj.id) as all_check_talk,
-                sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as shipping_all,
-                sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as research_all,
-                sum(CASE WHEN users.dating_type = 0 and  dkj.dkj_status = 1  THEN 1 ELSE 0 END) as research_janky_count,
-                sum(CASE WHEN users.dating_type = 1 and  dkj.dkj_status = 1  THEN 1 ELSE 0 END) as shipping_janky_count,
-                SUM(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as all_bad"))
+                sum(CASE WHEN users.dating_type = 1  and deleted = 0 THEN 1 ELSE 0 END) as shipping_all,
+                sum(CASE WHEN users.dating_type = 0  and deleted = 0 THEN 1 ELSE 0 END) as research_all,
+                sum(CASE WHEN users.dating_type = 0  and deleted = 0 and  dkj.dkj_status = 1  THEN 1 ELSE 0 END) as research_janky_count,
+                sum(CASE WHEN users.dating_type = 1  and deleted = 0 and  dkj.dkj_status = 1  THEN 1 ELSE 0 END) as shipping_janky_count,
+                SUM(CASE WHEN dkj.dkj_status = 1  and deleted = 0 THEN 1 ELSE 0 END) as all_bad"))
                 ->where('dkj.add_date','like',$today)
+                ->where('deleted',0)
                 ->groupBy('department_info.id','department_info.type')->get();
           return $dkj_user;
         }
