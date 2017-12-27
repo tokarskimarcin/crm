@@ -237,8 +237,8 @@
         var sim_net = $("select[name='sim_net']").val();
         var sim_pin = $("input[name='sim_pin']").val();
         var sim_puk = $("input[name='sim_puk']").val();
+        var sim_number = $("input[name='sim_number_phone']").val();
         var imei = $("input[name='imei']").val();
-
         var validation_ok = true;
 
         $('#add_equipment').submit(function(){
@@ -255,6 +255,12 @@
             validation_ok = false;
         }else {
             $('#alert_model').fadeOut(1000);
+        }
+        if (sim_number == '') {
+            $('#alert_sim_number_phone').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_sim_number_phone').fadeOut(1000);
         }
 
         if (serial_code == '') {

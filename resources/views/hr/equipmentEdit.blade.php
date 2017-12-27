@@ -51,37 +51,71 @@
                         <div class="form-group">
                             <label for="model">Model</label>
                             <input name="model" id="model" type="text" value="{{$equipment->model}}" class="form-control" />
-                        <div>
+                        </div>
+
+                            <div class="alert alert-danger" style="display: none" id="alert_model">
+                                <label>Podaj nazwę modelu!</label>
+                            </div>
+
                         <div class="form-group">
                             <label for="serial_code">Numer seryjny</label>
                             <input name="serial_code" type="text" value="{{$equipment->serial_code}}" class="form-control" />
-                        <div>
+                        </div>
+
+                            <div class="alert alert-danger" style="display: none" id="alert_serial_code">
+                                <label>Podaj numer seryjny!</label>
+                            </div>
+
                         <div class="form-group">
                             <label for="power_cable">Kabel zasilający</label>
                             <select name="power_cable" class="form-control">
                                 <option value="1" @if($equipment->power_cable == 1) selected @endif>Tak</option>
                                 <option value="0" @if($equipment->power_cable == 0) selected @endif>Nie</option>
                             </select>
-                        <div>
+                        </div>
+
+                            <div class="alert alert-danger" style="display: none" id="alert_power_cable">
+                                <label>Wybierz stan kabla zasilającego!</label>
+                            </div>
+
                         @if($equipment->equipment_type_id == 1)
                             <div class="form-group">
                                 <label for="laptop_processor">Procesor</label>
                                 <input name="laptop_processor" type="text" value="{{$equipment->laptop_processor}}" class="form-control" />
-                            <div>
+                            </div>
+
+                                <div class="alert alert-danger" style="display: none" id="alert_laptop_processor">
+                                    <label >Podaj nazwę procesor!</label>
+                                </div>
+
                             <div class="form-group">
                                 <label for="laptop_ram">Pamięć RAM</label>
                                 <input name="laptop_ram" type="text" value="{{$equipment->laptop_ram}}" class="form-control" />
-                            <div>
+                            </div>
+
+                                <div class="alert alert-danger" style="display: none" id="alert_laptop_ram">
+                                    <label >Podaj ilość RAM!</label>
+                                </div>
+
                             <div class="form-group">
                                 <label for="laptop_hard_drive">Dysk twardy</label>
                                 <input name="laptop_hard_drive" type="text" value="{{$equipment->laptop_hard_drive}}" class="form-control" />
-                            <div>
+                            </div>
+
+                                <div class="alert alert-danger" style="display: none" id="alert_laptop_hard_drive">
+                                    <label >Podaj pojemność dysku!</label>
+                                </div>
                         @endif
                         @if($equipment->equipment_type_id == 4)
                             <div class="form-group">
                                 <label for="sim_number_phone">Numer telefonu</label>
                                 <input name="sim_number_phone" type="text" value="{{$equipment->sim_number_phone}}" class="form-control" />
-                            <div>
+                            </div>
+
+                                <div class="alert alert-danger" style="display: none" id="alert_sim_number_phone">
+                                    <label>Podaj numer telefonu!</label>
+                                </div>
+
                             <div class="form-group">
                                 <label for="sim_type">Rodzaj karty SIM</label>
                                 <select name="sim_type" class="form-control">
@@ -89,14 +123,29 @@
                                     <option value="2" @if($equipment->sim_type == 2) selected @endif>Prepaid</option>
                                 </select>
                             </div>
+
+                                <div class="alert alert-danger" style="display: none" id="alert_sim_type">
+                                    <label>Wybierz typ umowy!</label>
+                                </div>
+
                             <div class="form-group">
                                 <label for="sim_pin">Kod PIN</label>
                                 <input name="sim_pin" type="text" value="{{$equipment->sim_pin}}" class="form-control" />
-                            <div>
+                            </div>
+
+                                <div class="alert alert-danger" style="display: none" id="alert_sim_pin">
+                                    <label>Podaj PIN!</label>
+                                </div>
+
                             <div class="form-group">
                                 <label for="sim_puk">Kod PUK</label>
                                 <input name="sim_puk" type="text" value="{{$equipment->sim_puk}}" class="form-control" />
-                            <div>
+                            </div>
+
+                                <div class="alert alert-danger" style="display: none" id="alert_sim_puk">
+                                    <label>Podaj numer PUK!</label>
+                                </div>
+
                             <div class="form-group">
                                 <label for="sim_net">Internet</label>
                                 <select name="sim_net" class="form-control">
@@ -104,6 +153,11 @@
                                     <option value="0" @if($equipment->sim_net == 0) selected @endif>Nie</option>
                                 </select>
                             </div>
+
+                                <div class="alert alert-danger" style="display: none" id="alert_sim_net">
+                                    <label>Wybierz opcje!</label>
+                                </div>
+
                         @endif
                         @if($equipment->equipment_type_id == 5)
                         <div class="form-group">
@@ -113,6 +167,11 @@
                                 <option value="0" @if($equipment->signal_cable == 0) selected @endif>Nie</option>
                             </select>
                         </div>
+
+                                <div class="alert alert-danger" style="display: none" id="alert_signal_cable">
+                                    <label>Wybierz stan kabla sygnałowego!</label>
+                                </div>
+
                         @endif
                         @if($equipment->equipment_type_id == 3)
                             <div class="form-group">
@@ -122,24 +181,43 @@
                                     <option value="0" @if($equipment->tablet_modem == 0) selected @endif>Nie</option>
                                 </select>
                             </div>
+
+                                <div class="alert alert-danger" style="display: none" id="alert_tablet_modem">
+                                    <label>Wybierz opcje!</label>
+                                </div>
+
                         @endif
                         @if($equipment->equipment_type_id == 2 || $equipment->equipment_type_id == 3)
                             <div class="form-group">
                                 <label for="imei">Numer IMEI</label>
                                 <input name="imei" type="text" value="{{$equipment->imei}}" class="form-control" />
-                            <div>
+                            </div>
+
+                                <div class="alert alert-danger" style="display: none" id="alert_imei">
+                                    <label >Podaj imei!</label>
+                                </div>
+
                             <div class="form-group">
-                                <label for="phone_box">Pudełko</label>
+                                <label for="phone_box">Opakowanie na telefon</label>
                                 <select name="phone_box" class="form-control">
                                     <option value="1" @if($equipment->phone_box == 1) selected @endif>Tak</option>
                                     <option value="0" @if($equipment->phone_box == 0) selected @endif>Nie</option>
                                 </select>
                             </div>
+
+                                <div class="alert alert-danger" style="display: none" id="alert_phone_box">
+                                    <label >Wybierz opcje!</label>
+                                </div>
+
                         @endif
                         <div class="form-group">
                             <label for="description">Opis</label>
                             <input name="description" type="text" value="{{$equipment->description}}" class="form-control" />
-                        <div>
+                        </div>
+
+                            <div class="alert alert-danger" style="display: none" id="alert_description">
+                                <label>Podaj opis!</label>
+                            </div>
                         <br />
                         <div class="form-group">
                             <input type="submit" value="Zapisz zmiany" id="save" class="btn btn-success pull-left" />
@@ -191,7 +269,9 @@
         var sim_net = $("select[name='sim_net']").val();
         var sim_pin = $("input[name='sim_pin']").val();
         var sim_puk = $("input[name='sim_puk']").val();
+        var sim_number = $("input[name='sim_number_phone']").val();
         var imei = $("input[name='imei']").val();
+        var validation_ok = true;
 
         $('#add_equipment').submit(function(){
             send = true;
@@ -203,77 +283,119 @@
         }
 
         if (model == '') {
-            alert("Podaj nazwę modelu!");
-            return false;
+            $('#alert_model').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_model').fadeOut(1000);
+        }
+
+        if (sim_number == '') {
+            $('#alert_sim_number_phone').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_sim_number_phone').fadeOut(1000);
         }
 
         if (serial_code == '') {
-            alert("Podaj numer seryjny!");
-            return false;
+            $('#alert_serial_code').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_serial_code').fadeOut(1000);
         }
 
         if (description == '') {
-            alert("Dodaj opis!");
-            return false;
+            $('#alert_description').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_description').fadeOut(1000);
         }
 
         if (imei == '') {
-            alert("Podaj nazwę IMEI!");
-            return false;
+            $('#alert_imei').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_imei').fadeOut(1000);
         }
 
         if (laptop_ram == '') {
-            alert("Podaj ilość pamięci RAM!");
-            return false;
+            $('#alert_laptop_ram').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_laptop_ram').fadeOut(1000);
         }
 
         if (laptop_processor == '') {
-            alert("Podaj nazwę procesora!");
-            return false;
+            $('#alert_laptop_processor').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_laptop_processor').fadeOut(1000);
         }
 
         if (laptop_hard_drive == '') {
-            alert("Podaj dane dysku twardego!");
-            return false;
+            $('#alert_laptop_hard_drive').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_laptop_hard_drive').fadeOut(1000);
         }
 
         if (power_cable == 'Wybierz') {
-            alert("Zaznacz czy sprzęt posiada kabel zasilający!");
-            return false;
+            $('#alert_power_cable').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_power_cable').fadeOut(1000);
         }
 
         if (phone_box == 'Wybierz') {
-            alert("Zaznacz czy telefon posiada opakowanie!");
-            return false;
+            $('#alert_phone_box').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_phone_box').fadeOut(1000);
         }
 
         if (tablet_modem == 'Wybierz') {
-            alert("Zaznacz czy tablet posiada modem 3G!");
-            return false;
+            $('#alert_tablet_modem').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_tablet_modem').fadeOut(1000);
         }
 
         if (sim_net == 'Wybierz') {
-            alert("Zaznacz czy telefon posiada dostęp do internetu!");
-            return false;
+            $('#alert_sim_net').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_sim_net').fadeOut(1000);
         }
 
         if (sim_type == 'Wybierz') {
-            alert("Zaznacz typ umowy!");
-            return false;
+            $('#alert_sim_type').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_sim_type').fadeOut(1000);
         }
 
         if (sim_pin == '') {
-            alert("Podaj numer PIN!");
-            return false;
+            $('#alert_sim_pin').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_sim_pin').fadeOut(1000);
         }
 
         if (sim_puk == '') {
-            alert("Podaj numer PUK!");
-            return false;
+            $('#alert_sim_puk').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_sim_puk').fadeOut(1000);
         }
 
         if (signal_cable == 'Wybierz') {
-            alert("Zaznacz czy monitor posiada kabel sygnałowy!");
+            $('#alert_signal_cable').fadeIn(1000);
+            validation_ok = false;
+        }else {
+            $('#alert_signal_cable').fadeOut(1000);
+        }
+
+        if(validation_ok == false)
+        {
             return false;
         }
 
