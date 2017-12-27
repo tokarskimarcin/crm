@@ -182,6 +182,7 @@ class ScheduleController extends Controller
                     if($i == 9)
                     {
                         $czas_plus = $i+1;
+                        $czas = '0' . $i;
                     }else {
                         $czas_plus = '0' . $i + 1;
                         $czas = '0' . $i;
