@@ -252,107 +252,112 @@
 
         if (model == '') {
             $('#alert_model').fadeIn(1000);
-            return false;
+            validation_ok = false;
         }else {
             $('#alert_model').fadeOut(1000);
         }
 
         if (serial_code == '') {
             $('#alert_serial_code').fadeIn(1000);
-            return false;
+            validation_ok = false;
         }else {
             $('#alert_serial_code').fadeOut(1000);
         }
 
         if (description == '') {
             $('#alert_description').fadeIn(1000);
-            return false;
+            validation_ok = false;
         }else {
             $('#alert_description').fadeOut(1000);
         }
 
         if (imei == '') {
             $('#alert_imei').fadeIn(1000);
-            return false;
+            validation_ok = false;
         }else {
             $('#alert_imei').fadeOut(1000);
         }
 
         if (laptop_ram == '') {
             $('#alert_laptop_ram').fadeIn(1000);
-            return false;
+            validation_ok = false;
         }else {
             $('#alert_laptop_ram').fadeOut(1000);
         }
 
         if (laptop_processor == '') {
             $('#alert_laptop_processor').fadeIn(1000);
-            return false;
+            validation_ok = false;
         }else {
             $('#alert_laptop_processor').fadeOut(1000);
         }
 
         if (laptop_hard_drive == '') {
             $('#alert_laptop_hard_drive').fadeIn(1000);
-            return false;
+            validation_ok = false;
         }else {
             $('#alert_laptop_hard_drive').fadeOut(1000);
         }
 
         if (power_cable == 'Wybierz') {
             $('#alert_power_cable').fadeIn(1000);
-            return false;
+            validation_ok = false;
         }else {
             $('#alert_power_cable').fadeOut(1000);
         }
 
         if (phone_box == 'Wybierz') {
             $('#alert_phone_box').fadeIn(1000);
-            return false;
+            validation_ok = false;
         }else {
             $('#alert_phone_box').fadeOut(1000);
         }
 
         if (tablet_modem == 'Wybierz') {
             $('#alert_tablet_modem').fadeIn(1000);
-            return false;
+            validation_ok = false;
         }else {
             $('#alert_tablet_modem').fadeOut(1000);
         }
 
         if (sim_net == 'Wybierz') {
             $('#alert_sim_net').fadeIn(1000);
-            return false;
+            validation_ok = false;
         }else {
             $('#alert_sim_net').fadeOut(1000);
         }
 
         if (sim_type == 'Wybierz') {
             $('#alert_sim_type').fadeIn(1000);
-            return false;
+            validation_ok = false;
         }else {
             $('#alert_sim_type').fadeOut(1000);
         }
 
         if (sim_pin == '') {
             $('#alert_sim_pin').fadeIn(1000);
-            return false;
+            validation_ok = false;
         }else {
             $('#alert_sim_pin').fadeOut(1000);
         }
 
         if (sim_puk == '') {
             $('#alert_sim_puk').fadeIn(1000);
-            return false;
+            validation_ok = false;
         }else {
             $('#alert_sim_puk').fadeOut(1000);
         }
 
         if (signal_cable == 'Wybierz') {
             $('#alert_signal_cable').fadeIn(1000);
-            return false;
+            validation_ok = false;
         }else {
             $('#alert_signal_cable').fadeOut(1000);
+        }
+
+        if(validation_ok == false)
+        {
+            return false;
         }
     });
 
