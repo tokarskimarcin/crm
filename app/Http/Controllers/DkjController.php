@@ -537,7 +537,7 @@ class DkjController extends Controller
                 join('users', 'dkj.id_user', '=', 'users.id')
                 ->join('department_info', 'dkj.department_info_id', '=', 'department_info.id')
                 ->select(DB::raw("
-                dkj.department_info_id,
+                department_info.id as department_info_id,
                 department_info.type,
                 count(dkj.id) as all_check_talk,
                 sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as shipping_all,
@@ -546,7 +546,7 @@ class DkjController extends Controller
                 sum(CASE WHEN users.dating_type = 1 and  dkj.dkj_status = 1  THEN 1 ELSE 0 END) as shipping_janky_count,
                 SUM(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as all_bad"))
                 ->where('dkj.add_date','like',$today)
-                ->groupBy('dkj.department_info_id','department_info.type')->get();
+                ->groupBy('department_info.id','department_info.type')->get();
           return $dkj_user;
         }
     }

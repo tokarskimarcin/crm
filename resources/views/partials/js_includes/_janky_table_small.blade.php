@@ -1,5 +1,6 @@
 <script>
 $( "#check_messages" ).on('click', function() {
+    $("#check_messages").css("pointer-events", "none");
     $.ajax({
         type: "POST",
         url: '{{ route('api.getStats') }}',
@@ -8,7 +9,7 @@ $( "#check_messages" ).on('click', function() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         success: function(response) {
-          console.log(response);
+            console.log(response);
             for (var i = 0; i < response.length; i++) {
                 if(response[i].type == 'Badania/Wysyłka')
                 {
@@ -32,6 +33,7 @@ $( "#check_messages" ).on('click', function() {
                     $("#" + response[i].department_info_id + "dkjstatus td[name='status']").addClass("alert-success");
                 }
             }
+            $("#check_messages").css("pointer-events", "auto");
         }
     });
 });
