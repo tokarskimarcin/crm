@@ -54,6 +54,7 @@ function getStartAndEndDate($week, $year) {
                                             <h1 style ="font-family: 'bebas_neueregular',sans-serif; margin-top:0px;text-shadow: 2px 2px 2px rgba(150, 150, 150, 0.8); font-size:25px;">Wybierz tydzień:</h1>
                                             <form class="form-horizontal" method="post" action="{{URL::to('/set_schedule')}}">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                                <input type="hidden" name="schedule_year" id="schedule_year" value="">
                                                 <select class="form-control" name="show_schedule" id="week_text">
                                                     @php($date = new DateTime())
                                                     @for ($i=0; $i < 5; $i++)
@@ -174,6 +175,22 @@ function getStartAndEndDate($week, $year) {
 @section('script')
     <script src="{{ asset('/js/moment.js')}}"></script>
 <script>
+    function setYear() {
+        var week_text = $('#week_text').val();
+        var now = new Date();
+        var year = now.getFullYear();
+        if (week_text < 20) {
+            $('#schedule_year').attr('value', year + 1);
+        } else {
+            $('#schedule_year').attr('value', year);
+        }
+    }
+    $(document).ready(function(){
+        setYear();
+    });
+    $('#week_text').on('change', function() {
+        setYear();
+    });
     moment().format();
     function format ( d ) {
         var start_work = Array(d.monday_start,d.tuesday_start,d.wednesday_start,d.thursday_start,d.friday_start,d.saturday_start,d.sunday_start);
