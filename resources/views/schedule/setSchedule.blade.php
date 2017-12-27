@@ -220,7 +220,7 @@ function getStartAndEndDate($week, $year) {
                 table+='<span class="glyphicon glyphicon-arrow-down"></span>';
 
                 time = moment('07'+':'+'45','HH:mm');
-                table+='<select name='+week_array[i]+'_stop_work class="form-control" style="font-size:12px">'+
+                table+='<select name='+week_array[i]+'_stop_work class="form-control" style="font-size:12px; min-width: 90px">'+
                     '<option>Wybierz</option>';
                 while(time.format("HH")!='21')
                 {
