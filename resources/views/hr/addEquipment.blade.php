@@ -37,24 +37,48 @@
                         <div class="form-group">
                             <label for="model">Model</label>
                             <input name="model" id="model" type="text" class="form-control" placeholder="Model"/>
-                        <div>
+                        </div>
+
+                            <div class="alert alert-danger" style="display: none" id="alert_model">
+                                <label>Podaj nazwę modelu!</label>
+                            </div>
+
                         <div class="form-group">
                             <label for="serial_code">Numer seryjny</label>
                             <input name="serial_code" id="serial_code" type="text" class="form-control" placeholder="Numer seryjny" />
-                        <div>
+                        </div>
+
+                            <div class="alert alert-danger" style="display: none" id="alert_serial_code">
+                                <label>Podaj numer seryjny!</label>
+                            </div>
+
                         @if($equipments_types->id == 1)
                             <div class="form-group">
                                 <label for="laptop_processor">Procesor:</label>
                                 <input name="laptop_processor" id="laptop_processor" type="text" class="form-control" placeholder="Procesor"/>
-                            <div>
+                            </div>
+
+                                <div class="alert alert-danger" style="display: none" id="alert_laptop_processor">
+                                    <label >Wpisz nazwę procesor!</label>
+                                </div>
+
                             <div class="form-group">
                                 <label for="laptop_ram">Pamięć RAM:</label>
                                 <input name="laptop_ram" id="laptop_ram" type="text" class="form-control" placeholder="Pamięć RAM"/>
-                            <div>
+                            </div>
+
+                                <div class="alert alert-danger" style="display: none" id="alert_laptop_ram">
+                                    <label >Podaj ilość RAM!</label>
+                                </div>
+
                             <div class="form-group">
                                 <label for="laptop_hard_drive">Dysk twardy:</label>
                                 <input name="laptop_hard_drive" id="laptop_hard_drive" type="text" class="form-control" placeholder="Dysk twardy" />
-                            <div>
+                            </div>
+
+                                <div class="alert alert-danger" style="display: none" id="alert_laptop_hard_drive">
+                                    <label >Podaj pojemność dysku!</label>
+                                </div>
                         @endif
                         @if($equipments_types->id == 2)
                             <div class="form-group">
@@ -64,7 +88,10 @@
                                     <option value="1">Tak</option>
                                     <option value="0">Nie</option>
                                 </select>
-                            <div>
+                            </div>
+                                <div class="alert alert-danger" style="display: none" id="alert_phone_box">
+                                    <label >Wybierz opcje!</label>
+                                </div>
                         @endif
                         @if($equipments_types->id == 3)
                             <div class="form-group">
@@ -74,27 +101,46 @@
                                     <option value="1">Tak</option>
                                     <option value="0">Nie</option>
                                 </select>
-                            <div>
+                            </div>
+                            <div class="alert alert-danger" style="display: none" id="alert_tablet_modem">
+                                <label>Wybierz opcje!</label>
+                            </div>
                         @endif
                         @if($equipments_types->id == 3 || $equipments_types->id == 2 || $equipments_types->id == 4)
                             <div class="form-group">
                                 <label for="imei">Numer IMEI</label>
                                 <input name="imei" id="imei" type="text" class="form-control" placeholder="Numer IMEI"/>
-                            <div>
+                            </div>
+                            <div class="alert alert-danger" style="display: none" id="alert_imei">
+                                <label >Podaj imei!</label>
+                            </div>
                         @endif
                         @if($equipments_types->id == 4)
                             <div class="form-group">
                                 <label for="sim_number_phone">Numer telefonu</label>
                                 <input name="sim_number_phone" id="sim_number_phone" type="text" class="form-control" placeholder="Numer telefonu"/>
-                            <div>
+                            </div>
+                            <div class="alert alert-danger" style="display: none" id="alert_sim_number_phone">
+                                <label>Podaj numer telefonu!</label>
+                            </div>
                             <div class="form-group">
                                 <label for="sim_pin">Numer PIN</label>
                                 <input name="sim_pin" id="sim_pin" type="text" class="form-control" placeholder="Numer PIN"/>
-                            <div>
+                            </div>
+
+                            <div class="alert alert-danger" style="display: none" id="alert_sim_pin">
+                                <label>Podaj PIN!</label>
+                            </div>
+
                             <div class="form-group">
                                 <label for="sim_puk">Numer PUK</label>
                                 <input name="sim_puk" id="sim_puk" type="text" class="form-control" placeholder="Numer PUK"/>
-                            <div>
+                            </div>
+
+                            <div class="alert alert-danger" style="display: none" id="alert_sim_puk">
+                                <label>Podaj numer PUK!</label>
+                            </div>
+
                             <div class="form-group">
                                 <label for="sim_type">Typ umowy</label>
                                 <select name="sim_type" class="form-control">
@@ -102,7 +148,12 @@
                                     <option value="1">Abonament</option>
                                     <option value="2">Prepaid</option>
                                 </select>
-                            <div>
+                            </div>
+
+                            <div class="alert alert-danger" style="display: none" id="alert_sim_type">
+                                <label>Wybierz typ umowy!</label>
+                            </div>
+
                             <div class="form-group">
                                 <label for="sim_net">Internet</label>
                                 <select name="sim_net" class="form-control">
@@ -110,7 +161,11 @@
                                     <option value="1">Tak</option>
                                     <option value="0">Nie</option>
                                 </select>
-                            <div>
+                            </div>
+
+                            <div class="alert alert-danger" style="display: none" id="alert_sim_net">
+                                <label>Wybierz opcje!</label>
+                            </div>
                         @endif
                         @if($equipments_types->id != 4)
                             <div class="form-group">
@@ -120,7 +175,10 @@
                                     <option value="1">Tak</option>
                                     <option value="0">Nie</option>
                                 </select>
-                            <div>
+                            </div>
+                                <div class="alert alert-danger" style="display: none" id="alert_power_cable">
+                                    <label>Wybierz stan kabla zasilającego!</label>
+                                </div>
                         @endif
                         @if($equipments_types->id == 5)
                             <div class="form-group">
@@ -130,13 +188,18 @@
                                     <option value="1">Tak</option>
                                     <option value="0">Nie</option>
                                 </select>
-                            <div>
+                            </div>
+                                <div class="alert alert-danger" style="display: none" id="alert_signal_cable">
+                                    <label>Wybierz stan kabla sygnałowego!</label>
+                                </div>
                         @endif
                         <div class="form-group">
                             <label for="description">Opis</label>
                             <input name="description" id="description" type="text" class="form-control" placeholder="Opis"/>
-                        <div>
-                        <br />
+                        </div>
+                            <div class="alert alert-danger" style="display: none" id="alert_description">
+                                <label>Podaj opis!</label>
+                            </div>
                         <div class="form-group">
                             <input type="submit" value="Dodaj" class="btn btn-success" id="add_button"/>
                         </div>
@@ -188,83 +251,109 @@
         }
 
         if (model == '') {
-            alert("Podaj nazwę modelu!");
+            $('#alert_model').fadeIn(1000);
             return false;
+        }else {
+            $('#alert_model').fadeOut(1000);
         }
 
         if (serial_code == '') {
-            alert("Podaj numer seryjny!");
+            $('#alert_serial_code').fadeIn(1000);
             return false;
+        }else {
+            $('#alert_serial_code').fadeOut(1000);
         }
 
         if (description == '') {
-            alert("Dodaj opis!");
+            $('#alert_description').fadeIn(1000);
             return false;
+        }else {
+            $('#alert_description').fadeOut(1000);
         }
 
         if (imei == '') {
-            alert("Podaj nazwę IMEI!");
+            $('#alert_imei').fadeIn(1000);
             return false;
+        }else {
+            $('#alert_imei').fadeOut(1000);
         }
 
         if (laptop_ram == '') {
-            alert("Podaj ilość pamięci RAM!");
+            $('#alert_laptop_ram').fadeIn(1000);
             return false;
+        }else {
+            $('#alert_laptop_ram').fadeOut(1000);
         }
 
         if (laptop_processor == '') {
-            alert("Podaj nazwę procesora!");
+            $('#alert_laptop_processor').fadeIn(1000);
             return false;
+        }else {
+            $('#alert_laptop_processor').fadeOut(1000);
         }
 
         if (laptop_hard_drive == '') {
-            alert("Podaj dane dysku twardego!");
+            $('#alert_laptop_hard_drive').fadeIn(1000);
             return false;
+        }else {
+            $('#alert_laptop_hard_drive').fadeOut(1000);
         }
 
         if (power_cable == 'Wybierz') {
-            alert("Zaznacz czy sprzęt posiada kabel zasilający!");
+            $('#alert_power_cable').fadeIn(1000);
             return false;
+        }else {
+            $('#alert_power_cable').fadeOut(1000);
         }
 
         if (phone_box == 'Wybierz') {
-            alert("Zaznacz czy telefon posiada opakowanie!");
+            $('#alert_phone_box').fadeIn(1000);
             return false;
+        }else {
+            $('#alert_phone_box').fadeOut(1000);
         }
 
         if (tablet_modem == 'Wybierz') {
-            alert("Zaznacz czy tablet posiada modem 3G!");
+            $('#alert_tablet_modem').fadeIn(1000);
             return false;
+        }else {
+            $('#alert_tablet_modem').fadeOut(1000);
         }
 
         if (sim_net == 'Wybierz') {
-            alert("Zaznacz czy telefon posiada dostęp do internetu!");
+            $('#alert_sim_net').fadeIn(1000);
             return false;
+        }else {
+            $('#alert_sim_net').fadeOut(1000);
         }
 
         if (sim_type == 'Wybierz') {
-            alert("Zaznacz typ umowy!");
+            $('#alert_sim_type').fadeIn(1000);
             return false;
+        }else {
+            $('#alert_sim_type').fadeOut(1000);
         }
 
         if (sim_pin == '') {
-            alert("Podaj numer PIN!");
+            $('#alert_sim_pin').fadeIn(1000);
             return false;
+        }else {
+            $('#alert_sim_pin').fadeOut(1000);
         }
 
         if (sim_puk == '') {
-            alert("Podaj numer PUK!");
+            $('#alert_sim_puk').fadeIn(1000);
             return false;
+        }else {
+            $('#alert_sim_puk').fadeOut(1000);
         }
 
         if (signal_cable == 'Wybierz') {
-            alert("Zaznacz czy monitor posiada kabel sygnałowy!");
+            $('#alert_signal_cable').fadeIn(1000);
             return false;
+        }else {
+            $('#alert_signal_cable').fadeOut(1000);
         }
-
-
-
-
     });
 
 </script>

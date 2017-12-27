@@ -4,18 +4,18 @@
         <a id="check_messages_dkj" class="dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="fa fa-envelope fa-fw"></i><i class="fa fa-caret-down"></i>
         </a>
-        <ul class="dropdown-menu dropdown-messages" style="width: 150vh; max-height: 350px; margin-right: -100px">
+        <ul class="dropdown-menu dropdown-messages" >
                 <strong>Oddziały</strong>
             <li>
                 <div class="table-responsive" style="max-height: 300px">
                   <table class="table table-bordered" style="margin-bottom:0px">
                     <thead>
                         <tr>
-                            <th style="width: 10%">Lp.</th>
-                            <th>Oddział</th>
-                            <th>Status</th>
-                            <th style="width: 20%">Janki</th>
-                            <th style="width: 10%">Odrzuconych</th>
+                            <th>Lp.</th>
+                            <th >Oddział</th>
+                            <th >Status</th>
+                            <th >Janki</th>
+                            <th >Odrzuconych</th>
                         </tr>
                     </thead>
                     <tbody>
