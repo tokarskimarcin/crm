@@ -22,33 +22,38 @@ function countNotifications() {
           }
       });
 }
+let ajaxRunningNotifications = false;
 $(document).ready(function(){
     $("#it_support").on('click', function() {
-        var department_info_id = $("#change_department").val();
-        $("#it_notifications").empty();
-        $("#it_support").css("pointer-events", "none");
-        $.ajax({
-                type: "POST",
-                url: '{{ route('api.itSupport') }}',
-                data: {
-                  "department_info_id":department_info_id
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                    countNotifications();
-                    clickDisabled = true;
-                    setTimeout(function(){clickDisabled = false;}, 2000);
-                    if(response.length == 0) {
-                        $("#it_notifications").append("<li>Brak nowych zgłoszeń!</li>");
+        if (ajaxRunningNotifications == false) {
+            ajaxRunningNotifications = true;
+            var department_info_id = $("#change_department").val();
+            $("#it_notifications").empty();
+            $("#it_support").css("pointer-events", "none");
+            $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.itSupport') }}',
+                    data: {
+                      "department_info_id":department_info_id
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        countNotifications();
+                        clickDisabled = true;
+                        setTimeout(function(){clickDisabled = false;}, 2000);
+                        if(response.length == 0) {
+                            $("#it_notifications").append("<li>Brak nowych zgłoszeń!</li>");
+                        }
+                        for (var i = 0; i < response.length; i++) {
+                            $("#it_notifications").append("<li><a href='{{URL::to('/show_notification/')}}/" + response[i].id + "'><div><i class='fa fa-comment fa-fw'></i><span> " +response[i].notification_type.name+": "+ response[i].title +" ("+response[i].user.last_name+")"+ "</span></div></a></li><li class='divider'></li>");
+                        }
+                        $("#it_support").css("pointer-events", "auto");
+                        ajaxRunningNotifications = false;
                     }
-                    for (var i = 0; i < response.length; i++) {
-                        $("#it_notifications").append("<li><a href='{{URL::to('/show_notification/')}}/" + response[i].id + "'><div><i class='fa fa-comment fa-fw'></i><span> " +response[i].notification_type.name+": "+ response[i].title +" ("+response[i].user.last_name+")"+ "</span></div></a></li><li class='divider'></li>");
-                    }
-                    $("#it_support").css("pointer-events", "auto");
-                }
-            });
+                });
+        }
     });
 });
 </script>

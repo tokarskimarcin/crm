@@ -33,6 +33,9 @@
           {{-- Including DKJ table big --}}
           @include('partials.nav_includes._blocked_for_dkj_big')
 
+          {{-- Including table for DKJ users--}}
+          @include('partials.nav_includes._users_table')
+
       @endforeach
 
       {{-- Including multiple departments selector --}}
