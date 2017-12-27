@@ -1,11 +1,11 @@
 @extends('layouts.main')
 @section('style')
     <style>
-        .table td {
+        .live_user td {
                  text-align: center;
             font-weight: bold;
              }
-        table {
+        live_user {
             table-layout: fixed;
             word-wrap: break-word;
         }
@@ -29,7 +29,7 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                     <div class="well">
-                                    <table class="table table-bordered">
+                                    <table class="table table-bordered live_user">
                                         <thead>
                                         <tr>
                                             <th style="width: 6%;">Lp.</th>
