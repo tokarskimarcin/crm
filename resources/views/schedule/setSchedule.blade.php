@@ -183,7 +183,7 @@ function getStartAndEndDate($week, $year) {
         var day = $("#week_text option:selected").text();
         day = day.split(" ");
         var start_date = moment(day[0], "YYYY.MM.DD");
-        var table = '<table class="table-bordered">'+
+        var table = '<table class="table-bordered" style="width: 100%">'+
             '<thead>' +
             '<tr>';
             for(var i=0;i<7;i++)
