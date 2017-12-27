@@ -31,7 +31,7 @@ var defaultParams = {
   confirmButtonAriaLabel: '',
   confirmButtonColor: '#3085d6',
   confirmButtonClass: null,
-  cancelButtonText: 'Cancel',
+  cancelButtonText: 'Anuluj',
   cancelButtonAriaLabel: '',
   cancelButtonColor: '#aaa',
   cancelButtonClass: null,

@@ -68,16 +68,16 @@
             register_stop = $('#register_stop').val();
             if(register_start == null || register_start =='')
             {
-                alert('Brak godziny rozpoczęcia pracy');
+                swal('Brak godzin rozpoczęcia pracy!')
             }else if (register_stop == null || register_stop =='') {
-                alert('Brak godziny zakończenia pracy');
-            }else if(register_stop < register_start)
+                swal('Brak godziny zakończenia pracy!')
+            }else if(register_stop <= register_start)
             {
-                alert('Błędne godziny.')
+                swal('Błędne godziny')
             }else if(register_start < '07:00'){
-                alert('Pracę możesz rozpocząć najwcześniej o godzinie 7!');
+                swal('Pracę możesz rozpocząć najwcześniej o godzinie 7!')
             }else if(register_stop > '21:00'){
-                alert('Pracę możesz zakończyć najpóźniej o godzinie 21!');
+                swal('Pracę możesz zakończyć najpóźniej o godzinie 21!')
             }
             else
             {

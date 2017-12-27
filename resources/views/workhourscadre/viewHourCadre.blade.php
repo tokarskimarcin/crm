@@ -230,8 +230,13 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        alert("Godziny zostały usunięte");
-                        location.reload();
+                        if (response == 1) {
+                            alert("Godziny zostały usunięte");
+                            location.reload();
+                        } else {
+                            alert('Ups! Coś poszło nie tak. Skontaktuj się z administratorem!');
+                        }
+
                     }
                 });
             }

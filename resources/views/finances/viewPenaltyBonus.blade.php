@@ -366,6 +366,7 @@ $("#addpbsubmit").click(function () {
                 success: function(response) {
                     if (response == 0) {
                         alert('Ups, coś poszło nie tak. Skontaktuj się z administratorem!');
+                        $( "#edit_user_modal" ).removeAttr('disabled');
                     } else {
                         location.reload();
                     }

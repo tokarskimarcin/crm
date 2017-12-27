@@ -87,16 +87,16 @@
             success = $('#success_add').val();
             if(accept_start == null || accept_start =='')
             {
-                alert('Brak godziny rozpoczęcia pracy');
+                swal('Brak godziny rozpoczęcia pracy')
             }else if (accept_stop == null || accept_stop =='')
-                alert('Brak godziny zakończenia pracy');
+                swal('Brak godziny zakończenia pracy')
             else if(success <0)
             {
-                alert('Liczba zgód nie może być mniejsza niż zero');
+                swal('Liczba zgód nie może być mniejsza niż zero')
             }
             else if(accept_start >= accept_stop)
             {
-                alert('Godziny są ustawione niepoprawnie');
+                swal('Godziny są ustawione niepoprawnie')
             }else
             {
                 $(this).attr('disabled',true);
@@ -114,7 +114,7 @@
                         window.location.reload(true);
                     },
                     error: function(response) {
-                        alert('Wystąpił problem z bazą danych. Prosimy spróbuj później.');
+                        swal('Wystąpił problem z bazą danych. Prosimy spróbuj później.')
                         location.reload();
                     }
                 });

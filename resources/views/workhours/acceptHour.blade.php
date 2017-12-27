@@ -229,11 +229,11 @@
             {
                 if(modify_start == '' || modify_stop == '')
                 {
-                    alert("Brak wszystkich godzin w modyfikacji");
+                    swal("Brak wszystkich godzin w modyfikacji")
                     validate = 0;
                 }else if(modify_start > modify_stop)
                 {
-                    alert("Godziny są ustawione niepoprawnie");
+                    swal("Godziny są ustawione niepoprawnie")
                     validate = 0;
                 }else
                 {
@@ -241,7 +241,7 @@
                 }
             }else if(register_start == 'Brak infromacji' || register_stopt == 'Brak infromacji')
             {
-                alert("Brak wszystkich godzin w modyfikacji");
+                swal("Brak wszystkich godzin w modyfikacji")
                 validate = 0;
             }else
             {
@@ -267,7 +267,7 @@
                     success: function(response) {
                         if(response == '-1')
                         {
-                            alert("Brak zarejestrowanych godzin");
+                            swal("Brak zarejestrowanych godzin")
                         }else
                             table.ajax.reload();
                             $("#success_div").fadeIn();

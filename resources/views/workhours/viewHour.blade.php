@@ -223,25 +223,34 @@
         });
 
         $( ".delete" ).click(function() {
-            conf = confirm('Czy napewno chcesz usunąć godziny pracy?');
 
-            if (conf == true) {
-                var id = (this.id);
-                $(this).attr('disabled',true);
-                $.ajax({
-                    type: "POST",
-                    url: '{{ route('api.deleteAcceptHour') }}',
-                    data: {
-                        "id": id
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        window.location.reload(true);
-                    }
-                });
+          swal({
+            title: 'Usunąć godziny pracy?',
+            text: "",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Tak'
+          }).then((result) => {
+            if (result.value) {
+              var id = (this.id);
+              $(this).attr('disabled',true);
+              $.ajax({
+                  type: "POST",
+                  url: '{{ route('api.deleteAcceptHour') }}',
+                  data: {
+                      "id": id
+                  },
+                  headers: {
+                      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                  },
+                  success: function(response) {
+                      window.location.reload(true);
+                  }
+              });
             }
+          })
         });
     </script>
 @endsection

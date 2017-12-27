@@ -329,13 +329,18 @@ class WorkHoursController extends Controller
         if($request->ajax())
         {
             $id = $request->id;
-                Work_Hour::where('id', $id)
-                    ->update(['id_manager' => Auth::id(),
-                        'success' => 0,
-                        'accept_start' => null,
-                        'accept_stop' => null,
-                        'status' => 6]);
+            $checkWorkHour = Work_Hour::find($id);
+            if ($checkWorkHour == null) {
+                return 0;
+            }
+            Work_Hour::where('id', $id)
+                ->update(['id_manager' => Auth::id(),
+                    'success' => 0,
+                    'accept_start' => null,
+                    'accept_stop' => null,
+                    'status' => 6]);
             new ActivityRecorder(5, 'Usunięcie godzin pracy, wpis id godzin pracy: ' . $id);
+            return 1;
         }
     }
     public function editAcceptHour(Request $request)

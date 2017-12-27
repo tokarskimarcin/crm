@@ -232,6 +232,9 @@ class FinancesController extends Controller
             if ($object == null) {
                 return 0;
             }
+            if ($request->type != 1 && $request->type != 2) {
+                return 0;
+            }
             $object->type = $request->type;
             $object->amount = $request->amount;
             $object->comment = $request->comment;

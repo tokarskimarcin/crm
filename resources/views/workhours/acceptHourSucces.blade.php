@@ -234,22 +234,22 @@
             {
                 if(modify_start == '' || modify_stop == '')
                 {
-                    alert("Brak wszystkich godzin w modyfikacji");
+                    swal("Brak wszystkich godzin w modyfikacji")
                     validate = 0;
                 }else if(modify_start > modify_stop)
                 {
-                    alert("Godziny są ustawione niepoprawnie");
+                    swal("Godziny są ustawione niepoprawnie")
                     validate = 0;
                 }else
                     type_edit = 1;
             }else if(register_start == 'Brak infromacji' || register_stopt == 'Brak infromacji')
             {
-                alert("Brak wszystkich godzin w modyfikacji");
+                swal("Brak wszystkich godzin w modyfikacji")
                 validate = 0;
             }
             if(succes>100 || succes < 0 || succes == '' )
             {
-                alert("Błędne informacje o ilości sukcesów");
+                swal("Błędne informacje o ilości sukcesów")
                 validate = 0;
             }
             if(validate == 1)
@@ -271,7 +271,7 @@
                     success: function(response) {
                         if(response == '-1')
                         {
-                            alert("Brak zarejestrowanych godzin");
+                            swal("Brak zarejestrowanych godzin")
                         }else
                             table.ajax.reload();
                             $("#success_div").fadeIn();
@@ -282,19 +282,4 @@
 
         });
     </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @endsection
