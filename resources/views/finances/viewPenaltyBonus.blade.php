@@ -85,65 +85,68 @@
                                     <h1 style ="font-family: 'bebas_neueregular'; text-shadow: 2px 2px 2px rgba(150, 150, 150, 0.8); font-size:30px;">Sprawdź Karę/Premię</h1>
                                 </div>
 
-                                <div class="col-md-3">
-
-
+                                <div class="col-md-12">
                                     <div class="well">
                                         <div class="form-group">
-
                                             <form action="view_penalty_bonus" method="post">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                                <label for="exampleInputPassword1">Pracownik:</label>
-                                                <select name="showuser" class="form-control" style="font-size:18px;">
+                                                <div class="col-md-4">
+                                                    <label for="exampleInputPassword1">Pracownik:</label>
+                                                    <select name="showuser" class="form-control" style="font-size:18px;">
 
-                                                    @if(isset($showuser))
-                                                        @if($showuser == -1)
-                                                              <option value="-1" selected>Wszyscy</option>
+                                                        @if(isset($showuser))
+                                                            @if($showuser == -1)
+                                                                  <option value="-1" selected>Wszyscy</option>
+                                                            @else
+                                                                  <option value="-1">Wszyscy</option>
+                                                            @endif
                                                         @else
-                                                              <option value="-1">Wszyscy</option>
+                                                            <option value="-1" selected>Wszyscy</option>
                                                         @endif
-                                                    @else
-                                                        <option value="-1" selected>Wszyscy</option>
-                                                    @endif
 
-                                                    @foreach($users as $user)
+                                                        @foreach($users as $user)
 
-                                                    @if(isset($showuser))
-                                                        @if($showuser == $user->id)
-                                                                <option value={{$user->id}} selected >{{$user->last_name.' '.$user->first_name}}</option>
+                                                        @if(isset($showuser))
+                                                            @if($showuser == $user->id)
+                                                                    <option value={{$user->id}} selected >{{$user->last_name.' '.$user->first_name}}</option>
+                                                            @else
+                                                                  <option value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
+                                                            @endif
                                                         @else
-                                                              <option value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
+                                                            <option value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
                                                         @endif
-                                                    @else
-                                                        <option value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
-                                                    @endif
 
 
 
-                                                    @endforeach
-                                                </select></br>
+                                                        @endforeach
+                                                    </select></br>
+                                                </div>
 
-                                                <label for="exampleInputPassword1">Zakres Od:</label>
-                                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                                    @if(isset($date_start))
-                                                        <input class="form-control" name="date_penalty_show_start" type="text" value="{{$date_start}}" readonly >
-                                                    @else
-                                                        <input class="form-control" name="date_penalty_show_start" type="text" value="{{date('Y-m-d')}}" readonly >
-                                                    @endif
+                                                <div class="col-md-4">
+                                                    <label for="exampleInputPassword1">Zakres Od:</label>
+                                                    <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                                        @if(isset($date_start))
+                                                            <input class="form-control" name="date_penalty_show_start" type="text" value="{{$date_start}}" readonly >
+                                                        @else
+                                                            <input class="form-control" name="date_penalty_show_start" type="text" value="{{date('Y-m-d')}}" readonly >
+                                                        @endif
 
-                                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                                                </div></br>
+                                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                                    </div></br>
+                                                </div>
 
-                                                <label for="exampleInputPassword1">Zakres Do:</label>
-                                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                                  @if(isset($date_stop))
-                                                      <input class="form-control" name="date_penalty_show_stop" type="text" value="{{$date_stop}}" readonly >
-                                                  @else
-                                                      <input class="form-control" name="date_penalty_show_stop" type="text" value="{{date('Y-m-d')}}" readonly >
-                                                  @endif
+                                                <div class="col-md-4">
+                                                    <label for="exampleInputPassword1">Zakres Do:</label>
+                                                    <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                                      @if(isset($date_stop))
+                                                          <input class="form-control" name="date_penalty_show_stop" type="text" value="{{$date_stop}}" readonly >
+                                                      @else
+                                                          <input class="form-control" name="date_penalty_show_stop" type="text" value="{{date('Y-m-d')}}" readonly >
+                                                      @endif
 
-                                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                                                </div></br>
+                                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                                    </div></br>
+                                                </div>
                                                 <button type="submit" class="btn btn-primary" name="showpbsubmit" style="font-size:18px; width:100%;">Wyszukaj</button>
 
                                             </form>
@@ -151,7 +154,7 @@
                                     </div>
                                 </div>
                                 @if(isset($users_show))
-                                <div class="col-md-9">
+                                <div class="col-md-12">
                                     <div class="well"><div class="tab-content">
                                             <div class="tab-pane active" id="profile">
                                                 <div class="panel-heading" style="border:1px solid #d3d3d3;"><b>Wyszukiwanie w zakresie od </b></div>
