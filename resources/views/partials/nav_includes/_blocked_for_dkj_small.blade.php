@@ -4,7 +4,7 @@
           <a id="check_messages" class="dropdown-toggle" data-toggle="dropdown" href="#">
               <i class="fa fa-envelope fa-fw"></i> <i class="fa fa-caret-down"></i>
           </a>
-          <ul class="dropdown-menu dropdown-messages" style="width: 80vh; max-height: 550px; margin-right: -200px">
+          <ul class="dropdown-menu dropdown-messages" style="width: 80vh; max-height: 550px;">
                   <strong>Oddziały</strong>
               <li>
                   <div class="table-responsive"  style="max-height: 500px">
