@@ -396,16 +396,16 @@ function getStartAndEndDate($week, $year) {
                         },
                         data:{"start_hours":$start_hour_array,"stop_hours":$stop_hour_array,"reasons":$reason_array,"id_user":id_user,"schedule_id":schedule_id},
                         success: function(response) {
-                            alert("Godziny zostały zarejestrowane!");
+                            swal("Godziny zostały zarejestrowane!")
                             location.reload();
                         }
                     });
                 }else {
                     if(time == false)
                     {
-                        alert("Godziny są nieprawidłowe");
+                        swal("Godziny są nieprawidłowe")
                     }else
-                    alert("Nie wszystkie dane zostały uzupełnione.");
+                    swal("Nie wszystkie dane zostały uzupełnione.")
                 }
 
             });

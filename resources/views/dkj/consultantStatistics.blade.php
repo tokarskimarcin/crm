@@ -197,11 +197,11 @@
         var users_id  =$("select[name='users_id']").val();
         if(department_id == 0)
         {
-            alert("Wybierz oddział");
+            swal("Wybierz oddział")
             return false;
         }if(users_id == 0)
         {
-            alert("Wybierz pracownika");
+            swal("Wybierz pracownika")
             return false;
         }
     });

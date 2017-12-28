@@ -116,12 +116,12 @@ $('#add_department_submit').on('click', function() {
     var city = $('#city').val();
 
     if (department == '-1' && city == '') {
-        alert('Wybierz oddział lub dodaj nowy!');
+        swal('Wybierz oddział lub dodaj nowy!')
         return false;
     }
 
     if (id_dep_type == 'Wybierz') {
-        alert('Wybierz typ oddziału!');
+        swal('Wybierz typ oddziału!')
         return false;
     }
 });

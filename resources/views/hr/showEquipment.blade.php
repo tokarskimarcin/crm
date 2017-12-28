@@ -156,10 +156,6 @@
 <script src="{{ asset('/js/dataTables.select.min.js')}}"></script>
 
 <script>
-$('.edit_me').on( 'click',function () {
-        var data = table.row( $(this).parents('tr') ).data();
-        alert( data[0] +"'s salary is: "+ data[ 5 ] );
-    } );
 
 table = $('#laptop').DataTable({
     "autoWidth": false,

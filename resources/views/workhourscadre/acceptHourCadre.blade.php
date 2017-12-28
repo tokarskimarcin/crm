@@ -27,8 +27,6 @@
 @endsection
 @section('content')
 
-
-
     {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
@@ -37,8 +35,6 @@
     </div>
 
     <div id="success_div" style="display: none;" class='alert alert-success'>Godziny zostały zaakceptowane!</div>
-
-
 
     <div class="row">
         <div class="col-lg-12">
@@ -245,11 +241,11 @@
             {
                 if(modify_start == '' || modify_stop == '')
                 {
-                    alert("Brak wszystkich godzin w modyfikacji");
+                    swal("Brak wszystkich godzin w modyfikacji")
                     validate = 0;
                 }else if(modify_start > modify_stop)
                 {
-                    alert("Godziny są ustawione niepoprawnie");
+                    swal("Godziny są ustawione niepoprawnie")
                     validate = 0;
                 }else
                     type_edit = 1;
@@ -274,7 +270,7 @@
                     success: function(response) {
                         if(response == '-1')
                         {
-                            alert("Brak zarejestrowanych godzin");
+                            swal("Brak zarejestrowanych godzin")
                         }else
                             table.ajax.reload();
                             $("#success_div").fadeIn();
