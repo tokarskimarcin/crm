@@ -22,10 +22,10 @@
               background-color: #000;
           }
 
-        table tr td:first-child + td + td + td + td{
+        .table-striped tr td:first-child + td + td + td + td{
             word-break: break-all;
         }
-        table tr td:first-child + td + td + td + td + td{
+        .table-striped tr td:first-child + td + td + td + td + td{
             word-break: break-all;
         }
 
