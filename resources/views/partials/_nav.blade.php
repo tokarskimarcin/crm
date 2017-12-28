@@ -104,10 +104,5 @@
         <div id="blok" style="display: none; width: 0px; height: 0px">
             <p><span id="notification_janky_count" style="display: none"></span></p>
         </div>
-        <style>
-            .container-fluid{
-                margin-top: 53px !important;
-            }
-        </style>
     @endif
 </nav>
