@@ -44,18 +44,51 @@
 {{-- End of includes --}}
 
 <script>
-//
+if (typeof(Storage) !== "undefined") {
+  if (!localStorage.menu_visible) {
+      localStorage.setItem("menu_visible", "true");
+  }
+}
 
-    $('#blok').on('click', () => {
-        window.location.replace("{{URL::to('/dkjVerification/')}}");
-    });
+$(document).ready(function() {
+    var menu_visible = localStorage.menu_visible;
 
-    setInterval(function () {
-        countNotifications();
-    },60000);
+    if (menu_visible == 'false') {
+        $('#sidebar-wrapper').fadeOut(0);
+        localStorage.setItem("menu_visible", "false");
+        $("#wrapper").toggleClass("toggled");
+        $('#wrapper.toggled').find("#sidebar-wrapper").find(".collapse").collapse('hide');
+    }
+});
+$("#menu-toggle").click(function(e) {
+    e.preventDefault();
 
-    $(document).ready(function(){
-        countNotifications();
-    });
+    var menu_visible = localStorage.menu_visible;
+
+    $("#wrapper").toggleClass("toggled");
+
+    if (menu_visible == 'true') {
+        $('#sidebar-wrapper').fadeOut(0);
+        localStorage.setItem("menu_visible", "false");
+    } else {
+        $('#sidebar-wrapper').fadeIn(0);
+        localStorage.setItem("menu_visible", "true");
+    }
+
+    $('#wrapper.toggled').find("#sidebar-wrapper").find(".collapse").collapse('hide');
+
+});
+
+$('#blok').on('click', () => {
+    window.location.replace("{{URL::to('/dkjVerification/')}}");
+});
+
+setInterval(function () {
+    countNotifications();
+},60000);
+
+$(document).ready(function(){
+    countNotifications();
+});
 
 </script>

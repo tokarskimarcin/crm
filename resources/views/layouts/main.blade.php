@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <div id="wrapper">
+    <div id="wrapper" class="toggle">
 
     @include('partials._nav')
 

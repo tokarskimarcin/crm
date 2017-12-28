@@ -8,6 +8,7 @@
 
     <link href="{{ asset('/css/bootstrap-datetimepicker.min.css')}}" rel="stylesheet">
     <link href="{{ asset('/css/bootstrap-select.min.css')}}" rel="stylesheet">
+    <link href="{{ asset('/css/toogle.css')}}" rel="stylesheet">
     <!-- Bootstrap Core CSS -->
     <link href="{{ asset('/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
     <!-- MetisMenu CSS -->

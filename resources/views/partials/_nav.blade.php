@@ -1,6 +1,14 @@
 <!-- Navigation -->
 <nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">
+      <ul class="nav navbar-top-links navbar-right">
+            <li>
+            	<!--menu toggle button -->
+                <button id="menu-toggle" type="button" data-toggle="button" class="btn btn-default btn-lg">
+                    <i class="fa fa-exchange fa-fw"></i>
+                </button>
+            </li>
+        </ul>
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
@@ -63,7 +71,7 @@
         </li>
     </ul>
 
-    <div class="navbar-default sidebar pre-scrollable" role="navigation" style="min-height: 93vh"  id="my_left_menu">
+    <div class="navbar-default sidebar pre-scrollable" role="navigation" style="min-height: 93vh"  id="sidebar-wrapper">
         <div class="sidebar-nav navbar-collapse">
             <ul class="nav" id="side-menu">
                 <li>
