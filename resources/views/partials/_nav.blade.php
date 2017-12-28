@@ -1,12 +1,17 @@
 <!-- Navigation -->
+
+<style>
+    .toggle.btn
+    {
+        margin-top: 7px;
+    }
+</style>
 <nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">
       <ul class="nav navbar-top-links navbar-right">
             <li>
             	<!--menu toggle button -->
-                <button id="menu-toggle" type="button" data-toggle="button" class="btn btn-default btn-lg" aria-pressed='false'>
-                    <i class="fa fa-exchange fa-fw"></i>
-                </button>
+                <input id="menu-toggle" type="checkbox" data-toggle="toggle">
             </li>
         </ul>
         <a class="navbar-brand" href="{{url('/')}}">TeamBox</a>

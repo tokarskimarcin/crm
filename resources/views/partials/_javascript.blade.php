@@ -14,7 +14,7 @@
 <script src="{{ asset('/js/sb-admin-2.js')}}"></script>
 <!-- Bootstrap Core JavaScript -->
 <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-
+<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 {{-- Here go includes from folder js_includes --}}
 
     {{-- Include JS for moving notifications div--}}
@@ -89,6 +89,7 @@ $(document).ready(function() {
     var menu_visible = localStorage.menu_visible;
 
     if (menu_visible == 'false') {
+        $('#menu-toggle').prop('checked', true).change();
         $('#sidebar-wrapper').fadeOut(0);
         localStorage.setItem("menu_visible", "false");
         $("#wrapper").toggleClass("toggled");
@@ -96,8 +97,8 @@ $(document).ready(function() {
     }
 });
 
-$('#menu-toggle').on('click', function(e) {
-      e.preventDefault();
+$('#menu-toggle').change(function() {
+
       var menu_visible = localStorage.menu_visible;
       if (menu_visible == 'true') {
           $('#sidebar-wrapper').fadeOut(0);
