@@ -44,6 +44,40 @@
 {{-- End of includes --}}
 
 <script>
+$(document).ready(function() {
+
+    var menu_visible = localStorage.menu_visible;
+    var windowMenu = $('#menu-toggle').attr('aria-pressed');
+
+    if (menu_visible == 'false') {
+        $('#menu-toggle').attr('aria-pressed', true);
+        $('#menu-toggle').addClass('active');
+    }
+
+
+});
+window.onfocus = function() {
+    checkForMenu();
+};
+function checkForMenu(){
+    var menu_visible = localStorage.menu_visible;
+
+    var windowMenu = $('#menu-toggle').attr('aria-pressed');
+    if (menu_visible == 'true' && windowMenu == false) {
+        $('#sidebar-wrapper').fadeIn(0);
+        $("#wrapper").toggleClass("toggled");
+        $('#wrapper.toggled').find("#sidebar-wrapper").find(".collapse").collapse('hide');
+    }
+
+    if (menu_visible == 'false' && windowMenu == true) {
+        $('#sidebar-wrapper').fadeOut(0);
+        $("#wrapper").toggleClass("toggled");
+        $('#wrapper.toggled').find("#sidebar-wrapper").find(".collapse").collapse('hide');
+    }
+
+
+}
+
 if (typeof(Storage) !== "undefined") {
   if (!localStorage.menu_visible) {
       localStorage.setItem("menu_visible", "true");
