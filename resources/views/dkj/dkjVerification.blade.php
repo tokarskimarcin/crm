@@ -15,7 +15,15 @@
         .panel-heading a.collapsed:after {
             content:"\e080";
         }
-
+        table tr td:first-child + td + td + td + td{
+            word-break: break-all;
+        }
+        table tr td:first-child + td + td + td + td + td{
+            word-break: break-all;
+        }
+        table tr td:first-child + td + td + td + td + td+ td+ td+ td{
+            word-break: break-all;
+        }
 
     </style>
 
