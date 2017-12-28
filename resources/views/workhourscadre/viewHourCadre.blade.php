@@ -215,9 +215,16 @@
 
 
         $( ".delete" ).click(function() {
-            var conf = confirm('Czy napewno chcesz usunąć godziny pracy?');
-
-            if (conf == true) {
+          swal({
+              title: '',
+              text: "Czy napewno chcesz usunąć godziny pracy?",
+              type: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Tak'
+              }).then((result) => {
+              if (result.value) {
                 var id = (this.id);
                 $(this).attr('disabled',true);
                 $.ajax({
@@ -231,15 +238,16 @@
                     },
                     success: function(response) {
                         if (response == 1) {
-                            alert("Godziny zostały usunięte");
+                            swal("Godziny zostały usunięte")
                             location.reload();
                         } else {
-                            alert('Ups! Coś poszło nie tak. Skontaktuj się z administratorem!');
+                            swal('Ups! Coś poszło nie tak. Skontaktuj się z administratorem!')
                         }
 
                     }
                 });
-            }
+              }
+          })
         });
     </script>
 @endsection

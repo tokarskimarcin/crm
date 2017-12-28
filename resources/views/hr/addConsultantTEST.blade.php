@@ -281,27 +281,27 @@
         }
 
         if (first_name == '') {
-            alert("Pole imie nie może być puste!");
+            swal("Pole imie nie może być puste!")
             return false;
         }
 
         if (last_name == '') {
-            alert("Pole nazwsko nie może być puste!");
+            swal("Pole nazwsko nie może być puste!")
             return false;
         }
 
         if (private_phone == '') {
-            alert("Pole telefon prywatny nie może być puste!");
+            swal("Pole telefon prywatny nie może być puste!")
             return false;
         }
 
         if (username == '') {
-            alert("Pole login(godzinówka) nie może być puste!");
+            swal("Pole login(godzinówka) nie może być puste!")
             return false;
         }
 
         if (password == '') {
-            alert("Pole hasło nie może być puste!");
+            swal("Pole hasło nie może być puste!")
             return false;
         }
 
@@ -311,28 +311,37 @@
     $( ".delete" ).click(function() {
         var id = (this.id);
 
-        var conf = confirm("Czy napewno chcesz usunąć karę/premię?");
-
-        if (conf == true) {
-            $.ajax({
-                type: "POST",
-                url: '{{ route('api.deletePenaltyBonus') }}',
-                data: {
-                    "id": id
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                  if (response == 1) {
-                      alert("Pomyślnie usunięto karę/premię!");
-                  } else {
-                      alert('Ups! Coś poszło nie tak. Skontaktuj się z administratorem!');
-                  }
-                }
-            });
-            $('tr[name=' + this.id + ']').fadeOut(0);
-        }
+        swal({
+            title: '',
+            text: "Czy napewno chcesz usunąć karę/premię?",
+            type: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Tak'
+          }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.deletePenaltyBonus') }}',
+                    data: {
+                        "id": id
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                      if (response == 1) {
+                          swal("Pomyślnie usunięto karę/premię!")
+                          $('tr[name=' + id + ']').fadeOut(0);
+                      } else {
+                          swal('Ups! Coś poszło nie tak. Skontaktuj się z administratorem!')
+                          return;
+                      }
+                    }
+                  });
+              }
+        })
     });
 
     var validation = false;
