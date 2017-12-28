@@ -4,7 +4,7 @@
       <ul class="nav navbar-top-links navbar-right">
             <li>
             	<!--menu toggle button -->
-                <button id="menu-toggle" type="button" data-toggle="button" class="btn btn-default btn-lg">
+                <button id="menu-toggle" type="button" data-toggle="button" class="btn btn-default btn-lg" aria-pressed='false'>
                     <i class="fa fa-exchange fa-fw"></i>
                 </button>
             </li>

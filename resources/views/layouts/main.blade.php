@@ -8,7 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
-<body onpageshow="checkForMenu()">
+<body>
     <div id="wrapper" class="toggle">
 
     @include('partials._nav')
