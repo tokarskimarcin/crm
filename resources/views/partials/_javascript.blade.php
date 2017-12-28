@@ -44,7 +44,7 @@
 {{-- End of includes --}}
 
 <script>
-
+//
 
     $('#blok').on('click', () => {
         window.location.replace("{{URL::to('/dkjVerification/')}}");
