@@ -98,6 +98,7 @@
     </div>
 
     @if(isset($show_moving_notifications) && $show_moving_notifications == true)
+
         @include('partials.nav_includes._canvas_janky')
     @else
         <div id="blok" style="display: none; width: 0px; height: 0px">

@@ -13,6 +13,7 @@ $(document).ready(function(){
           if (count != 0) {
               $('#blok').css('display', 'block');
               $('#notification_janky_count').text(count);
+              $(".container-fluid").css('margin-top','70px');
           }
         }
     });
