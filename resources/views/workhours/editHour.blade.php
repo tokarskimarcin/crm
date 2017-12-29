@@ -125,7 +125,7 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        window.location.reload(true);
+                        $('#form_submit').trigger('click');
                     }
                 });
             }

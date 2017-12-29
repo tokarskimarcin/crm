@@ -37,7 +37,7 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <div class="panel-body">
-                                    <form class="form-horizontal" method="post" action="view_hour">
+                                    <form class="form-horizontal" method="post" action="view_hour" id="my_form">
                                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                             <div class="form-group">
                                                 <label for ="ipadress">Pracownik:</label>
@@ -106,7 +106,7 @@
                                                                 <th>Godz.</th>
                                                                 <th>Pod.</th>
                                                                 @if($agreement == 1)
-                                                                    <th>Zogdy</th>
+                                                                    <th>Zgody</th>
                                                                     <th>Średnia</th>
                                                                 @endif
                                                                 <th>Status</th>
@@ -246,7 +246,16 @@
                       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                   },
                   success: function(response) {
-                      window.location.reload(true);
+                    swal({
+                        title: 'Godziny Usunięto!',
+                        text: '',
+                        }).then((result) => {
+                        if (result.dismiss === 'timer') {
+                            $('#form_submit').trigger('click');
+                        } else {
+                            $('#form_submit').trigger('click');
+                        }
+                    })
                   }
               });
             }

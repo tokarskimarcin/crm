@@ -111,11 +111,11 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        window.location.reload(true);
+                        $('#form_submit').trigger('click');
                     },
                     error: function(response) {
                         swal('Wystąpił problem z bazą danych. Prosimy spróbuj później.')
-                        location.reload();
+                        $('#form_submit').trigger('click');
                     }
                 });
             }

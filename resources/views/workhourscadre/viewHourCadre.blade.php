@@ -74,7 +74,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <div class="col-sm-12">
-                                                    <button class="btn btn-primary" disabled style="width: 100%" name="submit" type="submit" id="generic_submit">
+                                                    <button class="btn btn-primary" disabled style="width: 100%" name="submit" type="submit" id="form_submit">
                                                         Generuj
                                                     </button>
                                                 </div>
@@ -200,16 +200,16 @@
 
         var userid = $('#userid').val();
         if (userid != -1) {
-            $('#generic_submit').removeAttr('disabled');
+            $('#form_submit').removeAttr('disabled');
         }
 
         $("#userid").on('change', function(){
             var userid = $('#userid').val();
             if (userid != -1) {
-                $('#generic_submit').removeAttr('disabled');
+                $('#form_submit').removeAttr('disabled');
             }
             if (userid == -1) {
-                $('#generic_submit').attr('disabled', true);
+                $('#form_submit').attr('disabled', true);
             }
         });
 
@@ -239,9 +239,10 @@
                     success: function(response) {
                         if (response == 1) {
                             swal("Godziny zostały usunięte")
-                            location.reload();
+                            $('#form_submit').trigger('click');
                         } else {
                             swal('Ups! Coś poszło nie tak. Skontaktuj się z administratorem!')
+                            $('#form_submit').trigger('click');
                         }
 
                     }

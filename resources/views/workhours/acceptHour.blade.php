@@ -220,7 +220,7 @@
             var modify_start = $(this).closest("tr").find("input[id='register_start']").val();
             var modify_stop = $(this).closest("tr").find("input[id='register_stop']").val();
             var register_start = $(this).closest("tr").find("[name='user_register_start']").text();
-            var register_stopt = $(this).closest("tr").find("[name='user_register_stop']").text();
+            var register_stop = $(this).closest("tr").find("[name='user_register_stop']").text();
             var succes = 0;
             var id = data.id;
             var type_edit = 0;
@@ -231,7 +231,7 @@
                 {
                     swal("Brak wszystkich godzin w modyfikacji")
                     validate = 0;
-                }else if(modify_start > modify_stop)
+                }else if(modify_start >= modify_stop)
                 {
                     swal("Godziny są ustawione niepoprawnie")
                     validate = 0;
@@ -239,7 +239,7 @@
                 {
                     type_edit = 1;
                 }
-            }else if(register_start == 'Brak infromacji' || register_stopt == 'Brak infromacji')
+            }else if(register_start == 'Brak infromacji' || register_stop == 'Brak infromacji')
             {
                 swal("Brak wszystkich godzin w modyfikacji")
                 validate = 0;
@@ -276,19 +276,4 @@
             }
         });
     </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @endsection
