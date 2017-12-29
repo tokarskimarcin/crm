@@ -53,6 +53,10 @@
                                 <td colspan="1">Podaj adres email!</td>
                                 <td></td>
                             </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_email_checked">
+                                <td colspan="1">Adres email jest zajęty!</td>
+                                <td></td>
+                            </tr>
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Telefon służbowy:</b></td>
                                 <td>
@@ -348,6 +352,7 @@
                 } else {
                     $('#alert_user_name').fadeOut(1000);
                     $('#alert_user_name_checked').fadeOut(1000);
+                    validationCheck = true;
                 }
             }
 
@@ -378,14 +383,11 @@
                       } else {
                           $('#alert_email').fadeOut(1000);
                           $('#alert_email_checked').fadeOut(1000);
+                          validationCheck = true;
                       }
                   }
-
               }
             }
-
-
-            //tutaj if() dating type
 
             if (first_name == '') {
                 $('#alert_name').fadeIn(1000);
@@ -430,7 +432,7 @@
                 $('#alert_ck').fadeOut(1000);
             }
             if (rate == 'Wybierz') {
-                alert("Musisz wybrać Stawkę!");
+                swal("Musisz wybrać Stawkę!")
                 validationCheck = false;
             }
             if (login_phone == '') {
@@ -470,9 +472,10 @@
                 $('#alert_department').fadeOut(1000);
             }
             if (dating_type == 'Wybierz') {
-                alert("Musisz wybrać typ użytkownika!");
+                swal("Musisz wybrać typ użytkownika!")
                 validationCheck = false;
             }
+
             return validationCheck;
         });
     });
