@@ -100,7 +100,6 @@
             </div>
         </div>
     </div>
-
 @endsection
 
 @section('script')
@@ -113,7 +112,6 @@
             table.ajax.reload();
 
         }
-
             $('.form_date').datetimepicker({
                 language:  'pl',
                 autoclose: 1,
@@ -139,7 +137,6 @@
                         maxView: 1,
                         forceParse: 0
                     });
-
                 },
                 "ajax": {
                     'url': "{{ route('api.checkList') }}",
@@ -177,9 +174,7 @@
                             data.time = "Brak infromacji";
                         return data.time;
                     }, "name": "time","searchable": false },
-
                 ],
-
             });
         });
 
@@ -197,7 +192,7 @@
                 {
                     swal("Brak wszystkich godzin w modyfikacji")
                     validate = 0;
-                }else if(modify_start > modify_stop)
+                }else if(modify_start >= modify_stop)
                 {
                     swal("Godziny są ustawione niepoprawnie")
                     validate = 0;

@@ -191,6 +191,7 @@ class NotificationController extends Controller
               ->whereBetween('add_date', [$yesterday, $today])
               ->whereNull('manager_status')
               ->where('dkj_status', '=', 1)
+              ->where('deleted', '=', 0)
               ->where('department_info_id', '=', Auth::user()->department_info_id)
               ->get();
 

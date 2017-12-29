@@ -243,7 +243,7 @@
                 {
                     swal("Brak wszystkich godzin w modyfikacji")
                     validate = 0;
-                }else if(modify_start > modify_stop)
+                }else if(modify_start >= modify_stop)
                 {
                     swal("Godziny są ustawione niepoprawnie")
                     validate = 0;

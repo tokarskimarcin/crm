@@ -42,7 +42,7 @@
     <input type="hidden" name="user_department_post" value="{{$user_id_post}}">
     @foreach($department_info as $department)
                 <div class="checkbox">
-                    <label><input type="checkbox" name="dep{{$department->id}}"
+                    <label><input type="checkbox" style="display: block" name="dep{{$department->id}}"
                   @foreach($user_dep as $ud)
                           @if($ud->department_info_id == $department->id)
                             checked

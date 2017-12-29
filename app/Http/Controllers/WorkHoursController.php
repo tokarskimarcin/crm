@@ -92,7 +92,7 @@ class WorkHoursController extends Controller
                     work_hours.register_stop,
                     work_hours.date,
                     SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time'))
-                ->where('work_hours.status', '=', 3)
+                ->whereIn('work_hours.status', [1,2,3])
                 ->where('users.department_info_id', '=', Auth::user()->department_info_id)
                 ->where('users.user_type_id', '=', 1)
                 ->where('work_hours.id_manager', '=', null)
@@ -264,6 +264,10 @@ class WorkHoursController extends Controller
               return view('workhourscadre.viewHourCadre')
                   ->with('users',$users);
         }
+        $checkUser = User::find($request->userid);
+        if ($checkUser == null) {
+            return view('errors.404');
+        }
         $user_type_info = UserTypes::find(Auth::user()->user_type_id);
         $what_show = $user_type_info->all_departments;
         $users = $this->getCadre($what_show);
@@ -293,7 +297,10 @@ class WorkHoursController extends Controller
           return view('workhours.viewHour')
               ->with('users',$users);
         }
-
+        $checkUser = User::find($request->userid);
+        if ($checkUser == null) {
+            return view('errors.404');
+        }
         $month = $request->month;
         $userid = $request->userid;
         $myDepartment_info = Department_info::find(Auth::user()->department_info_id);

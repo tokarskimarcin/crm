@@ -261,9 +261,9 @@ function getStartAndEndDate($week, $year) {
                 table+=
                     '</div><p>';
                 if(reason[i] != null)
-                    table+='<input type="checkbox" checked class="checkbox '+week_array[i]+'_reasonCheck">Wolne';
+                    table+='<input type="checkbox" style="display: block" checked class="checkbox '+week_array[i]+'_reasonCheck">Wolne';
                 else
-                    table+='<input type="checkbox" class="checkbox '+week_array[i]+'_reasonCheck">Wolne';
+                    table+='<input type="checkbox" style="display: block" class="checkbox '+week_array[i]+'_reasonCheck">Wolne';
 
                     '</p></td>';
                 time = moment('07'+':'+'45','HH:mm');
