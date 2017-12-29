@@ -546,7 +546,6 @@ class DkjController extends Controller
                 sum(CASE WHEN users.dating_type = 1  and deleted = 0 and  dkj.dkj_status = 1  THEN 1 ELSE 0 END) as shipping_janky_count,
                 SUM(CASE WHEN dkj.dkj_status = 1  and deleted = 0 THEN 1 ELSE 0 END) as all_bad"))
                 ->where('dkj.add_date','like',$today)
-                ->where('deleted',0)
                 ->groupBy('department_info.id','department_info.type')->get();
           return $dkj_user;
         }
@@ -577,7 +576,6 @@ class DkjController extends Controller
               sum(CASE WHEN users.dating_type = 1 and  dkj.dkj_status = 1 and manager_status = 1 and deleted = 0 THEN 1 ELSE 0 END) as manager_shipping_janky_count,
               SUM(CASE WHEN dkj.dkj_status = 1 and deleted = 0 THEN 1 ELSE 0 END) as all_bad"))
               ->where('dkj.add_date','like',$today)
-              ->where('deleted',0)
               ->groupBy('department_info.id','department_info.type')->get();
             return $dkj_user;
         }

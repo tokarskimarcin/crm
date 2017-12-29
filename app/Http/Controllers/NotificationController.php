@@ -221,11 +221,45 @@ class NotificationController extends Controller
     }
 
     public function judgeNotificationPost(Request $request){
+        /**
+         * Sprawdzenie czy powiadomienie nie zostało już ocenione
+         */
         $checkNotification = JudgeResult::where('notification_id', $request->notification_id)->count();
         if ($checkNotification > 0) {
             return view('errors.404');
         }
 
+        /**
+         * Sprawdzenie czy ID powiadomienia jest zgodne z formularzem
+         */
+        $id = $request->notification_id;
+        $url_array = explode('/',URL::previous());
+        $urlValidation = end($url_array);
+        $checkNotification = Notifications::find($id);
+        if ($checkNotification == null || ($urlValidation != $id)) {
+            return view('errors.404');
+        }
+
+        /**
+         * Sprawdzenie czy przekazane wartości z formularza są prawidłowe
+         */
+        if ($request->q1 != 1 && $request->q1 != 2) {
+            return view('errors.404');
+        }
+        if ($request->q5 != 1 && $request->q5 != 2) {
+            return view('errors.404');
+        }
+        $default_array = [1,2,3,4,5,6];
+        $check_array = [$request->q2, $request->q3, $request->q4];
+        foreach ($check_array as $key) {
+            if (!in_array($key, $default_array)) {
+                return view('errors.404');
+            }
+        }
+
+        /**
+         * Sprawdzenie czy powiadomienie istnieje, jest danego uzytkowinika oraz czy zostało zakończone
+         */
         $result = new JudgeResult();
         $notification = Notifications::find($request->notification_id);
         if ($notification == null || $notification->user_id != Auth::user()->id || $notification->displayed_by == null) {
