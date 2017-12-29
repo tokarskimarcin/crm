@@ -341,7 +341,7 @@ class DkjController extends Controller
     public function saveDkjVerification(Request $request)
     {
         if($request->manager_status != 0 && $request->manager_status!= 1){
-            die;
+            return 0;
         }
         $dkj_id = $request->id;
         $manager_comment = $request->manager_coment;
@@ -353,6 +353,7 @@ class DkjController extends Controller
         $dkj_record->id_manager = Auth::user()->id;
         $dkj_record->save();
         new ActivityRecorder(4, "Weryfikacja janka, status: " . $request->manager_status . ', komentarz trenera: ' . $request->manager_coment);
+        return 1;
     }
 
 
@@ -445,7 +446,7 @@ class DkjController extends Controller
         {
             $userCheck = User::find($request->id_user);
             if ($userCheck == null) {
-                die;
+                return 0;
             }
             $dkj->id_user = $request->id_user;
             $dkj->phone = $request->phone;
@@ -473,7 +474,7 @@ class DkjController extends Controller
         if (isset($activity)) {
           new ActivityRecorder(4, $activity . $request->dkj_status . ', komentarz: ' . $request->comment . ', numer telefonu: ' . $request->phone . ', kampania: ' . $request->campaign);
         }
-          return 'ok';
+        return 1;
 
     }
     private function getDepartment()

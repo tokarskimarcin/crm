@@ -334,9 +334,16 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function (response) {
-                        $('#edit_dkj').modal('toggle');
-                        $("#save_dkj").removeAttr('disabled');
-                        table.ajax.reload();
+                        if (response == 1) {
+                            $('#edit_dkj').modal('toggle');
+                            $("#save_dkj").removeAttr('disabled');
+                            table.ajax.reload();
+                        } else {
+                            swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem.')
+                            $('#edit_dkj').modal('toggle');
+                            $("#save_dkj").removeAttr('disabled');
+                        }
+
                     }
                 });
             }

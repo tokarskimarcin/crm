@@ -234,8 +234,13 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
+                    if (response == 1) {
                         table_verified.ajax.reload();
                         table.ajax.reload();
+                    } else {
+                        swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem.')
+                    }
+
                 }
             });
 
