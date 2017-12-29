@@ -79,7 +79,8 @@ class NotificationController extends Controller
             return view('errors.404');
         } else {
             $status = $request->status;
-            if ($status != 1 && $status != 2 && $status != 3) {
+            $default_array = [1,2,3];
+            if (!in_array($status, $default_array)) {
                 return view('errors.404');
             }
             $notification->status = $status;

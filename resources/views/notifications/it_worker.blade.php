@@ -1,7 +1,6 @@
 @extends('layouts.main')
 @section('content')
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 <div class="row">
     <div class="col-lg-12">
@@ -14,10 +13,10 @@
 $data = $user_results[0];
 
 $dataPoints = array(
-array("y" => round($data->user_judge_sum, 2), "label" => "Średnia ocena"),
-array("y" => round($data->user_quality, 2), "label" => "Ocena jakości wykonania"),
-array("y" => round($data->user_contact, 2), "label" => "Ocena kontaktu z serwisantem"),
-array("y" => round($data->user_time, 2), "label" => "Ocena czasu wykonania")
+round($data->user_judge_sum, 2),
+round($data->user_quality, 2),
+round($data->user_contact, 2),
+round($data->user_time, 2)
 );
 @endphp
 <?php
@@ -25,7 +24,7 @@ array("y" => round($data->user_time, 2), "label" => "Ocena czasu wykonania")
 ?>
 <div class="row">
   <div class="col-md-6">
-      <div id="chartContainer"></div>
+    <div id="dual_x_div" style="width: 400px; height: 400px;"></div>
   </div>
   <div class="col-md-6">
       <div class="panel panel-green" style="height: 100%">
@@ -68,22 +67,36 @@ array("y" => round($data->user_time, 2), "label" => "Ocena czasu wykonania")
 @endsection
 @section('script')
 <script>
+google.charts.load('current', {'packages':['bar']});
+google.charts.setOnLoadCallback(drawStuff);
 
-$(function () {
-var chart = new CanvasJS.Chart("chartContainer", {
-	animationEnabled: true,
-	title: {
-		text: "Średnia ocen"
-	},
-	data: [
-	{
-		type: "column",
-		dataPoints: <?php echo json_encode($dataPoints, JSON_NUMERIC_CHECK); ?>
-	}
-	]
-});
-chart.render();
-});
+function drawStuff() {
+  var data = google.visualization.arrayToDataTable([
+   ['', 'Ocena', { role: 'style' }],
+   ['Suma', {{$dataPoints[0]}}, 'gray'],            // RGB value
+   ['Jakość', {{$dataPoints[1]}}, 'silver'],            // English color name
+   ['Kontakt', {{$dataPoints[2]}}, 'gold'],
+   ['Czas wykonania', {{$dataPoints[3]}}, 'color: gray' ], // CSS-style declaration
+]);
+
+  var options = {
+    width: 500,
+    chart: {
+      title: 'Średnia ocena użytkownika',
+      subtitle: 'Ocena w skali od 0 do 6'
+    },
+    bars: 'horizontal', // Required for Material Bar Charts.
+    axes: {
+      x: {
+        distance: {label: 'parsecs'}, // Bottom x-axis.
+        brightness: {side: 'top', label: 'apparent magnitude'} // Top x-axis.
+      }
+    }
+  };
+
+var chart = new google.charts.Bar(document.getElementById('dual_x_div'));
+chart.draw(data, options);
+};
 
 </script>
 @endsection
