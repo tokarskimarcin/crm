@@ -179,6 +179,7 @@ return [
         App\Providers\NavComposerProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
         PragmaRX\Firewall\Vendor\Laravel\ServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
 
     ],
 
@@ -229,6 +230,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Firewall' => PragmaRX\Firewall\Vendor\Laravel\Facade::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
 
     ],
 
