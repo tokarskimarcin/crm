@@ -33,21 +33,24 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <div class="panel-body">
-                                        <div class="well">
                                             <div class="alert alert-danger" style="border: 1px solid #222;" role="alert">
-                                                <strong>Podstawowa obsługa systemu!</strong></br>
-                                                Witaj <b></b>!</br></br>
-
-                                                <b>Krok 1:</b><br>
+                                               @if(Auth::user()->user_type_id == 1 ||  Auth::user()->user_type_id == 2)
+                                                <strong>Podstawowa obsługa systemu!</strong></br></br>
                                                 Przychodząc do pracy, logujemy się do systemu i używamy przycisku <b>Zaczynam Pracę</b>.<br><br>
-                                                <b>Krok 2:</b><br>
+                                                <b>Krok 2:</b>
                                                 Kiedy zakończyliśmy swoją pracę, ponownie logujemy się do systemu i używamy przycisku <b>Kończę Pracę</b>.<br><br>
-                                                <b>Krok 3:</b><br>
-                                                Po zakończeniu pracy należy koniecznie przejść do zakładki <b>Rejestracja Godzin</b> i zarejestrować godziny pracy.<br/><br/><b>UWAGA!!! Jeśli nie zarejestrujesz godzin, trener nie dostanie informacji o twojej obecności w pracy i żadne godziny nie będą się liczyły do czasu pracy.</b><br>
+                                                <b>Krok 3:</b>
+                                                Po zakończeniu pracy należy zarejestrować godzin pracy, używając przycisku <b>Rejestracja Godzin</b> <br/><br/>
+                                                    <b>UWAGA!!! Jeśli nie zarejestrujesz godzin, trener nie dostanie informacji o twojej obecności w pracy i żadne godziny nie będą się liczyły do czasu pracy.</b><br>
+                                                @else
+                                                    <strong>UWAGA REJESTRACJA CZASU PRACY!</strong></br></br>
+                                                    Pamiętaj o zarejestrowaniu swojej obecności w pracy przez <b>Zaczynam Pracę</b>/<b>Kończę Pracę</b><br><br>
+
+                                                    Po zakończeniu pracy należy zarejestrować godzin pracy, używając przycisku <b>Rejestracja Godzin</b>
+                                                @endif
                                             </div>
                                             <!--Ładowanie przycisku start stop do div  -->
                                             <div id="startstopdiv"></div>
-                                        </div>
                                     </div>
 
                                     <?php if($status == 0): ?>
@@ -117,7 +120,7 @@
                   server = response;
                   $("#stop").attr('data-toggle','modal');
                   $("#stop").attr('data-target','#registerModal');
-                  $("#stop").text('Rejestruj godziny');
+                  $("#stop").text('Rejestracja Godzin');
                   $("#stop").attr('id', 'done');
                   $("#done").removeClass('btn-danger');
                   $("#done").addClass('btn-default');
