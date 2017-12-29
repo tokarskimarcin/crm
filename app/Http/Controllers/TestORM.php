@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Mail;
@@ -17,7 +18,7 @@ class TestORM extends Controller
         if(!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
         if (($handle = fopen("http://vc.e-pbx.pl/callcenter/api/statistic-report", "r")) !== FALSE) {
             while (($data1 = fgetcsv($handle, 1000, ";")) !== FALSE) {
-                if ($lp > 1)
+                if ($lp > 1 && $lp <= 399)
                 {
                     $dont_save = false;
                     $i = 0;
@@ -52,8 +53,9 @@ class TestORM extends Controller
             }
             fclose($handle);
         }
+        array_pop($spreadsheet_data);
 
-        dd($spreadsheet_data);
+        DB::table('pbx_report_extension')->insert($spreadsheet_data);
 
 
 
