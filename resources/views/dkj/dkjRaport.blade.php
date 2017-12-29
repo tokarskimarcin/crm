@@ -175,7 +175,7 @@
                                                 <th>Telefon</th>
                                                 <th>Kampania</th>
                                                 <th>Komentarz</th>
-                                                <th>Jank</th>
+                                                <th>Janek</th>
                                                 <th>Weryfikacja trenera</th>
                                             </tr>
                                         </thead>
@@ -274,8 +274,7 @@
             $("#search_button").attr('disabled', true);
         }
     });
-
-
+    var user_type_id = {{Auth::user()->user_type_id}};
     var action = '';
     var id = -1;
     $(document).ready(function() {
@@ -456,10 +455,12 @@
             ],
             select: true
         });
-
+        if(user_type_id == 2)
+            table.column( 1 ).visible( false );
         table.buttons().container()
             .appendTo( $('.col-sm-6:eq(0)', table.table().container() ) );
     });
+
 
 </script>
 @endsection
