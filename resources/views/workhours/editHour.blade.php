@@ -125,11 +125,32 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        $('#form_submit').trigger('click');
+                        if (response == 1) {
+                            swal({
+                                title: 'Godziny zostały edytowane!',
+                                text: '',
+                                }).then((result) => {
+                                if (result.dismiss === 'timer') {
+                                    $('#form_submit').trigger('click');
+                                } else {
+                                    $('#form_submit').trigger('click');
+                                }
+                            })
+                        } else {
+                            swal({
+                                title: 'Ups! Coś poszło nie tak, skontaktuj się z administratorem.',
+                                text: '',
+                                }).then((result) => {
+                                if (result.dismiss === 'timer') {
+                                    $('#form_submit').trigger('click');
+                                } else {
+                                    $('#form_submit').trigger('click');
+                                }
+                            })
+                        }
                     }
                 });
             }
-
         });
     </script>
 @endsection

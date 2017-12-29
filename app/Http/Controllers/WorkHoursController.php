@@ -361,7 +361,7 @@ class WorkHoursController extends Controller
             $id_manager = Auth::id();
             $checkWorkHour = Work_Hour::find($id);
             if ($checkWorkHour == null) {
-                die;
+                return 0;
             }
             Work_Hour::where('id', $id)
                 ->update(['id_manager' => $id_manager,
@@ -376,6 +376,7 @@ class WorkHoursController extends Controller
                 'success' => $request->success,
             ];
             new ActivityRecorder(5, $data);
+            return 1;
         }
     }
     public function addAcceptHour(Request $request)
