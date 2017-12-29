@@ -1,6 +1,11 @@
 @extends('layouts.main')
 @section('content')
 
+    <style>
+        .table-striped tr td:first-child + td {
+            word-break: break-all;
+        }
+    </style>
 <div class="row">
     <div class="col-lg-12">
         <h1 class="page-header">

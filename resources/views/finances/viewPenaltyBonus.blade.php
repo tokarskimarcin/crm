@@ -146,7 +146,7 @@
                                                         <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                                     </div></br>
                                                 </div>
-                                                <button type="submit" class="btn btn-primary" name="showpbsubmit" style="font-size:18px; width:100%;">Wyszukaj</button>
+                                                <button type="submit" class="btn btn-primary" name="showpbsubmit" id="showpbsubmit_btn" style="font-size:18px; width:100%;">Wyszukaj</button>
 
                                             </form>
                                         </div>
@@ -368,7 +368,8 @@ $("#addpbsubmit").click(function () {
                         swal('Ups, coś poszło nie tak. Skontaktuj się z administratorem!')
                         $( "#edit_user_modal" ).removeAttr('disabled');
                     } else {
-                        location.reload();
+                        $("#showpbsubmit_btn").trigger("click");
+
                     }
 
                 }
