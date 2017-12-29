@@ -321,10 +321,11 @@
                 $("#add_consultant").attr('disabled', true);
             }
 
+            var validationCheck = true;
 
             if (username == '') {
                 $('#alert_user_name').fadeIn(1000);
-                return false;
+                validationCheck = false;
             }else
             {
                 var check = 0;
@@ -343,7 +344,7 @@
                 });
                 if(check == 1) {
                     $('#alert_user_name_checked').fadeIn(1000);
-                    return false;
+                    validationCheck = false;
                 } else {
                     $('#alert_user_name').fadeOut(1000);
                     $('#alert_user_name_checked').fadeOut(1000);
@@ -353,7 +354,7 @@
             if (email != null) {
               if (email == '') {
                   $('#alert_email').fadeIn(1000);
-                  return false;
+                  validationCheck = false;
               }else
               {
                   var check = 0;
@@ -373,7 +374,7 @@
                       });
                       if(check == 1) {
                           $('#alert_email_checked').fadeIn(1000)
-                          return false;
+                          validationCheck = false;
                       } else {
                           $('#alert_email').fadeOut(1000);
                           $('#alert_email_checked').fadeOut(1000);
@@ -388,89 +389,91 @@
 
             if (first_name == '') {
                 $('#alert_name').fadeIn(1000);
-                return false;
+                validationCheck = false;
             } else {
                 $('#alert_name').fadeOut(1000);
             }
             if (last_name == '') {
                 $('#alert_last_name').fadeIn(1000);
-                return false;
+                validationCheck = false;
             } else {
                 $('#alert_last_name').fadeOut(1000);
             }
             if (password== '') {
                 $('#alert_pass').fadeIn(1000);
-                return false;
+                validationCheck = false;
             } else {
                 $('#alert_pass').fadeOut(1000);
             }
             if (documents == 'Wybierz') {
                 $('#alert_documents').fadeIn(1000);
-                return false;
+                validationCheck = false;
             } else {
                 $('#alert_documents').fadeOut(1000);
             }
             if (agency == 'Wybierz') {
                 $('#alert_agency').fadeIn(1000);
-                return false;
+                validationCheck = false;
             } else {
                 $('#alert_agency').fadeOut(1000);
             }
             if (student == 'Wybierz') {
                 $('#alert_student').fadeIn(1000);
-                return false;
+                validationCheck = false;
             } else {
                 $('#alert_student').fadeOut(1000);
             }
             if (salary_to_account == 'Wybierz') {
                 $('#alert_ck').fadeIn(1000);
-                return false;
+                validationCheck = false;
             } else {
                 $('#alert_ck').fadeOut(1000);
             }
             if (rate == 'Wybierz') {
                 alert("Musisz wybrać Stawkę!");
-                return false;
+                validationCheck = false;
             }
             if (login_phone == '') {
                 $('#alert_pbx').fadeIn(1000);
-                return false;
+                validationCheck = false;
             } else {
                 $('#alert_pbx').fadeOut();
             }
             if (private_phone == '' || isNaN(private_phone)) {
                 $('#alert_user_phone').fadeIn(1000);
-                return false;
+                validationCheck = false;
             } else {
                 $('#alert_user_phone').fadeOut(1000);
             }
             if (description == '') {
                 $('#alert_desc').fadeIn(1000);
-                return false;
+                validationCheck = false;
             } else {
                 $('#alert_desc').fadeOut(1000);
             }
-            if (username == '') {
-                alert("Musisz wprowadzić login pracownika z programu do dzwonienia!");
-                return false;
+            if (login_phone == '') {
+                $('#alert_pbx').fadeIn(1000);
+                validationCheck = false;
+            } else {
+                $('#alert_pbx').fadeOut(1000);
             }
             if (user_type == 'Wybierz') {
                 $('#alert_user_type').fadeIn(1000);
-                return false;
+                validationCheck = false;
             } else {
                 $('#alert_user_type').fadeOut(1000);
             }
             if (department_info == 'Wybierz') {
                 $('#alert_department').fadeIn(1000);
-                return false;
+                validationCheck = false;
             } else {
                 $('#alert_department').fadeOut(1000);
             }
             if (dating_type == 'Wybierz') {
                 alert("Musisz wybrać typ użytkownika!");
-                return false;
+                validationCheck = false;
             }
-
+            return validationCheck;
         });
     });
 

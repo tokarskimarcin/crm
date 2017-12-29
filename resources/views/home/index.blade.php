@@ -51,11 +51,11 @@
                                     </div>
 
                                     <?php if($status == 0): ?>
-                                    <button id="start" class="button btn-success"> Zacznij Pracę </button>
+                                    <button id="start" class="button btn-success"> Zaczynam pracę </button>
                                     <?php elseif($status == 1): ?>
-                                    <button id="stop" class="button btn-danger"> Zakończ Pracę </button>
+                                    <button id="stop" class="button btn-danger"> Kończę Pracę </button>
                                     <?php elseif($status == 2): ?>
-                                    <button id="done" class="button" data-toggle="modal" data-target="#registerModal">Rarejestruj Godziny</button>
+                                    <button id="done" class="button" data-toggle="modal" data-target="#registerModal">Rejestracja Godzin</button>
                                      <?php elseif($status >=3): ?>
                                        <div class="alert alert-success">
                                            Godziny zostały zarejestrowane w przedziale: <span id="register_hour_done_start">{{substr($register_start,0,-3)}}</span> - <span id="register_hour_done_stop">{{substr($register_stop,0,-3)}}</span>
