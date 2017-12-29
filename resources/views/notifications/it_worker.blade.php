@@ -73,10 +73,10 @@ google.charts.setOnLoadCallback(drawStuff);
 function drawStuff() {
   var data = google.visualization.arrayToDataTable([
    ['', 'Ocena', { role: 'style' }],
-   ['Suma', {{$dataPoints[0]}}, 'gray'],            // RGB value
-   ['Jakość', {{$dataPoints[1]}}, 'silver'],            // English color name
-   ['Kontakt', {{$dataPoints[2]}}, 'gold'],
-   ['Czas wykonania', {{$dataPoints[3]}}, 'color: gray' ], // CSS-style declaration
+   ['Suma', {{$dataPoints[0]}} + "/6", 'gray'],            // RGB value
+   ['Jakość', {{$dataPoints[1]}} + "/6", 'silver'],            // English color name
+   ['Kontakt', {{$dataPoints[2]}} + "/6", 'gold'],
+   ['Czas wykonania', {{$dataPoints[3]}} + "/6", 'color: gray' ], // CSS-style declaration
 ]);
 
   var options = {

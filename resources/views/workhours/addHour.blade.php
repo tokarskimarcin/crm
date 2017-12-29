@@ -38,16 +38,13 @@
                     <input id="success_add" class="form-control" size="16" type="hidden" value="0">
                 @endif
                 <button id="add_hour" type="submit" class="btn btn-primary" name="register" style="font-size:18px; width:100%;">Zarejestruj</button>
-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default close" data-dismiss="modal">Anuluj</button>
             </div>
         </div>
-
     </div>
 </div>
-
 
 @section('script.addhour')
     <script>
@@ -111,7 +108,16 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        $('#form_submit').trigger('click');
+                        swal({
+                            title: 'Godziny zostały dodane!',
+                            text: '',
+                            }).then((result) => {
+                            if (result.dismiss === 'timer') {
+                                $('#form_submit').trigger('click');
+                            } else {
+                                $('#form_submit').trigger('click');
+                            }
+                        })
                     },
                     error: function(response) {
                         swal('Wystąpił problem z bazą danych. Prosimy spróbuj później.')
@@ -119,7 +125,6 @@
                     }
                 });
             }
-
         });
     </script>
 @endsection

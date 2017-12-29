@@ -23,11 +23,6 @@
             <h1 class="page-header">Podgląd godzin</h1>
         </div>
     </div>
-    @if(isset($add_hour_success) &&  ($add_hour_success == true))
-        <div id="success_div" class='alert alert-success'>Godziny zostały zaakceptowane!</div>
-    @endif
-
-
 
     <div class="row">
         <div class="col-lg-12">
@@ -246,16 +241,29 @@
                       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                   },
                   success: function(response) {
-                    swal({
-                        title: 'Godziny Usunięto!',
-                        text: '',
-                        }).then((result) => {
-                        if (result.dismiss === 'timer') {
-                            $('#form_submit').trigger('click');
-                        } else {
-                            $('#form_submit').trigger('click');
-                        }
-                    })
+                      if (response == 1) {
+                          swal({
+                              title: 'Godziny Usunięto!',
+                              text: '',
+                              }).then((result) => {
+                              if (result.dismiss === 'timer') {
+                                  $('#form_submit').trigger('click');
+                              } else {
+                                  $('#form_submit').trigger('click');
+                              }
+                          })
+                      } else {
+                          swal({
+                              title: 'Ups! Coś poszło nie tak, Skontaktuj się z administratorem.',
+                              text: '',
+                              }).then((result) => {
+                              if (result.dismiss === 'timer') {
+                                  $('#form_submit').trigger('click');
+                              } else {
+                                  $('#form_submit').trigger('click');
+                              }
+                          })
+                      }
                   }
               });
             }

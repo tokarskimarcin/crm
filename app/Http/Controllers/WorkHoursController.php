@@ -398,7 +398,6 @@ class WorkHoursController extends Controller
             $work_hour->id_user = $date[0];
             $work_hour->id_manager = $id_manager;
             $work_hour->save();
-            session(['add_hour_success' => true]);
 
             $data = [
                 'Dodanie czasu pracy pracownika' => '',
