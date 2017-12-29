@@ -22,6 +22,9 @@
               background-color: #000;
           }
 
+        .table-striped tr td:first-child + td + td + td {
+            word-break: break-all;
+        }
 
     </style>
 
