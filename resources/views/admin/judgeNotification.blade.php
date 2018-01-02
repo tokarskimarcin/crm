@@ -23,6 +23,10 @@
         font-size: 30px;
         margin-left: 10px;
       }
+      .btn {
+         outline: none !important;
+         box-shadow: none !important;
+      }
 
 </style>
 <div class="row">
