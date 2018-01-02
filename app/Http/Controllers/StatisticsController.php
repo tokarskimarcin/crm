@@ -885,34 +885,34 @@ class StatisticsController extends Controller
            ->get();
  //dd($accepted_users);
 
-    $accepted_users = [
-        'testmaila12345@wp.pl',
-        'cytawa.verona@gmail.com',
-        'jarzyna.verona@gmail.com'
-    ];
+//    $accepted_users = [
+//        'testmaila12345@wp.pl',
+//        'cytawa.verona@gmail.com',
+//        'jarzyna.verona@gmail.com'
+//    ];
 
 
-Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users)
-{
-    $message->from('noreply.verona@gmail.com');
-    foreach ($accepted_users as $key => $user) {
-      if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
-          $message->to($user)->subject('Verona Consulting!');
-      }
-    }
-});
+//Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users)
+//{
+//    $message->from('noreply.verona@gmail.com');
+//    foreach ($accepted_users as $key => $user) {
+//      if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
+//          $message->to($user)->subject('Verona Consulting!');
+//      }
+//    }
+//});
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
-      // Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users)
-      // {
-      //     $message->from('noreply.verona@gmail.com');
-      //     foreach($accepted_users as $user) {
-      //      if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
-      //          $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject('Verona Consulting!');
-      //       } else if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
-      //          $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject('Verona Consulting!');
-      //       }
-      //     }
-      // });
+       Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users)
+       {
+           $message->from('noreply.verona@gmail.com');
+           foreach($accepted_users as $user) {
+            if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
+                $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject('Verona Consulting!');
+             } else if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
+                $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject('Verona Consulting!');
+             }
+           }
+       });
 
     }
 }
