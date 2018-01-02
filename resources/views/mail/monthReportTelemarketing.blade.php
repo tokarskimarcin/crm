@@ -84,13 +84,13 @@
 
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>Total:</b></td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_avg_average / $count, 2)}}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_avg_average_proc}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_realRBH}} godzin</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_sum_success}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_janky / $count, 2)}} %</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_avg_wear_base / $count, 2)}} %</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_sum_call_time / $count, 2)}} %</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_goal / $count, 2)}} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_janky_proc}} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_avg_wear_base_proc}} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_sum_call_time_poc}} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_goal}} %</td>
         </tr>
 
     </tbody>
