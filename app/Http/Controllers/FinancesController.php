@@ -97,6 +97,7 @@ class FinancesController extends Controller
         $object->event_date = date('Y-m-d');
         $object->id_manager = $id_manager;
         $object->comment = $request->reason;
+        $object->event_date = $request->date_penalty;
         $object->save();
 
         $data = [
@@ -145,7 +146,7 @@ class FinancesController extends Controller
         $users =  User::where('department_info_id', Auth::user()->department_info_id)
             ->whereIn('user_type_id', [1, 2])
             ->where('status_work', '=', 1)
-            ->groupBy('last_name')
+            ->orderBy('last_name')
             ->get();
         return view('finances.viewPenaltyBonus')
             ->with('users',$users);
@@ -155,7 +156,7 @@ class FinancesController extends Controller
         $users =  User::where('department_info_id', Auth::user()->department_info_id)
             ->whereIn('user_type_id', [1, 2])
             ->where('status_work', '=', 1)
-            ->groupBy('last_name')
+            ->orderBy('last_name')
             ->get();
         $view = view('finances.viewPenaltyBonus')->with('users',$users);
 

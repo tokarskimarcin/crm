@@ -15,6 +15,7 @@ use Session;
 use Illuminate\Support\Facades\Hash;
 use App\ActivityRecorder;
 use Illuminate\Support\Facades\URL;
+use App\PenaltyBonus;
 
 class UsersController extends Controller
 {
@@ -75,7 +76,7 @@ class UsersController extends Controller
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
         if ($request->email == null) {
-            $user->email_off = strtolower($request->first_name) . '.' . strtolower($request->last_name) . '@veronaconsulting.pl';
+            $user->email_off = null;//strtolower($request->first_name) . '.' . strtolower($request->last_name) . '@veronaconsulting.pl';
         } else {
             $user->email_off = $request->email;
         }
@@ -162,9 +163,6 @@ class UsersController extends Controller
     public function edit_cadreGet($id) {
         $user = User::find($id);
 
-        // if ($user == null || $user->user_type_id == 1 || $user->user_type_id == 2) {
-        //     return view('errors.404');
-        // }
         $agencies = Agencies::all();
         $month = date('m');
         $months_names = ['Styczeń', 'Luty', 'Marzec', 'Kwiecien', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Padziernik', 'Listopad', 'Grudzień'];
@@ -176,10 +174,29 @@ class UsersController extends Controller
             return $mnt;
         }
         $months = [$months_names[month_reverse($month - 1)], $months_names[month_reverse($month - 2)]];
+        $actual_month = date('Y-m') . '%';
+        $previous_month = date('Y-m', strtotime(date('Y-m')." -1 month")) . "%";
 
-        $penalty_bonuses = DB::select("SELECT event_date,SUM(CASE WHEN `type` = 2 AND `status` = 1 THEN `amount` ELSE 0 END) as premia , SUM(CASE WHEN `type` = 1 AND `status` = 1 THEN `amount` ELSE 0 END) as kara FROM
-         `penalty_bonus` WHERE `id_user` = " . $id . " group by MONTH(`event_date`) LIMIT 2");
-// dd($months);
+         $penalty_bonuses[0] = DB::table('penalty_bonus')
+            ->select(DB::raw('
+                SUM(CASE WHEN `type` = 2 AND `status` = 1 THEN `amount` ELSE 0 END) as premia ,
+                SUM(CASE WHEN `type` = 1 AND `status` = 1 THEN `amount` ELSE 0 END) as kara
+            '))
+            ->where('id_user', '=', $id)
+            ->where('status', '=', 1)
+            ->where('event_date', 'like', $actual_month)
+            ->get();
+
+            $penalty_bonuses[1] = DB::table('penalty_bonus')
+               ->select(DB::raw('
+                   SUM(CASE WHEN `type` = 2 AND `status` = 1 THEN `amount` ELSE 0 END) as premia ,
+                   SUM(CASE WHEN `type` = 1 AND `status` = 1 THEN `amount` ELSE 0 END) as kara
+               '))
+               ->where('id_user', '=', $id)
+               ->where('status', '=', 1)
+               ->where('event_date', 'like', $previous_month)
+               ->get();
+
          $userTypes = UserTypes::all();
 
         return view('hr.addConsultantTEST')

@@ -35,12 +35,17 @@
         <form method="POST" action="{{URL::to('/view_penalty_bonus_edit/')}}" id="pb">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="user_id" value="{{$user->id}}">
-            <td colspan="2">
+            <td colspan="1">
                 <select class="form-control" name="penalty_type">
                     <option>Wybierz</option>
                     <option value="1">Kara</option>
                     <option value="2">Premia</option>
                 </select>
+            </td>
+            <td>
+              <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+              <input class="form-control" name="date_penalty" type="text" value="{{date("Y-m-d")}}" readonly>
+              <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span></div>
             </td>
             <td><input type="number" placeholder="0" name="cost" class="form-control"></td>
             <td colspan="2"><input type="text" placeholder="Powód" name="reason" class="form-control"></td>
