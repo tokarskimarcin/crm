@@ -310,6 +310,7 @@ class UsersController extends Controller
                 user_types.name as user_type_name
                 '))
                 ->where('users.user_type_id','!=',1)
+                ->where('users.user_type_id','!=',2)
                 ->where('users.status_work','=',1);
             return datatables($query)->make(true);
         }

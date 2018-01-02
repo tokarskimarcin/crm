@@ -222,8 +222,15 @@ class WorkHoursController extends Controller
         {
             $time_register_start = $request->register_start;
             $time_register_stop = $request->register_stop;
+            $check = Work_Hour::where('id_user', Auth::id())
+                ->where('date', date('Y-m-d'))
+                ->get();
+            if ($check[0]->status >= 4) {
+                return 1;
+            }
+
             Work_Hour::where('id_user', Auth::id())
-                ->where('date',$this->actuall_date)
+                ->where('date', date('Y-m-d'))
                 ->update(['register_start' => $time_register_start,'register_stop' => $time_register_stop, 'status' => 3]);
         }
     }

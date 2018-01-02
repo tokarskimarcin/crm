@@ -56,6 +56,10 @@
                 </select>
             </div>
             <div class="form-group">
+                <label for="pbx_id">Id z programu PBX:<span style="color:red;">*</span></label>
+                <input type="text" class="form-control" id="pbx_id" name="pbx_id" placeholder="PBX ID">
+            </div>
+            <div class="form-group">
                 <label for="city">System jankowy:<span style="color:red;">*</span></label>
                 <select class="form-control" name="janky_system_id">
                   <option>Wybierz</option>

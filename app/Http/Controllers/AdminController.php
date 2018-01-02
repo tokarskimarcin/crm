@@ -191,6 +191,7 @@ class AdminController extends Controller
         $department_info->dep_aim_week = ($request->dep_aim_week) ? $request->dep_aim_week : 0 ;
         $department_info->type = ($request->type != 'Wybierz') ? $request->type : '' ;
         $department_info->janky_system_id = ($request->janky_system_id) ? $request->janky_system_id : 0 ;
+        $department_info->pbx_id = ($request->pbx_id) ? $request->pbx_id : 0 ;
         $department_info->blocked = 0;
 
         $department_info->save();
@@ -246,6 +247,7 @@ class AdminController extends Controller
             $selected_department->dep_aim_week = ($request->dep_aim_week) ? $request->dep_aim_week : 0 ;
             $selected_department->type = ($request->type != 'Wybierz') ? $request->type : '' ;
             $selected_department->janky_system_id = ($request->janky_system_id) ? $request->janky_system_id : 0 ;
+            $selected_department->pbx_id = ($request->pbx_id != null) ? $request->pbx_id : 0 ;
 
             $selected_department->save();
         }
