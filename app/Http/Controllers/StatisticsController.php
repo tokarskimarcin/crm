@@ -866,11 +866,11 @@ class StatisticsController extends Controller
     */
 
     private function sendMailByVerona($mail_type, $data) {
-       $email = [];
-
-       $mail_type = ucfirst($mail_type);
-       $mail_type = 'page' . $mail_type;
-
+//       $email = [];
+//
+//       $mail_type = ucfirst($mail_type);
+//       $mail_type = 'page' . $mail_type;
+//
 //       $accepted_users = DB::table('users')
 //           ->select(DB::raw('
 //           users.first_name,
@@ -883,6 +883,7 @@ class StatisticsController extends Controller
 //           ->where('links.link', '=', $mail_type)
 //           ->where('users.status_work', '=', 1)
 //           ->get();
+// dd($accepted_users);
 
     $accepted_users = [
         'testmaila12345@wp.pl',
@@ -893,22 +894,22 @@ class StatisticsController extends Controller
 
 Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users)
 {
-    $message->from('noreply.verona@gmail.com');
+    $message->from('jarzyna.verona@gmail.com');
     foreach ($accepted_users as $key => $user) {
       if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
-          $message->to($user)->subject('Verona Consulting!');
+          $message->to($user)->subject('Welcome!');
       }
     }
 });
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
       // Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users)
       // {
-      //     $message->from('noreply.verona@gmail.com');
+      //     $message->from('jarzyna.verona@gmail.com');
       //     foreach($accepted_users as $user) {
       //      if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
-      //          $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject('Verona Consulting!');
+      //          $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject('Welcome!');
       //       } else if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
-      //          $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject('Verona Consulting!');
+      //          $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject('Welcome!');
       //       }
       //     }
       // });
