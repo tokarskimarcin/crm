@@ -99,13 +99,13 @@
                                                 @foreach($schedule_user as $item =>$key)
                                                  <tr>
                                                      <td align="center"><b>{{$key->user_first_name.' - '.$key->user_last_name}}</b></td>
-                                                     <td align="center"><b>{{$key->monday_start !== null ?  $key->monday_start.' - '.$key->monday_stop : ($key->monday_comment !== null ? $key->monday_comment : null) }}</b></td>
-                                                     <td align="center"><b>{{$key->tuesday_start !== null ?  $key->tuesday_start.' - '.$key->tuesday_stop : ($key->tuesday_comment !== null ? $key->tuesday_comment : null) }}</b></td>
-                                                     <td align="center"><b>{{$key->wednesday_start !== null ?  $key->wednesday_start.' - '.$key->wednesday_stop : ($key->wednesday_comment !== null ? $key->wednesday_comment : null) }}</b></td>
-                                                     <td align="center"><b>{{$key->thursday_start !== null ?  $key->thursday_start.' - '.$key->thursday_stop : ($key->thursday_comment !== null ? $key->thursday_comment : null) }}</b></td>
-                                                     <td align="center"><b>{{$key->friday_start !== null ?  $key->friday_start.' - '.$key->friday_stop : ($key->friday_comment !== null ? $key->friday_comment : null) }}</b></td>
-                                                     <td align="center"><b>{{$key->saturday_start !== null ?  $key->saturday_start.' - '.$key->saturday_stop : ($key->saturday_comment !== null ? $key->saturday_comment : null) }}</b></td>
-                                                     <td align="center"><b>{{$key->sunday_start !== null ?  $key->sunday_start.' - '.$key->sunday_stop : ($key->sunday_comment !== null ? $key->sunday_comment : null) }}</b></td>
+                                                     <td align="center"><b>{{$key->monday_start !== null ?  substr($key->monday_start,0,5).' - '.substr($key->monday_stop,0,5) : ($key->monday_comment !== null ? $key->monday_comment : null) }}</b></td>
+                                                     <td align="center"><b>{{$key->tuesday_start !== null ?  substr($key->tuesday_start,0,5).' - '.substr($key->tuesday_stop,0,5) : ($key->tuesday_comment !== null ? $key->tuesday_comment : null) }}</b></td>
+                                                     <td align="center"><b>{{$key->wednesday_start !== null ?  substr($key->wednesday_start,0,5).' - '.substr($key->wednesday_stop,0,5) : ($key->wednesday_comment !== null ? $key->wednesday_comment : null) }}</b></td>
+                                                     <td align="center"><b>{{$key->thursday_start !== null ?  substr($key->thursday_start,0,5).' - '.substr($key->thursday_stop,0,5) : ($key->thursday_comment !== null ? $key->thursday_comment : null) }}</b></td>
+                                                     <td align="center"><b>{{$key->friday_start !== null ?  substr($key->friday_start,0,5).' - '.substr($key->friday_stop,0,5) : ($key->friday_comment !== null ? $key->friday_comment : null) }}</b></td>
+                                                     <td align="center"><b>{{$key->saturday_start !== null ?  substr($key->saturday_start,0,5).' - '.substr($key->saturday_stop,0,5) : ($key->saturday_comment !== null ? $key->saturday_comment : null) }}</b></td>
+                                                     <td align="center"><b>{{$key->sunday_start !== null ?  substr($key->sunday_start,0,5).' - '.substr($key->sunday_stop,0,5) : ($key->sunday_comment !== null ? $key->sunday_comment : null) }}</b></td>
                                                     @php
                                                     $rbg_monday += $key->sec_monday;
                                                     $rbg_tuesday += $key->sec_tuesday;
