@@ -19,6 +19,7 @@
                         <td>{{$equipment->equipment_type->name}}</td>
                         <td style="width: 10px;">
                             <button  type="button" id="{{$equipment->id}}" class="btn btn-info equipment_data" data-toggle="modal" data-target="#myModal"
+                                data-equipment_id_database="{{$equipment->equipment_type->id}}"
                                 data-equipment_type_id="{{$equipment->equipment_type->name}}"
                                 data-laptop_processor="{{$equipment->laptop_processor}}"
                                 data-laptop_ram="{{$equipment->laptop_ram}}"

@@ -1,4 +1,5 @@
 @extends('layouts.main')
+@section('style')
 @section('content')
 
     <!-- Main -->
@@ -207,20 +208,20 @@
                                             <tr>
                                                 <td class="td-class"><b>Suma kar/premii ({{$month[0]}}):</b></td>
                                                 <td>
-                                                    <input disabled type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="{{$penalty_bonuses[0]->premia - $penalty_bonuses[0]->kara}}">
+                                                    <input disabled type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="{{$penalty_bonuses[0][0]->premia - $penalty_bonuses[0][0]->kara}}">
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td class="td-class"><b>Suma kar/premii ({{$month[1]}}):</b></td>
                                                 <td>
-                                                    <input disabled type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="{{$penalty_bonuses[1]->premia - $penalty_bonuses[1]->kara}}">
+                                                    <input disabled type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="{{$penalty_bonuses[1][0]->premia - $penalty_bonuses[1][0]->kara}}">
                                                 </td>
                                             </tr>
                                         @elseif(isset($penalty_bonuses[0]))
                                             <tr>
                                                 <td class="td-class"><b>Suma kar/premii ({{$month[1]}}):</b></td>
                                                 <td>
-                                                    <input disabled type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="{{$penalty_bonuses[0]->premia - $penalty_bonuses[0]->kara}}">
+                                                    <input disabled type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="{{$penalty_bonuses[0][0]->premia - $penalty_bonuses[0][0]->kara}}">
                                                 </td>
                                             </tr>
                                         @endif
@@ -256,6 +257,13 @@
 @section('script')
 
 <script>
+
+    $('.form_date').datetimepicker({
+        language: 'pl',
+        autoclose: 1,
+        minView: 2,
+        pickTime: false,
+    });
 
     $("#status_work").on('change', function() {
         $(".stop_date").removeAttr('readonly');
@@ -402,6 +410,7 @@
     $(".equipment_data").on('click', function(){
         var id = this.id;
 
+        var equipment_id_database= $(this).data('equipment_id_database');
         var equipment_type_id= $(this).data('equipment_type_id');
         var laptop_processor= $(this).data('laptop_processor');
         var laptop_ram= $(this).data('laptop_ram');
@@ -420,100 +429,144 @@
         var signal_cable= $(this).data('signal_cable');
         var to_user= $(this).data('to_user');
 
+        var equipmentArray = [
+          equipment_type_id,
+          laptop_processor,
+          laptop_ram,
+          laptop_hard_drive,
+          phone_box,
+          tablet_modem,
+          sim_number_phone,
+          sim_type,
+          sim_pin,
+          sim_puk,
+          sim_net,
+          model,
+          serial_code,
+          description,
+          power_cable,
+          signal_cable,
+          to_user
+        ];
+
+        var newElements = [];
+      console.log(typeof(equipment_id_database));
+
         if(equipment_type_id != '') {
             equipment_type_id = $("<tr><td><b>" + "Rodzaj sprzętu" + "</b></td><td>" + equipment_type_id + "</td></tr>");
-        }
-
-        if(laptop_processor != '' || !isNaN(laptop_processor)) {
-            laptop_processor = $("<tr><td><b>" + "Rodzaj procesora" + "</b></td><td>" + laptop_processor + "</td></tr>");
-        }
-
-        if(laptop_ram != '' || !isNaN(laptop_ram)) {
-
-            laptop_ram = $("<tr><td><b>" + "Pamięć RAM" + "</b></td><td>" + laptop_ram + "</td></tr>");
-        }
-
-        if(laptop_hard_drive != '' || !isNaN(laptop_hard_drive)) {
-            laptop_hard_drive = $("<tr><td><b>" + "Dysk twardy" + "</b></td><td>" + laptop_hard_drive + "</td></tr>");
-        }
-
-        if(phone_box != '' || !isNaN(phone_box)) {
-            phone_box = 'Tak';
-            phone_box = $("<tr><td><b>" + "Opakowanie na telefon" + "</b></td><td>" + phone_box + "</td></tr>");
-        }
-
-        if(tablet_modem != '' || !isNaN(tablet_modem)) {
-            tablet_modem = 'Tak';
-            tablet_modem = $("<tr><td><b>" + "Modem" + "</b></td><td>" + tablet_modem + "</td></tr>");
-        }
-
-        if(sim_number_phone != '' || !isNaN(sim_number_phone)) {
-            sim_number_phone = $("<tr><td><b>" + "Numer telefonu" + "</b></td><td>" + sim_number_phone + "</td></tr>");
-        }
-
-        if(sim_type != '' || !isNaN(sim_type)) {
-            sim_type = (sim_type == 1) ? 'Prepaid' : 'Abonament' ;
-            sim_type = $("<tr><td><b>" + "Rodzaj karty SIM" + "</b></td><td>" + sim_type + "</td></tr>");
-        }
-
-        if(sim_pin != '' || !isNaN(sim_pin)) {
-            sim_pin = $("<tr><td><b>" + "Numer PIN" + "</b></td><td>" + sim_pin + "</td></tr>");
-        }
-
-        if(sim_puk != '' || !isNaN(sim_puk)) {
-            sim_puk = $("<tr><td><b>" + "Numer PUK" + "</b></td><td>" + sim_puk + "</td></tr>");
-        }
-
-        if(sim_net != '' || !isNaN(sim_net)) {
-            sim_net = $("<tr><td><b>" + "Numer NET" + "</b></td><td>" + sim_net + "</td></tr>");
+            newElements.push(equipment_type_id);
         }
 
         if(model != '' || !isNaN(model)) {
             model = $("<tr><td><b>" + "Model" + "</b></td><td>" + model + "</td></tr>");
+            newElements.push(model);
         }
 
         if(serial_code != '' || !isNaN(serial_code)) {
             serial_code = $("<tr><td><b>" + "Numer seryjny" + "</b></td><td>" + serial_code + "</td></tr>");
+            newElements.push(serial_code);
         }
 
         if(description != '' || !isNaN(description)) {
             description = $("<tr><td><b>" + "Opis" + "</b></td><td>" + description + "</td></tr>");
+            newElements.push(description);
         }
 
-        if(power_cable != '' || !isNaN(power_cable)) {
-            power_cable = (power_cable == 0) ? "Nie" : "Tak" ;
-            power_cable = $("<tr><td><b>" + "Kabel zasilający" + "</b></td><td>" + power_cable + "</td></tr>");
+
+        //dla laptopów
+        if (equipment_id_database == 1) {
+            if(laptop_processor != '' || !isNaN(laptop_processor)) {
+                laptop_processor = $("<tr><td><b>" + "Rodzaj procesora" + "</b></td><td>" + laptop_processor + "</td></tr>");
+                newElements.push(laptop_processor);
+            }
+
+            if(laptop_ram != '' || !isNaN(laptop_ram)) {
+
+                laptop_ram = $("<tr><td><b>" + "Pamięć RAM" + "</b></td><td>" + laptop_ram + "</td></tr>");
+                newElements.push(laptop_ram);
+            }
+
+            if(laptop_hard_drive != '' || !isNaN(laptop_hard_drive)) {
+                laptop_hard_drive = $("<tr><td><b>" + "Dysk twardy" + "</b></td><td>" + laptop_hard_drive + "</td></tr>");
+                newElements.push(laptop_hard_drive);
+            }
         }
 
-        if(signal_cable != '' || !isNaN(signal_cable)) {
-            signal_cable = (signal_cable == 0) ? 'Nie' : 'Tak' ;
-            signal_cable = $("<tr><td><b>" + "Antena" + "</b></td><td>" + signal_cable + "</td></tr>");
+        //dla telefonów/tabletow
+
+        if (equipment_id_database == 3) {
+            if(phone_box != '' || !isNaN(phone_box)) {
+                phone_box = 'Tak';
+                phone_box = $("<tr><td><b>" + "Opakowanie na telefon" + "</b></td><td>" + phone_box + "</td></tr>");
+                newElements.push(phone_box);
+            }
+        }
+
+        //dla SIM
+        if (equipment_id_database == 4) {
+
+            if(tablet_modem != '' || !isNaN(tablet_modem)) {
+                tablet_modem = 'Tak';
+                tablet_modem = $("<tr><td><b>" + "Modem" + "</b></td><td>" + tablet_modem + "</td></tr>");
+                newElements.push(tablet_modem);
+            }
+
+            if(sim_number_phone != '' || !isNaN(sim_number_phone)) {
+                sim_number_phone = $("<tr><td><b>" + "Numer telefonu" + "</b></td><td>" + sim_number_phone + "</td></tr>");
+                newElements.push(sim_number_phone);
+            }
+
+            if(sim_type != '') {
+                sim_type = (sim_type == 1) ? 'Prepaid' : 'Abonament' ;
+                sim_type = $("<tr><td><b>" + "Rodzaj karty SIM" + "</b></td><td>" + sim_type + "</td></tr>");
+                newElements.push(sim_type);
+            }
+
+            if(sim_pin != '' || !isNaN(sim_pin)) {
+                sim_pin = $("<tr><td><b>" + "Numer PIN" + "</b></td><td>" + sim_pin + "</td></tr>");
+                newElements.push(sim_pin);
+            }
+
+            if(sim_puk != '' || !isNaN(sim_puk)) {
+                sim_puk = $("<tr><td><b>" + "Numer PUK" + "</b></td><td>" + sim_puk + "</td></tr>");
+                newElements.push(sim_puk);
+            }
+
+            if(sim_net != '' || !isNaN(sim_net)) {
+                sim_net = (sim_type == "1") ? 'Tak' : 'Nie' ;
+                sim_net = $("<tr><td><b>" + "Internet" + "</b></td><td>" + sim_net + "</td></tr>");
+                newElements.push(sim_net);
+            }
+        }
+
+        if (equipment_id_database != 4) {
+            if(power_cable != '' || !isNaN(power_cable)) {
+                power_cable = (power_cable == 0) ? "Nie" : "Tak" ;
+                power_cable = $("<tr><td><b>" + "Kabel zasilający" + "</b></td><td>" + power_cable + "</td></tr>");
+                newElements.push(power_cable);
+            }
+        }
+
+
+        //dla monitorow
+        if (equipment_id_database == 5) {
+            if(signal_cable != '' || !isNaN(signal_cable)) {
+                signal_cable = (signal_cable == 0) ? 'Nie' : 'Tak' ;
+                signal_cable = $("<tr><td><b>" + "Antena" + "</b></td><td>" + signal_cable + "</td></tr>");
+                newElements.push(signal_cable);
+            }
         }
 
         if(to_user != '') {
             to_user = $("<tr><td><b>" + "Data wydania" + "</b></td><td>" + to_user + "</td></tr>");
+            newElements.push(to_user);
         }
 
-
-        $("#modal_content").append(
-            equipment_type_id,
-            laptop_processor,
-            laptop_ram,
-            laptop_hard_drive,
-            phone_box,
-            tablet_modem,
-            sim_number_phone,
-            sim_type,
-            sim_pin,
-            sim_puk,
-            sim_net,
-            model,
-            serial_code,
-            description,
-            power_cable,
-            signal_cable,
-            to_user
-          );
+        $.each(newElements, function(key, value) {
+            $("#modal_content").append(
+                  value
+              );
+        });
     });
 
 </script>
