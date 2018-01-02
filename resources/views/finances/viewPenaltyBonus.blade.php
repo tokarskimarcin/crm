@@ -156,7 +156,7 @@
                                 <div class="col-md-12">
                                     <div class="well"><div class="tab-content">
                                             <div class="tab-pane active" id="profile">
-                                                <div class="panel-heading" style="border:1px solid #d3d3d3;"><b>Wyszukiwanie w zakresie od </b></div>
+                                                <div class="panel-heading" style="border:1px solid #d3d3d3;"><b>Wyszukiwanie w zakresie od: {{$date_start}} - {{$date_stop}}</b></div>
                                                 <table class="table table-bordered">
                                                         <thead>
                                                             <tr align="center">

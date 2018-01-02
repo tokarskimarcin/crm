@@ -308,15 +308,8 @@ class StatisticsController extends Controller
         }
 
         $days_list = ['normal_day' => $normal_day, 'weekend_day' => $weekend_day];
-
         $month_name = $this::monthReverseName($month);
-
-        if ($month == 1) {
-            $date = ($year - 1) . "-" . $this::monthReverse($month) . '-%';
-        } else {
-            $date = $year . "-" . $month . "-%";
-        }
-
+        $date = $year . "-" . $month . "-%";
         $month = date('Y') . '-' . $month . '%';
 
         $reports = DB::table('hour_report')

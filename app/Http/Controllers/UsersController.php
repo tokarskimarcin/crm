@@ -179,7 +179,7 @@ class UsersController extends Controller
 
         $penalty_bonuses = DB::select("SELECT event_date,SUM(CASE WHEN `type` = 2 AND `status` = 1 THEN `amount` ELSE 0 END) as premia , SUM(CASE WHEN `type` = 1 AND `status` = 1 THEN `amount` ELSE 0 END) as kara FROM
          `penalty_bonus` WHERE `id_user` = " . $id . " group by MONTH(`event_date`) LIMIT 2");
-
+// dd($months);
          $userTypes = UserTypes::all();
 
         return view('hr.addConsultantTEST')
