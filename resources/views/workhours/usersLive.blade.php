@@ -142,7 +142,7 @@
                                             @elseif ($start_work_click == 0)
                                                 <script>
                                                     var id = {{$item->id}}
-                                                    document.getElementById(id+"w").style.backgroundColor = "#e03838";
+                                                    document.getElementById(id+"w").style.backgroundColor = "#E03838";
                                                 </script>
                                              @else
                                                 <script>
