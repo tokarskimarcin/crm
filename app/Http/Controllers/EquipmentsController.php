@@ -79,6 +79,7 @@ class EquipmentsController extends Controller
             return view('errors.404');
         }
         $users = User::where('status_work', '=', 1)
+            ->wherenotIn('user_type_id',[1,2])
             ->orderBy('last_name')
             ->get();
         $department_info = Department_info::all();
@@ -152,6 +153,7 @@ class EquipmentsController extends Controller
         }
 
         $users = User::where('status_work', '=', 1)
+            ->wherenotIn('user_type_id',[1,2])
             ->orderBy('last_name')
             ->get();
         $department_info = Department_info::all();
