@@ -1,17 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
-use Mail;
-use Request;
+use Illuminate\Database\Eloquent\Model;
 
-
-class TestORM extends Controller
+class CsvReader extends Model
 {
-    public function test() {
+    public function pbx_report_extension() {
         $lp = 0;
         $dont_save = false;
         $header_array = array('pbx_id', 'login_time', 'count_private_pause', 'count_lesson_pause', 'received_calls', 'closed_arranged', 'closed_bilingual', 'away_contacts', 'succes', 'wrong_number', 'avg_time_pause', 'avg_time_wait_per_hour', 'avg_time_wait', 'avg_succes_per_hour', 'use_working_time', 'avg_decision_time', 'avg_delayed_time', 'report_date');
@@ -57,5 +52,4 @@ class TestORM extends Controller
 
         DB::table('pbx_report_extension')->insert($spreadsheet_data);
     }
-
 }
