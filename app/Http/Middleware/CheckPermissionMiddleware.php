@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Facades\Auth;
 use App\Links;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 use Session;
 
 class CheckPermissionMiddleware
@@ -58,7 +59,7 @@ class CheckPermissionMiddleware
             if (Auth::user()->department_info->blocked != 0) { // gdy jest inspecja pracy
                 if ($route != '') { // nie pozwalaj do innej strony niz domowa
                   Auth::logout();
-                  return redirect()->to('/login')->with('warning', 'Nastąpiło przelogowanie :)');
+                  return redirect()->to('/login')->with('message', 'Nastąpiło przelogowanie');
                 }else
                 {
                     return $next($request);
@@ -85,12 +86,12 @@ class CheckPermissionMiddleware
 
             if ($link_key->isEmpty() || !Auth::user()) { // gdy brak dostępu
                 Auth::logout();
-                return redirect()->to('/login')->with('warning', 'Brak Dostępu.');
+                return Redirect::to('/login')->with('message', 'Brak Dostępu.');
             }
 
 
         }else{ // Brak sesji zalogowania
-            return redirect('login');
+            return redirect()->to('/login')->with('message', 'Brak Sesji.');
         }
 
     }
