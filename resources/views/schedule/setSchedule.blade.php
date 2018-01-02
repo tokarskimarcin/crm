@@ -176,14 +176,9 @@ function getStartAndEndDate($week, $year) {
     <script src="{{ asset('/js/moment.js')}}"></script>
 <script>
     function setYear() {
-        var week_text = $('#week_text').val();
-        var now = new Date();
-        var year = now.getFullYear();
-        if (week_text < 20) {
-            $('#schedule_year').attr('value', year + 1);
-        } else {
-            $('#schedule_year').attr('value', year);
-        }
+        var week_text = $("#week_text option:selected").text();
+        var year = week_text.slice(0, 4);
+        $('#schedule_year').attr('value', year);
     }
     $(document).ready(function(){
         setYear();

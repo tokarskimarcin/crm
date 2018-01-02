@@ -241,13 +241,13 @@ $("#delete").on('click', (e) => {
     e.preventDefault();
 
     swal({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
+        title: '',
+        text: "Usunąć sprzęt?",
         type: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonText: 'Tak'
       }).then((result) => {
         if (result.value) {
           $('#status_delete').val(1);
