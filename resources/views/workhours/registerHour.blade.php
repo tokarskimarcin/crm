@@ -36,7 +36,7 @@
     </div>
 </div>
 
-
+@php($userType = Auth::user()->user_type_id)
 @section('script.register')
     <script>
 
@@ -64,6 +64,8 @@
         $( "#register_hour" ).click(function() {
             var register_start = 0;
             var register_stop = 0;
+            var userType = {{$userType}};
+            var consultantValidation = (userType == 1 || userType == 2) ? true : false ;
             register_start = $('#register_start').val();
             register_stop = $('#register_stop').val();
             if(register_start == null || register_start =='')
@@ -74,9 +76,9 @@
             }else if(register_stop <= register_start)
             {
                 swal('Błędne godziny')
-            }else if(register_start < '07:00'){
+            }else if(register_start < '07:00' && consultantValidation == true){
                 swal('Pracę możesz rozpocząć najwcześniej o godzinie 7!')
-            }else if(register_stop > '21:00'){
+            }else if(register_stop > '21:00' && consultantValidation == true){
                 swal('Pracę możesz zakończyć najpóźniej o godzinie 21!')
             }
             else
