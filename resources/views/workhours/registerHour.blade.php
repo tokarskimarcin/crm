@@ -92,14 +92,14 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        window.location.reload(true);
+                        if (response == 1){
+                            swal('Twoje godziny zostały zaakceptowane i nie możesz ich zmienić.')
+                        } else {
+                            window.location.reload(true);
+                        }
                     }
                 });
             }
-
         });
-
-
-
     </script>
 @endsection

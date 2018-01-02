@@ -70,8 +70,8 @@
             <div class="form-group">
                 <label for="city">System jankowy:<span style="color:red;">*</span></label>
                 <select class="form-control" name="janky_system_id">
-                  <option @if($selected_department->janky_system_id == 1) selected @endif>Tak</option>
-                  <option @if($selected_department->janky_system_id == 0) selected @endif>Nie</option>
+                  <option value="1" @if($selected_department->janky_system_id == 1) selected @endif>Tak</option>
+                  <option value="0" @if($selected_department->janky_system_id == 0) selected @endif>Nie</option>
                 </select>
             </div>
             <div class="form-group">

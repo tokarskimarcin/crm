@@ -478,7 +478,7 @@ class StatisticsController extends Controller
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
             ->whereBetween('add_date', [$hour_start, $hour_stop])
-            ->groupBy('dkj.department_info_id')
+            ->groupBy('users.department_info_id')
             ->groupBy('users.dating_type')
             ->get();
         $data = [
@@ -524,7 +524,7 @@ class StatisticsController extends Controller
           ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
           ->join('departments', 'departments.id', '=', 'department_info.id_dep')
           ->where('add_date', 'like', $today)
-          ->groupBy('dkj.department_info_id')
+          ->groupBy('users.department_info_id')
           ->groupBy('department_info.type')
           ->get();
 
