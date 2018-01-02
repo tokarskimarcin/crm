@@ -868,7 +868,7 @@ class StatisticsController extends Controller
     private function sendMailByVerona($mail_type, $data) {
        $email = [];
 
-       $mail_type = ucfirst($mail_type);
+       $mail_type2 = ucfirst($mail_type);
        $mail_type2 = 'page' . $mail_type;
 
 //       $accepted_users = DB::table('users')
