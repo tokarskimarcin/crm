@@ -112,8 +112,8 @@ Route::get('/weekReportChecked', 'StatisticsController@weekReportChecked');
 Auth::routes();
 
 
-
-Route::middleware(['check-permission','check-firewall'])->group(function () {
+//'check-firewall'
+Route::middleware(['check-permission'])->group(function () {
     Route::get('/', 'HomeController@index');
     // Admin_Panel --Start--
     Route::get('/admin_privilage','AdminController@admin_privilage');
