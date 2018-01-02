@@ -866,23 +866,23 @@ class StatisticsController extends Controller
     */
 
     private function sendMailByVerona($mail_type, $data) {
-//       $email = [];
-//
-//       $mail_type = ucfirst($mail_type);
-//       $mail_type = 'page' . $mail_type;
-//
-//       $accepted_users = DB::table('users')
-//           ->select(DB::raw('
-//           users.first_name,
-//           users.last_name,
-//           users.username,
-//           users.email_off
-//           '))
-//           ->join('privilage_relation', 'privilage_relation.user_type_id', '=', 'users.user_type_id')
-//           ->join('links', 'privilage_relation.link_id', '=', 'links.id')
-//           ->where('links.link', '=', $mail_type)
-//           ->where('users.status_work', '=', 1)
-//           ->get();
+       $email = [];
+
+       $mail_type = ucfirst($mail_type);
+       $mail_type = 'page' . $mail_type;
+
+       $accepted_users = DB::table('users')
+           ->select(DB::raw('
+           users.first_name,
+           users.last_name,
+           users.username,
+           users.email_off
+           '))
+           ->join('privilage_relation', 'privilage_relation.user_type_id', '=', 'users.user_type_id')
+           ->join('links', 'privilage_relation.link_id', '=', 'links.id')
+           ->where('links.link', '=', $mail_type)
+           ->where('users.status_work', '=', 1)
+           ->get();
 // dd($accepted_users);
 
     $accepted_users = [
