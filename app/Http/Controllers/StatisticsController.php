@@ -776,7 +776,7 @@ class StatisticsController extends Controller
             $today = date('Y-m-d');
             $data_help = date('Y-m-d');
         } else if ($type == 'yesterday') {
-            $today = date("'Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+            $today = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
             $data_help = $today;
         }
 
