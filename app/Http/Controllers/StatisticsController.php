@@ -464,8 +464,8 @@ class StatisticsController extends Controller
     private function hourReportDkj() {
         $today = date('Y-m-d');
 
-        $hour_stop = $today . ' ' . date('H', time() + 36000) . ':00:00'; //tutaj zmienic przy wydawaniu na produkcję na  date('H') - 1
-        $hour_start = $today . ' ' . date("H", time() - 3600) . ':00:00';
+        $hour_stop = $today . ' ' . '23:00:00'; //tutaj zmienic przy wydawaniu na produkcję na  date('H') - 1
+        $hour_start = $today . ' 07:00:00';
 
         $dkj = DB::table('dkj')
             ->select(DB::raw('
@@ -715,8 +715,8 @@ class StatisticsController extends Controller
 
     private function hourReportCheckedData() {
         $date = date('Y-m-d');
-        $hour = date('H') . ':00:00'; //tutaj zmienic przy wydawaniu na produkcję na  date('H') - 1
-        $hour_start = date("H", time() - 3600) . ':00:00';
+        $hour = date('H') . ':00:00';
+        $hour_start = '07:00:00';
 
         $reports = $this->getHourReportData('hourReport', $date, $hour);
 
