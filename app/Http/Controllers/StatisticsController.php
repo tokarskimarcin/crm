@@ -772,8 +772,6 @@ class StatisticsController extends Controller
 
     //dane do raportu dziennego odsłuchancyh rozmow
     private function dayReportCheckedData($type) {
-        $today = date('Y-m-d');
-
         if ($type == 'today') {
             $today = date('Y-m-d');
             $data_help = date('Y-m-d');
