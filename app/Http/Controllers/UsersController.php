@@ -146,6 +146,7 @@ class UsersController extends Controller
         $agencies = Agencies::all();
         $user = User::find($id);
         $department_info = Department_info::all();
+        $userTypes = UserTypes::all();
 
         if ($user == null || ($user->user_type_id != 1 && $user->user_type_id != 2)) {
             return view('errors.404');
@@ -158,6 +159,7 @@ class UsersController extends Controller
         return view('hr.addConsultantTEST')->with('agencies',$agencies)
           ->with('user',$user)
           ->with('department_info', $department_info)
+          ->with('userTypes', $userTypes)
           ->with('type', 1);
 
     }

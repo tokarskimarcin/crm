@@ -165,16 +165,6 @@
                                                     <input type="number" class="form-control" placeholder="0" name="additional_salary" value="{{$user->additional_salary}}">
                                                 </td>
                                             </tr>
-                                            <tr>
-                                                <td class="td-class"><b>Uprawnienia:</b></td>
-                                                <td>
-                                                    <select class="form-control" style="font-size:18px;" name="user_type" >
-                                                        @foreach($userTypes as $user_type)
-                                                            <option value="{{$user_type->id}}" @if($user_type->id == $user->user_type_id) selected @endif>{{$user_type->name}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </td>
-                                            </tr>
                                         @endif
                                         <tr>
                                             <td class="td-class"><b>Całość na konto:</b></td>
@@ -182,6 +172,16 @@
                                                 <select class="form-control" style="font-size:18px;" name="salary_to_account">
                                                     <option value="1" @if($user->salary_to_account == 1) selected @endif>Tak</option>
                                                     <option value="0" @if($user->salary_to_account == 0) selected @endif>Nie</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="td-class"><b>Uprawnienia:</b></td>
+                                            <td>
+                                                <select class="form-control" style="font-size:18px;" name="user_type" >
+                                                    @foreach($userTypes as $user_type)
+                                                        <option value="{{$user_type->id}}" @if($user_type->id == $user->user_type_id) selected @endif>{{$user_type->name}}</option>
+                                                    @endforeach
                                                 </select>
                                             </td>
                                         </tr>
