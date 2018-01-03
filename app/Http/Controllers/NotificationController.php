@@ -384,4 +384,18 @@ class NotificationController extends Controller
             ->with('user_results', $data)
             ->with('comments', $comments);
     }
+
+    public function viewNotification($id) {
+        $notification = Notifications::find($id);
+
+        if ($notification == null) {
+            return view('errors.404');
+        }
+
+        $it_user = User::find($notification->displayed_by);
+
+        return view('notifications.view_notification')
+            ->with('it_user', $it_user)
+            ->with('notification', $notification);
+    }
 }

@@ -21,7 +21,8 @@
                 <tr>
                     <th style="width: 20%">Data:</th>
                     <th style="width: 40%">Tytuł:</th>
-                    <th style="width: 30%">Stan realizacji</th>
+                    <th style="width: 20%">Stan realizacji</th>
+                    <th style="width: 10%">Szczegóły</th>
                     <th style="width: 10%">Oceń</th>
                 </tr>
             </thead>
@@ -63,6 +64,9 @@ table = $('#datatable').DataTable({
             }
           }
         },
+        {"data": function (data, type, dataToSet) {
+              return '<a class="btn btn-default" href="view_notification/'+data.id+'" >Szczegóły</a>';
+        },"orderable": false, "searchable": false },
         {"data": function (data, type, dataToSet) {
             var status = data.status;
             if (status != 3) {

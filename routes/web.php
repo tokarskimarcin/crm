@@ -253,6 +253,9 @@ Route::middleware(['check-permission'])->group(function () {
     Route::get('/it_cadre','NotificationController@ITCadreGet');
 
     Route::get('/it_worker/{id}', 'NotificationController@ITWorkerGet');
+
+
+    Route::get('/view_notification/{id}', 'NotificationController@viewNotification');
     //Notification STOP
 
 
