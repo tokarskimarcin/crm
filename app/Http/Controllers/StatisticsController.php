@@ -890,30 +890,30 @@ class StatisticsController extends Controller
     */
 
     private function sendMailByVerona($mail_type, $data, $mail_title) {
-       // $email = [];
-       //
-       // $mail_type2 = ucfirst($mail_type);
-       // $mail_type2 = 'page' . $mail_type2;
-       //
-       // $accepted_users = DB::table('users')
-       //     ->select(DB::raw('
-       //     users.first_name,
-       //     users.last_name,
-       //     users.username,
-       //     users.email_off
-       //     '))
-       //     ->join('privilage_relation', 'privilage_relation.user_type_id', '=', 'users.user_type_id')
-       //     ->join('links', 'privilage_relation.link_id', '=', 'links.id')
-       //     ->where('links.link', '=', $mail_type2)
-       //     ->where('users.status_work', '=', 1)
-       //     ->where('users.id', '!=', 4592) // tutaj szczesna
-       //     ->get();
-       //
-       //     $szczesny = new User();
-       //     $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
-       //     $szczesny->first_name = 'Bartosz';
-       //     $szczesny->last_name = 'Szczęsny';
-       //     $accepted_users->push($szczesny);
+        $email = [];
+
+        $mail_type2 = ucfirst($mail_type);
+        $mail_type2 = 'page' . $mail_type2;
+
+        $accepted_users = DB::table('users')
+            ->select(DB::raw('
+            users.first_name,
+            users.last_name,
+            users.username,
+            users.email_off
+            '))
+            ->join('privilage_relation', 'privilage_relation.user_type_id', '=', 'users.user_type_id')
+            ->join('links', 'privilage_relation.link_id', '=', 'links.id')
+            ->where('links.link', '=', $mail_type2)
+            ->where('users.status_work', '=', 1)
+            ->where('users.id', '!=', 4592) // tutaj szczesna
+            ->get();
+
+            $szczesny = new User();
+            $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
+            $szczesny->first_name = 'Bartosz';
+            $szczesny->last_name = 'Szczęsny';
+            $accepted_users->push($szczesny);
 
 // dd($accepted_users);
    // $accepted_users = [
