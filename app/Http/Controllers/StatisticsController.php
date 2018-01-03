@@ -898,40 +898,35 @@ class StatisticsController extends Controller
            ->join('links', 'privilage_relation.link_id', '=', 'links.id')
            ->where('links.link', '=', $mail_type2)
            ->where('users.status_work', '=', 1)
+           ->where('users.id', '!=', 4592)
            ->get();
- //dd($accepted_users);
-//
-//    $accepted_users = [
-//        'testmaila12345@wp.pl',
-//        'jarzyna.verona@gmail.com'
-//    ];
-//
-//
-// Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
-// {
-//    $message->from('noreply.verona@gmail.com');
-//    foreach ($accepted_users as $key => $user) {
-//      if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
-//          $message->to($user)->subject($mail_title);
-//      }
-//    }
-// });
 
-/* Tablica z emailami na które nie chcemy wysyłać emaili*/
+   // $accepted_users = [
+   //     'testmaila12345@wp.pl',
+   //     'jarzyna.verona@gmail.com'
+   // ];
+   //
+   //
+   //  Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title, $no_email)
+   //  {
+   //     $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+   //     foreach ($accepted_users as $key => $user) {
+   //       if (filter_var($user, FILTER_VALIDATE_EMAIL) && (!in_array($user, $no_email))) {
+   //           $message->to($user)->subject($mail_title);
+   //       }
+   //     }
+   //  });
 
-      $no_email = [
-          'magdalena.szczesna@veronaconsulting.pl'
-      ];
 
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
-       Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title, $no_email)
+       Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
        {
            $message->from('noreply.verona@gmail.com');
            foreach($accepted_users as $user) {
-            if (filter_var($user->username, FILTER_VALIDATE_EMAIL) && (!in_array($user->username, $no_email))) {
+            if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
                 $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
-             } else if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL) && (!in_array($user->username, $no_email))) {
-                $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
+             } else if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
+                $message->to($user->email_off, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
              }
            }
        });
