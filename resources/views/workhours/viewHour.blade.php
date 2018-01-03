@@ -112,6 +112,8 @@
                                                             <?php
                                                             $dateexplode = explode("-", $response_month);
                                                             $daysinmonth = date("t",mktime(0,0,0,$dateexplode[1],1,$dateexplode[0]));
+                                                            $total_time = 0;
+                                                            $cash_sum = 0;
                                                             ?>
                                                             @for ($i=0; $i < $daysinmonth; $i++)
                                                                 <?php
@@ -149,7 +151,16 @@
                                                                                     <div class="accept_hour_stop" >{{substr($item->accept_stop,0,-3)}}</div>
                                                                                 </td>
                                                                                 <td>{{$item->time}}</td>
+                                                                                @php
+                                                                                    $time_array = explode(':', $item->time);
+                                                                                    $hours_to_minute = $time_array[0] * 60;
+                                                                                    $time_sum = $hours_to_minute + $time_array[1];
+                                                                                    $total_time += $time_sum;
+                                                                                @endphp
                                                                                 <td>{{number_format ( ($item->second/3600)*$item->rate, 2 )}} PLN</td>
+                                                                                @php
+                                                                                    $cash_sum += number_format ( ($item->second/3600)*$item->rate, 2 );
+                                                                                @endphp
                                                                                 @if($agreement == 1)
                                                                                     <td class="succes_count">{{$item->success}}</td>
                                                                                     <td>{{$avg}}</td>
@@ -180,6 +191,18 @@
                                                                     </tr>
                                                                 @endif
                                                             @endfor
+                                                            <tr>
+                                                                <td colspan="3"><b>Suma</b></td>
+                                                                @php
+                                                                    $hours_sum = round($total_time / 60);
+                                                                    $minutes = $total_time % 60;
+                                                                    $time_string = $hours_sum . ":" . $minutes;
+                                                                @endphp
+                                                                <td><b>{{$time_string}}</b></td>
+                                                                <td><b>{{$cash_sum}} PLN</b></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            <tr/>
                                                             </tbody>
                                                         </table>
                                                     </div>

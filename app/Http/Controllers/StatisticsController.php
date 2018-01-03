@@ -916,14 +916,21 @@ class StatisticsController extends Controller
 //      }
 //    }
 // });
+
+/* Tablica z emailami na które nie chcemy wysyłać emaili*/
+
+      $no_email = [
+          'magdalena.szczesna@veronaconsulting.pl'
+      ];
+
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
-       Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
+       Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title, $no_email)
        {
            $message->from('noreply.verona@gmail.com');
            foreach($accepted_users as $user) {
-            if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
+            if (filter_var($user->username, FILTER_VALIDATE_EMAIL) && (!in_array($user->username, $no_email))) {
                 $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
-             } else if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
+             } else if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL) && (!in_array($user->username, $no_email))) {
                 $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
              }
            }
