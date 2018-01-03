@@ -212,9 +212,13 @@ class StatisticsController extends Controller
     }
 
     //dane do raportu dziennego telemarketing
-    private function dayReportTelemarketing()
+    private function dayReportTelemarketing($type)
     {
-        $date = date('Y-m-d');
+        if ($type == 'today') {
+            $date = date('Y-m-d');
+        } else if ($type == 'yesterday') {
+            $date = date("d.m.Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+        }
 
         $reports = DB::table('hour_report')
             ->select(DB::raw(
@@ -264,14 +268,14 @@ class StatisticsController extends Controller
     }
 //Mail do raportu dziennego Telemarketing
     public function MailDayReportTelemarketing() {
-        $data = $this::dayReportTelemarketing();
+        $data = $this::dayReportTelemarketing('yesterday');
 
-        $title = 'Raport dzienny telemarketing';
+        $title = 'Raport dzienny telemarketing '.date("d.m.Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
         $this->sendMailByVerona('dayReportTelemarketing', $data, $title);
     }
     // Wyswietlenie raportu dziennego na stronie 'telemarketing'
     public function pageDayReportTelemarketing() {
-        $data = $this::dayReportTelemarketing();
+        $data = $this::dayReportTelemarketing('today');
 
         return view('reportpage.dayReportTelemarketing')
             ->with('date', $data['date'])
@@ -552,7 +556,7 @@ class StatisticsController extends Controller
 
     public function dayReportDkj() {
         $data = $this->dayReportDkjData('yesterday');
-        $title = 'Raport dzienny DKJ '.date("d.m.Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));;
+        $title = 'Raport dzienny DKJ '.date("d.m.Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
         $this->sendMailByVerona('dayReportDkj', $data, $title);
     }
 
