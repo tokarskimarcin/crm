@@ -94,7 +94,7 @@ class WorkHoursController extends Controller
                     SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time'))
                 ->whereIn('work_hours.status', [1,2,3])
                 ->where('users.department_info_id', '=', Auth::user()->department_info_id)
-                ->where('users.user_type_id', '=', 1)
+                ->whereIn('users.user_type_id', [1,2])
                 ->where('work_hours.id_manager', '=', null)
                 ->whereBetween('date',[$start_date,$stop_date]);
             return datatables($query)->make(true);
@@ -125,6 +125,7 @@ class WorkHoursController extends Controller
                 $query->where('users.department_info_id', '=', $dep_info);
             }
             $query->where('users.user_type_id','!=',1)
+                ->where('users.user_type_id','!=',2)
                 ->where('work_hours.id_manager', '=', null)
                 ->whereBetween('date',[$start_date,$stop_date]);
             return datatables($query)->make(true);
