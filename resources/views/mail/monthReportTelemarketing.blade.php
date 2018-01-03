@@ -13,7 +13,7 @@
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Liczba Zaproszeń</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">% Janków</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">% Wykorzystania Bazy</th>
-        <th style="border:1px solid #231f20;padding:3px;background:#231f20">Czas Rozmów</th>
+        <th style="border:1px solid #231f20;padding:3px;background:#231f20">% Czas Rozmów</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">% Celu</th>
     </tr>
 </thead>
@@ -77,7 +77,7 @@
                   $total_avg_wear_base_proc = round($total_avg_wear_base / $count, 2);
                   $total_janky_proc = round($total_janky / $count, 2);
                   $total_avg_average_proc = round($total_avg_average / $count, 2);
-                  $total_sum_call_time_poc = round($total_sum_call_time, 2);
+                  $total_sum_call_time_poc = round($total_sum_call_time / $count, 2);
                   $total_realRBH = round($total_realRBH, 2);
             }
       @endphp
