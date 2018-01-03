@@ -121,7 +121,7 @@ class StatisticsController extends Controller
     public function MailhourReportTelemarketing() {
         $data = $this::hourReportTelemarketing();
 
-        $title = 'Raport godzinny telemarketing';
+        $title = 'Raport godzinny telemarketing ' . date('Y-m-d H') . ":00:00";
         $this->sendMailByVerona('hourReportTelemarketing', $data, $title);
         foreach ($data['reports'] as $report) {
             $report->is_send = 1;
@@ -512,8 +512,15 @@ class StatisticsController extends Controller
             ->with('dkj', $data['dkj']);
     }
 
-    private function dayReportDkjData() {
-      $today = date('Y-m-d') . "%";
+    private function dayReportDkjData($type) {
+      if ($type == 'today') {
+          $today = date('Y-m-d') . "%";
+          $data_help = date('Y-m-d');
+      } else if ($type == 'yesterday') {
+          $today = date('Y-m-d', time() - 24 * 3600) . "%";
+          $data_help = date('Y-m-d', time() - 24 * 3600);
+      }
+
 
       $dkj = DB::table('dkj')
           ->select(DB::raw('
@@ -538,20 +545,20 @@ class StatisticsController extends Controller
 
         $data = [
             'dkj' => $dkj,
-            'today' => date('Y-m-d')
+            'today' => $data_help
         ];
         return $data;
     }
 
     public function dayReportDkj() {
-        $data = $this->dayReportDkjData();
+        $data = $this->dayReportDkjData('yesterday');
 
         $title = 'Raport dzienny DKJ';
         $this->sendMailByVerona('dayReportDkj', $data, $title);
     }
 
     public function pageDayReportDKJ() {
-        $data = $this->dayReportDkjData();
+        $data = $this->dayReportDkjData('today');
 
         return view('reportpage.DayReportDkj')
             ->with('today', $data['today'])
@@ -883,30 +890,30 @@ class StatisticsController extends Controller
     */
 
     private function sendMailByVerona($mail_type, $data, $mail_title) {
-       $email = [];
-
-       $mail_type2 = ucfirst($mail_type);
-       $mail_type2 = 'page' . $mail_type2;
-
-       $accepted_users = DB::table('users')
-           ->select(DB::raw('
-           users.first_name,
-           users.last_name,
-           users.username,
-           users.email_off
-           '))
-           ->join('privilage_relation', 'privilage_relation.user_type_id', '=', 'users.user_type_id')
-           ->join('links', 'privilage_relation.link_id', '=', 'links.id')
-           ->where('links.link', '=', $mail_type2)
-           ->where('users.status_work', '=', 1)
-           ->where('users.id', '!=', 4592) // tutaj szczesna
-           ->get();
-
-           $szczesny = new User();
-           $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
-           $szczesny->first_name = 'Bartosz';
-           $szczesny->last_name = 'Szczęsny';
-           $accepted_users->push($szczesny);
+       // $email = [];
+       //
+       // $mail_type2 = ucfirst($mail_type);
+       // $mail_type2 = 'page' . $mail_type2;
+       //
+       // $accepted_users = DB::table('users')
+       //     ->select(DB::raw('
+       //     users.first_name,
+       //     users.last_name,
+       //     users.username,
+       //     users.email_off
+       //     '))
+       //     ->join('privilage_relation', 'privilage_relation.user_type_id', '=', 'users.user_type_id')
+       //     ->join('links', 'privilage_relation.link_id', '=', 'links.id')
+       //     ->where('links.link', '=', $mail_type2)
+       //     ->where('users.status_work', '=', 1)
+       //     ->where('users.id', '!=', 4592) // tutaj szczesna
+       //     ->get();
+       //
+       //     $szczesny = new User();
+       //     $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
+       //     $szczesny->first_name = 'Bartosz';
+       //     $szczesny->last_name = 'Szczęsny';
+       //     $accepted_users->push($szczesny);
 
 // dd($accepted_users);
    // $accepted_users = [
@@ -915,15 +922,15 @@ class StatisticsController extends Controller
    // ];
    //
    //
-   //  Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title, $no_email)
+   //  Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
    //  {
    //     $message->from('noreply.verona@gmail.com', 'Verona Consulting');
    //     foreach ($accepted_users as $key => $user) {
-   //       if (filter_var($user, FILTER_VALIDATE_EMAIL) && (!in_array($user, $no_email))) {
+   //       if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
    //           $message->to($user)->subject($mail_title);
    //       }
-   //     }
-   //  });
+    //    }
+    // });
 
 
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
