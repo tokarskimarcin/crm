@@ -716,6 +716,7 @@ class StatisticsController extends Controller
     private function hourReportCheckedData() {
         $date = date('Y-m-d');
         $hour = date('H') . ':00:00';
+        $hour_stop = '23:00:00';
         $hour_start = '07:00:00';
 
         $reports = $this->getHourReportData('hourReport', $date, $hour);
@@ -726,7 +727,7 @@ class StatisticsController extends Controller
                 count(*) as dkj_sum
             '))
             ->join('users', 'users.id', '=', 'dkj.id_user')
-            ->whereBetween('add_date', [$date . ' ' . $hour_start, $date . ' ' . $hour])
+            ->whereBetween('add_date', [$date . ' ' . $hour_start, $date . ' ' . $hour_stop])
             ->groupBy('users.department_info_id')
             ->get();
 
