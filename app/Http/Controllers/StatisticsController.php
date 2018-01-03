@@ -771,8 +771,16 @@ class StatisticsController extends Controller
     }
 
     //dane do raportu dziennego odsłuchancyh rozmow
-    private function dayReportCheckedData() {
+    private function dayReportCheckedData($type) {
         $today = date('Y-m-d');
+
+        if ($type == 'today') {
+            $today = date('Y-m-d');
+            $data_help = date('Y-m-d');
+        } else if ($type == 'yesterday') {
+            $today = date("'Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+            $data_help = $today;
+        }
 
         $hour_reports = $this->getHourReportData('dayReport', $today);
 
@@ -796,15 +804,15 @@ class StatisticsController extends Controller
 
     //wysyłanie emaili (raport dzienny odłsuchanych rozmów)
     public function dayReportChecked() {
-      $data = $this->dayReportCheckedData();
+      $data = $this->dayReportCheckedData('yesterday');
 
-      $title = 'Raport dzienny odsłuchanych rozmów';
+      $title = 'Raport dzienny odsłuchanych rozmów '.date("d.m.Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
       $this->sendMailByVerona('dayReportChecked', $data, $title);
     }
 
     //wyświetlanie raportu odsłuchanych rozmów (raport dzienny)
     public function pageDayReportChecked() {
-        $data = $this->dayReportCheckedData();
+        $data = $this->dayReportCheckedData('today');
 
         return view('reportpage.DayReportChecked')
             ->with('hour_reports', $data['hour_reports'])
