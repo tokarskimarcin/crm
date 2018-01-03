@@ -416,8 +416,7 @@ class DkjController extends Controller
             }
             if($request->type_verification == 1)
             {
-                $query->where('dkj.manager_status','!=',null)
-                    ->where('dkj_status',1);
+                $query->where('dkj_status',1);
             }
 
             return datatables($query)->make(true);

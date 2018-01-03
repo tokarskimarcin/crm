@@ -415,8 +415,11 @@
                                     if(data.manager_status == 1)
                                     {
                                         return "Nie " + " " + data.comment_manager;
+                                    }else if(data.manager_status == null)
+                                    {
+                                        return "Brak weryfikacji";
                                     }else
-                                    return "Tak "+ " " + data.comment_manager;
+                                        return "Tak "+ " " + data.comment_manager;
                                 }, "name": " dkj.comment_manager"
                             }
                         ],
