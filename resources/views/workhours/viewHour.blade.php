@@ -205,7 +205,7 @@
                                                                 <td colspan="3"><b>Suma</b></td>
                                                                 @php
                                                                     $hours_sum = round($total_time / 60);
-                                                                    $minutes = $total_time % 60;
+                                                                    $minutes = ($total_time % 60 < 10) ? ("0" . ($total_time % 60)) : $total_time % 60 ;
                                                                     $time_string = $hours_sum . ":" . $minutes;
                                                                 @endphp
                                                                 <td><b>{{$time_string}} H</b></td>

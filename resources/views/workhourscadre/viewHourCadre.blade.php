@@ -111,6 +111,7 @@
                                                             <?php
                                                             $dateexplode = explode("-", $response_month);
                                                             $daysinmonth = date("t",mktime(0,0,0,$dateexplode[1],1,$dateexplode[0]));
+                                                            $total_time = 0;
                                                             ?>
                                                             @for ($i=0; $i < $daysinmonth; $i++)
                                                                 <?php
@@ -151,6 +152,14 @@
                                                                                     <div class="accept_hour_stop" >{{substr($item->accept_stop,0,-3)}}</div>
                                                                                 </td>
                                                                                 <td>{{$item->time}}</td>
+                                                                                @php
+                                                                                    if (isset($item->time)) {
+                                                                                        $time_array = explode(':', $item->time);
+                                                                                        $hours_to_minute = $time_array[0] * 60;
+                                                                                        $time_sum = $hours_to_minute + $time_array[1];
+                                                                                        $total_time += $time_sum;
+                                                                                    }
+                                                                                @endphp
                                                                                 <td>{{$status}}</td>
                                                                                 @if($action_status == 1)
                                                                                 <td>
@@ -176,6 +185,17 @@
                                                                     </tr>
                                                                 @endif
                                                             @endfor
+                                                            @php
+                                                                $hours_sum = round($total_time / 60);
+                                                                $minutes = ($total_time % 60 < 10) ? ("0" . ($total_time % 60)) : $total_time % 60 ;
+                                                                $time_string = $hours_sum . ":" . $minutes;
+                                                            @endphp
+                                                            <tr>
+                                                                <td colspan="3"><b>SUMA</b></td>
+                                                                <td><b>{{$time_string}} H</b></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
                                                             </tbody>
                                                         </table>
                                                     </div>

@@ -365,7 +365,7 @@ class NotificationController extends Controller
           '))
           ->leftJoin('users', 'users.id', '=', 'judge_results.it_id')
           ->leftJoin('notifications', 'notifications.id', '=', 'judge_results.notification_id')
-          ->where('users.id', '=', $id)
+          ->where('judge_results.it_id', '=', $id)
           ->get();
 
         $comments = DB::table('judge_results')
