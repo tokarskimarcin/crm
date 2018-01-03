@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Mail;
 use App\Department_info;
+use App\User;
 
 class StatisticsController extends Controller
 {
@@ -898,9 +899,16 @@ class StatisticsController extends Controller
            ->join('links', 'privilage_relation.link_id', '=', 'links.id')
            ->where('links.link', '=', $mail_type2)
            ->where('users.status_work', '=', 1)
-           ->where('users.id', '!=', 4592)
+           ->where('users.id', '!=', 4592) // tutaj szczesna
            ->get();
 
+           $szczesny = new User();
+           $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
+           $szczesny->first_name = 'Bartosz';
+           $szczesny->last_name = 'Szczęsny';
+           $accepted_users->push($szczesny);
+
+// dd($accepted_users);
    // $accepted_users = [
    //     'testmaila12345@wp.pl',
    //     'jarzyna.verona@gmail.com'
