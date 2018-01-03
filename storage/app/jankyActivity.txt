@@ -34,3 +34,6 @@ ID: [1] DATE: [2017-12-06 14:20:25] ACTION: [Dodanie janka przez dkj, status: 0,
 ID: [1] DATE: [2017-12-06 14:20:59] ACTION: [Dodanie janka przez dkj, status: 1, komentarz: 123, numer telefonu: 123, kampania: 123]
 ID: [1] DATE: [2017-12-07 07:33:10] ACTION: [Dodanie janka przez dkj, status: 1, komentarz: 234, numer telefonu: 234, kampania: 234]
 ID: [1] DATE: [2017-12-07 07:44:13] ACTION: [Dodanie janka przez dkj, status: 1, komentarz: 12, numer telefonu: 12, kampania: 12]
+ID: [5113] DATE: [2017-12-19 21:27:28] ACTION: [Edycja janka przez dkj, status: 1, komentarz: brak inf o czasie trwania badania, numer telefonu: 696012370, kampania: 14963 - 10:00-potw-LBN_Gdańsk_06.12_(środa)_LaboTrans]
+ID: [5113] DATE: [2017-12-19 21:27:34] ACTION: [Edycja janka przez dkj, status: 0, komentarz: brak inf o czasie trwania badania, numer telefonu: 696012370, kampania: 14963 - 10:00-potw-LBN_Gdańsk_06.12_(środa)_LaboTrans]
+ID: [5113] DATE: [2017-12-19 21:40:51] ACTION: [Edycja janka przez dkj, status: 1, komentarz: konsultantka nie poinformowała o prelekcji; brak informacji o przedziałe wiekowym i przeciwwskazaniach dla osoby towarzyszącej, numer telefonu: 817513039, kampania: 15151 - 10:00-potw-LBN_Świdnik_07.12_(czwartek)_Alther]

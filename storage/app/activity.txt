@@ -26,3 +26,10 @@ ID: [44] DATE: [2017-11-28 10:35:20] ACTION: [Edycja statusu powiadomienia o pro
 ID: [44] DATE: [2017-11-28 10:35:20] ACTION: [Edycja statusu powiadomienia o problemie : . Id problemu : 12. status : 1. ]
 ID: [44] DATE: [2017-11-28 10:35:24] ACdfsdfsdTION: [Edycja statusu powiadomienia o problemie : . Id problemu : 12. status : 1. ]
 ID: [44] DATE: [2017-11-28 11:16:35] ACTION: [Edycja statusu psdfsdfowiadomienia o problemie : . Id problemu : 1008. status : 2. ]svAADVDS
+
+ID: [5113] DATE: [2017-12-12 14:00:33] ACTION: [Edycja statusu powiadomienia o problemie : , Id problemu : 1038, status : 2, ]
+ID: [5113] DATE: [2017-12-12 14:00:38] ACTION: [Edycja statusu powiadomienia o problemie : , Id problemu : 1038, status : 1, ]
+ID: [5113] DATE: [2017-12-12 14:00:41] ACTION: [Edycja statusu powiadomienia o problemie : , Id problemu : 1038, status : 2, ]
+ID: [5113] DATE: [2017-12-12 14:00:44] ACTION: [Edycja statusu powiadomienia o problemie : , Id problemu : 1038, status : 1, ]
+ID: [5113] DATE: [2017-12-12 14:00:47] ACTION: [Edycja statusu powiadomienia o problemie : , Id problemu : 1038, status : 2, ]
+ID: [5113] DATE: [2017-12-12 14:00:51] ACTION: [Edycja statusu powiadomienia o problemie : , Id problemu : 1038, status : 1, ]
