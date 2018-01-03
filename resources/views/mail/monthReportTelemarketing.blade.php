@@ -78,6 +78,7 @@
                   $total_janky_proc = round($total_janky / $count, 2);
                   $total_avg_average_proc = round($total_avg_average / $count, 2);
                   $total_sum_call_time_poc = round($total_sum_call_time / $count, 2);
+                  $total_goal_proc = round($total_goal / $count, 2);
                   $total_realRBH = round($total_realRBH, 2);
             }
       @endphp
@@ -90,7 +91,7 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_janky_proc}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_avg_wear_base_proc}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_sum_call_time_poc}} %</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_goal}} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_goal_proc}} %</td>
         </tr>
 
     </tbody>
