@@ -772,7 +772,7 @@ class StatisticsController extends Controller
             '))
             ->join('users', 'users.id', '=', 'dkj.id_user')
             ->where('add_date', 'like', $today . '%')
-            ->groupBy('department_info_id')
+            ->groupBy('users.department_info_id')
             ->get();
 
         $data = [
