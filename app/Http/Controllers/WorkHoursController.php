@@ -156,6 +156,7 @@ class WorkHoursController extends Controller
                 $query = $query->where('users.department_info_id', '=', $dep_info);
             }
             $query = $query->wherenotin('users.user_type_id',[1,2])
+            ->where('users.id','!=',11)
             ->where('users.status_work',1);
             return datatables($query)->make(true);
         }
