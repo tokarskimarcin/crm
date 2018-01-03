@@ -217,9 +217,8 @@ class StatisticsController extends Controller
         if ($type == 'today') {
             $date = date('Y-m-d');
         } else if ($type == 'yesterday') {
-            $date = date("d.m.Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+            $date = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
         }
-
         $reports = DB::table('hour_report')
             ->select(DB::raw(
                 'SUM(call_time) as sum_call_time,
