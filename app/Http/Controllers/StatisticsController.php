@@ -120,7 +120,8 @@ class StatisticsController extends Controller
     public function MailhourReportTelemarketing() {
         $data = $this::hourReportTelemarketing();
 
-        $this->sendMailByVerona('hourReportTelemarketing', $data);
+        $title = 'Raport godzinny telemarketing';
+        $this->sendMailByVerona('hourReportTelemarketing', $data, $title);
         foreach ($data['reports'] as $report) {
             $report->is_send = 1;
             $report->save();
@@ -195,7 +196,8 @@ class StatisticsController extends Controller
     public function MailweekReportTelemarketing() {
         $data = $this::weekReportTelemarketing();
 
-        $this->sendMailByVerona('weekReportTelemarketing', $data);
+        $title = 'Raport tygodniowy telemarketing';
+        $this->sendMailByVerona('weekReportTelemarketing', $data, $title);
     }
     // Wyswietlenie raportu tygodniowego na stronie 'telemarketing'
     public function pageWeekReportTelemarketing() {
@@ -263,7 +265,8 @@ class StatisticsController extends Controller
     public function MailDayReportTelemarketing() {
         $data = $this::dayReportTelemarketing();
 
-        $this->sendMailByVerona('dayReportTelemarketing', $data);
+        $title = 'Raport dzienny telemarketing';
+        $this->sendMailByVerona('dayReportTelemarketing', $data, $title);
     }
     // Wyswietlenie raportu dziennego na stronie 'telemarketing'
     public function pageDayReportTelemarketing() {
@@ -367,7 +370,8 @@ class StatisticsController extends Controller
     $year = date('Y');
     $data = $this::monthReportTelemarketing($month,$year);
 
-    $this->sendMailByVerona('monthReportTelemarketing', $data);
+    $title = 'Raport miesięczny telemarketing';
+    $this->sendMailByVerona('monthReportTelemarketing', $data, $title);
     }
     // wyswietlenie raportu miesiecznego
     public function pageMonthReportTelemarketing()
@@ -417,7 +421,8 @@ class StatisticsController extends Controller
     public function MailweekReportJanky() {
         $data = $this->weekReportJankyData();
 
-        $this->sendMailByVerona('weekReportJanky', $data);
+        $title = 'Raport tygodniowy janki';
+        $this->sendMailByVerona('weekReportJanky', $data, $title);
     }
 
     public function pageWeekReportJanky(){
@@ -452,7 +457,8 @@ class StatisticsController extends Controller
             'today' => $today
         ];
 
-        $this->sendMailByVerona('dayReportMissedRepo', $data);
+        $title = 'Raport dzienny pominięte raporty';
+        $this->sendMailByVerona('dayReportMissedRepo', $data, $title);
     }
     // Przygotowanie danych do raportu godzinnego DKJ
     private function hourReportDkj() {
@@ -493,7 +499,8 @@ class StatisticsController extends Controller
     public function MailhourReportDkj() {
         $data = $this::hourReportDkj();
 
-        $this->sendMailByVerona('hourReportDkj', $data);
+        $title = 'Raport godzinny DKJ';
+        $this->sendMailByVerona('hourReportDkj', $data, $title);
     }
     public function pageHourReportDKJ()
     {
@@ -538,7 +545,8 @@ class StatisticsController extends Controller
     public function dayReportDkj() {
         $data = $this->dayReportDkjData();
 
-        $this->sendMailByVerona('dayReportDkj', $data);
+        $title = 'Raport dzienny DKJ';
+        $this->sendMailByVerona('dayReportDkj', $data, $title);
     }
 
     public function pageDayReportDKJ() {
@@ -604,7 +612,8 @@ class StatisticsController extends Controller
     public function MailWeekReportDkj() {
       $data = $this->weekReportDkjData();
 
-      $this->sendMailByVerona('weekReportDkj', $data);
+      $title = 'Raport tygodniowy DKJ';
+      $this->sendMailByVerona('weekReportDkj', $data, $title);
     }
 
     //przygotowanie danych do raportu miesięcznego dkj
@@ -655,7 +664,8 @@ class StatisticsController extends Controller
     public function monthReportDkj() {
       $data = $this->MonthReportDkjData();
 
-      $this->sendMailByVerona('monthReportDkj', $data);
+      $title = 'Raport miesięczny DKJ';
+      $this->sendMailByVerona('monthReportDkj', $data, $title);
     }
 
     //wyswietlanie raoprtu miesiecznego pracownicy dkj
@@ -712,11 +722,12 @@ class StatisticsController extends Controller
 
         $dkj = DB::table('dkj')
             ->select(DB::raw('
-                department_info_id,
+                users.department_info_id,
                 count(*) as dkj_sum
             '))
+            ->join('users', 'users.id', '=', 'dkj.id_user')
             ->whereBetween('add_date', [$date . ' ' . $hour_start, $date . ' ' . $hour])
-            ->groupBy('department_info_id')
+            ->groupBy('users.department_info_id')
             ->get();
 
         $data = [
@@ -733,7 +744,8 @@ class StatisticsController extends Controller
     public function hourReportChecked() {
         $data = $this->hourReportCheckedData();
 
-        $this->sendMailByVerona('hourReportChecked', $data);
+        $title = 'Raport godzinny odsłuchanych rozmów';
+        $this->sendMailByVerona('hourReportChecked', $data, $title);
     }
 
     //wyswietlanie widoku odsłuchu godzinnego
@@ -755,9 +767,10 @@ class StatisticsController extends Controller
 
         $dkj = DB::table('dkj')
             ->select(DB::raw('
-                department_info_id,
+                users.department_info_id,
                 count(*) as dkj_sum
             '))
+            ->join('users', 'users.id', '=', 'dkj.id_user')
             ->where('add_date', 'like', $today . '%')
             ->groupBy('department_info_id')
             ->get();
@@ -774,7 +787,8 @@ class StatisticsController extends Controller
     public function dayReportChecked() {
       $data = $this->dayReportCheckedData();
 
-      $this->sendMailByVerona('dayReportChecked', $data);
+      $title = 'Raport dzienny odsłuchanych rozmów';
+      $this->sendMailByVerona('dayReportChecked', $data, $title);
     }
 
     //wyświetlanie raportu odsłuchanych rozmów (raport dzienny)
@@ -844,7 +858,8 @@ class StatisticsController extends Controller
     public function weekReportChecked() {
         $data = $this->weekReportCheckedData();
 
-        $this->sendMailByVerona('weekReportChecked', $data);
+        $title = 'Raport tygodniowy odsłuchanych rozmów';
+        $this->sendMailByVerona('weekReportChecked', $data, $title);
     }
 
     //wyświetlanie widoku raport tygodniowy odsłuchane rozmowy
@@ -865,7 +880,7 @@ class StatisticsController extends Controller
     *
     */
 
-    private function sendMailByVerona($mail_type, $data) {
+    private function sendMailByVerona($mail_type, $data, $mail_title) {
        $email = [];
 
        $mail_type2 = ucfirst($mail_type);
@@ -884,23 +899,22 @@ class StatisticsController extends Controller
            ->where('users.status_work', '=', 1)
            ->get();
  //dd($accepted_users);
-
+//
 //    $accepted_users = [
 //        'testmaila12345@wp.pl',
-//        'cytawa.verona@gmail.com',
 //        'jarzyna.verona@gmail.com'
 //    ];
-
-
-//Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users)
-//{
+//
+//
+// Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
+// {
 //    $message->from('noreply.verona@gmail.com');
 //    foreach ($accepted_users as $key => $user) {
 //      if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
-//          $message->to($user)->subject('Verona Consulting!');
+//          $message->to($user)->subject($mail_title);
 //      }
 //    }
-//});
+// });
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users)
        {
