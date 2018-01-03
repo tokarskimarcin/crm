@@ -121,7 +121,7 @@ class StatisticsController extends Controller
     public function MailhourReportTelemarketing() {
         $data = $this::hourReportTelemarketing();
 
-        $title = 'Raport godzinny telemarketing ' . date('Y-m-d H') . ":00:00";
+        $title = 'Raport godzinny telemarketing ' . date('Y-m-d');
         $this->sendMailByVerona('hourReportTelemarketing', $data, $title);
         foreach ($data['reports'] as $report) {
             $report->is_send = 1;
@@ -500,7 +500,7 @@ class StatisticsController extends Controller
     public function MailhourReportDkj() {
         $data = $this::hourReportDkj();
 
-        $title = 'Raport godzinny DKJ';
+        $title = 'Raport godzinny DKJ '.date('Y-m-d');
         $this->sendMailByVerona('hourReportDkj', $data, $title);
     }
     public function pageHourReportDKJ()
@@ -552,8 +552,7 @@ class StatisticsController extends Controller
 
     public function dayReportDkj() {
         $data = $this->dayReportDkjData('yesterday');
-
-        $title = 'Raport dzienny DKJ';
+        $title = 'Raport dzienny DKJ '.date("d.m.Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));;
         $this->sendMailByVerona('dayReportDkj', $data, $title);
     }
 
@@ -753,7 +752,7 @@ class StatisticsController extends Controller
     public function hourReportChecked() {
         $data = $this->hourReportCheckedData();
 
-        $title = 'Raport godzinny odsłuchanych rozmów';
+        $title = 'Raport godzinny odsłuchanych rozmów '.date('Y-m-d');
         $this->sendMailByVerona('hourReportChecked', $data, $title);
     }
 
