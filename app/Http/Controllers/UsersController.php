@@ -145,6 +145,7 @@ class UsersController extends Controller
     {
         $agencies = Agencies::all();
         $user = User::find($id);
+        $department_info = Department_info::all();
 
         if ($user == null || ($user->user_type_id != 1 && $user->user_type_id != 2)) {
             return view('errors.404');
@@ -156,6 +157,7 @@ class UsersController extends Controller
 
         return view('hr.addConsultantTEST')->with('agencies',$agencies)
           ->with('user',$user)
+          ->with('department_info', $department_info)
           ->with('type', 1);
 
     }
@@ -164,6 +166,7 @@ class UsersController extends Controller
         $user = User::find($id);
 
         $agencies = Agencies::all();
+        $department_info = Department_info::all();
         $month = date('m');
         $months_names = ['Styczeń', 'Luty', 'Marzec', 'Kwiecien', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Padziernik', 'Listopad', 'Grudzień'];
 
@@ -205,6 +208,7 @@ class UsersController extends Controller
             ->with('user', $user)
             ->with('penalty_bonuses', $penalty_bonuses)
             ->with('month', $months)
+            ->with('department_info', $department_info)
             ->with('type', 2);
     }
 
@@ -243,6 +247,13 @@ class UsersController extends Controller
         $user->additional_salary = $request->additional_salary;
         $user->status_work = $request->status_work;
         $user->dating_type = $request->dating_type;
+        if ($request->department_info_id != null) {
+            $check_department = Department_info::find($request->department_info_id);
+            if ($check_department == null) {
+                return view('errors.404');
+            }
+            $user->department_info_id = $request->department_info_id;
+        }
         if ($request->user_type != null && $request->user_type != 0) {
             $user->user_type_id = $request->user_type;
         }

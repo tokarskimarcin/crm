@@ -231,7 +231,18 @@
                                                 <input type="text" class="form-control" placeholder="Login z programu do dzwonienia" name="login_phone" value="{{$user->login_phone}}">
                                             </td>
                                         </tr>
-
+                                        @if($type == 2)
+                                            <tr>
+                                                <td class="td-class"><b>Oddział:</b></td>
+                                                <td>
+                                                    <select class="form-control" style="font-size:18px;" name="department_info_id" id="department_info_id">
+                                                        @foreach($department_info as $dep)
+                                                            <option @if($dep->id == $user->department_info_id) selected @endif value="{{$dep->id}}">{{$dep->departments->name . ' ' . $dep->department_type->name}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        @endif
                                         </tbody>
                                     </table>
                                 </div>
