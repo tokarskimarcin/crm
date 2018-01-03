@@ -32,6 +32,7 @@ class FinancesController extends Controller
         $agencies = Agencies::all();
         $salary = DB::table(DB::raw("users"))
             ->whereNotIn('users.user_type_id',[1,2])
+            ->where('users.salary','>',0)
             ->selectRaw('
             `users`.`id`,
             `users`.`agency_id`,
