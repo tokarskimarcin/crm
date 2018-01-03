@@ -111,7 +111,7 @@ class DkjController extends Controller
               $users = $users->where('dating_type',$dating_type);
             }else if($department_type->type == 'Badania/Wysyłka')
                 $users = $users->where('dating_type',$dating_type);
-            $users = $users->groupBy('users.last_name')->get();
+            $users = $users->orderBy('users.last_name')->get();
 
         return view('dkj.dkjRaport')
         ->with('departments',$departments)
@@ -524,7 +524,7 @@ class DkjController extends Controller
                     $query->where('department_info.id', '=', $department_id_info);
                 }
                 return $query->where('users.user_type_id', '=', 1)
-                    ->groupBy('last_name')
+                    ->orderBy('last_name')
                     ->get();
             }else
             return 0;
@@ -599,7 +599,7 @@ class DkjController extends Controller
                     ->Join('work_hours', 'work_hours.id_user', '=', 'users.id')
                     ->where('work_hours.status', 1)
                     ->where('work_hours.date','like',$today)
-                    ->groupBy('last_name');
+                    ->orderBy('last_name');
                 if($department_id<0)
                 {
                     $users->where('department_info_id',$department_id*(-1))
