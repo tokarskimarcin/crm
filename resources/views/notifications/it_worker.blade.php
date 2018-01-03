@@ -12,8 +12,9 @@
 @php
 $data = $user_results[0];
 
-$user_time = explode(':', $data->notifications_time_sum);
-$user_time = (($user_time[0] * 3600) + ($user_time[1] * 60) + $user_time[2]);
+// $user_time = explode(':', $data->notifications_time_sum);
+//dd($user_time);
+//$user_time = (($user_time[0] * 3600) + ($user_time[1] * 60) + $user_time[2]); -->
 
 $dataPoints = array(
 round($data->user_judge_sum, 2),
@@ -35,7 +36,7 @@ round($data->user_time, 2)
           <div class="panel-body">
               <div class="list-group">
                   <div class="list-group-item">Liczba ocen pozytywnych: <b>{{$data->user_sum_repaired . '/' . $data->user_sum}}</b></div>
-                  <div class="list-group-item">Średni czas realizacji: <b>{{round($user_time / 3600, 2)}} h</b></div>
+                  <div class="list-group-item">Średni czas realizacji: <b>{{round($data->response_after / 3600, 2)}} h</b></div>
                   <div class="list-group-item">Oddzwonienia: <b>{{$data->response_after . '/' . $data->user_sum}}</b></div>
               </div>
           </div>
