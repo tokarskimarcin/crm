@@ -6,6 +6,8 @@ use App\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\User;
+use App\Work_hour;
 
 class ScheduleController extends Controller
 {
@@ -209,5 +211,23 @@ class ScheduleController extends Controller
         //     ->where('year',$request->session()->get('year'));
         return $query->get();
     }
+
+    public function timesheetGet() {
+
+        return view('schedule.timesheet');
+    }
+
+    public function timesheetPost(Request $request) {
+
+        $work_hours = Work_hour::where('date', '=', $request->timesheet_date)
+            ->whereIn('status', [4,5])
+            ->get();
+
+        return view('schedule.timesheet')
+            ->with('selected_date', $request->timesheet_date)
+            ->with('work_hours', $work_hours);
+    }
+
+
 
 }

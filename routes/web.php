@@ -204,6 +204,10 @@ Route::middleware(['check-permission'])->group(function () {
 
     Route::get('/view_schedule','ScheduleController@viewScheduleGet');
     Route::Post('/view_schedule','ScheduleController@viewSchedulePOST');
+
+
+    Route::get('/timesheet', 'ScheduleController@timesheetGet');
+    Route::POST('/timesheet', 'ScheduleController@timesheetPost');
     // schedule -- STOP --
 
     // Finances -- START --
