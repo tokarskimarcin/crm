@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\CsvReader;
 use App\Department_info;
+use App\HourReport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -17,10 +18,10 @@ class TestORM extends Controller
     public function test()
     {
 
-        $today = date('Y-m-d');
+        $today = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d"), date("Y")));
 
-        $hour_stop = $today . ' ' . date('H', time() + 36000) . ':00:00'; //tutaj zmienic przy wydawaniu na produkcję na  date('H') - 1
-        $hour_start = $today . ' ' . date("H", time() - 3600) . ':00:00';
+        $hour_stop = $today . ' ' . '23:00:00'; //tutaj zmienic przy wydawaniu na produkcję na  date('H') - 1
+        $hour_start = $today . ' ' . '00:00:00';
 
         $dkj = DB::table('dkj')
             ->select(DB::raw('
@@ -43,6 +44,7 @@ class TestORM extends Controller
             ->groupBy('users.dating_type')
             ->get();
 
+
         $lp = 0;
         $dont_save = false;
         $report_type = 0;
@@ -55,6 +57,9 @@ class TestORM extends Controller
                 if ($lp > 2) {
                     $dont_save = false;
                     $i = 0;
+                    $typ = 0;
+                    $janky = 0;
+                    $count_cehck =0;
                     foreach ($data1 as $item) {
                         if ($i == 0) {
                             preg_match_all('!\d+!', $item, $matches);
@@ -63,16 +68,10 @@ class TestORM extends Controller
                                 {
                                     // id_department dodać orm
                                     $department_id = Department_info::where('pbx_id',$matches[0][0])->first();
-                                    if(isset($department_id->id) && $department_id->id != null)
+                                    if(isset($department_id->id) && $department_id->id != null){
                                         $spreadsheet_data[$lp][$header_array[$i]] = $department_id->id;
-                                    if($matches[0][0] == 12 || $matches[0][0] == 9)
-                                    {
-                                        if($matches[0][0] == 12)
-                                        {
-                                            $spreadsheet_data[$lp][$header_array[$i]] = 4;
-                                        }else{
-                                            $spreadsheet_data[$lp][$header_array[$i]] = -4;
-                                        }
+                                    }else{
+                                        $dont_save = true;
                                     }
                                 }
                                 else
@@ -92,9 +91,45 @@ class TestORM extends Controller
                                 $spreadsheet_data[$lp][$header_array[$i]] = utf8_encode($item);
                             }
                             $spreadsheet_data[$lp]['user_id'] = 1364;
-                            $spreadsheet_data[$lp]['hour'] = date('H:i');
+                            $spreadsheet_data[$lp]['hour'] = date('H').":00:00";
                             $spreadsheet_data[$lp]['report_date'] = date('Y-m-d');
-                            $spreadsheet_data[$lp]['is_send'] = 1;
+                            $spreadsheet_data[$lp]['is_send'] = 0;
+
+                            if($department_id->id == 13)
+                            {
+                                $colection = $dkj->where('department_info_id',4)->where('badania','!=',0)->first();
+                                if(isset($colection->liczba_odsluchanych) && $colection->liczba_odsluchanych != null)
+                                {
+                                    $count_cehck = $colection->liczba_odsluchanych;
+                                    $janky = $colection->bad_badania;
+                                }
+
+                            }else if($department_id->id == 4){
+                                $colection = $dkj->where('department_info_id',$spreadsheet_data[$lp]['department_info_id'])->where('wysylka','!=',0)->first();
+                                if(isset($colection->liczba_odsluchanych) && $colection->liczba_odsluchanych != null)
+                                {
+                                    $count_cehck = $colection->liczba_odsluchanych;
+                                    $janky = $colection->bad_wysylka;
+                                }
+                            }else{
+                                $colection = $dkj->where('department_info_id',$spreadsheet_data[$lp]['department_info_id'])->first();
+                                if(isset($colection->liczba_odsluchanych) && $colection->liczba_odsluchanych != null) {
+                                    if ($colection->type == 'Badania') {
+                                        $count_cehck = $colection->liczba_odsluchanych;
+                                        $janky = $colection->bad_badania;
+                                    } else if ($colection->type == 'Wysyłka') {
+                                        $count_cehck = $colection->liczba_odsluchanych;
+                                        $janky = $colection->bad_wysylka;
+                                    }
+                                }
+                            }
+                            if($count_cehck != 0){
+                                $janky_count = round($janky / $count_cehck * 100, 2);
+                            }else{
+                                $janky_count = 0;
+                            }
+
+                            $spreadsheet_data[$lp]['janky_count'] = $janky_count;
                         }
                         $i++;
                     }
@@ -104,6 +139,8 @@ class TestORM extends Controller
             fclose($handle);
         }
         dd($spreadsheet_data);
+        HourReport::insert($spreadsheet_data);
+
         //array_pop($spreadsheet_data);
 
 
