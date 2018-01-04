@@ -47,16 +47,16 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px">500</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round((500 / 717) * 100, 2)}}%</td>
         </tr>
-        @php($total_dkj_sum += 383)
-        @php($total_success += 479)
+        @php($total_dkj_sum += 500)
+        @php($total_success += 717)
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Wysyłka</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">1609</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">1109</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round((1109 / 1609) * 100, 2)}} %</td>
         </tr>
-        @php($total_dkj_sum += 893)
-        @php($total_success += 1240)
+        @php($total_dkj_sum += 1109)
+        @php($total_success += 1609)
     @endif
 
 @if($total_success > 0)
