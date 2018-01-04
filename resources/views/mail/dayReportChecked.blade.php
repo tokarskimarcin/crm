@@ -43,17 +43,17 @@
         @if($today == date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y"))))
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Badania</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">479</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">383</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round((383 / 479) * 100, 2)}}%</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">717</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">500</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round((500 / 717) * 100, 2)}}%</td>
         </tr>
         @php($total_dkj_sum += 383)
         @php($total_success += 479)
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Wysyłka</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">1240</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">893</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round((893 / 1240) * 100, 2)}} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">1609</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">1109</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round((1109 / 1609) * 100, 2)}} %</td>
         </tr>
         @php($total_dkj_sum += 893)
         @php($total_success += 1240)
