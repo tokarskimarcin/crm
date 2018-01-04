@@ -87,12 +87,7 @@
                 {"data": "department_name","name":"departments.name"},
                 {"data": "department_type_name","name":"department_type.name"},
                 {"data": "user_type_name","name":"user_types.name"},
-                {"data": function (data, type, dataToSet) {
-                    if(data.phone != 0)
-                        return data.phone;
-                    else
-                        return data.private_phone;
-                }},
+                {"data": "phone"},
                 {"data": function (data, type, dataToSet) {
                     if(show_action == 1)
                         return '<a href="edit_cadre/'+data.id+'" >Edytuj</a>';
