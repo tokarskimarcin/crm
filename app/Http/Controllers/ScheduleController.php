@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\User;
-use App\Work_hour;
+use App\Work_Hour;
 
 class ScheduleController extends Controller
 {
@@ -219,7 +219,7 @@ class ScheduleController extends Controller
 
     public function timesheetPost(Request $request) {
 
-        $work_hours = Work_hour::where('date', '=', $request->timesheet_date)
+        $work_hours = Work_Hour::where('date', '=', $request->timesheet_date)
             ->whereIn('status', [4,5])
             ->get();
 
