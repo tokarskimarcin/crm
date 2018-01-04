@@ -58,6 +58,7 @@ class WorkHoursController extends Controller
         $shedule = Schedule::where('week_num',$date)
             ->where('year',date('Y'))
             ->where($dayOfWeekArray[$day_number].'_start','!=',null)
+            ->orderby($dayOfWeekArray[$day_number].'_start')
             ->get();
         // $shedule = DB::table('schedule')
         //     ->select(DB::raw('
