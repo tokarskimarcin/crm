@@ -42,7 +42,16 @@
                 @php
                 $create_column = false;
                 $time_sum_array = explode(":", $hour->work_time);
-                $user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2);
+
+                if($time_sum_array != null)
+                {
+                    $user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2);
+                }else
+                {
+                    $user_time_sum = 0;
+                }
+
+
                 $total_work_hour += $user_time_sum;
                 if($user_time_sum != 0)
                         $user_avg = round($item->user_sum / $user_time_sum, 2);
@@ -126,7 +135,10 @@
                 @php
                     $create_column = false;
                     $time_sum_array = explode(":", $hour->work_time);
-                    $user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2);
+                    if($time_sum_array != null)
+                        $user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2);
+                    else
+                        $user_time_sum = 0;
                     $total_work_hour += $user_time_sum;
                     if($user_time_sum != 0)
                         $user_avg = round($item->user_sum / $user_time_sum, 2);
