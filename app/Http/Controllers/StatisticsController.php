@@ -607,6 +607,69 @@ class StatisticsController extends Controller
         return $data;
     }
 
+    //wysyłanie maila z raportem pracownikow dkj (wczorajszy)
+    public function MaildayReportEmployeeDkj()
+    {
+        //$data = $this->weekReportDkjData();
+        $data = $this->dayReportEmployeeDkjData('yesterday');
+        $title = 'Raport dzienny pracowników DKJ '.date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+        $this->sendMailByVerona('dayReportEmployeeDkj', $data, $title);
+    }
+    // wyświetlenie strony z raportem pracownikow dkj
+    public function pageDayReportEmployeeDkj()
+    {
+        $data = $this->dayReportEmployeeDkjData('today');
+        return view('reportpage.DayReportEmployeeDkj')
+            ->with('date', $data['date'])
+            ->with('work_hours', $data['work_hours'])
+            ->with('dkj', $data['dkj']);
+    }
+
+    public function dayReportEmployeeDkjData($type)
+    {
+        if ($type == 'today') {
+            $date =  date('Y-m-d');
+            $data_help = $date;
+        } else if ($type == 'yesterday') {
+            $date = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+            $data_help = $date;
+        }
+
+        $dkj = DB::table('users')
+            ->select(DB::raw('
+                users.id,
+                users.first_name,
+                users.last_name,
+                users.dating_type,
+                count(*) as user_sum,
+                sum(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as user_janek,
+                sum(CASE WHEN dkj.dkj_status = 0 THEN 1 ELSE 0 END) as user_not_janek
+            '))
+            ->join('dkj', 'users.id', '=', 'dkj.id_dkj')
+            ->whereBetween('dkj.add_date', [$date.' 00:00:00', $date.' 23:00:00'])
+            ->groupBy('dkj.id_dkj')
+            ->get();
+
+        $work_hours = DB::table('users')
+            ->select(DB::raw('
+                users.id,
+                sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as work_time
+            '))
+            ->join('work_hours', 'users.id', '=', 'work_hours.id_user')
+            ->where('work_hours.date', $date)
+            ->where('users.user_type_id', '=', 2)
+            ->groupBy('users.id')
+            ->get();
+
+        $data = [
+            'date' => $date,
+            'dkj' => $dkj,
+            'work_hours' => $work_hours
+        ];
+        return $data;
+    }
+
+
     //wyswietlanie danych raportu tygodniowego dla DKJ
     public function pageWeekReportDKJ() {
       $data = $this->weekReportDkjData();
@@ -902,7 +965,6 @@ class StatisticsController extends Controller
 
         $mail_type2 = ucfirst($mail_type);
         $mail_type2 = 'page' . $mail_type2;
-
         $accepted_users = DB::table('users')
             ->select(DB::raw('
             users.first_name,
@@ -923,7 +985,7 @@ class StatisticsController extends Controller
             $szczesny->last_name = 'Szczęsny';
             $accepted_users->push($szczesny);
 
-// dd($accepted_users);
+//dd($accepted_users);
 //    $accepted_users = [
 //        'cytawa.verona@gmail.com',
 //        'jarzyna.verona@gmail.com'
@@ -948,11 +1010,11 @@ class StatisticsController extends Controller
            foreach($accepted_users as $user) {
             if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
                 $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
-             } else if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
+             }
+             if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
                 $message->to($user->email_off, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
              }
            }
        });
-
     }
 }
