@@ -43,7 +43,7 @@
                 $create_column = false;
                 $time_sum_array = explode(":", $hour->work_time);
 
-                if($time_sum_array != null)
+                if(isset($time_sum_array[0])  && isset($time_sum_array[1]))
                 {
                     $user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2);
                 }else
@@ -135,7 +135,7 @@
                 @php
                     $create_column = false;
                     $time_sum_array = explode(":", $hour->work_time);
-                    if($time_sum_array != null)
+                    if(isset($time_sum_array[0])  && isset($time_sum_array[1]))
                         $user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2);
                     else
                         $user_time_sum = 0;
