@@ -71,7 +71,9 @@
                                                     <select onchange="myFunction()" class="form-control showhidetext" name="department_id_info" style="border-radius: 0px;">
                                                         <option value="*" selected>Wszystkie oddziały</option>
                                                         @foreach($departments as $department)
-                                                            <option value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name}}</option>
+                                                            @if($department->id != 13)
+                                                                <option value={{$department->id}}>{{$department->department_name.' '.$department->department_type_name}}</option>
+                                                            @endif
                                                         @endforeach
                                                     </select>
                                                 </div>

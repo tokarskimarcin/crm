@@ -44,7 +44,9 @@
                             <select class="form-control" name="department_info_id">
                                 <option value="-1">Wybierz</option>
                                 @foreach($department_info as $department)
-                                    <option value="{{$department->id}}" @if($department->id == $equipment->department_info_id) selected @endif >{{$department->departments->name . ' ' . $department->department_type->name}}</option>
+                                    @if($department->id != 13)
+                                        <option value="{{$department->id}}" @if($department->id == $equipment->department_info_id) selected @endif >{{$department->departments->name . ' ' . $department->department_type->name}}</option>
+                                    @endif
                                 @endforeach
                             </select>
                         </div>

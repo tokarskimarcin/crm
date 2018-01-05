@@ -228,7 +228,9 @@
                                   <select class="form-control" style="font-size:18px;" name="department_info">
                                       <option>Wybierz</option>
                                       @foreach($department_info as $item)
+                                          @if($item->id != 13)
                                           <option value={{$item->id}}>{{$item->departments->name.' '.$item->department_type->name}}</option>
+                                          @endif
                                       @endforeach
                                   </select>
                                 </td>

@@ -305,12 +305,12 @@ class NotificationController extends Controller
                 first_name,
                 last_name,
                 count(*) as user_sum,
-                SUM(CASE WHEN repaired = 2 THEN 1 ELSE 0 END) as user_sum_repaired,
+                SUM(CASE WHEN repaired = 1 THEN 1 ELSE 0 END) as user_sum_repaired,
                 AVG(judge_quality) as user_quality,
                 AVG(judge_contact) as user_contact,
                 AVG(judge_time) as user_time,
                 AVG(judge_sum) as user_judge_sum,
-                SUM(CASE WHEN response_after = 1 THEN 0 ELSE 1 END) as response_after,
+                SUM(CASE WHEN response_after = 1 THEN 1 ELSE 0 END) as response_after,
                 AVG(TIME_TO_SEC(notifications.sec)) / 3600 as notifications_time_sum
             '))
             ->leftJoin('users', 'users.id', '=', 'judge_results.it_id')
@@ -355,12 +355,12 @@ class NotificationController extends Controller
               first_name,
               last_name,
               count(*) as user_sum,
-              SUM(CASE WHEN repaired = 2 THEN 1 ELSE 0 END) as user_sum_repaired,
+              SUM(CASE WHEN repaired = 1 THEN 1 ELSE 0 END) as user_sum_repaired,
               AVG(judge_quality) as user_quality,
               AVG(judge_contact) as user_contact,
               AVG(judge_time) as user_time,
               AVG(judge_sum) as user_judge_sum,
-              SUM(CASE WHEN response_after = 1 THEN 0 ELSE 1 END) as response_after,
+              SUM(CASE WHEN response_after = 1 THEN 1 ELSE 0 END) as response_after,
               AVG(TIME_TO_SEC(notifications.sec))/3600 as notifications_time_sum
           '))
           ->leftJoin('users', 'users.id', '=', 'judge_results.it_id')

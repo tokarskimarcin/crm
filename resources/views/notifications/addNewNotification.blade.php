@@ -47,7 +47,9 @@
                 <select name="department_info_id" class="form-control" id="department_info_id">
                     <option>Wybierz</option>
                     @foreach($department_info as $department)
+                        @if($department->id != 13)
                         <option value="{{$department->id}}">{{$department->departments->name . ' ' . $department->department_type->name}}</option>
+                        @endif
                     @endforeach
                 </select>
             </div>
