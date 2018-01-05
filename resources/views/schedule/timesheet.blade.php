@@ -91,7 +91,7 @@
                           @endphp
                           <tr>
                               <td>{{$lp}}</td>
-                              <td>{{$hour->first_name . ' ' . $hour->last_name}}</td>
+                              <td>{{$hour->last_name . ' ' . $hour->first_name}}</td>
                               <td>{{round($hour->user_sum, 2)}}</td>
                               <td>{{$hour->rate}}</td>
                               <td>{{$hour->user_success}}</td>

@@ -147,7 +147,6 @@
                                                                                 }
                                                                                 $salary_total_all += $salary_total;
 
-                                                                                $payment_total += $salary_total_all;
                                                                                 $documents_total += $item2->documents;
                                                                                 $students_total +=$item2->student;
                                                                                 $rbh_total += $item2->sum;
@@ -168,6 +167,9 @@
                                                                                 <td>{{(round($salary_total,2))}} PLN</td>
                                                                             </tr>
                                                                         @endforeach
+                                                                        @php
+                                                                            $payment_total += $salary_total_all;
+                                                                        @endphp
                                                                         <tr>
                                                                             <td colspan="9"></td>
                                                                             <td style="display: none;"></td>

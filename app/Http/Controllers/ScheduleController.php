@@ -233,6 +233,7 @@ class ScheduleController extends Controller
             ->whereIn('work_hours.status', [4,5])
             ->where('users.department_info_id', '=', Auth::user()->department_info_id)
             ->groupBy('users.id')
+            ->orderBy('users.last_name')
             ->get();
 
         return view('schedule.timesheet')
@@ -260,6 +261,7 @@ class ScheduleController extends Controller
             ->whereBetween('work_hours.date', [$date_start, $date_stop])
             ->whereIn('work_hours.status', [4,5])
             ->groupBy('users.id')
+            ->orderBy('users.last_name')
             ->get();
 
             return view('schedule.timesheetCadre')
