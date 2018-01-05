@@ -311,7 +311,7 @@ class NotificationController extends Controller
                 AVG(judge_time) as user_time,
                 AVG(judge_sum) as user_judge_sum,
                 SUM(CASE WHEN response_after = 1 THEN 0 ELSE 1 END) as response_after,
-                AVG(notifications.sec) as notifications_time_sum
+                AVG(TIME_TO_SEC(notifications.sec)) / 3600 as notifications_time_sum
             '))
             ->leftJoin('users', 'users.id', '=', 'judge_results.it_id')
             ->leftJoin('notifications', 'notifications.id', '=', 'judge_results.notification_id')
@@ -361,7 +361,7 @@ class NotificationController extends Controller
               AVG(judge_time) as user_time,
               AVG(judge_sum) as user_judge_sum,
               SUM(CASE WHEN response_after = 1 THEN 0 ELSE 1 END) as response_after,
-              AVG(notifications.sec) as notifications_time_sum
+              AVG(TIME_TO_SEC(notifications.sec))/3600 as notifications_time_sum
           '))
           ->leftJoin('users', 'users.id', '=', 'judge_results.it_id')
           ->leftJoin('notifications', 'notifications.id', '=', 'judge_results.notification_id')

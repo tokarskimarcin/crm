@@ -16,18 +16,40 @@
   <tbody>
 @php($total_success = 0)
 @php($total_dkj_sum = 0)
+@php($add_research = true)
 
     @foreach($hour_reports as $report)
     @php($column = true)
         <tr>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->dep_name . ' ' . $report->dep_name_type}}</td>
+            @if($report->department_info_id == 4)
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzanie Wysyłka</td>
+            @elseif($report->department_info_id == 13)
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzanie Badania</td>
+            @else
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->dep_name . ' ' . $report->dep_name_type}}</td>
+            @endif
+
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->success}}</td>
             @foreach($dkj as $item)
-                @if($item->department_info_id == $report->department_info_id)
-            @php($avg_department = round(($item->dkj_sum / $report->success) * 100, 2))
-            @php($total_dkj_sum += $item->dkj_sum)
+                @if($item->department_info_id == $report->department_info_id && ($report->department_info_id != 4))
+                    @php($avg_department = round(($item->dkj_sum / $report->success) * 100, 2))
+                    @php($total_dkj_sum += $item->dkj_sum)
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->dkj_sum}}</td>
                     @php($column = false)
+
+                @elseif($item->department_info_id == $report->department_info_id && $report->department_info_id == 4 && $item->dating_type == 1)
+                    @php($avg_department = round(($item->dkj_sum / $report->success) * 100, 2))
+                    @php($total_dkj_sum += $item->dkj_sum)
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->dkj_sum}}</td>
+                    @php($column = false)
+
+                @elseif($report->department_info_id == 13 && $item->dating_type == 0 && $add_research == true)
+                    @php($avg_department = round(($item->dkj_sum / $report->success) * 100, 2))
+                    @php($total_dkj_sum += $item->dkj_sum)
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->dkj_sum}}</td>
+                    @php($column = false)
+                    @php($add_research = false)
+
                 @endif
             @endforeach
             @if($column == true)
@@ -40,24 +62,6 @@
         </tr>
     @endforeach
 
-        @if($today == date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y"))))
-        <tr>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Badania</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">717</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">500</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round((500 / 717) * 100, 2)}}%</td>
-        </tr>
-        @php($total_dkj_sum += 500)
-        @php($total_success += 717)
-        <tr>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Wysyłka</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">1609</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">1109</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round((1109 / 1609) * 100, 2)}} %</td>
-        </tr>
-        @php($total_dkj_sum += 1109)
-        @php($total_success += 1609)
-    @endif
 
 @if($total_success > 0)
     <td colspan="1" style="border:1px solid #231f20;text-align:center;padding:3px"><b>TOTAL</b></td>

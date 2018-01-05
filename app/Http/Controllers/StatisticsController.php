@@ -787,15 +787,30 @@ class StatisticsController extends Controller
         $hour_start = '07:00:00';
 
         $reports = $this->getHourReportData('hourReport', $date, $hour);
+        $today = date('Y-m-d');
+
+        $hour_stop = $today . ' ' . '23:00:00';
+        $hour_start = $today . ' 07:00:00';
 
         $dkj = DB::table('dkj')
             ->select(DB::raw('
-                users.department_info_id,
-                count(*) as dkj_sum
-            '))
+              users.department_info_id,
+              departments.name as dep_name,
+              department_type.name as dep_name_type,
+              department_info.type,
+              count(dkj.id) as liczba_odsluchanych,
+              sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as badania,
+              sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as wysylka,
+              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 0 THEN 1 ELSE 0 END) as bad_badania,
+              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 1 THEN 1 ELSE 0 END) as bad_wysylka
+          '))
             ->join('users', 'users.id', '=', 'dkj.id_user')
-            ->whereBetween('add_date', [$date . ' ' . $hour_start, $date . ' ' . $hour_stop])
+            ->join('department_info', 'department_info.id', '=', 'dkj.department_info_id')
+            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+            ->whereBetween('add_date', [$hour_start, $hour_stop])
             ->groupBy('users.department_info_id')
+            ->groupBy('users.dating_type')
             ->get();
 
         $data = [
@@ -842,11 +857,13 @@ class StatisticsController extends Controller
         $dkj = DB::table('dkj')
             ->select(DB::raw('
                 users.department_info_id,
+                users.dating_type,
                 count(*) as dkj_sum
             '))
             ->join('users', 'users.id', '=', 'dkj.id_user')
             ->where('add_date', 'like', $today . '%')
             ->groupBy('users.department_info_id')
+            ->groupBy('users.dating_type')
             ->get();
 
         $data = [

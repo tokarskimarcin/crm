@@ -99,7 +99,7 @@
                       <tr>
                         <td colspan="1"></td>
                         <td><b>SUMA</b></td>
-                        <td><b>{{round($total_time, 2)}} H</b></td>
+                        <td><b>{{round($total_time, 2)}} RBH</b></td>
                         <td><b>-</b></td>
                         <td><b>{{$total_success}}</b></td>
                         <td><b>{{round($total_success / $total_time ,2)}}</b></td>
@@ -123,10 +123,6 @@ $('.form_date').datetimepicker({
     minView: 2,
     pickTime: false,
 });
-
-
-
-
 
 </script>
 @endsection

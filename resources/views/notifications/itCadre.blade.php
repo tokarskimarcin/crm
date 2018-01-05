@@ -9,8 +9,6 @@
     </div>
 </div>
 
-
-
 <ul class="nav nav-tabs">
   <li class="active"><a data-toggle="tab" href="#today">Dzisiaj</a></li>
   <li><a data-toggle="tab" href="#this_week">Ostatni tydzień</a></li>
@@ -50,7 +48,7 @@
                                 <td>{{round($result->user_contact, 2)}}/6</td>
                                 <td>{{round($result->user_time, 2)}}/6</td>
                                 <td>{{round($result->user_judge_sum, 2)}}/6</td>
-                                <td>{{round($result->notifications_time_sum /3600, 2)}} h</td>
+                                <td>{{round($result->notifications_time_sum, 2)}} h</td>
                                 <td>{{$result->response_after}}/{{$result->user_sum}}</td>
                             </tr>
                         @endforeach
@@ -92,7 +90,7 @@
                                 <td>{{round($result->user_contact, 2)}}/6</td>
                                 <td>{{round($result->user_time, 2)}}/6</td>
                                 <td>{{round($result->user_judge_sum, 2)}}/6</td>
-                                <td>{{round($result->notifications_time_sum /3600, 2)}} h</td>
+                                <td>{{round($result->notifications_time_sum, 2)}} h</td>
                                 <td>{{$result->response_after}}/{{$result->user_sum}}</td>
                             </tr>
                         @endforeach
@@ -133,7 +131,7 @@
                                 <td>{{round($result->user_contact, 2)}}/6</td>
                                 <td>{{round($result->user_time, 2)}}/6</td>
                                 <td>{{round($result->user_judge_sum, 2)}}/6</td>
-                                <td>{{round($result->notifications_time_sum /3600, 2)}} h</td>
+                                <td>{{round($result->notifications_time_sum, 2)}} h</td>
                                 <td>{{$result->response_after}}/{{$result->user_sum}}</td>
                             </tr>
                         @endforeach
@@ -174,7 +172,7 @@
                                 <td>{{round($result->user_contact, 2)}}/6</td>
                                 <td>{{round($result->user_time, 2)}}/6</td>
                                 <td>{{round($result->user_judge_sum, 2)}}/6</td>
-                                <td>{{round($result->notifications_time_sum /3600, 2)}} h</td>
+                                <td>{{round($result->notifications_time_sum, 2)}} h</td>
                                 <td>{{$result->response_after}}/{{$result->user_sum}}</td>
                             </tr>
                         @endforeach
@@ -185,8 +183,6 @@
     </div>
   </div>
 </div>
-
-
 
 @endsection
 @section('script')
