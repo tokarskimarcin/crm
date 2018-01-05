@@ -202,13 +202,11 @@ class ScheduleController extends Controller
             }
         }
         $query->select(DB::raw($sql))
-->join('users','users.id','schedule.id_user')
-->where('week_num',$number_week)
-->where('year',$request->session()->get('year'))
-->where('users.department_info_id',Auth::user()->department_info_id);
-        // $query->select(DB::raw($sql))
-        //     ->where('week_num',$number_week)
-        //     ->where('year',$request->session()->get('year'));
+          ->join('users','users.id','schedule.id_user')
+          ->where('week_num',$number_week)
+          ->where('year',$request->session()->get('year'))
+          ->where('users.department_info_id',Auth::user()->department_info_id);
+
         return $query->get();
     }
 
@@ -218,16 +216,56 @@ class ScheduleController extends Controller
     }
 
     public function timesheetPost(Request $request) {
+        $date_start = $request->timesheet_date_start;
+        $date_stop = $request->timesheet_date_stop;
 
-        $work_hours = Work_Hour::where('date', '=', $request->timesheet_date)
-            ->whereIn('status', [4,5])
+        $hours = DB::table('work_hours')
+            ->select(DB::raw('
+                first_name,
+                last_name,
+                rate,
+                SUM(success) as user_success,
+                SUM(time_to_sec(accept_stop) - time_to_sec(accept_start)) / 3600 as user_sum
+            '))
+            ->join('users', 'users.id', '=', 'work_hours.id_user')
+            ->whereBetween('work_hours.date', [$date_start, $date_stop])
+            ->whereIn('users.user_type_id', [1,2])
+            ->whereIn('work_hours.status', [4,5])
+            ->where('users.department_info_id', '=', Auth::user()->department_info_id)
+            ->groupBy('users.id')
             ->get();
 
         return view('schedule.timesheet')
-            ->with('selected_date', $request->timesheet_date)
-            ->with('work_hours', $work_hours);
+            ->with('date_start', $date_start)
+            ->with('date_stop', $date_stop)
+            ->with('hours', $hours);
     }
 
+    public function timesheetCadreGet() {
+        return view('schedule.timesheetCadre');
+    }
 
+    public function timesheetCadrePost(Request $request) {
+        $date_start = $request->timesheet_date_start;
+        $date_stop = $request->timesheet_date_stop;
+
+        $hours = DB::table('work_hours')
+            ->select(DB::raw('
+                first_name,
+                last_name,
+                SUM(time_to_sec(accept_stop) - time_to_sec(accept_start)) / 3600 as user_sum
+            '))
+            ->join('users', 'users.id', '=', 'work_hours.id_user')
+            ->whereNotIn('users.user_type_id', [1,2])
+            ->whereBetween('work_hours.date', [$date_start, $date_stop])
+            ->whereIn('work_hours.status', [4,5])
+            ->groupBy('users.id')
+            ->get();
+
+            return view('schedule.timesheetCadre')
+                ->with('date_start', $date_start)
+                ->with('date_stop', $date_stop)
+                ->with('hours', $hours);
+    }
 
 }

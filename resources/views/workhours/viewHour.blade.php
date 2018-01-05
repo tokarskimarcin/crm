@@ -212,7 +212,11 @@
                                                                 <td><b>{{$cash_sum}} PLN</b></td>
                                                                 @if($agreement == 1)
                                                                 <td><b>{{$total_success}}</b></td>
-                                                                <td><b>{{$total_avg}}</b></td>
+                                                                    @if($iteration > 0)
+                                                                        <td><b>{{round($total_avg / $iteration, 2)}}</b></td>
+                                                                    @else
+                                                                        <td><b>0</b></td>
+                                                                    @endif
                                                                 @endif
                                                                 <td></td>
                                                                 <td></td>

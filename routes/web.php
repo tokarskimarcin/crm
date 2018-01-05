@@ -208,6 +208,9 @@ Route::middleware(['check-permission'])->group(function () {
 
     Route::get('/timesheet', 'ScheduleController@timesheetGet');
     Route::POST('/timesheet', 'ScheduleController@timesheetPost');
+
+    Route::get('/timesheet_cadre', 'ScheduleController@timesheetCadreGet');
+    Route::POST('/timesheet_cadre', 'ScheduleController@timesheetCadrePost');
     // schedule -- STOP --
 
     // Finances -- START --

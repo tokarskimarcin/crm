@@ -4,38 +4,53 @@
 <div class="row">
     <div class="col-lg-12">
         <h1 class="page-header">
-            <div id="page_title">Lista obecności
-              <span id="show_selected">
-                @if(isset($selected_date))
-                 {{$selected_date}}
-                @endif
-              </span>
-            </div>
+            <div id="page_title">Lista obecności</div>
         </h1>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-md-6">
         <form method="POST" action="{{URL::to('/timesheet/')}}">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <div class="form-group">
-                <label for="timesheet_date"><h3>Wybierz datę:</h3></label>
+                <label>
+                    <h3>Wybierz datę:
+                        <span id="show_selected">
+                          <b>
+                            @if(isset($date_start))
+                                {{$date_start . ' - ' . $date_stop}}
+                            @endif
+                          </b>
+                        </span>
+                  </h3>
+                </label>
             </div>
-            <div class="form-group">
-                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                <input class="form-control" name="timesheet_date" id="timesheet_date" type="text" value="@if(isset($selected_date)){{$selected_date}}
-                @else{{date('Y-m-d')}}
-                @endif
-                " readonly>
-                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span></div>
-            </div>
-            <div class="form-group">
-                <button class="btn btn-default btn-lg" id="date_selected">Pokaż listę obecności</button>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                    <input class="form-control" name="timesheet_date_start" id="timesheet_date_start" type="text" value="@if(isset($date_start)){{$date_start}}
+                    @else{{date('Y-m-d')}}
+                    @endif
+                    " readonly>
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span></div>
+                </div>
+                <div class="form-group">
+                    <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                    <input class="form-control" name="timesheet_date_stop" id="timesheet_date_stop" type="text" value="@if(isset($date_stop)){{$date_stop}}
+                    @else{{date('Y-m-d')}}
+                    @endif
+                    " readonly>
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span></div>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-default btn-lg" id="date_selected">Pokaż listę obecności</button>
+                </div>
             </div>
         </form>
     </div>
 </div>
+
 
 <div class="row">
     <div class="col-md-12">
@@ -59,53 +74,49 @@
                       $total_success = 0;
                       $total_avg_rate = 0;
                       $total_avg = 0;
-                      $lp = 1;
+                      $lp = 0;
                   @endphp
-                  @if(isset($work_hours))
-                      @foreach($work_hours as $item)
-                          @if($item->user->department_info_id == Auth::user()->department_info_id && ($item->user->user_type_id == 1 || $item->user->user_type_id == 2))
-                            <tr>
-                                <td>{{$lp}}</td>
-                                <td>{{$item->user->first_name . ' ' . $item->user->last_name}}</td>
-                                <td>{{$item->accept_start . ' - ' . $item->accept_stop}}</td>
-                                <td>{{$item->user->rate}} PLN/H</td>
-                                <td>{{$item->success}}</td>
-                                <td>
-                                    @php
-                                        $start_array = explode(":", $item->accept_start);
-                                        $stop_array = explode(":", $item->accept_stop);
-                                        $sum_start = (($start_array[0] * 60) + $start_array[1]);
-                                        $sum_stop = (($stop_array[0] * 60) + $stop_array[1]);
-                                        $hour_sum = ($sum_stop - $sum_start) / 60;
-                                        $cash = round($hour_sum * $item->user->rate, 2);
-                                        $avg = round($item->success / $hour_sum, 2);
-                                        $lp++;
+                  @if(isset($hours))
 
-                                        $total_time += $hour_sum;
-                                        $total_cash += $cash;
-                                        $total_success += $item->success;
-                                        $total_avg_rate += $item->user->rate;
-                                        $total_avg += $avg;
-                                    @endphp
-                                    {{$avg}}
-                                </td>
-                                <td>
-                                    {{$cash}} PLN
-                                </td>
-                            </tr>
-                          @endif
+                      @foreach($hours as $hour)
+                          @php
+                              $lp++;
+                              $avg = round($hour->user_success / $hour->user_sum, 2);
+                              $user_cash = round($hour->user_sum * $hour->rate , 2);
+                              $total_time += $hour->user_sum;
+                              $total_avg_rate += $hour->rate;
+                              $total_success += $hour->user_success;
+                              $total_avg += round($hour->user_success / $hour->user_sum, 2);
+                              $total_cash += $user_cash;
+                          @endphp
+                          <tr>
+                              <td>{{$lp}}</td>
+                              <td>{{$hour->first_name . ' ' . $hour->last_name}}</td>
+                              <td>{{round($hour->user_sum, 2)}}</td>
+                              <td>{{$hour->rate}}</td>
+                              <td>{{$hour->user_success}}</td>
+                              <td>{{$avg}}</td>
+                              <td>{{$user_cash}}</td>
+                          </tr>
                       @endforeach
-                      @if($total_cash > 0)
+
                       <tr>
-                        <td colspan="1"></td>
-                        <td><b>SUMA</b></td>
-                        <td><b>{{round($total_time, 2)}} RBH</b></td>
-                        <td><b>-</b></td>
-                        <td><b>{{$total_success}}</b></td>
-                        <td><b>{{round($total_success / $total_time ,2)}}</b></td>
-                        <td><b>{{$total_cash}} PLN</b></td>
+                          <td colspan="1"></td>
+                          <td><b>SUMA</b></td>
+                          <td><b>{{round($total_time)}}</b></td>
+                          @if($lp > 0)
+                              <td><b>{{round($total_avg_rate / $lp, 2)}}</b></td>
+                          @else
+                              <td><b>0</b></td>
+                          @endif
+                          <td><b>{{$total_success}}</b></td>
+                          @if($lp > 0)
+                              <td><b>{{round($total_success / $total_time, 2)}}</b></td>
+                          @else
+                              <td><b>0</b></td>
+                          @endif
+                          <td><b>{{round($total_cash, 2)}}</b></td>
                       </tr>
-                      @endif
                   @endif
                 </tbody>
             </table>
