@@ -85,7 +85,7 @@ class ScheduleController extends Controller
                 users.id as id_user,
                 users.first_name as user_first_name,
                 users.last_name as user_last_name,
-                users.phone as user_phone
+                users.private_phone as user_phone
                 '))
             ->wherein('users.user_type_id',[1,2])
             ->where('users.status_work', '=', 1)

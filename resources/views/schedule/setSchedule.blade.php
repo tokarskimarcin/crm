@@ -305,7 +305,7 @@ function getStartAndEndDate($week, $year) {
                 },
                 {"data": "user_first_name", "name": "first_name"},
                 {"data": "user_last_name", "name": "last_name"},
-                {"data": "user_phone", "name": "phone"},
+                {"data": "user_phone", "name": "private_phone"},
                 {
                     "data": function (data, type, dataToSet) {
                         if (data.id == null)
