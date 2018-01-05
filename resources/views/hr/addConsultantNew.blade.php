@@ -257,6 +257,11 @@
                                   </select>
                                 </td>
                             </tr>
+                            <tr class="alert alert-danger" style="display: none" id="alert_dating_type">
+                                <td colspan="1">Wybierz typ użytkownika!</td>
+                                <td></td>
+                            </tr>
+
                             @endif
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Opis</b></td>
@@ -329,7 +334,7 @@
 
             var validationCheck = true;
 
-            if (username == '') {
+            if (username.trim().length == 0) {
                 $('#alert_user_name').fadeIn(1000);
                 validationCheck = false;
             }else
@@ -359,7 +364,7 @@
             }
 
             if (email != null) {
-              if (email == '') {
+              if (email.trim().length == 0) {
                   $('#alert_email').fadeIn(1000);
                   validationCheck = false;
               }else
@@ -391,19 +396,19 @@
               }
             }
 
-            if (first_name == '') {
+            if (first_name.trim().length == 0) {
                 $('#alert_name').fadeIn(1000);
                 validationCheck = false;
             } else {
                 $('#alert_name').fadeOut(1000);
             }
-            if (last_name == '') {
+            if (last_name.trim().length == 0) {
                 $('#alert_last_name').fadeIn(1000);
                 validationCheck = false;
             } else {
                 $('#alert_last_name').fadeOut(1000);
             }
-            if (password== '') {
+            if (password.trim().length == 0) {
                 $('#alert_pass').fadeIn(1000);
                 validationCheck = false;
             } else {
@@ -437,25 +442,25 @@
                 swal("Musisz wybrać Stawkę!")
                 validationCheck = false;
             }
-            if (login_phone == '') {
+            if (login_phone.trim().length == 0) {
                 $('#alert_pbx').fadeIn(1000);
                 validationCheck = false;
             } else {
                 $('#alert_pbx').fadeOut();
             }
-            if (private_phone == '' || isNaN(private_phone)) {
+            if (private_phone.trim().length == 0 || isNaN(private_phone)) {
                 $('#alert_user_phone').fadeIn(1000);
                 validationCheck = false;
             } else {
                 $('#alert_user_phone').fadeOut(1000);
             }
-            if (description == '') {
+            if (description.trim().length == 0) {
                 $('#alert_desc').fadeIn(1000);
                 validationCheck = false;
             } else {
                 $('#alert_desc').fadeOut(1000);
             }
-            if (login_phone == '') {
+            if (login_phone.trim().length == 0) {
                 $('#alert_pbx').fadeIn(1000);
                 validationCheck = false;
             } else {
@@ -474,8 +479,10 @@
                 $('#alert_department').fadeOut(1000);
             }
             if (dating_type == 'Wybierz') {
-                swal("Musisz wybrać typ użytkownika!")
+                $('#alert_dating_type').fadeIn(1000);
                 validationCheck = false;
+            }else {
+                $('#alert_dating_type').fadeOut(1000);
             }
 
             return validationCheck;
