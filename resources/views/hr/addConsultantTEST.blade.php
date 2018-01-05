@@ -31,11 +31,19 @@
                                                 <input type="text" class="form-control" name="first_name" placeholder="Imię" value="{{$user->first_name}}">
                                             </td>
                                         </tr>
+                                        <tr class="alert alert-danger" style="display: none" id="alert_name">
+                                            <td colspan="1">Podaj imie!</td>
+                                            <td></td>
+                                        </tr>
                                         <tr>
                                             <td class="td-class"><b>Nazwisko:</b></td>
                                             <td>
                                                 <input type="text" class="form-control" placeholder="Nazwisko" name="last_name"  value="{{$user->last_name}}">
                                             </td>
+                                        </tr>
+                                        <tr class="alert alert-danger" style="display: none" id="alert_last_name">
+                                            <td colspan="1">Podaj nazwisko!</td>
+                                            <td></td>
                                         </tr>
                                         @if($type == 2)
                                             <tr>
@@ -43,6 +51,10 @@
                                                 <td>
                                                     <input type="mail" class="form-control" placeholder="Email" name="email"  value="{{$user->email_off}}">
                                                 </td>
+                                            </tr>
+                                            <tr class="alert alert-danger" style="display: none" id="alert_email">
+                                                <td colspan="1">Podaj adres email!</td>
+                                                <td></td>
                                             </tr>
                                             <tr>
                                                 <td class="td-class"><b>Telefon służbowy:</b></td>
@@ -57,17 +69,31 @@
                                                 <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="private_phone" value="{{$user->private_phone}}">
                                             </td>
                                         </tr>
+                                        <tr class="alert alert-danger" style="display: none" id="alert_user_phone">
+                                            <td colspan="1">Podaj telefon pracownika!</td>
+                                            <td></td>
+                                        </tr>
                                         <tr>
                                             <td class="td-class"><b>Login(Godzinówka):</b></td>
                                             <td><input type="text" class="form-control" placeholder="Login" name="username" value="{{$user->username}}"></td>
-
+                                        </tr>
+                                        <tr class="alert alert-danger" style="display: none" id="alert_user_name">
+                                            <td colspan="1">Podaj login!</td>
+                                            <td></td>
+                                        </tr>
+                                        <tr class="alert alert-danger" style="display: none" id="alert_user_name_checked">
+                                            <td colspan="1">Użytkownik o podanej nazwie już istnieje!</td>
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <td class="td-class"><b>Hasło:</b></td>
                                             <td>
                                                 <input type="text" class="form-control" placeholder="Hasło" name="password"  value="{{base64_decode($user->guid)}}">
                                             </td>
-
+                                        </tr>
+                                        <tr class="alert alert-danger" style="display: none" id="alert_pass">
+                                            <td colspan="1">Podaj hasło!</td>
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <td class="td-class"><b>Dokumenty:</b></td>
@@ -78,6 +104,10 @@
                                                 </select>
                                             </td>
                                         </tr>
+                                        <tr class="alert alert-danger" style="display: none" id="alert_documents">
+                                            <td colspan="1">Wybierz jedną z opcji!</td>
+                                            <td></td>
+                                        </tr>
                                         <tr>
                                             <td class="td-class"><b>Student:</b></td>
                                             <td>
@@ -86,6 +116,10 @@
                                                     <option value="0" @if($user->student == 0) selected @endif>Nie</option>
                                                 </select>
                                             </td>
+                                        </tr>
+                                        <tr class="alert alert-danger" style="display: none" id="alert_student">
+                                            <td colspan="1">Wybierz status studenta!</td>
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <td class="td-class"><b>Agencja:</b></td>
@@ -96,6 +130,10 @@
                                                     @endforeach
                                                 </select>
                                             </td>
+                                        </tr>
+                                        <tr class="alert alert-danger" style="display: none" id="alert_agency">
+                                            <td colspan="1">Wybierz agencję!</td>
+                                            <td></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -175,6 +213,10 @@
                                                 </select>
                                             </td>
                                         </tr>
+                                        <tr class="alert alert-danger" style="display: none" id="alert_ck">
+                                            <td colspan="1">Wybierz wartość CK!</td>
+                                            <td></td>
+                                        </tr>
                                         <tr>
                                             <td class="td-class"><b>Uprawnienia:</b></td>
                                             <td>
@@ -184,6 +226,10 @@
                                                     @endforeach
                                                 </select>
                                             </td>
+                                        </tr>
+                                        <tr class="alert alert-danger" style="display: none" id="alert_user_type">
+                                            <td colspan="1">Wybierz uprawnienia!</td>
+                                            <td></td>
                                         </tr>
                                         @if($type == 1)
                                         <tr>
@@ -198,10 +244,12 @@
                                                       <option value="0" @if($user->dating_type == 0) selected @endif>Badania</option>
                                                       <option value="1" @if($user->dating_type == 1) selected @endif>Wysyłka</option>
                                                   @endif
-
-
                                               </select>
                                             </td>
+                                        </tr>
+                                        <tr class="alert alert-danger" style="display: none" id="alert_dating_type">
+                                            <td colspan="1">Wybierz typ użytkownika!</td>
+                                            <td></td>
                                         </tr>
                                         @endif
                                         @if(isset($penalty_bonuses[1]))
@@ -231,6 +279,10 @@
                                                 <input type="text" class="form-control" placeholder="Login z programu do dzwonienia" name="login_phone" value="{{$user->login_phone}}">
                                             </td>
                                         </tr>
+                                        <tr class="alert alert-danger" style="display: none" id="alert_pbx">
+                                            <td colspan="1">Podaj login programu PBX!</td>
+                                            <td></td>
+                                        </tr>
                                         @if($type == 2)
                                             <tr>
                                                 <td class="td-class"><b>Oddział:</b></td>
@@ -243,6 +295,10 @@
                                                         @endforeach
                                                     </select>
                                                 </td>
+                                            </tr>
+                                            <tr class="alert alert-danger" style="display: none" id="alert_department">
+                                                <td colspan="1">Wybierz oddział!</td>
+                                                <td></td>
                                             </tr>
                                         @endif
                                         </tbody>
@@ -291,7 +347,7 @@
         var private_phone = $("input[name='private_phone']").val();
         var username = $("input[name='username']").val();
         var password = $("input[name='password']").val();
-
+        var login_phone = $("input[name='login_phone']").val();
         $('#edit_user').submit(function(){
             validation_user = true;
             $(this).find(':submit').attr('disabled','disabled');
@@ -301,31 +357,50 @@
             $("#addpbsubmit").attr('disabled', true);
         }
 
-        if (first_name == '') {
-            swal("Pole imie nie może być puste!")
-            return false;
+        var validationCheck = true;
+
+
+        if (first_name.trim().length == 0) {
+            $('#alert_name').fadeIn(1000);
+            validationCheck = false;
+        } else {
+            $('#alert_name').fadeOut(1000);
         }
 
-        if (last_name == '') {
-            swal("Pole nazwsko nie może być puste!")
-            return false;
+        if (last_name.trim().length == 0) {
+            $('#alert_last_name').fadeIn(1000);
+            validationCheck = false;
+        } else {
+            $('#alert_last_name').fadeOut(1000);
         }
 
-        if (private_phone == '') {
-            swal("Pole telefon prywatny nie może być puste!")
-            return false;
+        if (private_phone.trim().length == 0 || isNaN(private_phone)) {
+            $('#alert_user_phone').fadeIn(1000);
+            validationCheck = false;
+        } else {
+            $('#alert_user_phone').fadeOut(1000);
         }
 
-        if (username == '') {
-            swal("Pole login(godzinówka) nie może być puste!")
-            return false;
+        if (username.trim().length == 0) {
+            $('#alert_user_name').fadeIn(1000);
+            validationCheck = false;
+        }else {
+            $('#alert_user_name').fadeOut(1000);
         }
 
-        if (password == '') {
-            swal("Pole hasło nie może być puste!")
-            return false;
+        if (password.trim().length == 0) {
+            $('#alert_pass').fadeIn(1000);
+            validationCheck = false;
+        } else {
+            $('#alert_pass').fadeOut(1000);
         }
-
+        if (login_phone.trim().length == 0) {
+            $('#alert_pbx').fadeIn(1000);
+            validationCheck = false;
+        } else {
+            $('#alert_pbx').fadeOut();
+        }
+        return validationCheck;
     });
 
 
@@ -389,7 +464,7 @@
             $('#alert_select').slideUp(1000);
         }
 
-        if (cost == '') {
+        if (cost.trim().length == 0) {
             $('#alert_value').slideDown(1000);
             validation = false;
             return false;
@@ -405,7 +480,7 @@
             $('#alert_value_plus').slideUp(1000);
         }
 
-        if (reason == '') {
+        if (reason.trim().length == 0) {
             $('#alert_reason').slideDown(1000);
             validation = false;
             return false;
