@@ -47,7 +47,7 @@
                                             $start_work_click  =0;
                                         @endphp
                                     @foreach($shedule as $item)
-                                    @if($item->user->department_info_id == Auth::user()->department_info_id)
+                                    @if($item->user->department_info_id == Auth::user()->department_info_id && $item->user->status_work == 1)
                                         @php
                                             $work_hour = $item->user->work_hours->where('date','=', date('Y-m-d'))->first();
                                             $start_work_click = 0;
