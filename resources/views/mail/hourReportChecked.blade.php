@@ -40,15 +40,15 @@
                       @php($total_dkj_sum += $item->liczba_odsluchanych)
                           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->liczba_odsluchanych}}</td>
                       @php($column = false)
-                  @elseif($item->department_info_id == 4 && $report->department_info_id == 4 && $item->bad_badania > 0)
+                  @elseif($item->department_info_id == 4 && $report->department_info_id == 4 && $item->wysylka > 0)
                       @php($avg_department = round(($item->liczba_odsluchanych / $report->success) * 100, 2))
-                      @php($total_dkj_sum += $item->bad_wysylka)
-                          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->badania}}</td>
-                      @php($column = false)
-                  @elseif($item->department_info_id == 4 && $report->department_info_id == 13 && $item->bad_wysylka > 0)
-                      @php($avg_department = round(($item->liczba_odsluchanych / $report->success) * 100, 2))
-                      @php($total_dkj_sum += $item->bad_badania)
+                      @php($total_dkj_sum += $item->wysylka)
                           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->wysylka}}</td>
+                      @php($column = false)
+                  @elseif($item->department_info_id == 4 && $report->department_info_id == 13 && $item->badania > 0)
+                      @php($avg_department = round(($item->liczba_odsluchanych / $report->success) * 100, 2))
+                      @php($total_dkj_sum += $item->badania)
+                          <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->badania}}</td>
                       @php($column = false)
                   @endif
            @endforeach
