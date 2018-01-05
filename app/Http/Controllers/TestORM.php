@@ -138,11 +138,8 @@ class TestORM extends Controller
             }
             fclose($handle);
         }
-        dd($spreadsheet_data);
+        //dd($spreadsheet_data);
         HourReport::insert($spreadsheet_data);
-
-        //array_pop($spreadsheet_data);
-
 
     }
 }
