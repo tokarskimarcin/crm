@@ -51,13 +51,18 @@
 
     </tr>
     @php($total_success += $report->success)
-
 @endforeach
+@php
+if($total_success != 0)
+    $total_proc = round($total_sum / $total_success * 100, 2);
+else
+    $total_proc = 0;
+@endphp
 <tr>
     <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>Total</b></td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_sum}}</td>
       <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_success}}</td>
-    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($total_sum / $total_success * 100, 2)}} %</td>
+    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_proc}} %</td>
 </tr>
   </tbody>
 </table>
