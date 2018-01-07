@@ -1009,7 +1009,7 @@ class StatisticsController extends Controller
     public function weekReportChecked() {
         $data = $this->weekReportCheckedData();
 
-        $title = 'Raport tygodniowy odsłuchanych rozmów';
+        $title = 'Raport tygodniowy odsłuchanych rozmów '.$data['date_start'].' - '.$data['date_stop'];
         $this->sendMailByVerona('weekReportChecked', $data, $title);
     }
 
