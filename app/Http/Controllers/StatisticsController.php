@@ -165,6 +165,7 @@ class StatisticsController extends Controller
                 ))
                     ->from('hour_report')
                     ->whereBetween('report_date', [$date_start, $date_stop])
+                    ->where('call_time', '!=',0)
                     ->groupBy('department_info_id','report_date');
             })
             ->where('department_info.id_dep_type', '=', 2)
@@ -239,6 +240,7 @@ class StatisticsController extends Controller
                     'MAX(hour_report.id)'
                 ))
                     ->from('hour_report')
+                    ->where('call_time', '!=',0)
                     ->where('report_date', '=',$date)
                     ->groupBy('department_info_id');
             })
