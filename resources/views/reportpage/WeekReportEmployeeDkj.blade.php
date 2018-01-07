@@ -4,7 +4,7 @@
     {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Tygodniowy Raport DKJ</h1>
+            <h1 class="page-header">Tygodniowy Raport Pracowników DKJ</h1>
         </div>
     </div>
     <div class="row">
@@ -14,7 +14,7 @@
                     <div class="col-lg-12">
                         <div id="start_stop">
                             <div class="panel-body">
-                                @include('mail.weekReportDkj.blade.php')
+                                @include('mail.weekReportEmployeeDkj')
                             </div>
                         </div>
                     </div>
