@@ -1007,16 +1007,16 @@ class StatisticsController extends Controller
 
     //Wysyłanie maila raport tygodniowy odsłuchane rozmowy
     public function weekReportChecked() {
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
         $data = $this->weekReportCheckedData();
-
-        $title = 'Raport tygodniowy odsłuchanych rozmów '.$data['date_start'].' - '.$data['date_stop'];
+        $title = 'Raport tygodniowy odsłuchanych rozmów '.$date_start.' - '.$date_stop;
         $this->sendMailByVerona('weekReportChecked', $data, $title);
     }
 
     //wyświetlanie widoku raport tygodniowy odsłuchane rozmowy
     public function pageWeekReportChecked() {
         $data = $this->weekReportCheckedData();
-
         return view('reportpage.WeekReportChecked')
             ->with('date_start', $data['date_start'])
             ->with('date_stop', $data['date_stop'])
