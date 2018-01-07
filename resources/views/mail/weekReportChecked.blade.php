@@ -56,19 +56,19 @@
     <td style="border:1px solid #231f20;text-align:center;padding:3px">Lublin Potwierdzanie</td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px">1786</td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px">2557</td>
-    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round(1786/ 2557 * 100, 2)}}</td>
+    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round(1786/ 2557 * 100, 2)}} %</td>
 </tr>
 <tr>
     <td style="border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzanie Wysyłka</td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px">4046</td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px">5619</td>
-    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round(4046/ 5619 * 100, 2)}}</td>
+    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round(4046/ 5619 * 100, 2)}} %</td>
 </tr>
 <tr>
     <td style="border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzanie Badania</td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px">1503</td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px">2039</td>
-    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round(1503/ 2039 * 100, 2)}}</td>
+    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round(1503/ 2039 * 100, 2)}} %</td>
 </tr>
 @php
     $total_sum += 1786+4046+1503;
