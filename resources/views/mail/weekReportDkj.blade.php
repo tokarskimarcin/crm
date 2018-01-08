@@ -46,7 +46,6 @@
                     $time_sum_array = explode(":", $hour->work_time);
                     if (count($time_sum_array) == 3) {
                         $user_time_sum = round((($time_sum_array[0] * 3600) + ($time_sum_array[1] * 60) + $time_sum_array[2]) / 3600, 2);
-                        echo $i;
                     } else {
                         $user_time_sum = 0;
                     }
