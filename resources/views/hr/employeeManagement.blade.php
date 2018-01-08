@@ -90,7 +90,7 @@
                 {"data": "private_phone"},
                 {"data": function (data, type, dataToSet) {
                     if(data.documents == 1)
-                        data.documents = "Tak";
+                        data.documents = "Posiada";
                     else if(data.documents == 0)
                         data.documents = "Brak";
                     return data.documents;
@@ -105,9 +105,9 @@
                 {"data": "last_login"},
                 {"data": function (data, type, dataToSet) {
                     if(data.status_work == 1)
-                        data.status_work = "Pracuje";
+                        data.status_work = "Pracujący";
                     else if(data.status_work == 0)
-                        data.status_work = "Nie pracuje";
+                        data.status_work = "Niepracujący";
                     return data.status_work;
                 },"name": "status_work"},
                 {"data": function (data, type, dataToSet) {

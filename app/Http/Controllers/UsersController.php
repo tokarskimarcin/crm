@@ -307,7 +307,27 @@ class UsersController extends Controller
                 ->whereIn('user_type_id', [1,2])
                 ->where('department_info_id', Auth::user()->department_info_id);
         }
-        return datatables($query)->make(true);
+        return datatables($query)
+            ->filterColumn('student', function($query, $keyword) {
+                $sql = "student = ?";
+                if(strtolower($keyword) == 'tak')
+                    $query->whereRaw($sql, ["1"]);
+                else if(strtolower($keyword) == 'nie')
+                    $query->whereRaw($sql, ["0"]);
+            })->filterColumn('status_work', function($query, $keyword) {
+                $sql = "status_work = ?";
+                if(mb_strtolower($keyword) == 'pracujący')
+                    $query->whereRaw($sql, ["1"]);
+                else if(mb_strtolower($keyword) == "niepracujący")
+                    $query->whereRaw($sql, ["0"]);
+            })->filterColumn('documents', function($query, $keyword) {
+                $sql = "documents = ?";
+                if(mb_strtolower($keyword) == 'posiada')
+                    $query->whereRaw($sql, ["1"]);
+                else if(mb_strtolower($keyword) == "brak")
+                    $query->whereRaw($sql, ["0"]);
+            })->
+            make(true);
     }
     public function datatableCadreManagement(Request $request)
     {
