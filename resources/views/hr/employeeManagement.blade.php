@@ -6,6 +6,11 @@
             font-size: 12px;
             text-align: center;
         }
+        th input {
+            width: 100%;
+            padding: 3px;
+            box-sizing: border-box;
+        }
     </style>
 
 {{--Header page --}}
@@ -42,10 +47,32 @@
                                             <th>Data rozp.</th>
                                             <th>Data zak.</th>
                                             <th>Nr. Tel.</th>
-                                            <th>Dok.</th>
-                                            <th>Student</th>
+                                            <th>
+                                                <label>Dokumenty</label><br>
+                                                <select class="search-input-text" data-column="6">
+                                                    <option value=""></option>
+                                                    <option value="">Posiada</option>
+                                                    <option value="">Brak</option>
+                                                </select>
+                                            </th>
+                                            <th>
+                                                <label>Student</label><br>
+                                                <select class="search-input-text" data-column="7">
+                                                    <option value=""></option>
+                                                    <option value="">Tak</option>
+                                                    <option value="">Nie</option>
+                                                </select>
+                                            </th>
                                             <th>Ost. log</th>
-                                            <th>Status</th>
+                                            {{--<th><input type="text" data-column="9"  class="search-input-text"></th>--}}
+                                            <th>
+                                                <label>Status</label><br>
+                                                <select class="search-input-text" data-column="9">
+                                                    <option value=""></option>
+                                                    <option value="">Pracujący</option>
+                                                    <option value="">Niepracujący</option>
+                                                </select>
+                                            </th>
                                             <th>Akcja</th>
                                         </tr>
                                         </thead>
@@ -69,7 +96,7 @@
     $(document).ready( function () {
 
         table = $('#datatable').DataTable({
-            "autoWidth": false,
+            "autoWidth": true,
             "processing": true,
             "serverSide": true,
             "drawCallback": function( settings ) {
@@ -94,14 +121,14 @@
                     else if(data.documents == 0)
                         data.documents = "Brak";
                     return data.documents;
-                },"name": "documents"},
+                },"orderable": false,"name": "documents"},
                 {"data": function (data, type, dataToSet) {
                     if(data.student == 1)
                         data.student = "Tak";
                     else if(data.student == 0)
                         data.student = "Nie";
                     return data.student;
-                },"name": "student"},
+                },"orderable": false,"name": "student"},
                 {"data": "last_login"},
                 {"data": function (data, type, dataToSet) {
                     if(data.status_work == 1)
@@ -109,12 +136,18 @@
                     else if(data.status_work == 0)
                         data.status_work = "Niepracujący";
                     return data.status_work;
-                },"name": "status_work"},
+                },"orderable": false,"name": "status_work"},
                 {"data": function (data, type, dataToSet) {
                     return '<a href="edit_consultant/'+data.id+'" >Edytuj</a>'
                 },"orderable": false, "searchable": false }
                 ]
         });
+
+        $('.search-input-text').on( 'change', function () {   // for text boxes
+            var i =$(this).attr('data-column');  // getting column index
+            var v = $(this).find("option:selected").text()  // getting search input value
+            table.columns(i).search(v).draw();
+        } );
     });
 
 </script>
