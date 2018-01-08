@@ -653,7 +653,7 @@ class StatisticsController extends Controller
             ->groupBy('users.department_info_id')
             ->groupBy('department_info.type')
             ->get();
-          
+
         $data = [
             'date_start' => $date_start,
             'date_stop' => $date_stop,
@@ -732,7 +732,7 @@ class StatisticsController extends Controller
     public function MailWeekReportDkj() {
       $data = $this->weekReportDkjData();
 
-      $title = 'Raport tygodniowy DKJ';
+      $title = 'Raport tygodniowy DKJ ' . $data['date_start'] . ' - ' . $data['date_stop'];
       $this->sendMailByVerona('weekReportDkj', $data, $title);
     }
 
