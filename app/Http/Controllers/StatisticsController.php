@@ -1026,6 +1026,49 @@ class StatisticsController extends Controller
             ->with('hour_reports', $data['hour_reports']);
     }
 
+    //Raport godzinnny pracownikow DKJ
+    private function hourReportDkjEmployeeData() {
+      $date = date("Y-m-d");
+      $hour = date('H'). ":00:00";
+
+      $dkj = DB::table('users')
+      ->select(DB::raw('
+          users.id,
+          users.first_name,
+          users.last_name,
+          users.dating_type,
+          count(*) as user_sum,
+          sum(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as user_janek,
+          sum(CASE WHEN dkj.dkj_status = 0 THEN 1 ELSE 0 END) as user_not_janek
+      '))
+      ->join('dkj', 'users.id', '=', 'dkj.id_dkj')
+      ->whereBetween('dkj.add_date', [$date.' 00:00:00', $date.' 23:00:00'])
+      ->groupBy('dkj.id_dkj')
+      ->get();
+
+      $data = [
+          'date' => $date,
+          'dkj' => $dkj,
+          'hour' => $hour
+      ];
+      return $data;
+
+    }
+    public function MailHourReportDkjEmployee(){
+        $data = $this->hourReportDkjEmployeeData();
+        $title = 'Raport godzinny pracownicy DKJ ' . date('Y-m-d H') . ':00:00';
+        $this->sendMailByVerona('hourReportDkjEmployee', $data, $title);
+    }
+
+    public function pageHourReportDkjEmployee() {
+        $data = $this->hourReportDkjEmployeeData();
+
+        return view('reportpage.HourReportDkjEmployee')
+            ->with('dkj', $data['dkj'])
+            ->with('hour', $data['hour'])
+            ->with('date', $data['date']);
+    }
+
     /******** Główna funkcja do wysyłania emaili*************/
     /*
     * $mail_type - jaki mail ma być wysłany - typ to nazwa ścieżki z web.php
@@ -1059,22 +1102,22 @@ class StatisticsController extends Controller
             $accepted_users->push($szczesny);
 
 
-//dd($accepted_users);
-//    $accepted_users = [
-//        'cytawa.verona@gmail.com',
-//        'jarzyna.verona@gmail.com'
-//    ];
-
-
-//     Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
-//     {
-//        $message->from('noreply.verona@gmail.com', 'Verona Consulting');
-//        foreach ($accepted_users as $key => $user) {
-//          if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
-//              $message->to($user)->subject($mail_title);
-//          }
-//        }
-//     });
+   //
+   // $accepted_users = [
+   //     'cytawa.verona@gmail.com',
+   //     'jarzyna.verona@gmail.com'
+   // ];
+   //
+   //
+   //  Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
+   //  {
+   //     $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+   //     foreach ($accepted_users as $key => $user) {
+   //       if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
+   //           $message->to($user)->subject($mail_title);
+   //       }
+   //     }
+   //  });
 
 
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
