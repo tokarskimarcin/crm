@@ -31,7 +31,7 @@ class CheckFirewall
         // 	   $acces = 1;
         // }
 
-        if (Auth::user()->department_info_id == 1){
+        if (Auth::user()->department_info_id == 2){
             if (Auth::user()->user_type_id != 3)
             {
                 if(is_null($acces)) {
