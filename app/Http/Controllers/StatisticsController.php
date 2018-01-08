@@ -1039,7 +1039,9 @@ class StatisticsController extends Controller
           users.dating_type,
           count(*) as user_sum,
           sum(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as user_janek,
-          sum(CASE WHEN dkj.dkj_status = 0 THEN 1 ELSE 0 END) as user_not_janek
+          sum(CASE WHEN dkj.dkj_status = 0 THEN 1 ELSE 0 END) as user_not_janek,
+          sum(CASE WHEN dkj.dkj_status = 1 AND dkj.manager_status = 1 THEN 1 ELSE 0 END) as user_manager_disagre,
+          sum(CASE WHEN dkj.deleted = 1 THEN 1 ELSE 0 END) as dkj_deleted
       '))
       ->join('dkj', 'users.id', '=', 'dkj.id_dkj')
       ->whereBetween('dkj.add_date', [$date.' 00:00:00', $date.' 23:00:00'])

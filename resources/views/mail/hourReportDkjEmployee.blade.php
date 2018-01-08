@@ -12,14 +12,20 @@
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba odsłuchanych rozmów</th>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba poprawnych rozmów</th>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba niepoprawnych rozmów</th>
+<th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba podważonych janków</th>
+<th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba usuniętych</th>
 </tr>
 </thead>
 <tbody>
 
-@php($i = 1)
-@php($total_user_sum = 0)
-@php($total_user_janek = 0)
-@php($total_user_not_janek = 0)
+@php
+    $i = 1;
+    $total_user_sum = 0;
+    $total_user_janek = 0;
+    $total_user_not_janek = 0;
+    $total_manager_disagre = 0;
+    $total_dkj_deleted = 0;
+@endphp
 @foreach($dkj as $item)
     @if($item->dating_type == 0)
     @php($create_column = true)
@@ -30,11 +36,17 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_sum}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_not_janek}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_janek}}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_manager_disagre}}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dkj_deleted}}</td>
         </tr>
 
-        @php($total_user_sum += $item->user_sum)
-        @php($total_user_janek += $item->user_janek)
-        @php($total_user_not_janek += $item->user_not_janek)
+        @php
+            $total_user_sum += $item->user_sum;
+            $total_user_janek += $item->user_janek;
+            $total_user_not_janek += $item->user_not_janek;
+            $total_manager_disagre += $item->user_manager_disagre;
+            $total_dkj_deleted += $item->dkj_deleted;
+        @endphp
 
         @php($i++)
     @endif
@@ -46,6 +58,8 @@
         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_user_sum}}</td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_user_not_janek}}</td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_user_janek}}</td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_manager_disagre}}</td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_dkj_deleted}}</td>
     </tr>
 @endif
 
@@ -67,14 +81,20 @@
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba odsłuchanych rozmów</th>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba poprawnych rozmów</th>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba niepoprawnych rozmów</th>
+<th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba podważonych janków</th>
+<th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba usuniętych</th>
 </tr>
 </thead>
 <tbody>
 
-@php($y = 1)
-@php($total_user_sum = 0)
-@php($total_user_janek = 0)
-@php($total_user_not_janek = 0)
+@php
+    $y = 1;
+    $total_user_sum = 0;
+    $total_user_janek = 0;
+    $total_user_not_janek = 0;
+    $total_manager_disagre = 0;
+    $total_dkj_deleted = 0;
+@endphp
 @foreach($dkj as $item)
     @if($item->dating_type == 1)
     @php($create_column = true)
@@ -85,11 +105,17 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_sum}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_not_janek}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_janek}}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->user_manager_disagre}}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dkj_deleted}}</td>
         </tr>
 
-        @php($total_user_sum += $item->user_sum)
-        @php($total_user_janek += $item->user_janek)
-        @php($total_user_not_janek += $item->user_not_janek)
+        @php
+            $total_user_sum += $item->user_sum;
+            $total_user_janek += $item->user_janek;
+            $total_user_not_janek += $item->user_not_janek;
+            $total_manager_disagre += $item->user_manager_disagre;
+            $total_dkj_deleted += $item->dkj_deleted;
+        @endphp
 
         @php($y++)
     @endif
@@ -101,6 +127,8 @@
         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_user_sum}}</td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_user_not_janek}}</td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_user_janek}}</td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_manager_disagre}}</td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_dkj_deleted}}</td>
     </tr>
 @endif
 
