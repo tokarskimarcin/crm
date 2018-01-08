@@ -116,7 +116,7 @@ Auth::routes();
 
 
 //'check-firewall'
-Route::middleware(['check-permission'])->group(function () {
+Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/', 'HomeController@index');
     // Admin_Panel --Start--
     Route::get('/admin_privilage','AdminController@admin_privilage');
@@ -260,7 +260,7 @@ Route::middleware(['check-permission'])->group(function () {
     Route::get('/judge_notification/{id}','NotificationController@judgeNotificationGet');
     Route::Post('/judge_notification','NotificationController@judgeNotificationPost');
 
-    Route::get('/it_cadre','NotificationController@ITCadreGet')->middleware('check-firewall');
+    Route::get('/it_cadre','NotificationController@ITCadreGet');
 
     Route::get('/it_worker/{id}', 'NotificationController@ITWorkerGet');
 
