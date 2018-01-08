@@ -131,6 +131,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::Post('/set_multiple_department','AdminController@multipleDepartmentPost');
     Route::get('/create_link','AdminController@createLinkGet');
     Route::Post('/create_link','AdminController@createLinkPost');
+    Route::get('/firewall_ip', 'AdminController@firewallGet');
+    Route::POST('/firewall_ip', 'AdminController@firewallPost');
     // Admin_Panel --Stop--
 
     // Password change --START--

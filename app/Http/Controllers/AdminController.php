@@ -18,6 +18,7 @@ use Session;
 use App\User;
 use App\Notifications;
 use Illuminate\Support\Facades\URL;
+use App\Firewall;
 
 class AdminController extends Controller
 {
@@ -353,6 +354,26 @@ class AdminController extends Controller
         return Redirect::back();
     }
 
+    public function firewallGet() {
+        $firewall = Firewall::all();
 
+        return view('admin.firewall')
+            ->with('firewall', $firewall);
+    }
+
+    public function firewallPost(Request $request) {
+        $firewall = new Firewall();
+
+        if ($request->ip_status != 1 && $request->ip_status != 2) {
+            return view('errors.404');
+        }
+
+        $firewall->ip_address = $request->new_ip;
+        $firewall->whitelisted = $request->ip_status;
+        $firewall->save();
+
+        Session::flash('message_ok', "Adres IP został dodany!");
+        return Redirect::back();
+    }
 
 }
