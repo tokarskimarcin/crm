@@ -425,7 +425,14 @@ class DkjController extends Controller
                 $query->where('dkj_status',1);
             }
 
-            return datatables($query)->make(true);
+            return datatables($query)
+                ->filterColumn('dkj_status', function($query, $keyword) {
+                    $sql = "dkj.dkj_status = ?";
+                    if(strtolower($keyword) == 'tak')
+                        $query->whereRaw($sql, ["1"]);
+                    else if(strtolower($keyword) == 'nie')
+                        $query->whereRaw($sql, ["0"]);
+                })->make(true);
         }
     }
 
