@@ -633,37 +633,31 @@ class StatisticsController extends Controller
         $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
         $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
 
-        $dkj = DB::table('users')
+        $dkj = DB::table('dkj')
             ->select(DB::raw('
-                users.id,
-                users.first_name,
-                users.last_name,
-                users.dating_type,
-                count(*) as user_sum,
-                sum(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as user_janek,
-                sum(CASE WHEN dkj.dkj_status = 0 THEN 1 ELSE 0 END) as user_not_janek
+                dkj.department_info_id,
+                departments.name as dep_name,
+                department_type.name as dep_name_type,
+                department_info.type,
+                count(dkj.id) as liczba_odsluchanych,
+                sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as wysylka,
+                sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as badania,
+                SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 1 THEN 1 ELSE 0 END) as bad_wysylka,
+                SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 0 THEN 1 ELSE 0 END) as bad_badania
             '))
-            ->join('dkj', 'users.id', '=', 'dkj.id_dkj')
-            ->whereBetween('dkj.add_date', [$date_start.' 00:00:00', $date_stop.' 23:00:00'])
-            ->groupBy('dkj.id_dkj')
+            ->join('users', 'users.id', '=', 'dkj.id_user')
+            ->join('department_info', 'department_info.id', '=', 'dkj.department_info_id')
+            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+            ->whereBetween('add_date', [$date_start, $date_stop])
+            ->groupBy('users.department_info_id')
+            ->groupBy('department_info.type')
             ->get();
-
-        $work_hours = DB::table('users')
-            ->select(DB::raw('
-                users.id,
-                sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as work_time
-            '))
-            ->join('work_hours', 'users.id', '=', 'work_hours.id_user')
-            ->whereBetween('work_hours.date', [$date_start, $date_stop])
-            ->where('users.user_type_id', '=', 2)
-            ->groupBy('users.id')
-            ->get();
-
+          
         $data = [
             'date_start' => $date_start,
             'date_stop' => $date_stop,
-            'dkj' => $dkj,
-            'work_hours' => $work_hours
+            'dkj' => $dkj
         ];
         return $data;
     }
@@ -731,7 +725,6 @@ class StatisticsController extends Controller
         return view('reportpage.WeekReportDkj')
             ->with('date_start', $data['date_start'])
             ->with('date_stop', $data['date_stop'])
-            ->with('work_hours', $data['work_hours'])
             ->with('dkj', $data['dkj']);
     }
 
@@ -1070,6 +1063,8 @@ class StatisticsController extends Controller
             ->with('hour', $data['hour'])
             ->with('date', $data['date']);
     }
+
+
 
     /******** Główna funkcja do wysyłania emaili*************/
     /*
