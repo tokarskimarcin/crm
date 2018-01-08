@@ -31,18 +31,24 @@ class CheckFirewall
         // 	   $acces = 1;
         // }
 
-        if (Auth::user()->user_type_id != 3)
-        {
-            if(is_null($acces)) {
-                Auth::logout();
-                Session::flash('message', 'Logujesz się ze złej lokalizacji!');
-                return redirect('login');
+        if (Auth::user()->department_info_id == 1){
+            if (Auth::user()->user_type_id != 3)
+            {
+                if(is_null($acces)) {
+                    Auth::logout();
+                    Session::flash('message', 'Logujesz się ze złej lokalizacji!');
+                    return redirect('login');
+                }else{
+                    return $next($request);
+                }
             }else{
                 return $next($request);
             }
-        }else{
+        } else {
             return $next($request);
         }
+
+
 
     }
 }
