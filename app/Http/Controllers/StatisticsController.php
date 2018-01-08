@@ -976,12 +976,12 @@ class StatisticsController extends Controller
                   ->groupBy('hour_report.department_info_id')
                   ->groupBy('hour_report.report_date');
               })
-              ->where('department_info.id_dep_type', '=', 2)
+              //->where('department_info.id_dep_type', '=', 2)
               ->groupBy('hour_report.department_info_id')
               ->get();
 
-          $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-          $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+          $day_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+          $day_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
 
           $date_start .= ' 00:00:00';
           $date_stop .= ' 23:00:00';
@@ -989,16 +989,18 @@ class StatisticsController extends Controller
           $dkj = DB::table('dkj')
               ->select(DB::raw('
                   users.department_info_id,
-                  count(*) as department_sum
+                  count(*) as dkj_sum,
+                  users.dating_type
               '))
               ->join('users', 'users.id', '=', 'dkj.id_user')
               ->whereBetween('add_date', [$date_start, $date_stop])
               ->groupBy('users.department_info_id')
+              ->groupBy('users.dating_type')
               ->get();
 
           $data = [
-              'date_start' => $date_start,
-              'date_stop' => $date_stop,
+              'day_start' => $day_start,
+              'day_stop' => $day_stop,
               'hour_reports' => $hour_reports,
               'dkj' => $dkj
           ];
@@ -1018,8 +1020,8 @@ class StatisticsController extends Controller
     public function pageWeekReportChecked() {
         $data = $this->weekReportCheckedData();
         return view('reportpage.WeekReportChecked')
-            ->with('date_start', $data['date_start'])
-            ->with('date_stop', $data['date_stop'])
+            ->with('day_start', $data['day_start'])
+            ->with('day_stop', $data['day_stop'])
             ->with('dkj', $data['dkj'])
             ->with('hour_reports', $data['hour_reports']);
     }
