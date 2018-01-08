@@ -27,9 +27,9 @@ class CheckFirewall
         }
         $acces = Firewall::where('ip_address', $ip)->first();
 
-        if (preg_match('/^10\.200\.46\..*$/', $ip))  {
-        	   $acces = 1;
-        }
+        // if (preg_match('/^10\.200\.46\..*$/', $ip))  {
+        // 	   $acces = 1;
+        // }
 
         if (Auth::user()->user_type_id != 3)
         {

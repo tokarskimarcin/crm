@@ -260,10 +260,9 @@ Route::middleware(['check-permission'])->group(function () {
     Route::get('/judge_notification/{id}','NotificationController@judgeNotificationGet');
     Route::Post('/judge_notification','NotificationController@judgeNotificationPost');
 
-    Route::get('/it_cadre','NotificationController@ITCadreGet');
+    Route::get('/it_cadre','NotificationController@ITCadreGet')->middleware('check-firewall');
 
     Route::get('/it_worker/{id}', 'NotificationController@ITWorkerGet');
-
 
     Route::get('/view_notification/{id}', 'NotificationController@viewNotification');
     //Notification STOP
