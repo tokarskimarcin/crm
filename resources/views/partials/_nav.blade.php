@@ -74,7 +74,7 @@
         <div class="sidebar-nav navbar-collapse">
             <ul class="nav" id="side-menu">
                 <li>
-                    <a href="{{url('/')}}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                    <a href="{{url('/')}}"><i class="fa fa-dashboard fa-fw"></i> Strona główna</a>
                 </li>
                 @if(Auth::user()->department_info->blocked == 0)
                   @foreach($groups->where('id','!=',8) as $group)
