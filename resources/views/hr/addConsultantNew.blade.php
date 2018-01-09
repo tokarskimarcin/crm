@@ -197,13 +197,13 @@
                                 <td></td>
                             </tr>
                             <tr>
-                                <td style="width: 170px;height:52px;"><b>Login PBX:</b></td>
+                                <td style="width: 170px;height:52px;"><b>Numer kolejki PBX:</b></td>
                                 <td>
                                     <input type="text" class="form-control" placeholder="Login z programu do dzwonienia" name="login_phone" value="">
                                 </td>
                             </tr>
                             <tr class="alert alert-danger" style="display: none" id="alert_pbx">
-                                <td colspan="1">Podaj login programu PBX!</td>
+                                <td colspan="1">Podaj numer kolejki PBX!</td>
                                 <td></td>
                             </tr>
                             @if($type == 2)
