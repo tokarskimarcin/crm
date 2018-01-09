@@ -19,6 +19,7 @@ use App\User;
 use App\Notifications;
 use Illuminate\Support\Facades\URL;
 use App\Firewall;
+use App\FirewallPrivileges;
 
 class AdminController extends Controller
 {
@@ -374,6 +375,41 @@ class AdminController extends Controller
 
         Session::flash('message_ok', "Adres IP został dodany!");
         return Redirect::back();
+    }
+
+    public function firewallPrivilegesGet() {
+        $firewall_privileges = FirewallPrivileges::all();
+        $users = User::whereNotIn('user_type_id', [1,2])
+            ->where('status_work', '=', 1)
+            ->orderBy('last_name')
+            ->get();
+
+        return view('admin.firewallPrivileges')
+            ->with('firewall_privileges', $firewall_privileges)
+            ->with('users', $users);
+    }
+
+    public function firewallPrivilegesPost(Request $request) {
+        $obj = new FirewallPrivileges();
+
+        $obj->user_id = $request->user_selected;
+        $obj->save();
+
+        Session::flash('message_ok', "Użytkownik został dodany!");
+        return Redirect::back();
+    }
+
+    public function firewallDeleteUser(Request $request) {
+        if ($request->ajax()) {
+            $user = User::find($request->user_id);
+
+            if ($user == null) {
+                return 0;
+            } else {
+                FirewallPrivileges::where('user_id', '=', $request->user_id)->delete();
+                return 1;
+            }
+        }
     }
 
 }

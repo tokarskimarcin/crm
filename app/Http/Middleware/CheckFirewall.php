@@ -6,6 +6,7 @@ use App\Firewall;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 use Session;
+use App\FirewallPrivileges;
 
 class CheckFirewall
 {
@@ -31,7 +32,9 @@ class CheckFirewall
         // 	   $acces = 1;
         // }
 
-        if (Auth::user()->user_type_id != 3)
+        $firewall_privileges_check = FirewallPrivileges::where('user_id', '=', Auth::user()->id)->first();
+
+        if ($firewall_privileges_check == null)
         {
             if(is_null($acces)) {
                 Auth::logout();

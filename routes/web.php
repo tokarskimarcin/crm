@@ -79,6 +79,9 @@ Route::POST('/datatableShowFinishedNotifications','NotificationController@datata
 //locker / Multiple departments
 Route::POST('/locker','AdminController@lockerPost')->name('api.locker');
 
+//firewall delete users
+Route::POST('/firewallDeleteUser','AdminController@firewallDeleteUser')->name('api.firewallDeleteUser');
+
 //notifications moving
 Route::POST('/getNotficationsJanky','NotificationController@getNotficationsJanky')->name('api.getNotficationsJanky');
 
@@ -120,19 +123,29 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/', 'HomeController@index');
     // Admin_Panel --Start--
     Route::get('/admin_privilage','AdminController@admin_privilage');
+
     Route::get('/admin_privilage_show/{id}','AdminController@admin_privilage_show');
     Route::Post('/admin_privilage_edit/{id}','AdminController@admin_privilage_edit');
+
     Route::get('/locker','AdminController@lockerGet');
+
     Route::get('/add_department','AdminController@addDepartmentGet');
     Route::Post('/add_department','AdminController@addDepartmentPost');
+
     Route::get('/edit_department','AdminController@editDepartmentGet');
     Route::Post('/edit_department','AdminController@editDepartmentPost');
+
     Route::get('/set_multiple_department','AdminController@multipleDepartmentGet');
     Route::Post('/set_multiple_department','AdminController@multipleDepartmentPost');
+
     Route::get('/create_link','AdminController@createLinkGet');
     Route::Post('/create_link','AdminController@createLinkPost');
+
     Route::get('/firewall_ip', 'AdminController@firewallGet');
     Route::POST('/firewall_ip', 'AdminController@firewallPost');
+
+    Route::get('/firewall_privileges', 'AdminController@firewallPrivilegesGet');
+    Route::POST('/firewall_privileges', 'AdminController@firewallPrivilegesPost');
     // Admin_Panel --Stop--
 
     // Password change --START--
@@ -304,6 +317,16 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageHourReportDkjEmployee', 'StatisticsController@pageHourReportDkjEmployee');
 
     //Report Page STOP
+
+    //TESTS START //
+
+    Route::get('/tests_admin_panel', 'TestsController@testsAdminPanelGet');
+    Route::POST('/tests_admin_panel', 'TestsController@testsAdminPanelPost');
+
+    Route::get('/test_user', 'TestsController@testUserGet');
+    Route::POST('/test_user', 'TestsController@testUserPost');
+
+    //TESTS STOP//
 });
 //////////////////////Testing ORM///////////////
 
