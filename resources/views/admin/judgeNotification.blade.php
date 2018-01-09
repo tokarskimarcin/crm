@@ -38,8 +38,8 @@
 </div>
 <div class="row">
     <div class="col-md-12">
-      <div class="panel panel-default">
-          <div class="panel-heading">ID zgłoszenia {{$notification->id}}</div>
+      <div class="panel panel-info">
+          <div class="panel-heading"><b>ID zgłoszenia {{$notification->id}}</b></div>
           <div class="panel-body">
               <p><b>Tytuł:</b></p>
               <p>{{$notification->title}}</p>
@@ -55,62 +55,100 @@
 @if(isset($judgeResult) && $judgeResult != null)
 @php($judgeResult = $judgeResult[0])
 
-<div class="row col-md-12">
-    <div class="table-responsive">
-        <table class="table table-bordered">
-            <thead>
-              <tr>
-                <td style="width: 50%"></td>
-                <td style="width: 50%"></td>
-              </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Serwisant:</td>
-                    <td>{{$judgeResult->user_it->first_name . ' ' . $judgeResult->user_it->last_name}}</td>
-                </tr>
-                <tr>
-                    <td>Czy problem został naprawiony:</td>
-                    <td>
-                        @if($judgeResult->repaired == 1)
-                            TAK
-                        @else
-                            NIE
-                        @endif
-                    </td>
-                </tr>
-                <tr>
-                    <td>Jakość wykonania zgłoszenia:</td>
-                    <td>{{$judgeResult->judge_quality}}/6</td>
-                </tr>
-                <tr>
-                    <td>Kontakt z serwisantem:</td>
-                    <td>{{$judgeResult->judge_contact}}/6</td>
-                </tr>
-                <tr>
-                    <td>Czas wykonywania zgłoszenia:</td>
-                    <td>{{$judgeResult->judge_time}}/6</td>
-                </tr>
-                <tr>
-                    <td>Technik kontaktował się po zakończeniu zgłoszenia:</td>
-                    <td>
-                        @if($judgeResult->repaired == 1)
-                            TAK
-                        @else
-                            NIE
-                        @endif
-                    </td>
-                </tr>
-                <tr>
-                    <td>Ogólna ocena:</td>
-                    <td>{{$judgeResult->judge_sum}}/6</td>
-                </tr>
-                <tr>
-                    <td>Komentarz:</td>
-                    <td>{{$judgeResult->comment}}</td>
-                </tr>
-            </tbody>
-        </table>
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <b>Serwisant</b>
+            </div>
+            <div class="panel-body">
+                {{$judgeResult->user_it->first_name . ' ' . $judgeResult->user_it->last_name}}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <b>Czy problem został naprawiony:</b>
+            </div>
+            <div class="panel-body">
+                @if($judgeResult->repaired == 1)
+                    TAK
+                @else
+                    NIE
+                @endif
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <b>Technik kontaktował się po zakończeniu zgłoszenia:</b>
+            </div>
+            <div class="panel-body">
+                @if($judgeResult->response_after == 1)
+                    TAK
+                @else
+                    NIE
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <b>Jakość wykonania zgłoszenia:</b>
+            </div>
+            <div class="panel-body">
+                {{$judgeResult->judge_quality}}/6
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <b>Kontakt z serwisantem:</b>
+            </div>
+            <div class="panel-body">
+                {{$judgeResult->judge_contact}}/6
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <b>Czas wykonywania zgłoszenia:</b>
+            </div>
+            <div class="panel-body">
+                {{$judgeResult->judge_time}}/6
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <b>Ogólna ocena:</b>
+            </div>
+            <div class="panel-body">
+                {{$judgeResult->judge_sum}}/6
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <b>Komentarz:</b>
+            </div>
+            <div class="panel-body">
+                {{$judgeResult->comment}}
+            </div>
+        </div>
     </div>
 </div>
 
