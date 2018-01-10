@@ -17,7 +17,7 @@ class TestsController extends Controller
         Przesłanie odpowiedzi przez użytkownika
     */
     public function testUserPost(Request $request) {
-
+        
     }
 
     /* 
@@ -46,7 +46,7 @@ class TestsController extends Controller
         Wyświetlenie wsyzstkic testów osoby testującej
     */
     public function showTestsGet() {
-        return view('tests.showTests');
+        return view('tests.showTest');
     }
 
     /* 
@@ -67,7 +67,7 @@ class TestsController extends Controller
         Zapis oceny testu
     */
     public function testCheckPost(Request $request) {
-
+        
     }
 
     /* 
@@ -89,5 +89,26 @@ class TestsController extends Controller
     */
     public function testsAdminPanelPost(Request $request) {
 
+    }
+
+    /* 
+        Statystyki poszczególnych pracowników
+    */
+    public function employeeTestsStatisticsGet() {
+        return view('tests.employeeStatistics');
+    }
+
+    /* 
+        Statystyki poszczególnych oddziałów
+    */
+    public function departmentTestsStatisticsGet() {
+        return view('tests.departmentStatistics');
+    }
+
+    /* 
+        Statystyki poszczególnych testów
+    */
+    public function testStatisticsGet() {
+        return view('tests.oneTestStatistics');
     }
 }
