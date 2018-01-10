@@ -13,7 +13,7 @@
 Route::POST('/startWork', 'HomeController@startWork');
 Route::POST('/stopWork', 'HomeController@stopWork');
 Route::POST('/register_hour','WorkHoursController@registerHour');
-
+ 
 //********************AJAX*********************** */
 Route::POST('/datatableAcceptHour','WorkHoursController@datatableAcceptHour')->name('api.acceptHour');
 Route::POST('/datatableAcceptHourCadre','WorkHoursController@datatableAcceptHourCadre')->name('api.acceptHourCadre');
