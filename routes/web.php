@@ -326,6 +326,19 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/test_user', 'TestsController@testUserGet');
     Route::POST('/test_user', 'TestsController@testUserPost');
 
+    Route::get('/all_user_tests', 'TestsController@allUserTests');
+
+    Route::get('/add_test', 'TestsController@addTestGet');
+    Route::POST('/add_test', 'TestsController@addTestPost');
+
+    Route::get('/show_tests', 'TestsController@showTestsGet');
+    Route::POST('/show_tests', 'TestsController@showTestsPost');
+
+    Route::get('/check_test', 'TestsController@testCheckGet');
+    Route::POST('/check_test', 'TestsController@testCheckPost');
+
+    Route::get('/tests_statistics', 'TestsController@testsStatisticsGet');
+
     //TESTS STOP//
 });
 //////////////////////Testing ORM///////////////
