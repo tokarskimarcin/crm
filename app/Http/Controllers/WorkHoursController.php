@@ -93,7 +93,7 @@ class WorkHoursController extends Controller
                     work_hours.register_stop,
                     work_hours.date,
                     SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time'))
-                ->whereIn('work_hours.status', [1,2,3])
+                ->whereIn('work_hours.status', [2,3])
                 ->where('users.department_info_id', '=', Auth::user()->department_info_id)
                 ->whereIn('users.user_type_id', [1,2])
                 ->where('work_hours.id_manager', '=', null)
@@ -120,7 +120,7 @@ class WorkHoursController extends Controller
                     work_hours.register_stop,
                     work_hours.date,
                     SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time'))
-                ->where('work_hours.status', '=', 3);
+                ->whereIn('work_hours.status', [2,3]);
             if($dep_info != '*')
             {
                 $query->where('users.department_info_id', '=', $dep_info);
