@@ -41,14 +41,17 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div id="donutchart" style="width: 450; height: 250;"></div>
+    <div class="col-md-6">
+        <div id="donutchart" style="width: 550; height: 350;"></div>
     </div>
-    <div class="col-md-4">
-        <div id="drawChartUsers" style="width: 450; height: 250;"></div>
+    <div class="col-md-6">
+        <div id="drawChartUsers" style="width: 550; height: 350;"></div>
     </div>
-    <div class="col-md-4">
-        <div id="drawChartType" style="width: 450; height: 250;"></div>
+    <div class="col-md-6">
+        <div id="drawChartType" style="width: 550; height: 350;"></div>
+    </div>
+    <div class="col-md-6">
+        <div id="drawChartTester" style="width: 550; height: 350;"></div>
     </div>
 </div>
 
@@ -118,5 +121,24 @@ google.charts.load("current", {packages:["corechart"]});
         chart.draw(data, options);
       }
 
+
+google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChartTester);
+      function drawChartTester() {
+        var data = google.visualization.arrayToDataTable([
+          ['Ilość', 'Statystyki'],
+          ['Alicja Galicja', 3],
+          ['Józef Zenoniuk', 4],
+          ['Robert Biedroń', 2]
+        ]);
+
+        var options = {
+          title: 'Osoba testująca',
+          pieHole: 0.4,
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('drawChartTester'));
+        chart.draw(data, options);
+      }
 </script>
 @endsection

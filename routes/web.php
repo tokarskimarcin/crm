@@ -85,7 +85,14 @@ Route::POST('/firewallDeleteUser','AdminController@firewallDeleteUser')->name('a
 //notifications moving
 Route::POST('/getNotficationsJanky','NotificationController@getNotficationsJanky')->name('api.getNotficationsJanky');
 
+/* TEST AJAX ROUTES START */
 
+Route::POST('/addTestQuestion','TestsController@addTestQuestion')->name('api.addTestQuestion');
+Route::POST('/saveCategoryName','TestsController@saveCategoryName')->name('api.saveCategoryName');
+Route::POST('/categoryStatusChange','TestsController@categoryStatusChange')->name('api.categoryStatusChange');
+Route::POST('/showCategoryQuestions','TestsController@showCategoryQuestions')->name('api.showCategoryQuestions');
+
+/* TEST AJAX ROUTES STOP */
 
 //********************AJAX*********************** */
 
