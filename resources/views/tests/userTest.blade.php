@@ -62,7 +62,7 @@
 
 var q_time = 10; // tutaj podstawiamy ilość czasu na pytanie
 var total_questions = 5;
-var actual_question = 3;
+var actual_question = 5;
 var loopTime = 1000;
 
 $(document).ready(function() {

@@ -85,7 +85,14 @@ Route::POST('/firewallDeleteUser','AdminController@firewallDeleteUser')->name('a
 //notifications moving
 Route::POST('/getNotficationsJanky','NotificationController@getNotficationsJanky')->name('api.getNotficationsJanky');
 
+/* TEST AJAX ROUTES START */
 
+Route::POST('/addTestQuestion','TestsController@addTestQuestion')->name('api.addTestQuestion');
+Route::POST('/saveCategoryName','TestsController@saveCategoryName')->name('api.saveCategoryName');
+Route::POST('/categoryStatusChange','TestsController@categoryStatusChange')->name('api.categoryStatusChange');
+Route::POST('/showCategoryQuestions','TestsController@showCategoryQuestions')->name('api.showCategoryQuestions');
+
+/* TEST AJAX ROUTES STOP */
 
 //********************AJAX*********************** */
 
@@ -323,7 +330,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/tests_admin_panel', 'TestsController@testsAdminPanelGet');
     Route::POST('/tests_admin_panel', 'TestsController@testsAdminPanelPost');
 
-    Route::get('/test_user', 'TestsController@testUserGet');
+    Route::get('/test_user', 'TestsController@testUserGet'); // tutaj bedzie {id}
     Route::POST('/test_user', 'TestsController@testUserPost');
 
     Route::get('/all_user_tests', 'TestsController@allUserTests');
@@ -334,10 +341,16 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/show_tests', 'TestsController@showTestsGet');
     Route::POST('/show_tests', 'TestsController@showTestsPost');
 
-    Route::get('/check_test', 'TestsController@testCheckGet');
+    Route::get('/check_test', 'TestsController@testCheckGet'); // tutaj bedzie {id}
     Route::POST('/check_test', 'TestsController@testCheckPost');
 
     Route::get('/tests_statistics', 'TestsController@testsStatisticsGet');
+
+    Route::get('/one_test_statistics', 'TestsController@testStatisticsGet'); // tutaj bedzie {id}
+
+    Route::get('/employee_statistics', 'TestsController@employeeTestsStatisticsGet'); // tutaj bedzie {id}
+
+    Route::get('/department_statistics', 'TestsController@departmentTestsStatisticsGet'); // tutaj bedzie {id}
 
     //TESTS STOP//
 });
