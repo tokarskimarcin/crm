@@ -338,7 +338,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/tests_admin_panel', 'TestsController@testsAdminPanelGet');
     Route::POST('/tests_admin_panel', 'TestsController@testsAdminPanelPost');
 
-    Route::get('/test_user', 'TestsController@testUserGet'); // tutaj bedzie {id}
+    Route::get('/test_user/{id}', 'TestsController@testUserGet'); // tutaj bedzie {id}
     Route::POST('/test_user', 'TestsController@testUserPost');
 
     Route::get('/all_user_tests', 'TestsController@allUserTests');
@@ -349,14 +349,14 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/show_tests', 'TestsController@showTestsGet');
     Route::POST('/show_tests', 'TestsController@showTestsPost');
 
-    Route::get('/check_test', 'TestsController@testCheckGet'); // tutaj bedzie {id}
+    Route::get('/check_test/{id}', 'TestsController@testCheckGet'); // tutaj bedzie {id}
     Route::POST('/check_test', 'TestsController@testCheckPost');
 
     Route::get('/tests_statistics', 'TestsController@testsStatisticsGet');
 
     Route::get('/one_test_statistics', 'TestsController@testStatisticsGet'); // tutaj bedzie {id}
 
-    Route::get('/employee_statistics', 'TestsController@employeeTestsStatisticsGet'); // tutaj bedzie {id}
+    Route::get('/employee_statistics/{id}', 'TestsController@employeeTestsStatisticsGet'); // tutaj bedzie {id}
 
     Route::get('/department_statistics', 'TestsController@departmentTestsStatisticsGet'); // tutaj bedzie {id}
 
