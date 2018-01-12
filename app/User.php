@@ -85,4 +85,8 @@ class User extends Authenticatable
     public function multiple_departments() {
         return $this->hasMany('App\MultipleDepartments', 'user_id');
     }
+
+    public function userTests() {
+        return $this->hasMany('App\UserTest', 'user_id');
+    }
 }
