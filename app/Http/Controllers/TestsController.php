@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use Illuminate\Http\Request;
 use App\TestCategory;
 use App\TestQuestion;
@@ -12,6 +11,7 @@ use Illuminate\Support\Facades\Redirect;
 use Session;
 use App\UserTest;
 use App\UserQuestion;
+use App\User;
 
 class TestsController extends Controller
 {
@@ -105,35 +105,7 @@ class TestsController extends Controller
     */
 
     public function addTestGet() {
-        $categories = TestCategory::where('deleted','=',0)->get();
-        $cadre = User::where('status_work','=',1)
-            ->whereNotin('user_type_id',[1,2])->get();
-        return view('tests.addTest')
-            ->with('categories',$categories)
-            ->with('users',$cadre);
-    }
-
-    /*
-     * Przygotowanie danych do datatable, związanych z pytaniami na konkretną kategorię
-     */
-    public function showQuestionDatatable(Request $request)
-    {
-        if($request->ajax())
-        {
-            $query = TestQuestion::where('category_id',$request->category_id)->get();
-            return datatables($query)->make(true);
-        }
-    }
-    /*
-     *  Zapisywanie testu
-     */
-    public function saveTestWithUser(Request $request)
-    {
-        if($request->ajax()){
-            print_R($request->question_test_array);
-            print_R($request->id_user);
-            return $request->question_test_array;
-        }
+        return view('tests.addTest');
     }
 
     /* 
@@ -182,20 +154,43 @@ class TestsController extends Controller
         }
 
         $cadre_comments = $request->comment_question;
-
+    
         foreach($test->questions as $question) {
             $question->cadre_comment = $cadre_comments[0];
             $question->save();
-            $cadre_comments = array_shift($cadre_comments);
+            array_shift($cadre_comments);
         }
-        
+
+        $test->status = 4;
+        $test->result = $request->q1;
+        $test->save();
+
+        Session::flash('message_ok', "Ocena została przesłana!");
+        return Redirect::back();
     }
 
     /* 
         Sttatystyki testów dla osoby testującej
     */
     public function testsStatisticsGet() {
-        return view('tests.testsStatistics');
+        $tests = UserTest::all();
+
+        $departments_stats = DB::table('department_info') //to zapytanie jest gównem
+            ->select(DB::raw('
+                departments.name as dep_name,
+                department_type.name as dep_type_name,
+                count(user_tests.id) as dep_sum
+            '))
+            ->join('departments', 'departments.id', 'department_info.id_dep')
+            ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
+            ->join('users', 'users.department_info_id', 'department_info.id')
+            ->join('user_tests', 'users.id', 'user_tests.user_id')
+            ->join('user_questions', 'user_tests.id', 'user_questions.test_id')
+            ->groupBy('department_info.id')
+            ->get();
+//dd($departments_stats);
+        return view('tests.testsStatistics')
+            ->with('tests', $tests);
     }
 
     /* 
@@ -229,8 +224,40 @@ class TestsController extends Controller
     /* 
         Statystyki poszczególnych pracowników
     */
-    public function employeeTestsStatisticsGet() {
-        return view('tests.employeeStatistics');
+    public function employeeTestsStatisticsGet($id) {
+        $user = User::find($id);
+
+        if ($user == null) {
+            return view('errors.404');
+        }
+
+        $cadre = DB::table('user_tests')
+            ->select(DB::raw('
+                first_name,
+                last_name,
+                count(*) as cadre_sum
+            '))
+            ->join('users', 'users.id', 'user_tests.cadre_id')
+            ->where('user_tests.user_id', '=', $id)
+            ->groupBy('users.id')
+            ->get();
+
+        $categories = DB::table('user_questions')
+            ->select(DB::raw('
+                test_categories.name as name,
+                count(*) as sum
+            '))
+            ->join('user_tests', 'user_tests.id', 'user_questions.test_id')
+            ->join('test_questions', 'test_questions.id', 'user_questions.question_id')
+            ->join('test_categories', 'test_categories.id', 'test_questions.category_id')
+            ->where('user_tests.user_id', '=', $id)
+            ->groupBy('test_categories.id')
+            ->get();
+
+        return view('tests.employeeStatistics')
+            ->with('categories', $categories)
+            ->with('cadre', $cadre)
+            ->with('user', $user);
     }
 
     /* 
