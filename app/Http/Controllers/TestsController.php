@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use Illuminate\Http\Request;
 use App\TestCategory;
 use App\TestQuestion;
@@ -105,7 +106,56 @@ class TestsController extends Controller
     */
 
     public function addTestGet() {
-        return view('tests.addTest');
+        $categories = TestCategory::where('deleted','=',0)->get();
+        $cadre = User::where('status_work','=',1)
+            ->whereNotin('user_type_id',[1,2])->get();
+        return view('tests.addTest')
+            ->with('categories',$categories)
+            ->with('users',$cadre);
+    }
+
+    /*
+     * Przygotowanie danych do datatable, związanych z pytaniami na konkretną kategorię
+     */
+    public function showQuestionDatatable(Request $request)
+    {
+        if($request->ajax())
+        {
+            $query = TestQuestion::where('category_id',$request->category_id)->get();
+            return datatables($query)->make(true);
+        }
+    }
+    /*
+     *  Zapisywanie testu
+     */
+    public function saveTestWithUser(Request $request)
+    {
+        if($request->ajax()){
+            $new_test = new UserTest();
+            $new_test->cadre_id = Auth::user()->id;
+            $new_test->user_id = $request->id_user;
+            $new_test->status = 1;
+            $new_test->template_id = 0;
+            $new_test->name= $request->subject;
+            $new_test->save();
+            $id_test = $new_test->id;
+            $question_array = $request->question_test_array;
+
+            foreach ($question_array as $item)
+            {
+                print_R($item);
+                $new_user_question = new UserQuestion();
+                $new_user_question->test_id = $id_test;
+                $new_user_question->question_id = $item['id'];
+                $new_user_question->available_time = $item['time'];
+                $new_user_question->save();
+
+            }
+//            print_R($request->question_test_array);
+//            print_R($request->id_user);
+            print_R($id_test);
+
+        }
     }
 
     /* 
@@ -154,7 +204,7 @@ class TestsController extends Controller
         }
 
         $cadre_comments = $request->comment_question;
-    
+
         foreach($test->questions as $question) {
             $question->cadre_comment = $cadre_comments[0];
             $question->save();

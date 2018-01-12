@@ -25,23 +25,14 @@
                 <div class="row">
                     <div class="col-lg-12">
 
-                        <div class="col-lg-4">
+                        <div class="col-lg-6">
                             <div class="panel panel-default">
                                 <div class="panel-heading">Temat: </div>
-                                <input type="text" class="form-control" name="subject" placeholder="podaj temat.." value="">
+                                <input type="text" id="subject_input" class="form-control" name="subject" placeholder="podaj temat.." value="">
                             </div>
                         </div>
 
-                        <div class="col-lg-4">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">Zagadnienia: </div>
-                                @foreach($categories as $category)
-                                    <p><button id={{'categoryid_'.$category->id}} class="category" data-toggle="modal" data-target="#myModal" value={{$category->name}}>{{$category->name}}</button> <br></p>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <div class="col-lg-4">
+                        <div class="col-lg-6">
                             <div class="panel panel-default">
                                 <div class="panel-heading">Test dla: </div>
                                     <select class="form-control" id="user_select">
@@ -50,6 +41,14 @@
                                         @endforeach
                                     </select>
                                 </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Zagadnienia: </div>
+                                @foreach($categories as $category)
+                                    <p><button id={{'categoryid_'.$category->id}} class="category" data-toggle="modal" data-target="#myModal" value={{$category->name}}>{{$category->name}}</button> <br></p>
+                                @endforeach
+                            </div>
                         </div>
 
                     </div>
@@ -253,8 +252,8 @@
          }  , "columns": [
 
                  {"class" : "question_text","data": "content"},
-                 { "data": function (data, type, dataToSet) {
-                     return '<input type="text" class="form-control question_time" placeholder="min" value='+data.default_time+'>';
+                 { "width": "10%","data": function (data, type, dataToSet) {
+                     return '<input type="number" class="form-control question_time" placeholder="min" value='+data.default_time+'>';
                     }
                  },
                  { "data": function (data, type, dataToSet) {
@@ -268,9 +267,16 @@
     // generowanie tabeli z zaznaczonymi pytaniami
      table_all_guestion= $('#all_question').DataTable({
          "dom": 'lBfrtip',
+         "autoWidth": false,
          "language": {
              "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
          },
+         "columns":[
+             {"width": "10%"},
+             null,
+             {"width": "10%"},
+             {"width": "10%"}
+         ]
      });
 
      // zmiana nazwy kategoerii na modalu
@@ -306,6 +312,7 @@
      // zapisanie testu
     $('#save_button').on('click',function (e) {
         var id_user = $('#user_select').val();
+        var subject = $('#subject_input').val();
         $.ajax({
             type:"POST",
             url: '{{ route('api.saveTestWithUser') }}',
@@ -314,13 +321,50 @@
             },
             data:{
                 "question_test_array":question_text_array,
-                "id_user": id_user
+                "id_user": id_user,
+                "subject": subject
             },
             success: function(response) {
-               console.log(response);
+               console.log("Zapis do bazy");
             }
         });
     });
+
+     $('#all_question').on('focusout','.question_time',function (e) {
+
+         if($(this).val() > 10 )
+         {
+             alert('za dużo')
+         }else if($(this).val() < 1)
+         {
+             alert('za mało')
+
+         }else
+         // wyłuskanie tr należącego do button
+         var tr = $(this).closest('tr').attr('id');
+         tr = tr.split("_");
+         //przypisane question_id
+         var question_id = tr[1];
+         for(var i=0;i<question_text_array.length;i++)
+         {
+             if(question_text_array[i].id == question_id)
+                 question_text_array[i].time = $(this).val();
+         }
+     });
+     $('#all_question').on('click','.delete_row',function (e) {
+         // wyłuskanie tr należącego do button
+         var tr = $(this).closest('tr').attr('id');
+         tr = tr.split("_");
+         var question_id = tr[1];
+         //usunięcie wiersza z tabeli z pytaniami
+         table_all_guestion.row('#question_'+question_id).remove().draw();
+         //usunicie informacji o wierszu z tabeli
+         removeFunction(question_text_array,"id",question_id);
+         // zmniejsz ilość wybranych pytań
+         question_count--;
+     });
+
+
 
         // ręczne wybieranie pytań
     $('#question_table tbody').on( 'click', 'button',function () {
@@ -345,10 +389,10 @@
             var rowNode =  table_all_guestion.row.add([
                 category_name,
                 question_text,
-                question_time,
-                "0"
+                '<input type="number" class="form-control question_time" placeholder="min" value='+question_time+'>',
+                '<button type="button" class="btn btn-danger delete_row">Usuń</button>'
             ]).node();
-             rowNode.id = "question"+question_id;
+             rowNode.id = "question_"+question_id;
              // wpisanie informacji o pytaniu do tablicy
              question_text_array.push({id:question_id,text:question_text,time:question_time,subject:category_name});
             //gdy pytanie jest powtórzone zaznacz na innny kolor
@@ -360,9 +404,9 @@
              question_count++;
          }else {
              // usuń wiersz z tabeli pod modalem
-             $('#question'+question_id).remove();
+             $('#question_'+question_id).remove();
              //to samo w datatable, chyba zbędne wyżej
-             table_all_guestion.row('#question'+question_id).remove().draw();
+             table_all_guestion.row('#question_'+question_id).remove().draw();
              //usunicie informacji o wierszu z tabeli
              removeFunction(question_text_array,"id",question_id);
              // zmiana flagi w klacie -> wyłączenie koloru
