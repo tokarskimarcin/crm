@@ -96,6 +96,10 @@ Route::POST('/editTestQuestion','TestsController@editTestQuestion')->name('api.e
 Route::POST('/deleteTestQuestion','TestsController@deleteTestQuestion')->name('api.deleteTestQuestion');
 Route::POST('/mainTableCounter','TestsController@mainTableCounter')->name('api.mainTableCounter');
 
+Route::POST('/showQuestionDatatable','TestsController@showQuestionDatatable')->name('api.showQuestionDatatable');
+Route::POST('/saveTestWithUser','TestsController@saveTestWithUser')->name('api.saveTestWithUser');
+
+
 /* TEST AJAX ROUTES STOP */
 
 //********************AJAX*********************** */
@@ -334,7 +338,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/tests_admin_panel', 'TestsController@testsAdminPanelGet');
     Route::POST('/tests_admin_panel', 'TestsController@testsAdminPanelPost');
 
-    Route::get('/test_user/{id}', 'TestsController@testUserGet'); // tutaj bedzie {id}
+    Route::get('/test_user', 'TestsController@testUserGet'); // tutaj bedzie {id}
     Route::POST('/test_user', 'TestsController@testUserPost');
 
     Route::get('/all_user_tests', 'TestsController@allUserTests');
@@ -345,7 +349,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/show_tests', 'TestsController@showTestsGet');
     Route::POST('/show_tests', 'TestsController@showTestsPost');
 
-    Route::get('/check_test/{id}', 'TestsController@testCheckGet'); // tutaj bedzie {id}
+    Route::get('/check_test', 'TestsController@testCheckGet'); // tutaj bedzie {id}
     Route::POST('/check_test', 'TestsController@testCheckPost');
 
     Route::get('/tests_statistics', 'TestsController@testsStatisticsGet');
