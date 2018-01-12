@@ -45,7 +45,7 @@
                 <b>Data testu</b>
             </div>
             <div class="panel-body">
-                2017-12-12
+                {{$test->created_at}}
             </div>
         </div>
     </div>
@@ -55,7 +55,7 @@
                 <b>Tytuł testu</b>
             </div>
             <div class="panel-body">
-                Chuje muje dzikie węże ple pe rgergn  erg erge rger
+                {{$test->name}}
             </div>
         </div>
     </div>
@@ -65,147 +65,58 @@
                 <b>Użytkownik</b>
             </div>
             <div class="panel-body">
-                Czesław Miłosz
+                {{$test->user->first_name . ' ' . $test->user->last_name}}
             </div>
         </div>
     </div>
 </div>
 
 <ul class="nav nav-tabs">
-    <li class="active"><a data-toggle="tab" href="#question1">Pytanie nr 1</a></li>
-    <li><a data-toggle="tab" href="#question2">Pytanie nr 2</a></li>
-    <li><a data-toggle="tab" href="#question3">Pytanie nr 3</a></li>
-    <li><a data-toggle="tab" href="#question4">Pytanie nr 4</a></li>
-    <li><a data-toggle="tab" href="#question5">Pytanie nr 5</a></li>
+    @php($i = 0)
+    @foreach($test->questions as $item)
+        @php($i++)
+        <li @if($i == 1) class="active" @endif>
+            <a data-toggle="tab" href="#question{{$item->id}}">
+                Pytanie nr {{$i}}
+            </a>
+        </li>
+    @endforeach
     <li><a data-toggle="tab" href="#question_total">Ocena ogólna</a></li>
 </ul>
 
 <form method="POST" action="{{URL::to('/check_test')}}" id="checkForm">
     <input type="hidden" name="_token" value="{{ csrf_token() }}">
     <div class="tab-content">
-        <div id="question1" class="tab-pane fade in active">
-            <div class="form-group" style="margin-top: 30px">
-                <div class="panel panel-warning">
-                    <div class="panel-heading">
-                        <b>Treść pytania</b>
+
+        @php($i = 0)
+        @foreach($test->questions as $item)
+            @php($i++)
+            <div id="question{{$i}}" class="tab-pane @if($i == 1) fade in active @endif">
+                    <div class="form-group" style="margin-top: 30px">
+                        <div class="panel panel-warning">
+                            <div class="panel-heading">
+                                <b>Treść pytania</b>
+                            </div>
+                            <div class="panel-body">
+                               {{$item->testQuestion->content}}
+                            </div>
+                        </div>
+                        <div class="panel panel-warning">
+                            <div class="panel-heading">
+                                <b>Odpowiedź użytkownika</b>
+                            </div>
+                            <div class="panel-body">
+                                {{$item->user_answer}}
+                            </div>
+                        </div>
                     </div>
-                    <div class="panel-body">
-                        Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg ?
+                    <div class="form-group">
+                        <label for="comment_question1">Dodaj komentarz (opcjonalne):</label>
+                        <textarea class="form-control" name="comment_question[]" placeholder="Twój komentarz..." rows="5"></textarea>
                     </div>
                 </div>
-                <div class="panel panel-warning">
-                    <div class="panel-heading">
-                        <b>Odpowiedź użytkownika</b>
-                    </div>
-                    <div class="panel-body">
-                        Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg 
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="comment_question1">Dodaj komentarz (opcjonalne):</label>
-                <textarea class="form-control" name="comment_question1" placeholder="Twój komentarz..." rows="5"></textarea>
-            </div>
-        </div>
-        <div id="question2" class="tab-pane fade">
-            <div class="form-group" style="margin-top: 30px">
-            <div class="panel panel-warning">
-                <div class="panel-heading">
-                    <b>Treść pytania</b>
-                </div>
-                <div class="panel-body">
-                    Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg ?
-                </div>
-            </div>
-            <div class="panel panel-warning">
-                <div class="panel-heading">
-                    <b>Odpowiedź użytkownika</b>
-                </div>
-                <div class="panel-body">
-                    Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg 
-                </div>
-            </div>
-            </div>
-            <div class="form-group">
-                <button class="btn btn-default btn-lg add_comment"><span class="glyphicon glyphicon-plus"></span>Dodaj komentarz</button>
-            </div>
-            <div class="form-group" id="comment_div_1" style="display: none">
-                <label for="comment_question1">Twój komentarz:</label>
-                <textarea class="form-control" name="comment_question1" placeholder="Twój komentarz..." rows="5"></textarea>
-            </div>
-        </div>
-        <div id="question3" class="tab-pane fade">
-            <div class="form-group" style="margin-top: 30px">
-            <div class="panel panel-warning">
-                <div class="panel-heading">
-                    <b>Treść pytania</b>
-                </div>
-                <div class="panel-body">
-                    Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg ?
-                </div>
-            </div>
-            <div class="panel panel-warning">
-                <div class="panel-heading">
-                    <b>Odpowiedź użytkownika</b>
-                </div>
-                <div class="panel-body">
-                    Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg 
-                </div>
-            </div>
-            </div>
-            <div class="form-group">
-                <label for="comment_question1">Dodaj komentarz (opcjonalne):</label>
-                <textarea class="form-control" name="comment_question1" placeholder="Twój komentarz..." rows="5"></textarea>
-            </div>
-        </div>
-        <div id="question4" class="tab-pane fade">
-        <div class="form-group" style="margin-top: 30px">
-        <div class="panel panel-warning">
-            <div class="panel-heading">
-                <b>Treść pytania</b>
-            </div>
-            <div class="panel-body">
-                Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg ?
-            </div>
-        </div>
-        <div class="panel panel-warning">
-            <div class="panel-heading">
-                <b>Odpowiedź użytkownika</b>
-            </div>
-            <div class="panel-body">
-                Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg 
-            </div>
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="comment_question1">Dodaj komentarz (opcjonalne):</label>
-        <textarea class="form-control" name="comment_question1" placeholder="Twój komentarz..." rows="5"></textarea>
-    </div>
-        </div>
-        <div id="question5" class="tab-pane fade">
-        <div class="form-group" style="margin-top: 30px">
-        <div class="panel panel-warning">
-            <div class="panel-heading">
-                <b>Treść pytania</b>
-            </div>
-            <div class="panel-body">
-                Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg ?
-            </div>
-        </div>
-        <div class="panel panel-warning">
-            <div class="panel-heading">
-                <b>Odpowiedź użytkownika</b>
-            </div>
-            <div class="panel-body">
-                Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg Plelele sfsdf sdf sfsdf sd   sdksgjdnfgkjn sg drg ergregerg erg ergergnekjrgnekj e nkrgn ekrjg e e rgjne krjgn ekjrg 
-            </div>
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="comment_question1">Dodaj komentarz (opcjonalne):</label>
-        <textarea class="form-control" name="comment_question1" placeholder="Twój komentarz..." rows="5"></textarea>
-    </div>
-        </div>
+        @endforeach
+        
         <div id="question_total" class="tab-pane fade">
             <div class="form-group" style="margin-top: 30px">
                 <label>Test został zaliczony:</label>
@@ -227,19 +138,13 @@
             <div>
         </div>
     </div>
+    <input type="hidden" value="{{$test->id}}" name="test_id" />
 </form>
 
 @endsection
 
 @section('script')
 <script>
-
-$('.add_comment').click(function(e) {
-    e.preventDefault();
-    $('.add_comment').fadeOut(0);
-    $('#comment_div_1').slideDown(500);
-
-});
 
 $("#q1_yes").on('click', () => {
     $('#q1_span').text('TAK');
