@@ -58,6 +58,17 @@ class TestsController extends Controller
             return datatables($query)->make(true);
         }
     }
+    /*
+     *  Zapisywanie testu
+     */
+    public function saveTestWithUser(Request $request)
+    {
+        if($request->ajax()){
+            print_R($request->question_test_array);
+            print_R($request->id_user);
+            return $request->question_test_array;
+        }
+    }
 
     /* 
         Zapis testu przez osobę testującą

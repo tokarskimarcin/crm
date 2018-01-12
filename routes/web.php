@@ -93,6 +93,9 @@ Route::POST('/categoryStatusChange','TestsController@categoryStatusChange')->nam
 Route::POST('/showCategoryQuestions','TestsController@showCategoryQuestions')->name('api.showCategoryQuestions');
 
 Route::POST('/showQuestionDatatable','TestsController@showQuestionDatatable')->name('api.showQuestionDatatable');
+Route::POST('/saveTestWithUser','TestsController@saveTestWithUser')->name('api.saveTestWithUser');
+
+
 /* TEST AJAX ROUTES STOP */
 
 //********************AJAX*********************** */

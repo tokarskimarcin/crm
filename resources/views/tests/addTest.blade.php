@@ -44,9 +44,9 @@
                         <div class="col-lg-4">
                             <div class="panel panel-default">
                                 <div class="panel-heading">Test dla: </div>
-                                    <select class="form-control">
-                                        @foreach($users as $users)
-                                            <option>{{$users->last_name.' '.$users->first_name}}</option>
+                                    <select class="form-control" id="user_select">
+                                        @foreach($users as $user)
+                                            <option value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -76,6 +76,7 @@
 
                             </tbody>
                         </table>
+                        <button id="save_button">zapisz</button>
                     </div>
                 </div>
             </div>
@@ -195,6 +196,7 @@
                 $(nRow).addClass('no_checked');
              $(nRow).attr('id', aData.id);
              return nRow;
+             // po wyświetleniu strony dodaj nagłówek z możliwościa losowania pytań
          },"fnDrawCallback": function(settings){
              // Dodanie nagłówka do datatable
              var api = new $.fn.dataTable.Api( settings );
@@ -260,17 +262,15 @@
                  }
              }
              ],
-         // po wyświetleniu strony dodaj nagłówek z możliwościa losowania pytań
-         fnInitComplete: function(){
-
-
-         }
          });
  });
 
     // generowanie tabeli z zaznaczonymi pytaniami
      table_all_guestion= $('#all_question').DataTable({
-         "dom": 'lBfrtip'
+         "dom": 'lBfrtip',
+         "language": {
+             "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+         },
      });
 
      // zmiana nazwy kategoerii na modalu
@@ -301,6 +301,26 @@
                 myObjects.splice(what_delete,1);
             return myObjects;
      }
+
+
+     // zapisanie testu
+    $('#save_button').on('click',function (e) {
+        var id_user = $('#user_select').val();
+        $.ajax({
+            type:"POST",
+            url: '{{ route('api.saveTestWithUser') }}',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data:{
+                "question_test_array":question_text_array,
+                "id_user": id_user
+            },
+            success: function(response) {
+               console.log(response);
+            }
+        });
+    });
 
         // ręczne wybieranie pytań
     $('#question_table tbody').on( 'click', 'button',function () {
