@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use Illuminate\Http\Request;
 use App\TestCategory;
 use App\TestQuestion;
@@ -38,7 +39,24 @@ class TestsController extends Controller
     */
 
     public function addTestGet() {
-        return view('tests.addTest');
+        $categories = TestCategory::where('deleted','=',0)->get();
+        $cadre = User::where('status_work','=',1)
+            ->whereNotin('user_type_id',[1,2])->get();
+        return view('tests.addTest')
+            ->with('categories',$categories)
+            ->with('users',$cadre);
+    }
+
+    /*
+     * Przygotowanie danych do datatable, związanych z pytaniami na konkretną kategorię
+     */
+    public function showQuestionDatatable(Request $request)
+    {
+        if($request->ajax())
+        {
+            $query = TestQuestion::where('category_id',$request->category_id)->get();
+            return datatables($query)->make(true);
+        }
     }
 
     /* 
