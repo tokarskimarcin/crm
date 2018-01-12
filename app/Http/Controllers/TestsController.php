@@ -10,21 +10,87 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Session;
+use App\UserTest;
+use App\UserQuestion;
 
 class TestsController extends Controller
 {
     /* 
-        Wyświetlanie widoku test dla użytkownika
+        Wyświetlanie widoku testu dla użytkownika
+        Sprawdzane jest pole "user_answer" w tabeli user_questions
+        Pytania wybierane są kolejno, tam gdzie "user_answer"  = null
     */
-    public function testUserGet() {
-        return view('tests.userTest');
+    public function testUserGet($id) {
+        $test = UserTest::find($id);
+
+        if ($test == null) {
+            return view('errors.404');
+        }
+
+        if ($test->user_id != Auth::user()->id) {
+            return view('errors.404');
+        }
+
+        $question = UserQuestion::where('test_id', '=', $id)
+            ->whereNull('user_answer')
+            ->first();
+
+        $question_count = $test->questions->count();
+        $actual_count = UserQuestion::where('test_id', '=', $id)
+            ->whereNull('user_answer')
+            ->count();
+
+        /* 
+            $status = określa czy pytanie jest pierwszym lub ostatnim
+            0 - pytanie nie jest początkowe/ostatnie
+            1 - pierwsze pytanie
+            2 - ostanite pytanie 
+            3 - test zakończony
+        */
+        if ($question_count == $actual_count) {
+            $status = 1;
+        } else if ($actual_count <= 0) {
+            $status = 2;
+        } else {
+            $status = 0;
+        }
+
+        if ($question == null) {
+            $status = 3;
+            $test->status = 3;
+            $test->save();
+        }
+        
+
+        return view('tests.userTest')
+            ->with('test', $test)
+            ->with('status', $status)
+            ->with('question_count', $question_count)
+            ->with('actual_count', $question_count - $actual_count + 1)
+            ->with('question', $question);
     }
 
     /* 
         Przesłanie odpowiedzi przez użytkownika
     */
     public function testUserPost(Request $request) {
-        
+        $question = UserQuestion::find($request->question_id);
+
+        if ($question->test->user_id != Auth::user()->id) {
+            return view('errors.404');
+        }
+
+        if ($question == null) {
+            return view('errors.404');
+        }
+
+        $question->user_answer = ($request->user_answer != null) ? $request->user_answer : 'Brak odpowiedzi' ;
+        $answer_time = $request->answer_time;
+        $question->answer_time = $request->available_time - $answer_time * (-1);
+
+        $question->save();
+
+        return Redirect::back();
     }
 
     /* 
@@ -94,14 +160,34 @@ class TestsController extends Controller
     /* 
         Pogdląd testu + możliwość jego oceny
     */
-    public function testCheckGet() {
-        return view('tests.checkTest');
+    public function testCheckGet($id) {
+        $test = UserTest::find($id);
+
+        if ($test == null) {
+            return view('errors.404');
+        }
+
+        return view('tests.checkTest')
+            ->with('test', $test);
     }
 
     /* 
         Zapis oceny testu
     */
     public function testCheckPost(Request $request) {
+        $test = UserTest::find($request->test_id);
+        
+        if ($test == null) {
+            return view('errors.404');
+        }
+
+        $cadre_comments = $request->comment_question;
+
+        foreach($test->questions as $question) {
+            $question->cadre_comment = $cadre_comments[0];
+            $question->save();
+            $cadre_comments = array_shift($cadre_comments);
+        }
         
     }
 
@@ -165,9 +251,23 @@ class TestsController extends Controller
         ******************** AJAX REQUESTS ************************
     */
 
+   
     public function addTestQuestion(Request $request) {
         if ($request->ajax()) {
-            
+            $question = new TestQuestion();
+
+            $question->content = $request->content;
+            $question->default_time = $request->question_time * 60;
+            $question->category_id = $request->category_id;
+            $question->created_at = date('Y-m-d H:i:s');
+            $question->updated_at = date('Y-m-d H:i:s');
+            $question->cadre_by = Auth::user()->id;
+            $question->user_id = Auth::user()->id;
+            $question->deleted = 0;
+
+            $question->save();
+
+            return 1;
         }
     }
 
@@ -208,9 +308,58 @@ class TestsController extends Controller
             $data = [];
 
             $data[] = TestCategory::find($request->category_id);
-            $data[] = TestQuestion::where('category_id', '=', $request->category_id)->get();
+            $data[] = TestQuestion::where('category_id', '=', $request->category_id)->where('deleted', '=', 0)->get();
 
             return $data;
+        }
+    }
+
+    public function editTestQuestion(Request $request) {
+        if ($request->ajax()) {
+            $question = TestQuestion::find($request->question_id);
+
+            if ($question == null) {
+                return 0;
+            }
+
+            $question->content = $request->question;
+            $question->default_time = $request->newTime * 60;
+            $question->updated_at = date('Y-m-d H:i:s');
+            $question->cadre_by = Auth::user()->id;
+
+            $question->save();
+
+            return 1;
+        }
+    }
+
+    public function deleteTestQuestion(Request $request) {
+        if ($request->ajax()) {
+            $question = TestQuestion::find($request->id);
+
+            if ($question == null) {
+                return 0;
+            }
+
+            $question->deleted = 1;
+            $question->updated_at = date('Y-m-d H:i:s');
+            $question->cadre_by = Auth::user()->id;
+
+            $question->save();
+
+            return 1;
+        }
+    }
+
+    public function mainTableCounter(Request $request) {
+        if ($request->ajax()) {
+            $category = TestCategory::find($request->category_id);
+
+            if ($category == null) {
+                return null;
+            }
+
+            return $category->questions->where('deleted', '=', 0)->count();
         }
     }
 }
