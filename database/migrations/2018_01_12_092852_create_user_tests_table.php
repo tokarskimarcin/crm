@@ -17,9 +17,9 @@ class CreateUserTestsTable extends Migration
             $table->increments('id');
             $table->integer('cadre_id');
             $table->integer('user_id');
-            $table->integer('status');
-            $table->integer('result');
-            $table->integer('template_id');
+            $table->integer('status')->default(0);
+            $table->integer('result')->nullable();
+            $table->integer('template_id')->default(0);
             $table->timestamps();
         });
     }

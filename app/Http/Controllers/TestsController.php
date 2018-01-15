@@ -31,6 +31,10 @@ class TestsController extends Controller
             return view('errors.404');
         }
 
+        if ($test->status < 2) {
+            return view('errors.404');
+        }
+
         $question = UserQuestion::where('test_id', '=', $id)
             ->whereNull('user_answer')
             ->first();
@@ -60,7 +64,9 @@ class TestsController extends Controller
             $test->status = 3;
             $test->save();
         }
-        
+
+        $kurwa = TestQuestion::find(6);
+        dd($question->testQuestion);
 
         return view('tests.userTest')
             ->with('test', $test)
@@ -179,7 +185,10 @@ class TestsController extends Controller
         Wyświetlenie wsyzstkic testów osoby testującej
     */
     public function showTestsGet() {
-        return view('tests.showTest');
+        $tests = UserTest::where('cadre_id', '=', Auth::user()->id)->get();
+
+        return view('tests.showTest')
+            ->with('tests', $tests);
     }
 
     /* 
@@ -235,21 +244,31 @@ class TestsController extends Controller
     public function testsStatisticsGet() {
         $tests = UserTest::all();
 
-        $departments_stats = DB::table('department_info') //to zapytanie jest gównem
+        $departments_stats = DB::table('user_tests')
             ->select(DB::raw('
                 departments.name as dep_name,
                 department_type.name as dep_type_name,
                 count(user_tests.id) as dep_sum
             '))
+            ->join('users', 'users.id', 'user_tests.user_id')
+            ->join('department_info', 'users.department_info_id', 'department_info.id')
             ->join('departments', 'departments.id', 'department_info.id_dep')
             ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
-            ->join('users', 'users.department_info_id', 'department_info.id')
-            ->join('user_tests', 'users.id', 'user_tests.user_id')
-            ->join('user_questions', 'user_tests.id', 'user_questions.test_id')
             ->groupBy('department_info.id')
             ->get();
-//dd($departments_stats);
+
+        $stats_by_user_type = DB::table('user_tests')
+            ->select(DB::raw('
+                user_types.name as user_type,
+                count(user_tests.id) as user_type_sum
+            '))
+            ->join('users', 'users.id', 'user_tests.user_id')
+            ->join('user_types', 'users.user_type_id', 'user_types.id')
+            ->get();
+
         return view('tests.testsStatistics')
+            ->with('stats_by_user_type', $stats_by_user_type)
+            ->with('departments_stats', $departments_stats)
             ->with('tests', $tests);
     }
 
@@ -447,6 +466,21 @@ class TestsController extends Controller
             }
 
             return $category->questions->where('deleted', '=', 0)->count();
+        }
+    }
+
+    function activateTest(Request $request) {
+        if ($request->ajax()) {
+            $checkTest = UserTest::find($request->id);
+
+            if ($checkTest == null) {
+                return 0;
+            }
+
+            $checkTest->status = 2;
+            $checkTest->save();
+
+            return 1;
         }
     }
 }

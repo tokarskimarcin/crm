@@ -1,11 +1,18 @@
 @extends('layouts.main')
 @section('content')
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<style>
+.panel-info > .panel-heading {
+    background-color: #a36bce;
+    color: white;
+}
+
+</style>
 
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Statystyki oddziału</h1>
+                <div class="well my-well">Testy / Statystyki oddziału / {{'department_name'}}</div>
         </div>
     </div>
 </div>

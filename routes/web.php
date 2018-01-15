@@ -99,6 +99,8 @@ Route::POST('/mainTableCounter','TestsController@mainTableCounter')->name('api.m
 Route::POST('/showQuestionDatatable','TestsController@showQuestionDatatable')->name('api.showQuestionDatatable');
 Route::POST('/saveTestWithUser','TestsController@saveTestWithUser')->name('api.saveTestWithUser');
 
+Route::POST('/activateTest','TestsController@activateTest')->name('api.activateTest');
+
 Route::POST('/getRepeatQuestion','TestsController@getRepeatQuestion')->name('api.getRepeatQuestion'); //tu zmienic z ORM
 
 /* TEST AJAX ROUTES STOP */

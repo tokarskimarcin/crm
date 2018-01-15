@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>{{$test->name}}</h1>
+            <div class="well my-well">Testy / Test kompetencji / {{$test->name}}</div>
         </div>
         @if($status != 3)
             <div class="col-md-9">
@@ -28,7 +28,7 @@
     </div>
 </div>
 
-@if($status == 1)
+@if($status == 2)
 
 @php
     $max_time = 0;
@@ -101,8 +101,9 @@
 @else 
     <div class="row">
         <div class="col-md-12">
-            <div class="alert alert-warning">
+            <div class="alert alert-info">
                 <h1>Ten test jest już zakończony! Wyniki otrzymasz drogą mailową.</h1>
+                <h3>Możesz sprawdzić również wyniki testów w zakładce <a href="{{ URL::to('/all_user_tests') }}">moje testy.</a></h3>
             </div>
         </div>
     </div>

@@ -18,9 +18,9 @@ class CreateUserQuestionsTable extends Migration
             $table->integer('test_id');
             $table->integer('question_id');
             $table->integer('available_time');
-            $table->integer('answer_time');
-            $table->text('user_answer');
-            $table->text('cadre_comment');
+            $table->integer('answer_time')->nullable();
+            $table->text('user_answer')->nullable();
+            $table->text('cadre_comment')->nullable();
             $table->timestamps();
         });
     }

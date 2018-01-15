@@ -97,7 +97,7 @@
             @php($i++)
             <div id="question{{$item->id}}" class="tab-pane @if($i == 1 && $test->result == null) fade in active @endif">
                     <div class="form-group" style="margin-top: 30px">
-                        <div class="panel panel-warning">
+                        <div class="panel panel-info">
                             <div class="panel-heading">
                                 <b>Treść pytania</b>
                             </div>
@@ -105,7 +105,7 @@
                                {{$item->testQuestion->content}}
                             </div>
                         </div>
-                        <div class="panel panel-warning">
+                        <div class="panel panel-info">
                             <div class="panel-heading">
                                 <b>Odpowiedź użytkownika</b>
                             </div>
