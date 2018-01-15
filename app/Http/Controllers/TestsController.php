@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\TestUsersQuestion;
 use App\User;
 use Illuminate\Http\Request;
 use App\TestCategory;
@@ -153,6 +154,10 @@ class TestsController extends Controller
                 $new_user_question->question_id = $item['id'];
                 $new_user_question->available_time = $item['time'];
                 $new_user_question->save();
+                $new_many_to_many = new TestUsersQuestion();
+                $new_many_to_many->user_question_id = $new_user_question->id;
+                $new_many_to_many->test_question_id = $item['id'];
+                $new_many_to_many->save();
             }
             return 1;
         }
