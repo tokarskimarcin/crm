@@ -11,6 +11,6 @@ class TestQuestion extends Model
     }
 
     public function userQuestion() {
-        return $this->hasOne('App\UserQuestion', 'question_id');
+        return $this->belongsToMany('App\UserQuestion', 'test_users_questions', 'test_question_id', 'user_question_id');
     }
 }

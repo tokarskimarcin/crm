@@ -27,7 +27,7 @@
                 <b>Oddział</b>
             </div>
             <div class="panel-body">
-                {{$user->department_info->departments->name . ' ' . $user->department_info->departments->name}}
+                {{$user->department_info->departments->name . ' ' . $user->department_info->department_type->name}}
             </div>
         </div>
     </div>
