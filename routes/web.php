@@ -101,6 +101,7 @@ Route::POST('/saveTestWithUser','TestsController@saveTestWithUser')->name('api.s
 
 Route::POST('/activateTest','TestsController@activateTest')->name('api.activateTest');
 
+Route::POST('/getRepeatQuestion','TestsController@getRepeatQuestion')->name('api.getRepeatQuestion'); //tu zmienic z ORM
 
 /* TEST AJAX ROUTES STOP */
 
