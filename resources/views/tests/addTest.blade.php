@@ -6,10 +6,20 @@
         left: 0px;
     }
     .checked{
-        background: red !important;;
+        background: #42d4f4 !important;
     }
     .no_checked{
-        background: #f9f9f9 !important;
+        background: #f9f9f9;
+    }
+    .btn-info {
+        color: #fff;
+        background-color: #de5b5b !important;
+        border-color: black !important;
+    }
+    .btn-info:hover {
+        color: #fff;
+        background-color: #de5b5b !important;
+        border-color: black !important;
     }
 </style>
 <div class="row">
@@ -48,9 +58,9 @@
                         <div class="col-lg-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">Zagadnienia: </div>
-                                <div class="col-xs-12 col-md-12" style="padding-top: 5px">
+                                <div class="col-xs-12 col-md-12" style="padding-top: 15px">
                                     @foreach($categories as $category)
-                                            <a href="#" style="margin-bottom: 5px" class="btn btn-success btn-lg category" role="button" id={{'categoryid_'.$category->id}}   data-toggle="modal" data-target="#myModal" value={{$category->name}} ><span class="glyphicon glyphicon-user"></span> <br/>{{$category->name}}</a>
+                                            <a href="#" style="margin-bottom: 15px" class="btn btn-success btn-lg category" role="button" id={{'categoryid_'.$category->id}}   data-toggle="modal" data-target="#myModal" value={{$category->name}} ><span class="glyphicon glyphicon-user"></span> <br/>{{$category->name}}</a>
                                     @endforeach
                                 </div>
                             </div>
@@ -189,21 +199,16 @@
                          question_repeat.push(response[i]['question_id']);
                          //spradzenie czy wybrany użytkownik nie miał już danego pytania w teście
                          if(jQuery.inArray(String(question_repeat[i]),question_array_id) != -1){
-                             $('#question_'+question_repeat[i]).css('background','black');
+                             $('#question_'+question_repeat[i]).css('background','#f3e97c');
                          }else{
-                             $('#question_'+question_repeat[i]).css('background','white');
+                             $('#question_'+question_repeat[i]).css('background','#5cb85cbf');
                          }
                      }
-                 }else {
+                 }else { // jeżeli nic nie dostanie w odpowiedzi, to wszysko zmień na zielono
                      for (var i = 0; i < question_array_id.length; i++) {
-                         $('#question_'+question_array_id[i]).css('background','white');
+                         $('#question_'+question_array_id[i]).css('background','#5cb85cbf');
                      }
                  }
-
-
-
-                 table_question.draw();
-                 table_all_guestion.draw();
              }
          });
 
@@ -241,8 +246,14 @@
          "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
              if(checkElementInArray(question_text_array,aData.id))
                  $(nRow).addClass('checked');
-             else
-                $(nRow).addClass('no_checked');
+             else{
+                 $(nRow).addClass('no_checked');
+                 if(jQuery.inArray(parseInt(aData.id),question_repeat) != -1) {
+                     $(nRow).css('background','#f3e97c');
+                 }else{
+                     $(nRow).css('background','#5cb85cbf');
+                 }
+             }
              $(nRow).attr('id', aData.id);
              return nRow;
              // po wyświetleniu strony dodaj nagłówek z możliwościa losowania pytań
@@ -306,8 +317,8 @@
                      return '<input type="number" class="form-control question_time" placeholder="min" value='+data.default_time+'>';
                     }
                  },
-                 { "data": function (data, type, dataToSet) {
-                     return '<button class="button_question_choice">Wybierz</button>';
+                 { "width": "10%","data": function (data, type, dataToSet) {
+                     return '<button type="button" class="button_question_choice btn btn-info" >Wybierz</button>';
                  }
              }
              ],
@@ -468,9 +479,11 @@
              rowNode.id = "question_"+question_id;
              // wpisanie informacji o pytaniu do tablicy
              question_text_array.push({id:question_id,text:question_text,time:question_time,subject:category_name});
-            //gdy pytanie jest powtórzone zaznacz na innny kolor
+            //gdy pytanie jest powtórzone zaznacz na innny kolor | zielony ok | żółty powtórzony
              if(jQuery.inArray(parseInt(question_id),question_repeat) != -1)
-                 $(rowNode).css('background','black');
+                 $(rowNode).css('background','#f3e97c');
+             else
+                 $(rowNode).css('background','#5cb85cbf');
              // dodanie klasy z informacją że wiersz jest zaznaczony
              tr.removeClass(tr_class[0]+' no_checked').addClass(tr_class[0]).addClass('checked');
              //powiększ ilość pytań
@@ -484,7 +497,11 @@
              removeFunction(question_text_array,"id",question_id);
              // zmiana flagi w klacie -> wyłączenie koloru
              tr.removeClass(tr_class[0]+' checked').addClass(tr_class[0]).addClass('no_checked');
-
+             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1) {
+                 tr.css('background','#f3e97c');
+             }else{
+                 tr.css('background','#5cb85cbf');
+             }
              // zmniejsz ilość wybranych pytań
              question_count--;
          }
