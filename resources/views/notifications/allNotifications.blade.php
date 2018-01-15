@@ -143,7 +143,7 @@ table = $('#new_notifications').DataTable({
         }, "name": "dep_name"},
         {"data": function (data, type, dataToSet) {
               return data.first_name + " " + data.last_name;
-        }, "name": "user_name"},
+        }, "name": "last_name"},
         {"data": function (data, type, dataToSet) {
             return "<a class='btn btn-default' href={{URL::to('/show_notification/')}}/" + data.notification_id + ">Pokaż</a>";
         }, "name": "id_user"},
@@ -176,7 +176,7 @@ table = $('#in_progress').DataTable({
         }, "name": "dep_name"},
         {"data": function (data, type, dataToSet) {
               return data.first_name + " " + data.last_name;
-        }, "name": "user_name"},
+        }, "name":  "last_name"},
         {"data": function (data, type, dataToSet) {
             return "<a class='btn btn-default' href={{URL::to('/show_notification/')}}/" + data.notification_id + ">Pokaż</a>";
         }, "name": "id_user"},
@@ -209,7 +209,7 @@ table = $('#finished').DataTable({
         }, "name": "dep_name"},
         {"data": function (data, type, dataToSet) {
               return data.first_name + " " + data.last_name;
-        }, "name": "user_name"},
+        }, "name":  "last_name"},
         {"data": function (data, type, dataToSet) {
             return "<a class='btn btn-default' href={{URL::to('/show_notification/')}}/" + data.notification_id + ">Pokaż</a>";
         }, "name": "id_user"},
