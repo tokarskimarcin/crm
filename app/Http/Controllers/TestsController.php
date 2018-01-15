@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Redirect;
 use Session;
 use App\UserTest;
 use App\UserQuestion;
-use App\User;
 
 class TestsController extends Controller
 {
