@@ -24,158 +24,91 @@
                         <th>Lp.</th>
                         <th>Data</th>
                         <th>Osoba testująca</th>
+                        <th>Tytuł testu</th>
                         <th style="width: 10%">Akcja</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>2017-12-12</td>
-                        <td>Antoni Macierewicz</td>
-                        <td><button class="btn btn-default">Szczegóły</button></td>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>2017-12-12</td>
-                        <td>Antoni Macierewicz</td>
-                        <td><button class="btn btn-default">Szczegóły</button></td>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>2017-12-12</td>
-                        <td>Antoni Macierewicz</td>
-                        <td><button class="btn btn-default">Szczegóły</button></td>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>2017-12-12</td>
-                        <td>Antoni Macierewicz</td>
-                        <td><button class="btn btn-default">Szczegóły</button></td>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>2017-12-12</td>
-                        <td>Antoni Macierewicz</td>
-                        <td><button class="btn btn-default">Szczegóły</button></td>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>2017-12-12</td>
-                        <td>Antoni Macierewicz</td>
-                        <td><button class="btn btn-default">Szczegóły</button></td>
-                    </tr>
+                    @php($i = 0)
+                    @foreach($tests->where('status', '=', 2) as $test)
+                        @php($i++)
+                        <tr>
+                            <td>{{$i}}</td>
+                            <td>{{$test->updated_at}}</td>
+                            <td>{{$test->cadre->first_name . ' ' . $test->cadre->last_name}}</td>
+                            <td>{{$test->name}}</td>
+                            <td>
+                                <a class="btn btn-info" href="{{ URL::to('/test_user') }}/{{$test->id}}">
+                                    <span class="glyphicon glyphicon-pencil" style="color: white"></span> Przystąp do testu
+                                </a>    
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
     </div>
     <div id="finished" class="tab-pane fade">
-    <div class="table-responsive" style="margin-top: 20px">
-    <table class="table table-stripped">
-        <thead>
-            <tr>
-                <th>Lp.</th>
-                <th>Data</th>
-                <th>Osoba testująca</th>
-                <th style="width: 10%">Akcja</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>2017-12-12</td>
-                <td>Antoni Macierewicz</td>
-                <td><button class="btn btn-default">Szczegóły</button></td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>2017-12-12</td>
-                <td>Antoni Macierewicz</td>
-                <td><button class="btn btn-default">Szczegóły</button></td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>2017-12-12</td>
-                <td>Antoni Macierewicz</td>
-                <td><button class="btn btn-default">Szczegóły</button></td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>2017-12-12</td>
-                <td>Antoni Macierewicz</td>
-                <td><button class="btn btn-default">Szczegóły</button></td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>2017-12-12</td>
-                <td>Antoni Macierewicz</td>
-                <td><button class="btn btn-default">Szczegóły</button></td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>2017-12-12</td>
-                <td>Antoni Macierewicz</td>
-                <td><button class="btn btn-default">Szczegóły</button></td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+        <div class="table-responsive" style="margin-top: 20px">
+        <table class="table table-stripped">
+            <thead>
+                <tr>
+                    <th>Lp.</th>
+                    <th>Data</th>
+                    <th>Osoba testująca</th>
+                    <th>Tytuł testu</th>
+                    <th style="width: 10%">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php($i = 0)
+                @foreach($tests->where('status', '=', 3) as $test)
+                    @php($i++)
+                    <tr>
+                        <td>{{$i}}</td>
+                        <td>{{$test->updated_at}}</td>
+                        <td>{{$test->cadre->first_name . ' ' . $test->cadre->last_name}}</td>
+                        <td>{{$test->name}}</td>
+                        <td>Czeka na ocenę</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
     </div>
     <div id="judged" class="tab-pane fade">
-    <div class="table-responsive" style="margin-top: 20px">
-    <table class="table table-stripped">
-        <thead>
-            <tr>
-                <th>Lp.</th>
-                <th>Data</th>
-                <th>Osoba testująca</th>
-                <th style="width: 10%">Akcja</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>2017-12-12</td>
-                <td>Antoni Macierewicz</td>
-                <td><button class="btn btn-default">Szczegóły</button></td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>2017-12-12</td>
-                <td>Antoni Macierewicz</td>
-                <td><button class="btn btn-default">Szczegóły</button></td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>2017-12-12</td>
-                <td>Antoni Macierewicz</td>
-                <td><button class="btn btn-default">Szczegóły</button></td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>2017-12-12</td>
-                <td>Antoni Macierewicz</td>
-                <td><button class="btn btn-default">Szczegóły</button></td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>2017-12-12</td>
-                <td>Antoni Macierewicz</td>
-                <td><button class="btn btn-default">Szczegóły</button></td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>2017-12-12</td>
-                <td>Antoni Macierewicz</td>
-                <td><button class="btn btn-default">Szczegóły</button></td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+        <div class="table-responsive" style="margin-top: 20px">
+        <table class="table table-stripped">
+            <thead>
+                <tr>
+                    <th>Lp.</th>
+                    <th>Data</th>
+                    <th>Osoba testująca</th>
+                    <th>Tytuł testu</th>
+                    <th style="width: 10%">Akcja</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php($i = 0)
+                @foreach($tests->where('status', '=', 4) as $test)
+                    @php($i++)
+                    <tr>
+                        <td>{{$i}}</td>
+                        <td>{{$test->updated_at}}</td>
+                        <td>{{$test->cadre->first_name . ' ' . $test->cadre->last_name}}</td>
+                        <td>{{$test->name}}</td>
+                        <td>
+                            <a class="btn btn-info">
+                                <span class="glyphicon glyphicon-pencil"></span> Zobacz ocenę testu
+                            </a>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
     </div>
 </div>
-
-
-
 
 @endsection
 

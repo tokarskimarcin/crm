@@ -58,7 +58,7 @@
     </div>
 @endif
 
-@if($status != 3 && $question != null)
+@if($status != 3 && $status != 4 && $question != null)
     <div class="row" id="question_info">
         <div class="col-md-12">
             <p>
@@ -75,7 +75,7 @@
                     Treść pytania
                 </div>
                 <div class="panel-body">
-                    {{$question->testQuestion->content}}
+                    {{$question->testQuestion[0]->content}}
                 </div>
             </div>
         </div>

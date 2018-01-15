@@ -12,7 +12,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-                <div class="well my-well">Testy / Statystyki oddziału / {{'department_name'}}</div>
+                <div class="well my-well">Testy / Statystyki oddziału / {{$department_info->departments->name . ' ' . $department_info->department_type->name}}</div>
         </div>
     </div>
 </div>

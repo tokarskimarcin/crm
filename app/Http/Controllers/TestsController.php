@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Redirect;
 use Session;
 use App\UserTest;
 use App\UserQuestion;
+use App\Department_info;
 
 class TestsController extends Controller
 {
@@ -65,11 +66,15 @@ class TestsController extends Controller
             $test->save();
         }
 
-        $kurwa = TestQuestion::find(6);
-        dd($question->testQuestion);
+        if ($question != null) {
+            $testQuestion = TestQuestion::where('id', '=', $question->question_id)->get();
+        } else {
+            $testQuestion = false;
+        }        
 
         return view('tests.userTest')
             ->with('test', $test)
+            ->with('testQuestion', $testQuestion[0])
             ->with('status', $status)
             ->with('question_count', $question_count)
             ->with('actual_count', $question_count - $actual_count + 1)
@@ -103,7 +108,10 @@ class TestsController extends Controller
         Wyświetlenie wszystkich testów użytkownika
     */
     public function allUserTests() {
-        return view('tests.allUserTests');
+        $tests = UserTest::where('user_id', '=', Auth::user()->id)->get();
+
+        return view('tests.allUserTests')
+            ->with('tests', $tests);
     }
 
     /* 
@@ -203,6 +211,11 @@ class TestsController extends Controller
     */
     public function testCheckGet($id) {
         $test = UserTest::find($id);
+        $testQuestions = TestQuestion::all();
+
+        foreach($test->questions as $question) {
+            
+        }
 
         if ($test == null) {
             return view('errors.404');
@@ -342,8 +355,12 @@ class TestsController extends Controller
     /* 
         Statystyki poszczególnych oddziałów
     */
-    public function departmentTestsStatisticsGet() {
-        return view('tests.departmentStatistics');
+    public function departmentTestsStatisticsGet($id) {
+        $department_info = Department_info::find($id);
+
+
+        return view('tests.departmentStatistics')
+            ->with('department_info', $department_info);
     }
 
     /* 
