@@ -43,7 +43,7 @@
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->dkj_sum}}</td>
                     @php($column = false)
 
-                @elseif($report->department_info_id == 13 && $item->dating_type == 0 && $add_research == true)
+                @elseif($report->department_info_id == 4 && $item->dating_type == 0 && $add_research == true)
                     @php($avg_department = round(($item->dkj_sum / $report->success) * 100, 2))
                     @php($total_dkj_sum += $item->dkj_sum)
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->dkj_sum}}</td>
