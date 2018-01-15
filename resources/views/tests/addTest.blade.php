@@ -30,6 +30,9 @@
                                 <div class="panel-heading">Temat: </div>
                                 <input type="text" id="subject_input" class="form-control" name="subject" placeholder="podaj temat.." value="">
                             </div>
+                            <div class="alert alert-danger" style = "display:none" id="alert_subject">
+                                <span colspan="1">Podaj temat testu.</span>
+                            </div>
                         </div>
 
                         <div class="col-lg-6">
@@ -45,9 +48,11 @@
                         <div class="col-lg-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">Zagadnienia: </div>
-                                @foreach($categories as $category)
-                                    <p><button id={{'categoryid_'.$category->id}} class="category" data-toggle="modal" data-target="#myModal" value={{$category->name}}>{{$category->name}}</button> <br></p>
-                                @endforeach
+                                <div class="col-xs-12 col-md-12" style="padding-top: 5px">
+                                    @foreach($categories as $category)
+                                            <a href="#" style="margin-bottom: 5px" class="btn btn-success btn-lg category" role="button" id={{'categoryid_'.$category->id}}   data-toggle="modal" data-target="#myModal" value={{$category->name}} ><span class="glyphicon glyphicon-user"></span> <br/>{{$category->name}}</a>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
 
@@ -75,7 +80,7 @@
 
                             </tbody>
                         </table>
-                        <button id="save_button">zapisz</button>
+                        <button type="button" class="btn btn-primary" id="save_button">Zapisz Test</button>
                     </div>
                 </div>
             </div>
@@ -123,16 +128,13 @@
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
                 </div>
             </div>
 
         </div>
     </div>
 </div>
-
-
-
 
 @endsection
 
@@ -151,13 +153,61 @@
     //Domyślna wartość czasu na pytanie pobrana z bazy
     var time_question_from_database = 5;
     //które pytania powtarzają się dla użytkownika
-    var question_repeat = [1,5];
+    var question_repeat = [];
     // Tablica do przechowywania losowych indeksów
     var random_array = [];
 
-
  $(document).ready( function () {
 
+     downloadRepeatQuestion();
+
+     $('#user_select').on('change',function (e) {
+         downloadRepeatQuestion();
+     })
+     // funkcja pobierająca pytania które użytkownik już rozwiązywał
+     function downloadRepeatQuestion() {
+         // pobranie id użytkownika
+         var id_user = $('#user_select').val();
+         //pobranie id pytań użytkownika
+         $.ajax({
+             type: "POST",
+             url: '{{ route('api.getRepeatQuestion') }}',
+             headers: {
+                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+             },
+             data: {
+                 "id_user": id_user,
+             },
+             success: function (response) {
+                 //wpisanie infromacji do tablicy powtórzonych pytań
+                 question_repeat = [];
+
+                 if(response.length != 0)
+                 {
+                     for(var i=0;i<response.length;i++)
+                     {  // dodanie wpisu do tablicy
+                         question_repeat.push(response[i]['question_id']);
+                         //spradzenie czy wybrany użytkownik nie miał już danego pytania w teście
+                         if(jQuery.inArray(String(question_repeat[i]),question_array_id) != -1){
+                             $('#question_'+question_repeat[i]).css('background','black');
+                         }else{
+                             $('#question_'+question_repeat[i]).css('background','white');
+                         }
+                     }
+                 }else {
+                     for (var i = 0; i < question_array_id.length; i++) {
+                         $('#question_'+question_array_id[i]).css('background','white');
+                     }
+                 }
+
+
+
+                 table_question.draw();
+                 table_all_guestion.draw();
+             }
+         });
+
+     }
     // funkcja do sprawdzania czy danyc element jest w tabeli pod indeksem id
     function checkElementInArray(array,element) {
         for(var i=0;i<array.length;i++)
@@ -281,7 +331,7 @@
 
      // zmiana nazwy kategoerii na modalu
      $('.category').on('click',function (e) {
-         category_name = $(this).attr('value');
+         category_name = $(this).text();
          category_id = $(this).attr('id');
          category_id = category_id.split("_");
          category_id = category_id[1];
@@ -313,33 +363,56 @@
     $('#save_button').on('click',function (e) {
         var id_user = $('#user_select').val();
         var subject = $('#subject_input').val();
-        $.ajax({
-            type:"POST",
-            url: '{{ route('api.saveTestWithUser') }}',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data:{
-                "question_test_array":question_text_array,
-                "id_user": id_user,
-                "subject": subject
-            },
-            success: function(response) {
-               console.log("Zapis do bazy");
+        var flag_all_ok = true;
+        var flag_all_ok_time = true;
+        if(subject.trim().length == 0){
+            flag_all_ok = false;
+            $('#alert_subject').fadeIn(1000);
+        }else{
+            $('#alert_subject').fadeOut(1000);
+        }
+        if(question_text_array.length == 0 && flag_all_ok)
+        {
+            flag_all_ok = false;
+            swal("Nie wybrałeś pytań do testu.")
+        }
+        for(var i=0;i<question_text_array.length;i++)
+        {
+            if( question_text_array[i].time.trim().length == 0 || question_text_array[i].time <= 0)
+            {
+                flag_all_ok_time = false;
+                break;
             }
-        });
+        }
+        if(!flag_all_ok_time){
+            flag_all_ok = false;
+            swal("Błędny czas potrzebny na pytanie")
+        }
+
+        if(flag_all_ok) {
+            $.ajax({
+                type: "POST",
+                url: '{{ route('api.saveTestWithUser') }}',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    "question_test_array": question_text_array,
+                    "id_user": id_user,
+                    "subject": subject
+                },
+                success: function (response) {
+                    if (response == 1){
+                        console.log('zapisany');
+                        window.location = '{{URL::to('/show_tests')}}';
+                    }
+                }
+            });
+        }
     });
 
      $('#all_question').on('focusout','.question_time',function (e) {
 
-         if($(this).val() > 10 )
-         {
-             alert('za dużo')
-         }else if($(this).val() < 1)
-         {
-             alert('za mało')
-
-         }else
          // wyłuskanie tr należącego do button
          var tr = $(this).closest('tr').attr('id');
          tr = tr.split("_");
@@ -389,7 +462,7 @@
             var rowNode =  table_all_guestion.row.add([
                 category_name,
                 question_text,
-                '<input type="number" class="form-control question_time" placeholder="min" value='+question_time+'>',
+                '<input type="number" class="form-control question_time" value='+question_time+'>',
                 '<button type="button" class="btn btn-danger delete_row">Usuń</button>'
             ]).node();
              rowNode.id = "question_"+question_id;

@@ -107,7 +107,7 @@ class TestsController extends Controller
     public function addTestGet() {
         $categories = TestCategory::where('deleted','=',0)->get();
         $cadre = User::where('status_work','=',1)
-            ->whereNotin('user_type_id',[1,2])->get();
+            ->whereNotin('user_type_id',[1,2])->orderBy('last_name')->get();
         return view('tests.addTest')
             ->with('categories',$categories)
             ->with('users',$cadre);
@@ -142,18 +142,29 @@ class TestsController extends Controller
 
             foreach ($question_array as $item)
             {
-                print_R($item);
                 $new_user_question = new UserQuestion();
                 $new_user_question->test_id = $id_test;
                 $new_user_question->question_id = $item['id'];
                 $new_user_question->available_time = $item['time'];
                 $new_user_question->save();
-
             }
-//            print_R($request->question_test_array);
-//            print_R($request->id_user);
-            print_R($id_test);
-
+            return 1;
+        }
+        return 0;
+    }
+    public function getRepeatQuestion (Request $request)
+    {
+        if($request->ajax())
+        {
+            $user_question_repeat = DB::table('user_questions') //to zapytanie jest gównem
+            ->select(DB::raw('
+                Distinct(question_id)
+            '))
+                ->join('user_tests', 'user_tests.id', 'user_questions.test_id')
+                ->join('users', 'users.id', 'user_tests.user_id')
+                ->where('users.id',$request->id_user)
+                ->get();
+            return response()->json($user_question_repeat);
         }
     }
 
