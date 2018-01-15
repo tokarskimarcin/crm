@@ -18,7 +18,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Panel zarządzania testami</h1>
+            <div class="well well-sm">Testy / Zarządanie testami</div>
         </div>
     </div>
 </div>
@@ -167,6 +167,7 @@
 @section('script')
 <script>
 
+//walidacja nazyw testu
 $('#category_submit').click((e) => {
     e.preventDefault();
     var category_name = $('#category_name').val();
@@ -178,35 +179,57 @@ $('#category_submit').click((e) => {
     }
 });
 
+
+//funkcja edytująca pytanie 
 function edit_question_button(e) {
+    //pobranie ID pytania
     var id = $(e).data('q_id');
+    //sprawdzenie czy w pierwszej kolumnie wiersza istnieje input typu textarea
     var check = $('.modal_table tr[name="' + id + '"]').find(' td:first textarea').html();
 
+    //jezeli nie istnieje input typu textarea
     if (check == undefined) {
+        //pobranie tresci pytania z pierwszej kolumny wiersza
         var question = $('.modal_table tr[name="' + id + '"]').find(' td:first').html();
+        //wykreowanie inputu z treścią pytania
         var rawHtml = '<textarea rows="5" id="edited_question" class="form-control">' + question +'</textarea>';
+        //podmiana  pierwszej kolumny na input typu textarea
         $('.modal_table tr[name="' + id + '"]').find(' td:first').html(rawHtml);
+        //zmiana atrybutu inputu zawierajacego minuty
         $('.modal_table tr[name="' + id + '"]').find(' td:nth-child(2) input').attr('readonly', false);
+        //podmiania ikony z ołówka na kopertę
         $(e).find('span').removeClass('glyphicon-pencil').addClass('glyphicon-envelope');
+        //zablokowanie wszystkich przyciskow w tabeli
         $("#myModal .btn-link").attr('disabled', true);
+        //odblokowanie przycisku zapisującego
         $(e).attr('disabled', false);
     } else {
+        /*
+            jezeli istnieje input typu textarea - zapisujemy zmiany
+        */
+        //pobranie tresci pytania
         var question = $('#edited_question').val();
+        //pobranie nowewj ilosci minut
         var newTime = $('.modal_table tr[name="' + id + '"]').find(' td:nth-child(2) input').val();
         var validation = true;
+
+        //walidacja pustego pytania
         if (question == '') {
             swal('Musisz podać treść pytania!')
             validation = false;
         }
+        //walidacja pustego czasu pytania
         if (newTime == '') {
             swal('Musisz podać czas pytania!')
             validation = false;
         }
+        //walidacja prawidłowego czasu pytania
         if (newTime <= 0) {
             swal('Czas pytania musi wynosić minimum 1 minutę!')
             validation = false;
         }
 
+        //zaktualizowanie danych w bazie
         if (validation == true) {
             $.ajax({
                 type:"POST",
@@ -228,17 +251,27 @@ function edit_question_button(e) {
                     }
                 }
             });
+            //podmiania pierwszej kolumny na nową treśc pytania
             $('.modal_table tr[name="' + id + '"]').find(' td:first').html(question);
+            //podmiana ikony z koperty na ołówek
             $(e).find('span').removeClass('glyphicon-envelope').addClass('glyphicon-pencil');
+            //zablokowanie inputu zawierajacego czas pytania
             $('.modal_table tr[name="' + id + '"]').find(' td:nth-child(2) input').attr('readonly', true);
+            //odblokowanie przyciskow w tabeli
             $(".btn-link").attr('disabled', false);
         }
     }
 }
 
+
+/*
+    Funkcja usuwajaca pytanie 
+*/
 function deleteQuestion(e) {
+    //zdefiniowanie ID pytania
     var id = $(e).data('q_id');
 
+    //konfirmacja usunięcia
     swal({
         title: '',
         text: "Usunąć to pytanie?",
@@ -262,6 +295,7 @@ function deleteQuestion(e) {
                 success: function(response) {
                     if (response == 1) {
                         swal('Pytanie zostało usunięte!')
+                        //usunięcie kolumny z pytaniem
                         $('tr[name="' + id + '"]').fadeOut(500);
                     } else {
                         swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!');
@@ -272,24 +306,39 @@ function deleteQuestion(e) {
         })
 }
 
+
 var type_is_edited = false;
 $('.edit_type').click(function() {
+    //zdefiniowanie id kategorii do edycji
     var id = $(this).data('edit_type');
 
+    //edycja kategorii
     if (type_is_edited == false) {
+        //podpierdolenie html-a
         var question = $('.type_table tr[name="' + id + '"]').find(' td:nth-child(2)').html();
+        //zdefiniowanie inputu z podpierdolonym html-em
         var rawHtml = '<input type="text" id="edited_type" class="form-control" value="' + question +'">';
+        //wpierdolenie html-a z inputem wypełnionym nazwą kategorii
         $('.type_table tr[name="' + id + '"]').find(' td:nth-child(2)').html(rawHtml);
+        //zmiana ikony z ołowka na kopertę
         $(this).find('span').removeClass('glyphicon-pencil').addClass('glyphicon-envelope');
+        //deaktywacja pozostałych przyciskow
         $(".btn-link").attr('disabled', true);
+        //odblokowanie przycisku zapisującego
         $(this).attr('disabled', false);
+        //zmiana zatusu z możliwośći educji na zapis
         type_is_edited = true;
     } else {
+        //pobranie tresci nazwy kategorii
         var question = $('#edited_type').val();
+
+        //walidacja braku nazwy
         if (question == '') {
             swal('Podaj nazwę kategorii!')
             return;
         }
+
+        //educja nazyw kategorii
         $.ajax({
             type:"POST",
             async: false,
@@ -309,17 +358,27 @@ $('.edit_type').click(function() {
                 }
             }
         });
+        //podmiana inputu na wiersz z nową nazwą kategorii
         $('.type_table tr[name="' + id + '"]').find(' td:nth-child(2)').html(question);
+        //zmiana ikony z koperty na ołówek
         $(this).find('span').removeClass('glyphicon-envelope').addClass('glyphicon-pencil');
+        //odblokowanie przyciskow w tabeli
         $(".btn-link").attr('disabled', false);
+        //zmiana statusu z zapisu na edycję
         type_is_edited = false;
     }
 });
 
+
+//zmiana stutusu kaktegorii
 $('.category_status').click(function() {
+    //pobranie ID kategorii
     var id = $(this).data('category_id');
+    //pobranie statusu
     var status = $(this).data('category_status');
+    //zmiana statusu
     status = (status == 0) ? 1 : 0 ;
+    //zdefiniowanie czy udło sie podmienic status
     var success = false;
     $.ajax({
         type:"POST",
@@ -335,15 +394,19 @@ $('.category_status').click(function() {
         success: function(response) {
             if (response == 1) {
                 swal('Status kategorii zmieniony pomyślnie!')
+                //podmiana statusu ok
                 success = true;
             } else {
                 swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
             }
         }
     });
-
+    //zmiana ikony  w wypadku powidzenia
     if (success == true) {
+        //podmiana statusu w przycisku
         $(this).data('category_status', status);
+
+        //zmiana ikony
         if (status == 1) {
             $(this).find('span').removeClass('glyphicon-remove').addClass('glyphicon-ok').css('color', 'green');
         } else {
@@ -353,12 +416,16 @@ $('.category_status').click(function() {
 
 });
 
+// zdefiniowanie zmiennej globalnej do kategorii w modalu
 var modal_category_id = null;
 $('.categry_to_modal').click(function() {
+    //wyzerowanie danych w omdalu po jego otwarcu
     $('#myModal tbody').empty();
+    //zdefiniowanie globalnej zmiennej zawierajacej id kategorii do wypełnienia modalu
     modal_category_id = $(this).data('category_id');
 });
 
+//wypełnienie modalu danymi z wybranej kategorii
 $('#myModal').on('show.bs.modal', function() {
     $.ajax({
         type:"POST",
@@ -371,15 +438,24 @@ $('#myModal').on('show.bs.modal', function() {
             "category_id":modal_category_id
         },
         success: function(response) {
-           $('#modal_category').text(response[0].name);
+            //nadanie tytułu w modalu (nazwa kategorii)
+            $('#modal_category').text(response[0].name);
 
+            //zdefiniowanie pustego html-a
             var modalHtml = '';
+            //loopwanie przez wszystkie rekodry z bazy
             $.each(response[1], function(key, value) {
+                //zmiana sekund na minuty
                 var questionTime = value.default_time / 60;
+                //zdefiniowanie wiersza razem z atrybutem typu "name" zawierającym id pytania
                 modalHtml += '<tr name="' + value.id + '">';
+                //zdefiniowanie kolumny  z tresci pytania
                 modalHtml += '<td>' + value.content + '</td>';
+                //zdefiniowanie czasu na pytanie 
                 modalHtml += '<td class="modal_column"><input type="number" class="form-control" value="' + questionTime + '" readonly></td>';
+                //dodanie przycisku z edycją/zapisem pytania
                 modalHtml += '<td class="modal_column"><button class="btn btn-link" onclick="edit_question_button(this)" data-q_id="' + value.id + '"><span style="color:green" class="glyphicon glyphicon-pencil"></span></button></td>';
+                //dodanie przycisku usuwającego pytanie
                 modalHtml += '<td class="modal_column"><button class="btn btn-link" onclick="deleteQuestion(this)" data-q_id="' + value.id + '"><span style="color:red" class="glyphicon glyphicon-remove"></span></button></td>';
                 modalHtml += '</tr>';
                  
@@ -389,6 +465,7 @@ $('#myModal').on('show.bs.modal', function() {
     });
 });
 
+//ponowne zliczenie ilosci pytan w tabeli z kategoriami
 $('#myModal').on('hidden.bs.modal', function () {
     $.ajax({
         type:"POST",
@@ -402,28 +479,37 @@ $('#myModal').on('hidden.bs.modal', function () {
         },
         success: function(response) {
             if (response != null) {
+                //przepierdolenie ilosci pytan w tabeli
                 $('.type_table [name="' + modal_category_id + '"] td:nth-child(3)').text(response);
             }
         }
     });
 })
 
+//dodawanie w modalu templatki do dodawania pytan
 $('#add_question').click(() => {
     $('#add_question').fadeOut(0);
     $('#new_question').fadeIn(500);
 });
 
-$('#question_ready').click(() => { 
+
+//zapis nowego pytania
+$('#question_ready').click(() => {
+    //pobranie tresci pytania 
     var content = $('#question_content').val();
+    //pobranie czasu pytania
     var question_time = $('#question_time').val();
+    //walidacja braku tresci pytania
     if (content == '') {
         swal('Podaj treść pytania!')
         return;
     }
+    //walidacja braku czasu pytania
     if (question_time == '') {
         swal('Podaj czas pytania!')
         return;
     }
+    //wysłanie danych z nowym pytaniem
     $.ajax({
         type:"POST",
         async: false,
@@ -439,7 +525,10 @@ $('#question_ready').click(() => {
         success: function(response) {
             if (response == 1) {
                 swal('Pytanie zostało dodane!')
+                //wyczyszczenie formularza z nowym pytaniem
                 $('#question_content').val('');
+                $('#question_time').val(0);
+                //ukrycie modala
                 $('#myModal').modal('toggle');
             } else {
                 swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')

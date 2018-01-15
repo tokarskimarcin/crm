@@ -228,28 +228,22 @@ google.charts.load("current", {packages:["corechart"]});
         chart.draw(data, options);
       }
 
-      google.charts.load("current", {packages:["corechart"]});
-      google.charts.setOnLoadCallback(drawChartDep);
-      function drawChartDep() {
-        var data = google.visualization.arrayToDataTable([
-          ['Language', 'Speakers (in millions)'],
-          ['Lublin telemarketing',  5],
-          ['Radom Potwierdzanie',  12],
-          ['Radom DKJ', 8],
-          ['Lublin potwierdzanie', 1],
-          ['Lublin potwierdzanie', 32],
-          ['Lublin potwierdzanie', 21],
-          ['Lublin potwierdzanie', 11],
-          ['Lublin potwierdzanie', 3],
-          ['Lublin potwierdzanie', 23],
-          ['Lublin potwierdzanie', 55]
+        google.charts.load("current", {packages:["corechart"]});
+        google.charts.setOnLoadCallback(drawChartDep);
+        function drawChartDep() {
+            var data = google.visualization.arrayToDataTable([
+            ['Language', 'Speakers (in millions)'],
+            @foreach($departments_stats as $item)
+                ['{{$item->dep_name . ' ' .  $item->dep_type_name}}', {{$item->dep_sum}}],
+            @endforeach
+            ['', 0]
         ]);
 
-      var options = {
-        legend: 'none',
-        pieSliceText: 'label',
-        title: 'Ilość testów w oddziałach',
-        pieStartAngle: 100,
+        var options = {
+            legend: 'none',
+            pieSliceText: 'label',
+            title: 'Ilość testów w oddziałach',
+            pieStartAngle: 100,
       };
 
         var chart = new google.visualization.PieChart(document.getElementById('piechart'));
@@ -259,14 +253,12 @@ google.charts.load("current", {packages:["corechart"]});
       google.charts.load("current", {packages:["corechart"]});
       google.charts.setOnLoadCallback(drawChartType);
       function drawChartType() {
-        var data = google.visualization.arrayToDataTable([
-          ['Task', 'Hours per Day'],
-          ['Koordynator',     11],
-          ['HR',      2],
-          ['Trener',  2],
-          ['Trener DKJ', 2],
-          ['Kierownik',    7],
-          ['Kierownik DKJ',    7]
+            var data = google.visualization.arrayToDataTable([
+            ['Task', 'Ilość rozmów'],
+            @foreach($stats_by_user_type as $item)
+                ['{{$item->user_type}}', '{{$item->user_type_sum}}'],
+            @endforeach
+            ['', 0]
         ]);
 
         var options = {

@@ -19,8 +19,8 @@ class CreateTestQuestionsTable extends Migration
             $table->integer('category_id');
             $table->integer('user_id');
             $table->integer('cadre_by');
-            $table->integer('default_time');
-            $table->integer('deleted');
+            $table->integer('default_time')->nullable();
+            $table->integer('deleted')->default(0);
             $table->timestamps();
         });
     }
