@@ -102,7 +102,10 @@
                                 <b>Treść pytania</b>
                             </div>
                             <div class="panel-body">
-                               {{$item->testQuestion->content}}
+                                {{--  Dlaczego tu kurwa jebane gówno nie umie wyciągnąć tego normalnie z kolekcji? nie wiem  --}}
+                                @foreach($item->testQuestion as $shit)
+                                    {{$shit->content}} 
+                                @endforeach
                             </div>
                         </div>
                         <div class="panel panel-info">

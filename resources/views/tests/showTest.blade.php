@@ -1,5 +1,13 @@
 @extends('layouts.main')
 @section('content')
+<style>
+    .xsm-col-th {
+        width: 5%
+    }
+    .sm-col-th {
+        width: 15%
+    }
+</style>
 
 <div class="row">
     <div class="col-md-12">
@@ -22,12 +30,12 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <td>Lp.</td>
-                        <td>Data</td>
+                        <td class="xsm-col-th">Lp.</td>
+                        <td class="sm-col-th">Data</td>
                         <td>Użytkownik</td>
                         <td>Nazwa testu</td>
-                        <td>Aktywacja</td>
-                        <td>Szczegóły</td>
+                        <td class="sm-col-th">Aktywacja</td>
+                        <td class="sm-col-th">Szczegóły</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -53,104 +61,113 @@
                     @endforeach
                 </tbody>
             </table>
+            @if($i == 0)
+                <h3>Brak danych!</h3>
+            @endif
         </div>
     </div>
     <div id="active" class="tab-pane fade">
         <div class="table-responsive" style="margin-top: 20px">
-                <table class="table table-striped">
-                    <thead>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td class="xsm-col-th">Lp.</td>
+                        <td class="sm-col-th">Data</td>
+                        <td>Użytkownik</td>
+                        <td>Nazwa testu</td>
+                        <td class="sm-col-th">Szczegóły</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php($i = 0)
+                    @foreach($tests->where('status', '=', 2) as $test)
+                        @php($i++)
                         <tr>
-                            <td>Lp.</td>
-                            <td>Data</td>
-                            <td>Użytkownik</td>
-                            <td>Nazwa testu</td>
-                            <td>Szczegóły</td>
+                            <td>{{$i}}</td>
+                            <td>{{$test->created_at}}</td>
+                            <td>{{$test->user->first_name . ' ' . $test->user->last_name}}</td>
+                            <td>{{$test->name}}</td>
+                            <td>
+                                tutaj nie można zaglądać
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @php($i = 0)
-                        @foreach($tests->where('status', '=', 2) as $test)
-                            @php($i++)
-                            <tr>
-                                <td>{{$i}}</td>
-                                <td>{{$test->created_at}}</td>
-                                <td>{{$test->user->first_name . ' ' . $test->user->last_name}}</td>
-                                <td>{{$test->name}}</td>
-                                <td>
-                                    <button class="btn btn-default">
-                                        Szczegóły
-                                    </button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    <div id="finished" class="tab-pane fade">
-        <div class="table-responsive" style="margin-top: 20px">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <td>Lp.</td>
-                            <td>Data</td>
-                            <td>Użytkownik</td>
-                            <td>Nazwa testu</td>
-                            <td>Szczegóły</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @php($i = 0)
-                        @foreach($tests->where('status', '=', 3) as $test)
-                            @php($i++)
-                            <tr>
-                                <td>{{$i}}</td>
-                                <td>{{$test->created_at}}</td>
-                                <td>{{$test->user->first_name . ' ' . $test->user->last_name}}</td>
-                                <td>{{$test->name}}</td>
-                                <td>
-                                    <button class="btn btn-default">
-                                        Szczegóły
-                                    </button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                    @endforeach
+                </tbody>
+            </table>
+            @if($i == 0)
+                <h3>Brak danych!</h3>
+            @endif
         </div>
     </div>
-    <div id="judged" class="tab-pane fade"> eeee
+
+    <div id="finished" class="tab-pane fade">
         <div class="table-responsive" style="margin-top: 20px">
-                <table class="table table-striped">
-                    <thead>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td class="xsm-col-th">Lp.</td>
+                        <td class="sm-col-th">Data</td>
+                        <td>Użytkownik</td>
+                        <td>Nazwa testu</td>
+                        <td class="sm-col-th">Szczegóły</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php($i = 0)
+                    @foreach($tests->where('status', '=', 3) as $test)
+                        @php($i++)
                         <tr>
-                            <td>Lp.</td>
-                            <td>Data</td>
-                            <td>Użytkownik</td>
-                            <td>Nazwa testu</td>
-                            <td>Szczegóły</td>
+                            <td>{{$i}}</td>
+                            <td>{{$test->created_at}}</td>
+                            <td>{{$test->user->first_name . ' ' . $test->user->last_name}}</td>
+                            <td>{{$test->name}}</td>
+                            <td>
+                                <a class="btn btn-default" href="{{ URL::to('/check_test') }}/{{$test->id}}">
+                                    <span class="glyphicon glyphicon-education" style="color: green"></span> Oceń
+                                </a>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @php($i = 0)
-                        @foreach($tests->where('status', '=', 4) as $test)
-                            @php($i++)
-                            <tr>
-                                <td>{{$i}}</td>
-                                <td>{{$test->created_at}}</td>
-                                <td>{{$test->user->first_name . ' ' . $test->user->last_name}}</td>
-                                <td>{{$test->name}}</td>
-                                <td>
-                                    <button class="btn btn-default">
-                                        Szczegóły
-                                    </button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                    @endforeach
+                </tbody>
+            </table>
+            @if($i == 0)
+                <h3>Brak danych!</h3>
+            @endif
+        </div>
+    </div>
+    <div id="judged" class="tab-pane fade">
+        <div class="table-responsive" style="margin-top: 20px">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td class="xsm-col-th">Lp.</td>
+                        <td class="sm-col-th">Data</td>
+                        <td>Użytkownik</td>
+                        <td>Nazwa testu</td>
+                        <td class="sm-col-th">Szczegóły</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php($i = 0)
+                    @foreach($tests->where('status', '=', 4) as $test)
+                        @php($i++)
+                        <tr>
+                            <td>{{$i}}</td>
+                            <td>{{$test->created_at}}</td>
+                            <td>{{$test->user->first_name . ' ' . $test->user->last_name}}</td>
+                            <td>{{$test->name}}</td>
+                            <td>
+                                <a class="btn btn-default" href="{{ URL::to('/check_test') }}/{{$test->id}}">
+                                    Szczegóły
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            @if($i == 0)
+                <h3>Brak danych!</h3>
+            @endif
         </div>
     </div>
 </div>
