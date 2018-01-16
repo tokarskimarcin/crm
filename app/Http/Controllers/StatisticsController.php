@@ -630,8 +630,8 @@ class StatisticsController extends Controller
 
     //przygotowanie danych do raportu tygodniowego dkj
     private function weekReportDkjData() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-8,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-2,date("Y")));
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
 
         $dkj = DB::table('dkj')
             ->select(DB::raw('
