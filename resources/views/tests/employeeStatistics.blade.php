@@ -14,7 +14,7 @@
     <div class="col-md-4">
         <div class="panel panel-info">
             <div class="panel-heading">
-                <b>Imie i naswisko</b>
+                <b>Imie i nazwisko</b>
             </div>
             <div class="panel-body">
                 {{$user->first_name . ' ' . $user->last_name}}
