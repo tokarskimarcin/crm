@@ -6,6 +6,9 @@
             font-size: 12px;
             text-align: center;
         }
+        .table-striped tr td:first-child + td + td + td + td+ td +td{
+            word-break: break-all;
+        }
     </style>
 
 {{--Header page --}}
@@ -42,6 +45,7 @@
                                             <th>Dział</th>
                                             <th>Stanowisko</th>
                                             <th>Nr. Tel.</th>
+                                            <th>E-mail</th>
                                             @if(Auth::user()->user_type->all_departments == 1)
                                                 <th>Akcja</th>
                                             @endif
@@ -64,6 +68,14 @@
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
 
 <script>
+
+    function checkEmail(email) {
+        var filter = /^[A-Za-z0-9_\-]+([.][A-Za-z0-9_\-]+)*[@][A-Za-z0-9_\-]+([.][A-Za-z0-9_\-]+)+$/;
+        if (!filter.test(email.value)) {
+            return false;
+        }else
+            return true;
+    }
 
     $(document).ready( function () {
         var show_action = {{Auth::user()->user_type->all_departments}};
@@ -88,6 +100,18 @@
                 {"data": "department_type_name","name":"department_type.name"},
                 {"data": "user_type_name","name":"user_types.name"},
                 {"data": "phone"},
+                {"data": function (data, type, dataToSet) {
+                    var n = data.username.indexOf('@');
+                    if(data.username.indexOf('@') != -1  && (data.email_off == '' || data.email_off == null))
+                    {
+                        return data.username;
+                    }else if(data.email_off != '' && data.email_off != null)
+                    {
+                        return data.email_off;
+                    }else {
+                        return "Brak informacji";
+                    }
+                },"orderable": false, "searchable": false },
                 {"data": function (data, type, dataToSet) {
                     if(show_action == 1)
                         return '<a href="edit_cadre/'+data.id+'" >Edytuj</a>';

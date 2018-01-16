@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\TemplateQuestion;
+use App\TemplateUserTest;
 use App\TestUsersQuestion;
 use App\User;
 use Illuminate\Http\Request;
@@ -152,16 +154,21 @@ class TestsController extends Controller
     */
 
     public function addTestGet() {
+        // pobranie wszystkich kategorii
         $categories = TestCategory::where('deleted','=',0)->get();
+        // pobranie wszystkich pracowników kardy(pracujących)
         $cadre = User::where('status_work','=',1)
             ->whereNotin('user_type_id',[1,2])->orderBy('last_name')->get();
+        $teplate = TemplateUserTest::where('deleted',0)->get();
+        //generowanie widoku
         return view('tests.addTest')
             ->with('categories',$categories)
-            ->with('users',$cadre);
+            ->with('users',$cadre)
+            ->with('template',$teplate);
     }
 
     /*
-     * Przygotowanie danych do datatable, związanych z pytaniami na konkretną kategorię
+     * Przygotowanie danych do datatable, związanych z pytaniami na konkretną kategorię Datatable
      */
     public function showQuestionDatatable(Request $request)
     {
@@ -181,7 +188,7 @@ class TestsController extends Controller
             $new_test->cadre_id = Auth::user()->id;
             $new_test->user_id = $request->id_user;
             $new_test->status = 1;
-            $new_test->template_id = 0;
+            $new_test->template_id = $request->template_id;
             $new_test->name= $request->subject;
             $new_test->save();
             $id_test = $new_test->id;
@@ -192,7 +199,7 @@ class TestsController extends Controller
                 $new_user_question = new UserQuestion();
                 $new_user_question->test_id = $id_test;
                 $new_user_question->question_id = $item['id'];
-                $new_user_question->available_time = $item['time'];
+                $new_user_question->available_time = $item['time']*60;
                 $new_user_question->save();
                 $new_many_to_many = new TestUsersQuestion();
                 $new_many_to_many->user_question_id = $new_user_question->id;
@@ -203,11 +210,12 @@ class TestsController extends Controller
         }
         return 0;
     }
+    // Wysłanie infromacji o użytkowniku, jakie pytania już rozwiązał
     public function getRepeatQuestion (Request $request)
     {
         if($request->ajax())
-        {
-            $user_question_repeat = DB::table('user_questions') //to zapytanie jest gównem
+        {   // chwilowo tylko sprawdza czy rozwiązywał a nie ile razy to robił
+            $user_question_repeat = DB::table('user_questions')
             ->select(DB::raw('
                 Distinct(question_id)
             '))
@@ -219,6 +227,24 @@ class TestsController extends Controller
         }
     }
 
+    /*
+     * Pobranie pytań do szablonu
+     */
+    public function getTemplateQuestion(Request $request)
+    {
+        if($request->ajax())
+        {
+            $question_id = TemplateQuestion::select('question_id','question_time',
+                'test_questions.content','test_categories.name')
+                ->join('test_questions','question_id','test_questions.id')
+                ->join('test_categories','test_questions.category_id','test_categories.id')
+                ->where('template_id',$request->template_id)
+                ->get();
+            return $question_id;
+        }
+        return 0;
+    }
+
     /* 
         Zapis testu przez osobę testującą
     */
@@ -226,7 +252,48 @@ class TestsController extends Controller
 
     }
 
-    /* 
+    /*
+        Dodawanie szablonu testu
+    */
+    public function addTestTemplate()
+    {
+        $categories = TestCategory::where('deleted','=',0)->get();
+        $cadre = User::where('status_work','=',1)
+            ->whereNotin('user_type_id',[1,2])->orderBy('last_name')->get();
+        return view('tests.addTestTemplate')
+            ->with('categories',$categories)
+            ->with('users',$cadre);
+    }
+
+    /*
+       Zapisywanie szablonu testu
+   */
+    public function saveTestTemplate(Request $request)
+    {
+        if($request->ajax())
+        {
+                $new_template = new TemplateUserTest();
+                $new_template->template_name = $request->template;
+                $new_template->cadre_id = Auth::user()->id;
+                $new_template->name= $request->subject;
+                $new_template->save();
+                $id_template = $new_template->id;
+                $question_array = $request->question_test_array;
+
+                foreach ($question_array as $item)
+                {
+                    $new_template_question = new TemplateQuestion();
+                    $new_template_question->template_id = $id_template;
+                    $new_template_question->question_id = $item['id'];
+                    $new_template_question->question_time = $item['time']*60;
+                    $new_template_question->save();
+                }
+                return 1;
+            }
+            return 0;
+    }
+
+    /*
         Wyświetlenie wsyzstkic testów osoby testującej
     */
     public function showTestsGet() {

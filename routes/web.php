@@ -104,6 +104,9 @@ Route::POST('/activateTest','TestsController@activateTest')->name('api.activateT
 Route::POST('/testAttempt','TestsController@testAttempt')->name('api.testAttempt');
 
 Route::POST('/getRepeatQuestion','TestsController@getRepeatQuestion')->name('api.getRepeatQuestion'); //tu zmienic z ORM
+Route::POST('/saveTestTemplate','TestsController@saveTestTemplate')->name('api.saveTestTemplate'); //tu zmienic z ORM
+
+Route::POST('/getTemplateQuestion','TestsController@getTemplateQuestion')->name('api.getTemplateQuestion'); //tu zmienic z ORM
 
 /* TEST AJAX ROUTES STOP */
 
@@ -367,6 +370,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/test_result/{id}', 'TestsController@testResult');
 
+    Route::get('/add_test_template', 'TestsController@addTestTemplate'); // szablony testów
     //TESTS STOP//
 });
 //////////////////////Testing ORM///////////////
