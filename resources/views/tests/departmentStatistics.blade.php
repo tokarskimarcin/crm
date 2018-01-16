@@ -24,7 +24,7 @@
                 <b>Oddział</b>
             </div>
             <div class="panel-body">
-                Lublin potwierdzanie
+                {{$department_info->departments->name . ' ' . $department_info->department_type->name}}
             </div>
         </div>
     </div>
@@ -44,7 +44,7 @@
                 <b>Ilość pracowników kadry</b>
             </div>
             <div class="panel-body">
-                12
+                {{$department_info->users->whereNotIn('user_type_id', [1,2])->where('status_work', '=', 1)->count()}}
             </div>
         </div>
     </div>

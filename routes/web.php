@@ -101,6 +101,8 @@ Route::POST('/saveTestWithUser','TestsController@saveTestWithUser')->name('api.s
 
 Route::POST('/activateTest','TestsController@activateTest')->name('api.activateTest');
 
+Route::POST('/testAttempt','TestsController@testAttempt')->name('api.testAttempt');
+
 Route::POST('/getRepeatQuestion','TestsController@getRepeatQuestion')->name('api.getRepeatQuestion'); //tu zmienic z ORM
 Route::POST('/saveTestTemplate','TestsController@saveTestTemplate')->name('api.saveTestTemplate'); //tu zmienic z ORM
 
@@ -365,6 +367,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/employee_statistics/{id}', 'TestsController@employeeTestsStatisticsGet'); // tutaj bedzie {id}
 
     Route::get('/department_statistics/{id}', 'TestsController@departmentTestsStatisticsGet'); // tutaj bedzie {id}
+
+    Route::get('/test_result/{id}', 'TestsController@testResult');
 
     Route::get('/add_test_template', 'TestsController@addTestTemplate'); // szablony testów
     //TESTS STOP//

@@ -1,39 +1,43 @@
 @extends('layouts.main')
 @section('content')
 <style type="text/css">
-      body{margin:40px;}
-      .btn-circle {
-        width: 30px;
-        height: 30px;
-        text-align: center;
-        padding: 6px 0;
-        font-size: 12px;
-        line-height: 1.428571429;
-        border-radius: 15px;
-      }
-      .btn-circle.btn-lg {
-        width: 50px;
-        height: 50px;
-        padding: 13px 13px;
-        font-size: 18px;
-        line-height: 1.33;
-        border-radius: 25px;
-      }
-      .selected-span {
-        font-size: 30px;
-        margin-left: 10px;
-      }
-      .btn {
-         outline: none !important;
-         box-shadow: none !important;
-      }
+body{margin:40px;}
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    line-height: 1.428571429;
+    border-radius: 15px;
+}
+.btn-circle.btn-lg {
+    width: 50px;
+    height: 50px;
+    padding: 13px 13px;
+    font-size: 18px;
+    line-height: 1.33;
+    border-radius: 25px;
+}
+.selected-span {
+    font-size: 30px;
+    margin-left: 10px;
+}
+.btn {
+    outline: none !important;
+    box-shadow: none !important;
+}
+.panel-info > .panel-heading {
+    background-color: #a36bce;
+    color: white;
+}
 
 </style>
 
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Ocena testu</h1>
+            <div class="well">Testy / Ocena testu / {{$test->name}}</div>
         </div>
     </div>
 </div>
@@ -124,7 +128,6 @@
                 </div>
         @endforeach
         
-        
         <div id="question_total" class="tab-pane fade @if($test->result != null) in active @endif">
             @if($test->result == null)
                 <div class="form-group" style="margin-top: 30px">
@@ -180,7 +183,6 @@ $("#q1_yes").on('click', () => {
 $("#q1_no").on('click', () => {
     $('#q1_span').text('NIE');
 });
-
 
 $('#send_opinion').on('click', function(e) {
     e.preventDefault();

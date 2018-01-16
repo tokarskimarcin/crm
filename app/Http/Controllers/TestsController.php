@@ -39,6 +39,11 @@ class TestsController extends Controller
             return view('errors.404');
         }
 
+        if ($test->test_start == null) {
+            $test->test_start = date('Y-m-d H:i:s');
+            $test->save();
+        }
+
         $question = UserQuestion::where('test_id', '=', $id)
             ->whereNull('user_answer')
             ->first();
@@ -66,6 +71,9 @@ class TestsController extends Controller
         if ($question == null) {
             $status = 3;
             $test->status = 3;
+            if ($test->date_stop == null) {
+                $test->test_stop = date('Y-m-d H:i:s');
+            }
             $test->save();
         }
 
@@ -73,10 +81,20 @@ class TestsController extends Controller
             $testQuestion = TestQuestion::where('id', '=', $question->question_id)->get();
         } else {
             $testQuestion = false;
-        }        
+        }
+
+        /**
+         * Sprawdzenie czy była podjęta próba odpowiedzi
+         */
+
+        if ($question != null && $question->user_answer == null && $question->attempt != null) 
+            $rest_of_time = $question->available_time - (strtotime($question->attempt) - time()) * (-1);
+        else 
+            $rest_of_time = false;
 
         return view('tests.userTest')
             ->with('test', $test)
+            ->with('rest_of_time', $rest_of_time)
             ->with('testQuestion', $testQuestion[0])
             ->with('status', $status)
             ->with('question_count', $question_count)
@@ -105,6 +123,20 @@ class TestsController extends Controller
         $question->save();
 
         return Redirect::back();
+    }
+
+    /**
+     * Wyświetlanie wyników testu
+     */
+    public function testResult($id) {
+        $test = UserTest::find($id);
+        
+        if ($test == null || ($test->user_id != Auth::user()->id) && ($test->cadre_id != Auth::user()->id)) {
+            return view('errors.404');
+        }
+
+        return view('tests.testResult')
+            ->with('test', $test);
     }
 
     /* 
@@ -310,7 +342,7 @@ class TestsController extends Controller
         $cadre_comments = $request->comment_question;
 
         foreach($test->questions as $question) {
-            $question->cadre_comment = $cadre_comments[0];
+            $question->cadre_comment = ($cadre_comments[0] != null) ? $cadre_comments[0] : 'Brak komentarza.' ;
             $question->save();
             array_shift($cadre_comments);
         }
@@ -568,6 +600,29 @@ class TestsController extends Controller
 
             $checkTest->status = 2;
             $checkTest->save();
+
+            return 1;
+        }
+    }
+
+    /**
+     * Metoda zapisująca podjęcie próby rozwiązania zadania 
+     * 
+     * @param Request 
+     * @author konradja100
+     * @access Public 
+     * @return void
+     */
+    public function testAttempt(Request $request) {
+        if ($request->ajax()) {
+            $question = UserQuestion::find($request->question_id);
+
+            if ($question == null) {
+                return 0;
+            }
+
+            $question->attempt = date('Y-m-d H:i:s');
+            $question->save();
 
             return 1;
         }
