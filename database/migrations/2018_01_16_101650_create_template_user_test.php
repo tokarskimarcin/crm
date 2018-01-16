@@ -13,11 +13,12 @@ class CreateTemplateUserTest extends Migration
      */
     public function up()
     {
-        Schema::create('template_user_test', function (Blueprint $table) {
+        Schema::create('template_user_tests', function (Blueprint $table) {
             $table->increments('id');
             $table->char('template_name');
             $table->char('name');
             $table->integer('cadre_id');
+            $table->integer('deleted')->default(0);
             $table->timestamps();
         });
     }

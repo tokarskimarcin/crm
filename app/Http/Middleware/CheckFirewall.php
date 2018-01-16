@@ -26,24 +26,26 @@ class CheckFirewall
         } else {
             $ip = $_SERVER['REMOTE_ADDR'];
         }
+        // Sprawdzenie czy dane ip jest w bazie danych
         $acces = Firewall::where('ip_address', $ip)->first();
 
         // if (preg_match('/^10\.200\.46\..*$/', $ip))  {
         // 	   $acces = 1;
         // }
 
+        // użytkownicy wykluczeni z firewall
         $firewall_privileges_check = FirewallPrivileges::where('user_id', '=', Auth::user()->id)->first();
-
+        // jeśli użytkownik nie jest wykluczony
         if ($firewall_privileges_check == null)
-        {
+        {   //nie znalazło danego ip w bazie | wyloguj
             if(is_null($acces)) {
                 Auth::logout();
                 Session::flash('message', 'Logujesz się ze złej lokalizacji!');
                 return redirect('login');
-            }else{
+            }else{// znalazło | -> request
                 return $next($request);
             }
-        }else{
+        }else{ //-> request
             return $next($request);
         }
 

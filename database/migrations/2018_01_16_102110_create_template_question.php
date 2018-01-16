@@ -13,10 +13,10 @@ class CreateTemplateQuestion extends Migration
      */
     public function up()
     {
-        Schema::create('template_question', function (Blueprint $table) {
+        Schema::create('template_questions', function (Blueprint $table) {
             $table->integer('template_id');
             $table->integer('question_id');
-            $table->integer('default_time');
+            $table->integer('question_time');
         });
     }
 
