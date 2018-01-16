@@ -1099,22 +1099,22 @@ class StatisticsController extends Controller
             $accepted_users->push($szczesny);
 
 
-   //
-   // $accepted_users = [
-   //     'cytawa.verona@gmail.com',
-   //     'jarzyna.verona@gmail.com'
-   // ];
-   //
-   //
-   //  Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
-   //  {
-   //     $message->from('noreply.verona@gmail.com', 'Verona Consulting');
-   //     foreach ($accepted_users as $key => $user) {
-   //       if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
-   //           $message->to($user)->subject($mail_title);
-   //       }
-   //     }
-   //  });
+   
+//    $accepted_users = [
+//        'cytawa.verona@gmail.com',
+//        'jarzyna.verona@gmail.com'
+//    ];
+   
+   
+//     Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
+//     {
+//        $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+//        foreach ($accepted_users as $key => $user) {
+//          if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
+//              $message->to($user)->subject($mail_title);
+//          }
+//        }
+//     });
 
 
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
