@@ -442,6 +442,7 @@
         var subject = $('#subject_input').val();
         var flag_all_ok = true;
         var flag_all_ok_time = true;
+
         if(subject.trim().length == 0){
             flag_all_ok = false;
             $('#alert_subject').fadeIn(1000);
@@ -468,6 +469,7 @@
         }
 
         if(flag_all_ok) {
+            $("#save_button").attr('disabled', true);
             $.ajax({
                 type: "POST",
                 url: '{{ route('api.saveTestWithUser') }}',
@@ -485,6 +487,7 @@
                         console.log('zapisany');
                         window.location = '{{URL::to('/show_tests')}}';
                     }
+                    $("#save_button").remove('disabled', true);
                 }
             });
         }

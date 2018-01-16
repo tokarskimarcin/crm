@@ -371,6 +371,7 @@
         }
         // jeśli wszystko jest ok zapisz szablon
         if(flag_all_ok) {
+            $("#save_button").attr('disabled', true);
             $.ajax({
                 type: "POST",
                 url: '{{ route('api.saveTestTemplate') }}',
@@ -387,6 +388,7 @@
                         console.log('zapisany');
                         window.location = '{{URL::to('/show_tests')}}';
                     }
+                    $("#save_button").remove('disabled', true);
                 }
             });
         }
