@@ -630,8 +630,8 @@ class StatisticsController extends Controller
 
     //przygotowanie danych do raportu tygodniowego dkj
     private function weekReportDkjData() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-8,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-2,date("Y")));
 
         $dkj = DB::table('dkj')
             ->select(DB::raw('
@@ -1099,22 +1099,22 @@ class StatisticsController extends Controller
             $accepted_users->push($szczesny);
 
 
-   //
-   // $accepted_users = [
-   //     'cytawa.verona@gmail.com',
-   //     'jarzyna.verona@gmail.com'
-   // ];
-   //
-   //
-   //  Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
-   //  {
-   //     $message->from('noreply.verona@gmail.com', 'Verona Consulting');
-   //     foreach ($accepted_users as $key => $user) {
-   //       if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
-   //           $message->to($user)->subject($mail_title);
-   //       }
-   //     }
-   //  });
+   
+//    $accepted_users = [
+//        'cytawa.verona@gmail.com',
+//        'jarzyna.verona@gmail.com'
+//    ];
+   
+   
+//     Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
+//     {
+//        $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+//        foreach ($accepted_users as $key => $user) {
+//          if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
+//              $message->to($user)->subject($mail_title);
+//          }
+//        }
+//     });
 
 
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
