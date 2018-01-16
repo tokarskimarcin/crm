@@ -28,7 +28,7 @@
     </div>
 </div>
 
-@if($status == 2)
+@if($actual_count == 1 && $question->attempt == null)
 
 @php
     $max_time = 0;
@@ -38,12 +38,12 @@
 @endphp
     <div class="row" id="description">
         <div class="col-md-12">
-            <div class="alert alert-success">
+            <div class="alert alert-info">
                 <h1>
                     Przed Tobą test: <b>{{$test->name}}</b>
                 </h1>
                 <h3>
-                    Test składa się z {{$question_count}} pytań, maksymalny czas trwania testu to: {{$max_time / 60 . ':00'}} minut.
+                    Ilość pytań: {{$question_count}}, maksymalny czas trwania testu to: {{Round($max_time / 60) . ':00'}} minut.
                 </h3>
                 <hr>
                 <h3>
@@ -64,7 +64,7 @@
             <p>
                 <h3>Czas na odpowiedź: <b><span id="question_time"></span></b>, możesz zakończyć wcześniej klikająć przycisk "Zapisz odpowiedź" na dole strony.</h3>
             </p>
-            <button class="btn btn-success btn-lg" id="btn_start">Start</button>
+            <button class="btn btn-info btn-lg" id="btn_start" data-question_id="{{$question->id}}" ><span class="glyphicon glyphicon-pencil"></span> Start</button>
         </div>
     </div>
 
@@ -89,14 +89,22 @@
                     <textarea class="form-control" style="resize: none" rows="10" name="user_answer" id="user_answer" placeholder="Twoja odpowiedź..."></textarea>
                 </div>
                 <div class="form-group">
-                    <input type="submit" class="btn btn-success btn-lg" value="Zapisz" id="btn_test_submit"/>
+                    <button role="submit" class="btn btn-info btn-lg" id="btn_test_submit">
+                        <span class="glyphicon glyphicon-envelope"></span> Zapisz
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
 
-    <input type="hidden"  id="q_time_set" value="{{$question->available_time}}"/>
+    <input type="hidden"  id="q_time_set" value="
+        @if($question != null && $question->attempt != null)
+            {{$rest_of_time}}
+        @else
+            {{$question->available_time}}
+        @endif
+        "/>
 
 @else 
     <div class="row">
@@ -123,7 +131,7 @@ $(document).ready(function() {
     if (q_time == 60) {
         var time = 1;
     } else {
-        var time = Math.ceil(q_time / 60) - 1;
+        var time = Math.ceil(q_time / 60);
     }
     var seconds = q_time % 60;
     if (seconds >= 0 && seconds < 10) {
@@ -138,16 +146,17 @@ function stopTimer() {
     clearInterval(timeRemaining);
     /* Tutaj sprawdzenie czy pytanie było ostatnie w teście*/
     if (total_questions == actual_question) {
-        swal('Czas się skończył! Było to ostanie pytanie, wynik testu otrzymasz drogą mailową.')
+        swal('Czas się skończył! Było to ostanie pytanie, wynik testu otrzymasz drogą mailową.').then(function() { $('#answer_form').submit(); })
     } else {
-        swal('Czas się skończył! Zostaniesz automatycznie przekierowany do następnego pytania.')
+        swal('Czas się skończył! Zostaniesz automatycznie przekierowany do następnego pytania.').then(function() { $('#answer_form').submit(); })
     }
 
     setTimeout(function(){
         $('#answer_form').submit();
     }, 5000);
 }
-$('#btn_start').click(function() {
+
+function questionReady() {
     $('#description').slideUp(500);
     /* Funkcja odliczająca czas */
     timeRemaining = setInterval(function () {
@@ -157,7 +166,7 @@ $('#btn_start').click(function() {
                   //przeładowanie do nast pytania
                   stopTimer();
               }
-              console.log(q_time);
+
               $('#answer_time').val(q_time);
               var minutes = Math.ceil(q_time / 60) - 1;
               var seconds = q_time % 60;
@@ -176,6 +185,24 @@ $('#btn_start').click(function() {
 
     $('#question_info').fadeOut(0);
     $('#question_content').fadeIn(0);
+}
+
+$('#btn_start').click(function(e) {
+    var question_id = $(this).data('question_id');
+    questionReady();
+    $.ajax({
+        type:"POST",
+        url:" {{ route( 'api.testAttempt' ) }}",
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        data: {
+            "question_id":question_id
+        },
+        success: function(response) {
+            //do nothing
+        }
+    });
 
 });
 
@@ -183,7 +210,7 @@ $('#btn_start').click(function() {
 $('#btn_test_submit').click(function(e) {
     e.preventDefault();
     if (total_questions == actual_question) {
-        swal('Było to ostanie pytanie, wynik testu otrzymasz drogą mailową.')
+        swal('Było to ostanie pytanie, wynik testu otrzymasz drogą mailową.').then(function() { $('#answer_form').submit(); })
         setTimeout(function(){
             $('#answer_form').submit();
         }, 5000);
@@ -191,6 +218,13 @@ $('#btn_test_submit').click(function(e) {
         $('#answer_form').submit();
     }
 });
+
+/*
+    Sprawdzenie czy podjeta byłą próba opowiedzi, jezeli tak, odliczamy czas
+*/
+@if($question != null && $question->attempt != null)
+    questionReady();
+@endif
 
 </script>
 @endsection
