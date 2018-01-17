@@ -295,6 +295,40 @@ class TestsController extends Controller
     }
 
     /*
+     * Podgląd testu
+     */
+    public function viewTest($id)
+    {
+        // pobranie informacji o teście
+        $test_by_id = UserTest::find($id);
+        // pobranie pytań z testu
+        $all_question_id = $test_by_id->questions()->get();
+        // pobranie wszystkich kategorii
+        $categories = TestCategory::where('deleted','=',0)->get();
+        // pobranie wszystkich pracowników kardy(pracujących)
+        $cadre = User::where('status_work','=',1)
+            ->whereNotin('user_type_id',[1,2])->orderBy('last_name')->get();
+        $teplate = TemplateUserTest::where('deleted',0)->get();
+        //generowanie widoku
+        $all_question = array();
+        foreach ($all_question_id as $item)
+        {
+            $content_question = $item->testQuestion()->get();
+            dd($content_question);
+            $all_question += ["id_question" => $content_question->id,"content" => $content_question->content];
+
+
+            break;
+        }
+        return view('tests.viewTest')
+            ->with('test_by_id',$test_by_id)
+            ->with('all_question',$all_question)
+            ->with('categories',$categories)
+            ->with('users',$cadre)
+            ->with('template',$teplate);
+    }
+
+    /*
      * Pobranie pytań do szablonu
      */
     public function getTemplateQuestion(Request $request)

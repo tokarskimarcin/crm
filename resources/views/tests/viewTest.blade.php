@@ -25,38 +25,56 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Dodaj szablon testu</h1>
+            <h1>Podgląd testu</h1>
         </div>
     </div>
     <div class="col-lg-12">
         <div class="panel panel-default">
-            <div class="panel-heading">Dodaj szablon testu</div>
+            <div class="panel-heading">Podgląd testu</div>
             <div class="panel-body">
                 <div class="row">
                     <div class="col-lg-12">
 
-
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             <div class="panel panel-default">
-                                <div class="panel-heading">Podaj nazwę szablonu: </div>
-                                <input type="text" id="template_input" class="form-control" name="template_name" placeholder="Podaj nazwę szablonu.." value="">
-                            </div>
-                            <div class="alert alert-danger" style = "display:none" id="alert_subject">
-                                <span colspan="1">Podaj nazwę szablonu</span>
+                                <div class="panel-heading">Wybierz szablon: </div>
+                                <select class="form-control" id="template_select">
+                                    <option value="0">Wybierz</option>
+                                    @foreach($template as $item)
+                                        @if($test_by_id->template_id == $item->id)
+                                            <option value={{$item->id}} selected>{{$item->template_name}}</option>
+                                        @else
+                                            <option value={{$item->id}}>{{$item->template_name}}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
 
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             <div class="panel panel-default">
                                 <div class="panel-heading">Temat: </div>
-                                <input type="text" id="subject_input" class="form-control" name="subject" placeholder="podaj temat.." value="">
+                                <input type="text" id="subject_input" class="form-control" name="subject" placeholder="podaj temat.." value="{{$test_by_id->name}}">
                             </div>
-                            <div class="alert alert-danger" style = "display:none" id="alert_template">
+                            <div class="alert alert-danger" style = "display:none" id="alert_subject">
                                 <span colspan="1">Podaj temat testu.</span>
                             </div>
                         </div>
 
-
+                        <div class="col-lg-4">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Test dla: </div>
+                                    <select class="form-control" id="user_select">
+                                        @foreach($users as $user)
+                                            @if($test_by_id->user_id == $user->id)
+                                                <option selected value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
+                                            @else
+                                                <option value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </div>
+                        </div>
                         <div class="col-lg-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">Zagadnienia: </div>
@@ -89,9 +107,10 @@
                             </tr>
                             </thead>
                             <tbody>
+
                             </tbody>
                         </table>
-                        <button type="button" class="btn btn-primary" id="save_button">Zapisz Szablon</button>
+                        <button type="button" class="btn btn-primary" id="save_button">Zapisz Test</button>
                     </div>
                 </div>
             </div>
@@ -167,8 +186,138 @@
     var question_repeat = [];
     // Tablica do przechowywania losowych indeksów
     var random_array = [];
- $(document).ready( function () {
+    // Tablica z id i nazwami szablonu
+    var template_array = {!! json_encode($template) !!};
+    // numer szablonu
+    var template_id  = 0;
 
+    $(document).ready( function () {
+    // wywołanie funkcji pobierającej pytania dla pierwszego zaznaczonego użytkownika
+     downloadRepeatQuestion();
+     setDataFromPHP();
+    // pobranie danych wybranego szablonu
+     $('#template_select').on('change',function (e) {
+         // id szablonu
+         template_id = $(this).val();
+         $.ajax({
+             type: "POST",
+             url: '{{ route('api.getTemplateQuestion') }}',
+             headers: {
+                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+             },
+             data: {
+                 "template_id":template_id
+             }, success: function (response) {
+                 // odczyt nazwy tematu dla szablonu (ze zmiennej php)
+                 for(var i=0;i<template_array.length;i++)
+                 {
+                     if(template_array[i].id == template_id)
+                     {
+                         $('#subject_input').val(template_array[i].name);
+                         break;
+                     }
+                 }
+                 // zerowanie tablic pomcniczych oraz datatables
+                 question_array_id = [];
+                 question_text_array = [];
+                 table_all_guestion.clear();
+                 //wpisanie danych z szablonu na stronę testu
+                 for(var i=0;i<response.length;i++)
+                 {
+                     // przepisanie danych z szablonu do testu
+                     question_text_array.push({id:response[i].question_id,text:response[i].content,time:response[i].question_time/60,subject:response[i].name});
+                     question_array_id.push(parseInt(response[i].question_id));
+                     // dodanie wiersza do wszystkich pytań
+                    var rowNode = table_all_guestion.row.add([
+                        response[i].name,
+                          response[i].content,
+                         '<input type="number" class="form-control question_time" value='+response[i].question_time/60+'>',
+                         '<button type="button" class="btn btn-danger delete_row">Usuń</button>'
+                     ]).node();
+                     rowNode.id = "question_"+response[i].question_id;
+
+                     if(jQuery.inArray(parseInt(response[i].question_id),question_repeat) != -1)
+                         $(rowNode).css('background','#f3e97c');
+                     else
+                         $(rowNode).css('background','#5cb85cbf');
+                 }// render tablicy z pytaniami
+                 table_all_guestion.draw();
+             }
+         });
+     });
+     // wywołaj sprawdzenie pytań użytkownika po zmianie "Test dla"
+     $('#user_select').on('change',function (e) {
+         downloadRepeatQuestion();
+     });
+     // funkcja ustawiająca dane przez informacje z php
+        function setDataFromPHP() {
+            var question_array_php = {!! json_encode($all_question) !!};
+            // zerowanie tablic pomcniczych oraz datatables
+            question_array_id = [];
+            question_text_array = [];
+            table_all_guestion.clear();
+            //wpisanie danych z szablonu na stronę testu
+            for(var i=0;i<question_array_php.length;i++)
+            {
+                console.log(question_array_php[i].id);
+                // przepisanie danych z szablonu do testu
+                question_text_array.push({id:question_array_php[i].id,text:question_array_php[i].content,time:response[i].question_time/60,subject:response[i].name});
+                question_array_id.push(parseInt(response[i].question_id));
+                // dodanie wiersza do wszystkich pytań
+                var rowNode = table_all_guestion.row.add([
+                    response[i].name,
+                    response[i].content,
+                    '<input type="number" class="form-control question_time" value='+response[i].question_time/60+'>',
+                    '<button type="button" class="btn btn-danger delete_row">Usuń</button>'
+                ]).node();
+                rowNode.id = "question_"+response[i].question_id;
+
+                if(jQuery.inArray(parseInt(response[i].question_id),question_repeat) != -1)
+                    $(rowNode).css('background','#f3e97c');
+                else
+                    $(rowNode).css('background','#5cb85cbf');
+            }// render tablicy z pytaniami
+            table_all_guestion.draw();
+        }
+     // funkcja pobierająca pytania które użytkownik już rozwiązywał
+     function downloadRepeatQuestion() {
+         // pobranie id użytkownika
+         var id_user = $('#user_select').val();
+         //pobranie id pytań użytkownika
+         $.ajax({
+             type: "POST",
+             url: '{{ route('api.getRepeatQuestion') }}',
+             headers: {
+                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+             },
+             data: {
+                 "id_user": id_user,
+             },
+             success: function (response) {
+                 //wpisanie infromacji do tablicy powtórzonych pytań
+                 question_repeat = [];
+
+                 if(response.length != 0)
+                 {
+                     for(var i=0;i<response.length;i++)
+                     {  // dodanie wpisu do tablicy
+                         question_repeat.push(parseInt(response[i]['question_id']));
+                         //spradzenie czy wybrany użytkownik nie miał już danego pytania w teście
+                         if(jQuery.inArray(parseInt(question_repeat[i]),question_array_id) != -1){
+                             $('#question_'+question_repeat[i]).css('background','#f3e97c');
+                         }else{
+                             $('#question_'+question_repeat[i]).css('background','#5cb85cbf');
+                         }
+                     }
+                 }else { // jeżeli nic nie dostanie w odpowiedzi, to wszysko zmień na zielono
+                     for (var i = 0; i < question_array_id.length; i++) {
+                         $('#question_'+question_array_id[i]).css('background','#5cb85cbf');
+                     }
+                 }
+             }
+         });
+
+     }
     // funkcja do sprawdzania czy danyc element jest w tabeli pod indeksem id
     function checkElementInArray(array,element) {
         for(var i=0;i<array.length;i++)
@@ -328,60 +477,49 @@
 
      // zapisanie testu
     $('#save_button').on('click',function (e) {
-        // wartość pola temat
+        var id_user = $('#user_select').val();
         var subject = $('#subject_input').val();
-        // wartość pola szablon
-        var template = $('#template_input').val();
-        // flaga ostateczna
         var flag_all_ok = true;
-        // flaga czasowa
         var flag_all_ok_time = true;
-        // sprawdzanie czy input'y nie są puse lub spacjami
+
         if(subject.trim().length == 0){
             flag_all_ok = false;
             $('#alert_subject').fadeIn(1000);
         }else{
             $('#alert_subject').fadeOut(1000);
         }
-        if(template.trim().length == 0){
-            flag_all_ok = false;
-            $('#alert_template').fadeIn(1000);
-        }else{
-            $('#alert_template').fadeOut(1000);
-        }
-        // sprawdzanie czy wybrano pytania do testu
         if(question_text_array.length == 0 && flag_all_ok)
         {
             flag_all_ok = false;
             swal("Nie wybrałeś pytań do testu.")
         }
-        //sprawdzenie czy czas na pytanie nie jest mniejszy niz zero
+
         for(var i=0;i<question_text_array.length;i++)
         {
-            if( question_text_array[i].time.trim().length == 0 || question_text_array[i].time <= 0)
+            if( String(question_text_array[i].time).trim().length == 0 || question_text_array[i].time <= 0)
             {
                 flag_all_ok_time = false;
                 break;
             }
         }
-        //sprawdzenie czy czas na pytanie nie jest mniejszy niz zero
         if(!flag_all_ok_time){
             flag_all_ok = false;
             swal("Błędny czas potrzebny na pytanie")
         }
-        // jeśli wszystko jest ok zapisz szablon
+
         if(flag_all_ok) {
             $("#save_button").attr('disabled', true);
             $.ajax({
                 type: "POST",
-                url: '{{ route('api.saveTestTemplate') }}',
+                url: '{{ route('api.saveTestWithUser') }}',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 data: {
                     "question_test_array": question_text_array,
+                    "id_user": id_user,
                     "subject": subject,
-                    "template": template,
+                    "template_id": template_id
                 },
                 success: function (response) {
                     if (response == 1){
@@ -481,7 +619,7 @@
         question_array_id = [];
          for(var i =0;i<question_text_array.length;i++)
          {
-             question_array_id.push(question_text_array[i].id);
+             question_array_id.push(parseInt(question_text_array[i].id));
          }
          // renderuj tabele
          table_all_guestion.draw();
