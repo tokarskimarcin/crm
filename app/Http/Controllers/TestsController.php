@@ -27,28 +27,50 @@ class TestsController extends Controller
     public function testUserGet($id) {
         $test = UserTest::find($id);
 
+        /**
+         * Sprawdzenie czy istnieje test
+         */
         if ($test == null) {
             return view('errors.404');
         }
 
+        /**
+         * Sprawdzenie czy test należy do użytkownika
+         */
         if ($test->user_id != Auth::user()->id) {
             return view('errors.404');
         }
 
+        /**
+         * Sprawdzenie czy test jest aktywowany
+         */
         if ($test->status < 2) {
             return view('errors.404');
         }
 
+        /**
+         * SPrawdzenie czy test został rozpoczęty, jęzeli nie, wrzucamy czas poczatkowy testu
+         */
         if ($test->test_start == null) {
             $test->test_start = date('Y-m-d H:i:s');
             $test->save();
         }
 
+        /**
+         * Pobranie pierwszego z kolejnosci pytania bez odpowiedzi
+         */
         $question = UserQuestion::where('test_id', '=', $id)
             ->whereNull('user_answer')
             ->first();
 
+        /**
+         * Zliczenie ilości pytań w teście
+         */
         $question_count = $test->questions->count();
+
+        /**
+         * Pobranie numeru aktualnego pytania
+         */
         $actual_count = UserQuestion::where('test_id', '=', $id)
             ->whereNull('user_answer')
             ->count();
@@ -60,34 +82,62 @@ class TestsController extends Controller
             2 - ostanite pytanie 
             3 - test zakończony
         */
+
         if ($question_count == $actual_count) {
+            // jezeli ilość pytań bez odpowiedzi jest rowna sumie pytań to pytaine jest pierwsze 
             $status = 1;
         } else if ($actual_count <= 0) {
+            //jezeli ilosc pytan bez odpowiedzi jest mniejsza lub rowna 0 to pytanie jest ostatnie
             $status = 2;
         } else {
+            //jezeli pytanie nie jest pierwsze lub ostatnie to pytanie jest środkowe (MR OBVIOUS)
             $status = 0;
         }
 
+        /**
+         * Jezeli pytanie nie istnieje (koniec testu)
+         */
         if ($question == null) {
-            $status = 3;
-            $test->status = 3;
-            if ($test->date_stop == null) {
-                $test->test_stop = date('Y-m-d H:i:s');
+
+            /**
+             * Jezeli status testu jest mniejszy niz 4 (status oceniony)
+             * to pytanie ma status 3 (do oceny)
+             */
+            if ($test->status < 4) {
+                $status = 3;
+                $test->status = 3;
+                /**
+                 * Jezeli pytanie nie istnieje i nie ma daty zakończenia testu, ustalamy ją
+                 */
+                if ($test->date_stop == null) {
+                    $test->test_stop = date('Y-m-d H:i:s');
+                }
+                $test->save();
             }
-            $test->save();
+            /**
+             * Sprawdzenie czy test jest oceniony
+             */
+            if ($test->status == 4) {
+                $status = 3;
+            }
         }
 
+        /**
+         * Pobranie treści pytania
+         */
         if ($question != null) {
+            //odejmujemy od czasu rozpoczęcia pytania czas na jego rozwiązanie i nadpisujemy 
             $testQuestion = TestQuestion::where('id', '=', $question->question_id)->get();
         } else {
+            //zdefiniowanie zmiennej (coś w widoku się wykrzacza bez niej)
             $testQuestion = false;
         }
 
         /**
          * Sprawdzenie czy była podjęta próba odpowiedzi
+         * Sprawdzenie czy pytanie zostało juz rozpoczęte (w przypadku odświerzenia strony)
          */
-
-        if ($question != null && $question->user_answer == null && $question->attempt != null) 
+        if ($question != null && $question->user_answer == null && $question->attempt != null)
             $rest_of_time = $question->available_time - (strtotime($question->attempt) - time()) * (-1);
         else 
             $rest_of_time = false;
@@ -131,7 +181,24 @@ class TestsController extends Controller
     public function testResult($id) {
         $test = UserTest::find($id);
         
-        if ($test == null || ($test->user_id != Auth::user()->id) && ($test->cadre_id != Auth::user()->id)) {
+        /**
+         * Sprawdzenie czy istnieje test
+         */
+        if ($test == null) {
+            return view('errors.404');
+        }
+
+        /**
+         * Sprawdzenie czy test należy do pracownika kadry lub osoby testowanej
+         */
+        if ($test->user_id != Auth::user()->id && $test->cadre_id != Auth::user()->id) {
+            return view('errors.404');
+        }
+
+        /**
+         * sprawdzenie czy test został oceniony i osoba testowana może mieć do niego wgląd
+         */
+        if ($test->user_id == Auth::user()->id && $test->status != 4) {
             return view('errors.404');
         }
 
@@ -407,7 +474,7 @@ class TestsController extends Controller
             ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
             ->groupBy('department_info.id')
             ->get();
-
+            
         $stats_by_user_type = DB::table('user_tests')
             ->select(DB::raw('
                 user_types.name as user_type,
@@ -493,13 +560,82 @@ class TestsController extends Controller
     /* 
         Statystyki poszczególnych oddziałów
     */
-    public function departmentTestsStatisticsGet($id) {
-        $department_info = Department_info::find($id);
+    public function departmentTestsStatisticsGet() {
+        $department_info = Department_info::all();
 
-
-        return view('tests.departmentStatistics')
+        return view('tests.departmentStatistics') 
             ->with('department_info', $department_info);
     }
+
+    /**
+     * Statystyk wybranego oddziału
+     */
+
+     public function departmentTestsStatisticsPost(Request $request) {
+        $id = $request->dep_id;
+
+        $department = Department_info::find($id);
+
+        if ($department == null) {
+            return view('errors.404');
+        }
+
+        $department_info = Department_info::all();
+
+        $count_dep_test_sum = DB::table('user_tests')
+            ->select(DB::raw('
+                count(*) as dep_sum
+            '))
+            ->leftJoin('users', 'users.id', 'user_tests.user_id')
+            ->where('users.department_info_id', '=', $id)
+            ->get();
+
+        $tests_by_user = DB::table('user_tests')
+            ->select(DB::raw('
+                first_name,
+                last_name,
+                count(*) as user_sum,
+                SUM(CASE WHEN result = 1 THEN 1 ELSE 0 END) as user_not_pass,
+                SUM(CASE WHEN result = 2 THEN 1 ELSE 0 END) as user_pass
+            '))
+            ->leftJoin('users', 'users.id', 'user_tests.user_id')
+            ->where('users.department_info_id', '=', $id)
+            ->groupBy('users.id')
+            ->get();
+
+        $tests_by_cadre = DB::table('user_tests')
+            ->select(DB::raw('
+                first_name,
+                last_name,
+                count(*) as user_sum
+            '))
+            ->leftJoin('users', 'users.id', 'user_tests.cadre_id')
+            ->where('users.department_info_id', '=', $id)
+            ->groupBy('users.id')
+            ->get();
+
+        $categories = DB::table('user_questions')
+            ->select(DB::raw('
+                test_categories.name as name,
+                count(*) as sum
+            '))
+            ->join('user_tests', 'user_tests.id', 'user_questions.test_id')
+            ->join('test_questions', 'test_questions.id', 'user_questions.question_id')
+            ->join('test_categories', 'test_categories.id', 'test_questions.category_id')
+            ->join('users', 'users.id', 'user_tests.user_id')
+            ->where('users.department_info_id', '=', $id)
+            ->groupBy('test_categories.id')
+            ->get();
+
+        return view('tests.departmentStatistics')
+            ->with('dep_sum', $count_dep_test_sum[0]->dep_sum)
+            ->with('id', $id)
+            ->with('tests_by_user', $tests_by_user)
+            ->with('tests_by_cadre', $tests_by_cadre)
+            ->with('categories', $categories)
+            ->with('department_info', $department_info)
+            ->with('department', $department);
+     }
 
     /* 
         Statystyki poszczególnych testów
@@ -539,7 +675,7 @@ class TestsController extends Controller
             if ($category == null) {
                 return 0;
             }
-            $category->name = $request->new_name_category;
+            $category->name = htmlentities($request->new_name_category, ENT_QUOTES, "UTF-8");
             $category->updated_at = date('Y-m-d H:i:s');
             $category->cadre_id = Auth::user()->id;
             $category->save();

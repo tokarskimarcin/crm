@@ -1,5 +1,7 @@
 @extends('layouts.main')
 @section('content')
+<script src="//cdn.ckeditor.com/4.5.7/standard/ckeditor.js"></script>
+
 <style>
     .btn {
          outline: none !important;
@@ -12,6 +14,10 @@
 
     .category_column {
         width: 10%;
+    }
+    .panel-info > .panel-heading {
+        background-color: #a36bce;
+        color: white;
     }
 </style>
 
@@ -37,7 +43,7 @@
                 <input type="text" class="form-control" name="category_name" id="category_name" placeholder="Kategoria..."/>
             </div>
             <div class="form-group">
-                <input type="submit" class="btn btn-success btn-lg" id="category_submit" value="Dodaj"/>
+                <input type="submit" class="btn btn-success btn-lg" id="category_submit" value="Zapisz"/>
             </div>
         </form>
     </div>
@@ -98,7 +104,6 @@
     </div>
 </div>
 
-
 <div id="myModal" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg" style="width: 90%">
 
@@ -121,8 +126,11 @@
                                 <label for="question_time">Czas na pytanie (w minutach):</label>
                                 <input name="question_time" id="question_time" type="number" class="form-control" placeholder="0" />
                             </div>
-                            <div class="form-group">
-                                <button class="btn btn-success" id="question_ready"><span class="glyphicon glyphicon-plus"></span> Dodaj</button>
+                            <div class="form-group" style="display:none" id="question_ready_div">
+                                <button class="btn btn-info" id="question_ready"><span class="glyphicon glyphicon-envelope"></span> Zapisz</button>
+                            </div>
+                            <div class="form-group" style="display: none" id="question_edited_div">
+                                <button class="btn btn-info" id="question_edited"><span class="glyphicon glyphicon-envelope"></span> Zapisz zmiany</button>
                             </div>
                         </div>
                     </div>
@@ -160,12 +168,14 @@
     </div>
 </div>
 
-
-
 @endsection
 
 @section('script')
 <script>
+    var editor = null;
+    $(document).ready(() => {
+        editor = CKEDITOR.replace( 'question_content' );
+    });
 
 //walidacja nazyw testu
 $('#category_submit').click((e) => {
@@ -179,90 +189,76 @@ $('#category_submit').click((e) => {
     }
 });
 
-
-//funkcja edytująca pytanie 
+/* Nowa funkcja edytujaca pytanie */
 function edit_question_button(e) {
+    $('#myModal').animate({ scrollTop: 0 }, 'slow');
     //pobranie ID pytania
     var id = $(e).data('q_id');
-    //sprawdzenie czy w pierwszej kolumnie wiersza istnieje input typu textarea
-    var check = $('.modal_table tr[name="' + id + '"]').find(' td:first textarea').html();
+    var question = $('.modal_table tr[name="' + id + '"]').find(' td:first').html();
+    //przekazanie danych do edytora
+    editor.setData(question);
+    {{--  //zablokowanie wszystkich przyciskow w tabeli
+    $("#myModal .btn-link").attr('disabled', true);  --}}
+    $('#add_question').fadeOut(0);
+    $('#new_question').fadeIn(500);
+    $('#question_edited_div').fadeIn(0);
+    $('#question_ready_div').fadeOut(0);
 
-    //jezeli nie istnieje input typu textarea
-    if (check == undefined) {
-        //pobranie tresci pytania z pierwszej kolumny wiersza
-        var question = $('.modal_table tr[name="' + id + '"]').find(' td:first').html();
-        //wykreowanie inputu z treścią pytania
-        var rawHtml = '<textarea rows="5" id="edited_question" class="form-control">' + question +'</textarea>';
-        //podmiana  pierwszej kolumny na input typu textarea
-        $('.modal_table tr[name="' + id + '"]').find(' td:first').html(rawHtml);
-        //zmiana atrybutu inputu zawierajacego minuty
-        $('.modal_table tr[name="' + id + '"]').find(' td:nth-child(2) input').attr('readonly', false);
-        //podmiania ikony z ołówka na kopertę
-        $(e).find('span').removeClass('glyphicon-pencil').addClass('glyphicon-envelope');
-        //zablokowanie wszystkich przyciskow w tabeli
-        $("#myModal .btn-link").attr('disabled', true);
-        //odblokowanie przycisku zapisującego
-        $(e).attr('disabled', false);
-    } else {
-        /*
-            jezeli istnieje input typu textarea - zapisujemy zmiany
-        */
-        //pobranie tresci pytania
-        var question = $('#edited_question').val();
-        //pobranie nowewj ilosci minut
-        var newTime = $('.modal_table tr[name="' + id + '"]').find(' td:nth-child(2) input').val();
-        var validation = true;
+    //przekazanie ID
+    $('#question_edited').attr('data-question_id', id);
 
-        //walidacja pustego pytania
-        if (question == '') {
-            swal('Musisz podać treść pytania!')
-            validation = false;
-        }
-        //walidacja pustego czasu pytania
-        if (newTime == '') {
-            swal('Musisz podać czas pytania!')
-            validation = false;
-        }
-        //walidacja prawidłowego czasu pytania
-        if (newTime <= 0) {
-            swal('Czas pytania musi wynosić minimum 1 minutę!')
-            validation = false;
-        }
+    //pobranie  ilosci minut
+    var oldTime = $('.modal_table tr[name="' + id + '"]').find(' td:nth-child(2) input').val();
+    //podmiana czasu pytania
+    $('#question_time').val(oldTime);
 
-        //zaktualizowanie danych w bazie
-        if (validation == true) {
-            $.ajax({
-                type:"POST",
-                async: false,
-                url: '{{ route('api.editTestQuestion') }}',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                data:{
-                    "question":question,
-                    "question_id":id,
-                    "newTime":newTime
-                },
-                success: function(response) {
-                    if (response == 1) {
-                        swal('Zmiany zapisano pomyślnie!')
-                    } else {
-                        swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
-                    }
-                }
-            });
-            //podmiania pierwszej kolumny na nową treśc pytania
-            $('.modal_table tr[name="' + id + '"]').find(' td:first').html(question);
-            //podmiana ikony z koperty na ołówek
-            $(e).find('span').removeClass('glyphicon-envelope').addClass('glyphicon-pencil');
-            //zablokowanie inputu zawierajacego czas pytania
-            $('.modal_table tr[name="' + id + '"]').find(' td:nth-child(2) input').attr('readonly', true);
-            //odblokowanie przyciskow w tabeli
-            $(".btn-link").attr('disabled', false);
-        }
-    }
 }
 
+$('#question_edited').click(function(e) {
+    //pobranie Id pytania
+    var id = $(this).data('question_id');
+    //pobranie tresci pytania 
+    var content = editor.getData();
+    //pobranie czasu pytania
+    var question_time = $('#question_time').val();
+    //walidacja braku tresci pytania
+    if (content == '') {
+        swal('Podaj treść pytania!')
+        return;
+    }
+    //walidacja braku czasu pytania
+    if (question_time == '') {
+        swal('Podaj czas pytania!')
+        return;
+    }
+
+    //zaktualizowanie danych w bazie
+    $.ajax({
+        type:"POST",
+        async: false,
+        url: '{{ route('api.editTestQuestion') }}',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        data:{
+            "question":content,
+            "question_id":id,
+            "newTime":question_time
+        },
+        success: function(response) {
+            if (response == 1) {
+                swal('Zmiany zapisano pomyślnie!')
+            } else {
+                swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
+            }
+        }
+    });
+    $('#question_edited_div').fadeOut(0);
+    editor.setData('');
+    $('#add_question').fadeOut();
+    $('#question_time').val(0);
+    $('#myModal').modal('toggle');
+});
 
 /*
     Funkcja usuwajaca pytanie 
@@ -305,7 +301,6 @@ function deleteQuestion(e) {
         }
         })
 }
-
 
 var type_is_edited = false;
 $('.edit_type').click(function() {
@@ -368,7 +363,6 @@ $('.edit_type').click(function() {
         type_is_edited = false;
     }
 });
-
 
 //zmiana stutusu kaktegorii
 $('.category_status').click(function() {
@@ -484,19 +478,24 @@ $('#myModal').on('hidden.bs.modal', function () {
             }
         }
     });
+    editor.setData('');
+    $('#question_time').val(0);
+    $('#add_question').fadeIn(0);
+    $('#new_question').fadeOut(500);
 })
 
 //dodawanie w modalu templatki do dodawania pytan
 $('#add_question').click(() => {
     $('#add_question').fadeOut(0);
     $('#new_question').fadeIn(500);
+    $('#question_ready_div').fadeIn(0);
 });
-
 
 //zapis nowego pytania
 $('#question_ready').click(() => {
     //pobranie tresci pytania 
-    var content = $('#question_content').val();
+    var content = editor.getData();
+    {{--  var content = $('#question_content').val();  --}}
     //pobranie czasu pytania
     var question_time = $('#question_time').val();
     //walidacja braku tresci pytania
@@ -527,6 +526,7 @@ $('#question_ready').click(() => {
                 swal('Pytanie zostało dodane!')
                 //wyczyszczenie formularza z nowym pytaniem
                 $('#question_content').val('');
+                editor.setData('');
                 $('#question_time').val(0);
                 //ukrycie modala
                 $('#myModal').modal('toggle');

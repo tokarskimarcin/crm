@@ -4,6 +4,9 @@
     .xsm-col-th {
         width: 5%
     }
+    .md-col-th {
+        width: 10%
+    }
     .sm-col-th {
         width: 15%
     }
@@ -35,7 +38,7 @@
                         <td>Użytkownik</td>
                         <td>Nazwa testu</td>
                         <td class="sm-col-th">Aktywacja</td>
-                        <td class="sm-col-th">Szczegóły</td>
+                        <td class="md-col-th">Szczegóły</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -53,9 +56,9 @@
                                 </button>
                             </td>
                             <td>
-                                <button class="btn btn-default">
-                                    Szczegóły
-                                </button>
+                                <a class="btn btn-default" href="{{ URL::to('/test_result') }}/{{$test->id}}">
+                                    <span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły
+                                </a>
                             </td>
                         </tr>
                     @endforeach
@@ -88,7 +91,9 @@
                             <td>{{$test->user->first_name . ' ' . $test->user->last_name}}</td>
                             <td>{{$test->name}}</td>
                             <td>
-                                tutaj nie można zaglądać
+                                <a class="btn btn-default" href="{{ URL::to('/test_result') }}/{{$test->id}}">
+                                    <span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły
+                                </a>
                             </td>
                         </tr>
                     @endforeach
@@ -157,8 +162,8 @@
                             <td>{{$test->user->first_name . ' ' . $test->user->last_name}}</td>
                             <td>{{$test->name}}</td>
                             <td>
-                                <a class="btn btn-default" href="{{ URL::to('/check_test') }}/{{$test->id}}">
-                                    Szczegóły
+                                <a class="btn btn-default" href="{{ URL::to('/test_result') }}/{{$test->id}}">
+                                    <span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły
                                 </a>
                             </td>
                         </tr>
