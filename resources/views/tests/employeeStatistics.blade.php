@@ -56,10 +56,11 @@
   <table class="table table-striped">
       <thead>
           <tr>
-              <th>Lp.</th>
+              <th style="width: 5%">Lp.</th>
               <th>Nazwa testu</th>
-              <th>Osoba testująca</th>
-              <th>Rezultat</th>
+              <th style="width: 15%">Osoba testująca</th>
+              <th style="width: 10%">Rezultat</th>
+              <th style="width: 10%">Szczegóły</th>
           </tr>
         </thead>
         <tbody>
@@ -78,6 +79,11 @@
                         @else
                             <span>Brak oceny</span>
                         @endif
+                    </td>
+                    <td>
+                        <a class="btn btn-default" href="{{ URL::to('test_result') }}/{{$test->id}}">
+                            <span style="color: green" class="glyphicon glyphicon-info-sign"></span> Szczegóły
+                        </a>
                     </td>
                 </tr>
             @endforeach

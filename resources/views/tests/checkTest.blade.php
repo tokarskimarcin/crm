@@ -108,7 +108,7 @@ body{margin:40px;}
                             <div class="panel-body">
                                 {{--  Dlaczego tu kurwa jebane gówno nie umie wyciągnąć tego normalnie z kolekcji? nie wiem  --}}
                                 @foreach($item->testQuestion as $shit)
-                                    {{$shit->content}} 
+                                    {!! $shit->content !!} 
                                 @endforeach
                             </div>
                         </div>
@@ -146,7 +146,9 @@ body{margin:40px;}
                 <div>
                 <br />
                 <div class="form-group">
-                    <input type="submit" class="btn btn-success btn-lg" value="Prześlij ocenę" id="send_opinion"/>
+                    <button role="submit" class="btn btn-info" id="send_opinion"/>
+                        <span class="glyphicon glyphicon-send"></span> Prześlij opinię
+                    </button>
                 <div>
             @else
                 <div class="alert alert-info">

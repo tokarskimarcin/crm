@@ -78,7 +78,11 @@
                         <b>Data testu</b>
                     </div>
                     <div class="panel-body">
-                        {{substr($test->test_start, 0, 10)}}
+                        @if($test->test_stop != null)
+                            {{substr($test->test_start, 0, 10)}}
+                        @else
+                            Użytkownik nie wypełnił jeszcze testu.
+                        @endif
                     </div>
                 </div>
             </div>
@@ -88,7 +92,11 @@
                         <b>Czas rozpoczęcia/zakończenia</b>
                     </div>
                     <div class="panel-body">
-                        {{substr($test->test_start, 11, 20)}} - {{substr($test->test_stop, 11, 20)}}
+                        @if($test->test_stop != null)
+                            {{substr($test->test_start, 11, 20)}} - {{substr($test->test_stop, 11, 20)}}
+                        @else
+                            Użytkownik nie wypełnił jeszcze testu.
+                        @endif
                     </div>
                 </div>
             </div>
@@ -98,10 +106,12 @@
                         <b>Rezultat</b>
                     </div>
                     <div class="panel-body">
-                        @if($test->result == 1)
+                        @if($test->result == 2)
                             <b style="color: red">NEGATYWNY</b>
-                        @else
+                        @elseif($test->result == 1)
                             <b style="color: green">POZYTYWNY</b>
+                        @else
+                            <b>Brak oceny</b>
                         @endif
                     </div>
                 </div>
@@ -123,15 +133,33 @@
                     <ul class="list-group">
                         <li class="list-group-item">
                             <p><b>Treść pytania:</b></p>
-                            <div class="alert alert-info">{{$item->testQuestion[0]->content}}</div>
+                            <div class="alert alert-info">
+                                @if($item->testQuestion[0]->content != null)
+                                    {!! $item->testQuestion[0]->content !!}
+                                @else
+                                    Brak treści pytania.Skontaktuj się z administratorem!
+                                @endif
+                            </div>
                         </li>
                         <li class="list-group-item">
                             <p><b>Odpowiedź pracownika:</b></p>
-                            <div class="alert alert-info">{{$item->user_answer}}</div>
+                            <div class="alert alert-info">
+                                @if($item->user_answer != null)
+                                    {{$item->user_answer}}
+                                @else
+                                    Użytkownik nie wypełnił jeszcze testu!
+                                @endif
+                            </div>
                         </li>
                         <li class="list-group-item">
                             <p><b>Komentarz osoby testującej:</b></p>
-                            <div class="alert alert-info">{{$item->cadre_comment}}</div>
+                            <div class="alert alert-info">
+                                @if($item->cadre_comment != null)
+                                    {{$item->cadre_comment}}
+                                @else
+                                    Brak komentarza!
+                                @endif
+                            </div>
                         </li>
                     </ul>
                 </div>

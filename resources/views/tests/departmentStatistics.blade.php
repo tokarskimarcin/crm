@@ -12,11 +12,36 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-                <div class="well my-well">Testy / Statystyki oddziału / {{$department_info->departments->name . ' ' . $department_info->department_type->name}}</div>
+                <div class="well my-well">Testy / Statystyki oddziałów</div>
         </div>
     </div>
 </div>
 
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="col-md-4">
+            <form action="{{ URL::to('/department_statistics') }}" method="POST">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                <div class="form-group">
+                    <select class="form-control" name="dep_id">
+                        <option value="0">Wybierz</option>
+                        @foreach($department_info as $item)
+                            <option @if(isset($id) && $id == $item->id) selected @endif value="{{$item->id}}">{{$item->departments->name . ' ' . $item->department_type->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button role="submit" class="btn btn-info">
+                        <span></span> Pokaż statystyki
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@if(isset($department) && $department != null)
 <div class="row">
     <div class="col-md-4">
         <div class="panel panel-info">
@@ -24,7 +49,7 @@
                 <b>Oddział</b>
             </div>
             <div class="panel-body">
-                {{$department_info->departments->name . ' ' . $department_info->department_type->name}}
+                {{$department->departments->name . ' ' . $department->department_type->name}}
             </div>
         </div>
     </div>
@@ -34,7 +59,7 @@
                 <b>Ilość przeprowadzonych testów</b>
             </div>
             <div class="panel-body">
-                53
+                {{$dep_sum}}
             </div>
         </div>
     </div>
@@ -44,7 +69,7 @@
                 <b>Ilość pracowników kadry</b>
             </div>
             <div class="panel-body">
-                {{$department_info->users->whereNotIn('user_type_id', [1,2])->where('status_work', '=', 1)->count()}}
+                {{$department->users->whereNotIn('user_type_id', [1,2])->where('status_work', '=', 1)->count()}}
             </div>
         </div>
     </div>
@@ -62,40 +87,32 @@
     </div>
 </div>
 
-
+@endif
 @endsection
 
 @section('script')
+@if(isset($department) && $department != null)
 <script>
 
-google.charts.load("current", {packages:["corechart"]});
-      google.charts.setOnLoadCallback(drawChart);
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['Ilość', 'Statystyki'],
-          ['Zaliczone', 3],
-          ['Niezaliczone',      4]
-        ]);
-
-        var options = {
-          title: 'Rezultaty oddziału',
-          pieHole: 0.4,
-        };
-
-        var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
-        chart.draw(data, options);
-      }
-
+    @php
+        $total_ok = 0;
+        $total_nok = 0;
+        $total_sum = 0;
+    @endphp
 google.charts.load("current", {packages:["corechart"]});
       google.charts.setOnLoadCallback(drawChartUsers);
       function drawChartUsers() {
         var data = google.visualization.arrayToDataTable([
           ['Ilość', 'Statystyki'],
-          ['Mariola Pindola', 3],
-          ['Adam Małysz',      4],
-          ['Badam Małysz',      4],
-          ['Ladam Małysz',      4],
-          ['Amadam Małysz',      4]
+          @foreach($tests_by_user as $item)
+            ['{{$item->first_name . ' ' . $item->last_name}}', {{$item->user_sum}}],
+            @php
+                $total_ok += $item->user_pass;
+                $total_nok += $item->user_not_pass;
+                $total_sum += $item->user_sum;
+            @endphp
+          @endforeach
+            ['', 0]
         ]);
 
         var options = {
@@ -107,26 +124,44 @@ google.charts.load("current", {packages:["corechart"]});
         chart.draw(data, options);
       }
 
+
 google.charts.load("current", {packages:["corechart"]});
-      google.charts.setOnLoadCallback(drawChartType);
-      function drawChartType() {
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
         var data = google.visualization.arrayToDataTable([
-          ['Ilość', 'Statystyki'],
-          ['FUKO', 3],
-          ['SMART', 4],
-          ['FART', 2],
-          ['ART', 3],
-          ['ŻART', 9]
+        ['Ilość', 'Statystyki'],
+        ['Zaliczone', {{$total_ok}}],
+        ['Niezaliczone', {{$total_nok}}]
         ]);
 
         var options = {
-          title: 'Typy zagadnień',
-          pieHole: 0.4,
+        title: 'Rezultaty oddziału',
+        pieHole: 0.4,
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+        chart.draw(data, options);
+    }
+
+google.charts.load("current", {packages:["corechart"]});
+    google.charts.setOnLoadCallback(drawChartType);
+    function drawChartType() {
+        var data = google.visualization.arrayToDataTable([
+        ['Ilość', 'Statystyki'],
+            @foreach($categories as $item)
+                ['{{$item->name}}', {{$item->sum}}],
+            @endforeach
+        ['', 0]
+        ]);
+
+        var options = {
+        title: 'Typy zagadnień',
+        pieHole: 0.4,
         };
 
         var chart = new google.visualization.PieChart(document.getElementById('drawChartType'));
         chart.draw(data, options);
-      }
+    }
 
 
 google.charts.load("current", {packages:["corechart"]});
@@ -134,9 +169,10 @@ google.charts.load("current", {packages:["corechart"]});
       function drawChartTester() {
         var data = google.visualization.arrayToDataTable([
           ['Ilość', 'Statystyki'],
-          ['Alicja Galicja', 3],
-          ['Józef Zenoniuk', 4],
-          ['Robert Biedroń', 2]
+          @foreach($tests_by_cadre as $item)
+            ['{{$item->first_name . ' ' . $item->last_name}}', {{$item->user_sum}}],
+          @endforeach
+          ['', 0]
         ]);
 
         var options = {
@@ -148,4 +184,5 @@ google.charts.load("current", {packages:["corechart"]});
         chart.draw(data, options);
       }
 </script>
+@endif
 @endsection

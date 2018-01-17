@@ -38,7 +38,12 @@
 			.div2, .div4, .div6 {
 			  width:120%;
 			  height: auto;
-			}
+      }
+      
+      .alert-destroyer {
+        background-color: #888c91;
+        color: white;
+      }
 
 	</style>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->

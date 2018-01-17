@@ -1,5 +1,11 @@
 @extends('layouts.main')
 @section('content')
+<style>
+    thead {
+        background-color: #4a4e54;
+        color: white;
+    }
+</style>
 
 <div class="row">
     <div class="col-md-12">
@@ -21,9 +27,9 @@
             <table class="table table-stripped">
                 <thead>
                     <tr>
-                        <th>Lp.</th>
-                        <th>Data</th>
-                        <th>Osoba testująca</th>
+                        <th style="width: 5%">Lp.</th>
+                        <th style="width: 15%">Data</th>
+                        <th style="width: 20%">Osoba testująca</th>
                         <th>Tytuł testu</th>
                         <th style="width: 10%">Akcja</th>
                     </tr>
@@ -46,6 +52,9 @@
                     @endforeach
                 </tbody>
             </table>
+            @if($i == 0)
+                <div class="alert alert-destroyer">Brak elementów w tej kategorii!</div>
+            @endif
         </div>
     </div>
     <div id="finished" class="tab-pane fade">
@@ -53,9 +62,9 @@
         <table class="table table-stripped">
             <thead>
                 <tr>
-                    <th>Lp.</th>
-                    <th>Data</th>
-                    <th>Osoba testująca</th>
+                    <th style="width: 5%">Lp.</th>
+                    <th style="width: 15%">Data</th>
+                    <th style="width: 20%">Osoba testująca</th>
                     <th>Tytuł testu</th>
                     <th style="width: 10%">Status</th>
                 </tr>
@@ -81,9 +90,9 @@
         <table class="table table-stripped">
             <thead>
                 <tr>
-                    <th>Lp.</th>
-                    <th>Data</th>
-                    <th>Osoba testująca</th>
+                    <th style="width: 5%">Lp.</th>
+                    <th style="width: 15%">Data</th>
+                    <th style="width: 20%">Osoba testująca</th>
                     <th>Tytuł testu</th>
                     <th style="width: 10%">Akcja</th>
                 </tr>
@@ -98,7 +107,7 @@
                         <td>{{$test->cadre->first_name . ' ' . $test->cadre->last_name}}</td>
                         <td>{{$test->name}}</td>
                         <td>
-                            <a class="btn btn-info">
+                            <a class="btn btn-info" href="{{ URL::to('/test_result') }}/{{$test->id}}">
                                 <span class="glyphicon glyphicon-pencil"></span> Zobacz ocenę testu
                             </a>
                         </td>
