@@ -353,6 +353,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/add_test', 'TestsController@addTestGet');
     Route::POST('/add_test', 'TestsController@addTestPost');
+    Route::get('/view_test/{id}', 'TestsController@viewTest'); // podgląd testu
 
     Route::get('/show_tests', 'TestsController@showTestsGet');
     Route::POST('/show_tests', 'TestsController@showTestsPost');
