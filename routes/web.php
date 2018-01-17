@@ -135,6 +135,8 @@ Route::get('/hourReportChecked', 'StatisticsController@hourReportChecked');
 Route::get('/dayReportChecked', 'StatisticsController@dayReportChecked');
 Route::get('/weekReportChecked', 'StatisticsController@weekReportChecked');
 
+Route::get('/weekRaportNewBaseWeek', 'DatabaseURLController@MailNewBaseWeek');
+Route::get('/monthRaportNewBaseWeek', 'DatabaseURLController@MailRaportNewBaseMonth');
 //End emails
 
 
@@ -339,6 +341,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/pageHourReportDkjEmployee', 'StatisticsController@pageHourReportDkjEmployee');
 
+    Route::get('/pageRaportNewBaseWeek', 'DatabaseURLController@pageRaportNewBaseWeek');
+    Route::get('/pageRaportNewBaseMonth', 'DatabaseURLController@pageRaportNewBaseMonth');
     //Report Page STOP
 
     //TESTS START //
