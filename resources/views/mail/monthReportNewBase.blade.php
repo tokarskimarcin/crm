@@ -2,7 +2,7 @@
 <thead style="color:#efd88f;">
 <tr>
 <td colspan="3" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20; color:#efd88f;">
-<font size="4" face="sans-serif">Miesięczny raport nowych zgód {{$month}}</td>
+<font size="5" face="sans-serif">Miesięczny raport nowych zgód {{$month}}</td>
 <td colspan="4" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20;">
 <img src="http://xdes.pl/logovc.png"></td>
 </tr>

@@ -118,14 +118,7 @@
     </div>
 </div>
 
-
-
-
-
-
-
 <!-- Sekcja z modalami -->
-
 
 <div class="container">
     <!-- Modal -->
@@ -251,18 +244,21 @@
      });
      // funkcja ustawiająca dane przez informacje z php
         function setDataFromPHP() {
-            var question_array_php = {!! json_encode($all_question) !!};
+            var test_info = {!! json_encode($test_by_id) !!};
+            var all_question = {!! json_encode($all_question) !!};
+            console.log(all_question);
+            console.log(test_info);
             // zerowanie tablic pomcniczych oraz datatables
             question_array_id = [];
             question_text_array = [];
             table_all_guestion.clear();
             //wpisanie danych z szablonu na stronę testu
-            for(var i=0;i<question_array_php.length;i++)
+            for(var i=0;i<all_question.length;i++)
             {
-                console.log(question_array_php[i].id);
+                console.log(all_question[i].id_question);
                 // przepisanie danych z szablonu do testu
-                question_text_array.push({id:question_array_php[i].id,text:question_array_php[i].content,time:response[i].question_time/60,subject:response[i].name});
-                question_array_id.push(parseInt(response[i].question_id));
+                question_text_array.push({id:all_question[i].id_question,text:all_question[i].content,time:0,subject:0});
+                question_array_id.push(parseInt(all_question[i].question_id));
                 // dodanie wiersza do wszystkich pytań
                 var rowNode = table_all_guestion.row.add([
                     response[i].name,

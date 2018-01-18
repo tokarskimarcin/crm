@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Mail;
 class DatabaseURLController extends Controller
 {
 
-    // pobranie danych tygodniowych
+    // nowe zgody raport tygodniowy (przygotowanie danych)
     private function NewBaseWeekData(){
         $json =  file_get_contents('http://baza.teambox.pl/baza/getRaportNewBaseWeek');
         $obj = json_decode($json);
@@ -25,19 +25,19 @@ class DatabaseURLController extends Controller
         $data['rest'] = $rest_count;
         return $data;
     }
-    // wyświetlenie strony
-    public function pageRaportNewBaseWeek()
+    // wyświetlenie strony z nowymi zgodami tygodniowy
+    public function pageWeekRaportNewBaseWeek()
     {
         $data = $this->NewBaseWeekData();
-        return view('mail.weekReportNewBase')
+        return view('reportpage.WeekReportNewBase')
             ->with('bisnode',$data['bisnode'])
             ->with('aggree',$data['aggree'] )
             ->with('event',$data['event'])
             ->with('exito', $data['exito'])
             ->with('rest',$data['rest']);
     }
-    // wysłanie maila
-    public function MailNewBaseWeek(){
+    // wysłanie maila wyświetlenie strony z nowymi zgodami tygodniowy
+    public function MailWeekRaportNewBaseWeek(){
         $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
         $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
         $data = $this->NewBaseWeekData();
@@ -45,7 +45,7 @@ class DatabaseURLController extends Controller
         $this->sendMailByVerona('weekReportNewBase', $data, $title);
     }
 
-    // Raport bazy miesięczny Dane
+    //  nowe zgody raport miesieczny (przygotowanie danych)
     private function NewBaseMonthData()
     {
         $json =  file_get_contents('http://baza.teambox.pl/baza/getRaportNewBaseMonth');
@@ -66,11 +66,11 @@ class DatabaseURLController extends Controller
         $data['month'] = $month_name;
         return $data;
     }
-    //Strona
-    public function pageRaportNewBaseMonth()
+    //Strona nowe zgody raport miesieczny
+    public function pageMonthRaportNewBaseWeek()
     {
        $data = $this->NewBaseMonthData();
-        return view('mail.monthReportNewBase')
+        return view('reportpage.MonthReportNewBase')
             ->with('bisnode',$data['bisnode'])
             ->with('aggree',$data['aggree'] )
             ->with('event',$data['event'])
@@ -78,12 +78,87 @@ class DatabaseURLController extends Controller
             ->with('rest',$data['rest'])
             ->with('month',$data['month']);
     }
-    //Wysłanie maila
-    public function MailRaportNewBaseMonth(){
+    //Wysłanie maila z nowe zgody raport miesieczny (przygotowanie danych)
+    public function MailMonthRaportNewBaseWeek(){
         $data = $this->NewBaseMonthData();
         $title = 'Raport Miesięczny Nowych Zgód: '.$data['month'];
-        $this->sendMailByVerona('weekmonthReportNewBase', $data, $title);
+        $this->sendMailByVerona('monthReportNewBase', $data, $title);
     }
+
+
+    // przygotowanie danych pobranych rekordów z bazy (type -> 1 dzienny, 2 tygodniowy, 3 miesieczny)
+    private function DatabaseUseData($type)
+    {
+        $json =  file_get_contents('http://baza.teambox.pl/baza/getRaportDayAPI/'.$type);
+        $obj = json_decode($json);
+        $data['overall_result'] = $obj->overall_result;
+        $data['departments_statistic'] =  $obj->departments_statistic;
+        $data['employee_statistic'] =  $obj->employee_statistic;
+        return $data;
+    }
+
+    //Raport Dzienny
+    public function MailDayRaportDatabaseUse(){
+        $data = $this->DatabaseUseData(1);
+        $title = 'Raport dzienny wykorzystania bazy: '.date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $this->sendMailByVerona('dayReportDatabaseUse', $data, $title);
+    }
+
+    public function pageDayRaportDatabaseUse(){
+        $data = $this->DatabaseUseData(1);
+        return view('reportpage.DayReportDatabaseUse')
+            ->with('overall_result',$data['overall_result'])
+            ->with('departments_statistic',$data['departments_statistic'] )
+            ->with('employee_statistic',$data['employee_statistic']);
+    }
+    //Tygodniowy
+    public function MailWeekRaportDatabaseUse(){
+        $data = $this->DatabaseUseData(2);
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $title = 'Raport tygodniowy wykorzystania bazy: '.$date_start.' - '.$date_stop;
+        $this->sendMailByVerona('weekReportDatabaseUse', $data, $title);
+    }
+    public function pageWeekRaportDatabaseUse(){
+        $data = $this->DatabaseUseData(2);
+        return view('reportpage.WeekReportDatabaseUse')
+            ->with('overall_result',$data['overall_result'])
+            ->with('departments_statistic',$data['departments_statistic'] )
+            ->with('employee_statistic',$data['employee_statistic']);
+    }
+    //Miesięczny
+    public function MailMonthRaportDatabaseUse(){
+        $data = $this->DatabaseUseData(3);
+        $month = date('m') -1;
+        $month_name = $this::monthReverseName($month);
+        $title = 'Raport miesięczny wykorzystania bazy: '.$month_name;
+        $this->sendMailByVerona('monthReportDatabaseUse', $data, $title);
+    }
+    public function pageMonthRaportDatabaseUse(){
+        $data = $this->DatabaseUseData(3);
+        $month = date('m') -1;
+        $month_name = $this::monthReverseName($month);
+        return view('reportpage.MonthReportDatabaseUse')
+            ->with('overall_result',$data['overall_result'])
+            ->with('departments_statistic',$data['departments_statistic'] )
+            ->with('employee_statistic',$data['employee_statistic'])
+            ->with('month',$month_name);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    /*
+     * FUNKCJE PRYWATNE
+     */
 
     //zwracanie nazwy miesiąca którego dotyczy statystyka
     private function monthReverseName($month) {
@@ -92,6 +167,7 @@ class DatabaseURLController extends Controller
         $month = ($month < 0) ? 11 : $month ;
         return $month_names[$month];
     }
+
      // zliczanie danych
     private function count_date($obj,&$agree_count,&$bisnode_count,&$event_count,&$exito_count,&$rest_count)
     {
@@ -132,8 +208,8 @@ class DatabaseURLController extends Controller
     $accepted_users = [
         'cytawa.verona@gmail.com',
         'jarzyna.verona@gmail.com',
-        'pawel.zielinski@veronaconsulting.pl',
-        'kamil.kostecki@veronaconsulting.pl'
+//        'pawel.zielinski@veronaconsulting.pl',
+//        'kamil.kostecki@veronaconsulting.pl'
     ];
 
      Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
