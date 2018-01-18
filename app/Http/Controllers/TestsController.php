@@ -314,11 +314,9 @@ class TestsController extends Controller
         foreach ($all_question_id as $item)
         {
             $content_question = $item->testQuestion()->get();
-            dd($content_question);
-            $all_question += ["id_question" => $content_question->id,"content" => $content_question->content];
+            array_push($all_question,["id_question" => $content_question[0]->id,"content" => $content_question[0]->content]);
 
 
-            break;
         }
         return view('tests.viewTest')
             ->with('test_by_id',$test_by_id)
