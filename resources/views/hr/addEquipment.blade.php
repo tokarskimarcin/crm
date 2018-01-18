@@ -82,7 +82,7 @@
                                     <label >Podaj pojemność dysku!</label>
                                 </div>
                         @endif
-                        @if($equipments_types->id == 2)
+                        @if($equipments_types->id == 3)
                             <div class="form-group">
                                 <label for="phone_box">Opakowanie na telefon</label>
                                 <select name="phone_box" class="form-control">
@@ -95,7 +95,7 @@
                                     <label >Wybierz opcje!</label>
                                 </div>
                         @endif
-                        @if($equipments_types->id == 3)
+                        @if($equipments_types->id == 2)
                             <div class="form-group">
                                 <label for="tablet_modem">Modem 3G</label>
                                 <select name="tablet_modem" class="form-control">

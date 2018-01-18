@@ -175,7 +175,7 @@
                                 </div>
 
                         @endif
-                        @if($equipment->equipment_type_id == 3)
+                        @if($equipment->equipment_type_id == 2)
                             <div class="form-group">
                                 <label for="tablet_modem">Modem 3G</label>
                                 <select name="tablet_modem" class="form-control">
@@ -189,28 +189,26 @@
                                 </div>
 
                         @endif
-                        @if($equipment->equipment_type_id == 2 || $equipment->equipment_type_id == 3)
-                            <div class="form-group">
-                                <label for="imei">Numer IMEI</label>
-                                <input name="imei" type="text" value="{{$equipment->imei}}" class="form-control" />
-                            </div>
-
-                                <div class="alert alert-danger" style="display: none" id="alert_imei">
-                                    <label >Podaj imei!</label>
-                                </div>
-
-                            <div class="form-group">
-                                <label for="phone_box">Opakowanie na telefon</label>
-                                <select name="phone_box" class="form-control">
-                                    <option value="1" @if($equipment->phone_box == 1) selected @endif>Tak</option>
-                                    <option value="0" @if($equipment->phone_box == 0) selected @endif>Nie</option>
-                                </select>
-                            </div>
-
-                                <div class="alert alert-danger" style="display: none" id="alert_phone_box">
-                                    <label >Wybierz opcje!</label>
-                                </div>
-
+                        @if($equipment->equipment_type_id == 3)
+                        <div class="form-group">
+                            <label for="phone_box">Opakowanie na telefon</label>
+                            <select name="phone_box" class="form-control">
+                                <option value="1" @if($equipment->phone_box == 1) selected @endif>Tak</option>
+                                <option value="0" @if($equipment->phone_box == 0) selected @endif>Nie</option>
+                            </select>
+                        </div>
+                        <div class="alert alert-danger" style="display: none" id="alert_phone_box">
+                            <label >Wybierz opcje!</label>
+                        </div>
+                        @endif
+                        @if($equipment->equipment_type_id == 2 || $equipment->equipment_type_id == 3 || $equipment->equipment_type_id == 4)
+                        <div class="form-group">
+                            <label for="imei">Numer IMEI</label>
+                            <input name="imei" type="text" value="{{$equipment->imei}}" class="form-control" />
+                        </div>
+                        <div class="alert alert-danger" style="display: none" id="alert_imei">
+                            <label >Podaj imei!</label>
+                        </div>
                         @endif
                         <div class="form-group">
                             <label for="description">Opis</label>

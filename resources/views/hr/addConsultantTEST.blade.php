@@ -251,6 +251,16 @@
                                             <td colspan="1">Wybierz typ użytkownika!</td>
                                             <td></td>
                                         </tr>
+                                        <tr>
+                                            <td class="td-class"><b>Numer kolejki PBX:</b></td>
+                                            <td>
+                                                <input type="text" class="form-control" placeholder="Login z programu do dzwonienia" name="login_phone" value="{{$user->login_phone}}">
+                                            </td>
+                                        </tr>
+                                        <tr class="alert alert-danger" style="display: none" id="alert_pbx">
+                                            <td colspan="1">Podaj numer kolejki PBX!</td>
+                                            <td></td>
+                                        </tr>
                                         @endif
                                         @if(isset($penalty_bonuses[1]))
                                             <tr>
@@ -273,16 +283,6 @@
                                                 </td>
                                             </tr>
                                         @endif
-                                        <tr>
-                                            <td class="td-class"><b>Numer kolejki PBX:</b></td>
-                                            <td>
-                                                <input type="text" class="form-control" placeholder="Login z programu do dzwonienia" name="login_phone" value="{{$user->login_phone}}">
-                                            </td>
-                                        </tr>
-                                        <tr class="alert alert-danger" style="display: none" id="alert_pbx">
-                                            <td colspan="1">Podaj numer kolejki PBX!</td>
-                                            <td></td>
-                                        </tr>
                                         @if($type == 2)
                                             <tr>
                                                 <td class="td-class"><b>Oddział:</b></td>
