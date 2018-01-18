@@ -67,7 +67,7 @@
                             <div class="alert alert-danger" style="display: none" id="alert_serial_code">
                                 <label>Podaj numer seryjny!</label>
                             </div>
-
+                        @if($equipment->equipment_type_id != 4)
                         <div class="form-group">
                             <label for="power_cable">Kabel zasilający</label>
                             <select name="power_cable" class="form-control">
@@ -79,7 +79,7 @@
                             <div class="alert alert-danger" style="display: none" id="alert_power_cable">
                                 <label>Wybierz stan kabla zasilającego!</label>
                             </div>
-
+                        @endif
                         @if($equipment->equipment_type_id == 1)
                             <div class="form-group">
                                 <label for="laptop_processor">Procesor</label>

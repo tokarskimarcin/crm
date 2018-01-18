@@ -42,7 +42,7 @@ class ScheduleController extends Controller
             ->leftjoin("schedule", function ($join) use ($number_of_week,$year) {
                 $join->on("schedule.id_user", "=", "users.id")
                     ->where("schedule.week_num", "=", $number_of_week)
-                    ->groupBy('users.last_name')
+                    ->orderBy('users.last_name')
                     ->where("schedule.year", "=", $year);
             })
             ->select(DB::raw(
@@ -61,7 +61,7 @@ class ScheduleController extends Controller
             ->where('users.department_info_id',Auth::user()->department_info_id)
             ->where('users.status_work', '=', 1)
             ->wherein('users.user_type_id',[1,2])
-            ->groupBy('users.last_name')
+            ->orderBy('users.last_name')
             ->get();
 
         return view('schedule.viewSchedule')

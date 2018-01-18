@@ -221,7 +221,7 @@ table = $('#tablet').DataTable({
         {"data": 'serial_code'},
         {"data": 'imei'},
         {"data": function (data, type, dataToSet) {
-            if(data.id_user = 1)
+            if(data.tablet_modem == 1)
                 return 'Tak';
             else return 'Nie'
         }, "name": "tablet_modem"},
@@ -265,12 +265,12 @@ table = $('#phone').DataTable({
         {"data": 'model'},
         {"data": 'imei'},
         {"data": function (data, type, dataToSet) {
-            if(data.id_user = 1)
+            if(data.power_cable == 1)
                 return 'Tak';
             else return 'Nie'
         }, "name": "power_cable"},
         {"data": function (data, type, dataToSet) {
-            if(data.id_user = 1)
+            if(data.phone_box == 1)
                 return 'Tak';
             else return 'Nie'
         }, "name": "phone_box"},
@@ -311,7 +311,7 @@ table = $('#sim_card').DataTable({
     }, "columns": [
 
         {"data": function (data, type, dataToSet) {
-            if(data.id_user = 1)
+            if(data.sim_type == 1)
                 return 'Abonament';
             else return 'Prepaid'
         }, "name": "sim_type"},
@@ -319,7 +319,7 @@ table = $('#sim_card').DataTable({
         {"data": 'sim_pin'},
         {"data": 'sim_puk'},
         {"data": function (data, type, dataToSet) {
-            if(data.id_user = 1)
+            if(data.sim_net == 1)
                 return 'Tak';
             else return 'Nie'
         }, "name": "sim_net"},
@@ -361,8 +361,18 @@ table = $('#monitor').DataTable({
 
         {"data": 'model'},
         {"data": 'serial_code'},
-        {"data": 'signal_cable'},
-        {"data": 'power_cable'},
+        {{--  {"data": 'signal_cable'},  --}}
+        {"data": function (data, type, dataToSet) {
+            if(data.signal_cable == 1)
+                return 'Tak';
+            else return 'Nie'
+        }, "name": "signal_cable"},
+        {{--  {"data": 'power_cable'},  --}}
+        {"data": function (data, type, dataToSet) {
+            if(data.power_cable == 1)
+                return 'Tak';
+            else return 'Nie'
+        }, "name": "power_cable"},
         {"data": 'description'},
         {"data": function (data, type, dataToSet) {
             if(data.department_info_id != 0 && data.department_info_id != null)
