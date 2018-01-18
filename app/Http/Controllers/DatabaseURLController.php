@@ -132,6 +132,7 @@ class DatabaseURLController extends Controller
         $month = date('m') -1;
         $month_name = $this::monthReverseName($month);
         $title = 'Raport miesięczny wykorzystania bazy: '.$month_name;
+        $data['month'] = $month_name;
         $this->sendMailByVerona('monthReportDatabaseUse', $data, $title);
     }
     public function pageMonthRaportDatabaseUse(){
