@@ -2,7 +2,11 @@
 <thead style="color:#efd88f;">
 <tr>
 <td colspan="3" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20; color:#efd88f;">
-<font size="4" face="sans-serif">Tygodniowy raport nowych zgód</td>
+    @php
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+    @endphp
+<font size="5" face="sans-serif">Tygodniowy raport nowych zgód {{$date_start.' - '.$date_stop}}</td>
 <td colspan="4" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20;">
 <img src="http://xdes.pl/logovc.png"></td>
 </tr>

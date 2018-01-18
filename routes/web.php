@@ -147,6 +147,9 @@ Route::get('/monthRaportDatabaseUse', 'DatabaseURLController@MailMonthRaportData
 //End emails
 
 
+
+
+
 Auth::routes();
 //'check-firewall'
 Route::middleware(['check-permission', 'check-firewall'])->group(function () {
@@ -352,7 +355,6 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageDayRaportDatabaseUse', 'DatabaseURLController@pageDayRaportDatabaseUse');
     Route::get('/pageWeekRaportDatabaseUse', 'DatabaseURLController@pageWeekRaportDatabaseUse');
     Route::get('/pageMonthRaportDatabaseUse', 'DatabaseURLController@pageMonthRaportDatabaseUse');
-
 
     //Report Page STOP
 

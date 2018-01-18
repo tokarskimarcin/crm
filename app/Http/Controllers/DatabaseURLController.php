@@ -29,7 +29,7 @@ class DatabaseURLController extends Controller
     public function pageWeekRaportNewBaseWeek()
     {
         $data = $this->NewBaseWeekData();
-        return view('mail.weekReportNewBase')
+        return view('reportpage.WeekReportNewBase')
             ->with('bisnode',$data['bisnode'])
             ->with('aggree',$data['aggree'] )
             ->with('event',$data['event'])
@@ -70,7 +70,7 @@ class DatabaseURLController extends Controller
     public function pageMonthRaportNewBaseWeek()
     {
        $data = $this->NewBaseMonthData();
-        return view('mail.monthReportNewBase')
+        return view('reportpage.MonthReportNewBase')
             ->with('bisnode',$data['bisnode'])
             ->with('aggree',$data['aggree'] )
             ->with('event',$data['event'])
@@ -106,7 +106,7 @@ class DatabaseURLController extends Controller
 
     public function pageDayRaportDatabaseUse(){
         $data = $this->DatabaseUseData(1);
-        return view('mail.dayReportDatabaseUse')
+        return view('reportpage.DayReportDatabaseUse')
             ->with('overall_result',$data['overall_result'])
             ->with('departments_statistic',$data['departments_statistic'] )
             ->with('employee_statistic',$data['employee_statistic']);
@@ -121,7 +121,7 @@ class DatabaseURLController extends Controller
     }
     public function pageWeekRaportDatabaseUse(){
         $data = $this->DatabaseUseData(2);
-        return view('mail.weekReportDatabaseUse')
+        return view('reportpage.WeekReportDatabaseUse')
             ->with('overall_result',$data['overall_result'])
             ->with('departments_statistic',$data['departments_statistic'] )
             ->with('employee_statistic',$data['employee_statistic']);
@@ -136,10 +136,13 @@ class DatabaseURLController extends Controller
     }
     public function pageMonthRaportDatabaseUse(){
         $data = $this->DatabaseUseData(3);
-        return view('mail.monthReportDatabaseUse')
+        $month = date('m') -1;
+        $month_name = $this::monthReverseName($month);
+        return view('reportpage.MonthReportDatabaseUse')
             ->with('overall_result',$data['overall_result'])
             ->with('departments_statistic',$data['departments_statistic'] )
-            ->with('employee_statistic',$data['employee_statistic']);
+            ->with('employee_statistic',$data['employee_statistic'])
+            ->with('month',$month_name);
     }
 
 

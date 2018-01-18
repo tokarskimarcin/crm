@@ -1,8 +1,12 @@
 <table style ="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px;">
 <thead style="color:#efd88f;">
 <tr>
+    @php
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+    @endphp
 <td colspan="5" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20; color:#efd88f;">
-    <font size="5" face="sans-serif">Tygodniowy Raport Wykorzystania Bazy</font></td>
+    <font size="5" face="sans-serif">Tygodniowy Raport Wykorzystania Bazy {{$date_start.' - '.$date_stop}}</font></td>
 <td colspan="5" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20;">
 <img src="http://xdes.pl/logovc.png"></td>
 </tr>
