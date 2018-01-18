@@ -474,6 +474,8 @@ class DkjController extends Controller
                 }
                 new ActivityRecorder(4, 'Usunięce janka o id: ' . $request->id);
                 $dkj->deleted = 1;
+                $dkj->edit_dkj = Auth::user()->id;
+                $dkj->edit_date = date('Y-m-d H:i:s');
                 $dkj->save();
         }
 
