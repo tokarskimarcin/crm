@@ -135,14 +135,19 @@ Route::get('/hourReportChecked', 'StatisticsController@hourReportChecked');
 Route::get('/dayReportChecked', 'StatisticsController@dayReportChecked');
 Route::get('/weekReportChecked', 'StatisticsController@weekReportChecked');
 
-Route::get('/weekRaportNewBaseWeek', 'DatabaseURLController@MailNewBaseWeek');
-Route::get('/monthRaportNewBaseWeek', 'DatabaseURLController@MailRaportNewBaseMonth');
+
+// maile dotyczące bazy danych (telefonów) maile
+
+Route::get('/weekRaportNewBaseWeek', 'DatabaseURLController@MailWeekRaportNewBaseWeek');
+Route::get('/monthRaportNewBaseWeek', 'DatabaseURLController@MailMonthRaportNewBaseWeek');
+
+Route::get('/dayRaportDatabaseUse', 'DatabaseURLController@MailDayRaportDatabaseUse');
+Route::get('/weekRaportDatabaseUse', 'DatabaseURLController@MailWeekRaportDatabaseUse');
+Route::get('/monthRaportDatabaseUse', 'DatabaseURLController@MailMonthRaportDatabaseUse');
 //End emails
 
 
 Auth::routes();
-
-
 //'check-firewall'
 Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/', 'HomeController@index');
@@ -341,8 +346,14 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/pageHourReportDkjEmployee', 'StatisticsController@pageHourReportDkjEmployee');
 
-    Route::get('/pageRaportNewBaseWeek', 'DatabaseURLController@pageRaportNewBaseWeek');
-    Route::get('/pageRaportNewBaseMonth', 'DatabaseURLController@pageRaportNewBaseMonth');
+    Route::get('/pageWeekRaportNewBaseWeek', 'DatabaseURLController@pageWeekRaportNewBaseWeek');
+    Route::get('/pageMonthRaportNewBaseWeek', 'DatabaseURLController@pageMonthRaportNewBaseWeek');
+
+    Route::get('/pageDayRaportDatabaseUse', 'DatabaseURLController@pageDayRaportDatabaseUse');
+    Route::get('/pageWeekRaportDatabaseUse', 'DatabaseURLController@pageWeekRaportDatabaseUse');
+    Route::get('/pageMonthRaportDatabaseUse', 'DatabaseURLController@pageMonthRaportDatabaseUse');
+
+
     //Report Page STOP
 
     //TESTS START //
