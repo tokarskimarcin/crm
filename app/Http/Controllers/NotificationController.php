@@ -181,7 +181,7 @@ class NotificationController extends Controller
 
     public function getNotficationsJanky(Request $request) {
         if($request->ajax()) {
-            $yesterday = date("Y-m-d", time() - 120 * 60 * 24) . ' 01:00:00';
+            $yesterday = date("Y-m-d") . ' 00:00:00';
             $today = date('Y-m-d') . ' 23:00:00';
 
             $data = DB::table('dkj')
