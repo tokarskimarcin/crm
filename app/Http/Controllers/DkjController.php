@@ -131,14 +131,8 @@ class DkjController extends Controller
         $user_dkj_info = DB::table('dkj')
             ->select(DB::raw(
                 'Date(add_date) as add_date,
-                SUM(CASE WHEN
-                    (dkj_status = 0 or deleted = 1) OR
-                    (dkj_status = 1 and manager_status = 1) OR
-                    (dkj_status = 1 and manager_status is null)
-                    THEN 1 ELSE 0 END) as good ,
-                SUM(CASE WHEN
-                    dkj_status = 1 and manager_status = 0 AND deleted = 0
-                THEN 1 ELSE 0 END) as bad'))
+                SUM(CASE WHEN dkj_status = 0 or deleted = 1 THEN 1 ELSE 0 END) as good,
+                SUM(CASE WHEN dkj_status = 1 AND deleted = 0 THEN 1 ELSE 0 END) as bad'))
             ->where('id_user', Auth::user()->id)
             ->where('add_date','like',$actual_month.'%')
             ->groupBy(DB::raw('Date(add_date)'))
@@ -481,6 +475,8 @@ class DkjController extends Controller
                 }
                 new ActivityRecorder(4, 'Usunięce janka o id: ' . $request->id);
                 $dkj->deleted = 1;
+                $dkj->edit_dkj = Auth::user()->id;
+                $dkj->edit_date = date('Y-m-d H:i:s');
                 $dkj->save();
         }
 
