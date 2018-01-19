@@ -120,7 +120,12 @@
                 'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
             }, "columns": [
                 {"data": "add_date"},
-                {"data": "expiration_date","orderable": false, "searchable": false},
+                {
+                    "data": function (data, type, dataToSet) {
+                        return data.expiration_date + " 23:00:00";
+                    }, "name": "dkj.expiration_date","orderable": false, "searchable": false
+                },
+                {{--  {"data": "expiration_date","orderable": false, "searchable": false},  --}}
                 {
                     "data": function (data, type, dataToSet) {
                         return data.user_first_name + " " + data.user_last_name;
@@ -169,7 +174,13 @@
                 'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
             }, "columns": [
                 {"data": "add_date"},
-                {"data": "expiration_date","orderable": false, "searchable": false},
+                {
+                    "data": function (data, type, dataToSet) {
+                        var str = data.expiration_date;
+                        return str.substring(0, 10) + " 23:00:00";
+                    }, "name": "dkj.expiration_date","orderable": false, "searchable": false
+                },
+                {{--  {"data": "expiration_date","orderable": false, "searchable": false},  --}}
                 {
                     "data": function (data, type, dataToSet) {
                         return data.user_first_name + " " + data.user_last_name;
