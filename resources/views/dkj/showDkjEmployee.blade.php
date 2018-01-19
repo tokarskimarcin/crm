@@ -53,6 +53,11 @@
                                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                         <label for="exampleInputPassword1" class="showhidetext">Wybierz Pracownika</label>
                                         <select id="select_form" class="form-control showhidetext" name="user_dkj_id" style="border-radius: 0px;">
+                                            @if(isset($employee_id) && $employee_id == -1)
+                                                <option selected value="-1">Wszyscy</option>
+                                            @else
+                                                <option value="-1">Wszyscy</option>
+                                            @endif
                                                 @foreach($dkjEmployee as $item)
                                                     @if(isset($employee_id) && $employee_id == $item->id)
                                                     <option selected value={{$item->id}}>{{$item->last_name.' '.$item->first_name}}</option>

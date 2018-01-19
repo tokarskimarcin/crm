@@ -54,17 +54,18 @@ class DkjController extends Controller
         $date_stop = $request->stop_date;
         $user_dkj_id = $request->user_dkj_id;
 
-
-
-
         $employee_info =  DB::table('dkj')
             ->join('users', 'dkj.id_user', '=', 'users.id')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
             ->join('departments', 'department_info.id_dep', '=', 'departments.id')
             ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
             ->select(DB::raw('dkj.*,users.first_name,users.last_name,department_type.name as type_name,departments.name'))
-            ->where('id_dkj',$user_dkj_id)
+
             ->whereBetween('add_date',[$date_start.=' 00:00:00',$date_stop.=' 23:00:00']);
+        if($user_dkj_id != -1)
+        {
+            $employee_info = $employee_info->where('id_dkj',$user_dkj_id);
+        }
         if($janky_status == 1) // tylko janki
         {
             $employee_info = $employee_info->where('dkj_status',1)
