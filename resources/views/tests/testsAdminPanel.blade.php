@@ -24,7 +24,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="well well-sm">Testy / Zarządanie testami</div>
+            <div class="alert gray-nav">Testy / Zarządanie testami</div>
         </div>
     </div>
 </div>
@@ -43,21 +43,24 @@
                 <input type="text" class="form-control" name="category_name" id="category_name" placeholder="Kategoria..."/>
             </div>
             <div class="form-group">
-                <input type="submit" class="btn btn-success btn-lg" id="category_submit" value="Zapisz"/>
+                <button type="submit" class="btn btn-info" id="category_submit" value="Zapisz">
+                    <span class="glyphicon glyphicon-plus"></span> Zapisz
+                </button>
             </div>
         </form>
     </div>
 </div>
 <br />
-
+<hr >
 <div class="row">
     <div class="col-md-4">
         <input type="text" class="form-control" id="category_search"  placeholder="Wyszukaj..."/>
+        <br />
     </div>
     <div class="col-md-12">
         <div class="table-responsive">
             <table class="table table-striped type_table">
-                <thead>
+                <thead class="black-head">
                     <tr>
                         <th style="width:5%">Lp.</th>
                         <th>Typ testu</th>
@@ -76,9 +79,8 @@
                             <td>{{$category->name}}</td>
                             <td class="category_column">{{$category->questions->where('deleted', '=', 0)->count()}}</td>
                             <td class="category_column">
-                                <button data-toggle="modal" class="btn btn-link categry_to_modal" data-target="#myModal" data-category_id="{{$category->id}}" title="Pokaż listę pytań">
-                                    <span style="color:blue" class="glyphicon glyphicon-list">
-                                    </span>
+                                <button data-toggle="modal" class="btn btn-default categry_to_modal" data-target="#myModal" data-category_id="{{$category->id}}" title="Pokaż listę pytań">
+                                    <span style="color:blue" class="glyphicon glyphicon-file"></span> <span>Lista pytań</span>
                                 </button>
                             </td>
                             <td class="category_column">
@@ -146,10 +148,10 @@
             </div>
             <div class="table-responsive">
                 <table class="table modal_table">
-                    <thead>
+                    <thead class="black-head">
                         <tr>
                             <th>Treść pytania</th>
-                            <th class="modal_column">Czas (minuty)</th>
+                            <th style="width: 10%">Czas (minuty)</th>
                             <th class="modal_column">Edycja</th>
                             <th class="modal_column">Usuń</th>
                         </tr>
@@ -164,7 +166,6 @@
             <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
         </div>
         </div>
-
     </div>
 </div>
 
@@ -172,7 +173,11 @@
 
 @section('script')
 <script>
+
+    //zdefiniowanie edytora tekstu
     var editor = null;
+
+    //przypisanie edytora tekstu
     $(document).ready(() => {
         editor = CKEDITOR.replace( 'question_content' );
     });
@@ -180,6 +185,7 @@
 //walidacja nazyw testu
 $('#category_submit').click((e) => {
     e.preventDefault();
+    //pobranie nazwy kategorii
     var category_name = $('#category_name').val();
     if (category_name == '') {
         swal('Podaj nazwę kategorii!')
@@ -189,7 +195,7 @@ $('#category_submit').click((e) => {
     }
 });
 
-/* Nowa funkcja edytujaca pytanie */
+/*  Funkcja edytujaca pytanie */
 function edit_question_button(e) {
     $('#myModal').animate({ scrollTop: 0 }, 'slow');
     //pobranie ID pytania
@@ -197,8 +203,7 @@ function edit_question_button(e) {
     var question = $('.modal_table tr[name="' + id + '"]').find(' td:first').html();
     //przekazanie danych do edytora
     editor.setData(question);
-    {{--  //zablokowanie wszystkich przyciskow w tabeli
-    $("#myModal .btn-link").attr('disabled', true);  --}}
+
     $('#add_question').fadeOut(0);
     $('#new_question').fadeIn(500);
     $('#question_edited_div').fadeIn(0);
@@ -251,6 +256,9 @@ $('#question_edited').click(function(e) {
             } else {
                 swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
             }
+        },
+        error: function(response) {
+            swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
         }
     });
     $('#question_edited_div').fadeOut(0);
@@ -296,6 +304,9 @@ function deleteQuestion(e) {
                     } else {
                         swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!');
                     }
+                },
+                error: function(response) {
+                    swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
                 }
             });
         }
@@ -351,6 +362,9 @@ $('.edit_type').click(function() {
                 } else {
                     swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
                 }
+            },
+            error: function(response) {
+                swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
             }
         });
         //podmiana inputu na wiersz z nową nazwą kategorii
@@ -393,6 +407,9 @@ $('.category_status').click(function() {
             } else {
                 swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
             }
+        },
+        error: function(response) {
+            swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
         }
     });
     //zmiana ikony  w wypadku powidzenia
@@ -413,7 +430,7 @@ $('.category_status').click(function() {
 // zdefiniowanie zmiennej globalnej do kategorii w modalu
 var modal_category_id = null;
 $('.categry_to_modal').click(function() {
-    //wyzerowanie danych w omdalu po jego otwarcu
+    //wyzerowanie danych w modalu po jego otwarcu
     $('#myModal tbody').empty();
     //zdefiniowanie globalnej zmiennej zawierajacej id kategorii do wypełnienia modalu
     modal_category_id = $(this).data('category_id');
@@ -455,6 +472,9 @@ $('#myModal').on('show.bs.modal', function() {
                  
            });
            $('#myModal tbody').append(modalHtml);
+        },
+        error: function(response) {
+            swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
         }
     });
 });
@@ -478,7 +498,9 @@ $('#myModal').on('hidden.bs.modal', function () {
             }
         }
     });
+    //wyczyszczenie danych w edytorze tekstu
     editor.setData('');
+    //wyczyszczenie inputu zawierajacego czas pytania
     $('#question_time').val(0);
     $('#add_question').fadeIn(0);
     $('#new_question').fadeOut(500);
@@ -534,25 +556,32 @@ $('#question_ready').click(() => {
                 swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
                 $('#myModal').modal('toggle');
             }
+        },
+        error: function(response) {
+            swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
         }
     });
     $('#new_question').fadeOut(500);
     $('#add_question').fadeIn(500);
 });
 
+
+//wyszukiwanie danych w tabelach zawierających kategorie oraz pytania
 $(document).ready(function(){
+    //wyszukiwanie pytań
     $("#question_search").on("keyup", function() {
-      var value = $(this).val().toLowerCase();
-      $(".modal_table tr").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-      });
+        var value = $(this).val().toLowerCase();
+        $(".modal_table tbody tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
     });
 
+    //wyszukiwanie kategegorii
     $("#category_search").on("keyup", function() {
         var value = $(this).val().toLowerCase();
-        $(".type_table tr").filter(function() {
-          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
+            $(".type_table tbody tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
       });
   });
 </script>

@@ -15,7 +15,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Wszystkie testy (osoba testująca)</h1>
+            <div class="alert gray-nav">Testy / Testy stworzone przez Ciebie</div>
         </div>
     </div>
 </div>
@@ -31,14 +31,15 @@
     <div id="waiting" class="tab-pane fade in active">
         <div class="table-responsive" style="margin-top: 20px">
             <table class="table table-striped">
-                <thead>
+                <thead class="black-head">
                     <tr>
                         <td class="xsm-col-th">Lp.</td>
                         <td class="sm-col-th">Data</td>
                         <td>Użytkownik</td>
                         <td>Nazwa testu</td>
-                        <td class="sm-col-th">Aktywacja</td>
+                        <td class="md-col-th">Aktywacja</td>
                         <td class="md-col-th">Szczegóły</td>
+                        <td class="md-col-th">Edycja</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -60,19 +61,24 @@
                                     <span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły
                                 </a>
                             </td>
+                            <td>
+                                <a class="btn btn-default" href="{{ URL::to('/view_test') }}/{{$test->id}}">
+                                    <span style="color: green" class="glyphicon glyphicon glyphicon-pencil"></span> Edytuj
+                                </a>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
             @if($i == 0)
-                <h3>Brak danych!</h3>
+                <div class="alert alert-destroyer">Brak testów w tej kategorii!</div>
             @endif
         </div>
     </div>
     <div id="active" class="tab-pane fade">
         <div class="table-responsive" style="margin-top: 20px">
             <table class="table table-striped">
-                <thead>
+                <thead class="black-head">
                     <tr>
                         <td class="xsm-col-th">Lp.</td>
                         <td class="sm-col-th">Data</td>
@@ -100,7 +106,7 @@
                 </tbody>
             </table>
             @if($i == 0)
-                <h3>Brak danych!</h3>
+                <div class="alert alert-destroyer">Brak testów w tej kategorii!</div>
             @endif
         </div>
     </div>
@@ -108,13 +114,13 @@
     <div id="finished" class="tab-pane fade">
         <div class="table-responsive" style="margin-top: 20px">
             <table class="table table-striped">
-                <thead>
+                <thead class="black-head">
                     <tr>
                         <td class="xsm-col-th">Lp.</td>
                         <td class="sm-col-th">Data</td>
                         <td>Użytkownik</td>
                         <td>Nazwa testu</td>
-                        <td class="sm-col-th">Szczegóły</td>
+                        <td class="md-col-th">Szczegóły</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -136,14 +142,14 @@
                 </tbody>
             </table>
             @if($i == 0)
-                <h3>Brak danych!</h3>
+                <div class="alert alert-destroyer">Brak testów w tej kategorii!</div>
             @endif
         </div>
     </div>
     <div id="judged" class="tab-pane fade">
         <div class="table-responsive" style="margin-top: 20px">
             <table class="table table-striped">
-                <thead>
+                <thead class="black-head">
                     <tr>
                         <td class="xsm-col-th">Lp.</td>
                         <td class="sm-col-th">Data</td>
@@ -171,7 +177,7 @@
                 </tbody>
             </table>
             @if($i == 0)
-                <h3>Brak danych!</h3>
+                <div class="alert alert-destroyer">Brak testów w tej kategorii!</div>
             @endif
         </div>
     </div>
@@ -181,31 +187,35 @@
 
 @section('script')
 <script>
+/*
+    Funkcja aktywująca test dla pracownika
+*/
 function change(e) {
+    //pobranie id testu do aktywacji
     var test_id = $(e).attr('id');
   
-        $.ajax({
-            type: "POST",
-            url: '{{ route('api.activateTest') }}',
-            data: {
-              "id":test_id
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                console.log(response);
-                if (response == 1) {
-                    swal('Test został aktywowany!');
-                    location.reload();
-                } else {
-                    swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!');
-                }
+    $.ajax({
+        type: "POST",
+        url: '{{ route('api.activateTest') }}',
+        data: {
+            "id":test_id
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            if (response == 1) {
+                swal('Test został aktywowany!')
+                location.reload();
+            } else {
+                swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
             }
-        });
+        },
+        error: function(response) {
+            swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
+        }
+    });
 }
-
-
 
 </script>
 @endsection

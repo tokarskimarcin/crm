@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class TestQuestion extends Model
 {
     public function category() {
-        return $this->belongsTo('App\TestCategories', 'category_id');
+        return $this->belongsTo('App\TestCategory', 'category_id');
     }
 
     public function userQuestion() {

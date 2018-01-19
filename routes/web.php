@@ -380,7 +380,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/tests_statistics', 'TestsController@testsStatisticsGet');
 
-    Route::get('/one_test_statistics', 'TestsController@testStatisticsGet'); // tutaj bedzie {id}
+    Route::get('/one_test_statistics/{id}', 'TestsController@testStatisticsGet');
 
     Route::get('/employee_statistics/{id}', 'TestsController@employeeTestsStatisticsGet'); // tutaj bedzie {id}
 

@@ -1,11 +1,6 @@
 @extends('layouts.main')
 @section('content')
 <style>
-.panel-info > .panel-heading {
-    background-color: #a36bce;
-    color: white;
-}
-
 .panel-heading a: {
     font-family:'Glyphicons Halflings';
     content:"\e114";
@@ -27,7 +22,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="well">Testy / Rezultat testu / {{$test->name}}</div>
+            <div class="well gray-nav">Testy / Rezultat testu / {{$test->name}}</div>
         </div>
     </div>
 </div>
@@ -37,7 +32,7 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="panel panel-info">
-                    <div class="panel-heading">
+                    <div class="panel-heading alert-destroyer">
                         <b>Tytuł testu</b>
                     </div>
                     <div class="panel-body">
@@ -48,7 +43,7 @@
             <div class="col-md-4">
                 <div class="panel panel-info">
                     <div class="panel-heading">
-                        <b>Osoba exterminowana</b>
+                        <b>Pracownik</b>
                     </div>
                     <div class="panel-body">
                         {{$test->user->first_name . ' ' . $test->user->last_name}}
