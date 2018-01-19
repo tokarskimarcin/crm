@@ -60,11 +60,14 @@
                         <div class="col-lg-4">
                             <div class="panel panel-default">
                                 <div class="panel-heading">Test dla: </div>
-                                    <select class="form-control" id="user_select">
+                                <select class="selectpicker form-control" id="user_select" name="link_privilages[]" title="Brak wybranych użytkowników" multiple data-actions-box="true">
                                         @foreach($users as $user)
                                             <option value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
                                         @endforeach
-                                    </select>
+                                </select>
+                                </div>
+                                <div class="alert alert-danger" style = "display:none" id="alert_user">
+                                    <span colspan="1">Wybierz użytkownika</span>
                                 </div>
                         </div>
                         <div class="col-lg-12">
@@ -242,41 +245,42 @@
      });
      // funkcja pobierająca pytania które użytkownik już rozwiązywał
      function downloadRepeatQuestion() {
-         // pobranie id użytkownika
-         var id_user = $('#user_select').val();
-         //pobranie id pytań użytkownika
-         $.ajax({
-             type: "POST",
-             url: '{{ route('api.getRepeatQuestion') }}',
-             headers: {
-                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-             },
-             data: {
-                 "id_user": id_user,
-             },
-             success: function (response) {
-                 //wpisanie infromacji do tablicy powtórzonych pytań
-                 question_repeat = [];
+         {{--// pobranie id użytkownika--}}
+         {{--var id_user = $('#user_select').val();--}}
+         {{--alert(id_user);--}}
+         {{--//pobranie id pytań użytkownika--}}
+         {{--$.ajax({--}}
+             {{--type: "POST",--}}
+             {{--url: '{{ route('api.getRepeatQuestion') }}',--}}
+             {{--headers: {--}}
+                 {{--'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
+             {{--},--}}
+             {{--data: {--}}
+                 {{--"id_user": id_user,--}}
+             {{--},--}}
+             {{--success: function (response) {--}}
+                 {{--//wpisanie infromacji do tablicy powtórzonych pytań--}}
+                 {{--question_repeat = [];--}}
 
-                 if(response.length != 0)
-                 {
-                     for(var i=0;i<response.length;i++)
-                     {  // dodanie wpisu do tablicy
-                         question_repeat.push(parseInt(response[i]['question_id']));
-                         //spradzenie czy wybrany użytkownik nie miał już danego pytania w teście
-                         if(jQuery.inArray(parseInt(question_repeat[i]),question_array_id) != -1){
-                             $('#question_'+question_repeat[i]).css('background','#f3e97c');
-                         }else{
-                             $('#question_'+question_repeat[i]).css('background','#5cb85cbf');
-                         }
-                     }
-                 }else { // jeżeli nic nie dostanie w odpowiedzi, to wszysko zmień na zielono
-                     for (var i = 0; i < question_array_id.length; i++) {
-                         $('#question_'+question_array_id[i]).css('background','#5cb85cbf');
-                     }
-                 }
-             }
-         });
+                 {{--if(response.length != 0)--}}
+                 {{--{--}}
+                     {{--for(var i=0;i<response.length;i++)--}}
+                     {{--{  // dodanie wpisu do tablicy--}}
+                         {{--question_repeat.push(parseInt(response[i]['question_id']));--}}
+                         {{--//spradzenie czy wybrany użytkownik nie miał już danego pytania w teście--}}
+                         {{--if(jQuery.inArray(parseInt(question_repeat[i]),question_array_id) != -1){--}}
+                             {{--$('#question_'+question_repeat[i]).css('background','#f3e97c');--}}
+                         {{--}else{--}}
+                             {{--$('#question_'+question_repeat[i]).css('background','#5cb85cbf');--}}
+                         {{--}--}}
+                     {{--}--}}
+                 {{--}else { // jeżeli nic nie dostanie w odpowiedzi, to wszysko zmień na zielono--}}
+                     {{--for (var i = 0; i < question_array_id.length; i++) {--}}
+                         {{--$('#question_'+question_array_id[i]).css('background','#5cb85cbf');--}}
+                     {{--}--}}
+                 {{--}--}}
+             {{--}--}}
+         {{--});--}}
 
      }
     // funkcja do sprawdzania czy danyc element jest w tabeli pod indeksem id
@@ -448,6 +452,12 @@
             $('#alert_subject').fadeIn(1000);
         }else{
             $('#alert_subject').fadeOut(1000);
+        }if(id_user == null)
+        {
+            flag_all_ok = false;
+            $('#alert_user').fadeIn(1000);
+        }else {
+            $('#alert_user').fadeOut(1000);
         }
         if(question_text_array.length == 0 && flag_all_ok)
         {
@@ -478,7 +488,7 @@
                 },
                 data: {
                     "question_test_array": question_text_array,
-                    "id_user": id_user,
+                    "id_user_tab": id_user,
                     "subject": subject,
                     "template_id": template_id
                 },
@@ -488,6 +498,8 @@
                         window.location = '{{URL::to('/show_tests')}}';
                     }
                     $("#save_button").remove('disabled', true);
+                }, error: function (response) {
+                    console.log(response);
                 }
             });
         }
