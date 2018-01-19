@@ -294,7 +294,7 @@ class DkjController extends Controller
             ->join('users as dkj_user', 'dkj.id_dkj', '=', 'dkj_user.id')
             ->select(DB::raw(
                 'dkj.id as id,
-                DATE_ADD(dkj.add_date, INTERVAL 2 DAY) as expiration_date,
+                CURDATE() as expiration_date,
                 user.id as id_user,
                 user.first_name as user_first_name,
                 user.last_name as user_last_name,
@@ -307,7 +307,7 @@ class DkjController extends Controller
                 '))->where('dkj.dkj_status',1)
                  ->where('dkj.deleted',0)
                  ->where('dkj.manager_status',null)
-                ->where(DB::raw('DATE_ADD(dkj.add_date, INTERVAL 2 DAY)'),'>=',$date_actual.' 00:00:00')
+                ->where(DB::raw('DATE_ADD(dkj.add_date, INTERVAL 0 DAY)'),'>=',$date_actual.' 00:00:00')
                  ->where('user.department_info_id',Auth::user()->department_info_id);
         return datatables($query)->make(true);
     }
@@ -320,7 +320,7 @@ class DkjController extends Controller
             ->join('users as dkj_user', 'dkj.id_dkj', '=', 'dkj_user.id')
             ->select(DB::raw(
                 'dkj.id as id,
-                DATE_ADD(dkj.add_date, INTERVAL 2 DAY) as expiration_date,
+                DATE_ADD(dkj.add_date, INTERVAL 0 DAY) as expiration_date,
                 user.id as id_user,
                 user.first_name as user_first_name,
                 user.last_name as user_last_name,
