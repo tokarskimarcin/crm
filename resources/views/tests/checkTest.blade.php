@@ -121,9 +121,20 @@ body{margin:40px;}
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="comment_question1">Dodaj komentarz (opcjonalne):</label>
-                        <textarea class="form-control" name="comment_question[]" placeholder="Twój komentarz..." rows="5">{{$item->cadre_comment}}</textarea>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Dodaj ocenę:</label>
+                            <select class="form-control input-lg" name="question_result[]">
+                                <option value="1">Zaliczone</option>
+                                <option value="0">Niezaliczone</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Dodaj komentarz (opcjonalne):</label>
+                            <textarea class="form-control" name="comment_question[]" placeholder="Twój komentarz..." rows="5">{{$item->cadre_comment}}</textarea>
+                        </div>
                     </div>
                 </div>
         @endforeach
@@ -131,12 +142,13 @@ body{margin:40px;}
         <div id="question_total" class="tab-pane fade @if($test->result != null) in active @endif">
             @if($test->result == null)
                 <div class="form-group" style="margin-top: 30px">
-                    <label>Test został zaliczony:</label>
+                    {{--  <label>Test został zaliczony:</label>
                     <div data-toggle="buttons">
                         <label id="q1_yes" class="btn btn-default btn-circle btn-lg"><input type="radio"  name="q1" value="1"><i class="glyphicon glyphicon-ok"></i></label>
                         <label id="q1_no"  class="btn btn-default btn-circle btn-lg"><input type="radio" name="q1" value="2"><i class="glyphicon glyphicon-remove"></i></label>
                         <span class="selected-span" id="q1_span"></span>
-                    </div>
+                    </div>  --}}
+                    {{--  <h3>Twoja ocena: <span id="total_result"></span>/{{$test->questions->count()}}</h3>  --}}
                 </div>
                 <div class="alert alert-danger" style="display: none" id="alert_checked">
                     Zaznacz wynik testu!
@@ -155,14 +167,15 @@ body{margin:40px;}
                     <h1>
                         Test został już oceniony!
                     </h1>
-                    <h3>
-                        Twoja ocena:
-                        @if($test->result == 1)
+                    <h1>
+                        {{--  Twoja ocena: <span id="total_result"></span>  --}}
+                        {{--  @if($test->result == 1)
                             <b style="color:green">POZYTYWNA.</b>
                         @else
                             <b style="color:red">NEGATYWNA</b>
-                        @endif
-                    </h3>
+                        @endif  --}}
+                        {{$test->result}}/{{$test->questions->count()}}
+                    </h1>
                     <h3>
                         Statyki pracownika możesz sprawdzić <a href="{{URL::to('/employee_statistics/')}}/{{$test->user_id}}">tutaj.</a>
                     </h3>
@@ -179,6 +192,8 @@ body{margin:40px;}
 @section('script')
 <script>
 
+var totalCount = Number({{$test->questions->count()}});
+
     //podmiana napisu określającego wynik testu
 $("#q1_yes").on('click', () => {
     $('#q1_span').text('TAK');
@@ -187,7 +202,7 @@ $("#q1_no").on('click', () => {
     $('#q1_span').text('NIE');
 });
 
-//waildacja formualarza - sprawdzenie czy wynik został zaznaczony
+{{--  //waildacja formualarza - sprawdzenie czy wynik został zaznaczony (Funkcja aktualnie nieaktywna)
 $('#send_opinion').on('click', function(e) {
     e.preventDefault();
     var checkStatus = $('input[name=q1]:checked').val();
@@ -199,7 +214,6 @@ $('#send_opinion').on('click', function(e) {
         $('#alert_checked').slideUp(1000);
         $('#checkForm').submit();
     }
-
-});
+});  --}}
 </script>
 @endsection
