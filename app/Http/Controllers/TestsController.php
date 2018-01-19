@@ -460,6 +460,8 @@ class TestsController extends Controller
     public function testsStatisticsGet() {
         $tests = UserTest::all();
 
+        $months = ['Styczeń', 'Luty', 'Marzec', 'Kwiecien', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Padziernik', 'Listopad', 'Grudzień'];
+
         $departments_stats = DB::table('user_tests')
             ->select(DB::raw('
                 departments.name as dep_name,
@@ -483,6 +485,7 @@ class TestsController extends Controller
             ->get();
 
         return view('tests.testsStatistics')
+            ->with('months', $months)
             ->with('stats_by_user_type', $stats_by_user_type)
             ->with('departments_stats', $departments_stats)
             ->with('tests', $tests);
@@ -638,8 +641,15 @@ class TestsController extends Controller
     /* 
         Statystyki poszczególnych testów
     */
-    public function testStatisticsGet() {
-        return view('tests.oneTestStatistics');
+    public function testStatisticsGet($id) {
+        $test = TemplateUserTest::find($id);
+
+        if ($test == null) {
+            return view('errors.404');
+        }
+
+        return view('tests.oneTestStatistics')
+            ->with('test', $test);
     }
 
     /* 
@@ -785,6 +795,9 @@ class TestsController extends Controller
         if ($request->ajax()) {
             $question = UserQuestion::find($request->question_id);
 
+            /**
+             * Sprawdzenie czy pytanie istnieje w bazie 
+             */
             if ($question == null) {
                 return 0;
             }

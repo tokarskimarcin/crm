@@ -107,7 +107,8 @@ google.charts.load("current", {packages:["corechart"]});
 
         var options = {
           title: 'Rezultaty pracownika',
-          pieHole: 0.4,
+          pieHole: 0.0,
+          colors: ['#53e041', '#d81c32', '#dae23d']
         };
 
         var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
@@ -127,7 +128,7 @@ google.charts.load("current", {packages:["corechart"]});
 
         var options = {
           title: 'Osoba testująca',
-          pieHole: 0.4,
+          pieHole: 0.0,
         };
 
         var chart = new google.visualization.PieChart(document.getElementById('drawChartTester'));
@@ -147,7 +148,7 @@ google.charts.load("current", {packages:["corechart"]});
 
         var options = {
           title: 'Typy zagadnień',
-          pieHole: 0.4,
+          pieHole: 0.0,
         };
 
         var chart = new google.visualization.PieChart(document.getElementById('drawChartType'));

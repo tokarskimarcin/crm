@@ -28,7 +28,7 @@ body{margin:40px;}
     box-shadow: none !important;
 }
 .panel-info > .panel-heading {
-    background-color: #a36bce;
+    background-color: #4a4e54;
     color: white;
 }
 
@@ -37,7 +37,7 @@ body{margin:40px;}
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="well">Testy / Ocena testu / {{$test->name}}</div>
+            <div class="well gray-nav">Testy / Ocena testu / {{$test->name}}</div>
         </div>
     </div>
 </div>
@@ -179,6 +179,7 @@ body{margin:40px;}
 @section('script')
 <script>
 
+    //podmiana napisu określającego wynik testu
 $("#q1_yes").on('click', () => {
     $('#q1_span').text('TAK');
 });
@@ -186,6 +187,7 @@ $("#q1_no").on('click', () => {
     $('#q1_span').text('NIE');
 });
 
+//waildacja formualarza - sprawdzenie czy wynik został zaznaczony
 $('#send_opinion').on('click', function(e) {
     e.preventDefault();
     var checkStatus = $('input[name=q1]:checked').val();

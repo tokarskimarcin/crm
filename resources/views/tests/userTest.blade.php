@@ -1,11 +1,5 @@
 @extends('layouts.main')
 @section('content')
-<style>
-        .panel-info > .panel-heading {
-            background-color: #a36bce;
-            color: white;
-        }
-</style>
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">

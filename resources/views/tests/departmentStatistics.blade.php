@@ -1,22 +1,14 @@
 @extends('layouts.main')
 @section('content')
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<style>
-.panel-info > .panel-heading {
-    background-color: #a36bce;
-    color: white;
-}
-
-</style>
 
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-                <div class="well my-well">Testy / Statystyki oddziałów</div>
+            <div class="well gray-nav">Testy / Statystyki oddziałów @isset($department) / {{$department->departments->name . ' ' . $department->department_type->name}} @endisset</div>
         </div>
     </div>
 </div>
-
 
 <div class="row">
     <div class="col-md-12">
@@ -117,13 +109,12 @@ google.charts.load("current", {packages:["corechart"]});
 
         var options = {
           title: 'Pracownicy',
-          pieHole: 0.4,
+          pieHole: 0.0,
         };
 
         var chart = new google.visualization.PieChart(document.getElementById('drawChartUsers'));
         chart.draw(data, options);
       }
-
 
 google.charts.load("current", {packages:["corechart"]});
     google.charts.setOnLoadCallback(drawChart);
@@ -136,7 +127,8 @@ google.charts.load("current", {packages:["corechart"]});
 
         var options = {
         title: 'Rezultaty oddziału',
-        pieHole: 0.4,
+        pieHole: 0.0,
+        colors: ['#53e041', '#d81c32', '#e6f207']
         };
 
         var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
@@ -156,13 +148,12 @@ google.charts.load("current", {packages:["corechart"]});
 
         var options = {
         title: 'Typy zagadnień',
-        pieHole: 0.4,
+        pieHole: 0.0,
         };
 
         var chart = new google.visualization.PieChart(document.getElementById('drawChartType'));
         chart.draw(data, options);
     }
-
 
 google.charts.load("current", {packages:["corechart"]});
       google.charts.setOnLoadCallback(drawChartTester);
@@ -177,7 +168,7 @@ google.charts.load("current", {packages:["corechart"]});
 
         var options = {
           title: 'Osoba testująca',
-          pieHole: 0.4,
+          pieHole: 0.0,
         };
 
         var chart = new google.visualization.PieChart(document.getElementById('drawChartTester'));
