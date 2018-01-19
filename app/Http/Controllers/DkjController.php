@@ -320,7 +320,7 @@ class DkjController extends Controller
             ->join('users as dkj_user', 'dkj.id_dkj', '=', 'dkj_user.id')
             ->select(DB::raw(
                 'dkj.id as id,
-                DATE_ADD(dkj.add_date, INTERVAL 1 DAY) as expiration_date,
+                DATE_ADD(dkj.add_date, INTERVAL 0 DAY) as expiration_date,
                 user.id as id_user,
                 user.first_name as user_first_name,
                 user.last_name as user_last_name,
