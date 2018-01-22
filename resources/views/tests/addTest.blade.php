@@ -230,10 +230,10 @@
                      ]).node();
                      rowNode.id = "question_"+response[i].question_id;
 
-                     if(jQuery.inArray(parseInt(response[i].question_id),question_repeat) != -1)
-                         $(rowNode).css('background','#f3e97c');
-                     else
-                         $(rowNode).css('background','#5cb85cbf');
+//                     if(jQuery.inArray(parseInt(response[i].question_id),question_repeat) != -1)
+//                         $(rowNode).css('background','#f3e97c');
+//                     else
+//                         $(rowNode).css('background','#5cb85cbf');
                  }// render tablicy z pytaniami
                  table_all_guestion.draw();
              }
@@ -318,11 +318,11 @@
                  $(nRow).addClass('checked');
              else{
                  $(nRow).addClass('no_checked');
-                 if(jQuery.inArray(parseInt(aData.id),question_repeat) != -1) {
-                     $(nRow).css('background','#f3e97c');
-                 }else{
-                     $(nRow).css('background','#5cb85cbf');
-                 }
+//                 if(jQuery.inArray(parseInt(aData.id),question_repeat) != -1) {
+//                     $(nRow).css('background','#f3e97c');
+//                 }else{
+//                     $(nRow).css('background','#5cb85cbf');
+//                 }
              }
              $(nRow).attr('id', aData.id);
              return nRow;
@@ -563,10 +563,10 @@
              // wpisanie informacji o pytaniu do tablicy
              question_text_array.push({id:question_id,text:question_text,time:question_time,subject:category_name});
             //gdy pytanie jest powtórzone zaznacz na innny kolor | zielony ok | żółty powtórzony
-             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1)
-                 $(rowNode).css('background','#f3e97c');
-             else
-                 $(rowNode).css('background','#5cb85cbf');
+//             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1)
+//                 $(rowNode).css('background','#f3e97c');
+//             else
+//                 $(rowNode).css('background','#5cb85cbf');
              // dodanie klasy z informacją że wiersz jest zaznaczony
              tr.removeClass(tr_class[0]+' no_checked').addClass(tr_class[0]).addClass('checked');
              //powiększ ilość pytań
@@ -580,11 +580,11 @@
              removeFunction(question_text_array,"id",question_id);
              // zmiana flagi w klacie -> wyłączenie koloru
              tr.removeClass(tr_class[0]+' checked').addClass(tr_class[0]).addClass('no_checked');
-             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1) {
-                 tr.css('background','#f3e97c');
-             }else{
-                 tr.css('background','#5cb85cbf');
-             }
+//             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1) {
+//                 tr.css('background','#f3e97c');
+//             }else{
+//                 tr.css('background','#5cb85cbf');
+//             }
              // zmniejsz ilość wybranych pytań
              question_count--;
          }
