@@ -59,8 +59,8 @@
     </div>
     <div class="col-md-12">
         <div class="table-responsive">
-            <table class="table table-striped type_table">
-                <thead class="black-head">
+            <table class="table table-striped type_table thead-inverse">
+                <thead>
                     <tr>
                         <th style="width:5%">Lp.</th>
                         <th>Typ testu</th>
@@ -147,8 +147,8 @@
                 </div>
             </div>
             <div class="table-responsive">
-                <table class="table modal_table">
-                    <thead class="black-head">
+                <table class="table modal_table thead-inverse">
+                    <thead>
                         <tr>
                             <th>Treść pytania</th>
                             <th style="width: 10%">Czas (minuty)</th>
@@ -174,13 +174,13 @@
 @section('script')
 <script>
 
-    //zdefiniowanie edytora tekstu
-    var editor = null;
+//zdefiniowanie edytora tekstu
+var editor = null;
 
-    //przypisanie edytora tekstu
-    $(document).ready(() => {
-        editor = CKEDITOR.replace( 'question_content' );
-    });
+//przypisanie edytora tekstu
+$(document).ready(() => {
+    editor = CKEDITOR.replace( 'question_content' );
+});
 
 //walidacja nazyw testu
 $('#category_submit').click((e) => {

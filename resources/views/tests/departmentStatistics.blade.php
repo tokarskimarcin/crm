@@ -13,10 +13,10 @@
 <div class="row">
     <div class="col-md-12">
         <div class="col-md-4">
-            <form action="{{ URL::to('/department_statistics') }}" method="POST">
+            <form action="{{ URL::to('/department_statistics') }}" method="POST" id="dep_form">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}" />
                 <div class="form-group">
-                    <select class="form-control" name="dep_id">
+                    <select class="form-control" name="dep_id" id="dep_id">
                         <option value="0">Wybierz</option>
                         @foreach($department_info as $item)
                             <option @if(isset($id) && $id == $item->id) selected @endif value="{{$item->id}}">{{$item->departments->name . ' ' . $item->department_type->name}}</option>
@@ -24,7 +24,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <button role="submit" class="btn btn-info">
+                    <button role="submit" class="btn btn-info" id="show_department">
                         <span></span> Pokaż statystyki
                     </button>
                 </div>
@@ -83,14 +83,26 @@
 @endsection
 
 @section('script')
+
+<script>
+$(document).ready(function() {
+    $('#show_department').click(function(e) {
+        e.preventDefault();
+        var dep_id = $('#dep_id').val();
+    
+        if (dep_id == 0) {
+            swal('Wybierz oddział!')
+            return;
+        }
+
+        $('#dep_form').submit();
+    });
+})
+</script>
+
 @if(isset($department) && $department != null)
 <script>
 
-    @php
-        $total_ok = 0;
-        $total_nok = 0;
-        $total_sum = 0;
-    @endphp
 google.charts.load("current", {packages:["corechart"]});
       google.charts.setOnLoadCallback(drawChartUsers);
       function drawChartUsers() {
@@ -98,11 +110,6 @@ google.charts.load("current", {packages:["corechart"]});
           ['Ilość', 'Statystyki'],
           @foreach($tests_by_user as $item)
             ['{{$item->first_name . ' ' . $item->last_name}}', {{$item->user_sum}}],
-            @php
-                $total_ok += $item->user_pass;
-                $total_nok += $item->user_not_pass;
-                $total_sum += $item->user_sum;
-            @endphp
           @endforeach
             ['', 0]
         ]);
@@ -121,8 +128,8 @@ google.charts.load("current", {packages:["corechart"]});
     function drawChart() {
         var data = google.visualization.arrayToDataTable([
         ['Ilość', 'Statystyki'],
-        ['Zaliczone', {{$total_ok}}],
-        ['Niezaliczone', {{$total_nok}}]
+            ['Pozytywne', {{($results->dep_good != null) ? $results->dep_good : 0}}],
+            ['Niepoprawne', {{($results->dep_wrong != null) ? $results->dep_wrong : 0}}]
         ]);
 
         var options = {

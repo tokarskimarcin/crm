@@ -60,9 +60,9 @@
 @if($status != 3 && $status != 4 && $question != null)
     <div class="row" id="question_info">
         <div class="col-md-12">
-            <p>
+            <div class="alert alert-info">
                 <h3>Czas na odpowiedź: <b><span id="question_time"></span></b>, możesz zakończyć wcześniej klikająć przycisk "Zapisz odpowiedź" na dole strony.</h3>
-            </p>
+            </div>
             <button class="btn btn-info btn-lg" id="btn_start" data-question_id="{{$question->id}}" ><span class="glyphicon glyphicon-pencil"></span> Start</button>
         </div>
     </div>

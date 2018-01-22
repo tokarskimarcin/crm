@@ -45,6 +45,27 @@
         color: white;
       }
 
+      .gray-nav {
+        background-color: #bcbfc4;
+        font-size: 150%;
+        font-weight: bold;
+        color: white;
+      }
+
+      .panel-info > .panel-heading {
+        background-color: #545a63;
+        color: white;
+      }
+
+      .panel-info > .panel-heading > a {
+        color: white;
+      }
+
+      .thead-inverse > thead {
+        background-color: #545a63;
+        color: white;
+      }
+
 	</style>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

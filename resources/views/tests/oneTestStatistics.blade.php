@@ -67,7 +67,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="table-responsive">
-            <table class="table table-striped table-bordered">
+            <table class="table table-striped table-bordered thead-inverse">
                 <thead>
                     <tr>
                         <th style="width: 5%">Lp.</th>
@@ -100,14 +100,14 @@ google.charts.load("current", {packages:["corechart"]});
     function drawChart() {
         var data = google.visualization.arrayToDataTable([
         ['Ilość', 'Statystyki'],
-        ['Zaliczone', {{$test->tests->where('result', '=', 1)->count()}}],
-        ['Niezaliczone', {{$test->tests->where('result', '=', 2)->count()}}],
-        ['Brak oceny', {{$test->tests->where('result', '=', null)->count()}}]
+        ['Zaliczone', {{$results->good}}],
+        ['Niezaliczone', {{$results->bad}}],
+        ['Brak oceny', {{$results->not_judged}}]
         ]);
 
         var options = {
         title: 'Wyniki pracowników',
-        pieHole: 0.4,
+        pieHole: 0.0,
         colors: ['#53e041', '#d81c32', '#e6f207']
         };
 

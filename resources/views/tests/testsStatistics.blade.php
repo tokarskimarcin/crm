@@ -32,8 +32,8 @@ google.charts.load("current", {packages:["corechart"]});
     function drawChart() {
         var data = google.visualization.arrayToDataTable([
         ['Task', 'Hours per Day'],
-        ['Zaliczone', {{$tests->where('result', '=', 1)->count()}}],
-        ['Niezaliczone', {{$tests->where('result', '=', 2)->count()}}]
+        ['Zaliczone', {{$results->good}}],
+        ['Niezaliczone', {{$results->bad}}]
         ]);
 
         var options = {

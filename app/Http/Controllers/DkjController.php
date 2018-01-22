@@ -128,11 +128,23 @@ class DkjController extends Controller
     public function jankyStatistics()
     {
         $actual_month = date("Y-m");
+        $today = date('Y-m-d') . "%";
         $user_dkj_info = DB::table('dkj')
             ->select(DB::raw(
                 'Date(add_date) as add_date,
-                SUM(CASE WHEN dkj_status = 0 or deleted = 1 THEN 1 ELSE 0 END) as good,
-                SUM(CASE WHEN dkj_status = 1 AND deleted = 0 THEN 1 ELSE 0 END) as bad'))
+                SUM(CASE WHEN 
+                    (
+                        (dkj_status = 0 OR deleted = 1) OR
+                        (dkj_status = 1 AND manager_status IS NULL AND add_date LIKE "' . $today .  '") 
+                    )
+                    THEN 1 ELSE 0 END)
+                as good,
+                SUM(CASE WHEN
+                    (
+                        (dkj_status = 1 AND deleted = 0 AND manager_status IS NULL AND add_date NOT LIKE "' . $today . '") OR
+                        (dkj_status = 1 AND deleted = 0 AND manager_status IS NOT NULL)
+                    )
+                THEN 1 ELSE 0 END) as bad'))
             ->where('id_user', Auth::user()->id)
             ->where('add_date','like',$actual_month.'%')
             ->groupBy(DB::raw('Date(add_date)'))
@@ -333,9 +345,8 @@ class DkjController extends Controller
                 dkj.dkj_status
                 '))->where('dkj.dkj_status',1)
             ->where('dkj.deleted',0)
-            ->where('dkj.manager_status','!=',null)
             ->where('user.department_info_id',Auth::user()->department_info_id)
-            ->orderBy('dkj.date_manager', 'desc');
+            ->orderBy('dkj.add_date', 'desc');
         return datatables($query)->make(true);
     }
 

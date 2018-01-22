@@ -30,7 +30,7 @@
 <div class="tab-content">
     <div id="waiting" class="tab-pane fade in active">
         <div class="table-responsive" style="margin-top: 20px">
-            <table class="table table-striped">
+            <table class="table table-striped thead-inverse">
                 <thead class="black-head">
                     <tr>
                         <td class="xsm-col-th">Lp.</td>
@@ -77,7 +77,7 @@
     </div>
     <div id="active" class="tab-pane fade">
         <div class="table-responsive" style="margin-top: 20px">
-            <table class="table table-striped">
+            <table class="table table-striped thead-inverse">
                 <thead class="black-head">
                     <tr>
                         <td class="xsm-col-th">Lp.</td>
@@ -113,7 +113,7 @@
 
     <div id="finished" class="tab-pane fade">
         <div class="table-responsive" style="margin-top: 20px">
-            <table class="table table-striped">
+            <table class="table table-striped thead-inverse">
                 <thead class="black-head">
                     <tr>
                         <td class="xsm-col-th">Lp.</td>
@@ -148,14 +148,15 @@
     </div>
     <div id="judged" class="tab-pane fade">
         <div class="table-responsive" style="margin-top: 20px">
-            <table class="table table-striped">
+            <table class="table table-striped thead-inverse">
                 <thead class="black-head">
                     <tr>
-                        <td class="xsm-col-th">Lp.</td>
-                        <td class="sm-col-th">Data</td>
-                        <td>Użytkownik</td>
-                        <td>Nazwa testu</td>
-                        <td class="sm-col-th">Szczegóły</td>
+                        <th class="xsm-col-th">Lp.</th>
+                        <th class="sm-col-th">Data</th>
+                        <th>Użytkownik</th>
+                        <th>Nazwa testu</th>
+                        <th class="xsm-col-th">Rezultat</th>
+                        <th class="md-col-th">Szczegóły</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -167,6 +168,7 @@
                             <td>{{$test->created_at}}</td>
                             <td>{{$test->user->first_name . ' ' . $test->user->last_name}}</td>
                             <td>{{$test->name}}</td>
+                            <td>{{$test->result}} / {{$test->questions->count()}}</td>
                             <td>
                                 <a class="btn btn-default" href="{{ URL::to('/test_result') }}/{{$test->id}}">
                                     <span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły
