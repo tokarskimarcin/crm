@@ -251,27 +251,29 @@ class TestsController extends Controller
     public function saveTestWithUser(Request $request)
     {
         if($request->ajax()){
-            $new_test = new UserTest();
-            $new_test->cadre_id = Auth::user()->id;
-            $new_test->user_id = $request->id_user;
-            $new_test->status = 1;
-            $new_test->template_id = $request->template_id;
-            $new_test->name= $request->subject;
-            $new_test->save();
-            $id_test = $new_test->id;
-            $question_array = $request->question_test_array;
+            // wyłuskanie wszystkoch użytkowników
+            for ($i=0;$i<count($request->id_user_tab);$i++) {
+                $new_test = new UserTest();
+                $new_test->cadre_id = Auth::user()->id;
+                $new_test->user_id = $request->id_user_tab[$i];
+                $new_test->status = 1;
+                $new_test->template_id = $request->template_id;
+                $new_test->name = $request->subject;
+                $new_test->save();
+                $id_test = $new_test->id;
+                $question_array = $request->question_test_array;
 
-            foreach ($question_array as $item)
-            {
-                $new_user_question = new UserQuestion();
-                $new_user_question->test_id = $id_test;
-                $new_user_question->question_id = $item['id'];
-                $new_user_question->available_time = $item['time']*60;
-                $new_user_question->save();
-                $new_many_to_many = new TestUsersQuestion();
-                $new_many_to_many->user_question_id = $new_user_question->id;
-                $new_many_to_many->test_question_id = $item['id'];
-                $new_many_to_many->save();
+                foreach ($question_array as $item) {
+                    $new_user_question = new UserQuestion();
+                    $new_user_question->test_id = $id_test;
+                    $new_user_question->question_id = $item['id'];
+                    $new_user_question->available_time = $item['time'] * 60;
+                    $new_user_question->save();
+                    $new_many_to_many = new TestUsersQuestion();
+                    $new_many_to_many->user_question_id = $new_user_question->id;
+                    $new_many_to_many->test_question_id = $item['id'];
+                    $new_many_to_many->save();
+                }
             }
             return 1;
         }
@@ -314,7 +316,8 @@ class TestsController extends Controller
         foreach ($all_question_id as $item)
         {
             $content_question = $item->testQuestion()->get();
-            array_push($all_question,["id_question" => $content_question[0]->id,"content" => $content_question[0]->content]);
+            $category_name = TestCategory::where('id','=',$content_question[0]->category_id)->get();
+            array_push($all_question,["id_question" => $content_question[0]->id,"content" => $content_question[0]->content,"category_name"=>$category_name[0]->name]);
 
 
         }

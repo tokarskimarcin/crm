@@ -64,7 +64,7 @@
                         <th>Stawka</th>
                         <th>Ilość zgód</th>
                         <th>Średnia</th>
-                        <th>Pensja</th>
+                        <th>Podstawa</th>
                     </tr>
                 </thead>
                 <tbody>
