@@ -172,7 +172,23 @@
                 'url': "{{ route('api.datatableShowDkjVerification') }}",
                 'type': 'POST',
                 'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
-            }, "columns": [
+            },"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+                if(aData.manager_status == null) {
+                    $(nRow).css('background-color', '#f2876d');
+                }
+               
+                else{
+                    //$(nRow).css('background-color', 'yello');
+                // if(jQuery.inArray(parseInt(aData.id),question_repeat) != -1) {
+                // $(nRow).css('background','#f3e97c');
+                // }else{
+                // $(nRow).css('background','#5cb85cbf');
+                // }
+                }
+                {{--  $(nRow).attr('id', aData.id);  --}}
+                return nRow;  
+                // po wyświetleniu strony dodaj nagłówek z możliwościa losowania pytań
+                }, "columns": [
                 {"data": "add_date"},
                 {
                     "data": function (data, type, dataToSet) {
@@ -205,6 +221,8 @@
                             return "Brak Janka"
                         else if(data.manager_status == 0)
                             return "Janek"
+                        else
+                            return "Brak weryfikacji"
                     }, "name": "manager_status"
                 },
                 {"data": "comment_manager"},

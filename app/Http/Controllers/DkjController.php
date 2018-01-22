@@ -345,9 +345,8 @@ class DkjController extends Controller
                 dkj.dkj_status
                 '))->where('dkj.dkj_status',1)
             ->where('dkj.deleted',0)
-            ->where('dkj.manager_status','!=',null)
             ->where('user.department_info_id',Auth::user()->department_info_id)
-            ->orderBy('dkj.date_manager', 'desc');
+            ->orderBy('dkj.add_date', 'desc');
         return datatables($query)->make(true);
     }
 
