@@ -316,7 +316,8 @@ class TestsController extends Controller
         foreach ($all_question_id as $item)
         {
             $content_question = $item->testQuestion()->get();
-            array_push($all_question,["id_question" => $content_question[0]->id,"content" => $content_question[0]->content]);
+            $category_name = TestCategory::where('id','=',$content_question[0]->category_id)->get();
+            array_push($all_question,["id_question" => $content_question[0]->id,"content" => $content_question[0]->content,"category_name"=>$category_name[0]->name]);
 
 
         }
