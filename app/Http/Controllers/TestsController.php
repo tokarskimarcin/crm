@@ -491,8 +491,6 @@ class TestsController extends Controller
     public function testsStatisticsGet() {
         $tests = UserTest::all();
 
-        $months = ['Styczeń', 'Luty', 'Marzec', 'Kwiecien', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Padziernik', 'Listopad', 'Grudzień'];
-
         $departments_stats = DB::table('user_tests')
             ->select(DB::raw('
                 departments.name as dep_name,
@@ -583,7 +581,18 @@ class TestsController extends Controller
             ->groupBy('test_categories.id')
             ->get();
 
+        $stats = DB::table('user_questions')
+            ->select(DB::raw('
+                sum(CASE WHEN user_questions.result = 1 THEN 1 else 0 END) as user_good,
+                sum(CASE WHEN user_questions.result = 0 THEN 1 else 0 END) as user_wrong
+            '))
+            ->join('user_tests', 'user_tests.id', 'user_questions.test_id')
+            ->where('user_tests.user_id', '=', $id)
+            ->where('user_tests.result', '!=', null)
+            ->get();
+
         return view('tests.employeeStatistics')
+            ->with('stats', $stats[0])
             ->with('categories', $categories)
             ->with('cadre', $cadre)
             ->with('user', $user);
@@ -619,6 +628,17 @@ class TestsController extends Controller
                 count(*) as dep_sum
             '))
             ->leftJoin('users', 'users.id', 'user_tests.user_id')
+            ->where('users.department_info_id', '=', $id)
+            ->get();
+
+        $results = DB::table('user_questions')
+            ->select(DB::raw('
+                sum(CASE WHEN user_questions.result = 1 THEN 1 ELSE 0 END) as dep_good,
+                sum(CASE WHEN user_questions.result = 0 THEN 1 ELSE 0 END) as dep_wrong
+            '))
+            ->join('user_tests', 'user_tests.id', 'user_questions.test_id')
+            ->join('users', 'users.id', 'user_tests.user_id')
+            ->where('user_tests.result', '!=', null)
             ->where('users.department_info_id', '=', $id)
             ->get();
 
@@ -660,6 +680,7 @@ class TestsController extends Controller
             ->get();
 
         return view('tests.departmentStatistics')
+            ->with('results', $results[0])
             ->with('dep_sum', $count_dep_test_sum[0]->dep_sum)
             ->with('id', $id)
             ->with('tests_by_user', $tests_by_user)
@@ -679,7 +700,22 @@ class TestsController extends Controller
             return view('errors.404');
         }
 
+        /**
+         * Funkcja zliczająca wyniki pracownikow  dla danego testu
+         */
+
+        $results = DB::table('user_questions')
+            ->select(DB::raw('
+                SUM(CASE WHEN user_questions.result is null THEN 1 ELSE 0 END) as not_judged,
+                SUM(CASE WHEN user_questions.result = 1 THEN 1 ELSE 0 END) as good,
+                SUM(CASE WHEN user_questions.result = 0 THEN 1 ELSE 0 END) as bad
+            '))
+            ->join('user_tests', 'user_tests.id', 'user_questions.test_id')
+            ->where('user_tests.template_id', '=', $id)
+            ->get();
+
         return view('tests.oneTestStatistics')
+            ->with('results', $results[0])
             ->with('test', $test);
     }
 
