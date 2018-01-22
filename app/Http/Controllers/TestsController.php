@@ -317,10 +317,9 @@ class TestsController extends Controller
         {
             $content_question = $item->testQuestion()->get();
             $category_name = TestCategory::where('id','=',$content_question[0]->category_id)->get();
-            array_push($all_question,["id_question" => $content_question[0]->id,"content" => $content_question[0]->content,"category_name"=>$category_name[0]->name]);
-
-
+            array_push($all_question,["id_question" => $item->question_id,"content" => $content_question[0]->content,"category_name"=>$category_name[0]->name,"avaible_time" => $item->available_time]);
         }
+
         return view('tests.viewTest')
             ->with('test_by_id',$test_by_id)
             ->with('all_question',$all_question)

@@ -230,10 +230,10 @@
                      ]).node();
                      rowNode.id = "question_"+response[i].question_id;
 
-                     if(jQuery.inArray(parseInt(response[i].question_id),question_repeat) != -1)
-                         $(rowNode).css('background','#f3e97c');
-                     else
-                         $(rowNode).css('background','#5cb85cbf');
+//                     if(jQuery.inArray(parseInt(response[i].question_id),question_repeat) != -1)
+//                         $(rowNode).css('background','#f3e97c');
+//                     else
+//                         $(rowNode).css('background','#5cb85cbf');
                  }// render tablicy z pytaniami
                  table_all_guestion.draw();
              }
@@ -247,8 +247,6 @@
         function setDataFromPHP() {
             var test_info = {!! json_encode($test_by_id) !!};
             var all_question = {!! json_encode($all_question) !!};
-            console.log(all_question);
-            console.log(test_info);
             // zerowanie tablic pomcniczych oraz datatables
             question_array_id = [];
             question_text_array = [];
@@ -256,15 +254,15 @@
             //wpisanie danych z szablonu na stronę testu
             for(var i=0;i<all_question.length;i++)
             {
-                console.log(all_question[i].id_question);
+                question_count++;
                 // przepisanie danych z szablonu do testu
-                question_text_array.push({id:all_question[i].id_question,text:all_question[i].content,time:0,subject:0});
+                question_text_array.push({id:all_question[i].id_question,text:all_question[i].content,time:all_question[i].avaible_time,subject:all_question[i].category_name});
                 question_array_id.push(parseInt(all_question[i].question_id));
                 // dodanie wiersza do wszystkich pytań
                 var rowNode = table_all_guestion.row.add([
                     all_question[i].category_name,
                     all_question[i].content,
-                    '<input type="number" class="form-control question_time" value='+0+'>',
+                    '<input type="number" class="form-control question_time" value='+(all_question[i].avaible_time)/60+'>',
                     '<button type="button" class="btn btn-danger delete_row">Usuń</button>'
                 ]).node();
                 rowNode.id = "question_"+all_question[i].id_question;
@@ -274,6 +272,7 @@
 //                else
 //                    $(rowNode).css('background','#5cb85cbf');
             }// render tablicy z pytaniami
+            $('#count_question').text(question_count);
             table_all_guestion.draw();
         }
      // funkcja pobierająca pytania które użytkownik już rozwiązywał
@@ -350,11 +349,11 @@
                  $(nRow).addClass('checked');
              else{
                  $(nRow).addClass('no_checked');
-                 if(jQuery.inArray(parseInt(aData.id),question_repeat) != -1) {
-                     $(nRow).css('background','#f3e97c');
-                 }else{
-                     $(nRow).css('background','#5cb85cbf');
-                 }
+//                 if(jQuery.inArray(parseInt(aData.id),question_repeat) != -1) {
+//                     $(nRow).css('background','#f3e97c');
+//                 }else{
+//                     $(nRow).css('background','#5cb85cbf');
+//                 }
              }
              $(nRow).attr('id', aData.id);
              return nRow;
@@ -379,13 +378,15 @@
                  var count_random_question = $(this).val();
                  // wyzerowanie tablicy losowych wierszy
                  random_array = [];
+                 console.log(question_text_array);
                  for(var i=0;i<question_text_array.length;i++){
                      // tylko z tej samej kategorii
-                     if(question_text_array[i].subject == category_name)
-                     { // znajdz po nr:id wiersz w tabeli z pytaniami, i kliknij w przycisk wybierz
+                     if(question_text_array[i].subject.trim() == category_name.trim())
+                     {
+                         // znajdz po nr:id wiersz w tabeli z pytaniami, i kliknij w przycisk wybierz
                          var choisen_tr = $('#'+question_text_array[i].id).find('.button_question_choice');
                          $(choisen_tr).trigger('click');
-                         i--;
+                             i--;
                      }
                  }
                  if(count_random_question != 'Wybierz')
@@ -409,6 +410,7 @@
                          var choisen_tr = $('#'+choisen_row).find('.button_question_choice');
                          $(choisen_tr).trigger('click');
                      }
+                     console.log(question_text_array);
                  }
              });
 
@@ -587,10 +589,10 @@
              // wpisanie informacji o pytaniu do tablicy
              question_text_array.push({id:question_id,text:question_text,time:question_time,subject:category_name});
             //gdy pytanie jest powtórzone zaznacz na innny kolor | zielony ok | żółty powtórzony
-             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1)
-                 $(rowNode).css('background','#f3e97c');
-             else
-                 $(rowNode).css('background','#5cb85cbf');
+//             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1)
+//                 $(rowNode).css('background','#f3e97c');
+//             else
+//                 $(rowNode).css('background','#5cb85cbf');
              // dodanie klasy z informacją że wiersz jest zaznaczony
              tr.removeClass(tr_class[0]+' no_checked').addClass(tr_class[0]).addClass('checked');
              //powiększ ilość pytań
@@ -604,11 +606,11 @@
              removeFunction(question_text_array,"id",question_id);
              // zmiana flagi w klacie -> wyłączenie koloru
              tr.removeClass(tr_class[0]+' checked').addClass(tr_class[0]).addClass('no_checked');
-             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1) {
-                 tr.css('background','#f3e97c');
-             }else{
-                 tr.css('background','#5cb85cbf');
-             }
+//             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1) {
+//                 tr.css('background','#f3e97c');
+//             }else{
+//                 tr.css('background','#5cb85cbf');
+//             }
              // zmniejsz ilość wybranych pytań
              question_count--;
          }

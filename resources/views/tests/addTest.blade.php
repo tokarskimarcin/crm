@@ -229,12 +229,13 @@
                          '<button type="button" class="btn btn-danger delete_row">Usuń</button>'
                      ]).node();
                      rowNode.id = "question_"+response[i].question_id;
-
-                     if(jQuery.inArray(parseInt(response[i].question_id),question_repeat) != -1)
-                         $(rowNode).css('background','#f3e97c');
-                     else
-                         $(rowNode).css('background','#5cb85cbf');
+                     question_count++;
+//                     if(jQuery.inArray(parseInt(response[i].question_id),question_repeat) != -1)
+//                         $(rowNode).css('background','#f3e97c');
+//                     else
+//                         $(rowNode).css('background','#5cb85cbf');
                  }// render tablicy z pytaniami
+                 $('#count_question').text(question_count);
                  table_all_guestion.draw();
              }
          });
@@ -318,11 +319,11 @@
                  $(nRow).addClass('checked');
              else{
                  $(nRow).addClass('no_checked');
-                 if(jQuery.inArray(parseInt(aData.id),question_repeat) != -1) {
-                     $(nRow).css('background','#f3e97c');
-                 }else{
-                     $(nRow).css('background','#5cb85cbf');
-                 }
+//                 if(jQuery.inArray(parseInt(aData.id),question_repeat) != -1) {
+//                     $(nRow).css('background','#f3e97c');
+//                 }else{
+//                     $(nRow).css('background','#5cb85cbf');
+//                 }
              }
              $(nRow).attr('id', aData.id);
              return nRow;
@@ -349,8 +350,8 @@
                  random_array = [];
                  for(var i=0;i<question_text_array.length;i++){
                      // tylko z tej samej kategorii
-                     if(question_text_array[i].subject == category_name)
-                     { // znajdz po nr:id wiersz w tabeli z pytaniami, i kliknij w przycisk wybierz
+                     if(question_text_array[i].subject.trim() == category_name.trim())
+                     {   // znajdz po nr:id wiersz w tabeli z pytaniami, i kliknij w przycisk wybierz
                          var choisen_tr = $('#'+question_text_array[i].id).find('.button_question_choice');
                          $(choisen_tr).trigger('click');
                          i--;
@@ -529,6 +530,7 @@
          removeFunction(question_text_array,"id",question_id);
          // zmniejsz ilość wybranych pytań
          question_count--;
+         $('#count_question').text(question_count);
      });
 
 
@@ -563,10 +565,10 @@
              // wpisanie informacji o pytaniu do tablicy
              question_text_array.push({id:question_id,text:question_text,time:question_time,subject:category_name});
             //gdy pytanie jest powtórzone zaznacz na innny kolor | zielony ok | żółty powtórzony
-             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1)
-                 $(rowNode).css('background','#f3e97c');
-             else
-                 $(rowNode).css('background','#5cb85cbf');
+//             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1)
+//                 $(rowNode).css('background','#f3e97c');
+//             else
+//                 $(rowNode).css('background','#5cb85cbf');
              // dodanie klasy z informacją że wiersz jest zaznaczony
              tr.removeClass(tr_class[0]+' no_checked').addClass(tr_class[0]).addClass('checked');
              //powiększ ilość pytań
@@ -580,11 +582,11 @@
              removeFunction(question_text_array,"id",question_id);
              // zmiana flagi w klacie -> wyłączenie koloru
              tr.removeClass(tr_class[0]+' checked').addClass(tr_class[0]).addClass('no_checked');
-             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1) {
-                 tr.css('background','#f3e97c');
-             }else{
-                 tr.css('background','#5cb85cbf');
-             }
+//             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1) {
+//                 tr.css('background','#f3e97c');
+//             }else{
+//                 tr.css('background','#5cb85cbf');
+//             }
              // zmniejsz ilość wybranych pytań
              question_count--;
          }
