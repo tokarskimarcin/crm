@@ -88,13 +88,13 @@
             <div class="col-md-4">
                 <div class="panel panel-info">
                     <div class="panel-heading">
-                        <b>Czas rozpoczęcia/zakończenia</b>
+                        <b>Osoba sprawdzająca test</b>
                     </div>
                     <div class="panel-body panel-md">
-                        @if($test->test_stop != null)
-                            {{substr($test->test_start, 11, 20)}} - {{substr($test->test_stop, 11, 20)}}
+                        @if($test->checked_by != null)
+                            {{$test->checkedBy->first_name . ' ' . $test->checkedBy->last_name}}
                         @else
-                            Użytkownik nie wypełnił jeszcze testu.
+                            Nikt nie ocenił jeszcze testu.
                         @endif
                     </div>
                 </div>

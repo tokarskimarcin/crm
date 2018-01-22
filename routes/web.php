@@ -393,6 +393,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/test_result/{id}', 'TestsController@testResult');
 
     Route::get('/add_test_template', 'TestsController@addTestTemplate'); // szablony testów
+
+    Route::get('/all_tests', 'TestsController@allTestsGet');
     //TESTS STOP//
 });
 //////////////////////Testing ORM///////////////

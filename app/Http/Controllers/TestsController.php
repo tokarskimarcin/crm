@@ -176,6 +176,16 @@ class TestsController extends Controller
     }
 
     /**
+     * Funkcja zwracająca widok z dostępem do wszystkich zakończonych testów
+     */
+    public function allTestsGet() {
+        $tests = UserTest::whereIn('status', [3])->get();
+
+        return view('tests.allTests')
+            ->with('tests', $tests);
+    }
+
+    /**
      * Wyświetlanie wyników testu
      */
     public function testResult($id) {
@@ -882,9 +892,9 @@ class TestsController extends Controller
             $question->default_time = $request->newTime * 60;
             $question->updated_at = date('Y-m-d H:i:s');
             $question->cadre_by = Auth::user()->id;
-
+            
             $question->save();
-
+            
             return 1;
         }
     }

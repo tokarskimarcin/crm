@@ -153,7 +153,8 @@
                     <tr>
                         <th class="xsm-col-th">Lp.</th>
                         <th class="sm-col-th">Data</th>
-                        <th>Użytkownik</th>
+                        <th class="md-col-th">Użytkownik</th>
+                        <th class="md-col-th">Osoba oceniająca</th>
                         <th>Nazwa testu</th>
                         <th class="xsm-col-th">Rezultat</th>
                         <th class="md-col-th">Szczegóły</th>
@@ -167,6 +168,7 @@
                             <td>{{$i}}</td>
                             <td>{{$test->created_at}}</td>
                             <td>{{$test->user->first_name . ' ' . $test->user->last_name}}</td>
+                            <td>{{$test->checkedBy->first_name . ' ' . $test->checkedBy->last_name}}</td>
                             <td>{{$test->name}}</td>
                             <td>{{$test->result}} / {{$test->questions->count()}}</td>
                             <td>
