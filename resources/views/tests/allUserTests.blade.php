@@ -94,8 +94,9 @@
                 <thead>
                     <tr>
                         <th style="width: 5%">Lp.</th>
-                        <th style="width: 15%">Data</th>
-                        <th style="width: 20%">Osoba testująca</th>
+                        <th style="width: 10%">Data</th>
+                        <th style="width: 10%">Osoba testująca</th>
+                        <th style="width: 10%">Osoba sprawdzająca</th>
                         <th>Tytuł testu</th>
                         <th style="width: 10%">Rezultat</th>
                         <th style="width: 10%">Akcja</th>
@@ -109,6 +110,7 @@
                             <td>{{$i}}</td>
                             <td>{{$test->updated_at}}</td>
                             <td>{{$test->cadre->first_name . ' ' . $test->cadre->last_name}}</td>
+                            <td>{{$test->checkedBy->first_name . ' ' . $test->checkedBy->last_name}}</td>
                             <td>{{$test->name}}</td>
                             <td>
                                 {{$test->result}} / {{$test->questions->count()}}

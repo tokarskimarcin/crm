@@ -53,40 +53,40 @@
 </div>
 
 <div class="table-responsive" style="margin-top: 20px">
-  <table class="table table-striped thead-inverse">
-      <thead>
-          <tr>
-              <th style="width: 5%">Lp.</th>
-              <th>Nazwa testu</th>
-              <th style="width: 15%">Osoba testująca</th>
-              <th style="width: 10%">Rezultat</th>
-              <th style="width: 10%">Szczegóły</th>
-          </tr>
-        </thead>
-        <tbody>
-            @php($i = 0)
-            @foreach($user->userTests as $test)
-                @php($i++)
+    <table class="table table-striped thead-inverse">
+        <thead>
                 <tr>
-                    <td>{{$i}}</td>
-                    <td>{{$test->name}}</td>
-                    <td>{{$test->cadre->first_name . ' ' . $test->cadre->last_name}}</td>
-                    <td>
-                        @if($test->result != null)
-                            {{$test->result}} / {{$test->questions->count()}}
-                        @else
-                            <span>Brak oceny</span>
-                        @endif
-                    </td>
-                    <td>
-                        <a class="btn btn-default" href="{{ URL::to('test_result') }}/{{$test->id}}">
-                            <span style="color: green" class="glyphicon glyphicon-info-sign"></span> Szczegóły
-                        </a>
-                    </td>
+                    <th style="width: 5%">Lp.</th>
+                    <th>Nazwa testu</th>
+                    <th style="width: 15%">Osoba testująca</th>
+                    <th style="width: 10%">Rezultat</th>
+                    <th style="width: 10%">Szczegóły</th>
                 </tr>
-            @endforeach
-      </tbody>
-  </table>
+            </thead>
+            <tbody>
+                @php($i = 0)
+                @foreach($user->userTests as $test)
+                    @php($i++)
+                    <tr>
+                        <td>{{$i}}</td>
+                        <td>{{$test->name}}</td>
+                        <td>{{$test->cadre->first_name . ' ' . $test->cadre->last_name}}</td>
+                        <td>
+                            @if($test->result != null)
+                                {{$test->result}} / {{$test->questions->count()}}
+                            @else
+                                <span>Brak oceny</span>
+                            @endif
+                        </td>
+                        <td>
+                            <a class="btn btn-default" href="{{ URL::to('test_result') }}/{{$test->id}}">
+                                <span style="color: green" class="glyphicon glyphicon-info-sign"></span> Szczegóły
+                            </a>
+                        </td>
+                    </tr>
+                @endforeach
+        </tbody>
+    </table>
 </div>
 
 @endsection

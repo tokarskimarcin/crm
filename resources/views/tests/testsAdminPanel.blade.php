@@ -173,6 +173,8 @@
 
 @section('script')
 <script>
+//zdefiniowanie zidiociałego id pytania do edycji
+var editedQuestionID = null;
 
 //zdefiniowanie edytora tekstu
 var editor = null;
@@ -203,14 +205,15 @@ function edit_question_button(e) {
     var question = $('.modal_table tr[name="' + id + '"]').find(' td:first').html();
     //przekazanie danych do edytora
     editor.setData(question);
-
+///////////////////////////////////////////////////////////////////////gówno
+editedQuestionID = id;
     $('#add_question').fadeOut(0);
     $('#new_question').fadeIn(500);
     $('#question_edited_div').fadeIn(0);
     $('#question_ready_div').fadeOut(0);
 
     //przekazanie ID
-    $('#question_edited').attr('data-question_id', id);
+    $('#question_edited').removeAttr('data-question_id').attr('data-question_id', id);
 
     //pobranie  ilosci minut
     var oldTime = $('.modal_table tr[name="' + id + '"]').find(' td:nth-child(2) input').val();
@@ -221,7 +224,7 @@ function edit_question_button(e) {
 
 $('#question_edited').click(function(e) {
     //pobranie Id pytania
-    var id = $(this).data('question_id');
+    var id = $('#question_edited').data('question_id');
     //pobranie tresci pytania 
     var content = editor.getData();
     //pobranie czasu pytania
@@ -247,7 +250,7 @@ $('#question_edited').click(function(e) {
         },
         data:{
             "question":content,
-            "question_id":id,
+            "question_id":editedQuestionID,
             "newTime":question_time
         },
         success: function(response) {
@@ -438,6 +441,10 @@ $('.categry_to_modal').click(function() {
 
 //wypełnienie modalu danymi z wybranej kategorii
 $('#myModal').on('show.bs.modal', function() {
+    //defaultowe ukrycie diva z przyciskiem "zapisz zmiany"
+    $('#question_edited_div').fadeOut(0);
+
+    //ajax do pobania pytan z danej kategorii
     $.ajax({
         type:"POST",
         async: false,
