@@ -441,16 +441,47 @@ class TestsController extends Controller
             return view('errors.404');
         }
 
-        $cadre_comments = $request->comment_question;
+        /**
+         * Zdefiniowanie początkowej zmiennej przechowującej sumaryczny wynik testu
+         */
+        $result = 0;
 
+        /**
+         * Przekazanie danych na temat testu do tablic
+         */
+        $cadre_comments = $request->comment_question;
+        $cadre_result = $request->question_result;
+
+        /**
+         * Zapis danych o pytaniach
+         */
         foreach($test->questions as $question) {
+            /**
+             * Dodanie komentarza do pytania
+             * Defaultowo 'Brak komentarza'
+             */
             $question->cadre_comment = ($cadre_comments[0] != null) ? $cadre_comments[0] : 'Brak komentarza.' ;
+            $question->result = ($cadre_result[0] != null) ? intval($cadre_result[0]) : 0 ;
             $question->save();
+            /**
+             * Dodanie wyniku pytania do sumarycznego wyniku testu
+             */
+            $result += intval($cadre_result[0]);
+            /**
+             * usunięcie pierwszych elementów tablicy z pytaniami
+             */
             array_shift($cadre_comments);
+            array_shift($cadre_result);
         }
 
+        /**
+         * Zmiana statusu testu na oceniony
+         */
         $test->status = 4;
-        $test->result = $request->q1;
+        /**
+         * Zapis sumarycznego wyniku testu
+         */
+        $test->result = $result;
         $test->save();
 
         Session::flash('message_ok', "Ocena została przesłana!");
