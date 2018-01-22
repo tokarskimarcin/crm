@@ -242,7 +242,9 @@ class TestsController extends Controller
         if($request->ajax())
         {
             $query = TestQuestion::where('category_id',$request->category_id)->get();
-            return datatables($query)->make(true);
+            return datatables($query)
+                ->rawColumns(['content'])
+                ->make(true);
         }
     }
     /*
@@ -279,6 +281,54 @@ class TestsController extends Controller
         }
         return 0;
     }
+
+    // edycja testu ( usunięcie i wgranie ponownie
+    public function editTestWithUser(Request $request)
+    {
+        if($request->ajax()) {
+            // Sekcja usuwania
+            //usunięcie wszystkich pytań danego testu
+            $test_id = $request->test_id;
+            $status = UserTest::find($test_id);
+            if ($status->status == 1) {
+
+                $user_question = UserQuestion::where('test_id', $test_id)->get();
+                foreach ($user_question as $item) {
+                    // usuniecie z pytań do testu
+                    TestUsersQuestion::where('user_question_id', '=', $item->id)->delete();
+                }
+                // usunięcie z pytań testu
+                UserQuestion::where('test_id', $test_id)->delete();
+                // usunięcie testu
+                UserTest::where('id', '=', $test_id)->delete();
+
+                for ($i = 0; $i < count($request->id_user); $i++) {
+                    $new_test = new UserTest();
+                    $new_test->cadre_id = Auth::user()->id;
+                    $new_test->user_id = $request->id_user[$i];
+                    $new_test->status = 1;
+                    $new_test->template_id = $request->template_id;
+                    $new_test->name = $request->subject;
+                    $new_test->save();
+                    $id_test = $new_test->id;
+                    $question_array = $request->question_test_array;
+
+                    foreach ($question_array as $item) {
+                        $new_user_question = new UserQuestion();
+                        $new_user_question->test_id = $id_test;
+                        $new_user_question->question_id = $item['id'];
+                        $new_user_question->available_time = $item['time'] * 60;
+                        $new_user_question->save();
+                        $new_many_to_many = new TestUsersQuestion();
+                        $new_many_to_many->user_question_id = $new_user_question->id;
+                        $new_many_to_many->test_question_id = $item['id'];
+                        $new_many_to_many->save();
+                    }
+                }
+            }
+        }
+            return 1;
+    }
     // Wysłanie infromacji o użytkowniku, jakie pytania już rozwiązał
     public function getRepeatQuestion (Request $request)
     {
@@ -303,29 +353,32 @@ class TestsController extends Controller
     {
         // pobranie informacji o teście
         $test_by_id = UserTest::find($id);
-        // pobranie pytań z testu
-        $all_question_id = $test_by_id->questions()->get();
-        // pobranie wszystkich kategorii
-        $categories = TestCategory::where('deleted','=',0)->get();
-        // pobranie wszystkich pracowników kardy(pracujących)
-        $cadre = User::where('status_work','=',1)
-            ->whereNotin('user_type_id',[1,2])->orderBy('last_name')->get();
-        $teplate = TemplateUserTest::where('deleted',0)->get();
-        //generowanie widoku
-        $all_question = array();
-        foreach ($all_question_id as $item)
-        {
-            $content_question = $item->testQuestion()->get();
-            $category_name = TestCategory::where('id','=',$content_question[0]->category_id)->get();
-            array_push($all_question,["id_question" => $item->question_id,"content" => $content_question[0]->content,"category_name"=>$category_name[0]->name,"avaible_time" => $item->available_time]);
-        }
+        if($test_by_id->status == 1) {
+            // pobranie pytań z testu
+            $all_question_id = $test_by_id->questions()->get();
+            // pobranie wszystkich kategorii
+            $categories = TestCategory::where('deleted', '=', 0)->get();
+            // pobranie wszystkich pracowników kardy(pracujących)
+            $cadre = User::where('status_work', '=', 1)
+                ->whereNotin('user_type_id', [1, 2])->orderBy('last_name')->get();
+            $teplate = TemplateUserTest::where('deleted', 0)->get();
+            //generowanie widoku
+            $all_question = array();
+            foreach ($all_question_id as $item) {
+                $content_question = $item->testQuestion()->get();
+                $category_name = TestCategory::where('id', '=', $content_question[0]->category_id)->get();
+                array_push($all_question, ["id_question" => $item->question_id, "content" => $content_question[0]->content, "category_name" => $category_name[0]->name, "avaible_time" => $item->available_time]);
+            }
 
-        return view('tests.viewTest')
-            ->with('test_by_id',$test_by_id)
-            ->with('all_question',$all_question)
-            ->with('categories',$categories)
-            ->with('users',$cadre)
-            ->with('template',$teplate);
+            return view('tests.viewTest')
+                ->with('test_by_id', $test_by_id)
+                ->with('all_question', $all_question)
+                ->with('categories', $categories)
+                ->with('users', $cadre)
+                ->with('template', $teplate);
+        }else{
+            return redirect('show_tests');
+        }
     }
 
     /*

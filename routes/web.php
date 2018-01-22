@@ -98,6 +98,9 @@ Route::POST('/mainTableCounter','TestsController@mainTableCounter')->name('api.m
 
 Route::POST('/showQuestionDatatable','TestsController@showQuestionDatatable')->name('api.showQuestionDatatable');
 Route::POST('/saveTestWithUser','TestsController@saveTestWithUser')->name('api.saveTestWithUser');
+Route::POST('/editTestWithUser','TestsController@editTestWithUser')->name('api.editTestWithUser');
+
+
 
 Route::POST('/activateTest','TestsController@activateTest')->name('api.activateTest');
 
