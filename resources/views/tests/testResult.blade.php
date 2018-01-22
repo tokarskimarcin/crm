@@ -17,6 +17,10 @@
 .panel-heading a.collapsed:after {
     content:"\e080";
 }
+
+.panel-md {
+    font-size: 20px;
+}
 </style>
 
 <div class="row">
@@ -35,7 +39,7 @@
                     <div class="panel-heading alert-destroyer">
                         <b>Tytuł testu</b>
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body panel-md">
                         {{$test->name}}
                     </div>
                 </div>
@@ -45,7 +49,7 @@
                     <div class="panel-heading">
                         <b>Pracownik</b>
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body panel-md">
                         {{$test->user->first_name . ' ' . $test->user->last_name}}
                     </div>
                 </div>
@@ -55,7 +59,7 @@
                     <div class="panel-heading">
                         <b>Osoba przeprowadzająca test</b>
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body panel-md">
                         {{$test->cadre->first_name . ' ' . $test->cadre->last_name}}
                     </div>
                 </div>
@@ -72,7 +76,7 @@
                     <div class="panel-heading">
                         <b>Data testu</b>
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body panel-md">
                         @if($test->test_stop != null)
                             {{substr($test->test_start, 0, 10)}}
                         @else
@@ -86,7 +90,7 @@
                     <div class="panel-heading">
                         <b>Czas rozpoczęcia/zakończenia</b>
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body panel-md">
                         @if($test->test_stop != null)
                             {{substr($test->test_start, 11, 20)}} - {{substr($test->test_stop, 11, 20)}}
                         @else
@@ -100,11 +104,9 @@
                     <div class="panel-heading">
                         <b>Rezultat</b>
                     </div>
-                    <div class="panel-body">
-                        @if($test->result == 2)
-                            <b style="color: red">NEGATYWNY</b>
-                        @elseif($test->result == 1)
-                            <b style="color: green">POZYTYWNY</b>
+                    <div class="panel-body panel-md">
+                        @if($test->result != null)
+                            <b>{{$test->result}} / {{$test->questions->count()}}</b>
                         @else
                             <b>Brak oceny</b>
                         @endif

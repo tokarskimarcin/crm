@@ -111,11 +111,7 @@
                             <td>{{$test->cadre->first_name . ' ' . $test->cadre->last_name}}</td>
                             <td>{{$test->name}}</td>
                             <td>
-                                @if($test->result == 2)
-                                    <b style="color:red">NEGATYWNY</b>
-                                @else
-                                    <b style="color:green">POZYTYWNY</b>
-                                @endif
+                                {{$test->result}} / {{$test->questions->count()}}
                             </td>
                             <td>
                                 <a class="btn btn-default" href="{{ URL::to('/test_result') }}/{{$test->id}}">

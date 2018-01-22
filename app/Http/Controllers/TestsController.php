@@ -413,19 +413,22 @@ class TestsController extends Controller
     }
 
     /* 
-        Pogdląd testu + możliwość jego oceny
+        Ocena testu
     */
     public function testCheckGet($id) {
         $test = UserTest::find($id);
-        $testQuestions = TestQuestion::all();
-
-        foreach($test->questions as $question) {
-            
-        }
 
         if ($test == null) {
             return view('errors.404');
         }
+
+        if ($test->status < 3) {
+            return view('errors.404');
+        }
+
+        /*********************************
+         * Tutaj na koniec dodac sprawdzenie czy uzytkownik nie sprawdza testu sam sobie
+         ********************************/
 
         return view('tests.checkTest')
             ->with('test', $test);
@@ -482,6 +485,12 @@ class TestsController extends Controller
          * Zapis sumarycznego wyniku testu
          */
         $test->result = $result;
+
+        /**
+         * Zapis użytkownika sprawdzającego test
+         */
+        $test->checked_by = Auth::user()->id;
+
         $test->save();
 
         Session::flash('message_ok', "Ocena została przesłana!");
@@ -516,8 +525,15 @@ class TestsController extends Controller
             ->join('user_types', 'users.user_type_id', 'user_types.id')
             ->get();
 
+        $results = DB::table('user_questions')
+            ->select(DB::raw('
+                SUM(CASE WHEN result = 1 THEN 1 ELSE 0 END) as good,
+                SUM(CASE WHEN result = 0 THEN 1 ELSE 0 END) as bad
+            '))
+            ->get();
+
         return view('tests.testsStatistics')
-            ->with('months', $months)
+            ->with('results', $results[0])
             ->with('stats_by_user_type', $stats_by_user_type)
             ->with('departments_stats', $departments_stats)
             ->with('tests', $tests);
@@ -626,6 +642,9 @@ class TestsController extends Controller
 
         $department_info = Department_info::all();
 
+        /**
+         * Pobranie ilości przeprowadznych testow w oddziale
+         */
         $count_dep_test_sum = DB::table('user_tests')
             ->select(DB::raw('
                 count(*) as dep_sum
@@ -634,6 +653,9 @@ class TestsController extends Controller
             ->where('users.department_info_id', '=', $id)
             ->get();
 
+        /**
+         * Pobranie ilości dobrych i złych odpowiedzi
+         */
         $results = DB::table('user_questions')
             ->select(DB::raw('
                 sum(CASE WHEN user_questions.result = 1 THEN 1 ELSE 0 END) as dep_good,
@@ -645,19 +667,23 @@ class TestsController extends Controller
             ->where('users.department_info_id', '=', $id)
             ->get();
 
+        /**
+         * Pobranie ilosci testow na uzytkownika
+         */
         $tests_by_user = DB::table('user_tests')
             ->select(DB::raw('
                 first_name,
                 last_name,
-                count(*) as user_sum,
-                SUM(CASE WHEN result = 1 THEN 1 ELSE 0 END) as user_not_pass,
-                SUM(CASE WHEN result = 2 THEN 1 ELSE 0 END) as user_pass
+                count(*) as user_sum
             '))
             ->leftJoin('users', 'users.id', 'user_tests.user_id')
             ->where('users.department_info_id', '=', $id)
             ->groupBy('users.id')
             ->get();
 
+        /**
+         * Pobranie ilosci wykonanych testow przez kadre
+         */
         $tests_by_cadre = DB::table('user_tests')
             ->select(DB::raw('
                 first_name,
@@ -669,6 +695,9 @@ class TestsController extends Controller
             ->groupBy('users.id')
             ->get();
 
+        /**
+         * Pobranie ulości pytan ze względu na kategorię
+         */
         $categories = DB::table('user_questions')
             ->select(DB::raw('
                 test_categories.name as name,

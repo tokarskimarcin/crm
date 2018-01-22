@@ -5,7 +5,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Statystyki użytkownika</h1>
+            <div class="alert gray-nav">Testy / Statystyki użytkownika / {{$user->first_name . ' ' . $user->last_name}}</div>
         </div>
     </div>
 </div>
@@ -53,7 +53,7 @@
 </div>
 
 <div class="table-responsive" style="margin-top: 20px">
-  <table class="table table-striped">
+  <table class="table table-striped thead-inverse">
       <thead>
           <tr>
               <th style="width: 5%">Lp.</th>
@@ -72,10 +72,8 @@
                     <td>{{$test->name}}</td>
                     <td>{{$test->cadre->first_name . ' ' . $test->cadre->last_name}}</td>
                     <td>
-                        @if($test->result == 1)
-                            <span style="color:green">Pozytywny</span>
-                        @elseif($test->result == 2)
-                            <span style="color:red">Negatywny</span>
+                        @if($test->result != null)
+                            {{$test->result}} / {{$test->questions->count()}}
                         @else
                             <span>Brak oceny</span>
                         @endif
@@ -101,8 +99,8 @@ google.charts.load("current", {packages:["corechart"]});
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
           ['Ilość', 'Statystyki'],
-          ['Zaliczone', Number({{$user->userTests->where('result', '=', 1)->count()}})],
-          ['Niezaliczone', Number({{$user->userTests->where('result', '=', 2)->count()}})]
+          ['Poprawne', Number({{$stats->user_good}})],
+          ['Niepoprawne', Number({{$stats->user_wrong}})]
         ]);
 
         var options = {
