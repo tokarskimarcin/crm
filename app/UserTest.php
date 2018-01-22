@@ -17,5 +17,9 @@ class UserTest extends Model
     public function cadre() {
         return $this->belongsTo('App\User', 'cadre_id');
     }
+
+    public function checkedBy() {
+        return $this->belongsTo('App\User', 'checked_by');
+    }
     
 }
