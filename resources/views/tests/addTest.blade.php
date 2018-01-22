@@ -229,12 +229,13 @@
                          '<button type="button" class="btn btn-danger delete_row">Usuń</button>'
                      ]).node();
                      rowNode.id = "question_"+response[i].question_id;
-
+                     question_count++;
 //                     if(jQuery.inArray(parseInt(response[i].question_id),question_repeat) != -1)
 //                         $(rowNode).css('background','#f3e97c');
 //                     else
 //                         $(rowNode).css('background','#5cb85cbf');
                  }// render tablicy z pytaniami
+                 $('#count_question').text(question_count);
                  table_all_guestion.draw();
              }
          });
@@ -349,8 +350,8 @@
                  random_array = [];
                  for(var i=0;i<question_text_array.length;i++){
                      // tylko z tej samej kategorii
-                     if(question_text_array[i].subject == category_name)
-                     { // znajdz po nr:id wiersz w tabeli z pytaniami, i kliknij w przycisk wybierz
+                     if(question_text_array[i].subject.trim() == category_name.trim())
+                     {   // znajdz po nr:id wiersz w tabeli z pytaniami, i kliknij w przycisk wybierz
                          var choisen_tr = $('#'+question_text_array[i].id).find('.button_question_choice');
                          $(choisen_tr).trigger('click');
                          i--;
@@ -529,6 +530,7 @@
          removeFunction(question_text_array,"id",question_id);
          // zmniejsz ilość wybranych pytań
          question_count--;
+         $('#count_question').text(question_count);
      });
 
 
