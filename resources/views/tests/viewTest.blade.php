@@ -64,15 +64,16 @@
                         <div class="col-lg-4">
                             <div class="panel panel-default">
                                 <div class="panel-heading">Test dla: </div>
-                                    <select class="form-control" id="user_select">
-                                        @foreach($users as $user)
-                                            @if($test_by_id->user_id == $user->id)
-                                                <option selected value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
-                                            @else
-                                                <option value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
+                                <select class="selectpicker form-control"  disabled id="user_select" name="link_privilages[]" title="Brak wybranych użytkowników" multiple data-actions-box="true">
+                                    @foreach($users as $user)
+                                        @if($test_by_id->user_id == $user->id)
+                                            <option selected value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
+                                        @else
+                                            <option value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+
                                 </div>
                         </div>
                         <div class="col-lg-12">
@@ -261,57 +262,57 @@
                 question_array_id.push(parseInt(all_question[i].question_id));
                 // dodanie wiersza do wszystkich pytań
                 var rowNode = table_all_guestion.row.add([
-                    response[i].name,
-                    response[i].content,
-                    '<input type="number" class="form-control question_time" value='+response[i].question_time/60+'>',
+                    all_question[i].category_name,
+                    all_question[i].content,
+                    '<input type="number" class="form-control question_time" value='+0+'>',
                     '<button type="button" class="btn btn-danger delete_row">Usuń</button>'
                 ]).node();
-                rowNode.id = "question_"+response[i].question_id;
+                rowNode.id = "question_"+all_question[i].id_question;
 
-                if(jQuery.inArray(parseInt(response[i].question_id),question_repeat) != -1)
-                    $(rowNode).css('background','#f3e97c');
-                else
-                    $(rowNode).css('background','#5cb85cbf');
+//                if(jQuery.inArray(parseInt(response[i].question_id),question_repeat) != -1)
+//                    $(rowNode).css('background','#f3e97c');
+//                else
+//                    $(rowNode).css('background','#5cb85cbf');
             }// render tablicy z pytaniami
             table_all_guestion.draw();
         }
      // funkcja pobierająca pytania które użytkownik już rozwiązywał
      function downloadRepeatQuestion() {
-         // pobranie id użytkownika
-         var id_user = $('#user_select').val();
-         //pobranie id pytań użytkownika
-         $.ajax({
-             type: "POST",
-             url: '{{ route('api.getRepeatQuestion') }}',
-             headers: {
-                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-             },
-             data: {
-                 "id_user": id_user,
-             },
-             success: function (response) {
-                 //wpisanie infromacji do tablicy powtórzonych pytań
-                 question_repeat = [];
+         {{--// pobranie id użytkownika--}}
+         {{--var id_user = $('#user_select').val();--}}
+         {{--//pobranie id pytań użytkownika--}}
+         {{--$.ajax({--}}
+             {{--type: "POST",--}}
+             {{--url: '{{ route('api.getRepeatQuestion') }}',--}}
+             {{--headers: {--}}
+                 {{--'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
+             {{--},--}}
+             {{--data: {--}}
+                 {{--"id_user": id_user,--}}
+             {{--},--}}
+             {{--success: function (response) {--}}
+                 {{--//wpisanie infromacji do tablicy powtórzonych pytań--}}
+                 {{--question_repeat = [];--}}
 
-                 if(response.length != 0)
-                 {
-                     for(var i=0;i<response.length;i++)
-                     {  // dodanie wpisu do tablicy
-                         question_repeat.push(parseInt(response[i]['question_id']));
-                         //spradzenie czy wybrany użytkownik nie miał już danego pytania w teście
-                         if(jQuery.inArray(parseInt(question_repeat[i]),question_array_id) != -1){
-                             $('#question_'+question_repeat[i]).css('background','#f3e97c');
-                         }else{
-                             $('#question_'+question_repeat[i]).css('background','#5cb85cbf');
-                         }
-                     }
-                 }else { // jeżeli nic nie dostanie w odpowiedzi, to wszysko zmień na zielono
-                     for (var i = 0; i < question_array_id.length; i++) {
-                         $('#question_'+question_array_id[i]).css('background','#5cb85cbf');
-                     }
-                 }
-             }
-         });
+                 {{--if(response.length != 0)--}}
+                 {{--{--}}
+                     {{--for(var i=0;i<response.length;i++)--}}
+                     {{--{  // dodanie wpisu do tablicy--}}
+                         {{--question_repeat.push(parseInt(response[i]['question_id']));--}}
+                         {{--//spradzenie czy wybrany użytkownik nie miał już danego pytania w teście--}}
+                         {{--if(jQuery.inArray(parseInt(question_repeat[i]),question_array_id) != -1){--}}
+                             {{--$('#question_'+question_repeat[i]).css('background','#f3e97c');--}}
+                         {{--}else{--}}
+                             {{--$('#question_'+question_repeat[i]).css('background','#5cb85cbf');--}}
+                         {{--}--}}
+                     {{--}--}}
+                 {{--}else { // jeżeli nic nie dostanie w odpowiedzi, to wszysko zmień na zielono--}}
+                     {{--for (var i = 0; i < question_array_id.length; i++) {--}}
+                         {{--$('#question_'+question_array_id[i]).css('background','#5cb85cbf');--}}
+                     {{--}--}}
+                 {{--}--}}
+             {{--}--}}
+         {{--});--}}
 
      }
     // funkcja do sprawdzania czy danyc element jest w tabeli pod indeksem id
