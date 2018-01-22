@@ -74,7 +74,7 @@
     @php{
         $proc_exito = 0;
         if($all_record != 0)
-            $proc_rest = round($exito*100/$all_record,2);
+            $proc_exito = round($exito*100/$all_record,2);
     }
     @endphp
     <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$proc_exito}} %</td>
