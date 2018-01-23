@@ -133,6 +133,12 @@ class UsersController extends Controller
         return Redirect::back();
 
     }
+
+    public function cadre_management_fireGet()
+    {
+        return view('hr.cadreManagementFire');
+    }
+
     public function employee_managementGet()
     {
         return view('hr.employeeManagement');
@@ -346,6 +352,27 @@ class UsersController extends Controller
                 ->where('users.user_type_id','!=',1)
                 ->where('users.user_type_id','!=',2)
                 ->where('users.status_work','=',1);
+            return datatables($query)->make(true);
+        }
+    }
+
+    public function datatableCadreManagementFire(Request $request)
+    {
+        if($request->ajax()) {
+            $query = DB::table('users')
+                ->join('department_info', 'department_info.id', '=', 'users.department_info_id')
+                ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+                ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+                ->join('user_types', 'users.user_type_id', '=', 'user_types.id')
+                ->select(DB::raw('
+                users.*,
+                department_type.name as department_type_name,
+                departments.name as department_name,
+                user_types.name as user_type_name
+                '))
+                ->where('users.user_type_id','!=',1)
+                ->where('users.user_type_id','!=',2)
+                ->where('users.status_work','=',0);
             return datatables($query)->make(true);
         }
     }

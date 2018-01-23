@@ -29,6 +29,8 @@ Route::POST('/uniquerEmail','UsersController@uniqueEmail')->name('api.uniqueEmai
 Route::POST('/datatableEmployeeManagement','UsersController@datatableEmployeeManagement')->name('api.datatableEmployeeManagement');
 
 Route::POST('/datatableCadreManagement','UsersController@datatableCadreManagement')->name('api.datatableCadreManagement');
+Route::POST('/datatableCadreManagementFire','UsersController@datatableCadreManagementFire')->name('api.datatableCadreManagementFire');
+
 
 Route::POST('/datatableDkjRaport','DkjController@datatableDkjRaport')->name('api.datatableDkjRaport');
 Route::POST('/getUser','DkjController@getUser')->name('api.getUser');
@@ -98,6 +100,9 @@ Route::POST('/mainTableCounter','TestsController@mainTableCounter')->name('api.m
 
 Route::POST('/showQuestionDatatable','TestsController@showQuestionDatatable')->name('api.showQuestionDatatable');
 Route::POST('/saveTestWithUser','TestsController@saveTestWithUser')->name('api.saveTestWithUser');
+Route::POST('/editTestWithUser','TestsController@editTestWithUser')->name('api.editTestWithUser');
+
+
 
 Route::POST('/activateTest','TestsController@activateTest')->name('api.activateTest');
 
@@ -216,6 +221,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/employee_management','UsersController@employee_managementGet');
 
     Route::get('/cadre_management','UsersController@cadre_managementGet');
+    Route::get('/cadre_management_fire','UsersController@cadre_management_fireGet');
+
     Route::get('/add_cadre','UsersController@add_cadreGet');
     Route::POST('/add_cadre','UsersController@add_userPOST');
 
