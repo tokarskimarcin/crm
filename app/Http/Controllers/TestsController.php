@@ -287,6 +287,7 @@ class TestsController extends Controller
                     $new_many_to_many->save();
                 }
             }
+            Session::put('message_ok', "Test został utworzony!");
             return 1;
         }
         return 0;
@@ -462,7 +463,6 @@ class TestsController extends Controller
     */
     public function showTestsGet() {
         $tests = UserTest::where('cadre_id', '=', Auth::user()->id)->get();
-
         return view('tests.showTest')
             ->with('tests', $tests);
     }

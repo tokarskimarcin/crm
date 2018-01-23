@@ -6,7 +6,7 @@
         left: 0px;
     }
     .checked{
-        background: #42d4f4 !important;
+        background: #f4d6426b !important;
     }
     .no_checked{
         background: #f9f9f9;
@@ -21,22 +21,36 @@
         background-color: #de5b5b !important;
         border-color: black !important;
     }
+    .btn-success{
+        color: #fff;
+        background-color: #5d5bde !important;
+        border-color: black !important;
+    }
+    .btn-success:hover{
+        color: #fff;
+        background-color: #5e5cef !important;
+        border-color: black !important;
+    }
 </style>
+
 <div class="row">
-    <div class="col-md-12">
-        <div class="page-header">
-            <h1>Dodaj test</h1>
-        </div>
-    </div>
+       <div class="col-md-12">
+            <div class="page-header">
+                <div class="alert gray-nav ">Testy / Dodaj test</div>
+            </div>
+       </div>
+<div>
+
+<div class="row">
     <div class="col-lg-12">
-        <div class="panel panel-default">
+        <div class="panel panel-info">
             <div class="panel-heading">Dodaj test</div>
             <div class="panel-body">
                 <div class="row">
                     <div class="col-lg-12">
 
                         <div class="col-lg-4">
-                            <div class="panel panel-default">
+                            <div class="panel panel-info">
                                 <div class="panel-heading">Wybierz szablon: </div>
                                 <select class="form-control" id="template_select">
                                     <option value="0">Wybierz</option>
@@ -48,7 +62,7 @@
                         </div>
 
                         <div class="col-lg-4">
-                            <div class="panel panel-default">
+                            <div class="panel panel-info">
                                 <div class="panel-heading">Temat: </div>
                                 <input type="text" id="subject_input" class="form-control" name="subject" placeholder="podaj temat.." value="">
                             </div>
@@ -58,7 +72,7 @@
                         </div>
 
                         <div class="col-lg-4">
-                            <div class="panel panel-default">
+                            <div class="panel panel-info">
                                 <div class="panel-heading">Test dla: </div>
                                 <select class="selectpicker form-control" id="user_select" name="link_privilages[]" title="Brak wybranych użytkowników" multiple data-actions-box="true">
                                         @foreach($users as $user)
@@ -71,7 +85,7 @@
                                 </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="panel panel-default">
+                            <div class="panel panel-info">
                                 <div class="panel-heading">Zagadnienia: </div>
                                 <div class="col-xs-12 col-md-12" style="padding-top: 15px">
                                     @foreach($categories as $category)
@@ -87,7 +101,7 @@
         </div>
     </div>
     <div class="col-lg-12">
-        <div class="panel panel-default">
+        <div class="panel panel-info">
             <div class="panel-heading">Wybrane Pytania</div>
             <div class="panel-body">
                 <div class="row">
@@ -186,6 +200,10 @@
     // numer szablonu
     var template_id  = 0;
 
+    $('.selectpicker').selectpicker({
+        selectAllText: 'Zaznacz wszystkie',
+        deselectAllText: 'Odznacz wszystkie'
+    });
     $(document).ready( function () {
     // wywołanie funkcji pobierającej pytania dla pierwszego zaznaczonego użytkownika
      downloadRepeatQuestion();
