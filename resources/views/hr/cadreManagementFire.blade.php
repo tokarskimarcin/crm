@@ -14,7 +14,7 @@
 {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Zwolniona Kadra Informacje</h1>
+            <h1 class="page-header">Kadra Informacje(konta dezaktywowane)</h1>
         </div>
     </div>
 
@@ -45,7 +45,7 @@
                                             <th>Dział</th>
                                             <th>Stanowisko</th>
                                             <th>Nr. Tel.</th>
-                                            <th>E-mail</th>
+                                            <th>Data Zakończenia pracy</th>
                                             @if(Auth::user()->user_type->all_departments == 1)
                                                 <th>Akcja</th>
                                             @endif
@@ -100,18 +100,7 @@
                 {"data": "department_type_name","name":"department_type.name"},
                 {"data": "user_type_name","name":"user_types.name"},
                 {"data": "phone"},
-                {"data": function (data, type, dataToSet) {
-                    var n = data.username.indexOf('@');
-                    if(data.username.indexOf('@') != -1  && (data.email_off == '' || data.email_off == null))
-                    {
-                        return data.username;
-                    }else if(data.email_off != '' && data.email_off != null)
-                    {
-                        return data.email_off;
-                    }else {
-                        return "Brak informacji";
-                    }
-                },"orderable": false, "searchable": false },
+                {"data": "end_work"},
                 {"data": function (data, type, dataToSet) {
                     if(show_action == 1)
                         return '<a href="edit_cadre/'+data.id+'" >Edytuj</a>';

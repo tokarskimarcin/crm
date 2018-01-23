@@ -372,7 +372,8 @@ class UsersController extends Controller
                 '))
                 ->where('users.user_type_id','!=',1)
                 ->where('users.user_type_id','!=',2)
-                ->where('users.status_work','=',0);
+                ->where('users.status_work','=',0)
+            ->orderBY('end_work','desc');
             return datatables($query)->make(true);
         }
     }
