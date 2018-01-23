@@ -6,7 +6,7 @@
         left: 0px;
     }
     .checked{
-        background: #42d4f4 !important;
+        background: #f4d6426b !important;
     }
     .no_checked{
         background: #f9f9f9;
@@ -21,15 +21,29 @@
         background-color: #de5b5b !important;
         border-color: black !important;
     }
+    .btn-success{
+        color: #fff;
+        background-color: #5d5bde !important;
+        border-color: black !important;
+    }
+    .btn-success:hover{
+        color: #fff;
+        background-color: #5e5cef !important;
+        border-color: black !important;
+    }
 </style>
-<div class="row">
-    <div class="col-md-12">
-        <div class="page-header">
-            <h1>Dodaj szablon testu</h1>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="alert gray-nav ">Testy / Dodaj szablon testu</div>
+            </div>
         </div>
-    </div>
+        <div>
+
+<div class="row">
     <div class="col-lg-12">
-        <div class="panel panel-default">
+        <div class="panel panel-info">
             <div class="panel-heading">Dodaj szablon testu</div>
             <div class="panel-body">
                 <div class="row">
@@ -37,7 +51,7 @@
 
 
                         <div class="col-lg-6">
-                            <div class="panel panel-default">
+                            <div class="panel panel-info">
                                 <div class="panel-heading">Podaj nazwę szablonu: </div>
                                 <input type="text" id="template_input" class="form-control" name="template_name" placeholder="Podaj nazwę szablonu.." value="">
                             </div>
@@ -47,7 +61,7 @@
                         </div>
 
                         <div class="col-lg-6">
-                            <div class="panel panel-default">
+                            <div class="panel panel-info">
                                 <div class="panel-heading">Temat: </div>
                                 <input type="text" id="subject_input" class="form-control" name="subject" placeholder="podaj temat.." value="">
                             </div>
@@ -58,7 +72,7 @@
 
 
                         <div class="col-lg-12">
-                            <div class="panel panel-default">
+                            <div class="panel panel-info">
                                 <div class="panel-heading">Zagadnienia: </div>
                                 <div class="col-xs-12 col-md-12" style="padding-top: 15px">
                                     @foreach($categories as $category)
@@ -74,7 +88,7 @@
         </div>
     </div>
     <div class="col-lg-12">
-        <div class="panel panel-default">
+        <div class="panel panel-info">
             <div class="panel-heading">Wybrane Pytania</div>
             <div class="panel-body">
                 <div class="row">
@@ -98,13 +112,6 @@
         </div>
     </div>
 </div>
-
-
-
-
-
-
-
 <!-- Sekcja z modalami -->
 
 
@@ -204,11 +211,11 @@
                  $(nRow).addClass('checked');
              else{
                  $(nRow).addClass('no_checked');
-                 if(jQuery.inArray(parseInt(aData.id),question_repeat) != -1) {
-                     $(nRow).css('background','#f3e97c');
-                 }else{
-                     $(nRow).css('background','#5cb85cbf');
-                 }
+//                 if(jQuery.inArray(parseInt(aData.id),question_repeat) != -1) {
+//                     $(nRow).css('background','#f3e97c');
+//                 }else{
+//                     $(nRow).css('background','#5cb85cbf');
+//                 }
              }
              $(nRow).attr('id', aData.id);
              return nRow;
@@ -430,7 +437,7 @@
          tr_class = tr_class.split(" ");
          var tr_class_name = tr_class[1];
         // cd.
-         var question_text = tr.find('td.question_text').text();
+         var question_text = tr.find('td.question_text').html();
          var question_id = tr.attr('id');
          var question_time = tr.find('td input').val();
          // gdy nie ma wybranego czasu na pytanie
@@ -452,10 +459,10 @@
              // wpisanie informacji o pytaniu do tablicy
              question_text_array.push({id:question_id,text:question_text,time:question_time,subject:category_name});
             //gdy pytanie jest powtórzone zaznacz na innny kolor | zielony ok | żółty powtórzony
-             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1)
-                 $(rowNode).css('background','#f3e97c');
-             else
-                 $(rowNode).css('background','#5cb85cbf');
+//             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1)
+//                 $(rowNode).css('background','#f3e97c');
+//             else
+//                 $(rowNode).css('background','#5cb85cbf');
              // dodanie klasy z informacją że wiersz jest zaznaczony
              tr.removeClass(tr_class[0]+' no_checked').addClass(tr_class[0]).addClass('checked');
              //powiększ ilość pytań
@@ -469,11 +476,11 @@
              removeFunction(question_text_array,"id",question_id);
              // zmiana flagi w klacie -> wyłączenie koloru
              tr.removeClass(tr_class[0]+' checked').addClass(tr_class[0]).addClass('no_checked');
-             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1) {
-                 tr.css('background','#f3e97c');
-             }else{
-                 tr.css('background','#5cb85cbf');
-             }
+//             if(jQuery.inArray(parseInt(question_id),question_repeat) != -1) {
+//                 tr.css('background','#f3e97c');
+//             }else{
+//                 tr.css('background','#5cb85cbf');
+//             }
              // zmniejsz ilość wybranych pytań
              question_count--;
          }

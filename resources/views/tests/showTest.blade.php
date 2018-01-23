@@ -19,7 +19,10 @@
         </div>
     </div>
 </div>
-
+@if (Session::has('message_ok'))
+    <div class="alert alert-success">{{ Session::get('message_ok') }}</div>
+    {{ Session::forget('message_ok')}}
+@endif
 <ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#waiting">Oczekujące</a></li>
     <li><a data-toggle="tab" href="#active">Aktywowane</a></li>
