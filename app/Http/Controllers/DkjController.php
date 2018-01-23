@@ -343,10 +343,23 @@ class DkjController extends Controller
                 dkj.comment_manager,
                 dkj.manager_status,
                 dkj.dkj_status
-                '))->where('dkj.dkj_status',1)
-            ->where('dkj.deleted',0)
-            ->where('user.department_info_id',Auth::user()->department_info_id)
-            ->orderBy('dkj.add_date', 'desc');
+                '));
+                
+        $query->where(function ($query) {
+            $query->where('dkj.dkj_status',1)
+                ->where('dkj.deleted',0)
+                ->where('add_date', 'not like', date('Y-m-d%'))
+                ->where('user.department_info_id',Auth::user()->department_info_id);
+        })->orWhere(function($query) {
+            $query->where('dkj.dkj_status',1)
+                ->where('dkj.deleted',0)
+                ->where('add_date', 'like', date('Y-m-d%'))
+                ->where('manager_status', '!=', null)
+                ->where('user.department_info_id',Auth::user()->department_info_id);
+        });
+            
+        $query->orderBy('dkj.add_date', 'desc');
+
         return datatables($query)->make(true);
     }
 

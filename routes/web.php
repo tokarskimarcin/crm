@@ -387,7 +387,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/tests_statistics', 'TestsController@testsStatisticsGet');
 
-    Route::get('/one_test_statistics/{id}', 'TestsController@testStatisticsGet');
+    Route::get('/one_test_statistics', 'TestsController@testStatisticsGet');
+    Route::POST('/one_test_statistics', 'TestsController@testStatisticsPost');
 
     Route::get('/employee_statistics/{id}', 'TestsController@employeeTestsStatisticsGet'); // tutaj bedzie {id}
 
