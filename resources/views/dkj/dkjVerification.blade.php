@@ -160,6 +160,7 @@
 
 
         table_verified = $('#datatable_verified').DataTable({
+            "order": [[ 0, "desc" ]],
             "autoWidth": false,
             "processing": true,
             "serverSide": true,
@@ -176,19 +177,9 @@
                 if(aData.manager_status == null) {
                     $(nRow).css('background-color', '#f2876d');
                 }
-               
-                else{
-                    //$(nRow).css('background-color', 'yello');
-                // if(jQuery.inArray(parseInt(aData.id),question_repeat) != -1) {
-                // $(nRow).css('background','#f3e97c');
-                // }else{
-                // $(nRow).css('background','#5cb85cbf');
-                // }
-                }
-                {{--  $(nRow).attr('id', aData.id);  --}}
-                return nRow;  
-                // po wyświetleniu strony dodaj nagłówek z możliwościa losowania pytań
-                }, "columns": [
+                return nRow;
+                },
+              "columns": [
                 {"data": "add_date"},
                 {
                     "data": function (data, type, dataToSet) {
@@ -196,7 +187,6 @@
                         return str.substring(0, 10) + " 23:00:00";
                     }, "name": "dkj.expiration_date","orderable": false, "searchable": false
                 },
-                {{--  {"data": "expiration_date","orderable": false, "searchable": false},  --}}
                 {
                     "data": function (data, type, dataToSet) {
                         return data.user_first_name + " " + data.user_last_name;
