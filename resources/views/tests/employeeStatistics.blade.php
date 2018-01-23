@@ -79,7 +79,7 @@
                             @endif
                         </td>
                         <td>
-                            <a class="btn btn-default" href="{{ URL::to('test_result') }}/{{$test->id}}">
+                            <a class="btn btn-default" href="{{ URL::to('test_result') }}/{{$test->id}}" @if(($test->status == 1 || $test->status == 2) && ($test->cadre_by != Auth::user()->id)) disabled  title="Podgląd dostępny po wypełnieniu testu."  @endif>
                                 <span style="color: green" class="glyphicon glyphicon-info-sign"></span> Szczegóły
                             </a>
                         </td>

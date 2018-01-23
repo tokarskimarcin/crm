@@ -148,7 +148,7 @@ $('#show_template').click(function(e) {
     var template_id = $('#template_id').val();
 
     if (template_id == 0) {
-        swal('Wybierz oddział!')
+        swal('Wybierz szablon!')
         return;
     }
 
