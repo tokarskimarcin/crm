@@ -206,7 +206,7 @@
                                                                 @php
                                                                     $hours_sum = round($total_time );
                                                                     $minutes = ($total_time % 60 < 10) ? ("0" . ($total_time % 60)) : $total_time % 60 ;
-                                                                    $time_string = $total_time/60;
+                                                                    $time_string = round($total_time/60,2);
                                                                 @endphp
                                                                 <td><b>{{$time_string}} RBH</b></td>
                                                                 <td><b>{{$cash_sum}} PLN</b></td>
