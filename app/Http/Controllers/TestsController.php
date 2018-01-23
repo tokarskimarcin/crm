@@ -734,12 +734,23 @@ class TestsController extends Controller
     /* 
         Statystyki poszczególnych testów
     */
-    public function testStatisticsGet($id) {
+    public function testStatisticsGet() {
+        $templates = TemplateUserTest::all();
+
+        return view('tests.oneTestStatistics')
+            ->with('templates', $templates);
+    }
+
+    public function testStatisticsPost(Request $request) {
+        $id = $request->template_id;
+
         $test = TemplateUserTest::find($id);
 
         if ($test == null) {
             return view('errors.404');
         }
+
+        $templates = TemplateUserTest::all();
 
         /**
          * Funkcja zliczająca wyniki pracownikow  dla danego testu
@@ -757,6 +768,7 @@ class TestsController extends Controller
 
         return view('tests.oneTestStatistics')
             ->with('results', $results[0])
+            ->with('templates', $templates)
             ->with('test', $test);
     }
 
