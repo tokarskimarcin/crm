@@ -102,7 +102,8 @@ Route::POST('/showQuestionDatatable','TestsController@showQuestionDatatable')->n
 Route::POST('/saveTestWithUser','TestsController@saveTestWithUser')->name('api.saveTestWithUser');
 Route::POST('/editTestWithUser','TestsController@editTestWithUser')->name('api.editTestWithUser');
 
-
+Route::POST('/datatableShowCheckedTests','TestsController@datatableShowCheckedTests')->name('api.datatableShowCheckedTests');
+Route::POST('/datatableShowUncheckedTests','TestsController@datatableShowUncheckedTests')->name('api.datatableShowUncheckedTests');
 
 Route::POST('/activateTest','TestsController@activateTest')->name('api.activateTest');
 

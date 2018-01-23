@@ -199,10 +199,12 @@ class TestsController extends Controller
         }
 
         /**
-         * Sprawdzenie czy test należy do pracownika kadry lub osoby testowanej
+         * Podgląd testu dostępny jedynie dla osoby przeprowadzajacej test
          */
-        if ($test->user_id != Auth::user()->id && $test->cadre_id != Auth::user()->id) {
-            return view('errors.404');
+        if ($test->status == 1 || $test->status == 2) {
+            if ($test->cadre_id != Auth::user()->id) {
+                return view('errors.404');
+            }
         }
 
         /**
@@ -461,7 +463,9 @@ class TestsController extends Controller
         Wyświetlenie wsyzstkic testów osoby testującej
     */
     public function showTestsGet() {
-        $tests = UserTest::where('cadre_id', '=', Auth::user()->id)->get();
+        $tests = UserTest::where('cadre_id', '=', Auth::user()->id)
+            ->orWhere('checked_by', '=', Auth::user()->id)
+            ->get();
 
         return view('tests.showTest')
             ->with('tests', $tests);
@@ -575,16 +579,7 @@ class TestsController extends Controller
             ->join('department_info', 'users.department_info_id', 'department_info.id')
             ->join('departments', 'departments.id', 'department_info.id_dep')
             ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
-            ->groupBy('department_info.id')
-            ->get();
-            
-        $stats_by_user_type = DB::table('user_tests')
-            ->select(DB::raw('
-                user_types.name as user_type,
-                count(user_tests.id) as user_type_sum
-            '))
-            ->join('users', 'users.id', 'user_tests.user_id')
-            ->join('user_types', 'users.user_type_id', 'user_types.id')
+            ->groupBy('users.department_info_id')
             ->get();
 
         $results = DB::table('user_questions')
@@ -596,7 +591,6 @@ class TestsController extends Controller
 
         return view('tests.testsStatistics')
             ->with('results', $results[0])
-            ->with('stats_by_user_type', $stats_by_user_type)
             ->with('departments_stats', $departments_stats)
             ->with('tests', $tests);
     }
@@ -980,5 +974,51 @@ class TestsController extends Controller
 
             return 1;
         }
+    }
+
+    /**
+     * Funkcja zwracająca wszsystkie sprawdzone testy
+     */
+    public function datatableShowCheckedTests(Request $request) {
+        $data = DB::table('user_tests')
+            ->select(DB::raw('
+                first_name,
+                last_name,
+                user_tests.id as test_id,
+                user_tests.name as test_name,
+                test_start,
+                user_tests.result as test_result,
+                count(user_questions.id) as count_questions
+            '))
+            ->join('users', 'users.id', 'user_tests.user_id')
+            ->join('user_questions', 'user_questions.test_id', 'user_tests.id')
+            ->groupBy('user_tests.id')
+            ->where('user_tests.status', '=', 4)
+            ->get();
+
+        return datatables($data)->make(true);
+    }
+
+    /**
+     * Funkcja zwracająca wszsystkie testy do sprawdzenia
+     */
+    public function datatableShowUncheckedTests(Request $request) {
+        $data = DB::table('user_tests')
+            ->select(DB::raw('
+                first_name,
+                last_name,
+                user_tests.id as test_id,
+                user_tests.name as test_name,
+                test_start,
+                user_tests.result as test_result,
+                count(user_questions.id) as count_questions
+            '))
+            ->join('users', 'users.id', 'user_tests.user_id')
+            ->join('user_questions', 'user_questions.test_id', 'user_tests.id')
+            ->groupBy('user_tests.id')
+            ->where('user_tests.status', '=', 3)
+            ->get();
+
+        return datatables($data)->make(true);
     }
 }
