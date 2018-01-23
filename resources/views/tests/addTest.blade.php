@@ -342,6 +342,7 @@
              html_toolbar += '</select></label>';
              $('div.toolbar').html(html_toolbar);
 
+
              // Funkcja losująca
              $('#question_random_count').on('change',function (e) {
                  // Ilość pytań do wylosowania
@@ -355,6 +356,7 @@
                          var choisen_tr = $('#'+question_text_array[i].id).find('.button_question_choice');
                          $(choisen_tr).trigger('click');
                          i--;
+                         console.log(question_text_array);
                      }
                  }
                  if(count_random_question != 'Wybierz')
@@ -382,8 +384,8 @@
              });
 
          }  , "columns": [
+                 {"class" : "question_text","data": 'content'},
 
-                 {"class" : "question_text","data": "content"},
                  { "width": "10%","data": function (data, type, dataToSet) {
                      return '<input type="number" class="form-control question_time" placeholder="min" value='+data.default_time/60+'>';
                     }
@@ -543,7 +545,7 @@
          tr_class = tr_class.split(" ");
          var tr_class_name = tr_class[1];
         // cd.
-         var question_text = tr.find('td.question_text').text();
+         var question_text = tr.find('td.question_text').html();
          var question_id = tr.attr('id');
          var question_time = tr.find('td input').val();
          // gdy nie ma wybranego czasu na pytanie
@@ -552,6 +554,7 @@
              question_time = time_question_from_database;
          }
         // gdy wiersz nie jest zaznaczony: Działaj
+        console.log(question_text);
          if(tr_class_name == 'no_checked' )
          {
              // dodaj wiersz do datatable -> tabela pod modalem

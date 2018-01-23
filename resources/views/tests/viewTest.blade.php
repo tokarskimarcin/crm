@@ -184,6 +184,8 @@
     var template_array = {!! json_encode($template) !!};
     // numer szablonu
     var template_id  = 0;
+    // id edytowanego testu
+    var test_id = 0;
 
     $(document).ready( function () {
     // wywołanie funkcji pobierającej pytania dla pierwszego zaznaczonego użytkownika
@@ -247,6 +249,7 @@
         function setDataFromPHP() {
             var test_info = {!! json_encode($test_by_id) !!};
             var all_question = {!! json_encode($all_question) !!};
+            test_id = test_info.id;
             // zerowanie tablic pomcniczych oraz datatables
             question_array_id = [];
             question_text_array = [];
@@ -256,7 +259,7 @@
             {
                 question_count++;
                 // przepisanie danych z szablonu do testu
-                question_text_array.push({id:all_question[i].id_question,text:all_question[i].content,time:all_question[i].avaible_time,subject:all_question[i].category_name});
+                question_text_array.push({id:all_question[i].id_question,text:all_question[i].content,time:all_question[i].avaible_time/60,subject:all_question[i].category_name});
                 question_array_id.push(parseInt(all_question[i].question_id));
                 // dodanie wiersza do wszystkich pytań
                 var rowNode = table_all_guestion.row.add([
@@ -480,7 +483,6 @@
         var subject = $('#subject_input').val();
         var flag_all_ok = true;
         var flag_all_ok_time = true;
-
         if(subject.trim().length == 0){
             flag_all_ok = false;
             $('#alert_subject').fadeIn(1000);
@@ -510,7 +512,7 @@
             $("#save_button").attr('disabled', true);
             $.ajax({
                 type: "POST",
-                url: '{{ route('api.saveTestWithUser') }}',
+                url: '{{ route('api.editTestWithUser') }}',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
@@ -518,7 +520,8 @@
                     "question_test_array": question_text_array,
                     "id_user": id_user,
                     "subject": subject,
-                    "template_id": template_id
+                    "template_id": template_id,
+                    "test_id" : test_id,
                 },
                 success: function (response) {
                     if (response == 1){
@@ -567,7 +570,7 @@
          tr_class = tr_class.split(" ");
          var tr_class_name = tr_class[1];
         // cd.
-         var question_text = tr.find('td.question_text').text();
+         var question_text = tr.find('td.question_text').html();
          var question_id = tr.attr('id');
          var question_time = tr.find('td input').val();
          // gdy nie ma wybranego czasu na pytanie
