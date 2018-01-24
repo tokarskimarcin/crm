@@ -1,5 +1,7 @@
 @extends('layouts.main')
 @section('content')
+<script src="//cdn.ckeditor.com/4.5.7/standard/ckeditor.js"></script>
+
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
@@ -120,6 +122,15 @@
 
 @section('script')
 <script>
+
+//zdefiniowanie edytora tekstu
+var editor = null;
+
+//przypisanie edytora tekstu
+$(document).ready(() => {
+    editor = CKEDITOR.replace( 'user_answer' );
+});
+
 var q_time = Number($('#q_time_set').val()); // tutaj podstawiamy ilość czasu na pytanie
 var loopTime = 1000;
 var actual_question = Number({{$actual_count}});

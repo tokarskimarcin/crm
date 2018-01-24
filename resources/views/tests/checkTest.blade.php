@@ -117,7 +117,7 @@ body{margin:40px;}
                                 <b>Odpowiedź użytkownika</b>
                             </div>
                             <div class="panel-body">
-                                {{$item->user_answer}}
+                                {!! $item->user_answer !!}
                             </div>
                         </div>
                     </div>
