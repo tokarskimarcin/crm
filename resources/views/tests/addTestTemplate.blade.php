@@ -55,8 +55,8 @@
                                 <div class="panel-heading">Podaj nazwę szablonu: </div>
                                 <input type="text" id="template_input" class="form-control" name="template_name" placeholder="Podaj nazwę szablonu.." value="">
                             </div>
-                            <div class="alert alert-danger" style = "display:none" id="alert_subject">
-                                <span colspan="1">Podaj nazwę szablonu</span>
+                            <div class="alert alert-danger" style = "display:none" id="alert_template">
+                                <span colspan="1">Podaj temat testu.</span>
                             </div>
                         </div>
 
@@ -65,8 +65,8 @@
                                 <div class="panel-heading">Temat: </div>
                                 <input type="text" id="subject_input" class="form-control" name="subject" placeholder="podaj temat.." value="">
                             </div>
-                            <div class="alert alert-danger" style = "display:none" id="alert_template">
-                                <span colspan="1">Podaj temat testu.</span>
+                            <div class="alert alert-danger" style = "display:none" id="alert_subject">
+                                <span colspan="1">Podaj nazwę szablonu.</span>
                             </div>
                         </div>
 
@@ -347,12 +347,14 @@
         if(subject.trim().length == 0){
             flag_all_ok = false;
             $('#alert_subject').fadeIn(1000);
+            $("html, body").animate({ scrollTop: 0 }, 'slow');
         }else{
             $('#alert_subject').fadeOut(1000);
         }
         if(template.trim().length == 0){
             flag_all_ok = false;
             $('#alert_template').fadeIn(1000);
+            $("html, body").animate({ scrollTop: 0 }, 'slow');
         }else{
             $('#alert_template').fadeOut(1000);
         }

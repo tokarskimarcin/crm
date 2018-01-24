@@ -43,6 +43,7 @@
                         <td class="md-col-th">Aktywacja</td>
                         <td class="md-col-th">Szczegóły</td>
                         <td class="md-col-th">Edycja</td>
+                        <td class="md-col-th">Usuń</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -67,6 +68,11 @@
                             <td>
                                 <a class="btn btn-default" href="{{ URL::to('/view_test') }}/{{$test->id}}">
                                     <span style="color: green" class="glyphicon glyphicon glyphicon-pencil"></span> Edytuj
+                                </a>
+                            </td>
+                            <td>
+                                <a class="btn btn-default" href="{{ URL::to('/delete_test') }}/{{$test->id}}">
+                                    <span style="color: green" class="glyphicon glyphicon glyphicon-trash"></span> Usuń
                                 </a>
                             </td>
                         </tr>

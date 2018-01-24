@@ -471,12 +471,14 @@
         if(subject.trim().length == 0){
             flag_all_ok = false;
             $('#alert_subject').fadeIn(1000);
+            $("html, body").animate({ scrollTop: 0 }, 'slow');
         }else{
             $('#alert_subject').fadeOut(1000);
         }if(id_user == null)
         {
             flag_all_ok = false;
             $('#alert_user').fadeIn(1000);
+            $("html, body").animate({ scrollTop: 0 }, 'slow');
         }else {
             $('#alert_user').fadeOut(1000);
         }
@@ -518,9 +520,19 @@
                         console.log('zapisany');
                         window.location = '{{URL::to('/show_tests')}}';
                     }
+                    if (response == 0){
+                        swal(
+                            'Problem z zapisem',
+                            'Probszę o kontakt z administratorem'
+                        )
+                    }
                     $("#save_button").remove('disabled', true);
                 }, error: function (response) {
-                    console.log(response);
+                    swal(
+                        'Problem z zapisem',
+                        'Probszę o kontakt z administratorem'
+                    )
+                    $("#save_button").remove('disabled', true);
                 }
             });
         }
