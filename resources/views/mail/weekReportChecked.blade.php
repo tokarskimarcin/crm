@@ -4,7 +4,7 @@
 <td colspan="2" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
 <font size="6" face="Calibri">RAPORT ODSŁUCHANYCH ROZMÓW {{$day_start . ' - ' . $day_stop}} </font></td>
 <td colspan="2" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20">
-<img src="https://ci3.googleusercontent.com/proxy/2Yaz8WsJ34uYOsanmpfkEZKbZDP2-sOQDVLB5TQdLCq6R7YzBCfaGc6K2bNRItA=s0-d-e1-ft#http://teambox.pl/image/logovc.png" class="CToWUd"></td>
+<img src="http://teambox.pl/image/logovc.png" class="CToWUd"></td>
 </tr>
 <tr>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20">Oddział</th>
