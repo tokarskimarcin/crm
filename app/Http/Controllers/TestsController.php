@@ -265,33 +265,38 @@ class TestsController extends Controller
     public function saveTestWithUser(Request $request)
     {
         if($request->ajax()){
-            // wyłuskanie wszystkoch użytkowników
-            for ($i=0;$i<count($request->id_user_tab);$i++) {
-                $new_test = new UserTest();
-                $new_test->cadre_id = Auth::user()->id;
-                $new_test->user_id = $request->id_user_tab[$i];
-                $new_test->status = 1;
-                $new_test->template_id = $request->template_id;
-                $new_test->name = $request->subject;
-                $new_test->save();
-                $id_test = $new_test->id;
-                $question_array = $request->question_test_array;
+            $all_users = User::whereIn('id',$request->id_user_tab)->get();
+            $find_template = TemplateUserTest::where('id',$request->template_id)->get();
+            if(($all_users->count() == count($request->id_user_tab)) && ($request->template_id == 0 || ($find_template->count() == 1))) {
+                    // wyłuskanie wszystkoch użytkowników
+                    for ($i = 0; $i < count($request->id_user_tab); $i++) {
+                        $new_test = new UserTest();
+                        $new_test->cadre_id = Auth::user()->id;
+                        $new_test->user_id = $request->id_user_tab[$i];
+                        $new_test->status = 1;
+                        $new_test->template_id = $request->template_id;
+                        $new_test->name = $request->subject;
+                        $new_test->save();
+                        $id_test = $new_test->id;
+                        $question_array = $request->question_test_array;
 
-                foreach ($question_array as $item) {
-                    $new_user_question = new UserQuestion();
-                    $new_user_question->test_id = $id_test;
-                    $new_user_question->question_id = $item['id'];
-                    $new_user_question->available_time = $item['time'] * 60;
-                    $new_user_question->save();
-                    $new_many_to_many = new TestUsersQuestion();
-                    $new_many_to_many->user_question_id = $new_user_question->id;
-                    $new_many_to_many->test_question_id = $item['id'];
-                    $new_many_to_many->save();
+                        foreach ($question_array as $item) {
+                            $new_user_question = new UserQuestion();
+                            $new_user_question->test_id = $id_test;
+                            $new_user_question->question_id = $item['id'];
+                            $new_user_question->available_time = $item['time'] * 60;
+                            $new_user_question->save();
+                            $new_many_to_many = new TestUsersQuestion();
+                            $new_many_to_many->user_question_id = $new_user_question->id;
+                            $new_many_to_many->test_question_id = $item['id'];
+                            $new_many_to_many->save();
+                        }
+                    }
+                    Session::put('message_ok', "Test został utworzony!");
+                    return 1;
                 }
+             return 0;
             }
-            Session::put('message_ok', "Test został utworzony!");
-            return 1;
-        }
         return 0;
     }
 
@@ -303,45 +308,53 @@ class TestsController extends Controller
             //usunięcie wszystkich pytań danego testu
             $test_id = $request->test_id;
             $status = UserTest::find($test_id);
-            if ($status->status == 1) {
+            $all_users = User::whereIn('id',$request->id_user)->get();
+            $find_template = TemplateUserTest::where('id',$request->template_id)->get();
+            if(($all_users->count() == count($request->id_user) && $all_users->count() == 1) && ($request->template_id == 0 || ($find_template->count() == 1))) {
+                if ($status->status == 1) {
 
-                $user_question = UserQuestion::where('test_id', $test_id)->get();
-                foreach ($user_question as $item) {
-                    // usuniecie z pytań do testu
-                    TestUsersQuestion::where('user_question_id', '=', $item->id)->delete();
-                }
-                // usunięcie z pytań testu
-                UserQuestion::where('test_id', $test_id)->delete();
-                // usunięcie testu
-                UserTest::where('id', '=', $test_id)->delete();
-
-                for ($i = 0; $i < count($request->id_user); $i++) {
-                    $new_test = new UserTest();
-                    $new_test->cadre_id = Auth::user()->id;
-                    $new_test->user_id = $request->id_user[$i];
-                    $new_test->status = 1;
-                    $new_test->template_id = $request->template_id;
-                    $new_test->name = $request->subject;
-                    $new_test->save();
-                    $id_test = $new_test->id;
-                    $question_array = $request->question_test_array;
-
-                    foreach ($question_array as $item) {
-                        $new_user_question = new UserQuestion();
-                        $new_user_question->test_id = $id_test;
-                        $new_user_question->question_id = $item['id'];
-                        $new_user_question->available_time = $item['time'] * 60;
-                        $new_user_question->save();
-                        $new_many_to_many = new TestUsersQuestion();
-                        $new_many_to_many->user_question_id = $new_user_question->id;
-                        $new_many_to_many->test_question_id = $item['id'];
-                        $new_many_to_many->save();
+                    $user_question = UserQuestion::where('test_id', $test_id)->get();
+                    foreach ($user_question as $item) {
+                        // usuniecie z pytań do testu
+                        TestUsersQuestion::where('user_question_id', '=', $item->id)->delete();
                     }
+                    // usunięcie z pytań testu
+                    UserQuestion::where('test_id', $test_id)->delete();
+                    // usunięcie testu
+                    UserTest::where('id', '=', $test_id)->delete();
+
+                    for ($i = 0; $i < count($request->id_user); $i++) {
+                        $new_test = new UserTest();
+                        $new_test->cadre_id = Auth::user()->id;
+                        $new_test->user_id = $request->id_user[$i];
+                        $new_test->status = 1;
+                        $new_test->template_id = $request->template_id;
+                        $new_test->name = $request->subject;
+                        $new_test->save();
+                        $id_test = $new_test->id;
+                        $question_array = $request->question_test_array;
+
+                        foreach ($question_array as $item) {
+                            $new_user_question = new UserQuestion();
+                            $new_user_question->test_id = $id_test;
+                            $new_user_question->question_id = $item['id'];
+                            $new_user_question->available_time = $item['time'] * 60;
+                            $new_user_question->save();
+                            $new_many_to_many = new TestUsersQuestion();
+                            $new_many_to_many->user_question_id = $new_user_question->id;
+                            $new_many_to_many->test_question_id = $item['id'];
+                            $new_many_to_many->save();
+                        }
+                    }
+                    Session::put('message_ok', "Test został zmieniony!");
+                    return 1;
                 }
+                return 0;
             }
+            return 0;
         }
-        Session::put('message_ok', "Test został utworzony!");
-            return 1;
+        return 0;
+
     }
     // Wysłanie infromacji o użytkowniku, jakie pytania już rozwiązał
     public function getRepeatQuestion (Request $request)
