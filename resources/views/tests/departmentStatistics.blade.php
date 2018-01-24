@@ -19,7 +19,9 @@
                     <select class="form-control" name="dep_id" id="dep_id">
                         <option value="0">Wybierz</option>
                         @foreach($department_info as $item)
-                            <option @if(isset($id) && $id == $item->id) selected @endif value="{{$item->id}}">{{$item->departments->name . ' ' . $item->department_type->name}}</option>
+                            @if($item->id != 13)
+                                <option @if(isset($id) && $id == $item->id) selected @endif value="{{$item->id}}">{{$item->departments->name . ' ' . $item->department_type->name}}</option>
+                            @endif
                         @endforeach
                     </select>
                 </div>
