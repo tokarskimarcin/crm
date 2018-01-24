@@ -144,12 +144,12 @@ Route::get('/weekReportChecked', 'StatisticsController@weekReportChecked');
 
 // maile dotyczące bazy danych (telefonów) maile
 
-Route::get('/weekRaportNewBaseWeek', 'DatabaseURLController@MailWeekRaportNewBaseWeek');
-Route::get('/monthRaportNewBaseWeek', 'DatabaseURLController@MailMonthRaportNewBaseWeek');
+Route::get('/weekReportNewBaseWeek', 'DatabaseURLController@MailWeekRaportNewBaseWeek');
+Route::get('/monthReportNewBaseWeek', 'DatabaseURLController@MailMonthRaportNewBaseWeek');
 
-Route::get('/dayRaportDatabaseUse', 'DatabaseURLController@MailDayRaportDatabaseUse');
-Route::get('/weekRaportDatabaseUse', 'DatabaseURLController@MailWeekRaportDatabaseUse');
-Route::get('/monthRaportDatabaseUse', 'DatabaseURLController@MailMonthRaportDatabaseUse');
+Route::get('/dayReportDatabaseUse', 'DatabaseURLController@MailDayRaportDatabaseUse');
+Route::get('/weekReportDatabaseUse', 'DatabaseURLController@MailWeekRaportDatabaseUse');
+Route::get('/monthReportDatabaseUse', 'DatabaseURLController@MailMonthRaportDatabaseUse');
 //End emails
 
 
