@@ -10,15 +10,13 @@
     </div>
 </div>
 
+
 <div class="row">
-    <div class="col-md-4">
-        <div id="donutchart" style="width: 450px; height: 250px;"></div>
+    <div class="col-md-6">
+        <div id="donutchart" style="width: 750px; height: 550px;"></div>
     </div>
-    <div class="col-md-4">
-        <div id="piechart" style="width: 450px; height: 250px;"></div>
-    </div>
-    <div class="col-md-4">
-        <div id="donutchartType" style="width: 450px; height: 250px;"></div>
+    <div class="col-md-6">
+        <div id="piechart" style="width: 750px; height: 550px;"></div>
     </div>
 </div>
 
@@ -67,27 +65,6 @@ google.charts.load("current", {packages:["corechart"]});
         var chart = new google.visualization.PieChart(document.getElementById('piechart'));
         chart.draw(data, options);
       }
-
-google.charts.load("current", {packages:["corechart"]});
-    google.charts.setOnLoadCallback(drawChartType);
-    function drawChartType() {
-            var data = google.visualization.arrayToDataTable([
-            ['Task', 'Ilość rozmów'],
-            @foreach($stats_by_user_type as $item)
-                {{--  ['{{$item->user_type}}', '{{$item->user_type_sum}}'],  --}}
-                ['123', 10],
-            @endforeach
-            ['', 0]
-        ]);
-
-        var options = {
-        title: 'Ilość testów (typ użytkownika)',
-        pieHole: 0.4,
-        };
-
-        var chart = new google.visualization.PieChart(document.getElementById('donutchartType'));
-        chart.draw(data, options);
-    }
 
 </script>
 @endsection

@@ -155,10 +155,10 @@ body{margin:40px;}
             @else
                 <div class="alert alert-info">
                     <h1>
-                        Test został już oceniony!
+                        Test został już oceniony przez {{$test->checkedBy->first_name . ' ' . $test->checkedBy->last_name}}.
                     </h1>
                     <h1>
-                        Twoja ocena: 
+                        Ocena: 
                         {{$test->result}}/{{$test->questions->count()}}
                     </h1>
                     <h3>
