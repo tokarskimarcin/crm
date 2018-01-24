@@ -40,8 +40,5 @@
     </tr>
   <tbody>
 </table>
-<div style="width:10px;height:20px;"></div>
-<div style="display: block;">
-Wiadomość została wygenerowana automatycznie, prosimy na nią nie odpowiadać.</div>
-<div style="display: block;">
-Wszelkie uwagi oraz sugestie proszę kierować na adres: wojciech.mazur@veronaconsulting.pl</div>
+
+
