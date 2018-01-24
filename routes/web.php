@@ -146,12 +146,12 @@ Route::get('/weekReportChecked', 'StatisticsController@weekReportChecked');
 
 // maile dotyczące bazy danych (telefonów) maile
 
-Route::get('/weekRaportNewBaseWeek', 'DatabaseURLController@MailWeekRaportNewBaseWeek');
-Route::get('/monthRaportNewBaseWeek', 'DatabaseURLController@MailMonthRaportNewBaseWeek');
+Route::get('/weekReportNewBaseWeek', 'DatabaseURLController@MailWeekRaportNewBaseWeek');
+Route::get('/monthReportNewBaseWeek', 'DatabaseURLController@MailMonthRaportNewBaseWeek');
 
-Route::get('/dayRaportDatabaseUse', 'DatabaseURLController@MailDayRaportDatabaseUse');
-Route::get('/weekRaportDatabaseUse', 'DatabaseURLController@MailWeekRaportDatabaseUse');
-Route::get('/monthRaportDatabaseUse', 'DatabaseURLController@MailMonthRaportDatabaseUse');
+Route::get('/dayReportDatabaseUse', 'DatabaseURLController@MailDayRaportDatabaseUse');
+Route::get('/weekReportDatabaseUse', 'DatabaseURLController@MailWeekRaportDatabaseUse');
+Route::get('/monthReportDatabaseUse', 'DatabaseURLController@MailMonthRaportDatabaseUse');
 //End emails
 
 
@@ -359,12 +359,12 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/pageHourReportDkjEmployee', 'StatisticsController@pageHourReportDkjEmployee');
 
-    Route::get('/pageWeekRaportNewBaseWeek', 'DatabaseURLController@pageWeekRaportNewBaseWeek');
-    Route::get('/pageMonthRaportNewBaseWeek', 'DatabaseURLController@pageMonthRaportNewBaseWeek');
+    Route::get('/pageWeekReportNewBaseWeek', 'DatabaseURLController@pageWeekRaportNewBaseWeek');
+    Route::get('/pageMonthReportNewBaseWeek', 'DatabaseURLController@pageMonthRaportNewBaseWeek');
 
-    Route::get('/pageDayRaportDatabaseUse', 'DatabaseURLController@pageDayRaportDatabaseUse');
-    Route::get('/pageWeekRaportDatabaseUse', 'DatabaseURLController@pageWeekRaportDatabaseUse');
-    Route::get('/pageMonthRaportDatabaseUse', 'DatabaseURLController@pageMonthRaportDatabaseUse');
+    Route::get('/pageDayReportDatabaseUse', 'DatabaseURLController@pageDayRaportDatabaseUse');
+    Route::get('/pageWeekReportDatabaseUse', 'DatabaseURLController@pageWeekRaportDatabaseUse');
+    Route::get('/pageMonthReportDatabaseUse', 'DatabaseURLController@pageMonthRaportDatabaseUse');
 
     //Report Page STOP
 
@@ -384,7 +384,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/add_test', 'TestsController@addTestGet');
     Route::POST('/add_test', 'TestsController@addTestPost');
     Route::get('/view_test/{id}', 'TestsController@viewTest'); // podgląd testu
-
+    Route::get('/delete_test/{id}', 'TestsController@deleteTest'); // usunięcie  testu
     Route::get('/show_tests', 'TestsController@showTestsGet');
     Route::POST('/show_tests', 'TestsController@showTestsPost');
 

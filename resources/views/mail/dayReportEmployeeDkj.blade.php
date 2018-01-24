@@ -4,7 +4,7 @@
 <td colspan="4" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20; color:#efd88f;">
 <font size="4" face="sans-serif">RAPORT DZIENNY PRACOWNICY DKJ - BADANIA</td>
 <td colspan="4" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20;">
-<img src="http://xdes.pl/logovc.png"></td>
+<img src="http://teambox.pl/image/logovc.png"></td>
 </tr>
 <tr>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Lp.</th>
@@ -100,7 +100,7 @@
 <td colspan="4" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20; color:#efd88f;">
 <font size="4" face="sans-serif">RAPORT DZIENNY PRACOWNICY DKJ - WYSYŁKA</td>
 <td colspan="4" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20;">
-<img src="http://xdes.pl/logovc.png"></td>
+<img src="http://teambox.pl/image/logovc.png"></td>
 </tr>
 <tr>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Lp.</th>

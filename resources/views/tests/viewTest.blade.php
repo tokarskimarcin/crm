@@ -88,8 +88,10 @@
                                         @endif
                                     @endforeach
                                 </select>
-
                                 </div>
+                            <div class="alert alert-danger" style = "display:none" id="alert_user">
+                                <span colspan="1">Wybierz użytkownika</span>
+                            </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="panel panel-info">
@@ -501,6 +503,7 @@
         if(subject.trim().length == 0){
             flag_all_ok = false;
             $('#alert_subject').fadeIn(1000);
+            $("html, body").animate({ scrollTop: 0 }, 'slow');
         }else{
             $('#alert_subject').fadeOut(1000);
         }
@@ -508,6 +511,13 @@
         {
             flag_all_ok = false;
             swal("Nie wybrałeś pytań do testu.")
+        }if(id_user == null)
+        {
+            flag_all_ok = false;
+            $('#alert_user').fadeIn(1000);
+            $("html, body").animate({ scrollTop: 0 }, 'slow');
+        }else {
+            $('#alert_user').fadeOut(1000);
         }
 
         for(var i=0;i<question_text_array.length;i++)
@@ -522,7 +532,6 @@
             flag_all_ok = false;
             swal("Błędny czas potrzebny na pytanie")
         }
-
         if(flag_all_ok) {
             $("#save_button").attr('disabled', true);
             $.ajax({
@@ -542,8 +551,14 @@
                     if (response == 1){
                         console.log('zapisany');
                         window.location = '{{URL::to('/show_tests')}}';
+                    }else{
+                        swal(
+                            'Problem z zapisem',
+                            'Probszę o kontakt z administratorem'
+                        )
+                        $("#save_button").remove('disabled', false);
                     }
-                    $("#save_button").remove('disabled', true);
+
                 }
             });
         }

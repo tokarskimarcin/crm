@@ -4,7 +4,7 @@
 <td colspan="4" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20; color:#efd88f;">
 <font size="6" face="sans-serif">RAPORT SPÓŹNIONYCH ODDZIAŁÓW (DZIENNY) {{$today}}</td>
 <td colspan="6" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20;">
-<img src="http://xdes.pl/logovc.png"></td>
+<img src="http://teambox.pl/image/logovc.png"></td>
 </tr>
 <tr>
 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Lp.</th>
@@ -40,8 +40,5 @@
     </tr>
   <tbody>
 </table>
-<div style="width:10px;height:20px;"></div>
-<div style="display: block;">
-Wiadomość została wygenerowana automatycznie, prosimy na nią nie odpowiadać.</div>
-<div style="display: block;">
-Wszelkie uwagi oraz sugestie proszę kierować na adres: wojciech.mazur@veronaconsulting.pl</div>
+
+

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class DatabaseURLController extends Controller
@@ -101,7 +103,7 @@ class DatabaseURLController extends Controller
     public function MailDayRaportDatabaseUse(){
         $data = $this->DatabaseUseData(1);
         $title = 'Raport dzienny wykorzystania bazy: '.date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
-        $this->sendMailByVerona('dayReportDatabaseUse', $data, $title);
+        $this->sendMailByVeronaGroup('dayReportDatabaseUse', $data, $title);
     }
 
     public function pageDayRaportDatabaseUse(){
@@ -117,7 +119,7 @@ class DatabaseURLController extends Controller
         $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
         $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
         $title = 'Raport tygodniowy wykorzystania bazy: '.$date_start.' - '.$date_stop;
-        $this->sendMailByVerona('weekReportDatabaseUse', $data, $title);
+        $this->sendMailByVeronaGroup('weekReportDatabaseUse', $data, $title);
     }
     public function pageWeekRaportDatabaseUse(){
         $data = $this->DatabaseUseData(2);
@@ -133,7 +135,7 @@ class DatabaseURLController extends Controller
         $month_name = $this::monthReverseName($month);
         $title = 'Raport miesięczny wykorzystania bazy: '.$month_name;
         $data['month'] = $month_name;
-        $this->sendMailByVerona('monthReportDatabaseUse', $data, $title);
+        $this->sendMailByVeronaGroup('monthReportDatabaseUse', $data, $title);
     }
     public function pageMonthRaportDatabaseUse(){
         $data = $this->DatabaseUseData(3);
@@ -145,16 +147,6 @@ class DatabaseURLController extends Controller
             ->with('employee_statistic',$data['employee_statistic'])
             ->with('month',$month_name);
     }
-
-
-
-
-
-
-
-
-
-
 
 
     /*
@@ -210,7 +202,7 @@ class DatabaseURLController extends Controller
         'cytawa.verona@gmail.com',
         'jarzyna.verona@gmail.com',
         'pawel.zielinski@veronaconsulting.pl',
-        'kamil.kostecki@veronaconsulting.pl'
+        'kamil.kostecki@veronaconsulting.pl',
     ];
 
      Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
@@ -222,7 +214,49 @@ class DatabaseURLController extends Controller
           }
         }
      });
-
     }
 
+    private function sendMailByVeronaGroup($mail_type, $data, $mail_title) {
+        $email = [];
+
+        $mail_type2 = ucfirst($mail_type);
+        $mail_type2 = 'page' . $mail_type2;
+        $accepted_users = DB::table('users')
+            ->select(DB::raw('
+            users.first_name,
+            users.last_name,
+            users.username,
+            users.email_off
+            '))
+            ->join('privilage_relation', 'privilage_relation.user_type_id', '=', 'users.user_type_id')
+            ->join('links', 'privilage_relation.link_id', '=', 'links.id')
+            ->where('links.link', '=', $mail_type2)
+            ->where('users.status_work', '=', 1)
+            ->where('users.id', '!=', 4592) // tutaj szczesna
+            ->get();
+        $user = new User();
+        $user->username = 'daniel.abramowicz@veronaconsulting.pl';
+        $user->first_name = 'Daniel';
+        $user->last_name = 'Abramowicz';
+        $accepted_users->push($user);
+
+        $user2 = new User();
+        $user2->username = 'sylwia.kwiecien@veronaconsulting.pl';
+        $user2->first_name = 'Sylwia';
+        $user2->last_name = 'Kwiecień';
+        $accepted_users->push($user2);
+        /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
+        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
+        {
+            $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+            foreach($accepted_users as $user) {
+                if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
+                    $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
+                }
+                if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
+                    $message->to($user->email_off, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
+                }
+            }
+        });
+    }
 }
