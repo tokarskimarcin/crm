@@ -114,6 +114,8 @@ Route::POST('/saveTestTemplate','TestsController@saveTestTemplate')->name('api.s
 
 Route::POST('/getTemplateQuestion','TestsController@getTemplateQuestion')->name('api.getTemplateQuestion'); //tu zmienic z ORM
 
+Route::POST('/deleteTester','TestsController@deleteTester')->name('api.deleteTester');
+
 /* TEST AJAX ROUTES STOP */
 
 //********************AJAX*********************** */
@@ -370,6 +372,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/tests_admin_panel', 'TestsController@testsAdminPanelGet');
     Route::POST('/tests_admin_panel', 'TestsController@testsAdminPanelPost');
+
+    Route::get('/tester_list', 'TestsController@testerListGet');
+    Route::POST('/tester_list', 'TestsController@testerListPost');
 
     Route::get('/test_user/{id}', 'TestsController@testUserGet'); // tutaj bedzie {id}
     Route::POST('/test_user', 'TestsController@testUserPost');

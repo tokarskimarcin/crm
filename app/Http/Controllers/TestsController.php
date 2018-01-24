@@ -215,6 +215,24 @@ class TestsController extends Controller
             return view('errors.404');
         }
 
+        /**
+         * Sprawdzenie czy użytkownik ma uprawnienia do podglądania ocen wszystkich testów
+         */
+        $ids = DB::table('privilage_user_relation')
+            ->select(DB::raw('
+                DISTINCT(user_id)
+            '))
+            ->get();
+
+        $arr = [];
+        foreach($ids as $item) {
+            $arr[] = $item->user_id;
+        }
+
+        if ($test->user_id != Auth::user()->id && !in_array(Auth::user()->id, $arr)) {
+            return view('errors.404');
+        }
+
         return view('tests.testResult')
             ->with('test', $test);
     }
@@ -524,22 +542,7 @@ class TestsController extends Controller
     /* 
         Ocena testu
     */
-    public function testCheckGet($id) {   ///////////////////////////////////////////////////////////////////////////////////////
-        
-
-        $test = UserTest::find($id);
-
-        $user_mail = 'jarzyna.verona@gmail.com';
-        $user_name = 'Konrad Jarzyna';
-        $mail_title = 'Ocena testu';
-        $data = ['id', $id];
-        $mail_type = 'mailChecked';
-        
-        $this->sendMail($user_mail, $user_name, $mail_title, $data, $mail_type);
-        
-        return view('tests.mailChecked')->with('test', $test);
-
-
+    public function testCheckGet($id) {
         $test = UserTest::find($id);
 
         if ($test == null) {
@@ -624,10 +627,14 @@ class TestsController extends Controller
 
         $user_mail = $user->username;
         $user_name = $user->first_name . ' ' . $user->last_name;
-        $mail_title = "Ocena testu";
-        $data;
-
-        //sendMail($user_mail, $user_name, $mail_title, $data)
+        $mail_title = 'Ocena testu';
+        $data = [
+            'id' => $test->id,
+            'result' => $result . '/' . $test->questions->count()
+        ];
+        $mail_type = 'mailChecked';
+        
+        // $this->sendMail($user_mail, $user_name, $mail_title, $data, $mail_type);
 
         Session::flash('message_ok', "Ocena została przesłana!");
         return Redirect::back();
@@ -1101,5 +1108,108 @@ class TestsController extends Controller
             $message->to($user_mail, $mail_title)->subject($mail_title);
 
         });
+    }
+
+    /**
+     * Funkcja pobierająca listę osob z uprawnieniami do testowania
+     */
+    public function testerListGet() {
+        /**
+         * Pobranie pracownikow kadry
+         */
+        $users = User::whereNotIn('user_type_id', [1,2])
+            ->where('status_work', '=', 1)
+            ->orderBy('last_name')
+            ->get();
+
+        /**
+         * pobranie ID uzytkownikkow z uprawnieniami
+         */
+        $ids = DB::table('privilage_user_relation')
+            ->select(DB::raw('
+                DISTINCT(user_id)
+            '))
+            ->get();
+
+        /**
+         * Przepierdolenie id-ków do tablicy
+         */
+        $arr = [];
+        foreach($ids as $item) {
+            $arr[] = $item->user_id;
+        }
+
+        /**
+         * Pobranie testerow z bazy
+         */
+        $testers = DB::table('users')
+            ->select(DB::raw('
+                first_name,
+                last_name,
+                id
+            '))
+            ->whereIn('id', $arr)
+            ->get();
+
+        return view('tests.testerList')
+            ->with('testers', $testers)
+            ->with('users', $users);
+    }
+
+    /**
+     * Zapis pracownikow do bazy z przywilejami
+     */
+    public function testerListPost(Request $request) {
+        $id = $request->user_id;
+
+        /**
+         * PSrawdzenie czy użytkownik istnieje
+         */
+        $check = User::find($id);
+
+        if ($check == null) {
+            return view('errors.404');
+        }
+
+        DB::table('privilage_user_relation')->insert([
+            ['id' => null, 'link_id' => 90, 'user_id' => $id],
+            ['id' => null, 'link_id' => 93, 'user_id' => $id],
+            ['id' => null, 'link_id' => 94, 'user_id' => $id],
+            ['id' => null, 'link_id' => 95, 'user_id' => $id],
+            ['id' => null, 'link_id' => 96, 'user_id' => $id],
+            ['id' => null, 'link_id' => 91, 'user_id' => $id],
+            ['id' => null, 'link_id' => 97, 'user_id' => $id],
+            ['id' => null, 'link_id' => 98, 'user_id' => $id],
+            ['id' => null, 'link_id' => 99, 'user_id' => $id],
+            ['id' => null, 'link_id' => 100, 'user_id' => $id],
+            ['id' => null, 'link_id' => 101, 'user_id' => $id],
+            ['id' => null, 'link_id' => 102, 'user_id' => $id],
+            ['id' => null, 'link_id' => 103, 'user_id' => $id],
+            ['id' => null, 'link_id' => 105, 'user_id' => $id],
+            ['id' => null, 'link_id' => 107, 'user_id' => $id]
+        ]);
+
+        Session::flash('message_ok', "Tester został dodany!");
+        return Redirect::back();
+    }
+
+    /**
+     * Funkcja odbierająca uprawnienia testerow
+     */
+    public function deleteTester(Request $request) {
+        if ($request->ajax()) {
+            $id = $request->user_id;
+
+            $check = User::find($id);
+
+            if ($check == null) {
+                return 0;
+            }
+
+            DB::table('privilage_user_relation')
+                ->where('user_id', '=', $id)
+                ->delete();
+            return 1;
+        }
     }
 }

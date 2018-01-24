@@ -40,5 +40,5 @@ dgghfjh
     </div>
 </div>  --}}
 
-Twój test został oceniony. Wynik to: 1/2.
-Cały test dostępny jest pod adresem <a>http://www.teambox.pl/test_result</a>
+Twój test został oceniony. Wynik to: {{$result}}
+Cały test dostępny jest pod adresem <a>http://www.teambox.pl/test_result/{{$id}}</a>
