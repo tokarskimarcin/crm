@@ -234,7 +234,7 @@ class DatabaseURLController extends Controller
             ->where('users.status_work', '=', 1)
             ->where('users.id', '!=', 4592) // tutaj szczesna
             ->get();
-        dd($mail_type2);
+        dd($accepted_users);
 
 
         $user = new User();
