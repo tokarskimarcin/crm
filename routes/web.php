@@ -357,12 +357,12 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/pageHourReportDkjEmployee', 'StatisticsController@pageHourReportDkjEmployee');
 
-    Route::get('/pageWeekRaportNewBaseWeek', 'DatabaseURLController@pageWeekRaportNewBaseWeek');
-    Route::get('/pageMonthRaportNewBaseWeek', 'DatabaseURLController@pageMonthRaportNewBaseWeek');
+    Route::get('/pageWeekReportNewBaseWeek', 'DatabaseURLController@pageWeekRaportNewBaseWeek');
+    Route::get('/pageMonthReportNewBaseWeek', 'DatabaseURLController@pageMonthRaportNewBaseWeek');
 
-    Route::get('/pageDayRaportDatabaseUse', 'DatabaseURLController@pageDayRaportDatabaseUse');
-    Route::get('/pageWeekRaportDatabaseUse', 'DatabaseURLController@pageWeekRaportDatabaseUse');
-    Route::get('/pageMonthRaportDatabaseUse', 'DatabaseURLController@pageMonthRaportDatabaseUse');
+    Route::get('/pageDayReportDatabaseUse', 'DatabaseURLController@pageDayRaportDatabaseUse');
+    Route::get('/pageWeekReportDatabaseUse', 'DatabaseURLController@pageWeekRaportDatabaseUse');
+    Route::get('/pageMonthReportDatabaseUse', 'DatabaseURLController@pageMonthRaportDatabaseUse');
 
     //Report Page STOP
 
