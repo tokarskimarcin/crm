@@ -338,6 +338,7 @@ class TestsController extends Controller
                 }
             }
         }
+        Session::put('message_ok', "Test został utworzony!");
             return 1;
     }
     // Wysłanie infromacji o użytkowniku, jakie pytania już rozwiązał
