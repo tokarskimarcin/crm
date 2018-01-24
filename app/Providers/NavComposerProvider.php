@@ -26,6 +26,7 @@ class NavComposerProvider extends ServiceProvider
                 ->leftjoin('privilage_relation', 'links.id', '=', 'privilage_relation.link_id')
                 ->leftjoin('privilage_user_relation', 'links.id', '=', 'privilage_user_relation.link_id')
                 ->select(DB::raw('
+                    DISTINCT(links.id),
                   links.group_link_id,
                   links.link,
                   links.name'
