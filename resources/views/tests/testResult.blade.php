@@ -142,11 +142,29 @@
                             <p><b>Odpowiedź pracownika:</b></p>
                             <div class="alert alert-info">
                                 @if($item->user_answer != null)
-                                    {{$item->user_answer}}
+                                    {!! $item->user_answer !!}
                                 @else
                                     Użytkownik nie wypełnił jeszcze testu!
                                 @endif
                             </div>
+                        </li>
+                        <li class="list-group-item">
+                            <p><b>Ocena:</b></p>
+                            @if($item->result === null)
+                            <div class="alert alert-warning">
+                                    <b>Brak oceny!</b>
+                                </div>
+                            @elseif($item->result == 0 || $item->result == 1)
+                                @if($item->result == 0)
+                                    <div class="alert alert-danger">
+                                        <b style="color: red">Odpowiedź błędna</b>
+                                    </div>
+                                @elseif($item->result == 1)
+                                    <div class="alert alert-success">
+                                        <b style="color: green">Odpowiedź prawidłowa</b>
+                                    </div>
+                                @endif
+                            @endif
                         </li>
                         <li class="list-group-item">
                             <p><b>Komentarz osoby testującej:</b></p>
@@ -168,8 +186,7 @@
 
 @endsection
 @section('script')
-
-
+<script>
 
 </script>
 @endsection

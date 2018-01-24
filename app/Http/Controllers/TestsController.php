@@ -16,6 +16,7 @@ use Session;
 use App\UserTest;
 use App\UserQuestion;
 use App\Department_info;
+use Mail;
 
 class TestsController extends Controller
 {
@@ -523,7 +524,22 @@ class TestsController extends Controller
     /* 
         Ocena testu
     */
-    public function testCheckGet($id) {
+    public function testCheckGet($id) {   ///////////////////////////////////////////////////////////////////////////////////////
+        
+
+        $test = UserTest::find($id);
+
+        $user_mail = 'jarzyna.verona@gmail.com';
+        $user_name = 'Konrad Jarzyna';
+        $mail_title = 'Ocena testu';
+        $data = ['id', $id];
+        $mail_type = 'mailChecked';
+        
+        $this->sendMail($user_mail, $user_name, $mail_title, $data, $mail_type);
+        
+        return view('tests.mailChecked')->with('test', $test);
+
+
         $test = UserTest::find($id);
 
         if ($test == null) {
@@ -600,6 +616,18 @@ class TestsController extends Controller
         $test->checked_by = Auth::user()->id;
 
         $test->save();
+
+        /**
+         * Pobranie danych do maila
+         */
+        $user = User::find($test->user_id);
+
+        $user_mail = $user->username;
+        $user_name = $user->first_name . ' ' . $user->last_name;
+        $mail_title = "Ocena testu";
+        $data;
+
+        //sendMail($user_mail, $user_name, $mail_title, $data)
 
         Session::flash('message_ok', "Ocena została przesłana!");
         return Redirect::back();
@@ -1062,5 +1090,16 @@ class TestsController extends Controller
             ->get();
 
         return datatables($data)->make(true);
+    }
+
+    private function sendMail($user_mail, $user_name, $mail_title, $data, $mail_type) {
+
+        Mail::send('tests.' . $mail_type, $data, function($message) use ($user_mail, $user_name, $mail_title)
+        {
+
+            $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+            $message->to($user_mail, $mail_title)->subject($mail_title);
+
+        });
     }
 }

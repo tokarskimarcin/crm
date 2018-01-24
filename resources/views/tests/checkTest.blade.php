@@ -80,15 +80,17 @@ body{margin:40px;}
 </div>
 
 <ul class="nav nav-tabs">
-    @php($i = 0)
-    @foreach($test->questions as $item)
-        @php($i++)
-        <li @if($i == 1 && $test->result == null) class="active" @endif>
-            <a data-toggle="tab" href="#question{{$item->id}}">
-                Pytanie nr {{$i}}
-            </a>
-        </li>
-    @endforeach
+    @if($test->result == null)
+        @php($i = 0)
+        @foreach($test->questions as $item)
+            @php($i++)
+            <li @if($i == 1 && $test->result == null) class="active" @endif>
+                <a data-toggle="tab" href="#question{{$item->id}}">
+                    Pytanie nr {{$i}}
+                </a>
+            </li>
+        @endforeach
+    @endif
     <li @if($test->result != null) class="active" @endif><a data-toggle="tab" href="#question_total">Ocena ogólna</a></li>
 </ul>
 
@@ -96,49 +98,51 @@ body{margin:40px;}
     <input type="hidden" name="_token" value="{{ csrf_token() }}">
     <div class="tab-content">
 
-        @php($i = 0)
-        @foreach($test->questions as $item)
-            @php($i++)
-            <div id="question{{$item->id}}" class="tab-pane @if($i == 1 && $test->result == null) fade in active @endif">
-                    <div class="form-group" style="margin-top: 30px">
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <b>Treść pytania</b>
+        @if($test->result == null)
+            @php($i = 0)
+            @foreach($test->questions as $item)
+                @php($i++)
+                <div id="question{{$item->id}}" class="tab-pane @if($i == 1 && $test->result == null) fade in active @endif">
+                        <div class="form-group" style="margin-top: 30px">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <b>Treść pytania</b>
+                                </div>
+                                <div class="panel-body">
+                                    {{--  Dlaczego tu kurwa jebane gówno nie umie wyciągnąć tego normalnie z kolekcji? nie wiem  --}}
+                                    @foreach($item->testQuestion as $shit)
+                                        {!! $shit->content !!} 
+                                    @endforeach
+                                </div>
                             </div>
-                            <div class="panel-body">
-                                {{--  Dlaczego tu kurwa jebane gówno nie umie wyciągnąć tego normalnie z kolekcji? nie wiem  --}}
-                                @foreach($item->testQuestion as $shit)
-                                    {!! $shit->content !!} 
-                                @endforeach
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <b>Odpowiedź użytkownika</b>
+                                </div>
+                                <div class="panel-body">
+                                    {!! $item->user_answer !!}
+                                </div>
                             </div>
                         </div>
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <b>Odpowiedź użytkownika</b>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Dodaj ocenę pytania:</label>
+                                <select class="form-control input-lg" name="question_result[]">
+                                    <option value="1">Zaliczone</option>
+                                    <option value="0">Niezaliczone</option>
+                                </select>
                             </div>
-                            <div class="panel-body">
-                                {{$item->user_answer}}
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Dodaj komentarz (opcjonalne):</label>
+                                <textarea class="form-control" name="comment_question[]" placeholder="Twój komentarz..." rows="5">{{$item->cadre_comment}}</textarea>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label>Dodaj ocenę pytania:</label>
-                            <select class="form-control input-lg" name="question_result[]">
-                                <option value="1">Zaliczone</option>
-                                <option value="0">Niezaliczone</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label>Dodaj komentarz (opcjonalne):</label>
-                            <textarea class="form-control" name="comment_question[]" placeholder="Twój komentarz..." rows="5">{{$item->cadre_comment}}</textarea>
-                        </div>
-                    </div>
-                </div>
-        @endforeach
-        
+            @endforeach
+        @endif
+
         <div id="question_total" class="tab-pane fade @if($test->result != null) in active @endif">
             @if($test->result == null)
                 <div class="form-group">

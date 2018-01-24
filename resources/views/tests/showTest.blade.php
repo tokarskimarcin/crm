@@ -218,8 +218,13 @@ function change(e) {
         },
         success: function(response) {
             if (response == 1) {
-                swal('Test został aktywowany!')
-                location.reload();
+                swal({
+                    title: 'Test został aktywowany!',
+                    type: 'success',
+                    timer: 3000
+                }).then((result) => {
+                    location.reload();
+                })
             } else {
                 swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
             }
