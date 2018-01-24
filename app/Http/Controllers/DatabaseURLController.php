@@ -241,21 +241,26 @@ class DatabaseURLController extends Controller
         $user->last_name = 'Abramowicz';
         $accepted_users->push($user);
 
-        $user = new User();
-        $user->username = 'sylwia.kwiecien@veronaconsulting.pl';
-        $user->first_name = 'Sylwia';
-        $user->last_name = 'Kwiecień';
-        $accepted_users->push($user);
+        $user2 = new User();
+        $user2->username = 'sylwia.kwiecien@veronaconsulting.pl';
+        $user2->first_name = 'Sylwia';
+        $user2->last_name = 'Kwiecień';
+        $accepted_users->push($user2);
 
+        /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
         Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
         {
             $message->from('noreply.verona@gmail.com', 'Verona Consulting');
-            foreach ($accepted_users as $key => $user) {
-                if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
-                    $message->to($user)->subject($mail_title);
+            foreach($accepted_users as $user) {
+                if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
+                    $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
+                }
+                if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
+                    $message->to($user->email_off, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
                 }
             }
         });
+        dd($accepted_users);
     }
 
 }
