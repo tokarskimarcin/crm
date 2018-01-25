@@ -17,6 +17,7 @@ use App\UserTest;
 use App\UserQuestion;
 use App\Department_info;
 use Mail;
+use Illuminate\Support\Facades\URL;
 
 class TestsController extends Controller
 {
@@ -549,13 +550,19 @@ class TestsController extends Controller
             return view('errors.404');
         }
 
+        /**
+         * Sprawdzenie czy test jest zakończony
+         */
         if ($test->status < 3) {
             return view('errors.404');
         }
 
-        /*********************************
-         * Tutaj na koniec dodac sprawdzenie czy uzytkownik nie sprawdza testu sam sobie
-         ********************************/
+        /**
+         * Sprawdzenie czy osoba nie sprawdza testu sama sobie
+         */
+        if ($test->user_id == Auth::user()->id) {
+            return view('errors.404');
+        }
 
         return view('tests.checkTest')
             ->with('test', $test);
@@ -634,6 +641,9 @@ class TestsController extends Controller
         ];
         $mail_type = 'mailChecked';
         
+        /**
+         * Przesłanie maila z informacją o wyniku testu
+         */
         // $this->sendMail($user_mail, $user_name, $mail_title, $data, $mail_type);
 
         Session::flash('message_ok', "Ocena została przesłana!");
@@ -644,8 +654,6 @@ class TestsController extends Controller
         Sttatystyki testów dla osoby testującej
     */
     public function testsStatisticsGet() {
-        $tests = UserTest::all();
-
         $departments_stats = DB::table('user_tests')
             ->select(DB::raw('
                 departments.name as dep_name,
@@ -666,10 +674,31 @@ class TestsController extends Controller
             '))
             ->get();
 
+        $users = User::whereNotIn('user_type_id', [1,2])
+            ->orderBy('last_name')
+            ->where('status_work', '=', 1)
+            ->get();
+
         return view('tests.testsStatistics')
+            ->with('users', $users)
             ->with('results', $results[0])
-            ->with('departments_stats', $departments_stats)
-            ->with('tests', $tests);
+            ->with('departments_stats', $departments_stats);
+    }
+
+    /**
+     * Przekierowanie do statystyk konkretnego użytkownika
+     */
+    public function testsStatisticsPost(Request $request) {
+        $id = $request->user_id;
+
+        $check = User::find($id);
+
+        if ($check == null || $check->user_type_id == 1 || $check->user_type_id == 2) {
+            return view('errors.404');
+        }
+
+        return redirect('/employee_statistics/' . $id);
+
     }
 
     /* 
@@ -1172,12 +1201,7 @@ class TestsController extends Controller
         }
 
         DB::table('privilage_user_relation')->insert([
-            ['id' => null, 'link_id' => 90, 'user_id' => $id],
-            ['id' => null, 'link_id' => 93, 'user_id' => $id],
-            ['id' => null, 'link_id' => 94, 'user_id' => $id],
-            ['id' => null, 'link_id' => 95, 'user_id' => $id],
             ['id' => null, 'link_id' => 96, 'user_id' => $id],
-            ['id' => null, 'link_id' => 91, 'user_id' => $id],
             ['id' => null, 'link_id' => 97, 'user_id' => $id],
             ['id' => null, 'link_id' => 98, 'user_id' => $id],
             ['id' => null, 'link_id' => 99, 'user_id' => $id],
@@ -1185,8 +1209,14 @@ class TestsController extends Controller
             ['id' => null, 'link_id' => 101, 'user_id' => $id],
             ['id' => null, 'link_id' => 102, 'user_id' => $id],
             ['id' => null, 'link_id' => 103, 'user_id' => $id],
+            ['id' => null, 'link_id' => 104, 'user_id' => $id],
             ['id' => null, 'link_id' => 105, 'user_id' => $id],
-            ['id' => null, 'link_id' => 107, 'user_id' => $id]
+            ['id' => null, 'link_id' => 106, 'user_id' => $id],
+            ['id' => null, 'link_id' => 107, 'user_id' => $id],
+            ['id' => null, 'link_id' => 108, 'user_id' => $id],
+            ['id' => null, 'link_id' => 109, 'user_id' => $id],
+            ['id' => null, 'link_id' => 110, 'user_id' => $id],
+            ['id' => null, 'link_id' => 111, 'user_id' => $id]
         ]);
 
         Session::flash('message_ok', "Tester został dodany!");
@@ -1206,8 +1236,14 @@ class TestsController extends Controller
                 return 0;
             }
 
+            /**
+             * Usuwanie tylko linkow odnoszących się do testow
+             */
+            $links = [96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111];
+
             DB::table('privilage_user_relation')
                 ->where('user_id', '=', $id)
+                ->whereIn('link_id', $links)
                 ->delete();
             return 1;
         }
