@@ -232,6 +232,7 @@
                  // zerowanie tablic pomcniczych oraz datatables
                  question_array_id = [];
                  question_text_array = [];
+                 question_count = 0;
                  table_all_guestion.clear();
                  //wpisanie danych z szablonu na stronę testu
                  for(var i=0;i<response.length;i++)
