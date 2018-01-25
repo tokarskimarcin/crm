@@ -228,7 +228,7 @@ $('#question_edited').click(function(e) {
     //pobranie tresci pytania 
     var content = editor.getData();
     //pobranie czasu pytania
-    var question_time = $('#question_time').val();
+    var question_time = Math.ceil($('#question_time').val());
     //walidacja braku tresci pytania
     if (content == '') {
         swal('Podaj treść pytania!')
@@ -415,7 +415,7 @@ $('.category_status').click(function() {
             swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
         }
     });
-    //zmiana ikony  w wypadku powidzenia
+    //zmiana ikony  w wypadku powodzenia
     if (success == true) {
         //podmiana statusu w przycisku
         $(this).data('category_status', status);
@@ -526,7 +526,7 @@ $('#question_ready').click(() => {
     var content = editor.getData();
     {{--  var content = $('#question_content').val();  --}}
     //pobranie czasu pytania
-    var question_time = $('#question_time').val();
+    var question_time = Math.ceil($('#question_time').val());
     //walidacja braku tresci pytania
     if (content == '') {
         swal('Podaj treść pytania!')
