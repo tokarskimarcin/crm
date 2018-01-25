@@ -19,6 +19,14 @@ use App\Department_info;
 use Mail;
 use Illuminate\Support\Facades\URL;
 
+/**
+ * Statusy testu w  UserTest:
+ * 1 - Test jest stworzony
+ * 2 - Test aktywowany
+ * 3 - Test zakończony / do oceny
+ * 4 - Test oceniony (do wglądu dla pracownika)
+ */
+
 class TestsController extends Controller
 {
     /* 
@@ -477,7 +485,9 @@ class TestsController extends Controller
         Zapis testu przez osobę testującą
     */
     public function addTestPost(Request $request) {
-
+        /**
+         * Ta funkcia jest przejebana ajaxem 
+         */
     }
 
     /*
@@ -607,7 +617,7 @@ class TestsController extends Controller
         Zmiana statusu testu (osoba testująca)
     */
     public function showTestsPost(Request $request) {
-
+        //Ta funkcja jest przejebana do activateTest()
     }
 
     /* 
@@ -630,9 +640,9 @@ class TestsController extends Controller
         /**
          * Sprawdzenie czy osoba nie sprawdza testu sama sobie
          */
-        if ($test->user_id == Auth::user()->id) {
-            return view('errors.404');
-        }
+        // if ($test->user_id == Auth::user()->id) {
+        //     return view('errors.404');
+        // }
 
         return view('tests.checkTest')
             ->with('test', $test);
@@ -999,7 +1009,9 @@ class TestsController extends Controller
         ******************** AJAX REQUESTS ************************
     */
 
-   
+    /**
+     * Funkcja dodająca pytania testowe
+     */
     public function addTestQuestion(Request $request) {
         if ($request->ajax()) {
             $question = new TestQuestion();
@@ -1019,6 +1031,9 @@ class TestsController extends Controller
         }
     }
 
+    /**
+     * Funkcja edytująca nazwę kategorii
+     */
     public function saveCategoryName(Request $request) {
         if ($request->ajax()) {
             $category = TestCategory::find($request->category_id);
@@ -1035,6 +1050,9 @@ class TestsController extends Controller
         }
     }
 
+    /**
+     * Zmiana statusu kategorii ON/OFF
+     */
     public function categoryStatusChange(Request $request) {
         if ($request->ajax()) {
             $category = TestCategory::find($request->category_id);
@@ -1051,6 +1069,9 @@ class TestsController extends Controller
         }
     }
 
+    /**
+     * Funkcja zwracająca wszystkie pytania w danej kategorii
+     */
     public function showCategoryQuestions(Request $request) {
         if ($request->ajax()) {
             $data = [];
@@ -1062,6 +1083,9 @@ class TestsController extends Controller
         }
     }
 
+    /**
+     * Funkcja edytująca pytanie testowe
+     */
     public function editTestQuestion(Request $request) {
         if ($request->ajax()) {
             $question = TestQuestion::find($request->question_id);
@@ -1081,6 +1105,9 @@ class TestsController extends Controller
         }
     }
 
+    /**
+     * Usuwanie pytan testowych
+     */
     public function deleteTestQuestion(Request $request) {
         if ($request->ajax()) {
             $question = TestQuestion::find($request->id);
@@ -1099,6 +1126,9 @@ class TestsController extends Controller
         }
     }
 
+    /**
+     * Zliczanie ilości pytań w kategorii
+     */
     public function mainTableCounter(Request $request) {
         if ($request->ajax()) {
             $category = TestCategory::find($request->category_id);
@@ -1111,6 +1141,9 @@ class TestsController extends Controller
         }
     }
 
+    /**
+     * Funkcja aktywująca test
+     */
     function activateTest(Request $request) {
         if ($request->ajax()) {
             $checkTest = UserTest::find($request->id);
@@ -1262,7 +1295,7 @@ class TestsController extends Controller
         $id = $request->user_id;
 
         /**
-         * PSrawdzenie czy użytkownik istnieje
+         * Srawdzenie czy użytkownik istnieje
          */
         $check = User::find($id);
 
@@ -1286,7 +1319,10 @@ class TestsController extends Controller
             ['id' => null, 'link_id' => 108, 'user_id' => $id],
             ['id' => null, 'link_id' => 109, 'user_id' => $id],
             ['id' => null, 'link_id' => 110, 'user_id' => $id],
-            ['id' => null, 'link_id' => 111, 'user_id' => $id]
+            ['id' => null, 'link_id' => 111, 'user_id' => $id],
+            ['id' => null, 'link_id' => 112, 'user_id' => $id],
+            ['id' => null, 'link_id' => 113, 'user_id' => $id],
+            ['id' => null, 'link_id' => 114, 'user_id' => $id]
         ]);
 
         Session::flash('message_ok', "Tester został dodany!");
@@ -1309,7 +1345,7 @@ class TestsController extends Controller
             /**
              * Usuwanie tylko linkow odnoszących się do testow
              */
-            $links = [96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111];
+            $links = [96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114];
 
             DB::table('privilage_user_relation')
                 ->where('user_id', '=', $id)
@@ -1318,4 +1354,5 @@ class TestsController extends Controller
             return 1;
         }
     }
+
 }

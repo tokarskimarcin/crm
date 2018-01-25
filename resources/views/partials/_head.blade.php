@@ -55,6 +55,7 @@
       .panel-info > .panel-heading {
         background-color: #545a63;
         color: white;
+        max-height: 41px;
       }
 
       .panel-info > .panel-heading > a {

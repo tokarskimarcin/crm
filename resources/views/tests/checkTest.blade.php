@@ -187,6 +187,7 @@ $(document).ready(function() {
 
     $('#send_opinion').click(function() {
         $('#send_opinion').attr('disabled', true);
+        $('#checkForm').submit();
     });
 });
 
