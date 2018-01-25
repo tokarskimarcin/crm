@@ -1319,7 +1319,10 @@ class TestsController extends Controller
             ['id' => null, 'link_id' => 108, 'user_id' => $id],
             ['id' => null, 'link_id' => 109, 'user_id' => $id],
             ['id' => null, 'link_id' => 110, 'user_id' => $id],
-            ['id' => null, 'link_id' => 111, 'user_id' => $id]
+            ['id' => null, 'link_id' => 111, 'user_id' => $id],
+            ['id' => null, 'link_id' => 112, 'user_id' => $id],
+            ['id' => null, 'link_id' => 113, 'user_id' => $id],
+            ['id' => null, 'link_id' => 114, 'user_id' => $id]
         ]);
 
         Session::flash('message_ok', "Tester został dodany!");
@@ -1342,7 +1345,7 @@ class TestsController extends Controller
             /**
              * Usuwanie tylko linkow odnoszących się do testow
              */
-            $links = [96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111];
+            $links = [96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114];
 
             DB::table('privilage_user_relation')
                 ->where('user_id', '=', $id)
@@ -1351,4 +1354,5 @@ class TestsController extends Controller
             return 1;
         }
     }
+
 }
