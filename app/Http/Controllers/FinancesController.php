@@ -28,7 +28,7 @@ class FinancesController extends Controller
     }
     public function viewPaymentCadrePost(Request $request)
     {
-        $date = $request->search_money_month;
+        $date = $request->search_money_month.'%';
         $agencies = Agencies::all();
         $salary = DB::table(DB::raw("users"))
             ->whereNotIn('users.user_type_id',[1,2])
