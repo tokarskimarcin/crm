@@ -20,10 +20,53 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                Sprawdź statystyki pracownika
+            </div>
+            <div class="panel-body">
+                <form method="POST" action="{{ URL::to('/tests_statistics') }}" id="user_form">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
+                    <div class="form-group">
+                        <select class="form-control" name="user_id" id="user_id">
+                            <option value="0">Wybierz</option>
+                            @foreach($users as $user)
+                                <option value="{{$user->id}}">{{$user->last_name . ' ' . $user->first_name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-info" id="show_user">
+                            Pokaż statystyki
+                        </button>   
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('script')
 <script>
+
+$(document).ready(function() {
+    $('#show_user').click(function(e) {
+        e.preventDefault();
+        
+        var user_id = $('#user_id').val();
+
+        if (user_id == 0) {
+            swal('Wybierz użytkownika!')
+            return
+        }
+
+        $('#user_form').submit();
+    });
+});
 
 google.charts.load("current", {packages:["corechart"]});
     google.charts.setOnLoadCallback(drawChart);
