@@ -53,7 +53,7 @@
                                     <div class="col-lg-6">
                                         <div class="panel panel-info">
                                             <div class="panel-heading">Podaj nazwę szablonu: </div>
-                                            <input type="text" id="template_input" class="form-control" name="template_name" placeholder="Podaj nazwę szablonu.." value="">
+                                            <input type="text" id="template_input" class="form-control" name="template_name" placeholder="Podaj nazwę szablonu.." value={{$template->template_name}}>
                                         </div>
                                         <div class="alert alert-danger" style = "display:none" id="alert_template">
                                             <span colspan="1">Podaj temat testu.</span>
@@ -63,7 +63,7 @@
                                     <div class="col-lg-6">
                                         <div class="panel panel-info">
                                             <div class="panel-heading">Temat: </div>
-                                            <input type="text" id="subject_input" class="form-control" name="subject" placeholder="podaj temat.." value="">
+                                            <input type="text" id="subject_input" class="form-control" name="subject" placeholder="podaj temat.." value={{$template->name}}>
                                         </div>
                                         <div class="alert alert-danger" style = "display:none" id="alert_subject">
                                             <span colspan="1">Podaj nazwę szablonu.</span>
@@ -175,14 +175,16 @@
                     var question_repeat = [];
                     // Tablica do przechowywania losowych indeksów
                     var random_array = [];
+                    // indeks szablonu
+                    var template_id = 0;
                     $(document).ready( function () {
 
                         setDataFromPHP();
                         // funkcja ustawiająca dane przez informacje z php
                         function setDataFromPHP() {
                             var test_info = {!! json_encode($template) !!};
-                            var all_question = {!! json_encode($template_question) !!};
-                            console.log(all_question);
+                            template_id = test_info.id;
+                            var all_question = {!! json_encode($template_content) !!};
                             test_id = test_info.id;
                             // zerowanie tablic pomcniczych oraz datatables
                             question_array_id = [];
@@ -193,16 +195,16 @@
                             {
                                 question_count++;
                                 // przepisanie danych z szablonu do testu
-                                question_text_array.push({id:all_question[i].id_question,text:all_question[i].content,time:all_question[i].avaible_time/60,subject:all_question[i].category_name});
+                                question_text_array.push({id:all_question[i].question_id,text:all_question[i].content,time:all_question[i].question_time/60,subject:all_question[i].category_name});
                                 question_array_id.push(parseInt(all_question[i].question_id));
                                 // dodanie wiersza do wszystkich pytań
                                 var rowNode = table_all_guestion.row.add([
                                     all_question[i].category_name,
                                     all_question[i].content,
-                                    '<input type="number" class="form-control question_time" value='+(all_question[i].avaible_time)/60+'>',
+                                    '<input type="number" class="form-control question_time" value='+(all_question[i].question_time)/60+'>',
                                     '<button type="button" class="btn btn-danger delete_row">Usuń</button>'
                                 ]).node();
-                                rowNode.id = "question_"+all_question[i].id_question;
+                                rowNode.id = "question_"+all_question[i].question_id;
 
 //                if(jQuery.inArray(parseInt(response[i].question_id),question_repeat) != -1)
 //                    $(rowNode).css('background','#f3e97c');
@@ -405,7 +407,7 @@
                         //sprawdzenie czy czas na pytanie nie jest mniejszy niz zero
                         for(var i=0;i<question_text_array.length;i++)
                         {
-                            if( question_text_array[i].time.trim().length == 0 || question_text_array[i].time <= 0)
+                            if(String(question_text_array[i].time).trim() == 0 || question_text_array[i].time <= 0)
                             {
                                 flag_all_ok_time = false;
                                 break;
@@ -421,7 +423,7 @@
                             $("#save_button").attr('disabled', true);
                             $.ajax({
                                 type: "POST",
-                                url: '{{ route('api.saveTestTemplate') }}',
+                                url: '{{ route('api.saveEditTemplate') }}',
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
@@ -429,11 +431,14 @@
                                     "question_test_array": question_text_array,
                                     "subject": subject,
                                     "template": template,
+                                    "template_id": template_id,
                                 },
                                 success: function (response) {
                                     if (response == 1){
                                         console.log('zapisany');
-                                        window.location = '{{URL::to('/show_tests')}}';
+                                        window.location = '{{URL::to('/showTestTemplate')}}';
+                                    }else{
+                                        console.log(response)
                                     }
                                     $("#save_button").remove('disabled', true);
                                 }
@@ -535,6 +540,10 @@
                         // zmień wratość wybranych pytań na stronie;
                         $('#count_question').text(question_count);
                         //console.log(question_text_array);
+                    });
+                    //Funkcja odświerzająca licznik pytań w modalu
+                    $('#myModal').on('shown.bs.modal', function() {
+                        $('#count_question').text(question_count);
                     })
                 </script>
 @endsection

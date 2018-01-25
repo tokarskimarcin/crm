@@ -233,6 +233,7 @@
                  // zerowanie tablic pomcniczych oraz datatables
                  question_array_id = [];
                  question_text_array = [];
+                 question_count = 0;
                  table_all_guestion.clear();
                  //wpisanie danych z szablonu na stronę testu
                  for(var i=0;i<response.length;i++)
@@ -248,7 +249,7 @@
                          '<button type="button" class="btn btn-danger delete_row">Usuń</button>'
                      ]).node();
                      rowNode.id = "question_"+response[i].question_id;
-
+                     question_count++;
 //                     if(jQuery.inArray(parseInt(response[i].question_id),question_repeat) != -1)
 //                         $(rowNode).css('background','#f3e97c');
 //                     else
@@ -658,6 +659,11 @@
          // zmień wratość wybranych pytań na stronie;
          $('#count_question').text(question_count);
          //console.log(question_text_array);
- })
+ });
+
+    //Funkcja odświerzająca licznik pytań w modalu
+    $('#myModal').on('shown.bs.modal', function() {
+        $('#count_question').text(question_count);
+    })
 </script>
 @endsection

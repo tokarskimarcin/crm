@@ -551,17 +551,45 @@ class TestsController extends Controller
         $cadre = User::where('status_work','=',1)
             ->whereNotin('user_type_id',[1,2])->orderBy('last_name')->get();
         $template = TemplateUserTest::find($id);
-        $template_question = $template->templateQuestions()->get();
-
+        $template_content = TemplateUserTest::find($id)->questionsData();
 
 
         return view('tests.viewTestTemplate')
             ->with('template',$template)
-            ->with('template_question',$template_question)
-
+            ->with('template_content',$template_content)
             ->with('categories',$categories)
             ->with('users',$cadre);
     }
+    /*
+     * Zapisanie szablonu po edycji
+     */
+    public function saveEditTemplate(Request $request)
+    {
+        if($request->ajax()){
+                // wysłuskanie szukanego szablonu
+                $template = TemplateUserTest::find($request->template_id);
+                $template->template_name = $request->template;
+                $template->name = $request->subject;
+                $template->save();
+                //usunięcie wszystkich pytań szablonu
+
+                //Dodanie nowych pytań
+            TemplateQuestion::where('template_id',$request->template_id)->delete();
+                    $question_array = $request->question_test_array;
+                    foreach ($question_array as $item) {
+                        $new_user_question = new TemplateQuestion();
+                        $new_user_question->template_id = $request->template_id;
+                        $new_user_question->question_id = $item['id'];
+                        $new_user_question->question_time = $item['time']*60;
+                        $new_user_question->save();
+                    }
+
+                Session::flash('message_ok', "Szablon został zmieniony!");
+                return 1;
+        }
+        return 0;
+    }
+
 
     /*
         Wyświetlenie wsyzstkic testów osoby testującej
