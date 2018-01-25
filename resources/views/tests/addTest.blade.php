@@ -634,6 +634,11 @@
          // zmień wratość wybranych pytań na stronie;
          $('#count_question').text(question_count);
          //console.log(question_text_array);
+
+        //Funkcja odświerzająca licznik pytań w modalu
+        $('#myModal').on('shown.bs.modal', function() {
+            $('#count_question').text(question_count);
+        })
  })
 </script>
 @endsection
