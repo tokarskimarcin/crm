@@ -130,7 +130,7 @@ google.charts.load("current", {packages:["corechart"]});
     function drawChart() {
         var data = google.visualization.arrayToDataTable([
         ['Ilość', 'Statystyki'],
-            ['Pozytywne', {{($results->dep_good != null) ? $results->dep_good : 0}}],
+            ['Poprawne', {{($results->dep_good != null) ? $results->dep_good : 0}}],
             ['Niepoprawne', {{($results->dep_wrong != null) ? $results->dep_wrong : 0}}]
         ]);
 

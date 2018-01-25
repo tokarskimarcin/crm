@@ -183,5 +183,12 @@ body{margin:40px;}
 @section('script')
 <script>
 
+$(document).ready(function() {
+
+    $('#send_opinion').click(function() {
+        $('#send_opinion').attr('disabled', true);
+    });
+});
+
 </script>
 @endsection

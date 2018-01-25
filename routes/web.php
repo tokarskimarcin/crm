@@ -392,6 +392,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::POST('/check_test', 'TestsController@testCheckPost');
 
     Route::get('/tests_statistics', 'TestsController@testsStatisticsGet');
+    Route::POST('/tests_statistics', 'TestsController@testsStatisticsPost');
 
     Route::get('/one_test_statistics', 'TestsController@testStatisticsGet');
     Route::POST('/one_test_statistics', 'TestsController@testStatisticsPost');
