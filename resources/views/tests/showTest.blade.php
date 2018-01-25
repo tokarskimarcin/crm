@@ -21,8 +21,11 @@
 </div>
 @if (Session::has('message_ok'))
     <div class="alert alert-success">{{ Session::get('message_ok') }}</div>
-    {{ Session::forget('message_ok')}}
 @endif
+@if (Session::has('message_delete'))
+    <div class="alert alert-danger">{{ Session::get('message_delete') }}</div>
+@endif
+
 <ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#waiting">Oczekujące</a></li>
     <li><a data-toggle="tab" href="#active">Aktywowane</a></li>
@@ -71,7 +74,7 @@
                                 </a>
                             </td>
                             <td>
-                                <a class="btn btn-default" href="{{ URL::to('/delete_test') }}/{{$test->id}}">
+                                <a class="btn btn-default delete_test" data-id ={{$test->id}} href="#">
                                     <span style="color: green" class="glyphicon glyphicon glyphicon-trash"></span> Usuń
                                 </a>
                             </td>
@@ -200,13 +203,38 @@
 
 @section('script')
 <script>
+
+    // po kliknięciu usuń.
+    $('.delete_test').on('click',function (e) {
+         var id = $(this).data('id');
+       //
+        swal({
+            title: 'Jesteś pewien?',
+            text: "Cofnięcie zmian nie będzie możliwe.",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Tak, usuń test!'
+        }).then((result) => {
+            if (result.value) {
+            swal(
+                'Usunieto!',
+                'Wybrany test został usuniety.',
+                'success'
+            )
+            window.location.replace('{{ URL::to('/delete_test') }}'+'/'+id);
+        }
+    })
+    });
+
 /*
     Funkcja aktywująca test dla pracownika
 */
 function change(e) {
     //pobranie id testu do aktywacji
     var test_id = $(e).attr('id');
-  
+
     $.ajax({
         type: "POST",
         url: '{{ route('api.activateTest') }}',
