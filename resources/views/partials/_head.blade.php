@@ -76,6 +76,11 @@
       .panel-default > .panel-heading > a {
         color: white;
       }
+      .thead-inverse > thead {
+        background-color: #666564;
+        color: white;
+        font-weight: bold;
+      }
 
 /*********************** DARK THEME START ******************************/
       {{--  .panel-info > .panel-heading {
