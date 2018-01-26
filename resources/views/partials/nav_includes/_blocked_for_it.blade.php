@@ -1,7 +1,7 @@
 {{--ZABLOKOWANE DLA IT--}}
 @if($link->link == 'view_notification_table')
 <li class="dropdown">
-    <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="it_support">Zgłoszenia
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="it_support">
         <i class="fa fa-bell fa-fw"></i>
         <span id="show_notification_count" class="fa-stack fa-5x has-badge" data-count="" style="
         visibility: hidden;

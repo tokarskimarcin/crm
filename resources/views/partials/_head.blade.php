@@ -51,9 +51,11 @@
         font-weight: bold;
         color: white;
       }
-/*********************** DARK THEME START ******************************/
+      .well-back {
+        background-color: #fff;
+      }
       .panel-info > .panel-heading {
-        background-color: #7a7a7a;
+        background-color: #666564;
         color: white;
         max-height: 41px;
         font-weight: bold;
@@ -65,7 +67,31 @@
       }
 
       .panel-default > .panel-heading {
-        background-color: #7a7a7a;
+        background-color: #666564;
+        color: white;
+        max-height: 41px;
+        font-weight: bold;
+      }
+
+      .panel-default > .panel-heading > a {
+        color: white;
+      }
+
+/*********************** DARK THEME START ******************************/
+      {{--  .panel-info > .panel-heading {
+        background-color: #666564;
+        color: white;
+        max-height: 41px;
+        font-weight: bold;
+      }
+
+      .panel-info > .panel-heading > a {
+        color: white;
+        
+      }
+
+      .panel-default > .panel-heading {
+        background-color: #666564;
         color: white;
         max-height: 41px;
         font-weight: bold;
@@ -76,19 +102,19 @@
       }
 
       .thead-inverse > thead {
-        background-color: #7a7a7a;
+        background-color: #666564;
         color: white;
         font-weight: bold;
       }
 
       .navbar-default {
-        background-color: #7a7a7a;
+        background-color: #666564;
         color: #fcfcfc;
         font-weight: bold;
       }
 
       .navbar-default li {
-        background-color: #7a7a7a !important;
+        background-color: #666564 !important;
         color: #fcfcfc !important;
       }
 
@@ -132,7 +158,7 @@
 
       .nav-tabs > li > a:hover {
         background-color: white;
-      }
+      }  --}}
 /********************* DARK THEME STOP ***********************************/
 	</style>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->

@@ -1,6 +1,6 @@
 @if($multiple_departments->count() != 0)
 <li>
-    <label for="select_town">Wybierz oddział</label>
+    <label for="select_town"></label>
 </li>
 <li>
     <select id="change_department" class="form-control">
