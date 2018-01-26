@@ -9,6 +9,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\DB;
 use App\Department_info;
 use App\User;
+use App\UserTest;
 
 class NavComposerProvider extends ServiceProvider
 {
@@ -60,12 +61,18 @@ class NavComposerProvider extends ServiceProvider
                 $query->where('id_dep_type', 6);
             })->groupBy('id')->get();
 
+            /**
+             * Check if user has active test
+             */
+            $active_test = UserTest::where('user_id', '=', Auth::user()->id)->where('test_start', '=', null)->where('status', '=', 2)->count();
+
             $view
                 ->with('groups', $groups)
                 ->with('departments_for_dkj', $departments_for_dkj)
                 ->with('multiple_departments', $multiple_departments)
                 ->with('dkj_users', $dkj_users)
-                ->with('links', $links);
+                ->with('links', $links)
+                ->with('active_test', $active_test);
         });
     }
 
