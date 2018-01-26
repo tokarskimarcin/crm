@@ -63,7 +63,7 @@
                                     <div class="col-lg-6">
                                         <div class="panel panel-info">
                                             <div class="panel-heading">Temat: </div>
-                                            <input type="text" id="subject_input" class="form-control" name="subject" placeholder="podaj temat.." value={{$template->name}}>
+                                            <input type="text" id="subject_input" class="form-control" name="subject" placeholder="podaj temat.." value="{{$template->name}}">
                                         </div>
                                         <div class="alert alert-danger" style = "display:none" id="alert_subject">
                                             <span colspan="1">Podaj nazwę szablonu.</span>
