@@ -18,6 +18,7 @@
         <form action="{{ URL::to('tester_list') }}" method="POST" id="tester_form">
             <input type="hidden" name="_token" value="{{ csrf_token() }}" />
             <div class="col-md-4">
+                <div class="well well-back">
                 <div class="form-group">
                     <label>Wybierz pracownika:</label>
                     <select class="form-control" name="user_id" id="user_id">
@@ -32,6 +33,7 @@
                         <span class="glyphicon glyphicon-plus"></span> Przydziel uprawnienia
                     </button>
                 </div>
+                </div>
             </div>
         </form>
     </div>
@@ -39,6 +41,7 @@
 
 <div class="row" style="margin-top: 50px">
     <div class="col-md-5">
+        <div class="well well-back">
         <div class="table-responsive">
             <table class="table table-striped thead-inverse">
                 <thead>
@@ -69,6 +72,7 @@
                     <b>Brak testerów!</b>
                 </div>
             @endif
+        </div>
         </div>
     </div>
 </div>

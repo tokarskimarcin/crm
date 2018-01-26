@@ -33,5 +33,5 @@
       }
     </style>
 <div id="blok" style="display: none">
-    <p>Liczba nieodsłuchanych janków: <span id="notification_janky_count">0</span></p>
+    <p style="color: #212223" >Liczba nieodsłuchanych janków: <span id="notification_janky_count">0</span></p>
 </div>

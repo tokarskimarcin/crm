@@ -58,7 +58,7 @@
         $total_sum = 0;
     @endphp
     <div class="table-responsive">
-        <table class="table table-striped">
+        <table class="table table-striped thead-inverse">
             <thead>
                 <tr>
                     <th>Lp.</th>

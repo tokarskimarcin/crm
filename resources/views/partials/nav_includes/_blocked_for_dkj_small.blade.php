@@ -1,6 +1,6 @@
 {{--ZABLOKOWANE DLA DKJ--}}
       @if($link->link == 'view_dkj_table_small')
-      <li class="dropdown">
+      <li class="dropdown"  style="color: #000 !important">
           <a id="check_messages" class="dropdown-toggle" data-toggle="dropdown" href="#">
               <i class="fa fa-envelope fa-fw"></i> <i class="fa fa-caret-down"></i>
           </a>
@@ -8,7 +8,7 @@
                   <strong>Oddziały</strong>
               <li>
                   <div class="table-responsive"  style="max-height: 500px">
-                    <table class="table table-bordered" style="margin-bottom:0px">
+                    <table class="table table-bordered" style="margin-bottom:0px; color: #000; background-color: #fff">
                       <thead>
                           <tr>
                               <th style="width: 10%">Lp.</th>
@@ -17,7 +17,7 @@
                               <th style="width: 20%">Janki</th>
                           </tr>
                       </thead>
-                      <tbody>
+                      <tbody style="color: #000 !important">
                         @php($i = 1)
                         @foreach($departments_for_dkj as $department)
                             @if($department->type == 'Badania/Wysyłka')

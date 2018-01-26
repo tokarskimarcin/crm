@@ -47,7 +47,7 @@ $(document).ready(function(){
                             $("#it_notifications").append("<li>Brak nowych zgłoszeń!</li>");
                         }
                         for (var i = 0; i < response.length; i++) {
-                            $("#it_notifications").append("<li><a href='{{URL::to('/show_notification/')}}/" + response[i].id + "'><div><i class='fa fa-comment fa-fw'></i><span> " +response[i].notification_type.name+": "+ response[i].title +" ("+response[i].user.last_name+")"+ "</span></div></a></li><li class='divider'></li>");
+                            $("#it_notifications").append("<li><a style='background-color: #fff' href='{{URL::to('/show_notification/')}}/" + response[i].id + "'><div><i class='fa fa-comment fa-fw'></i><span> " +response[i].notification_type.name+": "+ response[i].title +" ("+response[i].user.last_name+")"+ "</span></div></a></li><li class='divider'></li>");
                         }
                         $("#it_support").css("pointer-events", "auto");
                         ajaxRunningNotifications = false;

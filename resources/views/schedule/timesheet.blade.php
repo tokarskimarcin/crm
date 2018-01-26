@@ -55,7 +55,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="table-responsive">
-            <table class="table table-striped" cellspacing="0" width="100%">
+            <table class="table table-striped thead-inverse" cellspacing="0" width="100%">
                 <thead>
                     <tr>
                         <th>Lp.</th>
