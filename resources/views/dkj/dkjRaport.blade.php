@@ -33,12 +33,15 @@
 
 {{--Header page --}}
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="page-header">
-                <h1>Raport DKJ</h1>
+                <div class="alert gray-nav ">DKJ / Janki zweryfikowane</div>
             </div>
         </div>
-        <div class="col-md-6">
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
           <div class="panel panel-default" style="margin-top: 3%">
               <div class="panel-body">Odsłuchanych rozmów: {{$dkj_user}}, ilość wystawionych janków: {{$user_yanek}}</div>
           </div>
@@ -61,7 +64,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-lg-8">
+                        <div class="col-lg-12">
                             <div id="start_stop">
                                 <div id="collapseOne" class="panel-collapse collapse in">
                                  <div class="panel-body">
@@ -166,7 +169,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div id="start_stop" class="table-responsive">
-                                <table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                                <table id="datatable" class="thead-inversetable table-striped table-bordered" cellspacing="0" width="100%">
                                         <thead>
                                             <tr>
                                                 <th>Data</th>

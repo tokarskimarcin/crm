@@ -18,14 +18,23 @@
 
 
     {{--Header page --}}
+
     <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Podgląd godzin</h1>
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="alert gray-nav ">DKJ / Statystyki</div>
+            </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
+                <div class="panel-heading">
+                    <a data-toggle="collapse" data-target="#collapseOne">
+                        Statystyki
+                    </a>
+                </div>
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-lg-12">
