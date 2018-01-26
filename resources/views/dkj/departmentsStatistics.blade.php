@@ -3,9 +3,13 @@
 
 
     {{--Header page --}}
+
+
     <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Statystyki Oddziałów</h1>
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="alert gray-nav ">DKJ / Statystyki Oddziałów</div>
+            </div>
         </div>
     </div>
 
@@ -56,8 +60,29 @@
                                             </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
                                 @if(isset($user_info))
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="panel panel-default"  id="panel1">
+                                                <div class="panel-heading">
+                                                    <a data-toggle="collapse" data-target="#collapseOne">
+                                                        Statystyki
+                                                    </a>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div id="start_stop">
                                 <div class="col-md-12">
                                   <div class="well">
                                     <div class="panel-body table-responsive">

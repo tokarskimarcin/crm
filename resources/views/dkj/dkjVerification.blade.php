@@ -29,17 +29,25 @@
 
 {{--Header page --}}
     <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Weryfikacja Janków</h1>
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="alert gray-nav ">DKJ / Weryfikacja Janków</div>
+            </div>
         </div>
     </div>
 
+
             <div class="panel panel-default"  id="panel2">
+                <div class="panel-heading">
+                    <a data-toggle="collapse" data-target="#collapseOne">
+                        Do weryfikacji
+                    </a>
+                </div>
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-lg-12">
                             <div id="start_stop" class="table-responsive">
-                                <table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                                <table id="datatable" class="thead-inverse table table-striped table-bordered " cellspacing="0" width="100%">
                                         <thead>
                                             <tr>
                                                 <th>Data Dodania</th>
@@ -63,17 +71,18 @@
                 </div>
         </div>
 
-    <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Janki zweryfikowane</h1>
-        </div>
-    </div>
+
     <div class="panel panel-default"  id="panel2">
+        <div class="panel-heading">
+            <a data-toggle="collapse" data-target="#collapseOne">
+                Zweryfikowane
+            </a>
+        </div>
         <div class="panel-body">
             <div class="row">
                 <div class="col-lg-12">
                     <div id="start_stop" class="table-responsive">
-                        <table id="datatable_verified" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                        <table id="datatable_verified" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
                             <thead>
                             <tr>
                                 <th>Data Dodania</th>

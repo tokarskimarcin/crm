@@ -30,8 +30,10 @@
 
     {{--Header page --}}
     <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Podgląd pracowników DKJ</h1>
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="alert gray-nav ">DKJ / Podgląd pracowników DKJ</div>
+            </div>
         </div>
     </div>
 
@@ -45,7 +47,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-lg-8">
+                        <div class="col-lg-12">
                             <div id="start_stop">
                                 <div id="collapseOne" class="panel-collapse collapse in">
                                  <div class="panel-body">
@@ -117,7 +119,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div id="start_stop" class="table-responsive">
-                                <table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                                <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
                                         <thead>
                                             <tr>
                                                 <th>Data</th>
