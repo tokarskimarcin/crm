@@ -24,6 +24,9 @@
     <ul class="nav navbar-top-links navbar-right">
 @if(Auth::user()->department_info->blocked == 0)
 
+       {{-- Including active test notification --}}
+       @include('partials.nav_includes._test_active')
+
       {{-- Including multiple departments selector --}}
       @include('partials.nav_includes._multiple_departments')
       @foreach($links as $link)
