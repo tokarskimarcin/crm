@@ -5,7 +5,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="well my-well">Testy / Test kompetencji / {{$test->name}}</div>
+            <div class="alert gray-nav">Testy / Test kompetencji / {{$test->name}}</div>
         </div>
         @if($status != 3)
             <div class="col-md-9">
