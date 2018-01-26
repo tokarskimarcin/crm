@@ -14,7 +14,7 @@
                 <input id="menu-toggle" type="checkbox" data-toggle="toggle">
             </li>
         </ul>
-        <a class="navbar-brand" style="color: white" href="{{url('/')}}">TeamBox</a>
+        <a class="navbar-brand" style="" href="{{url('/')}}">TeamBox</a>
 
     </div>
     <!-- /.navbar-header -->
