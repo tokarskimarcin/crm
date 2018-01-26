@@ -34,7 +34,7 @@
 @endif
 
 <br />
-<div class="row">
+<div class="row well well-back">
     <div class="col-md-6">
         <form method="POST" action="{{URL::to('/tests_admin_panel')}}" id="category_form">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -52,7 +52,7 @@
 </div>
 <br />
 <hr >
-<div class="row">
+<div class="row well well-back">
     <div class="col-md-4">
         <input type="text" class="form-control" id="category_search"  placeholder="Wyszukaj..."/>
         <br />

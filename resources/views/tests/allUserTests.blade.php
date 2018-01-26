@@ -1,11 +1,5 @@
 @extends('layouts.main')
 @section('content')
-<style>
-    thead {
-        background-color: #4a4e54;
-        color: white;
-    }
-</style>
 
 <div class="row">
     <div class="col-md-12">
@@ -24,7 +18,7 @@
 <div class="tab-content">
     <div id="waiting" class="tab-pane fade in active">
         <div class="table-responsive" style="margin-top: 20px">
-            <table class="table table-stripped">
+            <table class="table table-striped thead-inverse">
                 <thead>
                     <tr>
                         <th style="width: 5%">Lp.</th>
@@ -59,7 +53,7 @@
     </div>
     <div id="finished" class="tab-pane fade">
         <div class="table-responsive" style="margin-top: 20px">
-            <table class="table table-stripped">
+            <table class="table table-striped thead-inverse">
                 <thead>
                     <tr>
                         <th style="width: 5%">Lp.</th>
@@ -90,7 +84,7 @@
     </div>
     <div id="judged" class="tab-pane fade">
         <div class="table-responsive" style="margin-top: 20px">
-            <table class="table table-stripped">
+            <table class="table table-striped thead-inverse">
                 <thead>
                     <tr>
                         <th style="width: 5%">Lp.</th>

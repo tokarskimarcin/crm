@@ -14,7 +14,7 @@
                 <input id="menu-toggle" type="checkbox" data-toggle="toggle">
             </li>
         </ul>
-        <a class="navbar-brand" href="{{url('/')}}">TeamBox</a>
+        <a class="navbar-brand" style="color: white" href="{{url('/')}}">TeamBox</a>
 
     </div>
     <!-- /.navbar-header -->
@@ -57,11 +57,11 @@
                 <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
             </a>
             <ul class="dropdown-menu dropdown-user">
-                <li><a href="{{URL::to('/password_change')}}"><i class="fa fa-user fa-fw"></i>Zmiana hasła</a>
+                <li><a style="background-color: #fff" href="{{URL::to('/password_change')}}"><i class="fa fa-user fa-fw"></i>Zmiana hasła</a>
                 </li>
                 <li class="divider"></li>
                 <li>
-                    <a  href="{{ route('logout') }}" onclick="event.preventDefault();
+                    <a style="background-color: #fff" href="{{ route('logout') }}" onclick="event.preventDefault();
                                            document.getElementById('logout-form').submit();">
                         <i class="fa fa-sign-out fa-fw"></i>
                         Wyglouj</a>

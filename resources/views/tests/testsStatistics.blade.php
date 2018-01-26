@@ -13,10 +13,10 @@
 
 <div class="row">
     <div class="col-md-6">
-        <div id="donutchart" style="width: 750px; height: 550px;"></div>
+        <div id="donutchart" style="width: 100%; height: 550px;"></div>
     </div>
     <div class="col-md-6">
-        <div id="piechart" style="width: 750px; height: 550px;"></div>
+        <div id="piechart" style="width: 100%; height: 550px;"></div>
     </div>
 </div>
 

@@ -46,27 +46,94 @@
       }
 
       .gray-nav {
-        background-color: #bcbfc4;
+        background-color: #7a7a7a;
         font-size: 150%;
         font-weight: bold;
         color: white;
       }
-
+/*********************** DARK THEME START ******************************/
       .panel-info > .panel-heading {
-        background-color: #545a63;
+        background-color: #7a7a7a;
         color: white;
         max-height: 41px;
+        font-weight: bold;
       }
 
       .panel-info > .panel-heading > a {
         color: white;
+        
       }
 
-      .thead-inverse > thead {
-        background-color: #545a63;
+      .panel-default > .panel-heading {
+        background-color: #7a7a7a;
+        color: white;
+        max-height: 41px;
+        font-weight: bold;
+      }
+
+      .panel-default > .panel-heading > a {
         color: white;
       }
 
+      .thead-inverse > thead {
+        background-color: #7a7a7a;
+        color: white;
+        font-weight: bold;
+      }
+
+      .navbar-default {
+        background-color: #7a7a7a;
+        color: #fcfcfc;
+        font-weight: bold;
+      }
+
+      .navbar-default li {
+        background-color: #7a7a7a !important;
+        color: #fcfcfc !important;
+      }
+
+      .navbar-default a {
+        color: #fcfcfc;
+      }
+      
+      .container-fluid {
+        background-color: #f3f3f4;
+      }
+
+      #page-wrapper {
+        background-color: #f3f3f4;
+      }
+
+      .nav>li>a:focus, .nav>li>a:hover {
+        text-decoration: none;
+        background-color: #676767;
+      }
+
+      .sidebar ul li a.active {
+        background-color: #676767;
+      }
+
+      .nav .open>a, .nav .open>a:focus, .nav .open>a:hover {
+        background-color: #676767;
+        border-color: #676767;
+      }
+
+      #wrapper {
+        background-color: #f3f3f4;
+      }
+
+      body {
+       background-color: #f3f3f4;
+      }
+
+      .well-back {
+        background-color: #fff;
+      }
+
+      .nav-tabs > li > a:hover {
+        background-color: white;
+      }
+/********************* DARK THEME STOP ***********************************/
 	</style>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

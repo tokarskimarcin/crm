@@ -54,16 +54,16 @@
                                     </div>
 
                                     <?php if($status == 0): ?>
-                                    <button id="start" class="button btn-success"> Zaczynam pracę </button>
+                                    <button id="start" class="btn btn-success"> Zaczynam pracę </button>
                                     <?php elseif($status == 1): ?>
-                                    <button id="stop" class="button btn-danger"> Kończę Pracę </button>
+                                    <button id="stop" class="btn btn-danger"> Kończę Pracę </button>
                                     <?php elseif($status == 2): ?>
-                                    <button id="done" class="button" data-toggle="modal" data-target="#registerModal">Rejestracja Godzin</button>
+                                    <button id="done" class="btn btn-info" data-toggle="modal" data-target="#registerModal">Rejestracja Godzin</button>
                                      <?php elseif($status >=3): ?>
                                        <div class="alert alert-success">
                                            Godziny zostały zarejestrowane w przedziale: <span id="register_hour_done_start">{{substr($register_start,0,-3)}}</span> - <span id="register_hour_done_stop">{{substr($register_stop,0,-3)}}</span>
                                        </div>
-                                    <button id="done" class="button" data-toggle="modal" data-target="#registerModal">Edytuj godziny pracy</button>
+                                    <button id="done" class="btn btn-info" data-toggle="modal" data-target="#registerModal">Edytuj godziny pracy</button>
                                     <?php endif?>
                                 </div>
                             </div>
