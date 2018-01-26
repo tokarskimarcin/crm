@@ -35,14 +35,14 @@
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">
-                <div class="alert gray-nav ">DKJ / Janki zweryfikowane</div>
+                <div class="alert gray-nav ">DKJ / Raport</div>
             </div>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
-          <div class="panel panel-default" style="margin-top: 3%">
+          <div class="panel panel-default">
               <div class="panel-body">Odsłuchanych rozmów: {{$dkj_user}}, ilość wystawionych janków: {{$user_yanek}}</div>
           </div>
         </div>
