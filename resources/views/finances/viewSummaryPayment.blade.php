@@ -22,16 +22,19 @@
 
 
 {{--Header page --}}
-    <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Podgląd Wypłat</h1>
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+            <div class="alert gray-nav ">Rozliczenia / Podsumowanie Wypłat</div>
         </div>
     </div>
+</div>
+
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Podsumowanie Wypłat
+                    Zakres wyszukiwania:
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -63,8 +66,22 @@
                                                     <button class="btn btn-primary" id="show_load_data_info" style="width:100%;">Wyświetl</button>
                                                 </div></br></br>
                                             </form>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
                                             @if(isset($summary_month))
-                                                <table class="table table-striped table-bordered dt-responsive nowrap" cellspacing="0"  width="100%" id="datatable" style="margin-top: 30px;">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    Podsumowanie wypłat
+                                                </div>
+                                                <div class="panel-body">
+                                                <table class="table thead-inverse table-striped table-bordered dt-responsive nowrap" cellspacing="0"  width="100%" id="datatable" style="margin-top: 30px;">
                                                     <thead>
                                                     <tr>
                                                         <th>Lp.</th>
@@ -148,13 +165,7 @@
                                               </div>
                                             @endif
                                         </div>
-                                    </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 
 
 @endsection

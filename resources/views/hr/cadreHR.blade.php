@@ -9,6 +9,12 @@
     </div>
 </div>
 
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Pracownicy HR:
+    </div>
+    <div class="panel-body">
+
 <div class="table-responsive">
     <table id="datatable" class="table thead-inverse table-striped table-bordered" cellspacing="0" width="100%">
         <thead>
@@ -25,6 +31,8 @@
 
         </tbody>
     </table>
+</div>
+    </div>
 </div>
 
 @endsection
