@@ -65,6 +65,7 @@
         </div>
     </div>
 
+
 @endsection
 @section('script')
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>

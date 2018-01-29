@@ -30,11 +30,14 @@ function getStartAndEndDate($week, $year) {
     return $ret;}
 ?>
 {{--Header page --}}
-    <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Ustal Grafik</h1>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+            <div class="alert gray-nav ">Grafik / Ustal Grafik</div>
         </div>
     </div>
+</div>
 
 
     <div class="row">
