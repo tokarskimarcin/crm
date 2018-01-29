@@ -122,8 +122,11 @@
 
 
                         <div class="col-lg-12">
+                            <div class="form-group">
+                                <input class="form-control" placeholder="Wyszukaj" id="search_link"/>
+                            </div>
                             <div id="start_stop" class="table-responsive">
-                                <table class="table table-bordered">
+                                <table class="table table-bordered" id="to_search">
                                     <thead>
                                     <tr>
                                         <th>Nazwa</th>
@@ -158,6 +161,14 @@
 
 <script>
 
+$(document).ready(() => {
+    $("#search_link").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#to_search tbody tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+});
 
 </script>
 @endsection

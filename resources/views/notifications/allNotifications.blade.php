@@ -1,16 +1,17 @@
 @extends('layouts.main')
 @section('content')
 
-    <style>
-        .table-striped tr td:first-child + td {
-            word-break: break-all;
-        }
-    </style>
+<style>
+    .table-striped tr td:first-child + td {
+        word-break: break-all;
+    }
+</style>
+
 <div class="row">
-    <div class="col-lg-12">
-        <h1 class="page-header">
-            <span id="page_title">Nowe zgłoszenia</span>
-        </h1>
+    <div class="col-md-12">
+        <div class="page-header">
+            <div class="alert gray-nav ">Pomoc / <span id="page_title">Nowe zgłoszenia</span></div>
+        </div>
     </div>
 </div>
 
@@ -24,7 +25,7 @@
         <br />
         <div class="col-md-12">
           <div class="table-responsive" id="div_new_notifications">
-              <table id="new_notifications" class="table table-striped table-bordered" cellspacing="0" width="100%" >
+              <table id="new_notifications" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%" >
                 <thead>
                   <tr>
                       <td>ID zgłoszenia</td>
@@ -41,7 +42,7 @@
               </table>
           </div>
           <div class="table-responsive" style="display: none" id="div_in_progress">
-              <table id="in_progress" class="table table-striped table-bordered" cellspacing="0" width="100%" >
+              <table id="in_progress" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%" >
                 <thead>
                   <tr>
                       <td>ID zgłoszenia</td>
@@ -58,7 +59,7 @@
               </table>
           </div>
           <div class="table-responsive" style="display: none" id="div_finished">
-              <table id="finished" class="table table-striped table-bordered" cellspacing="0" width="100%" >
+              <table id="finished" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%" >
                 <thead>
                   <tr>
                       <td>ID zgłoszenia</td>
