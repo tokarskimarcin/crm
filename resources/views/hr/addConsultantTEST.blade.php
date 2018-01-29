@@ -19,7 +19,7 @@
                     <div class="panel-body">
                         <form class="form-horizontal" method="post" action="{{URL::to('/edit_cadre/')}}/{{$user->id}}" id="edit_user">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                            <div class="col-md-10">
+                            <div class="col-md-12">
 
                                 <div class=" col-md-6 col-lg-6 ">
                                     <table class="table table-user-information">
@@ -309,13 +309,34 @@
                                 <input type="submit" value="Zapisz zmiany" class="btn btn-success" id="edit_button"/>
                             </div>
                         </form>
-                        <div class=" col-md-10 col-lg-10 ">
-    		                  @include('hr.userPenaltyBonus')
-                          @include('hr.userEquipment')
-    		                </div>
+                    </div>
+                </div>
 
-            </div>
+                    <div class="panel panel-info" style="width: 100%">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Kary i Premie</h3>
+                        </div>
+
+                        <div class="panel-body">
+                            <div class=" col-md-12 col-lg-12 ">
+    		                  @include('hr.userPenaltyBonus')
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-info" style="width: 100%">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Posiadany Sprzęt</h3>
+                        </div>
+
+                        <div class="panel-body">
+                            <div class=" col-md-12 col-lg-12 ">
+                                @include('hr.userEquipment')
+                            </div>
+                        </div>
+                    </div>
         </div>
+
     <!--/container-->
     <!-- /Main -->
     <div class="modal">

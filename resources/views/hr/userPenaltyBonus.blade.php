@@ -1,6 +1,5 @@
 <table class="table table-user-information">
   <tbody>
-  <b style="font-size: 20px; font-family: sans-serif;">Kary i Premie</b>
     @if(($user->penalty_bonuses->where('status', '!=', 0)->count()) > 0)
           <tr>
             <td><b>Data</b></td>

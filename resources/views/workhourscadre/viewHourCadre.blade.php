@@ -18,15 +18,26 @@
 
 
     {{--Header page --}}
+
     <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Podgląd godzin</h1>
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="alert gray-nav ">Godziny Kadra / Podgląd godzin</div>
+            </div>
         </div>
     </div>
+
     <div id="accept_hour_success" class="alert alert-success" style="display: none">Godziny zarejestrowane pomyślnie!</div>
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <a data-toggle="collapse" data-target="#collapseOne">
+                        Zakres wyszukiwania:
+                    </a>
+                </div>
+
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-lg-12">
@@ -81,11 +92,19 @@
                                             </div>
                                     </form>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
                                 @if(isset($response_userid))
                                 <div class="panel panel-default">
                                     <div class="panel-heading">
-                                        Pracownik:
+                                        Godziny pracy:
                                     </div>
                                     <div class="panel-body">
                                         <div class="row">
@@ -205,13 +224,7 @@
                                     </div>
                                 </div>
                                 @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
 @endsection
 @include('workhours.editHour');
 @include('workhours.addHour');

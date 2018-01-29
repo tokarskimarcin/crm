@@ -27,7 +27,7 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Podgląd godzin
+                    Zakres wyszukiwania:
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -81,11 +81,20 @@
                                             </div>
                                     </form>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
                                 @if(isset($response_userid))
                                 <div class="panel panel-default">
                                     <div class="panel-heading">
-                                        Pracownik:
+                                        Godziny pracy:
                                     </div>
                                     <div class="panel-body">
                                         <div class="row">
@@ -233,12 +242,7 @@
                                 </div>
                                 @endif
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
 @endsection
 @include('workhours.editHour');
 @include('workhours.addHour');

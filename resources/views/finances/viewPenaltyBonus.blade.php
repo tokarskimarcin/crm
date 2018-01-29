@@ -6,31 +6,29 @@
 @section('content')
 
 {{--Header page --}}
-    <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Kary i Premie</h1>
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+            <div class="alert gray-nav ">Rozliczenia / Kary i Premie</div>
         </div>
     </div>
+</div>
 
 @if (Session::has('message_ok'))
     <div class="alert alert-success">{{ Session::get('message_ok') }}</div>
 @endif
 
-
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Podgląd Wypłat
+                    Przydziel Karę/Premię
                 </div>
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-lg-12">
                             <div id="start_stop">
-
-
                                 <div class="col-md-12">
-                                    <h1>Przydziel Karę/Premię</h1>
                                     <div class="well">
                                         <div class="form-group">
                                             <form action="create_penalty_bonus" method="post" id="create">
@@ -77,13 +75,28 @@
                                         </div></br>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
-                                <div class="col-md-12">
-                                    <h1>Sprawdź Karę/Premię</h1>
-                                </div>
 
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Sprawdź Karę/Premię
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div id="start_stop">
                                 <div class="col-md-12">
                                     <div class="well">
                                         <div class="form-group">
@@ -152,11 +165,28 @@
                                         </div>
                                     </div>
                                 </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
                                 @if(isset($users_show))
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Wyszukiwanie w zakresie od: {{$date_start}} - {{$date_stop}}
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div id="start_stop">
                                 <div class="col-md-12">
                                     <div class="well"><div class="tab-content">
                                             <div class="tab-pane active" id="profile">
-                                                <div class="panel-heading" style="border:1px solid #d3d3d3;"><b>Wyszukiwanie w zakresie od: {{$date_start}} - {{$date_stop}}</b></div>
                                                 <table class="table table-bordered">
                                                         <thead>
                                                             <tr align="center">
@@ -197,6 +227,9 @@
             </div>
         </div>
     </div>
+            </div>
+        </div>
+
 
 
             <!-- Modal -->

@@ -21,18 +21,19 @@
 </style>
 
 {{--Header page --}}
-    <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Podgląd Grafiku</h1>
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+            <div class="alert gray-nav ">Grafik / Podgląd Grafiku</div>
         </div>
     </div>
+</div>
 
     <div class="row">
         <div class="col-lg-12">
-
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Podgląd Grafiku
+                    Zakres wyszukiwania:
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -76,8 +77,28 @@
                                             </form>
                                         </div>
                                     </div>
-                                    <div class="col-md-12">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
                                         @if (isset($number_of_week))
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Podgląd grafiku:
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div id="start_stop">
+                                    <div class="panel-body">
+                                        <div class="col-md-12">
                                         <div class="table-responsive">
                                             <table class="table table-bordered">
                                                 <div class="panel-heading" style="border:1px solid #d3d3d3;"><h4><b>Analiza Grafik Plan</b></h4></div>
