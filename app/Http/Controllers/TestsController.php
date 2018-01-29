@@ -433,7 +433,7 @@ class TestsController extends Controller
         // pobranie informacji o teście
         $test_by_id = UserTest::find($id);
         if($test_by_id != null) {
-            if ($test_by_id->status == 1) {
+            if ($test_by_id->status == 1 || $test_by_id->status == 2) {
                 // pobranie pytań z testu
                 $all_question_id = $test_by_id->questions()->get();
                 // pobranie wszystkich kategorii
