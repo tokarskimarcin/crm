@@ -32,6 +32,9 @@ body{margin:40px;}
     color: white;
 }
 
+checkbox {
+    display: block
+}
 </style>
 
 <div class="row">
@@ -127,10 +130,23 @@ body{margin:40px;}
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Dodaj ocenę pytania:</label>
-                                <select class="form-control input-lg" name="question_result[]">
+                                <select class="form-control input-lg validate_selector" name="question_result[]">
+                                    <option value="-1">Wybierz ocenę</option>
                                     <option value="1">Zaliczone</option>
                                     <option value="0">Niezaliczone</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group" style="margin-top: 35px">
+                                <label style="float: left; margin-right: 10px;">Zatwierdź ocenę</label>     
+                                <input type="checkbox" style="display: block; width: 20px; height: 20px;" class="check_validate" name="vehicle" value="Bike">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label></label>
+                                <span></span>
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -185,9 +201,31 @@ body{margin:40px;}
 
 $(document).ready(function() {
 
-    $('#send_opinion').click(function() {
-        $('#send_opinion').attr('disabled', true);
-        $('#checkForm').submit();
+    $('#send_opinion').click(function(e) {
+        e.preventDefault();
+
+        var wrong_validation = 0;
+        var validation = true;
+
+        $('.validate_selector').each(function(key, value) {
+            
+            var newKey = key;
+            if ($(value).val() == -1) {
+                swal('Wybierz ocenę w pytaniu nr ' + (newKey + 1))
+                validation =  false;
+            }
+        });
+
+        if ($('.check_validate').not(':checked').length > 0) {
+            swal('Zatwierdź wszystkie oceny!')
+            validation = false;
+        }
+
+        if (validation == true) {
+            $('#send_opinion').attr('disabled', true);
+            $('#checkForm').submit();
+        }
+       
     });
 });
 
