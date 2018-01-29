@@ -281,7 +281,8 @@ class TestsController extends Controller
     {
         if($request->ajax())
         {
-            $query = TestQuestion::where('category_id',$request->category_id)->get();
+            $query = TestQuestion::where('category_id',$request->category_id)
+                ->where('deleted','=',0)->get();
             return datatables($query)
                 ->rawColumns(['content'])
                 ->make(true);
