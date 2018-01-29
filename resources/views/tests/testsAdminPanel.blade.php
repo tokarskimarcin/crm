@@ -24,7 +24,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="alert gray-nav">Testy / Zarządanie testami</div>
+            <div class="alert gray-nav">Testy / Zarządanie pytaniami</div>
         </div>
     </div>
 </div>
