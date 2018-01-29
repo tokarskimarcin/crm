@@ -79,7 +79,7 @@
                         <div class="col-lg-4">
                             <div class="panel panel-info">
                                 <div class="panel-heading">Test dla: </div>
-                                <select class="selectpicker form-control"  disabled id="user_select" name="link_privilages[]" title="Brak wybranych użytkowników" multiple data-actions-box="true">
+                                <select class="form-control " id="user_select"  name="link_privilages[]" title="Brak wybranych użytkowników">
                                     @foreach($users as $user)
                                         @if($test_by_id->user_id == $user->id)
                                             <option selected value={{$user->id}}>{{$user->last_name.' '.$user->first_name}}</option>
