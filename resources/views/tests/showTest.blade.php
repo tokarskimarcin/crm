@@ -115,8 +115,8 @@
                                 </a>
                             </td>
                             <td>
-                                <a class="btn btn-default" href="{{ URL::to('/view_test') }}/{{$test->id}}">
-                                    <span style="color: green" class="glyphicon glyphicon glyphicon-pencil"></span> Edytuj
+                                <a class="btn btn-default deactivate" id="{{$test->id}}" onclick="deactivate(this)">
+                                    <span style="color: red" class="glyphicon glyphicon-remove"></span> Cofnij aktywację
                                 </a>
                             </td>
                         </tr>
@@ -254,6 +254,41 @@ function change(e) {
             if (response == 1) {
                 swal({
                     title: 'Test został aktywowany!',
+                    type: 'success',
+                    timer: 3000
+                }).then((result) => {
+                    location.reload();
+                })
+            } else {
+                swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
+            }
+        },
+        error: function(response) {
+            swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!')
+        }
+    });
+}
+
+/*
+    Funkcja deaktywująca test dla pracownika
+*/
+function deactivate(e) {
+    //pobranie id testu do aktywacji
+    var test_id = $(e).attr('id');
+
+    $.ajax({
+        type: "POST",
+        url: '{{ route('api.deactivateTest') }}',
+        data: {
+            "id":test_id
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            if (response == 1) {
+                swal({
+                    title: 'Test został dezaktywowany!',
                     type: 'success',
                     timer: 3000
                 }).then((result) => {

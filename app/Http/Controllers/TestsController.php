@@ -1161,6 +1161,24 @@ class TestsController extends Controller
     }
 
     /**
+     * Funkcja dezaktywujaca test
+     */
+    public function deactivateTest(Request $request) {
+        if ($request->ajax()) {
+            $checkTest = UserTest::find($request->id);
+            
+            if ($checkTest == null) {
+                return 0;
+            }
+
+            $checkTest->status = 1;
+            $checkTest->save();
+
+            return 1;
+        }
+    }
+
+    /**
      * Metoda zapisująca podjęcie próby rozwiązania zadania 
      * 
      * @param Request 

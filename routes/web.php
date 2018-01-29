@@ -107,6 +107,8 @@ Route::POST('/datatableShowUncheckedTests','TestsController@datatableShowUncheck
 
 Route::POST('/activateTest','TestsController@activateTest')->name('api.activateTest');
 
+Route::POST('/deactivateTest','TestsController@deactivateTest')->name('api.deactivateTest');
+
 Route::POST('/testAttempt','TestsController@testAttempt')->name('api.testAttempt');
 
 Route::POST('/getRepeatQuestion','TestsController@getRepeatQuestion')->name('api.getRepeatQuestion'); //tu zmienic z ORM
