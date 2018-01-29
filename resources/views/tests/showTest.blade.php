@@ -96,7 +96,8 @@
                         <td class="sm-col-th">Data</td>
                         <td>Użytkownik</td>
                         <td>Nazwa testu</td>
-                        <td class="sm-col-th">Szczegóły</td>
+                        <td class="md-col-th">Szczegóły</td>
+                        <td class="md-col-th">Edytuj</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -111,6 +112,11 @@
                             <td>
                                 <a class="btn btn-default" href="{{ URL::to('/test_result') }}/{{$test->id}}">
                                     <span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły
+                                </a>
+                            </td>
+                            <td>
+                                <a class="btn btn-default" href="{{ URL::to('/view_test') }}/{{$test->id}}">
+                                    <span style="color: green" class="glyphicon glyphicon glyphicon-pencil"></span> Edytuj
                                 </a>
                             </td>
                         </tr>
