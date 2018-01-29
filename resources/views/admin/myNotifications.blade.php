@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Twoje zgłoszenia</h1>
+            <div class="alert gray-nav ">Pomoc / Moje zgłoszenia</div>
         </div>
     </div>
 </div>
@@ -16,7 +16,7 @@
 @endif
 
     <div class="table-responsive">
-        <table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <table id="datatable" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%">
             <thead>
                 <tr>
                     <th style="width: 20%">Data:</th>

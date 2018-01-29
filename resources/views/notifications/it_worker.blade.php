@@ -3,10 +3,10 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 <div class="row">
-    <div class="col-lg-12">
-        <h1 class="page-header">
-            <span id="page_title">Profil pracownika IT</span>
-        </h1>
+    <div class="col-md-12">
+        <div class="page-header">
+            <div class="alert gray-nav ">Pomoc / Profil pracownika IT</div>
+        </div>
     </div>
 </div>
 @php

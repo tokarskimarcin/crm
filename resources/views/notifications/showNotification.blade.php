@@ -2,8 +2,10 @@
 @section('content')
 
 <div class="row">
-    <div class="col-lg-12">
-        <h1 class="page-header">Opis problemu</h1>
+    <div class="col-md-12">
+        <div class="page-header">
+            <div class="alert gray-nav ">Pomoc / Opis problemu</div>
+        </div>
     </div>
 </div>
 
@@ -61,7 +63,7 @@
             <p>
               <form method="POST" action="{{URL::to('/show_notification/')}}/{{$notification->id}}" id="form_status">
                   <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                  <div class="col-md-3">
+                  <div class="col-md-4">
                       <div class="form-group ">
                         <label for="status_change">Zmień status:</label>
                         <select style="font-size:18px;" @if(($notification->status == 2 &&  $notification->displayed_by != Auth::user()->id) || $notification->status == 3) disabled @endif class="form-control" name="status" id="status_change">
@@ -77,7 +79,7 @@
               </form>
             </p>
             <p>
-              <div class="col-md-6">
+              <div class="col-md-8">
               <form method="POST" action="{{URL::to('/add_comment_notifications/')}}/{{$notification->id}}" id="form_comment">
                   <input type="hidden" name="_token" value="{{ csrf_token() }}">
                   <div class="form-group">
@@ -98,11 +100,15 @@
             @if($notification->comments != null)
               <h3>Komentarze:</h3>
               @foreach($notification->comments as $comment)
-                  <div class="well">
-                      <p><b>Dodał: {{$comment->user->first_name . ' ' . $comment->user->last_name}}</b></p>
-                      <small>Data dodania: {{$comment->created_at}}</small>
-                      <p>{{$comment->content}}</p>
-                  </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Dodał: {{$comment->user->first_name . ' ' . $comment->user->last_name}}
+                        </div>
+                        <div class="panel-body">
+                            <small>Data dodania: {{$comment->created_at}}</small>
+                            <p>{{$comment->content}}</p>
+                        </div>
+                    </div>
               @endforeach
             @endif
             </div>

@@ -29,26 +29,30 @@
       }
 
 </style>
+
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Ocena wykonania zgłoszenia</h1>
+            <div class="alert gray-nav ">Pomoc / Ocena wykonania zgłoszenia</div>
         </div>
     </div>
 </div>
+
 <div class="row">
     <div class="col-md-12">
-      <div class="panel panel-info">
-          <div class="panel-heading"><b>ID zgłoszenia {{$notification->id}}</b></div>
-          <div class="panel-body">
-              <p><b>Tytuł:</b></p>
-              <p>{{$notification->title}}</p>
-              <hr>
-              <p><b>Treść:</b></p>
-              <p>{{$notification->content}}</p>
-              <hr>
-          </div>
-      </div>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <b>ID zgłoszenia {{$notification->id}}</b>
+            </div>
+            <div class="panel-body">
+                <p><b>Tytuł:</b></p>
+                <p>{{$notification->title}}</p>
+                <hr>
+                <p><b>Treść:</b></p>
+                <p>{{$notification->content}}</p>
+                <hr>
+            </div>
+        </div>
     </div>
 </div>
 
