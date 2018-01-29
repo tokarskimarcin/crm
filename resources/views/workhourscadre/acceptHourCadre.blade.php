@@ -29,8 +29,10 @@
 
     {{--Header page --}}
     <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Akceptacja Godzin Kadry</h1>
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="alert gray-nav ">Godziny Kadra / Akceptacja Godzin Kadry</div>
+            </div>
         </div>
     </div>
 
@@ -46,7 +48,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-lg-8">
+                        <div class="col-lg-12">
                             <div id="start_stop">
                                 <div id="collapseOne" class="panel-collapse collapse in">
                                     <div class="panel-body">
@@ -87,13 +89,13 @@
 
             <div class="panel panel-default"  id="panel2">
                 <div class="panel-heading">
-                    Raport
+                    Godziny pracy
                 </div>
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="table-responsive col-md-12">
-                                <table id="datatable"  class="table table-striped table-bordered" cellspacing="0" width="100%">
+                                <table id="datatable"  class="table thead-inverse table-striped table-bordered" cellspacing="0" width="100%">
                                     <thead>
                                     <tr>
                                         <th>Data</th>
