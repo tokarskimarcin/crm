@@ -337,7 +337,8 @@ class TestsController extends Controller
             //usunięcie wszystkich pytań danego testu
             $test_id = $request->test_id;
             $status = UserTest::find($test_id);
-            $all_users = User::whereIn('id',$request->id_user)->get();
+            $all_users = User::where('id',$request->id_user)->get();
+
             $find_template = TemplateUserTest::where('id',$request->template_id)->get();
             if($status != null ) {
                 if (($all_users->count() == count($request->id_user) && $all_users->count() == 1) && ($request->template_id == 0 || ($find_template->count() == 1))) {
@@ -353,10 +354,10 @@ class TestsController extends Controller
                         // usunięcie testu
                         UserTest::where('id', '=', $test_id)->delete();
 
-                        for ($i = 0; $i < count($request->id_user); $i++) {
+
                             $new_test = new UserTest();
                             $new_test->cadre_id = Auth::user()->id;
-                            $new_test->user_id = $request->id_user[$i];
+                            $new_test->user_id = $request->id_user;
                             $new_test->status = 1;
                             $new_test->template_id = $request->template_id;
                             $new_test->name = $request->subject;
@@ -375,7 +376,7 @@ class TestsController extends Controller
                                 $new_many_to_many->test_question_id = $item['id'];
                                 $new_many_to_many->save();
                             }
-                        }
+
                         Session::put('message_ok', "Test został zmieniony!");
                         return 1;
                     }
