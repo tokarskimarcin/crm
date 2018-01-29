@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTemplateQuestion extends Migration
+class CreateAttemptStatus extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ class CreateTemplateQuestion extends Migration
      */
     public function up()
     {
-//        Schema::create('template_questions', function (Blueprint $table) {
-//            $table->integer('template_id');
-//            $table->integer('question_id');
-//            $table->integer('question_time');
-//        });
+        Schema::create('attempt_status', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->integer('status')->default(0);
+            $table->timestamps();
+        });
     }
 
     /**
@@ -27,6 +28,6 @@ class CreateTemplateQuestion extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('template_question');
+        //
     }
 }

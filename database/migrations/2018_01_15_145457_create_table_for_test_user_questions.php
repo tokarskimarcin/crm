@@ -13,10 +13,10 @@ class CreateTableForTestUserQuestions extends Migration
      */
     public function up()
     {
-        Schema::create('test_users_questions', function (Blueprint $table) {
-            $table->integer('test_question_id');
-            $table->integer('user_question_id');
-        });
+//        Schema::create('test_users_questions', function (Blueprint $table) {
+//            $table->integer('test_question_id');
+//            $table->integer('user_question_id');
+//        });
     }
 
     /**

@@ -13,14 +13,14 @@ class CreateTestCategoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('test_categories', function (Blueprint $table) {
-            $table->increments('id');
-            $table->char('name');
-            $table->integer('user_id');
-            $table->integer('cadre_id');
-            $table->integer('deleted');
-            $table->timestamps();
-        });
+//        Schema::create('test_categories', function (Blueprint $table) {
+//            $table->increments('id');
+//            $table->char('name');
+//            $table->integer('user_id');
+//            $table->integer('cadre_id');
+//            $table->integer('deleted');
+//            $table->timestamps();
+//        });
     }
 
     /**

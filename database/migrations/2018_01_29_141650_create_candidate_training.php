@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTemplateQuestion extends Migration
+class CreateCandidateTraining extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateTemplateQuestion extends Migration
      */
     public function up()
     {
-//        Schema::create('template_questions', function (Blueprint $table) {
-//            $table->integer('template_id');
-//            $table->integer('question_id');
-//            $table->integer('question_time');
-//        });
+        Schema::create('candidate_training', function (Blueprint $table) {
+            $table->integer('training_id'); //FK
+            $table->integer('candidate_id'); //FK
+        });
     }
 
     /**
@@ -27,6 +26,6 @@ class CreateTemplateQuestion extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('template_question');
+        //
     }
 }
