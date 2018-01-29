@@ -2,13 +2,15 @@
 @section('content')
 
 <div class="row">
-    <div class="col-lg-12">
-        <h1 class="page-header">Pracownicy działu HR</h1>
+    <div class="col-md-12">
+        <div class="page-header">
+            <div class="alert gray-nav ">Dział HR / Pracownicy działu HR</div>
+        </div>
     </div>
 </div>
 
 <div class="table-responsive">
-    <table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
+    <table id="datatable" class="table thead-inverse table-striped table-bordered" cellspacing="0" width="100%">
         <thead>
         <tr>
             <th>Imię</th>

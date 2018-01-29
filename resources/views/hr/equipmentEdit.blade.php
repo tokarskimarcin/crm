@@ -2,8 +2,10 @@
 @section('content')
 
 <div class="row">
-    <div class="col-lg-12">
-        <h1 class="page-header">Edytuj sprzęt firmowy</h1>
+    <div class="col-md-12">
+        <div class="page-header">
+            <div class="alert gray-nav ">Dział HR / Sprzęt Firmowy / Edytuj sprzęt firmowy</div>
+        </div>
     </div>
 </div>
 
@@ -20,12 +22,15 @@
 <div class="row">
     <div class="col-lg-12">
         <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Dane Sprzętu</h3>
+            </div>
             <div class="panel-body">
                 <form method="POST" action="{{URL::to('/edit_equipment/')}}/{{$equipment->id}}" id="add_equipment">
                   <input type="hidden" name="equipment_type" value="{{$equipment->equipment_type_id}}">
                   <input type="hidden" name="user_set" value="{{$equipment->user_id}}">
                   <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <label for="model">Typ</label>
                             <input disabled id="model" type="text" value="{{$equipment->equipment_type->name}}" class="form-control" />

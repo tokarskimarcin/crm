@@ -16,7 +16,7 @@
         <div class="panel-body">
             <form class="form-horizontal" method="post" action="add_consultant" id="consultant_add">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                <div class="col-md-10">
+                <div class="col-md-12">
 
                     <div class=" col-md-6 col-lg-6 ">
                         <table class="table table-user-information">

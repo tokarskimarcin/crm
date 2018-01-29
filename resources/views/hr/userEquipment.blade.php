@@ -1,9 +1,8 @@
 @if($user->equipments->count() > 0)
 
-    <div class=" col-md-10 col-lg-10 ">
+    <div class=" col-md-12 col-lg-12 ">
           <table class="table table-user-information">
               <tbody>
-                  <b style="font-size: 20px; font-family: sans-serif;">Posiadany Sprzęt</b>
                   <tr>
                     <td style="width: 10px;"><b>Lp.</b></td>
                     <td><b>Data Wyd.</b></td>

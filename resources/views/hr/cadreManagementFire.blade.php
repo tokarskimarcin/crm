@@ -12,9 +12,12 @@
     </style>
 
 {{--Header page --}}
+
     <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Kadra Informacje(konta dezaktywowane)</h1>
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="alert gray-nav ">Dział HR / Kadra Informacje(konta dezaktywowane)</div>
+            </div>
         </div>
     </div>
 
