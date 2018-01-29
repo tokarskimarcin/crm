@@ -15,7 +15,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="alert gray-nav">Testy / Gotowe Szablony</div>
+            <div class="alert gray-nav">Testy / Wszystkie szablony</div>
         </div>
     </div>
 </div>
