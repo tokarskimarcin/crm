@@ -76,7 +76,7 @@
             </div>
             <div class="panel panel-default"  id="panel2">
                 <div class="panel-heading">
-                    Raport
+                    Godziny pracy:
                 </div>
                 <div class="panel-body">
                     <div class="row">

@@ -12,7 +12,7 @@
     <div class="col-md-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                Wybierz zakres dat
+                Zakres wyszukiwania:
             </div>
             <div class="panel-body">
                     <form method="POST" action="{{URL::to('/timesheet/')}}">

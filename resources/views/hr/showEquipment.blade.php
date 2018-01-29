@@ -4,8 +4,10 @@
 
 {{--Header page --}}
 <div class="row">
-    <div class="col-lg-12">
-        <h1 class="page-header">Sprzęt Firmowy</h1>
+    <div class="col-md-12">
+        <div class="page-header">
+            <div class="alert gray-nav ">Dział HR / Sprzęt Firmowy</div>
+        </div>
     </div>
 </div>
 @if (Session::has('message_ok'))
@@ -35,7 +37,7 @@
 <br />
 
 <div class="table-responsive" id="div_laptop">
-    <table id="laptop" class="table table-striped table-bordered" cellspacing="0" width="100%">
+    <table id="laptop" class="table thead-inverse table-striped table-bordered" cellspacing="0" width="100%">
       <thead>
       <tr>
           <td>Model</td>
@@ -55,7 +57,7 @@
     </table>
 </div>
 <div class="table-responsive" style="display: none" id="div_tablet">
-    <table id="tablet" class="table table-striped table-bordered" cellspacing="0" width="100%" >
+    <table id="tablet" class="table thead-inverse table-striped table-bordered" cellspacing="0" width="100%" >
       <thead>
       <tr>
           <td>Model</td>
@@ -74,7 +76,7 @@
     </table>
 </div>
 <div class="table-responsive" style="display: none" id="div_phone">
-    <table id="phone" class="table table-striped table-bordered" cellspacing="0" width="100%" >
+    <table id="phone" class="table thead-inverse table-striped table-bordered" cellspacing="0" width="100%" >
       <thead>
       <tr>
           <td>Model</td>
@@ -93,7 +95,7 @@
     </table>
 </div>
 <div class="table-responsive" style="display: none" id="div_sim_card">
-    <table id="sim_card" class="table table-striped table-bordered" cellspacing="0" width="100%" >
+    <table id="sim_card" class="table thead-inverse table-striped table-bordered" cellspacing="0" width="100%" >
       <thead>
       <tr>
           <td>Typ</td>
@@ -113,7 +115,7 @@
     </table>
 </div>
 <div class="table-responsive" style="display: none" id="div_monitor">
-    <table id="monitor" class="table table-striped table-bordered" cellspacing="0" width="100%" >
+    <table id="monitor" class="table thead-inverse table-striped table-bordered" cellspacing="0" width="100%" >
       <thead>
         <tr>
             <td>Model</td>
@@ -132,7 +134,7 @@
     </table>
 </div>
 <div class="table-responsive" style="display: none" id="div_printer">
-    <table id="printer" class="table table-striped table-bordered" cellspacing="0" width="100%" >
+    <table id="printer" class="table thead-inverse table-striped table-bordered" cellspacing="0" width="100%" >
       <thead>
         <tr>
             <td>Model</td>

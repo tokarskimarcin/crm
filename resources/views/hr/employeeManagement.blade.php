@@ -11,12 +11,19 @@
             padding: 3px;
             box-sizing: border-box;
         }
+        select{
+            color: black;
+        }
+
     </style>
 
 {{--Header page --}}
+
     <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Zarządzaj Pracownikami(Konsultant)</h1>
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="alert gray-nav ">Dział HR / Zarządzaj Pracownikami</div>
+            </div>
         </div>
     </div>
 
@@ -38,7 +45,7 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <div class="panel-body table-responsive">
-                                    <table id="datatable"  class="table table-striped table-bordered" cellspacing="0" width="100%">
+                                    <table id="datatable"  class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
                                         <thead>
                                         <tr>
                                             <th>Imię</th>
