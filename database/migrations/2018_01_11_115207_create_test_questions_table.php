@@ -13,16 +13,16 @@ class CreateTestQuestionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('test_questions', function (Blueprint $table) {
-            $table->increments('id');
-            $table->text('content');
-            $table->integer('category_id');
-            $table->integer('user_id');
-            $table->integer('cadre_by');
-            $table->integer('default_time')->nullable();
-            $table->integer('deleted')->default(0);
-            $table->timestamps();
-        });
+//        Schema::create('test_questions', function (Blueprint $table) {
+//            $table->increments('id');
+//            $table->text('content');
+//            $table->integer('category_id');
+//            $table->integer('user_id');
+//            $table->integer('cadre_by');
+//            $table->integer('default_time')->nullable();
+//            $table->integer('deleted')->default(0);
+//            $table->timestamps();
+//        });
     }
 
     /**

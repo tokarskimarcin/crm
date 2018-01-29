@@ -13,15 +13,15 @@ class CreateUserTestsTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_tests', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('cadre_id');
-            $table->integer('user_id');
-            $table->integer('status')->default(0);
-            $table->integer('result')->nullable();
-            $table->integer('template_id')->default(0);
-            $table->timestamps();
-        });
+//        Schema::create('user_tests', function (Blueprint $table) {
+//            $table->increments('id');
+//            $table->integer('cadre_id');
+//            $table->integer('user_id');
+//            $table->integer('status')->default(0);
+//            $table->integer('result')->nullable();
+//            $table->integer('template_id')->default(0);
+//            $table->timestamps();
+//        });
     }
 
     /**
