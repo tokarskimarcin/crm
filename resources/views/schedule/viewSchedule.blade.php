@@ -46,7 +46,7 @@
                                             <form class="form-horizontal" method="post" action="view_schedule">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <select class="form-control" name="show_schedule" id="week_text" onchange="setTextField(this)" onload="setTextField(this)">
-                                                    @php($date = new DateTime())
+                                                    @php $date = new DateTime();  @endphp
                                                     @for ($i=0; $i < 5; $i++)
                                                         @php
                                                                     $date->modify('last monday');//poniedziałek

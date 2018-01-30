@@ -28,8 +28,10 @@
 @endphp
 @foreach($dkj as $item)
     @if($item->dating_type == 0)
-    @php($create_column = true)
-        @php($create_total_up = true)
+    @php
+        $create_column = true;
+        $create_total_up = true;
+    @endphp
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->first_name . ' ' . $item->last_name}}</td>
@@ -48,7 +50,7 @@
             $total_dkj_deleted += $item->dkj_deleted;
         @endphp
 
-        @php($i++)
+        @php $i++; @endphp
     @endif
 @endforeach
 
@@ -97,8 +99,10 @@
 @endphp
 @foreach($dkj as $item)
     @if($item->dating_type == 1)
-    @php($create_column = true)
-        @php($create_total_down = true)
+    @php
+        $create_column = true;
+        $create_total_down = true;
+    @endphp
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$y}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->first_name . ' ' . $item->last_name}}</td>
@@ -117,7 +121,7 @@
             $total_dkj_deleted += $item->dkj_deleted;
         @endphp
 
-        @php($y++)
+        @php $y++; @endphp
     @endif
 @endforeach
 

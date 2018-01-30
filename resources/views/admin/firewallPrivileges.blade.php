@@ -33,7 +33,7 @@
     </div>
 </div>
 
-@php($i = 0)
+@php $i = 0 @endphp
 
 <div class="row">
     <div class="col-md-6">
@@ -46,7 +46,7 @@
                 <thead>
                 <tbody>
                     @foreach($firewall_privileges as $item)
-                        @php($i++)
+                        @php $i++;  @endphp
                         <tr id="{{$i}}">
                             <td>{{$item->user->last_name . ' ' . $item->user->first_name}}</td>
                             <td>{{$item->updated_at}}</td>

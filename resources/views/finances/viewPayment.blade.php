@@ -78,7 +78,7 @@
                                                                 $students_total = 0;
                                                                 $users_total = 0;
                                                             @endphp
-                                                            @php($wrapper_scroll = 0)
+                                                            @php $wrapper_scroll = 0;  @endphp
                                                             @foreach($salary as $item => $key)
                                                                 @foreach($agencies as $agency)
                                                                     @if($agency->id == $item)
@@ -198,7 +198,7 @@
                                                                                 <td>{{(round($salary_total,2))}} PLN</td>
                                                                             </tr>
                                                                         @endforeach
-                                                                        @php($payment_total += $salary_total_all)
+                                                                        @php $payment_total += $salary_total_all;  @endphp
                                                                         <tr>
                                                                             <td colspan="13"></td>
                                                                             <td style="display: none;"></td>

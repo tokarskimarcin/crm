@@ -33,7 +33,7 @@
 
           {{-- Flag for janky moving notifications--}}
           @if($link->link == 'janky_notification')
-              @php($show_moving_notifications = true)
+              @php $show_moving_notifications = true;  @endphp
           @endif
 
           {{-- Including IT notifications --}}

@@ -18,7 +18,9 @@
     <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Suma</th>
 </tr>
 </thead>
-    @php($i=1)
+    @php
+        $i = 1;
+    @endphp
     <tbody>
     @if(!empty($overall_result) && $overall_result[0]->suma != 0)
     <tr>

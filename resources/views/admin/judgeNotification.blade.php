@@ -57,7 +57,7 @@
 </div>
 
 @if(isset($judgeResult) && $judgeResult != null)
-@php($judgeResult = $judgeResult[0])
+@php $judgeResult = $judgeResult[0];  @endphp
 
 <div class="row">
     <div class="col-md-4">

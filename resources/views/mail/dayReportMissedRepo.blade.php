@@ -15,9 +15,11 @@
 </tr>
 </thead>
   <tbody>
-    @php($i = 1)
-    @php($total_send = 0)
-    @php($total_missed = 0)
+    @php
+        $i = 1;
+        $total_send = 0;
+        $total_missed = 0;
+    @endphp
 
     @foreach($reports as $report)
         <tr>
@@ -27,9 +29,11 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->send}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->missed}}</td>
         </tr>
-        @php($total_send += $report->send)
-        @php($total_missed += $report->missed)
-        @php($i++)
+        @php
+            $total_send += $report->send;
+            $total_missed += $report->missed;
+            $i++;
+        @endphp
     @endforeach
     <tr>
         <td style="border:1px solid #231f20;text-align:center;padding:3px" colspan="1">{{$i}}</td>

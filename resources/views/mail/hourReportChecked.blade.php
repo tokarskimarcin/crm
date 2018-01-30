@@ -16,14 +16,15 @@
 </thead>
     <tbody>
 
-@php($total_success = 0)
-@php($total_dkj_sum = 0)
-
-@php($dep_4 = true)
+@php
+    $total_success = 0;
+    $total_dkj_sum = 0;
+    $dep_4 = true;
+@endphp
 
 @if(isset($reports))
 @foreach($reports as $report)
-@php($column = true)
+@php $column = true; @endphp
     <tr>
         @if($report->department_info_id == 4)
             <td style="border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Wysyłka</td>
@@ -36,20 +37,26 @@
         <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->success}}</td>
            @foreach($dkj as $item)
                   @if($item->department_info_id == $report->department_info_id && ($report->department_info_id != 4 && $report->department_info_id != 13))
-                      @php($avg_department = round(($item->liczba_odsluchanych / $report->success) * 100, 2))
-                      @php($total_dkj_sum += $item->liczba_odsluchanych)
+                      @php
+                          $avg_department = round(($item->liczba_odsluchanych / $report->success) * 100, 2);
+                          $total_dkj_sum += $item->liczba_odsluchanych;
+                      @endphp
                           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->liczba_odsluchanych}}</td>
-                      @php($column = false)
+                      @php $column = false; @endphp
                   @elseif($item->department_info_id == 4 && $report->department_info_id == 4 && $item->wysylka > 0)
-                      @php($avg_department = round(($item->liczba_odsluchanych / $report->success) * 100, 2))
-                      @php($total_dkj_sum += $item->wysylka)
+                      @php
+                           $avg_department = round(($item->liczba_odsluchanych / $report->success) * 100, 2);
+                           $total_dkj_sum += $item->wysylka;
+                      @endphp
                           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->wysylka}}</td>
-                      @php($column = false)
+                      @php $column = false;@endphp
                   @elseif($item->department_info_id == 4 && $report->department_info_id == 13 && $item->badania > 0)
-                      @php($avg_department = round(($item->liczba_odsluchanych / $report->success) * 100, 2))
-                      @php($total_dkj_sum += $item->badania)
+                      @php
+                           $avg_department = round(($item->liczba_odsluchanych / $report->success) * 100, 2);
+                           $total_dkj_sum += $item->badania;
+                      @endphp
                           <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->badania}}</td>
-                      @php($column = false)
+                      @php $column = false; @endphp
                   @endif
            @endforeach
            @if($column == true)
@@ -58,7 +65,7 @@
            @else
               <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$avg_department}} %</td>
            @endif
-           @php($total_success += $report->success)
+           @php $total_success += $report->success; @endphp
     </tr>
 
 @endforeach

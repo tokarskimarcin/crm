@@ -14,12 +14,16 @@
 </tr>
 </thead>
   <tbody>
-@php($total_success = 0)
-@php($total_dkj_sum = 0)
-@php($add_research = true)
+@php
+    $total_success = 0;
+    $total_dkj_sum = 0;
+    $add_research = true;
+@endphp
 
     @foreach($hour_reports as $report)
-    @php($column = true)
+    @php
+        $column = true;
+    @endphp
         <tr>
             @if($report->department_info_id == 4)
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzanie Wysyłka</td>
@@ -32,25 +36,37 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->success}}</td>
             @foreach($dkj as $item)
                 @if($item->department_info_id == $report->department_info_id && ($report->department_info_id != 4))
-                    @php($avg_department = round(($item->dkj_sum / $report->success) * 100, 2))
-                    @php($total_dkj_sum += $item->dkj_sum)
+                    @php
+                        $avg_department = round(($item->dkj_sum / $report->success) * 100, 2);
+                        $total_dkj_sum += $item->dkj_sum;
+                    @endphp
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->dkj_sum}}</td>
-                    @php($column = false)
+                    @php
+                        $column = false;
+                    @endphp
 
                 @elseif($item->department_info_id == $report->department_info_id && $report->department_info_id == 4 && $item->dating_type == 1)
-                    @php($avg_department = round(($item->dkj_sum / $report->success) * 100, 2))
-                    @php($total_dkj_sum += $item->dkj_sum)
+                    @php
+                        $avg_department = round(($item->dkj_sum / $report->success) * 100, 2);
+                        $total_dkj_sum += $item->dkj_sum;
+                    @endphp
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->dkj_sum}}</td>
-                    @php($column = false)
+                    @php
+                        $column = false;
+                    @endphp
 
-                @elseif($report->department_info_id == 13 && $item->department_info_id == 4 && $item->dating_type == 0 && $add_research == true)
-                    @php($avg_department = round(($item->dkj_sum / $report->success) * 100, 2))
-                    @php($total_dkj_sum += $item->dkj_sum)
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->dkj_sum}}</td>
-                    @php($column = false)
-                    @php($add_research = false)
+                    @elseif($report->department_info_id == 13 && $item->department_info_id == 4 && $item->dating_type == 0 && $add_research == true)
+                    @php
+                        $avg_department = round(($item->dkj_sum / $report->success) * 100, 2);
+                        $total_dkj_sum += $item->dkj_sum;
+                    @endphp
+                        <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->dkj_sum}}</td>
+                    @php
+                        $column = false;
+                        $add_research = false;
+                    @endphp
 
-                @endif
+                    @endif
             @endforeach
             @if($column == true)
                <td style="border:1px solid #231f20;text-align:center;padding:3px">0</td>
@@ -58,7 +74,9 @@
             @else
                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$avg_department}} %</td>
             @endif
-            @php($total_success += $report->success)
+            @php
+                $total_success += $report->success;
+            @endphp
         </tr>
     @endforeach
 

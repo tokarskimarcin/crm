@@ -18,7 +18,7 @@
 </tr>
 </thead>
 <tbody>
-@php($all_record = $bisnode +$aggree+$event+$exito+$rest)
+@php $all_record = $bisnode +$aggree+$event+$exito+$rest; @endphp
 <tr>
     <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{1}}</td>
     <td style="border:1px solid #231f20;text-align:center;padding:3px;">Bisnode</td>

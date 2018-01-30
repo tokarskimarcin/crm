@@ -45,9 +45,9 @@
                                                     <select id="hour" name="hour" class="form-control" style="font-size:18px;">
                                                         <option>Wybierz</option>
                                                         @for ($i=9; $i < 22; $i++)
-                                                            @php($godz = $i.':00')
+                                                            @php $godz = $i.':00';  @endphp
                                                             @if ($godz == '9:00')
-                                                                @php($godz = '09:00')
+                                                                @php $godz = '09:00';  @endphp
                                                             @endif
                                                             @if($reports->where('hour',$godz.':00')->isEmpty())
                                                                 <option value={{$godz.':00'}}>{{$godz}}</option>
@@ -119,11 +119,11 @@
                             </tr>
                             </thead>
                             @for ($i=9; $i < 22; $i++)
-                                @php($is_set = 0)
+                                @php $is_set = 0;  @endphp
                                 <tr>
-                                @php($godz = $i.':00')
+                                @php $godz = $i.':00';  @endphp
                                 @if ($godz == '9:00')
-                                    @php($godz = '09:00')
+                                    @php $godz = '09:00';  @endphp
                                 @endif
                                     <td>{{$godz}}</td>
                                     @foreach($reports as $report)

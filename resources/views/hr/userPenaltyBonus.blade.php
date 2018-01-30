@@ -12,7 +12,7 @@
     @else
         <div class="alert alert-info">Ten użytkownik nie ma jeszcze kar/premii!</div>
     @endif
-    @php($limit_event_date = date("Y-m", strtotime("-2 months")))
+    @php $limit_event_date = date("Y-m", strtotime("-2 months"));  @endphp
     @foreach($user->penalty_bonuses->where('status', '!=', 0)->where('event_date', '>=', $limit_event_date.'-01') as $penalty)
         <tr name={{$penalty->id}}>
           <td nowrap="nowrap">{{$penalty->event_date}}</td>

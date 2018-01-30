@@ -36,7 +36,7 @@
     </div>
 </div>
 
-@php($userType = Auth::user()->user_type_id)
+@php $userType = Auth::user()->user_type_id;  @endphp
 @section('script.register')
     <script>
 

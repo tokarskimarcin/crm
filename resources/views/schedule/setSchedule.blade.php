@@ -59,7 +59,7 @@ function getStartAndEndDate($week, $year) {
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <input type="hidden" name="schedule_year" id="schedule_year" value="">
                                                 <select class="form-control" name="show_schedule" id="week_text">
-                                                    @php($date = new DateTime())
+                                                    @php $date = new DateTime();  @endphp
                                                     @for ($i=0; $i < 5; $i++)
                                                         @php
                                                                 $date->modify('last monday');//poniedziałek

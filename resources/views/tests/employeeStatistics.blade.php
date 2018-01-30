@@ -67,9 +67,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php($i = 0)
+                    @php $i = 0;  @endphp
                     @foreach($user->userTests as $test)
-                        @php($i++)
+                        @php $i++;  @endphp
                         <tr>
                             <td>{{$i}}</td>
                             <td>{{$test->name}}</td>

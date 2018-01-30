@@ -106,7 +106,7 @@
                                                     @endphp
 
                                             @foreach($departments as $department)
-                                                @php($item = $summary_month->where('department_info_id',$department->id))
+                                                @php $item = $summary_month->where('department_info_id',$department->id);  @endphp
                                                 @if(empty(count($item)))
                                                     <tr>
                                                         <td>{{$lp++}}</td>
