@@ -19,27 +19,31 @@
 </thead>
     <tbody>
 
-      @php($total_avg_average = 0)
-      @php($total_realRBH = 0)
-      @php($total_sum_success = 0)
-      @php($total_sum_janky_count = 0)
-      @php($total_janky = 0)
-      @php($total_avg_wear_base = 0)
-      @php($total_sum_call_time = 0)
-      @php($count = 0)
-      @php($total_goal = 0)
-      @php($goal = ($days_list['normal_day']) * 1200 +($days_list['weekend_day'] * 500))
+      @php
+          $total_avg_average = 0;
+          $total_realRBH = 0;
+          $total_sum_success = 0;
+          $total_sum_janky_count = 0;
+          $total_janky = 0;
+          $total_avg_wear_base = 0;
+          $total_sum_call_time = 0;
+          $count = 0;
+          $total_goal = 0;
+          $goal = ($days_list['normal_day']) * 1200 +($days_list['weekend_day'] * 500);
+      @endphp
       @foreach($reports as $report)
-        @php($goal = (($days_list['normal_day'] * $report->dep_aim) + ($days_list['weekend_day'] * $report->dep_aim_week)))
-        @php($add_column = true)
+        @php
+            $goal = (($days_list['normal_day'] * $report->dep_aim) + ($days_list['weekend_day'] * $report->dep_aim_week));
+            $add_column = true;
+        @endphp
             <tr>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->dep_name . ' ' . $report->dep_type_name}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->avg_average, 2)}}</td>
                 @foreach($work_hours as $work_hour)
                     @if($work_hour->id == $report->id && $work_hour->realRBH != null)
-                    @php($total_realRBH += $work_hour->realRBH)
+                    @php $total_realRBH += $work_hour->realRBH;@endphp
                         <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($work_hour->realRBH, 2)}}</td>
-                        @php($add_column = false)
+                        @php $add_column = false;@endphp
                     @endif
                 @endforeach
                 @if($add_column == true)
@@ -52,14 +56,16 @@
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->sum_success / $goal) * 100, 2)}} %</td>
             </tr>
 
-            @php($total_avg_average += $report->avg_average)
-            @php($total_sum_success += $report->sum_success)
-            @php($total_sum_janky_count += $report->sum_janky_count)
-            @php($total_janky += $report->sum_janky_count)
-            @php($total_avg_wear_base += $report->avg_wear_base)
-            @php($total_goal += round(($report->sum_success / $goal) * 100, 2))
-            @php($total_sum_call_time += $report->sum_call_time)
-            @php($count++)
+            @php
+                $total_avg_average += $report->avg_average;
+                $total_sum_success += $report->sum_success;
+                $total_sum_janky_count += $report->sum_janky_count;
+                $total_janky += $report->sum_janky_count;
+                $total_avg_wear_base += $report->avg_wear_base;
+                $total_goal += round(($report->sum_success / $goal) * 100, 2);
+                $total_sum_call_time += $report->sum_call_time;
+                $count++;
+        @endphp
         @endforeach
 
       @php

@@ -18,10 +18,11 @@
 </thead>
 <tbody>
 
-@php($i = 1)
-@php($total_badania = 0)
-@php($total_bad_badania = 0)
-
+@php
+    $i = 1;
+    $total_badania = 0;
+    $total_bad_badania = 0;
+@endphp
 @foreach($dkj as $item)
     @if($item->type == 'Badania/Wysyłka' && $item->badania > 0)
         <tr>
@@ -38,9 +39,11 @@
             @endif
 
         </tr>
-        @php($i++)
-        @php($total_badania += $item->badania)
-        @php($total_bad_badania += $item->bad_badania)
+        @php
+            $i++;
+            $total_badania += $item->badania;
+            $total_bad_badania += $item->bad_badania;
+        @endphp
     @elseif($item->type == 'Badania')
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
@@ -55,9 +58,11 @@
                 <td style="border:1px solid #231f20;text-align:center;padding:3px;">0</td>
             @endif
         </tr>
-        @php($i++)
-        @php($total_badania += $item->badania)
-        @php($total_bad_badania += $item->bad_badania)
+        @php
+            $i++;
+            $total_badania += $item->badania;
+            $total_bad_badania += $item->bad_badania;
+        @endphp
     @endif
 
 @endforeach
@@ -97,9 +102,11 @@
 </thead>
 <tbody>
 
-@php($y = 1)
-@php($total_wysylka = 0)
-@php($total_bad_wysylka = 0)
+@php
+    $y = 1;
+    $total_wysylka = 0;
+    $total_bad_wysylka = 0;
+@endphp
 
 @foreach($dkj as $item)
     @if($item->type == 'Badania/Wysyłka' && $item->wysylka > 0)
@@ -116,9 +123,11 @@
                 <td style="border:1px solid #231f20;text-align:center;padding:3px;">0</td>
             @endif
         </tr>
-          @php($y++)
-          @php($total_wysylka += $item->wysylka)
-          @php($total_bad_wysylka += $item->bad_wysylka)
+          @php
+              $y++;
+              $total_wysylka += $item->wysylka;
+              $total_bad_wysylka += $item->bad_wysylka;
+        @endphp
     @elseif($item->type == 'Wysyłka')
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$y}}</td>
@@ -133,9 +142,11 @@
                 <td style="border:1px solid #231f20;text-align:center;padding:3px;">0</td>
             @endif
         </tr>
-          @php($y++)
-          @php($total_wysylka += $item->wysylka)
-          @php($total_bad_wysylka += $item->bad_wysylka)
+          @php
+              $y++;
+              $total_wysylka += $item->wysylka;
+              $total_bad_wysylka += $item->bad_wysylka;
+        @endphp
     @endif
 
 @endforeach

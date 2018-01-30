@@ -18,18 +18,22 @@
 </thead>
 <tbody>
 
-@php($i = 1)
-@php($total_user_sum = 0)
-@php($total_user_janek = 0)
-@php($total_user_not_janek = 0)
-@php($total_work_hour = 0)
-@php($total_avg = 0)
-@php($user_avg = 0)
-@php($user_time_sum = 0)
+@php
+    $i = 1;
+    $total_user_sum = 0;
+    $total_user_janek = 0;
+    $total_user_not_janek = 0;
+    $total_work_hour = 0;
+    $total_avg = 0;
+    $user_avg = 0;
+    $user_time_sum = 0;
+@endphp
 @foreach($dkj as $item)
     @if($item->dating_type == 0)
-    @php($add_column = true)
-        @php($create_total_up = true)
+    @php
+        $add_column = true;
+        $create_total_up = true;
+    @endphp
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->first_name . ' ' . $item->last_name}}</td>
@@ -57,11 +61,13 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$user_avg}}</td>
         </tr>
 
-        @php($total_user_sum += $item->user_sum)
-        @php($total_user_janek += $item->user_janek)
-        @php($total_user_not_janek += $item->user_not_janek)
+        @php
+            $total_user_sum += $item->user_sum;
+            $total_user_janek += $item->user_janek;
+            $total_user_not_janek += $item->user_not_janek;
+            $i++;
+        @endphp
 
-        @php($i++)
     @endif
 @endforeach
 
@@ -104,16 +110,20 @@
 </thead>
 <tbody>
 
-@php($y = 1)
-@php($total_user_sum = 0)
-@php($total_user_janek = 0)
-@php($total_user_not_janek = 0)
-@php($total_work_hour = 0)
-@php($total_avg = 0)
+@php
+    $y = 1;
+    $total_user_sum = 0;
+    $total_user_janek = 0;
+    $total_user_not_janek = 0;
+    $total_work_hour = 0;
+    $total_avg = 0;
+@endphp
 @foreach($dkj as $item)
     @if($item->dating_type == 1)
-        @php($create_total_down = true)
-        @php($add_column = true)
+        @php
+            $create_total_down = true;
+            $add_column = true;
+        @endphp
 
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$y}}</td>
@@ -142,11 +152,12 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$user_avg}}</td>
         </tr>
 
-        @php($total_user_sum += $item->user_sum)
-        @php($total_user_janek += $item->user_janek)
-        @php($total_user_not_janek += $item->user_not_janek)
-
-        @php($y++)
+        @php
+            $total_user_sum += $item->user_sum;
+            $total_user_janek += $item->user_janek;
+            $total_user_not_janek += $item->user_not_janek;
+            $y++;
+        @endphp
     @endif
 @endforeach
 

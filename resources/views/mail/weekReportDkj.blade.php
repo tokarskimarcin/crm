@@ -17,10 +17,12 @@
 </thead>
 <tbody>
 
-@php($i = 1)
-@php($total_all = 0)
-@php($total_good = 0)
-@php($total_bad = 0)
+@php
+    $i = 1;
+    $total_all = 0;
+    $total_good = 0;
+    $total_bad = 0;
+@endphp
 
 @foreach($dkj as $item)
 
@@ -37,10 +39,12 @@
                   <td style="border:1px solid #231f20;text-align:center;padding:3px;">0 %</td>
               @endif
 
-              @php($total_all += $item->wysylka)
-              @php($total_good += $item->wysylka - $item->bad_wysylka)
-              @php($total_bad += $item->bad_wysylka)
-              @php($i++)
+              @php
+                  $total_all += $item->wysylka;
+                  $total_good += $item->wysylka - $item->bad_wysylka;
+                  $total_bad += $item->bad_wysylka;
+                  $i++;
+            @endphp
         </tr>
     @endif
     @if($item->type == 'Badania/Wysyłka' && $item->badania != 0)
@@ -56,10 +60,12 @@
                 <td style="border:1px solid #231f20;text-align:center;padding:3px;">0 %</td>
             @endif
 
-            @php($total_all += $item->badania)
-            @php($total_good += $item->badania - $item->bad_badania)
-            @php($total_bad += $item->bad_badania)
-            @php($i++)
+            @php
+                $total_all += $item->badania;
+                $total_good += $item->badania - $item->bad_badania;
+                $total_bad += $item->bad_badania;
+                $i++;
+          @endphp
       </tr>
     @endif
     @if($item->type == 'Badania')
@@ -75,10 +81,12 @@
                   <td style="border:1px solid #231f20;text-align:center;padding:3px;">0 %</td>
               @endif
         </tr>
-        @php($total_all += $item->badania)
-        @php($total_good += $item->badania - $item->bad_badania)
-        @php($total_bad += $item->bad_badania)
-        @php($i++)
+        @php
+            $total_all += $item->badania;
+            $total_good += $item->badania - $item->bad_badania;
+            $total_bad += $item->bad_badania;
+            $i++;
+        @endphp
     @elseif($item->type == 'Wysyłka')
         <tr>
               <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
@@ -92,10 +100,12 @@
                   <td style="border:1px solid #231f20;text-align:center;padding:3px;">0 %</td>
               @endif
         </tr>
-        @php($total_all += $item->wysylka)
-        @php($total_good += $item->wysylka - $item->bad_wysylka)
-        @php($total_bad += $item->bad_wysylka)
-        @php($i++)
+        @php
+            $total_all += $item->wysylka;
+            $total_good += $item->wysylka - $item->bad_wysylka;
+            $total_bad += $item->bad_wysylka;
+            $i++;
+        @endphp
     @endif
 
 @endforeach
