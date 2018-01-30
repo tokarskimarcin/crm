@@ -23,14 +23,16 @@ class RecruitmentAttemptController extends Controller
     public function addAttemptLevel(Request $request) {
         $attempt_status = new AttemptStatus();
 
-        return $request->name;
-
-        $attempt_status->name = "Rozmowa telefoniczna";
+        $attempt_status->name = $request->name;
         $attempt_status->status = 0;
         $attempt_status->created_at = date('Y-m-d H:i:s');
         $attempt_status->updated_at = date('Y-m-d H:i:s');
         $attempt_status->save();
 
         return 1;
+    }
+
+    public function add_candidate() {
+        return view('recruitment.candidateProfile');
     }
 }

@@ -429,6 +429,13 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/all_tests', 'TestsController@allTestsGet');
     //TESTS STOP//
+
+
+    /**REKRUTACJA START */
+
+    Route::get('add_candidate', 'RecruitmentAttemptController@add_candidate');
+
+    /**REKRUTACJA STOP */
 });
 //////////////////////Testing ORM///////////////
 
