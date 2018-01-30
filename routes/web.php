@@ -120,7 +120,16 @@ Route::POST('/saveEditTemplate','TestsController@saveEditTemplate')->name('api.s
 
 Route::POST('/deleteTester','TestsController@deleteTester')->name('api.deleteTester');
 
+Route::POST('/datatableAllTests','AdminController@datatableAllTests')->name('api.datatableAllTests');
+
 /* TEST AJAX ROUTES STOP */
+
+//** RECRUITMENT AJAX */
+
+Route::POST('/getAttemptLevel', 'RecruitmentAttemptController@getAttemptLevel')->name('api.getAttemptLevel');
+Route::POST('/addAttemptLevel', 'RecruitmentAttemptController@addAttemptLevel')->name('api.addAttemptLevel');
+
+/** */
 
 //********************AJAX*********************** */
 
@@ -191,6 +200,10 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/firewall_privileges', 'AdminController@firewallPrivilegesGet');
     Route::POST('/firewall_privileges', 'AdminController@firewallPrivilegesPost');
+
+    Route::get('/check_all_tests', 'AdminController@check_all_tests');
+
+    Route::get('/show_test_for_admin/{id}', 'AdminController@show_test_for_admin');
     // Admin_Panel --Stop--
 
     // Password change --START--

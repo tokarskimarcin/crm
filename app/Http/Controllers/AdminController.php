@@ -20,6 +20,7 @@ use App\Notifications;
 use Illuminate\Support\Facades\URL;
 use App\Firewall;
 use App\FirewallPrivileges;
+use App\UserTest;
 
 class AdminController extends Controller
 {
@@ -410,6 +411,34 @@ class AdminController extends Controller
                 return 1;
             }
         }
+    }
+
+    public function check_all_tests() {                                                  return view('testorm');
+        return view('admin.all_tests');
+    }
+
+    public function datatableAllTests(Request $request) {
+        $data = DB::table('user_tests')
+            ->select(DB::raw('
+                user_tests.*,
+                first_name,
+                last_name
+            '))
+            ->join('users', 'users.id', 'user_tests.cadre_id')
+            ->get();
+
+        return datatables($data)->make(true);
+    }
+
+    public function show_test_for_admin($id) {
+        $test = UserTest::find($id);
+
+        if ($test == null) {
+            return view('errors.404');
+        }
+        
+        return view('tests.testResult')
+            ->with('test', $test);
     }
 
 }
