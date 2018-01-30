@@ -39,7 +39,7 @@
                 <div class="alert gray-nav ">Testy / Dodaj test</div>
             </div>
        </div>
-<div>
+    </div>
 
 <div class="row">
     <div class="col-lg-12">
