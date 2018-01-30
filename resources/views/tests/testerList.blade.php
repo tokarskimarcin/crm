@@ -52,11 +52,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php($i = 0)
+                    @php $i = 0; @endphp
                     @foreach($testers as $item)
-                        @php($i++)
                         <tr>
-                            <td>{{$i}}</td>
+                            <td>{{++$i}}</td>
                             <td>{{$item->last_name . ' ' . $item->first_name}}</td>
                             <td>
                                 <button class="btn btn-danger remove_user" data-user_id="{{$item->id}}">

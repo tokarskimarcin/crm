@@ -71,9 +71,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php($i = 0)
+                    @php $i = 0;  @endphp
                     @foreach($testCategory as $category)
-                        @php($i++)
+                        @php $i++;  @endphp
                         <tr name="{{$category->id}}">
                             <td style="width: 5%">{{$i}}</td>
                             <td>{{$category->name}}</td>

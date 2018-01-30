@@ -27,7 +27,7 @@
                   @foreach($firewall as $item)
                       <tr>
                           <td>{{$item->ip_address}}</td>
-                          @php($status = ($item->whitelisted == 1) ? 'Zatwierdzony' : 'Niezatwierdzony')
+                          @php $status = ($item->whitelisted == 1) ? 'Zatwierdzony' : 'Niezatwierdzony'; @endphp
                           <td>{{$status}}</td>
                       </tr>
                   @endforeach

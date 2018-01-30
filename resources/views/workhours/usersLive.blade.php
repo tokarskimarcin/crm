@@ -70,54 +70,54 @@
                                                    <br> <span class="glyphicon glyphicon-arrow-down"></span><br>
                                                    {{$item->monday_stop}}
                                                </td>
-                                                @php($start_work = $item->monday_start)
+                                                @php $start_work = $item->monday_start;  @endphp
                                             @elseif($day_number == 1)
                                                 <td>
                                                     {{$item->tuesday_start}}
                                                     <br> <span class="glyphicon glyphicon-arrow-down"></span><br>
                                                     {{$item->tuesday_stop}}
                                                 </td>
-                                                @php($start_work = $item->tuesday_start)
+                                                @php $start_work = $item->tuesday_start;  @endphp
                                             @elseif($day_number == 2)
                                                 <td>
                                                     {{$item->wednesday_start}}
                                                     <br> <span class="glyphicon glyphicon-arrow-down"></span><br>
                                                     {{$item->wednesday_stop}}
                                                 </td>
-                                                @php($start_work = $item->wednesday_start)
+                                                @php $start_work = $item->wednesday_start;  @endphp
                                             @elseif($day_number == 3)
                                                 <td>
                                                     {{$item->thursday_start}}
                                                     <br> <span class="glyphicon glyphicon-arrow-down"></span><br>
                                                     {{$item->thursday_stop}}
                                                 </td>
-                                                @php($start_work = $item->thursday_start)
+                                                @php $start_work = $item->thursday_start;  @endphp
                                             @elseif($day_number == 4)
                                                 <td>
                                                     {{$item->friday_start}}
                                                     <br> <span class="glyphicon glyphicon-arrow-down"></span><br>
                                                     {{$item->friday_stop}}
                                                 </td>
-                                                @php($start_work = $item->friday_start)
+                                                @php $start_work = $item->friday_start;  @endphp
                                             @elseif($day_number == 5)
                                                 <td>
                                                     {{$item->saturday_start}}
                                                     <br> <span class="glyphicon glyphicon-arrow-down"></span><br>
                                                     {{$item->saturday_stop}}
                                                 </td>
-                                                @php($start_work = $item->saturday_start)
+                                                @php $start_work = $item->saturday_start;  @endphp
                                             @elseif($day_number == 6)
                                                 <td>
                                                     {{$item->sunday_start}}
                                                     <br> <span class="glyphicon glyphicon-arrow-down"></span><br>
                                                     {{$item->sunday_stop}}
                                                 </td>
-                                                @php($start_work = $item->sunday_start)
+                                                @php $start_work = $item->sunday_start;  @endphp
                                             @endif
 
                                             @if(isset($work_hour->id))
                                                     @if($work_hour->click_start != null)
-                                                        @php($start_work_click = $work_hour->click_start)
+                                                        @php $start_work_click = $work_hour->click_start;  @endphp
                                                     <td>
                                                         {{($work_hour->click_start)}}
                                                             <br> <span class="glyphicon glyphicon-arrow-down"></span><br>

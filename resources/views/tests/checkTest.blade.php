@@ -84,9 +84,9 @@ checkbox {
 
 <ul class="nav nav-tabs">
     @if($test->result == null)
-        @php($i = 0)
+        @php $i = 0;  @endphp
         @foreach($test->questions as $item)
-            @php($i++)
+            @php $i++;  @endphp
             <li @if($i == 1 && $test->result == null) class="active" @endif>
                 <a data-toggle="tab" href="#question{{$item->id}}">
                     Pytanie nr {{$i}}
@@ -102,9 +102,9 @@ checkbox {
     <div class="tab-content">
 
         @if($test->result == null)
-            @php($i = 0)
+            @php $i = 0;  @endphp
             @foreach($test->questions as $item)
-                @php($i++)
+                @php $i++;  @endphp
                 <div id="question{{$item->id}}" class="tab-pane @if($i == 1 && $test->result == null) fade in active @endif">
                         <div class="form-group" style="margin-top: 30px">
                             <div class="panel panel-info">

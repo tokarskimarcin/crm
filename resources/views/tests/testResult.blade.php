@@ -117,9 +117,9 @@
     </div>
 </div>
 
-@php($i = 0)
+@php $i = 0;  @endphp
 @foreach($test->questions as $item)
-    @php($i++)
+    @php $i++;  @endphp
     <div class="row" id="questions">
         <div class="col-md-12">
             <div class="panel panel-info">

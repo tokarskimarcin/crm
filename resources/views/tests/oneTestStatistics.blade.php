@@ -101,9 +101,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php($i = 0)
+                        @php $i = 0;  @endphp
                         @foreach($test->templateQuestions as $item)
-                            @php($i++)
+                            @php $i++;  @endphp
                             <tr>
                                 <td><b>{{$i}}</b></td>
                                 <td>{{$item->category->name}}</td>

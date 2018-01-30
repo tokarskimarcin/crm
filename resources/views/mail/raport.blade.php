@@ -19,7 +19,7 @@
     </thead>
 <tbody>
 
-@php($i = 1)
+@php $i = 1; @endphp
 @foreach($dkj as $dk)
       @if($dk->type == 'Wysyłka' || $dk->type == 'Badania/Wysyłka')
       <tr>
@@ -31,7 +31,7 @@
           <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$dk->bad}}</td>
           <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($dk->bad / $dk->sum, 2) * 100}} % </td>
       </tr>
-        @php($i++)
+        @php $i++;  @endphp
     @endif
 
 @endforeach
@@ -58,7 +58,7 @@
             </tr>
         </thead>
 <tbody>
-@php($y = 1)
+@php $y = 1;  @endphp
 @foreach($dkj as $dk)
       @if($dk->type == 'Badania' || $dk->type == 'Badania/Wysyłka')
       <tr>
@@ -70,7 +70,7 @@
           <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$dk->bad}}</td>
           <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($dk->bad / $dk->sum, 2) * 100}} % </td>
       </tr>
-        @php($y++)
+        @php $y++;  @endphp
     @endif
 
 @endforeach

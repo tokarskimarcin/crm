@@ -19,7 +19,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                      @php($i = 1)
+                      @php $i = 1;  @endphp
                       @foreach($departments_for_dkj as $department)
                           @if($department->type == 'Badania/Wysyłka')
                               <tr id="{{$department->id}}dkjstatus">
@@ -29,7 +29,7 @@
                                   <td name="count_yanek">0</td>
                                   <td name="undone">0</td>
                               </tr>
-                              @php($i++)
+                              @php $i++;  @endphp
                               <tr id="{{$department->id*(-1)}}dkjstatus">
                                   <td>{{$i}}</td>
                                   <td>{{$department->departments->name . ' ' . $department->department_type->name.' Wysyłka '}}</td>
@@ -46,7 +46,7 @@
                                   <td name="undone">0</td>
                               </tr>
                           @endif
-                          @php($i++)
+                          @php $i++;  @endphp
                       @endforeach
                     </tbody>
                   </table>

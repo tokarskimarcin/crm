@@ -78,7 +78,7 @@
                                                                 $students_total = 0;
                                                                 $users_total = 0;
                                                             @endphp
-                                                            @php($wrapper_scroll = 0)
+                                                            @php $wrapper_scroll = 0;  @endphp
                                                             @foreach($salary as $item => $key)
                                                                 @foreach($agencies as $agency)
                                                                     @if($agency->id == $item)
