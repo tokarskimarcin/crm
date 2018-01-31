@@ -266,9 +266,7 @@ class UsersController extends Controller
         if ($request->user_type != null && $request->user_type != 0) {
             $user->user_type_id = $request->user_type;
         }
-        if($request->status_work == 0) {
-            $user->end_work = $request->stop_date;
-        }
+        $user->end_work = $request->stop_date;
         if($request->password != '')
         {
             $user->password = bcrypt($request->password);
