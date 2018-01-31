@@ -413,7 +413,7 @@ class AdminController extends Controller
         }
     }
 
-    public function check_all_tests() {                                                  return view('testorm');
+    public function check_all_tests() {
         return view('admin.all_tests');
     }
 

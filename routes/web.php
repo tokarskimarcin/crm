@@ -128,6 +128,21 @@ Route::POST('/datatableAllTests','AdminController@datatableAllTests')->name('api
 
 Route::POST('/getAttemptLevel', 'RecruitmentAttemptController@getAttemptLevel')->name('api.getAttemptLevel');
 Route::POST('/addAttemptLevel', 'RecruitmentAttemptController@addAttemptLevel')->name('api.addAttemptLevel');
+Route::POST('/editAttemptLevel', 'RecruitmentAttemptController@editAttemptLevel')->name('api.editAttemptLevel');
+Route::POST('/deleteAttemptLevel', 'RecruitmentAttemptController@deleteAttemptLevel')->name('api.deleteAttemptLevel');
+
+Route::POST('/getCandidateSource', 'RecruitmentAttemptController@getCandidateSource')->name('api.getCandidateSource');
+Route::POST('/addCandidateSource', 'RecruitmentAttemptController@addCandidateSource')->name('api.addCandidateSource');
+Route::POST('/editCandidateSource', 'RecruitmentAttemptController@editCandidateSource')->name('api.editCandidateSource');
+Route::POST('/deleteCandidateSource', 'RecruitmentAttemptController@deleteCandidateSource')->name('api.deleteCandidateSource');
+
+Route::POST('/addNewCandidate', 'RecruitmentAttemptController@addNewCandidate')->name('api.addNewCandidate');
+Route::POST('/editCandidate', 'RecruitmentAttemptController@editCandidate')->name('api.editCandidate');
+
+Route::POST('/startNewRecruitment', 'RecruitmentAttemptController@startNewRecruitment')->name('api.startNewRecruitment');
+Route::POST('/stopRecruitment', 'RecruitmentAttemptController@stopRecruitment')->name('api.stopRecruitment');
+Route::POST('/addRecruitmentLevel', 'RecruitmentAttemptController@addRecruitmentLevel')->name('api.addRecruitmentLevel');
+Route::POST('/addToTraining', 'RecruitmentAttemptController@addToTraining')->name('api.addToTraining');
 
 /** */
 
@@ -433,7 +448,10 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     /**REKRUTACJA START */
 
-    Route::get('add_candidate', 'RecruitmentAttemptController@add_candidate');
+    Route::get('/add_candidate', 'RecruitmentAttemptController@add_candidate');
+    Route::get('/candidateProfile/{id}', 'RecruitmentAttemptController@candidateProfile');
+
+    Route::get('recruitment_resources', 'RecruitmentAttemptController@recruitment_resources');
 
     /**REKRUTACJA STOP */
 });
