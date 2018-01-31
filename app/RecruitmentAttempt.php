@@ -18,4 +18,8 @@ class RecruitmentAttempt extends Model
     public function candidate() {
         return $this->belongsTo('App\Candidate', 'candidate_id');
     }
+
+    public function recruitment_story() {
+        return $this->hasMany('App\RecruitmentStory', 'recruitment_attempt_id');
+    }
 }
