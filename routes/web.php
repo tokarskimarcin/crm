@@ -125,7 +125,8 @@ Route::POST('/datatableAllTests','AdminController@datatableAllTests')->name('api
 /* TEST AJAX ROUTES STOP */
 
 //** RECRUITMENT AJAX */
-
+Route::POST('/datatableTrainingGroupList','GroupTrainingController@datatableTrainingGroupList')->name('api.datatableTrainingGroupList');
+Route::POST('/getGrpupTrainingInfo','GroupTrainingController@getGrpupTrainingInfo')->name('api.getGrpupTrainingInfo');
 Route::POST('/getAttemptLevel', 'RecruitmentAttemptController@getAttemptLevel')->name('api.getAttemptLevel');
 Route::POST('/addAttemptLevel', 'RecruitmentAttemptController@addAttemptLevel')->name('api.addAttemptLevel');
 Route::POST('/editAttemptLevel', 'RecruitmentAttemptController@editAttemptLevel')->name('api.editAttemptLevel');
@@ -447,7 +448,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 
     /**REKRUTACJA START */
-
+    Route::get('add_group_training', 'GroupTrainingController@add_group_training');
     Route::get('/add_candidate', 'RecruitmentAttemptController@add_candidate');
     Route::get('/candidateProfile/{id}', 'RecruitmentAttemptController@candidateProfile');
 
