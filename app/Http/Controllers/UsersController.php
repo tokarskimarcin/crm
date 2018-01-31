@@ -42,14 +42,16 @@ class UsersController extends Controller
     }
     public function uniqueUsername(Request $request)
     {
-       if($request->ajax())
-       {
-          $user = User::where('username',$request->username)->get();
-       }
-       if($user->isEmpty())
-            echo 0;
-       else
-           echo 1;
+        if($request->ajax())
+        {
+            $user = User::where('username', '=',$request->username)->get();
+   
+            if($user->count() > 0) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
     }
 
     public function uniqueEmail(Request $request)

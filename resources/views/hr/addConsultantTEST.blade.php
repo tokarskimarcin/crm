@@ -2,346 +2,346 @@
 @section('style')
 @section('content')
 
-    <!-- Main -->
+<!-- Main -->
 
-        <div class="row">
-            <!-- center left-->
-                <hr>
-                @if (Session::has('message_edit'))
-                    <br />
-                    <div class="alert alert-success">{{ Session::get('message_edit') }}</div>
-                @endif
-                <div class="panel panel-info" style="width: 100%">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Profil Pracownika</h3>
-                    </div>
+<div class="row">
+    <!-- center left-->
+        <hr>
+        @if (Session::has('message_edit'))
+            <br />
+            <div class="alert alert-success">{{ Session::get('message_edit') }}</div>
+        @endif
+        <div class="panel panel-info" style="width: 100%">
+            <div class="panel-heading">
+                <h3 class="panel-title">Profil Pracownika</h3>
+            </div>
 
-                    <div class="panel-body">
-                        <form class="form-horizontal" method="post" action="{{URL::to('/edit_cadre/')}}/{{$user->id}}" id="edit_user">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                            <div class="col-md-12">
+            <div class="panel-body">
+                <form class="form-horizontal" method="post" action="{{URL::to('/edit_cadre/')}}/{{$user->id}}" id="edit_user">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <div class="col-md-12">
 
-                                <div class=" col-md-6 col-lg-6 ">
-                                    <table class="table table-user-information">
-                                        <tbody>
-                                        <b style="font-size: 20px; font-family: sans-serif;">Dane Osobowe</b>
-                                        <tr>
-                                            <td class="td-class"><b>Imię:</b></td>
-                                            <td>
-                                                <input type="text" class="form-control" name="first_name" placeholder="Imię" value="{{$user->first_name}}">
-                                            </td>
-                                        </tr>
-                                        <tr class="alert alert-danger" style="display: none" id="alert_name">
-                                            <td colspan="1">Podaj imie!</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="td-class"><b>Nazwisko:</b></td>
-                                            <td>
-                                                <input type="text" class="form-control" placeholder="Nazwisko" name="last_name"  value="{{$user->last_name}}">
-                                            </td>
-                                        </tr>
-                                        <tr class="alert alert-danger" style="display: none" id="alert_last_name">
-                                            <td colspan="1">Podaj nazwisko!</td>
-                                            <td></td>
-                                        </tr>
-                                        @if($type == 2)
-                                            <tr>
-                                                <td class="td-class"><b>E-mail:</b></td>
-                                                <td>
-                                                    <input type="mail" class="form-control" placeholder="Email" name="email"  value="{{$user->email_off}}">
-                                                </td>
-                                            </tr>
-                                            <tr class="alert alert-danger" style="display: none" id="alert_email">
-                                                <td colspan="1">Podaj adres email!</td>
-                                                <td></td>
-                                            </tr>
-                                            <tr>
-                                                <td class="td-class"><b>Telefon służbowy:</b></td>
-                                                <td>
-                                                    <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="phone" value="{{$user->phone}}">
-                                                </td>
-                                            </tr>
-                                        @endif
-                                        <tr>
-                                            <td class="td-class"><b>Telefon prywatny:</b></td>
-                                            <td>
-                                                <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="private_phone" value="{{$user->private_phone}}">
-                                            </td>
-                                        </tr>
-                                        <tr class="alert alert-danger" style="display: none" id="alert_user_phone">
-                                            <td colspan="1">Podaj telefon pracownika!</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="td-class"><b>Login(Godzinówka):</b></td>
-                                            <td><input type="text" class="form-control" placeholder="Login" name="username" value="{{$user->username}}"></td>
-                                        </tr>
-                                        <tr class="alert alert-danger" style="display: none" id="alert_user_name">
-                                            <td colspan="1">Podaj login!</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr class="alert alert-danger" style="display: none" id="alert_user_name_checked">
-                                            <td colspan="1">Użytkownik o podanej nazwie już istnieje!</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="td-class"><b>Hasło:</b></td>
-                                            <td>
-                                                <input type="text" class="form-control" placeholder="Hasło" name="password"  value="{{base64_decode($user->guid)}}">
-                                            </td>
-                                        </tr>
-                                        <tr class="alert alert-danger" style="display: none" id="alert_pass">
-                                            <td colspan="1">Podaj hasło!</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="td-class"><b>Dokumenty:</b></td>
-                                            <td>
-                                                <select class="form-control" style="font-size:18px;" name="documents" >
-                                                    <option value="1" @if($user->documents == 1) selected @endif>Tak</option>
-                                                    <option value="0" @if($user->documents == 0) selected @endif>Nie</option>
-                                                </select>
-                                            </td>
-                                        </tr>
-                                        <tr class="alert alert-danger" style="display: none" id="alert_documents">
-                                            <td colspan="1">Wybierz jedną z opcji!</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="td-class"><b>Student:</b></td>
-                                            <td>
-                                                <select class="form-control" style="font-size:18px;" name="student">
-                                                    <option value="1" @if($user->student == 1) selected @endif>Tak</option>
-                                                    <option value="0" @if($user->student == 0) selected @endif>Nie</option>
-                                                </select>
-                                            </td>
-                                        </tr>
-                                        <tr class="alert alert-danger" style="display: none" id="alert_student">
-                                            <td colspan="1">Wybierz status studenta!</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="td-class"><b>Agencja:</b></td>
-                                            <td>
-                                                <select class="form-control" style="font-size:18px;" name="agency_id" >
-                                                    @foreach($agencies as $agency)
-                                                        <option value="{{$agency->id}}" @if($user->agency_id == $agency->id) selected @endif>{{$agency->name}}</option>
-                                                    @endforeach
-                                                </select>
-                                            </td>
-                                        </tr>
-                                        <tr class="alert alert-danger" style="display: none" id="alert_agency">
-                                            <td colspan="1">Wybierz agencję!</td>
-                                            <td></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                        <div class=" col-md-6 col-lg-6 ">
+                            <table class="table table-user-information">
+                                <tbody>
+                                <b style="font-size: 20px; font-family: sans-serif;">Dane Osobowe</b>
+                                <tr>
+                                    <td class="td-class"><b>Imię:</b></td>
+                                    <td>
+                                        <input type="text" class="form-control" name="first_name" placeholder="Imię" value="{{$user->first_name}}">
+                                    </td>
+                                </tr>
+                                <tr class="alert alert-danger" style="display: none" id="alert_name">
+                                    <td colspan="1">Podaj imie!</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="td-class"><b>Nazwisko:</b></td>
+                                    <td>
+                                        <input type="text" class="form-control" placeholder="Nazwisko" name="last_name"  value="{{$user->last_name}}">
+                                    </td>
+                                </tr>
+                                <tr class="alert alert-danger" style="display: none" id="alert_last_name">
+                                    <td colspan="1">Podaj nazwisko!</td>
+                                    <td></td>
+                                </tr>
+                                @if($type == 2)
+                                    <tr>
+                                        <td class="td-class"><b>E-mail:</b></td>
+                                        <td>
+                                            <input readonly type="mail" class="form-control" placeholder="Email" name="email"  value="{{$user->email_off}}">
+                                        </td>
+                                    </tr>
+                                    <tr class="alert alert-danger" style="display: none" id="alert_email">
+                                        <td colspan="1">Podaj adres email!</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-class"><b>Telefon służbowy:</b></td>
+                                        <td>
+                                            <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="phone" value="{{$user->phone}}">
+                                        </td>
+                                    </tr>
+                                @endif
+                                <tr>
+                                    <td class="td-class"><b>Telefon prywatny:</b></td>
+                                    <td>
+                                        <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="private_phone" value="{{$user->private_phone}}">
+                                    </td>
+                                </tr>
+                                <tr class="alert alert-danger" style="display: none" id="alert_user_phone">
+                                    <td colspan="1">Podaj telefon pracownika!</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="td-class"><b>Login(Godzinówka):</b></td>
+                                    <td><input readonly type="text" class="form-control" placeholder="Login" name="username" value="{{$user->username}}"></td>
+                                </tr>
+                                <tr class="alert alert-danger" style="display: none" id="alert_user_name">
+                                    <td colspan="1">Podaj login!</td>
+                                    <td></td>
+                                </tr>
+                                <tr class="alert alert-danger" style="display: none" id="alert_user_name_checked">
+                                    <td colspan="1">Użytkownik o podanej nazwie już istnieje!</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="td-class"><b>Hasło:</b></td>
+                                    <td>
+                                        <input type="text" class="form-control" placeholder="Hasło" name="password"  value="{{base64_decode($user->guid)}}">
+                                    </td>
+                                </tr>
+                                <tr class="alert alert-danger" style="display: none" id="alert_pass">
+                                    <td colspan="1">Podaj hasło!</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="td-class"><b>Dokumenty:</b></td>
+                                    <td>
+                                        <select class="form-control" style="font-size:18px;" name="documents" >
+                                            <option value="1" @if($user->documents == 1) selected @endif>Tak</option>
+                                            <option value="0" @if($user->documents == 0) selected @endif>Nie</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="alert alert-danger" style="display: none" id="alert_documents">
+                                    <td colspan="1">Wybierz jedną z opcji!</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="td-class"><b>Student:</b></td>
+                                    <td>
+                                        <select class="form-control" style="font-size:18px;" name="student">
+                                            <option value="1" @if($user->student == 1) selected @endif>Tak</option>
+                                            <option value="0" @if($user->student == 0) selected @endif>Nie</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="alert alert-danger" style="display: none" id="alert_student">
+                                    <td colspan="1">Wybierz status studenta!</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="td-class"><b>Agencja:</b></td>
+                                    <td>
+                                        <select class="form-control" style="font-size:18px;" name="agency_id" >
+                                            @foreach($agencies as $agency)
+                                                <option value="{{$agency->id}}" @if($user->agency_id == $agency->id) selected @endif>{{$agency->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="alert alert-danger" style="display: none" id="alert_agency">
+                                    <td colspan="1">Wybierz agencję!</td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
 
-                                <div class=" col-md-6 col-lg-6 ">
-                                    <table class="table table-user-information">
-                                        <tbody>
-                                        <b style="font-size: 20px; font-family: sans-serif;">Informacje cd</b>
-                                        <tr>
-                                            <td class="td-class"><b>Rozpoczęcie Pracy:</b></td>
-                                            <td>
-                                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                                    <input class="form-control" name="start_date" type="text" value="{{$user->start_work}}" readonly >
-                                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="td-class"><b>Zakończenie Pracy:</b></td>
-                                            <td>
-                                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                                    @if(isset($user->end_work))
-                                                        <input class="form-control stop_date" name="stop_date" type="text" value="{{$user->end_work}}" readonly >
-                                                    @else
-                                                        <input class="form-control stop_date" name="stop_date" type="text" value="{{date('Y-m-d')}}" readonly >
+                        <div class=" col-md-6 col-lg-6 ">
+                            <table class="table table-user-information">
+                                <tbody>
+                                <b style="font-size: 20px; font-family: sans-serif;">Informacje cd</b>
+                                <tr>
+                                    <td class="td-class"><b>Rozpoczęcie Pracy:</b></td>
+                                    <td>
+                                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                            <input class="form-control" name="start_date" type="text" value="{{$user->start_work}}" readonly >
+                                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td-class"><b>Zakończenie Pracy:</b></td>
+                                    <td>
+                                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                            @if(isset($user->end_work))
+                                                <input class="form-control stop_date" name="stop_date" type="text" value="{{$user->end_work}}" readonly >
+                                            @else
+                                                <input class="form-control stop_date" name="stop_date" type="text" value="{{date('Y-m-d')}}" readonly >
+                                            @endif
+
+                                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td-class"><b>Aktualnie zatrudniony</b></td>
+                                    <td>
+                                        <select class="form-control"  style="font-size:18px;" name="status_work" id="status_work">
+                                            <option @if($user->status_work == 1) selected @endif value="1">Tak</option>
+                                            <option @if($user->status_work == 0) selected @endif value="0">Nie</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td-class"><b>Stawka na godzine:</b></td>
+                                    <td>
+                                        <select class="form-control" style="font-size:18px;" name="rate" >
+                                            <option>Nie dotyczy</option>
+                                            @for ($i = 7.00; $i <=14; $i+=0.5)
+                                                <option value="{{number_format ($i,2)}}" @if($user->rate == $i) selected @endif>{{number_format ($i,2)}}</option>
+                                            @endfor
+                                        </select>
+                                    </td>
+                                </tr>
+                                @if($type == 2)
+                                    <tr>
+                                        <td class="td-class"><b>Wynagrodzenie:</b></td>
+                                        <td>
+                                            @if(isset($user->salary))
+                                                <input type="number" class="form-control" placeholder="0" name="salary" value="{{$user->salary}}">
+                                            @else
+                                                <input type="number" class="form-control" placeholder="0" name="salary" value="0">
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-class"><b>Dodatek slużbowy:</b></td>
+                                        <td>
+                                            <input type="number" class="form-control" placeholder="0" name="additional_salary" value="{{$user->additional_salary}}">
+                                        </td>
+                                    </tr>
+                                @endif
+                                <tr>
+                                    <td class="td-class"><b>Całość na konto:</b></td>
+                                    <td>
+                                        <select class="form-control" style="font-size:18px;" name="salary_to_account">
+                                            <option value="1" @if($user->salary_to_account == 1) selected @endif>Tak</option>
+                                            <option value="0" @if($user->salary_to_account == 0) selected @endif>Nie</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="alert alert-danger" style="display: none" id="alert_ck">
+                                    <td colspan="1">Wybierz wartość CK!</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="td-class"><b>Uprawnienia:</b></td>
+                                    <td>
+                                        <select class="form-control" style="font-size:18px;" name="user_type" >
+                                            @foreach($userTypes as $user_type)
+                                                <option value="{{$user_type->id}}" @if($user_type->id == $user->user_type_id) selected @endif>{{$user_type->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="alert alert-danger" style="display: none" id="alert_user_type">
+                                    <td colspan="1">Wybierz uprawnienia!</td>
+                                    <td></td>
+                                </tr>
+                                @if($type == 1)
+                                <tr>
+                                    <td style="width: 170px;height:52px;"><b>Typ:</b></td>
+                                    <td style="width: 170px;height:52px;">
+                                        <select class="form-control" style="font-size:18px;" name="dating_type" id="dating_type">
+                                            @if(Auth::user()->department_info->type == 'Badania')
+                                                <option value="0">Badania</option>
+                                            @elseif(Auth::user()->department_info->type == 'Wysyłka')
+                                                <option value="1">Wysyłka</option>
+                                            @else
+                                                <option value="0" @if($user->dating_type == 0) selected @endif>Badania</option>
+                                                <option value="1" @if($user->dating_type == 1) selected @endif>Wysyłka</option>
+                                            @endif
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="alert alert-danger" style="display: none" id="alert_dating_type">
+                                    <td colspan="1">Wybierz typ użytkownika!</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="td-class"><b>Numer kolejki PBX:</b></td>
+                                    <td>
+                                        <input type="text" class="form-control" placeholder="Login z programu do dzwonienia" name="login_phone" value="{{$user->login_phone}}">
+                                    </td>
+                                </tr>
+                                <tr class="alert alert-danger" style="display: none" id="alert_pbx">
+                                    <td colspan="1">Podaj numer kolejki PBX!</td>
+                                    <td></td>
+                                </tr>
+                                @endif
+                                @if(isset($penalty_bonuses[1]))
+                                    <tr>
+                                        <td class="td-class"><b>Suma kar/premii ({{$month[0]}}):</b></td>
+                                        <td>
+                                            <input disabled type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="{{$penalty_bonuses[0][0]->premia - $penalty_bonuses[0][0]->kara}}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-class"><b>Suma kar/premii ({{$month[1]}}):</b></td>
+                                        <td>
+                                            <input disabled type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="{{$penalty_bonuses[1][0]->premia - $penalty_bonuses[1][0]->kara}}">
+                                        </td>
+                                    </tr>
+                                @elseif(isset($penalty_bonuses[0]))
+                                    <tr>
+                                        <td class="td-class"><b>Suma kar/premii ({{$month[1]}}):</b></td>
+                                        <td>
+                                            <input disabled type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="{{$penalty_bonuses[0][0]->premia - $penalty_bonuses[0][0]->kara}}">
+                                        </td>
+                                    </tr>
+                                @endif
+                                @if($type == 2)
+                                    <tr>
+                                        <td class="td-class"><b>Oddział:</b></td>
+                                        <td>
+                                            <select class="form-control" style="font-size:18px;" name="department_info_id" id="department_info_id">
+                                                @foreach($department_info as $dep)
+                                                    @if($dep->id != 13)
+                                                        <option @if($dep->id == $user->department_info_id) selected @endif value="{{$dep->id}}">{{$dep->departments->name . ' ' . $dep->department_type->name}}</option>
                                                     @endif
-
-                                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                          <td class="td-class"><b>Aktualnie zatrudniony</b></td>
-                                          <td>
-                                              <select class="form-control"  style="font-size:18px;" name="status_work" id="status_work">
-                                                  <option @if($user->status_work == 1) selected @endif value="1">Tak</option>
-                                                  <option @if($user->status_work == 0) selected @endif value="0">Nie</option>
-                                              </select>
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="td-class"><b>Stawka na godzine:</b></td>
-                                            <td>
-                                                <select class="form-control" style="font-size:18px;" name="rate" >
-                                                    <option>Nie dotyczy</option>
-                                                    @for ($i = 7.00; $i <=14; $i+=0.5)
-                                                        <option value="{{number_format ($i,2)}}" @if($user->rate == $i) selected @endif>{{number_format ($i,2)}}</option>
-                                                    @endfor
-                                                </select>
-                                            </td>
-                                        </tr>
-                                        @if($type == 2)
-                                            <tr>
-                                                <td class="td-class"><b>Wynagrodzenie:</b></td>
-                                                <td>
-                                                  @if(isset($user->salary))
-                                                      <input type="number" class="form-control" placeholder="0" name="salary" value="{{$user->salary}}">
-                                                  @else
-                                                      <input type="number" class="form-control" placeholder="0" name="salary" value="0">
-                                                  @endif
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="td-class"><b>Dodatek slużbowy:</b></td>
-                                                <td>
-                                                    <input type="number" class="form-control" placeholder="0" name="additional_salary" value="{{$user->additional_salary}}">
-                                                </td>
-                                            </tr>
-                                        @endif
-                                        <tr>
-                                            <td class="td-class"><b>Całość na konto:</b></td>
-                                            <td>
-                                                <select class="form-control" style="font-size:18px;" name="salary_to_account">
-                                                    <option value="1" @if($user->salary_to_account == 1) selected @endif>Tak</option>
-                                                    <option value="0" @if($user->salary_to_account == 0) selected @endif>Nie</option>
-                                                </select>
-                                            </td>
-                                        </tr>
-                                        <tr class="alert alert-danger" style="display: none" id="alert_ck">
-                                            <td colspan="1">Wybierz wartość CK!</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="td-class"><b>Uprawnienia:</b></td>
-                                            <td>
-                                                <select class="form-control" style="font-size:18px;" name="user_type" >
-                                                    @foreach($userTypes as $user_type)
-                                                        <option value="{{$user_type->id}}" @if($user_type->id == $user->user_type_id) selected @endif>{{$user_type->name}}</option>
-                                                    @endforeach
-                                                </select>
-                                            </td>
-                                        </tr>
-                                        <tr class="alert alert-danger" style="display: none" id="alert_user_type">
-                                            <td colspan="1">Wybierz uprawnienia!</td>
-                                            <td></td>
-                                        </tr>
-                                        @if($type == 1)
-                                        <tr>
-                                            <td style="width: 170px;height:52px;"><b>Typ:</b></td>
-                                            <td style="width: 170px;height:52px;">
-                                              <select class="form-control" style="font-size:18px;" name="dating_type" id="dating_type">
-                                                  @if(Auth::user()->department_info->type == 'Badania')
-                                                      <option value="0">Badania</option>
-                                                  @elseif(Auth::user()->department_info->type == 'Wysyłka')
-                                                      <option value="1">Wysyłka</option>
-                                                  @else
-                                                      <option value="0" @if($user->dating_type == 0) selected @endif>Badania</option>
-                                                      <option value="1" @if($user->dating_type == 1) selected @endif>Wysyłka</option>
-                                                  @endif
-                                              </select>
-                                            </td>
-                                        </tr>
-                                        <tr class="alert alert-danger" style="display: none" id="alert_dating_type">
-                                            <td colspan="1">Wybierz typ użytkownika!</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="td-class"><b>Numer kolejki PBX:</b></td>
-                                            <td>
-                                                <input type="text" class="form-control" placeholder="Login z programu do dzwonienia" name="login_phone" value="{{$user->login_phone}}">
-                                            </td>
-                                        </tr>
-                                        <tr class="alert alert-danger" style="display: none" id="alert_pbx">
-                                            <td colspan="1">Podaj numer kolejki PBX!</td>
-                                            <td></td>
-                                        </tr>
-                                        @endif
-                                        @if(isset($penalty_bonuses[1]))
-                                            <tr>
-                                                <td class="td-class"><b>Suma kar/premii ({{$month[0]}}):</b></td>
-                                                <td>
-                                                    <input disabled type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="{{$penalty_bonuses[0][0]->premia - $penalty_bonuses[0][0]->kara}}">
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="td-class"><b>Suma kar/premii ({{$month[1]}}):</b></td>
-                                                <td>
-                                                    <input disabled type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="{{$penalty_bonuses[1][0]->premia - $penalty_bonuses[1][0]->kara}}">
-                                                </td>
-                                            </tr>
-                                        @elseif(isset($penalty_bonuses[0]))
-                                            <tr>
-                                                <td class="td-class"><b>Suma kar/premii ({{$month[1]}}):</b></td>
-                                                <td>
-                                                    <input disabled type="number" class="form-control" placeholder="0" name="additional_salary_2nd_month" value="{{$penalty_bonuses[0][0]->premia - $penalty_bonuses[0][0]->kara}}">
-                                                </td>
-                                            </tr>
-                                        @endif
-                                        @if($type == 2)
-                                            <tr>
-                                                <td class="td-class"><b>Oddział:</b></td>
-                                                <td>
-                                                    <select class="form-control" style="font-size:18px;" name="department_info_id" id="department_info_id">
-                                                        @foreach($department_info as $dep)
-                                                            @if($dep->id != 13)
-                                                                <option @if($dep->id == $user->department_info_id) selected @endif value="{{$dep->id}}">{{$dep->departments->name . ' ' . $dep->department_type->name}}</option>
-                                                            @endif
-                                                        @endforeach
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                            <tr class="alert alert-danger" style="display: none" id="alert_department">
-                                                <td colspan="1">Wybierz oddział!</td>
-                                                <td></td>
-                                            </tr>
-                                        @endif
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <input type="submit" value="Zapisz zmiany" class="btn btn-success" id="edit_button"/>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                    <div class="panel panel-info" style="width: 100%">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Kary i Premie</h3>
-                        </div>
-
-                        <div class="panel-body">
-                            <div class=" col-md-12 col-lg-12 ">
-    		                  @include('hr.userPenaltyBonus')
-                            </div>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr class="alert alert-danger" style="display: none" id="alert_department">
+                                        <td colspan="1">Wybierz oddział!</td>
+                                        <td></td>
+                                    </tr>
+                                @endif
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-
-                    <div class="panel panel-info" style="width: 100%">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Posiadany Sprzęt</h3>
-                        </div>
-
-                        <div class="panel-body">
-                            <div class=" col-md-12 col-lg-12 ">
-                                @include('hr.userEquipment')
-                            </div>
-                        </div>
+                    <div class="col-md-12">
+                        <input type="submit" value="Zapisz zmiany" class="btn btn-success" id="edit_button"/>
                     </div>
+                </form>
+            </div>
         </div>
 
-    <!--/container-->
-    <!-- /Main -->
-    <div class="modal">
+    <div class="panel panel-info" style="width: 100%">
+        <div class="panel-heading">
+            <h3 class="panel-title">Kary i Premie</h3>
+        </div>
 
+        <div class="panel-body">
+            <div class=" col-md-12 col-lg-12 ">
+                @include('hr.userPenaltyBonus')
+            </div>
+        </div>
     </div>
+
+    <div class="panel panel-info" style="width: 100%">
+        <div class="panel-heading">
+            <h3 class="panel-title">Posiadany Sprzęt</h3>
+        </div>
+
+        <div class="panel-body">
+            <div class=" col-md-12 col-lg-12 ">
+                @include('hr.userEquipment')
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--/container-->
+<!-- /Main -->
+<div class="modal">
+
+</div>
 
 @endsection
 @section('script')

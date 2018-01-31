@@ -348,13 +348,14 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        if(response == '1')
+                        if(response == 1)
                             check = 1;
                     }
                 });
                 if(check == 1) {
                     $('#alert_user_name_checked').fadeIn(1000);
                     validationCheck = false;
+                    return false;
                 } else {
                     $('#alert_user_name').fadeOut(1000);
                     $('#alert_user_name_checked').fadeOut(1000);
@@ -363,36 +364,36 @@
             }
 
             if (email != null) {
-              if (email.trim().length == 0) {
-                  $('#alert_email').fadeIn(1000);
-                  validationCheck = false;
-              }else
-              {
-                  var check = 0;
-                  if(email.length > 0) {
-                      $.ajax({
-                          type: "POST",
-                          async: false,
-                          url: '{{ route('api.uniqueEmail') }}',
-                          data: {"email":email},
-                          headers: {
-                              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                          },
-                          success: function(response) {
-                              if(response == '1')
-                                  check = 1;
-                          }
-                      });
-                      if(check == 1) {
-                          $('#alert_email_checked').fadeIn(1000)
-                          validationCheck = false;
-                      } else {
-                          $('#alert_email').fadeOut(1000);
-                          $('#alert_email_checked').fadeOut(1000);
-                          validationCheck = true;
-                      }
-                  }
-              }
+                if (email.trim().length == 0) {
+                    $('#alert_email').fadeIn(1000);
+                    validationCheck = false;
+                }else
+                {
+                    var check = 0;
+                    if(email.length > 0) {
+                        $.ajax({
+                            type: "POST",
+                            async: false,
+                            url: '{{ route('api.uniqueEmail') }}',
+                            data: {"email":email},
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                if(response == '1')
+                                    check = 1;
+                            }
+                        });
+                        if(check == 1) {
+                            $('#alert_email_checked').fadeIn(1000)
+                            validationCheck = false;
+                        } else {
+                            $('#alert_email').fadeOut(1000);
+                            $('#alert_email_checked').fadeOut(1000);
+                            validationCheck = true;
+                        }
+                    }
+                }
             }
 
             if (first_name.trim().length == 0) {
