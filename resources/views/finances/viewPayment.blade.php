@@ -102,6 +102,7 @@
                                                                                 <th>Lp.</th>
                                                                                 <th>Imię</th>
                                                                                 <th>Nazwisko</th>
+                                                                                <th>Login Godzinówki</th>
                                                                                 <th>Stawka</th>
                                                                                 <th>Średnia</th>
                                                                                 <th>RBH</th>
@@ -183,6 +184,7 @@
                                                                                 <td>{{$row_number++}}</td>
                                                                                 <td>{{($item2->first_name)}}</td>
                                                                                 <td>{{($item2->last_name)}}</td>
+                                                                                <td>{{($item2->username)}}</td>
                                                                                 @if($bonus_per_hour != 0)
                                                                                     <td>{{($item2->rate.'(+'.$bonus_per_hour.')')}} PLN</td>
                                                                                 @else
@@ -204,7 +206,8 @@
                                                                         @endforeach
                                                                         @php $payment_total += $salary_total_all;  @endphp
                                                                         <tr>
-                                                                            <td colspan="13"></td>
+                                                                            <td colspan="14"></td>
+                                                                            <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
@@ -289,7 +292,8 @@
                         $('row c[r^="A"]', sheet).attr( 's', '30' );
                         $('row c[r^="B"]', sheet).attr( 's', '30' );
                         $('row c[r^="C"]', sheet).attr( 's', '30' );
-                        $('row c[r^="H"]', sheet).each( function () {
+                        $('row c[r^="D"]', sheet).attr( 's', '30' );
+                        $('row c[r^="I"]', sheet).each( function () {
                                 if($('is t', this).text() != 'Kara(Janki)')
                                 {
                                     $text = $('is t', this).text();
@@ -301,7 +305,7 @@
                                 }
 
                         });
-                        $('row c[r^="J"]', sheet).each( function () {
+                        $('row c[r^="K"]', sheet).each( function () {
                             if($('is t', this).text() != 'Premia - Kara')
                             {
                                 $text = $('is t', this).text();
@@ -338,7 +342,8 @@
                         $('row c[r^="A"]', sheet).attr( 's', '30' );
                         $('row c[r^="B"]', sheet).attr( 's', '30' );
                         $('row c[r^="C"]', sheet).attr( 's', '30' );
-                        $('row c[r^="H"]', sheet).each( function () {
+                        $('row c[r^="D"]', sheet).attr( 's', '30' );
+                        $('row c[r^="I"]', sheet).each( function () {
                             if($('is t', this).text() != 'Kara(Janki)')
                             {
                                 $text = $('is t', this).text();
@@ -350,7 +355,7 @@
                             }
 
                         });
-                        $('row c[r^="J"]', sheet).each( function () {
+                        $('row c[r^="K"]', sheet).each( function () {
                             if($('is t', this).text() != 'Premia - Kara')
                             {
                                 $text = $('is t', this).text();
@@ -386,7 +391,8 @@
                         $('row c[r^="A"]', sheet).attr( 's', '30' );
                         $('row c[r^="B"]', sheet).attr( 's', '30' );
                         $('row c[r^="C"]', sheet).attr( 's', '30' );
-                        $('row c[r^="H"]', sheet).each( function () {
+                        $('row c[r^="D"]', sheet).attr( 's', '30' );
+                        $('row c[r^="I"]', sheet).each( function () {
                             if($('is t', this).text() != 'Kara(Janki)')
                             {
                                 $text = $('is t', this).text();
@@ -398,7 +404,7 @@
                             }
 
                         });
-                        $('row c[r^="J"]', sheet).each( function () {
+                        $('row c[r^="K"]', sheet).each( function () {
                             if($('is t', this).text() != 'Premia - Kara')
                             {
                                 $text = $('is t', this).text();
