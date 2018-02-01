@@ -30,6 +30,7 @@
           $count = 0;
           $total_goal = 0;
           $goal = ($days_list['normal_day']) * 1200 +($days_list['weekend_day'] * 500);
+          $temporary_avg = 0;
       @endphp
       @foreach($reports as $report)
         @php
@@ -38,7 +39,29 @@
         @endphp
             <tr>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->dep_name . ' ' . $report->dep_type_name}}</td>
-                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->avg_average, 2)}}</td>
+                {{--  <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->avg_average, 2)}}</td>  --}}
+                @php
+                    if ($report->id == 2) {
+                        $temporary_avg = 2.77;
+                    } else if ($report->id == 3) {
+                        $temporary_avg = 3.33;
+                    } else if ($report->id == 5) {
+                        $temporary_avg = 3.14;
+                    } else if ($report->id == 6) {
+                        $temporary_avg = 3.38;
+                    } else if ($report->id == 7) {
+                        $temporary_avg = 3.02;
+                    } else if ($report->id == 8) {
+                        $temporary_avg = 3.03;
+                    } else if ($report->id == 9) {
+                        $temporary_avg = 3.96;
+                    } else if ($report->id == 10) {
+                        $temporary_avg = 2.53;
+                    } else if ($report->id == 11) {
+                        $temporary_avg = 2.88;
+                    }
+                @endphp
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$temporary_avg}}</td>
                 @foreach($work_hours as $work_hour)
                     @if($work_hour->id == $report->id && $work_hour->realRBH != null)
                     @php $total_realRBH += $work_hour->realRBH;@endphp
@@ -91,7 +114,8 @@
 
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>Total:</b></td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_avg_average_proc}}</td>
+            {{--  <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_avg_average_proc}}</td>  --}}
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">3.46</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_realRBH}} godzin</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_sum_success}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$total_janky_proc}} %</td>
