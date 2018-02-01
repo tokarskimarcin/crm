@@ -313,6 +313,7 @@
         });
         // open modal
         $('#myModal').on('show.bs.modal', function() {
+            alert(123);
             clearLeftColumn();
             getGroupTrainingInfo();
         });
@@ -376,6 +377,7 @@
         $('#myModal').on('hidden.bs.modal',function () {
             id_training_group = 0;
             clearModalBasicInfo();
+            clearLeftColumn();
 
         });
         //tabela dostępnych szkoleń
