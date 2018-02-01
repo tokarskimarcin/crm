@@ -159,8 +159,10 @@
                                                                                         for ($step = $department_info->commission_step; $step <= 20; $step = ($step+0.5)) {
                                                                                               $avg_min = ($department_info->commission_avg-0.25)+(0.25*$lp);
                                                                                               $avg_max = $department_info->commission_avg+(0.25*$lp);
-                                                                                              if ($avg >=$avg_min AND $avg < $avg_max) {
+                                                                                              if ($avg > $avg_min AND $avg <= $avg_max) {
                                                                                                   $bonus_per_hour = $step;
+                                                                                              } else if ($avg == $department_info->commission_avg) {
+                                                                                                $bonus_per_hour = $department_info->commission_step;
                                                                                               }
                                                                                           $lp++;
                                                                                         }
