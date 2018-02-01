@@ -144,6 +144,10 @@ Route::POST('/stopRecruitment', 'RecruitmentAttemptController@stopRecruitment')-
 Route::POST('/addRecruitmentLevel', 'RecruitmentAttemptController@addRecruitmentLevel')->name('api.addRecruitmentLevel');
 Route::POST('/addToTraining', 'RecruitmentAttemptController@addToTraining')->name('api.addToTraining');
 
+Route::POST('/uniqueCandidatePhone', 'RecruitmentAttemptController@uniqueCandidatePhone')->name('api.uniqueCandidatePhone');
+
+Route::POST('/datatableShowCandidates', 'CandidateController@datatableShowCandidates')->name('api.datatableShowCandidates');
+
 /** */
 
 //********************AJAX*********************** */
@@ -451,7 +455,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/add_candidate', 'RecruitmentAttemptController@add_candidate');
     Route::get('/candidateProfile/{id}', 'RecruitmentAttemptController@candidateProfile');
 
-    Route::get('recruitment_resources', 'RecruitmentAttemptController@recruitment_resources');
+    Route::get('/recruitment_resources', 'RecruitmentAttemptController@recruitment_resources');
+
+    Route::get('/all_candidates', 'CandidateController@all_candidates');
 
     /**REKRUTACJA STOP */
 });
