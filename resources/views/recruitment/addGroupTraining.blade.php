@@ -56,11 +56,11 @@
 </div>
 
 
-<button data-toggle="modal" class="btn btn-default training_to_modal" data-target="#myModal" data-category_id="{{1}}" title="Dodaj szkolenie" style="margin-bottom: 14px">
+<button data-toggle="modal" class="btn btn-default training_to_modal" data-target="#myModalgroup" data-category_id="{{1}}" title="Dodaj szkolenie" style="margin-bottom: 14px">
     <span class="glyphicon glyphicon-plus"></span> <span>Dodaj szkolenie</span>
 </button>
 
-<div id="myModal" class="modal fade" role="dialog">
+<div id="myModalgroup" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg" style="width: 90%">
         <div class="modal-content">
             <div class="modal-header">
@@ -278,6 +278,7 @@
     $(document).ready(function() {
         var id_training_group = 0;
         var training_group_response;
+        var is_open = 0;
         var action_row =
             '<a class="btn btn-default info_active" href="#">'+
             '<span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły'+
@@ -312,10 +313,13 @@
             forceParse: 0
         });
         // open modal
-        $('#myModal').on('show.bs.modal', function() {
-            alert(123);
-            clearLeftColumn();
-            getGroupTrainingInfo();
+        $('#myModalgroup').on('show.bs.modal', function() {
+            if(is_open == 0)
+            {
+                clearLeftColumn();
+                getGroupTrainingInfo();
+                is_open = 1;
+            }
         });
 
         function clearLeftColumn()
@@ -331,54 +335,76 @@
         }
         // pobranie danych o szkoleniu
         function getGroupTrainingInfo() {
-            $.ajax({
-                type: "POST",
-                url: '{{ route('api.getGrpupTrainingInfo') }}',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                data: {
-                    "id_training_group": id_training_group
-                },
-                success: function (response) {
-                    console.log(response);
-                    training_group_response = response;
-                    if (response.length != 0) {
-                        for (var i = 0; i < response['group_training'].length; i++) {
+            // gdy tworzone jest nowe szkolenie
+            if(id_training_group == 0){
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.getCandidateForGrpupTrainingInfo') }}',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        "id_training_group": id_training_group
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        if (response.length != 0) {
+
+
+                        } else {
+
+                        }
+                    }
+                });
+            }// istniejące
+            else if(id_training_group != 0 ) {
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.getGrpupTrainingInfo') }}',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        "id_training_group": id_training_group
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        training_group_response = response;
+                        if (response.length != 0) {
+                            for (var i = 0; i < response['group_training'].length; i++) {
                                 $("input[name='start_date_training']").val(response['group_training'][i].training_date);
-                                $("input[id='start_time_training']").val(response['group_training'][i].training_hour.slice(0,-3));
+                                $("input[id='start_time_training']").val(response['group_training'][i].training_hour.slice(0, -3));
                                 $("#id_user").val("2826");
                                 $("#training_comment").val(response['group_training'][i].comment);
-                        }
-                        for (var i = 0; i < response['candidate'].length; i++) {
-                            var html = '<a class="list-group-item" id='+response['candidate'][i].id+'>'+
-                                response['candidate'][i].first_name +' '+response['candidate'][i].last_name+
-                                '<input type="checkbox" class="pull-right" style="display: block">'+
-                                '</a>';
-                            if(response['candidate'][i].attempt_status_id == 5)
-                            {
-                                $('#list_candidate').append(html);
-                            }else if(response['candidate'][i].attempt_status_id == 6)
-                            {
-                                $('#list_candidate_choice').append(html);
                             }
+                            for (var i = 0; i < response['candidate'].length; i++) {
+                                var html = '<a class="list-group-item" id=' + response['candidate'][i].id + '>' +
+                                    response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
+                                    '<input type="checkbox" class="pull-right" style="display: block">' +
+                                    '</a>';
+                                if (response['candidate'][i].attempt_status_id == 5) {
+                                    $('#list_candidate').append(html);
+                                } else if (response['candidate'][i].attempt_status_id == 6) {
+                                    $('#list_candidate_choice').append(html);
+                                }
 //                            $("input[name='start_date_training']").val(response['group_training'][i].training_date);
 //                            $("input[id='start_time_training']").val(response['group_training'][i].training_hour.slice(0,-3));
 //                            $("#id_user").val("2826");
 //                            $("#training_comment").val(response['group_training'][i].comment);
-                        }
-                    } else {
+                            }
+                        } else {
 
+                        }
                     }
-                }
-            });
+                });
+            }
         }
         //cancel modal
-        $('#myModal').on('hidden.bs.modal',function () {
-            id_training_group = 0;
-            clearModalBasicInfo();
-            clearLeftColumn();
-
+        $('#myModalgroup').on('hidden.bs.modal',function () {
+                id_training_group = 0;
+                clearModalBasicInfo();
+                clearLeftColumn();
+                is_open = 0;
         });
         //tabela dostępnych szkoleń
         var table_activ_training_group = $('#activ_training_group').DataTable({
@@ -410,7 +436,7 @@
                     //główny wiersz
                     var tr = $(this).closest('tr');
                     id_training_group = tr.attr('id');
-                    $('#myModal').modal("show");
+                    $('#myModalgroup').modal("show");
                 });
             },"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
                 // Dodanie id do wiersza

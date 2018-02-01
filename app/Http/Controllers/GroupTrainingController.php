@@ -27,6 +27,11 @@ class GroupTrainingController extends Controller
         $group_training = GroupTraining::where('status','=',$list_type);
         return datatables($group_training)->make(true);
     }
+    public function getCandidateForGrpupTrainingInfo(Request $request)
+    {
+
+        return 0;
+    }
     public function getGrpupTrainingInfo(Request $request)
     {
         if($request->ajax())
