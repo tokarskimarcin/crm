@@ -18,27 +18,6 @@ class GroupTrainingController extends Controller
             ->where('status_work','=',1)
             ->get();
 
-        $candidate = DB::table('candidate')
-            ->select(DB::raw('
-                recruitment_story.attempt_status_id,
-                recruitment_story.id as max_id,
-                candidate.*         
-            '))
-            ->join('candidate_training', 'candidate_training.candidate_id', 'candidate.id')
-            ->join('group_training', 'group_training.id', 'candidate_training.training_id')
-            ->join('recruitment_story','recruitment_story.candidate_id','candidate.id')
-            ->where('group_training.id','=',2)
-            ->whereIn('recruitment_story.id', function($query){
-                $query->select(DB::raw(
-                    'MAX(recruitment_story.id)'
-                ))
-                    ->from('recruitment_story')
-                    ->groupby('candidate.id');
-            })
-            ->get();
-        dd($candidate);
-
-
         return view('recruitment.addGroupTraining')
             ->with('cadre',$cadre);
     }
@@ -68,9 +47,8 @@ class GroupTrainingController extends Controller
                         'MAX(recruitment_story.id)'
                     ))
                         ->from('recruitment_story')
-                        ->where('call_time', '!=',0);
+                        ->groupby('recruitment_story.candidate_id');
                 })
-                ->groupby('candidate.id')
                 ->get();
             $object_array['group_training'] = $group_training ;
             $object_array['candidate'] = $candidate ;
