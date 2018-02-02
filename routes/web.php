@@ -136,20 +136,23 @@ Route::POST('/deleteAttemptLevel', 'RecruitmentAttemptController@deleteAttemptLe
 
 Route::POST('/getCandidateSource', 'RecruitmentAttemptController@getCandidateSource')->name('api.getCandidateSource');
 Route::POST('/addCandidateSource', 'RecruitmentAttemptController@addCandidateSource')->name('api.addCandidateSource');
-Route::POST('/editCandidateSource', 'RecruitmentAttemptController@editCandidateSource')->name('api.editCandidateSource');
+Route::POST('/editCandidateSource', 'CandidateController@editCandidateSource')->name('api.editCandidateSource');
 Route::POST('/deleteCandidateSource', 'RecruitmentAttemptController@deleteCandidateSource')->name('api.deleteCandidateSource');
 
-Route::POST('/addNewCandidate', 'RecruitmentAttemptController@addNewCandidate')->name('api.addNewCandidate');
-Route::POST('/editCandidate', 'RecruitmentAttemptController@editCandidate')->name('api.editCandidate');
+Route::POST('/addNewCandidate', 'CandidateController@addNewCandidate')->name('api.addNewCandidate');
+Route::POST('/editCandidate', 'CandidateController@editCandidate')->name('api.editCandidate');
+Route::POST('/addInterviewDate', 'RecruitmentAttemptController@addInterviewDate')->name('api.addInterviewDate');
 
-Route::POST('/startNewRecruitment', 'RecruitmentAttemptController@startNewRecruitment')->name('api.startNewRecruitment');
-Route::POST('/stopRecruitment', 'RecruitmentAttemptController@stopRecruitment')->name('api.stopRecruitment');
-Route::POST('/addRecruitmentLevel', 'RecruitmentAttemptController@addRecruitmentLevel')->name('api.addRecruitmentLevel');
-Route::POST('/addToTraining', 'RecruitmentAttemptController@addToTraining')->name('api.addToTraining');
+Route::POST('/startNewRecruitment', 'CandidateController@startNewRecruitment')->name('api.startNewRecruitment');
+Route::POST('/stopRecruitment', 'CandidateController@stopRecruitment')->name('api.stopRecruitment');
+Route::POST('/addRecruitmentLevel', 'CandidateController@addRecruitmentLevel')->name('api.addRecruitmentLevel');
+Route::POST('/addToTraining', 'CandidateController@addToTraining')->name('api.addToTraining');
 
-Route::POST('/uniqueCandidatePhone', 'RecruitmentAttemptController@uniqueCandidatePhone')->name('api.uniqueCandidatePhone');
+Route::POST('/uniqueCandidatePhone', 'CandidateController@uniqueCandidatePhone')->name('api.uniqueCandidatePhone');
 
 Route::POST('/datatableShowCandidates', 'CandidateController@datatableShowCandidates')->name('api.datatableShowCandidates');
+
+Route::POST('/myInterviews', 'RecruitmentAttemptController@myInterviews')->name('api.myInterviews');
 
 /** */
 
@@ -455,12 +458,14 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     /**REKRUTACJA START */
     Route::get('add_group_training', 'GroupTrainingController@add_group_training');
-    Route::get('/add_candidate', 'RecruitmentAttemptController@add_candidate');
-    Route::get('/candidateProfile/{id}', 'RecruitmentAttemptController@candidateProfile');
+    Route::get('/add_candidate', 'CandidateController@add_candidate');
+    Route::get('/candidateProfile/{id}', 'CandidateController@candidateProfile');
 
     Route::get('/recruitment_resources', 'RecruitmentAttemptController@recruitment_resources');
 
     Route::get('/all_candidates', 'CandidateController@all_candidates');
+
+    Route::get('/interviews_all', 'RecruitmentAttemptController@interviewsAllGet');
 
     /**REKRUTACJA STOP */
 });
