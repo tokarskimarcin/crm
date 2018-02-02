@@ -45,6 +45,13 @@
     .search_candidate{
         margin-bottom: 15px;
     }
+    .check{
+        background: #46b8da;
+    }
+    #button_move_area{
+        margin-top: 150px;
+    }
+
 </style>
 
 <div class="row">
@@ -54,7 +61,6 @@
         </div>
     </div>
 </div>
-
 
 <button data-toggle="modal" class="btn btn-default training_to_modal" data-target="#myModalgroup" data-category_id="{{1}}" title="Dodaj szkolenie" style="margin-bottom: 14px">
     <span class="glyphicon glyphicon-plus"></span> <span>Dodaj szkolenie</span>
@@ -102,7 +108,7 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label class="myLabel">Komentarz:</label>
-                                <textarea id="training_comment"></textarea>
+                                <textarea id="training_comment" class="form-control"></textarea>
                             </div>
                         </div>
                     </div>
@@ -113,23 +119,20 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="left_search" placeholder="Wyszukaj kandydata"/>
                                     <div class="input-group-addon">
-                                        <input type="checkbox" class="all-put-right" style="display: block">
+                                        <input type="checkbox" class="all-put-left" style="display: block">
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="left-container">
                                     <div class="list_group" id="list_candidate">
-
                                         <a class="list-group-item">
                                             Jan Kowalski
-                                            <input type="checkbox" class="pull-right" style="display: block">
+                                            <input type="checkbox" class="pull-left" style="display: block">
                                         </a>
-
-
                                         <a class="list-group-item checked">
                                             Jan Kowalski
-                                            <input type="checkbox" class="pull-right" style="display: block">
+                                            <input type="checkbox" class="pull-left" style="display: block">
                                         </a>
 
                                     </div>
@@ -137,8 +140,8 @@
                             </div>
                         </div>
 
-                        <div class="col-md-2">
-                            <button id="move_right" class="btn btn-default center-block add">
+                        <div class="col-md-2" id="button_move_area">
+                            <button id="move_right" class="btn btn-default center-block add" style="margin-bottom: 15px">
                                 <i class="glyphicon glyphicon-chevron-right"></i>
                             </button>
                             <button id="move_left" class="btn btn-default center-block remove">
@@ -275,26 +278,137 @@
 @endsection
 @section('script')
 <script>
+    var candidate_to_left = [];
+    var candidate_to_right = [];
+    var id_training_group = 0;
+    var training_group_response;
+    var is_open = 0;
+    var action_row =
+        '<a class="btn btn-default info_active" href="#">'+
+        '<span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły'+
+        '</a>'+
+        '<a class="btn btn-default end_active" href="#">'+
+        '<span style="color: green" class="glyphicon glyphicon glyphicon-pencil"></span> Zakończ'+
+        '</a>'+
+        '<a class="btn btn-default cancle_active" data-id ={{1}} href="#">'+
+        '<span style="color: green" class="glyphicon glyphicon glyphicon-trash"></span> Anuluj'+
+        '</a>';
+
+    var action_row_end_cancel =
+        '<a class="btn btn-default info_active" href="#">'+
+        '<span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły'+
+        '</a>';
+
+    $('#save_button').on('click',function (e) {
+        var start_date_training = $("input[name='start_date_training']").val();
+        var start_hour_training = $("input[id='start_time_training']").val();
+        var cadre_id = $("#id_user").val();
+        var comment_about_training = $("#training_comment").val();
+        var check_all = true;
+        var avaible_candidate = [];
+        var choice_candidate = [];
+        if(start_hour_training.trim() == 0)
+        {
+            swal("Nie wyznaczyłeś godziny szkolenia.")
+        }else{
+            // wszyscy kandydaci do wyboru
+            $('#list_candidate a').each(function (key, value) {
+                avaible_candidate.push(value.id) ;
+            });
+            // wyszycy kandydaci
+            $('#list_candidate_choice a').each(function (key, value) {
+                choice_candidate.push(value.id) ;
+            });
+
+            $.ajax({
+                type: "POST",
+                url: '{{ route('api.saveGroupTraining') }}',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    "start_date_training":start_date_training,
+                    "start_hour_training":start_hour_training,
+                    "cadre_id": cadre_id,
+                    "comment_about_training":comment_about_training,
+                    "avaible_candidate":avaible_candidate,
+                    "choice_candidate":choice_candidate
+                },
+                success: function (response) {
+
+                }
+            });
+
+        }
+    });
+
+    function onclickRowLeft(e)
+    {
+        var candidate_id = e.id;
+        var a_row = $('#'+candidate_id);
+        var class_name = a_row.attr('class');
+        var candidate_name = a_row.text();
+        class_name = class_name.split(" ");
+
+        //zaznaczony kandydat do szkolenia
+        if(class_name[1] == 'nocheck'){
+            a_row.removeClass('nocheck');
+            a_row.addClass('check');
+            // wpisanie kandydata do tablicy
+            candidate_to_right.push({id:candidate_id,name:candidate_name});
+        }else{ // zaznaczony kandydat do usuniecie ze szkolenia
+            a_row.removeClass('check');
+            a_row.addClass('nocheck');
+            // usunięcie z tablicy
+            removeFunction(candidate_to_right,"id",candidate_id);
+        }
+    }
+    function onclickRowRight(e)
+    {
+        // id kandydata
+        var candidate_id = e.id;
+        //pobranie wirsza z po id kandydata
+        var a_row = $('#'+candidate_id);
+        // wysłuskanie nazwy klasy(czy jest zaznaczona czy nie)
+        var class_name = a_row.attr('class');
+        var candidate_name = a_row.text();
+        class_name = class_name.split(" ");
+
+        //zaznaczony kandydat do szkolenia (dodanie odpowiedniej klasy i wpisanie do tablicy
+        // dzięki której będzie można przepisać z osobę z jednej tabeli do drugiej
+        if(class_name[1] == 'nocheck'){
+            a_row.removeClass('nocheck');
+            a_row.addClass('check');
+            // wpisanie kandydata do tablicy
+            candidate_to_left.push({id:candidate_id,name:candidate_name});
+        }else{ // zaznaczony kandydat do usuniecie ze szkolenia ( odznaczenie)
+            a_row.removeClass('check');
+            a_row.addClass('nocheck');
+            // usunięcie z tablicy po id
+            removeFunction(candidate_to_left,"id",candidate_id);
+        }
+    }
+
+    // Funkcja do usuwania elementów z tablicy no indeksie
+    function removeFunction (myObjects,prop,valu)
+    {
+        var what_delete = null;
+        for(var i=0;i<myObjects.length;i++)
+        {
+            if(myObjects[i][prop] == valu)
+            {
+                what_delete = i;
+                break;
+            }
+        }
+        if(what_delete != null)
+            myObjects.splice(what_delete,1);
+        return myObjects;
+    }
+
+
+
     $(document).ready(function() {
-        var id_training_group = 0;
-        var training_group_response;
-        var is_open = 0;
-        var action_row =
-            '<a class="btn btn-default info_active" href="#">'+
-            '<span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły'+
-            '</a>'+
-            '<a class="btn btn-default end_active" href="#">'+
-            '<span style="color: green" class="glyphicon glyphicon glyphicon-pencil"></span> Zakończ'+
-            '</a>'+
-            '<a class="btn btn-default cancle_active" data-id ={{1}} href="#">'+
-            '<span style="color: green" class="glyphicon glyphicon glyphicon-trash"></span> Anuluj'+
-            '</a>';
-
-        var action_row_end_cancel =
-            '<a class="btn btn-default info_active" href="#">'+
-            '<span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły'+
-            '</a>';
-
         $('.form_date').datetimepicker({
             language: 'pl',
             autoclose: 1,
@@ -312,6 +426,53 @@
             maxView: 1,
             forceParse: 0
         });
+
+        // przeniesienie do prawej tabeli (wybrani użytkownicy)
+        $('#move_right').on('click',function (e) {
+            // kod html z tabelą
+            var html_right_column = '';
+            for(var i = 0;i < candidate_to_right.length; i++)
+            {
+                html_right_column += '<a class="list-group-item nocheck" onclick = "onclickRowRight(this)" id=' + candidate_to_right[i].id + '>' +
+                    candidate_to_right[i].name +
+                    '<input type="checkbox" class="pull-right" style="display: block">' +
+                    '</a>';
+                // usunięcie użytkownika z lewej tabeli
+                $('#'+candidate_to_right[i].id).remove();
+            }
+            $('#list_candidate_choice').append(html_right_column);
+            candidate_to_right = [];
+        });
+
+        $('#move_left').on('click',function (e) { // analogiczne
+            var html_left_column = '';
+            for(var i = 0;i < candidate_to_left.length; i++)
+            {
+                html_left_column += '<a class="list-group-item nocheck" onclick = "onclickRowLeft(this)" id=' + candidate_to_left[i].id + '>' +
+                    candidate_to_left[i].name +
+                    '<input type="checkbox" class="pull-left" style="display: block">' +
+                    '</a>';
+                $('#'+candidate_to_left[i].id).remove();
+            }
+            $('#list_candidate').append(html_left_column);
+            candidate_to_left = [];
+        });
+        // wyszukiwanie
+        $("#left_search").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $(".left-container .list_group a").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
+        // wyszukiwanie
+        $("#right_search").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $(".right-container .list_group a").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
         // open modal
         $('#myModalgroup').on('show.bs.modal', function() {
             if(is_open == 0)
@@ -321,9 +482,11 @@
                 is_open = 1;
             }
         });
-
+        // Czyszczenie kolumn
         function clearLeftColumn()
         {
+            candidate_to_right = [];
+            candidate_to_left = [];
             $(".list_group a").remove();
         }
         // usuniecie podstawowych infromacji o szkoleniu
@@ -339,20 +502,22 @@
             if(id_training_group == 0){
                 $.ajax({
                     type: "POST",
-                    url: '{{ route('api.getCandidateForGrpupTrainingInfo') }}',
+                    url: '{{ route('api.getCandidateForGroupTrainingInfo') }}',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    data: {
-                        "id_training_group": id_training_group
-                    },
+                    data: {},
                     success: function (response) {
-                        console.log(response);
                         if (response.length != 0) {
-
-
-                        } else {
-
+                            for (var i = 0; i < response.length; i++) {
+                                var html = '<a class="list-group-item nocheck" onclick = "onclickRowLeft(this)" id=' + response[i].id + '>' +
+                                    response[i].first_name + ' ' + response[i].last_name +
+                                    '<input type="checkbox" class="pull-left" style="display: block">' +
+                                    '</a>';
+                                if (response[i].attempt_status_id == 5) {
+                                    $('#list_candidate').append(html);
+                                }
+                            }
                         }
                     }
                 });
@@ -360,7 +525,7 @@
             else if(id_training_group != 0 ) {
                 $.ajax({
                     type: "POST",
-                    url: '{{ route('api.getGrpupTrainingInfo') }}',
+                    url: '{{ route('api.getGroupTrainingInfo') }}',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
@@ -368,29 +533,28 @@
                         "id_training_group": id_training_group
                     },
                     success: function (response) {
-                        console.log(response);
                         training_group_response = response;
                         if (response.length != 0) {
                             for (var i = 0; i < response['group_training'].length; i++) {
                                 $("input[name='start_date_training']").val(response['group_training'][i].training_date);
                                 $("input[id='start_time_training']").val(response['group_training'][i].training_hour.slice(0, -3));
-                                $("#id_user").val("2826");
+                                $("#id_user").val(response['group_training'][i].cadre_id);
                                 $("#training_comment").val(response['group_training'][i].comment);
                             }
                             for (var i = 0; i < response['candidate'].length; i++) {
-                                var html = '<a class="list-group-item" id=' + response['candidate'][i].id + '>' +
-                                    response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
-                                    '<input type="checkbox" class="pull-right" style="display: block">' +
-                                    '</a>';
                                 if (response['candidate'][i].attempt_status_id == 5) {
+                                    var html = '<a class="list-group-item nocheck" onclick = "onclickRowLeft(this)" id=' + response['candidate'][i].id + '>' +
+                                        response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
+                                        '<input type="checkbox" class="pull-left" style="display: block">' +
+                                        '</a>';
                                     $('#list_candidate').append(html);
                                 } else if (response['candidate'][i].attempt_status_id == 6) {
+                                    var html = '<a class="list-group-item nocheck" onclick = "onclickRowRight(this)" id=' + response['candidate'][i].id + '>' +
+                                        response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
+                                        '<input type="checkbox" class="pull-right" style="display: block">' +
+                                        '</a>';
                                     $('#list_candidate_choice').append(html);
                                 }
-//                            $("input[name='start_date_training']").val(response['group_training'][i].training_date);
-//                            $("input[id='start_time_training']").val(response['group_training'][i].training_hour.slice(0,-3));
-//                            $("#id_user").val("2826");
-//                            $("#training_comment").val(response['group_training'][i].comment);
                             }
                         } else {
 
