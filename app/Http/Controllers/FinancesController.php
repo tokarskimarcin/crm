@@ -38,6 +38,9 @@ class FinancesController extends Controller
             `users`.`agency_id`,
             `users`.`first_name`,
             `users`.`last_name`,
+            `users`.`username`,
+            `departments`.`name` as dep_name, 
+            `department_type`.`name`  as dep_type,
             `users`.`salary`,
             `users`.`additional_salary`,
             `users`.`student`,
@@ -45,6 +48,10 @@ class FinancesController extends Controller
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "'.$date.'" AND `penalty_bonus`.`type`=1 AND `penalty_bonus`.`status`=1) as `penalty`,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$date.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `bonus`')
             ->where('users.status_work',1)
+            ->join('department_info','department_info.id','users.department_info_id')
+            ->join('departments','departments.id','department_info.id_dep')
+            ->join('department_type','department_type.id','department_info.id_dep_type')
+
             ->orderBy('users.last_name')->get();
         return view('finances.viewPaymentCadre')
             ->with('month',$date)
@@ -260,6 +267,7 @@ class FinancesController extends Controller
             `users`.`agency_id`,
             `users`.`first_name`,
             `users`.`last_name`,
+            `users`.`username`,
             `users`.`rate`,
              SUM( time_to_sec(`work_hours`.`accept_stop`)-time_to_sec(`work_hours`.`accept_start`)) as `sum`,
             `users`.`student`,
@@ -284,7 +292,7 @@ class FinancesController extends Controller
                    `deleted`=0 AND `dkj_status`=1 AND `add_date` LIKE  "'.$month.'"
                     GROUP by `dkj`.`id_user`) h'),'r.id','h.id_user'
                 )
-                ->selectRaw('`agency_id`,`first_name`,`last_name`,`rate`,`sum`,`student`,`documents`,`kara`,`premia`,`success`,
+                ->selectRaw('`agency_id`,`first_name`,`last_name`,`username`,`rate`,`sum`,`student`,`documents`,`kara`,`premia`,`success`,
             `f`.`ods`,
             `h`.`janki`,
             `salary_to_account`')->get();

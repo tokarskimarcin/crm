@@ -104,6 +104,8 @@
                                                                                 <th>Lp.</th>
                                                                                 <th>Imię</th>
                                                                                 <th>Nazwisko</th>
+                                                                                <th>Login Godzinówki</th>
+                                                                                <th>Filia</th>
                                                                                 <th>Podstawa</th>
                                                                                 <th>Dodatek</th>
                                                                                 <th>Premia</th>
@@ -133,6 +135,8 @@
                                                                                 <td>{{$row_number++}}</td>
                                                                                 <td>{{($item2->first_name)}}</td>
                                                                                 <td>{{($item2->last_name)}}</td>
+                                                                                <td>{{($item2->username)}}</td>
+                                                                                <td>{{($item2->dep_name.' '.$item2->dep_type)}}</td>
                                                                                 <td>{{$salary}} PLN</td>
                                                                                 <td>{{$additional_salary}} PLN</td>
                                                                                 <td>{{$bonus}} PLN</td>
@@ -143,7 +147,9 @@
                                                                             </tr>
                                                                         @endforeach
                                                                         <tr>
-                                                                            <td colspan="8"></td>
+                                                                            <td colspan="10"></td>
+                                                                            <td style="display: none;"></td>
+                                                                            <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
