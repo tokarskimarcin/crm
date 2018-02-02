@@ -79,20 +79,6 @@ class RecruitmentAttemptController extends Controller
     }
 
     /**
-     * Funkcja zwracająca widok z templatką dodającą kandydata
-     */
-    public function add_candidate() {
-        $department_info = Department_info::where('id', '!=', 13)->get();
-        $sources = CandidateSource::all();
-        $status = AttemptStatus::all();
-
-        return view('recruitment.newCandidate')
-            ->with('sources', $sources)
-            ->with('status', $status)
-            ->with('department_info', $department_info);
-    }
-
-    /**
      * Funkcja zwracająca wszystkie źródła kandydatów
      */
     public function getCandidateSource(Request $request) {
@@ -148,80 +134,7 @@ class RecruitmentAttemptController extends Controller
         }
     }
 
-    /**
-     * Dodanie nowego kandydata
-     */
-    public function addNewCandidate(Request $request) {
-        if ($request->ajax()) {
-            $candidate = new Candidate();
-
-            $candidate->first_name = $request->candidate_name;
-            $candidate->last_name = $request->candidate_surname;
-            $candidate->phone = $request->candidate_phone;
-            $candidate->department_info_id = $request->candidate_department;
-            $candidate->candidate_source_id = $request->candidate_source;
-            $candidate->comment = $request->candidate_desc;
-            $candidate->cadre_id = Auth::user()->id;
-            $candidate->cadre_edit_id = Auth::user()->id;
-            $candidate->created_at = date('Y-m-d H:i:s');
-            $candidate->updated_at = date('Y-m-d H:i:s');
-
-            $candidate->save();
-
-            return $candidate->id;
-
-            return 1;
-        }
-    }
-
-    /**
-     * Funkcja zwracająca widok z profilem kandydata
-     */
-    public function candidateProfile($id) {
-        $candidate = Candidate::find($id);
-
-        if ($candidate == null) {
-            return view('errors.404');
-        }
-
-        $department_info = Department_info::where('id', '!=', 13)->get();
-        $sources = CandidateSource::all();
-        $status = AttemptStatus::all();
-
-        return view('recruitment.candidateProfile')
-            ->with('sources', $sources)
-            ->with('status', $status)
-            ->with('department_info', $department_info)
-            ->with('candidate', $candidate);
-    }
-
-    /**
-     * Edycja danych kandydata (nie jego etapow rekrutacji)
-     */
-    public function editCandidate(Request $request) {
-        if ($request->ajax()) {
-            $candidate = Candidate::find($request->candidate_id);
-
-            if ($candidate == null) {
-                return view('errors.404');
-            }
-
-            $candidate->first_name = $request->candidate_name;
-            $candidate->last_name = $request->candidate_surname;
-            $candidate->phone = $request->candidate_phone;
-            $candidate->department_info_id = $request->candidate_department;
-            $candidate->candidate_source_id = $request->candidate_source;
-            $candidate->comment = $request->candidate_desc;
-            $candidate->cadre_edit_id = Auth::user()->id;
-            $candidate->updated_at = date('Y-m-d H:i:s');
-
-            $candidate->save();
-
-            return 1;
-        }
-    }
-
-    /**
+     /**
      * Widok z zarządzaniem etapami i źródłami
      */
     public function recruitment_resources() {
@@ -229,122 +142,45 @@ class RecruitmentAttemptController extends Controller
     }
 
     /**
-     * Rozpoczęcie nowej rekrutacji (dla istniejącego kandydata)
+     * Funkcja zwracająca wszystkie rozmowy kwalifikacyjne
      */
-    public function startNewRecruitment(Request $request) {
-        if ($request->ajax()) {
-            $id = $request->candidate_id;
+    public function interviewsAllGet() {
+        $active_recruitments = Candidate::where('cadre_id', '=', Auth::user()->id)->whereNotIn('attempt_status_id', [10])->count();
 
-            /**
-             * Sprawdzenie czy kandydat nie ma już aktywnej rekrutacji
-             */
-            $recruitment_check = RecruitmentAttempt::where('candidate_id', '=', $id)->where('status', '=', 0)->count();
+        $today_interviews = DB::table('recruitment_attempt')
+                ->select(DB::raw('
+                    SUM(candidate.id) as sum
+                '))
+                ->join('candidate', 'candidate.id', 'recruitment_attempt.candidate_id')
+                ->where('candidate.attempt_status_id', '=', 3)
+                ->where('recruitment_attempt.status', '=', 0)
+                ->where('interview_cadre', '=', Auth::user()->id)
+                ->where('recruitment_attempt.interview_date', 'like', date('Y-m-d') . '%')
+                ->get();
 
-            if ($recruitment_check > 0) {
-                return 2;
-            }
-
-            /**
-             * Stworznie nowej rekrutacji
-             */
-            $newAttempt = new RecruitmentAttempt();
-
-            $newAttempt->candidate_id = $id;
-            $newAttempt->status = 0;
-            $newAttempt->cadre_id = Auth::user()->id;
-            $newAttempt->created_at = date('Y-m-d H:i:s');
-            $newAttempt->updated_at = date('Y-m-d H:i:s');
-            
-            $newAttempt->save();
-
-            /**
-             * Dodanie pierwszego atepu w tej rekrutacji
-             */
-            $newStory = new RecruitmentStory();
-
-            $newStory->candidate_id = $id;
-            $newStory->cadre_id = Auth::user()->id;
-            $newStory->cadre_edit_id = Auth::user()->id;
-            $newStory->recruitment_attempt_id = $newAttempt->id;
-            $newStory->attempt_status_id = $request->new_recruitment_status;
-            $newStory->comment = $request->new_recruitment_comment;
-            $newStory->created_at = date('Y-m-d H:i:s');
-            $newStory->updated_at = date('Y-m-d H:i:s');
-
-            $newStory->save();
-
-            return 1;
-        }
+        return view('recruitment.interviewsAll')
+            ->with('today_interviews', $today_interviews[0]->sum)
+            ->with('active_recruitments', $active_recruitments);
     }
 
     /**
-     * Funkcja dezaktywująca rekrutację 
-     * w zależności od flagi:
-     *  0 - zakończenie rekrutacji bez dodawania kandydata jako konsultant
-     *  1 - zakońcenie rekrutacji + dodanie nowego konsultanta
+     * Zwrócenie oczekujących rozmow kwalifikacyjnych
      */
-    public function stopRecruitment(Request $request) {
+    public function myInterviews(Request $request) {
         if ($request->ajax()) {
-            $id = $request->candidate_id;
-            $recruitmentAttempt = RecruitmentAttempt::where('candidate_id', '=', $id)->where('status', '=', 0)->first();
+            $candidates = DB::table('recruitment_attempt')
+                ->select(DB::raw('
+                    recruitment_attempt.*,
+                    candidate.first_name as user_name,
+                    candidate.last_name as user_surname
+                '))
+                ->join('candidate', 'candidate.id', 'recruitment_attempt.candidate_id')
+                ->where('candidate.attempt_status_id', '=', 3)
+                ->where('interview_cadre', '=', Auth::user()->id)
+                ->whereBetween('recruitment_attempt.interview_date', [$request->start_search . ' 00:00:00', $request->stop_search . ' 23:00:00'])
+                ->get();
 
-            if ($recruitmentAttempt == null) {
-                return 0;
-            }
-
-            $recruitmentAttempt->status = 1;
-            $recruitmentAttempt->cadre_edit_id = Auth::user()->id;
-            $recruitmentAttempt->updated_at = date('Y-m-d H:i:s');
-
-            $recruitmentAttempt->save();
-
-            /**
-             * Dodanie etapu w tej rekrutacji
-             */
-            $newStory = new RecruitmentStory();
-
-            $newStory->candidate_id = $id;
-            $newStory->cadre_id = Auth::user()->id;
-            $newStory->cadre_edit_id = Auth::user()->id;
-            $newStory->recruitment_attempt_id = $recruitmentAttempt->id;
-            $newStory->attempt_status_id = $request->stop_recruitment_status;
-            $newStory->comment = $request->stop_recruitment_comment;
-            $newStory->created_at = date('Y-m-d H:i:s');
-            $newStory->updated_at = date('Y-m-d H:i:s');
-
-            $newStory->save();
-
-            return 1;
-        }
-    }
-
-    public function addRecruitmentLevel(Request $request) {
-        if ($request->ajax()) {
-            $id = $request->id;
-
-/**
-             * Dodanie etapu w tej rekrutacji
-             */
-            $newStory = new RecruitmentStory();
-
-            $newStory->candidate_id = $id;
-            $newStory->cadre_id = Auth::user()->id;
-            $newStory->cadre_edit_id = Auth::user()->id;
-            $newStory->recruitment_attempt_id = $recruitmentAttempt->id;
-            $newStory->attempt_status_id = $request->stop_recruitment_status;
-            $newStory->comment = $request->stop_recruitment_comment;
-            $newStory->created_at = date('Y-m-d H:i:s');
-            $newStory->updated_at = date('Y-m-d H:i:s');
-
-            $newStory->save();
-
-            return 1;
-        }
-    }
-
-    public function addToTraining(Request $request) {
-        if ($request->ajax()) {
-            return 1;
+            return $candidates;
         }
     }
 }

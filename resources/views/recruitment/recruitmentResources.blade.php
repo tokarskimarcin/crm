@@ -101,12 +101,12 @@ function getAttemptLevels() {
     fetch('{{ route('api.getAttemptLevel') }}',fetchData)
     .then((res) => res.json())
     .then((data) => {
-        var content = ""
+        var content = "";
 
         $.each(data, (key, value) => {
             content += `
                 <tr id="level${value.id}">
-                    <td>  ${value.name} </td>
+                    <td>${value.name}</td>
                     <td> 
                         <button class="btn btn-link" data-id="${value.id}" onclick="edit_level(this)">
                             <span style="color: green" class="glyphicon glyphicon-pencil"></span>
@@ -139,7 +139,7 @@ function getCandidateSource() {
             $.each(response, (key, value) => {
                 content += `
                     <tr id="source${value.id}">
-                        <td>  ${value.name} </td>
+                        <td>${value.name}</td>
                         <td> 
                             <button class="btn btn-link" data-id="${value.id}" onclick="editSource(this)">
                                 <span style="color: green" class="glyphicon glyphicon-pencil"></span>
@@ -153,7 +153,6 @@ function getCandidateSource() {
                     </tr>
                 `;
             })
-            
             $('#sources').append(content);
         }, error: function(response) {
             swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
@@ -248,7 +247,6 @@ $(document).ready(() => {
     });
 });
 
-
 //Funkcja edytująca etap rekrutacji
 function edit_level(e) {
     //Pobranie id etapu
@@ -262,7 +260,6 @@ function edit_level(e) {
     $(e).find('span').removeClass('glyphicon-pencil').addClass('glyphicon-envelope');
     //podmiana funcki wywołanej przy kliknięciu
     $(e).removeAttr('onclick').attr('onclick', 'saveLevel(this)');
-
 }
 
 function saveLevel(e) {
@@ -345,7 +342,6 @@ function editSource(e) {
     $(e).find('span').removeClass('glyphicon-pencil').addClass('glyphicon-envelope');
     //podmiana funcki wywołanej przy kliknięciu
     $(e).removeAttr('onclick').attr('onclick', 'saveSource(this)');
-
 }
 
 function saveSource(e) {
