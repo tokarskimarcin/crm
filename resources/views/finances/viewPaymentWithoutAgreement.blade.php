@@ -96,6 +96,7 @@
                                                                                 <th>Lp.</th>
                                                                                 <th>Imię</th>
                                                                                 <th>Nazwisko</th>
+                                                                                <th>Login Godzinówki</th>
                                                                                 <th>Stawka</th>
                                                                                 <th>RBH</th>
                                                                                 <th>Podstawa</th>
@@ -157,6 +158,7 @@
                                                                                 <td>{{$row_number++}}</td>
                                                                                 <td>{{($item2->first_name)}}</td>
                                                                                 <td>{{($item2->last_name)}}</td>
+                                                                                <td>{{($item2->username)}}</td>
                                                                                 <td>{{($item2->rate)}} PLN</td>
                                                                                 <td>{{$rbh}}</td>
                                                                                 {{--<td>{{($janky_proc)}} %</td>--}}
@@ -173,7 +175,8 @@
                                                                             $payment_total += $salary_total_all;
                                                                         @endphp
                                                                         <tr>
-                                                                            <td colspan="9"></td>
+                                                                            <td colspan="10"></td>
+                                                                            <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
@@ -251,7 +254,8 @@
                         $('row c[r^="A"]', sheet).attr( 's', '30' );
                         $('row c[r^="B"]', sheet).attr( 's', '30' );
                         $('row c[r^="C"]', sheet).attr( 's', '30' );
-                        $('row c[r^="G"]', sheet).each( function () {
+                        $('row c[r^="D"]', sheet).attr( 's', '30' );
+                        $('row c[r^="H"]', sheet).each( function () {
                             if($('is t', this).text() != 'Kara(Janki)')
                             {
                                 $text = $('is t', this).text();
@@ -300,7 +304,8 @@
                         $('row c[r^="A"]', sheet).attr( 's', '30' );
                         $('row c[r^="B"]', sheet).attr( 's', '30' );
                         $('row c[r^="C"]', sheet).attr( 's', '30' );
-                        $('row c[r^="G"]', sheet).each( function () {
+                        $('row c[r^="D"]', sheet).attr( 's', '30' );
+                        $('row c[r^="H"]', sheet).each( function () {
                             if($('is t', this).text() != 'Kara(Janki)')
                             {
                                 $text = $('is t', this).text();
@@ -348,7 +353,8 @@
                         $('row c[r^="A"]', sheet).attr( 's', '30' );
                         $('row c[r^="B"]', sheet).attr( 's', '30' );
                         $('row c[r^="C"]', sheet).attr( 's', '30' );
-                        $('row c[r^="G"]', sheet).each( function () {
+                        $('row c[r^="D"]', sheet).attr( 's', '30' );
+                        $('row c[r^="H"]', sheet).each( function () {
                             if($('is t', this).text() != 'Kara(Janki)')
                             {
                                 $text = $('is t', this).text();

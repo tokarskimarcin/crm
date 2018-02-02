@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Candidate;
 use App\GroupTraining;
 use App\User;
 use Illuminate\Http\Request;
@@ -24,40 +25,34 @@ class GroupTrainingController extends Controller
     public  function  datatableTrainingGroupList(Request $request)
     {
         $list_type = $request->list_type;
-        $group_training = GroupTraining::where('status','=',$list_type);
+        $group_training = GroupTraining::where('status','=',$list_type)
+        ->where('dapartment_info_id','=',Auth::user()->department_info_id);
         return datatables($group_training)->make(true);
     }
-    public function getCandidateForGrpupTrainingInfo(Request $request)
+    public function getCandidateForGroupTrainingInfo(Request $request)
     {
 
-        return 0;
+        if($request->ajax())
+        {
+            $candidate = Candidate::where('attempt_status_id','=',5)->get();
+            return $candidate;
+        }
     }
-    public function getGrpupTrainingInfo(Request $request)
+    public function getGroupTrainingInfo(Request $request)
     {
         if($request->ajax())
         {
             $group_training = GroupTraining::where('id','=',$request->id_training_group)->get();
-            $candidate = DB::table('candidate')
-                ->select(DB::raw('
-                recruitment_story.attempt_status_id,
-                recruitment_story.id as max_id,
-                candidate.*         
-            '))
-                ->join('candidate_training', 'candidate_training.candidate_id', 'candidate.id')
-                ->join('group_training', 'group_training.id', 'candidate_training.training_id')
-                ->join('recruitment_story','recruitment_story.candidate_id','candidate.id')
-                ->where('group_training.id','=',2)
-                ->whereIn('recruitment_story.id', function($query){
-                    $query->select(DB::raw(
-                        'MAX(recruitment_story.id)'
-                    ))
-                        ->from('recruitment_story')
-                        ->groupby('recruitment_story.candidate_id');
-                })
-                ->get();
+            $candidate =  $candidate = Candidate::whereIn('attempt_status_id',[5,6])->get();
             $object_array['group_training'] = $group_training ;
             $object_array['candidate'] = $candidate ;
             return $object_array;
+        }
+    }
+    public function saveGroupTraining (Request $request)
+    {
+        if($request->ajax()){
+
         }
     }
 }

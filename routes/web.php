@@ -125,10 +125,10 @@ Route::POST('/datatableAllTests','AdminController@datatableAllTests')->name('api
 /* TEST AJAX ROUTES STOP */
 
 //** RECRUITMENT AJAX */
-
-Route::POST('/getCandidateForGrpupTrainingInfo','GroupTrainingController@getCandidateForGrpupTrainingInfo')->name('api.getCandidateForGrpupTrainingInfo');
+Route::POST('/saveGroupTraining', 'GroupTrainingController@saveGroupTraining')->name('api.saveGroupTraining');
+Route::POST('/getCandidateForGroupTrainingInfo','GroupTrainingController@getCandidateForGroupTrainingInfo')->name('api.getCandidateForGroupTrainingInfo');
 Route::POST('/datatableTrainingGroupList','GroupTrainingController@datatableTrainingGroupList')->name('api.datatableTrainingGroupList');
-Route::POST('/getGrpupTrainingInfo','GroupTrainingController@getGrpupTrainingInfo')->name('api.getGrpupTrainingInfo');
+Route::POST('/getGroupTrainingInfo','GroupTrainingController@getGroupTrainingInfo')->name('api.getGroupTrainingInfo');
 Route::POST('/getAttemptLevel', 'RecruitmentAttemptController@getAttemptLevel')->name('api.getAttemptLevel');
 Route::POST('/addAttemptLevel', 'RecruitmentAttemptController@addAttemptLevel')->name('api.addAttemptLevel');
 Route::POST('/editAttemptLevel', 'RecruitmentAttemptController@editAttemptLevel')->name('api.editAttemptLevel');
@@ -153,6 +153,8 @@ Route::POST('/uniqueCandidatePhone', 'CandidateController@uniqueCandidatePhone')
 Route::POST('/datatableShowCandidates', 'CandidateController@datatableShowCandidates')->name('api.datatableShowCandidates');
 
 Route::POST('/myInterviews', 'RecruitmentAttemptController@myInterviews')->name('api.myInterviews');
+
+
 
 /** */
 
