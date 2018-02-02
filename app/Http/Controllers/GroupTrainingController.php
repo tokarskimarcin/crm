@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Candidate;
 use App\CandidateTraining;
 use App\GroupTraining;
+use App\RecruitmentStory;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +28,7 @@ class GroupTrainingController extends Controller
     {
         $list_type = $request->list_type;
         $group_training = GroupTraining::where('status','=',$list_type)
-        ->where('department_info_id','=',Auth::user()->department_info_id);
+            ->where('department_info_id','=',Auth::user()->department_info_id);
         return datatables($group_training)->make(true);
     }
     public function getCandidateForGroupTrainingInfo(Request $request)
@@ -46,10 +47,23 @@ class GroupTrainingController extends Controller
         {
 
             $group_training = GroupTraining::where('id','=',$request->id_training_group)->get();
-            $candidate = Candidate::whereIn('attempt_status_id',[5,6])
-                ->where('department_info_id','=',Auth::user()->department_info_id)->get();
+
+            $candidate_avaible = Candidate::whereIn('attempt_status_id',[5])
+                ->where('department_info_id','=',Auth::user()->department_info_id)->get()
+                ->toArray();
+
+            $candidate_choice = DB::table('candidate')
+                ->select(DB::raw('
+                candidate.*         
+            '))
+                ->join('candidate_training', 'candidate_training.candidate_id', 'candidate.id')
+                ->join('group_training', 'group_training.id', 'candidate_training.training_id')
+                ->where('group_training.id','=',$request->id_training_group)
+                ->get()->toArray();
+            $merge_array = array_merge($candidate_choice,$candidate_avaible);
+
             $object_array['group_training'] = $group_training ;
-            $object_array['candidate'] = $candidate ;
+            $object_array['candidate'] = $merge_array ;
             return $object_array;
         }
     }
@@ -72,7 +86,6 @@ class GroupTrainingController extends Controller
 
             }else if($request->id_training_group != 0){
                 $training = GroupTraining::find($request->id_training_group);
-
             }
             // wypełnienie danych odnośnie szkolenia
             $training->cadre_id = Auth::user()->id;
@@ -99,18 +112,31 @@ class GroupTrainingController extends Controller
                 CandidateTraining::where('training_id','=',$id)->delete();
                 // dodanie nowych kandydatów do szkolenia
                 for($i = 0 ;$i < count($choice_candidate) ; $i++){
-                    $new_relation = new CandidateTraining();
+
                     $candidate = Candidate::find($choice_candidate[$i]);
                     $candidate->attempt_status_id = 6;
+                    $candidate->save();
+                    $candidate_story = RecruitmentStory::where('candidate_id','=',$choice_candidate[$i])
+                        ->orderBy('id', 'desc')->first();
+                    $candidate_story->attempt_status_id = 6;
+                    $candidate_story->save();
+                    $new_relation = new CandidateTraining();
                     $new_relation->training_id = $id;
                     $new_relation->candidate_id = $choice_candidate[$i];
-                    $candidate->save();
                     $new_relation->save();
                 }
-            }
+                for($i =  0 ;$i < count($avaible_candidate) ; $i++){// osoby które zostły zdjęce ze szkolenia( znowu dostepne
+                    $candidate = Candidate::find($avaible_candidate[$i]);
+                    $candidate->attempt_status_id = 5;
+                    $candidate->save();
+                    $candidate_story = RecruitmentStory::where('candidate_id','=',$avaible_candidate[$i])
+                        ->orderBy('id', 'desc')->first();
+                    $candidate_story->attempt_status_id = 5;
+                    $candidate_story->save();
+                }
+                return 1;
+            }else
+                return 0;
         }
     }
 }
-
-
-
