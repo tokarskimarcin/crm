@@ -20,6 +20,7 @@ class GroupTrainingController extends Controller
             ->where('status_work','=',1)
             ->get();
 
+
         return view('recruitment.addGroupTraining')
             ->with('cadre',$cadre);
     }
@@ -46,10 +47,23 @@ class GroupTrainingController extends Controller
         {
 
             $group_training = GroupTraining::where('id','=',$request->id_training_group)->get();
-            $candidate = Candidate::whereIn('attempt_status_id',[5,6])
-                ->where('department_info_id','=',Auth::user()->department_info_id)->get();
+
+            $candidate_avaible = Candidate::whereIn('attempt_status_id',[5])
+                ->where('department_info_id','=',Auth::user()->department_info_id)->get()
+                ->toArray();
+
+            $candidate_choice = DB::table('candidate')
+                ->select(DB::raw('
+                candidate.*         
+            '))
+                ->join('candidate_training', 'candidate_training.candidate_id', 'candidate.id')
+                ->join('group_training', 'group_training.id', 'candidate_training.training_id')
+                ->where('group_training.id','=',$request->id_training_group)
+                ->get()->toArray();
+                $merge_array = array_merge($candidate_choice,$candidate_avaible);
+
             $object_array['group_training'] = $group_training ;
-            $object_array['candidate'] = $candidate ;
+            $object_array['candidate'] = $merge_array ;
             return $object_array;
         }
     }

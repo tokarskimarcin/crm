@@ -540,6 +540,7 @@
                     },
                     success: function (response) {
                         training_group_response = response;
+                        console.log(response);
                         if (response.length != 0) {
                             for (var i = 0; i < response['group_training'].length; i++) {
                                 $("input[name='start_date_training']").val(response['group_training'][i].training_date);
