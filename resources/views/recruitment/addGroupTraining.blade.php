@@ -283,6 +283,7 @@
     var id_training_group = 0;
     var training_group_response;
     var is_open = 0;
+    var saving_type = 1; // 1 - nowy wpis, 0 - edycja
     var action_row =
         '<a class="btn btn-default info_active" href="#">'+
         '<span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły'+
@@ -332,10 +333,12 @@
                     "cadre_id": cadre_id,
                     "comment_about_training":comment_about_training,
                     "avaible_candidate":avaible_candidate,
-                    "choice_candidate":choice_candidate
+                    "choice_candidate":choice_candidate,
+                    "saving_type":saving_type,
+                    "id_training_group" : id_training_group
                 },
                 success: function (response) {
-
+                    console.log(response);
                 }
             });
 
@@ -477,6 +480,9 @@
         $('#myModalgroup').on('show.bs.modal', function() {
             if(is_open == 0)
             {
+                if(saving_type == 1){
+                    $("input[name='start_date_training']").val("{{date('Y-m-d')}}");
+                }
                 clearLeftColumn();
                 getGroupTrainingInfo();
                 is_open = 1;
@@ -538,7 +544,7 @@
                             for (var i = 0; i < response['group_training'].length; i++) {
                                 $("input[name='start_date_training']").val(response['group_training'][i].training_date);
                                 $("input[id='start_time_training']").val(response['group_training'][i].training_hour.slice(0, -3));
-                                $("#id_user").val(response['group_training'][i].cadre_id);
+                                $("#id_user").val(response['group_training'][i].leader_id);
                                 $("#training_comment").val(response['group_training'][i].comment);
                             }
                             for (var i = 0; i < response['candidate'].length; i++) {
@@ -569,6 +575,7 @@
                 clearModalBasicInfo();
                 clearLeftColumn();
                 is_open = 0;
+                saving_type = 1;
         });
         //tabela dostępnych szkoleń
         var table_activ_training_group = $('#activ_training_group').DataTable({
@@ -597,6 +604,7 @@
             ],"fnDrawCallback": function(settings){ // działanie po wyrenderowaniu widoku
                 // po kliknięcu w szczegóły otwórz modal z możliwością edycji
                 $('.info_active').on('click',function (e) {
+                    saving_type = 0;
                     //główny wiersz
                     var tr = $(this).closest('tr');
                     id_training_group = tr.attr('id');
