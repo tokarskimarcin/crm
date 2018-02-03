@@ -17,7 +17,7 @@
         }
         .list-group{
             padding-left: 0;
-            margin-bottom: 20px;
+            margin-bottom: 21px;
         }
         .list-group-item{
             position: relative;
