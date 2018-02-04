@@ -208,12 +208,15 @@
                 <div class="alert alert-success" style = "display:none" id="succes_add_training">
                     <span colspan="1">Szkolenie zostało dodane</span>
                 </div>
+                <div class="alert alert-danger" style = "display:none" id="succes_delete_training">
+                    <span colspan="1">Szkolenie zostało usuniete</span>
+                </div>
                 <div class="panel-body">
                     <div class="row">
                         <ul class="nav nav-tabs" style="margin-bottom: 25px">
                             <li class="active"><a data-toggle="tab" href="#home">Dostępne</a></li>
                             <li><a data-toggle="tab" href="#menu1">Zakończone</a></li>
-                            <li><a data-toggle="tab" href="#menu2">Anulowane</a></li>
+                            <li><a data-toggle="tab" href="#menu2">Usuniete</a></li>
                         </ul>
                         <div class="tab-content">
                             <div id="home" class="tab-pane fade in active">
@@ -268,7 +271,7 @@
                                                     <td>Data</td>
                                                     <td>Godzina</td>
                                                     <td>Liczba osób</td>
-                                                    <td>Anulowane przez</td>
+                                                    <td>Usunieto przez</td>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
@@ -304,7 +307,7 @@
             '<span style="color: green" class="glyphicon glyphicon glyphicon-pencil"></span> Zakończ'+
             '</a>'+
             '<a class="btn btn-default cancle_active" data-id ={{1}} href="#">'+
-            '<span style="color: green" class="glyphicon glyphicon glyphicon-trash"></span> Anuluj'+
+            '<span style="color: green" class="glyphicon glyphicon glyphicon-trash"></span> Usuń'+
             '</a>';
 
         var action_row_end_cancel =
@@ -499,6 +502,8 @@
             });
 
 
+
+
             // przeniesienie do prawej tabeli (wybrani użytkownicy)
             $('#move_right').on('click',function (e) {
                 // kod html z tabelą
@@ -689,6 +694,46 @@
                         var tr = $(this).closest('tr');
                         id_training_group = tr.attr('id');
                         $('#myModalgroup').modal("show");
+                    });
+                    //usunięcie szkolenia
+                    $('.cancle_active').on('click',function (e) {
+                        let id_training_group_to_delete = $(this).closest('tr').attr('id');
+                        swal({
+                            title: 'Jesteś pewien?',
+                            text: "Spowoduje to usuniecie szkolenia, cofnięcie zmian nie będzie możliwe!",
+                            type: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Tak, usuń szkolenie!'
+                        }).then((result) => {
+                            if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                url: '{{ route('api.deleteGroupTraining') }}',
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                data: {
+                                    "id_training_group_to_delete" : id_training_group_to_delete
+                                },
+                                success: function (response) {
+                                    if(response == 1)
+                                    {
+                                        swal(
+                                            'Usunięto szkolenie!',
+                                            'Szkolenie zostało usunięte. Kandydaci zostali umieszczeni w poczekali',
+                                            'success'
+                                        )
+                                        $('#succes_delete_training').fadeIn(1000);
+                                        $('#succes_delete_training').delay(3000).fadeOut(1000);
+                                        table_activ_training_group.ajax.reload();
+
+                                    }
+                                }
+                            });
+                        }
+                    });
                     });
                 },"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
                     // Dodanie id do wiersza

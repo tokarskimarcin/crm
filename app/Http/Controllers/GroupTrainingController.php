@@ -43,6 +43,33 @@ class GroupTrainingController extends Controller
             return $candidate;
         }
     }
+
+    public function deleteGroupTraining(Request $request)
+    {
+        if($request->ajax())
+        {
+            // zmiana statusu szkolenia na usuniete
+            $training_id = $request->id_training_group_to_delete;
+            $training_grou = GroupTraining::find($training_id);
+            $training_grou->status = 0;
+            $training_grou->edit_cadre_id = Auth::user()->id;
+            if($training_grou->save()){
+
+                 $all_candidate = CandidateTraining::where('training_id','=',$training_id)->get();
+                 foreach ($all_candidate as $item)
+                 {
+                     $candidate = Candidate::find($item->candidate_id);
+                     $candidate->attempt_status_id = 5;
+                     $candidate->save();
+                     $candidate_story = RecruitmentStory::where('candidate_id','=',$item->candidate_id)
+                         ->orderBy('id', 'desc')->first();
+                     $candidate_story->attempt_status_id = 5;
+                     $candidate_story->save();
+                 }
+                 return 1;
+            }
+        }
+    }
     public function getGroupTrainingInfo(Request $request)
     {
         if($request->ajax())
