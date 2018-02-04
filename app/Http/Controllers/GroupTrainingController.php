@@ -27,9 +27,13 @@ class GroupTrainingController extends Controller
     public  function  datatableTrainingGroupList(Request $request)
     {
         $list_type = $request->list_type;
-        $group_training = GroupTraining::select('group_training.*','users.first_name','users.last_name')->
-        join('users','users.id','group_training.leader_id')->
-        where('group_training.status','=',$list_type)
+        $group_training = GroupTraining::select('group_training.*','users.first_name','users.last_name');
+        if($list_type == 1 || $list_type == 2)
+            $group_training = $group_training->join('users','users.id','group_training.leader_id');
+        else
+            $group_training = $group_training->join('users','users.id','group_training.edit_cadre_id');
+
+        $group_training = $group_training->where('group_training.status','=',$list_type)
             ->where('group_training.department_info_id','=',Auth::user()->department_info_id);
         return datatables($group_training)->make(true);
     }

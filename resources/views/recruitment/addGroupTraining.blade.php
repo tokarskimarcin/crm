@@ -272,6 +272,7 @@
                                                     <td>Godzina</td>
                                                     <td>Liczba osób</td>
                                                     <td>Usunieto przez</td>
+                                                    <td></td>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
@@ -679,12 +680,12 @@
                     {
                         "data": function (data, type, dataToSet) {
                             return data.last_name+' '+data.first_name;
-                        }
+                        },"name":"leader.last_name"
                     },
                     {
                         "data": function (data, type, dataToSet) {
                             return action_row;
-                        }
+                        },"searchable": false,"orderable": false
                     }
                 ],"fnDrawCallback": function(settings){ // działanie po wyrenderowaniu widoku
                     // po kliknięcu w szczegóły otwórz modal z możliwością edycji
@@ -786,8 +787,13 @@
                     {"data": "candidate_count"},
                     {
                         "data": function (data, type, dataToSet) {
+                            return data.last_name+' '+data.first_name;
+                        },"name":"edit_cadre.last_name"
+                    },
+                    {
+                        "data": function (data, type, dataToSet) {
                             return action_row_end_cancel;
-                        }
+                        },"searchable": false,"orderable": false
                     }
                 ]
             });
