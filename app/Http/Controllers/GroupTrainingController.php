@@ -27,8 +27,10 @@ class GroupTrainingController extends Controller
     public  function  datatableTrainingGroupList(Request $request)
     {
         $list_type = $request->list_type;
-        $group_training = GroupTraining::where('status','=',$list_type)
-            ->where('department_info_id','=',Auth::user()->department_info_id);
+        $group_training = GroupTraining::select('group_training.*','users.first_name','users.last_name')->
+        join('users','users.id','group_training.leader_id')->
+        where('group_training.status','=',$list_type)
+            ->where('group_training.department_info_id','=',Auth::user()->department_info_id);
         return datatables($group_training)->make(true);
     }
     public function getCandidateForGroupTrainingInfo(Request $request)
@@ -46,7 +48,8 @@ class GroupTrainingController extends Controller
         if($request->ajax())
         {
 
-            $group_training = GroupTraining::where('id','=',$request->id_training_group)->get();
+            $group_training = GroupTraining::
+            where('id','=',$request->id_training_group)->get();
 
             $candidate_avaible = Candidate::whereIn('attempt_status_id',[5])
                 ->where('department_info_id','=',Auth::user()->department_info_id)->get()

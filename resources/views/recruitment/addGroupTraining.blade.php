@@ -162,7 +162,7 @@
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="right_search" placeholder="Wyszukaj osobe na szkoleniu"/>
                                         <div class="input-group-addon">
-                                            <input type="checkbox" class="all-put-right" style="display: block">
+                                            <input type="checkbox" id="all-put-right" style="display: block">
                                         </div>
                                     </div>
                                 </div>
@@ -226,6 +226,7 @@
                                                     <td>Data</td>
                                                     <td>Godzina</td>
                                                     <td>Liczba osób</td>
+                                                    <td>Prowadząca</td>
                                                     <td>Akcja</td>
                                                 </tr>
                                                 </thead>
@@ -267,7 +268,7 @@
                                                     <td>Data</td>
                                                     <td>Godzina</td>
                                                     <td>Liczba osób</td>
-                                                    <td>Akcja</td>
+                                                    <td>Anulowane przez</td>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
@@ -459,13 +460,45 @@
                 }
             });
 
-
-            $('#all-put-left').on('change',function (e) {
+            // zaznacz wszystko z lewej kolumny
+            $('#all-put-left').change(function (e) {
                 $('#list_candidate a').each(function (key, value) {
-
+                    let status_select_all = $('#all-put-left').prop('checked');
+                    // zaznaczamy wszsytkie checkbox
+                    if(status_select_all)
+                    {
+                        if(!$(this).find('input:checkbox').prop('checked'))
+                        {
+                            $(this).trigger('click');
+                        }
+                    }else { // odznaczamy wszystko
+                        // zaznacza niezaznaczone
+                    if($(this).find('input:checkbox').prop('checked'))
+                        {
+                            $(this).trigger('click');
+                        }
+                    }
                 });
-
             });
+            $('#all-put-right').change(function (e) {
+                $('#list_candidate_choice a').each(function (key,value) {
+                    let status_select_all = $('#all-put-right').prop('checked');
+                    if(status_select_all)
+                    {
+                        if(!$(this).find('input:checkbox').prop('checked'))
+                        {
+                            $(this).trigger('click');
+                        }
+                    }else{
+                        if($(this).find('input:checkbox').prop('checked'))
+                        {
+                            $(this).trigger('click');
+                        }
+                    }
+                })
+            });
+
+
             // przeniesienie do prawej tabeli (wybrani użytkownicy)
             $('#move_right').on('click',function (e) {
                 // kod html z tabelą
@@ -481,6 +514,8 @@
                 }
                 $('#list_candidate_choice').append(html_right_column);
                 candidate_to_right = [];
+                // oddznaczenie 'select all'
+                $('#all-put-left').prop('checked',false);
             });
 
             $('#move_left').on('click',function (e) { // analogiczne
@@ -495,6 +530,7 @@
                 }
                 $('#list_candidate').append(html_left_column);
                 candidate_to_left = [];
+                $('#all-put-right').prop('checked',false);
             });
             // wyszukiwanie
             $("#left_search").on("keyup", function() {
@@ -613,6 +649,8 @@
                 clearLeftColumn();
                 is_open = 0;
                 saving_type = 1;
+                $('#all-put-right').prop('checked',false);
+                $('#all-put-left').prop('checked',false);
             });
             //tabela dostępnych szkoleń
             var table_activ_training_group = $('#activ_training_group').DataTable({
@@ -633,6 +671,11 @@
                     {"data": "training_date"},
                     {"data": "training_hour"},
                     {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.last_name+' '+data.first_name;
+                        }
+                    },
                     {
                         "data": function (data, type, dataToSet) {
                             return action_row;
