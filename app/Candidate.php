@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\AttemptStatus;
 
 class Candidate extends Model
 {
@@ -30,13 +31,24 @@ class Candidate extends Model
     }
 
     public function attempt_level() {
-        // $data = DB::table('recruitment_story')
-        //     ->select(DB::raw('
+        // $data = DB::select('
+        //     SELECT 
+        //     attempt_status.*
+        //     FROM `recruitment_story`
+        //     inner join recruitment_attempt on recruitment_attempt.id = recruitment_story.recruitment_attempt_id
+        //     inner join attempt_status on attempt_status.id = recruitment_story.attempt_status_id
+        //     where recruitment_attempt.status = 0
+        //     and recruitment_story.id in (
+        //         SELECT MAX(id) from recruitment_story where candidate_id = ' . $this->id . '
+        //     )
+        // ');
 
-        //     '))
-        //     ->join('attempt_status', 'attempt_status.id', 'recruitment_story.attempt_level_id')
-        //     ->join('recruitment_attempt', 'recruitment_attempt.id', '')
-        //     ->where('recruitment_attempt.status', '=', 0)
-        //     ->get();
+        // $status = (isset($data[0])) ? AttemptStatus::find($data[0]->id) : null;
+
+        // return $status;
+    }
+
+    public function attempt_level_data() {
+        return $this->belongsTo('App\AttemptStatus', 'attempt_status_id');
     }
 }

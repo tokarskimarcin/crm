@@ -103,11 +103,7 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label class="myLabel">Status rekrutacji:</label>
-                                        <select class="form-control" id="candidate_level">
-                                            @foreach($status as $item)
-                                                <option @if($item->id == 1) selected @else disabled @endif value="{{$item->id}}">{{$item->name}}</option>
-                                            @endforeach
-                                        </select>
+                                        <input type="text" readonly class="form-control" value="Dodanie kandydata" id="candidate_level">
                                     </div>
                                 </div>
                                 <div class="col-md-12">
@@ -179,40 +175,70 @@ $(document).ready(() => {
             swal('Dodaj opis kandydata!')
             return false;
         }
-
-        $('#add_submit').attr('disabled', true);
-
-        //Dodanie nowego kandydata
+        
+        //Sprawdzenie czy istnieje użytkownik o podanym numerze telefonu
         $.ajax({
             type: "POST",
-            url: '{{ route('api.addNewCandidate') }}',
+            url: '{{ route('api.uniqueCandidatePhone') }}',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             data: {
-                "candidate_name": candidate_name,
-                "candidate_surname": candidate_surname,
-                "candidate_phone": candidate_phone,
-                "candidate_department": candidate_department,
-                "candidate_source": candidate_source,
-                "candidate_desc": candidate_desc
+                "candidate_phone": candidate_phone
             },
             success: function (response) {
-                if (response > 0) {
-                    swal({
-                        title: 'Kandydat został dodany!',
-                        type: 'success',
-                        timer: 3000
-                    }).then((result) => {
-                        window.location.href = "{{ URL::to('/candidateProfile/') }}/" + response;
-                    })
+                if (response == 0) {
+                    //jezeli istenieje taki numer w bazie kandydatow
+                    swal('Numer telefonu istnieje już w bazie!')                   
+                } else if (response == 1) {
+                    //Jezeli numer jest unikatowy - dodanie kandydata
+
+                    //Zablokowanie przycisku
+                    $('#add_submit').prop('disabled', true);
+
+                    //Dodanie nowego kandydata
+                    $.ajax({
+                        type: "POST",
+                        url: '{{ route('api.addNewCandidate') }}',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data: {
+                            "candidate_name": candidate_name,
+                            "candidate_surname": candidate_surname,
+                            "candidate_phone": candidate_phone,
+                            "candidate_department": candidate_department,
+                            "candidate_source": candidate_source,
+                            "candidate_desc": candidate_desc
+                        },
+                        success: function (response) {
+                            if (response > 0) {
+                                swal({
+                                    title: 'Kandydat został dodany!',
+                                    type: 'success',
+                                    timer: 3000
+                                }).then((result) => {
+                                    //Przeniesienie do strony profilowej kandydata
+                                    window.location.href = "{{ URL::to('/candidateProfile/') }}/" + response;
+                                })
+                            } else {
+                                //W przypadku niepowodzenia dodania kandydata
+                                swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
+                            }
+                        }, error: function(response) {
+                            //W przypadku niepowodzenia dodania kandydata
+                            swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
+                        }
+                    });
                 } else {
+                    //W przypadku niepowodzenia w sprawdzeniu unikatowego numeru
                     swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
                 }
             }, error: function(response) {
+                //W przypadku niepowodzenia w sprawdzeniu unikatowego numeru
                 swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
             }
-        });
+        })
     });
 });
 

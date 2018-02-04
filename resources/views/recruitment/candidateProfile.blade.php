@@ -61,7 +61,7 @@
                                 <div class="alert alert-info">
                                     <b class="myLabel">Status rekrutacji:</b>
                                     <p class="myLabel">
-                                        <span id="user_status">Do zrobienia</span>
+                                        <span id="user_status">{{$candidate_status}}</span>
                                     </p>
                                 </div>
                             </div>
@@ -119,7 +119,7 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label class="myLabel">Status rekrutacji:</label>
-                                        <input type="text" class="form-control status_input" value="To do"/>
+                                        <input type="text" class="form-control status_input" value="{{$candidate_status}}"/>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
@@ -140,6 +140,15 @@
                         </div>
                     </div>
                 </div>
+                @if($candidate->attempt_status_id == 3)
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="alert alert-danger" style="color: #616366; font-size: 20px;">
+                                    Data rozmowy kwalifikacyjnej: <b>{{$candidate->recruitment_attempt->where('status', '=', 0)->first()->interview_date}}</b>
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -171,12 +180,13 @@
                 <ul class="nav nav-tabs" style="margin-bottom: 25px">
                     @php
                         $y = 0;
+                        $last_id = $item->recruitment_story->last()->id;
                     @endphp
                     @foreach($item->recruitment_story as $story)
                     @php
                         $y++;
                     @endphp
-                        <li @if($y == 1) class="active" @endif><a data-toggle="tab" href="#story{{$story->id}}">Etap {{$y}}</a></li>
+                        <li @if($story->id == $last_id) class="active" @endif><a data-toggle="tab" href="#story{{$story->id}}">Etap {{$y}}</a></li>
                     @endforeach
                 </ul>
                 
@@ -188,7 +198,7 @@
                     @php
                         $y++;
                     @endphp
-                        <div id="story{{$story->id}}" class="tab-pane fade in @if($y == 1) active @endif">
+                        <div id="story{{$story->id}}" class="tab-pane fade in @if($story->id == $last_id) active @endif">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     {{$story->attemptLevel->name}}
@@ -218,21 +228,21 @@
                                         <div class="col-md-4">
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <button data-toggle="modal" data-target="#nextLevel" class="btn btn-success" style="width: 100%" @if($item->status == 1) disabled @endif>  
+                                                    <button data-toggle="modal" data-target="#nextLevel" class="btn btn-success" style="width: 100%" @if($item->status == 1) disabled title="Rekrutacja zakończona!" @endif>  
                                                         <span class="glyphicon glyphicon-ok"></span> Następny etap
                                                     </button>
                                                 </div>
                                             </div>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <button data-toggle="modal" data-target="#add_training" class="btn btn-warning" style="width: 100%" @if($item->status == 1) disabled @endif>  
+                                                    <button data-toggle="modal" data-target="#add_training" class="btn btn-warning" style="width: 100%" @if($item->status == 1) disabled title="Rekrutacja zakończona!" @endif>  
                                                         <span class="glyphicon glyphicon-envelope"></span> Zapisz na szkolenie
                                                     </button>
                                                 </div>
                                             </div>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <button data-toggle="modal" data-target="#stopRecruitment" class="btn btn-danger" style="width: 100%" @if($item->status == 1) disabled @endif>  
+                                                    <button data-toggle="modal" data-target="#stopRecruitment" class="btn btn-danger" style="width: 100%" @if($item->status == 1) disabled title="Rekrutacja zakończona!" @endif>  
                                                         <span class="glyphicon glyphicon-remove"></span> Zakończ rekrutację
                                                     </button>
                                                 </div>
@@ -241,7 +251,7 @@
                                         <div class="col-md-8">
                                             <div class="form-group">
                                                 <label class="myLabel">Komentarz:</label>
-                                                <textarea rows="4" class="form-control" placeholder="Komentarz">{{$story->comment}}</textarea>
+                                                <textarea rows="4" readonly class="form-control" placeholder="Komentarz">{{$story->comment}}</textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -256,8 +266,7 @@
 </div>
 @endforeach
 
-
-<div id="newRecruitment" class="modal fade " role="dialog">
+<div id="newRecruitment" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -294,7 +303,7 @@
     </div>
 </div>
 
-<div id="stopRecruitment" class="modal fade " role="dialog">
+<div id="stopRecruitment" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -332,7 +341,7 @@
     </div>
 </div>
 
-<div id="nextLevel" class="modal fade " role="dialog">
+<div id="nextLevel" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -349,6 +358,26 @@
                                     <option value="{{$item->id}}">{{$item->name}}</option>
                                 @endforeach
                             </select>
+                        </div>
+                        <div class="row" id="inverview_date_div" style="display:none;">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="myLabel">Dodaj datę rozmowy kwalifikacyjnej</label>
+                                    <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                        <input class="form-control" id="interview_date" name="interview_date" type="text" value="{{date("Y-m-d")}}" >
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="myLabel">Dodaj godzinę rozmowy kwalifikacyjnej</label>
+                                <input type="time" class="form-control" id="interview_time" required>
+                                {{--  <div class="input-group date form_time col-md-5" data-date="" data-date-format="hh:ii" data-link-field="dtp_input3" data-link-format="hh:ii">
+                                    <input id="register_stop" class="form-control" size="16" type="text" value="" readonly>
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
+                                </div>  --}}
+                            </div>
                         </div>
                         <div class="form-group">
                             <label class="myLabel">Komentarz:</label>
@@ -369,7 +398,7 @@
     </div>
 </div>
 
-<div id="add_training" class="modal fade " role="dialog">
+<div id="add_training" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -406,7 +435,40 @@
 @endsection
 @section('script')
 <script>
+
+$('.form_date').datetimepicker({
+    language: 'pl',
+    autoclose: 1,
+    minView: 2,
+    pickTime: false,
+});
+
+$(function() {
+    $('.form_time').datetimepicker({
+        language:  'pl',
+        weekStart: 1,
+        todayBtn:  1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 1,
+        minView: 0,
+        maxView: 1,
+        forceParse: 0
+    });
+});
+
 $(document).ready(() => {
+
+    $('#add_level_status').change(() => {
+        var add_level_status = $('#add_level_status').val();
+
+        if (add_level_status == 3) {
+            $('#inverview_date_div').fadeIn(500);
+        } else {
+            $('#inverview_date_div').fadeOut(500);
+        }
+    });
+
     $('#edit_submit').click(() => {
         var candidate_id = $('#candidate_id').val();
         var candidate_name = $('#candidate_name').val();
@@ -489,6 +551,8 @@ $(document).ready(() => {
             return false;
         }
 
+        $('#new_recruitment_submit').prop('disabled', true);
+
         $.ajax({
             type: "POST",
             url: '{{ route('api.startNewRecruitment') }}',
@@ -513,6 +577,7 @@ $(document).ready(() => {
                 swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
             }
         });
+        $('#new_recruitment_submit').prop('disabled', false);
     });
 
     function stopRecruitment(stopType) {
@@ -524,6 +589,9 @@ $(document).ready(() => {
             swal('Dodaj komentarz!')
             return false;
         }
+
+        $('#stop_recruitment_submit').prop('disabled', true);
+        $('#stop_recruitment_add').prop('disabled', true);
 
         $.ajax({
             type: "POST",
@@ -565,10 +633,28 @@ $(document).ready(() => {
         var add_level_status = $('#add_level_status').val();
         var add_level_comment = $('#add_level_comment').val();
 
-        if (stop_recruitment_comment == '') {
+        if (add_level_comment == '') {
             swal('Dodaj komentarz!')
             return false;
         }
+
+        //Jezeli umowiony na rozmowe kwalifikacyjną
+        if (add_level_status == 3) {
+            var interview_date = $('#interview_date').val();
+            var interview_time = $('#interview_time').val();
+
+            if (interview_time == '') {
+                swal('Podaj godzinę rozmowy kwalifikacyjnej!')
+                return false;
+            }
+
+            var interview = interview_date + " " + interview_time +":00";
+        } else {
+            var interview = null;
+        }
+
+
+        $('#add_level_submit').prop('disabled', 'disabled');
 
         $.ajax({
             type: "POST",
@@ -579,7 +665,8 @@ $(document).ready(() => {
             data: {
                 "candidate_id": candidate_id,
                 "add_level_status": add_level_status,
-                "add_level_comment": add_level_comment
+                "add_level_comment": add_level_comment,
+                "interview": interview
             },
             success: function (response) {
                 if (response == 1) {
@@ -598,10 +685,12 @@ $(document).ready(() => {
         var candidate_id = $('#candidate_id').val();
         var add_training_comment = $('#add_training_comment').val();
 
-        if (stop_recruitment_comment == '') {
+        if (add_training_comment == '') {
             swal('Dodaj komentarz!')
             return false;
         }
+
+        $('#add_training_submit').prop('disabled', true);
 
         $.ajax({
             type: "POST",
@@ -612,11 +701,17 @@ $(document).ready(() => {
             data: {
                 "candidate_id": candidate_id,
                 "add_training_comment": add_training_comment,
-                "add_level_status": 9
+                "add_level_status": 5
             },
             success: function (response) {
                 if (response == 1) {
-                    window.location.href = "{{ URL::to('/add_group_training') }}";
+                    swal({
+                        title: 'Etap został dodany!',
+                        type: 'success',
+                        timer: 3000
+                    }).then((result) => {
+                        window.location.href = "{{ URL::to('/add_group_training') }}";
+                    })
                 } else {
                     swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
                 }
