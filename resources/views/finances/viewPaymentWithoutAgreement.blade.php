@@ -143,6 +143,9 @@
                                                                                 $bonus_penalty = $item2->premia - $item2->kara;
                                                                                 $student = ($item2->student == 0) ? "Nie" : "Tak";
                                                                                 $documents = ($item2->documents == 0) ? "Nie" : "Tak";
+                                                                                if ($bonus_penalty < 0) {
+                                                                                    $bonus_penalty = 0;
+                                                                                }
                                                                                 $salary_total = $standart_salary+$bonus_penalty;//-$janky_cost;
                                                                                 if($salary_total < 0 )
                                                                                 {
