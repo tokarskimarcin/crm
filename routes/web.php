@@ -129,6 +129,8 @@ Route::POST('/datatableAllTests','AdminController@datatableAllTests')->name('api
 
 Route::POST('/deleteGroupTraining', 'GroupTrainingController@deleteGroupTraining')->name('api.deleteGroupTraining');
 Route::POST('/saveGroupTraining', 'GroupTrainingController@saveGroupTraining')->name('api.saveGroupTraining');
+Route::POST('/EndGroupTraining', 'GroupTrainingController@EndGroupTraining')->name('api.EndGroupTraining');
+
 Route::POST('/getCandidateForGroupTrainingInfo','GroupTrainingController@getCandidateForGroupTrainingInfo')->name('api.getCandidateForGroupTrainingInfo');
 Route::POST('/datatableTrainingGroupList','GroupTrainingController@datatableTrainingGroupList')->name('api.datatableTrainingGroupList');
 Route::POST('/getGroupTrainingInfo','GroupTrainingController@getGroupTrainingInfo')->name('api.getGroupTrainingInfo');
