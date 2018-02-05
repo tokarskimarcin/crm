@@ -68,6 +68,22 @@
                                                 </div></br></br>
                                             </form>
                                         </div>
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                Legenda
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="alert alert-success">
+                                                    <h1>Wypłaty liczone są wg następujacego schematu:</h1>
+                                                    <h3>
+                                                        Podstawa wypłaty jest nienaruszalna - w przypadku kary przekraczających premię, wszystkie kary są zerowane, a pracownik dostaje wypracowaną podstawę.
+                                                    </h3>
+                                                    <h3>
+                                                        W każdym innym przypadku suma kar odejmowana jest od sumy premii, a suma wypłaty dla danego pracownika to podstawa + pozostała premia.
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                                 @if(isset($month))
                                                             @php
