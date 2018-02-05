@@ -221,6 +221,40 @@
                                 </div>
                             </div>
                         </div>
+
+
+                        {{--modal dla zakończonych szkoleń--}}
+                        <div class="col-md-12" id="modal_end" style="display: none">
+                            <div class="col-md-12">
+                                <label class="myLabel">Osoby biorące udział w szkoleniu:</label>
+                                <div class="search_candidate">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="right_search_cancle" placeholder="Wyszukaj osobe na szkoleniu"/>
+                                        <div class="input-group-addon">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="right-container">
+                                        <div class="list_group" id="list_candidate_choice_cancel">
+
+                                            <a class="list-group-item checked">
+                                                Jan Kowalski
+                                                <input type="checkbox" class="pull-left" style="display: block">
+                                            </a>
+                                            <a class="list-group-item">
+                                                Jan Kowalski
+                                                <input type="checkbox" class="pull-left" style="display: block">
+                                            </a>
+                                            <a class="list-group-item">
+                                                Jan Kowalski
+                                                <input type="checkbox" class="pull-left" style="display: block">
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <button type="button" class="btn btn-primary" id="save_button">Dodaj szkolenie</button>
                 </div>
@@ -750,6 +784,48 @@
                         var tr = $(this).closest('tr');
                         id_training_group = tr.attr('id');
                         $('#myModalgroup').modal("show");
+                    });
+                    // zakończenie szkolenia
+                    $('.end_active').click(function (e) {
+                        let training_group_to_end = $(this).closest('tr').attr('id');
+                        swal({
+                            title: 'Jesteś pewien?',
+                            text: "Spowoduje to zakończenie szkolenia, bez możliwości cofnięcia zmian!",
+                            type: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Tak, zakończ szkolenie!'
+                        }).then((result) => {
+                            if (result.value)
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    url: '{{ route('api.EndGroupTraining') }}',
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    data: {
+                                        "training_group_to_end" : training_group_to_end
+                                    },
+                                    success: function (response) {
+                                        if(response == 1)
+                                        {
+                                            swal(
+                                                'Usunięto zakończone!',
+                                                'Szkolenie zostało zakończone.',
+                                                'success'
+                                            )
+                                            $('#succes_delete_training').fadeIn(1000);
+                                            $('#succes_delete_training').delay(3000).fadeOut(1000);
+                                            table_activ_training_group.ajax.reload();
+                                            table_cancel_training_group.ajax.reload();
+                                            table_end_training_group.ajax.reload();
+                                        }
+                                    }
+                                });
+                            }
+                        });
                     });
                     //usunięcie szkolenia
                     $('.cancle_active').on('click',function (e) {

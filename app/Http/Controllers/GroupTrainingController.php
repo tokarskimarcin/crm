@@ -37,6 +37,40 @@ class GroupTrainingController extends Controller
             ->where('group_training.department_info_id','=',Auth::user()->department_info_id);
         return datatables($group_training)->make(true);
     }
+
+    public function EndGroupTraining(Request $request)
+    {
+        if($request->ajax())
+        {
+            $training_group_id = $request->training_group_to_end;
+            $training_group = GroupTraining::find($training_group_id);
+            $training_group->status = 2;
+
+            if($training_group->save()){
+
+                $all_candidate = CandidateTraining::where('training_id','=',$training_group_id)->get();
+                foreach ($all_candidate as $item)
+                {
+                    $candidate = Candidate::find($item->candidate_id);
+                    $candidate->attempt_status_id = 7;
+                    $candidate->save();
+
+                    $candidate_story_old = RecruitmentStory::where('candidate_id','=',$item->candidate_id)
+                        ->orderBy('id', 'desc')->first();
+
+                    $candidate_story_new = new RecruitmentStory();
+                    $candidate_story_new->cadre_id = Auth::user()->id;
+                    $candidate_story_new->cadre_edit_id = Auth::user()->id;
+                    $candidate_story_new->candidate_id = $item->candidate_id;
+                    $candidate_story_new->recruitment_attempt_id = $candidate_story_old->recruitment_attempt_id;
+                    $candidate_story_new->attempt_status_id = 7;
+                    $candidate_story_new->comment = "Szkolenie zakończone";
+                    $candidate_story_new->save();
+                }
+                return 1;
+            }
+        }
+    }
     public function getCandidateForGroupTrainingInfo(Request $request)
     {
 
