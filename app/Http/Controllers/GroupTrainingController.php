@@ -27,8 +27,14 @@ class GroupTrainingController extends Controller
     public  function  datatableTrainingGroupList(Request $request)
     {
         $list_type = $request->list_type;
-        $group_training = GroupTraining::where('status','=',$list_type)
-            ->where('department_info_id','=',Auth::user()->department_info_id);
+        $group_training = GroupTraining::select('group_training.*','users.first_name','users.last_name');
+        if($list_type == 1 || $list_type == 2)
+            $group_training = $group_training->join('users','users.id','group_training.leader_id');
+        else
+            $group_training = $group_training->join('users','users.id','group_training.edit_cadre_id');
+
+        $group_training = $group_training->where('group_training.status','=',$list_type)
+            ->where('group_training.department_info_id','=',Auth::user()->department_info_id);
         return datatables($group_training)->make(true);
     }
     public function getCandidateForGroupTrainingInfo(Request $request)
@@ -41,12 +47,40 @@ class GroupTrainingController extends Controller
             return $candidate;
         }
     }
+
+    public function deleteGroupTraining(Request $request)
+    {
+        if($request->ajax())
+        {
+            // zmiana statusu szkolenia na usuniete
+            $training_id = $request->id_training_group_to_delete;
+            $training_grou = GroupTraining::find($training_id);
+            $training_grou->status = 0;
+            $training_grou->edit_cadre_id = Auth::user()->id;
+            if($training_grou->save()){
+
+                 $all_candidate = CandidateTraining::where('training_id','=',$training_id)->get();
+                 foreach ($all_candidate as $item)
+                 {
+                     $candidate = Candidate::find($item->candidate_id);
+                     $candidate->attempt_status_id = 5;
+                     $candidate->save();
+                     $candidate_story = RecruitmentStory::where('candidate_id','=',$item->candidate_id)
+                         ->orderBy('id', 'desc')->first();
+                     $candidate_story->attempt_status_id = 5;
+                     $candidate_story->save();
+                 }
+                 return 1;
+            }
+        }
+    }
     public function getGroupTrainingInfo(Request $request)
     {
         if($request->ajax())
         {
 
-            $group_training = GroupTraining::where('id','=',$request->id_training_group)->get();
+            $group_training = GroupTraining::
+            where('id','=',$request->id_training_group)->get();
 
             $candidate_avaible = Candidate::whereIn('attempt_status_id',[5])
                 ->where('department_info_id','=',Auth::user()->department_info_id)->get()

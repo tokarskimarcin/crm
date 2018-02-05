@@ -162,7 +162,7 @@
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="right_search" placeholder="Wyszukaj osobe na szkoleniu"/>
                                         <div class="input-group-addon">
-                                            <input type="checkbox" class="all-put-right" style="display: block">
+                                            <input type="checkbox" id="all-put-right" style="display: block">
                                         </div>
                                     </div>
                                 </div>
@@ -208,12 +208,15 @@
                 <div class="alert alert-success" style = "display:none" id="succes_add_training">
                     <span colspan="1">Szkolenie zostało dodane</span>
                 </div>
+                <div class="alert alert-danger" style = "display:none" id="succes_delete_training">
+                    <span colspan="1">Szkolenie zostało usuniete</span>
+                </div>
                 <div class="panel-body">
                     <div class="row">
                         <ul class="nav nav-tabs" style="margin-bottom: 25px">
                             <li class="active"><a data-toggle="tab" href="#home">Dostępne</a></li>
                             <li><a data-toggle="tab" href="#menu1">Zakończone</a></li>
-                            <li><a data-toggle="tab" href="#menu2">Anulowane</a></li>
+                            <li><a data-toggle="tab" href="#menu2">Usuniete</a></li>
                         </ul>
                         <div class="tab-content">
                             <div id="home" class="tab-pane fade in active">
@@ -226,6 +229,7 @@
                                                     <td>Data</td>
                                                     <td>Godzina</td>
                                                     <td>Liczba osób</td>
+                                                    <td>Prowadząca</td>
                                                     <td>Akcja</td>
                                                 </tr>
                                                 </thead>
@@ -267,7 +271,8 @@
                                                     <td>Data</td>
                                                     <td>Godzina</td>
                                                     <td>Liczba osób</td>
-                                                    <td>Akcja</td>
+                                                    <td>Usunieto przez</td>
+                                                    <td></td>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
@@ -303,7 +308,7 @@
             '<span style="color: green" class="glyphicon glyphicon glyphicon-pencil"></span> Zakończ'+
             '</a>'+
             '<a class="btn btn-default cancle_active" data-id ={{1}} href="#">'+
-            '<span style="color: green" class="glyphicon glyphicon glyphicon-trash"></span> Anuluj'+
+            '<span style="color: green" class="glyphicon glyphicon glyphicon-trash"></span> Usuń'+
             '</a>';
 
         var action_row_end_cancel =
@@ -459,13 +464,47 @@
                 }
             });
 
-
-            $('#all-put-left').on('change',function (e) {
+            // zaznacz wszystko z lewej kolumny
+            $('#all-put-left').change(function (e) {
                 $('#list_candidate a').each(function (key, value) {
-
+                    let status_select_all = $('#all-put-left').prop('checked');
+                    // zaznaczamy wszsytkie checkbox
+                    if(status_select_all)
+                    {
+                        if(!$(this).find('input:checkbox').prop('checked'))
+                        {
+                            $(this).trigger('click');
+                        }
+                    }else { // odznaczamy wszystko
+                        // zaznacza niezaznaczone
+                    if($(this).find('input:checkbox').prop('checked'))
+                        {
+                            $(this).trigger('click');
+                        }
+                    }
                 });
-
             });
+            $('#all-put-right').change(function (e) {
+                $('#list_candidate_choice a').each(function (key,value) {
+                    let status_select_all = $('#all-put-right').prop('checked');
+                    if(status_select_all)
+                    {
+                        if(!$(this).find('input:checkbox').prop('checked'))
+                        {
+                            $(this).trigger('click');
+                        }
+                    }else{
+                        if($(this).find('input:checkbox').prop('checked'))
+                        {
+                            $(this).trigger('click');
+                        }
+                    }
+                })
+            });
+
+
+
+
             // przeniesienie do prawej tabeli (wybrani użytkownicy)
             $('#move_right').on('click',function (e) {
                 // kod html z tabelą
@@ -481,6 +520,8 @@
                 }
                 $('#list_candidate_choice').append(html_right_column);
                 candidate_to_right = [];
+                // oddznaczenie 'select all'
+                $('#all-put-left').prop('checked',false);
             });
 
             $('#move_left').on('click',function (e) { // analogiczne
@@ -495,6 +536,7 @@
                 }
                 $('#list_candidate').append(html_left_column);
                 candidate_to_left = [];
+                $('#all-put-right').prop('checked',false);
             });
             // wyszukiwanie
             $("#left_search").on("keyup", function() {
@@ -613,6 +655,8 @@
                 clearLeftColumn();
                 is_open = 0;
                 saving_type = 1;
+                $('#all-put-right').prop('checked',false);
+                $('#all-put-left').prop('checked',false);
             });
             //tabela dostępnych szkoleń
             var table_activ_training_group = $('#activ_training_group').DataTable({
@@ -635,8 +679,13 @@
                     {"data": "candidate_count"},
                     {
                         "data": function (data, type, dataToSet) {
+                            return data.last_name+' '+data.first_name;
+                        },"name":"leader.last_name"
+                    },
+                    {
+                        "data": function (data, type, dataToSet) {
                             return action_row;
-                        }
+                        },"searchable": false,"orderable": false
                     }
                 ],"fnDrawCallback": function(settings){ // działanie po wyrenderowaniu widoku
                     // po kliknięcu w szczegóły otwórz modal z możliwością edycji
@@ -646,6 +695,46 @@
                         var tr = $(this).closest('tr');
                         id_training_group = tr.attr('id');
                         $('#myModalgroup').modal("show");
+                    });
+                    //usunięcie szkolenia
+                    $('.cancle_active').on('click',function (e) {
+                        let id_training_group_to_delete = $(this).closest('tr').attr('id');
+                        swal({
+                            title: 'Jesteś pewien?',
+                            text: "Spowoduje to usuniecie szkolenia, cofnięcie zmian nie będzie możliwe!",
+                            type: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Tak, usuń szkolenie!'
+                        }).then((result) => {
+                            if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                url: '{{ route('api.deleteGroupTraining') }}',
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                data: {
+                                    "id_training_group_to_delete" : id_training_group_to_delete
+                                },
+                                success: function (response) {
+                                    if(response == 1)
+                                    {
+                                        swal(
+                                            'Usunięto szkolenie!',
+                                            'Szkolenie zostało usunięte. Kandydaci zostali umieszczeni w poczekali',
+                                            'success'
+                                        )
+                                        $('#succes_delete_training').fadeIn(1000);
+                                        $('#succes_delete_training').delay(3000).fadeOut(1000);
+                                        table_activ_training_group.ajax.reload();
+
+                                    }
+                                }
+                            });
+                        }
+                    });
                     });
                 },"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
                     // Dodanie id do wiersza
@@ -698,8 +787,13 @@
                     {"data": "candidate_count"},
                     {
                         "data": function (data, type, dataToSet) {
+                            return data.last_name+' '+data.first_name;
+                        },"name":"edit_cadre.last_name"
+                    },
+                    {
+                        "data": function (data, type, dataToSet) {
                             return action_row_end_cancel;
-                        }
+                        },"searchable": false,"orderable": false
                     }
                 ]
             });

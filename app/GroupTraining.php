@@ -13,7 +13,10 @@ class GroupTraining extends Model
     }
 
     public function edit_cadre() {
-        return $this->belongsTo('App\User', 'cadre_edit_id');
+        return $this->belongsTo('App\User', 'edit_cadre_id');
+    }
+    public function leader() {
+        return $this->belongsTo('App\User', 'leader_id');
     }
     public function dapartment_info() {
         return $this->belongsTo('App\Department_info', 'department_info_id');

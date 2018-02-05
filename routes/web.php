@@ -125,6 +125,9 @@ Route::POST('/datatableAllTests','AdminController@datatableAllTests')->name('api
 /* TEST AJAX ROUTES STOP */
 
 //** RECRUITMENT AJAX */
+
+
+Route::POST('/deleteGroupTraining', 'GroupTrainingController@deleteGroupTraining')->name('api.deleteGroupTraining');
 Route::POST('/saveGroupTraining', 'GroupTrainingController@saveGroupTraining')->name('api.saveGroupTraining');
 Route::POST('/getCandidateForGroupTrainingInfo','GroupTrainingController@getCandidateForGroupTrainingInfo')->name('api.getCandidateForGroupTrainingInfo');
 Route::POST('/datatableTrainingGroupList','GroupTrainingController@datatableTrainingGroupList')->name('api.datatableTrainingGroupList');
