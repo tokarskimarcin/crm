@@ -120,7 +120,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-12" id="modal_full" >
                             <div class="col-md-5">
                                 <label class="myLabel">Dostępni kandydaci:</label>
                                 <div class="search_candidate">
@@ -183,6 +183,39 @@
                                                 <input type="checkbox" class="pull-left" style="display: block">
                                             </a>
 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{--modal dla usunietych szkoleń--}}
+                        <div class="col-md-12" id="modal_cancel" style="display: none">
+                            <div class="col-md-12">
+                                <label class="myLabel">Osoby zapisane na szkolenie (Anulowane):</label>
+                                <div class="search_candidate">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="right_search_cancle" placeholder="Wyszukaj osobe na szkoleniu"/>
+                                        <div class="input-group-addon">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="right-container">
+                                        <div class="list_group" id="list_candidate_choice_cancel">
+
+                                            <a class="list-group-item checked">
+                                                Jan Kowalski
+                                                <input type="checkbox" class="pull-left" style="display: block">
+                                            </a>
+                                            <a class="list-group-item">
+                                                Jan Kowalski
+                                                <input type="checkbox" class="pull-left" style="display: block">
+                                            </a>
+                                            <a class="list-group-item">
+                                                Jan Kowalski
+                                                <input type="checkbox" class="pull-left" style="display: block">
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -272,7 +305,7 @@
                                                     <td>Godzina</td>
                                                     <td>Liczba osób</td>
                                                     <td>Usunieto przez</td>
-                                                    <td></td>
+                                                    <td>Akcja</td>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
@@ -299,6 +332,7 @@
         var id_training_group = 0;
         var training_group_response;
         var is_open = 0;
+        var cancel_candidate = 0;
         var saving_type = 1; // 1 - nowy wpis, 0 - edycja
         var action_row =
             '<a class="btn btn-default info_active" href="#">'+
@@ -312,7 +346,7 @@
             '</a>';
 
         var action_row_end_cancel =
-            '<a class="btn btn-default info_active" href="#">'+
+            '<a class="btn btn-default info_cancel" href="#">'+
             '<span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły'+
             '</a>';
 
@@ -554,6 +588,14 @@
                 });
             });
 
+            $('#right_search_cancle').on('keyup', function (e) {
+                let value = $(this).val().toLowerCase();
+                $("#list_candidate_choice_cancel a").filter(function (e) {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                })
+            })
+
+
             // open modal
             $('#myModalgroup').on('show.bs.modal', function() {
                 if(is_open == 0)
@@ -614,11 +656,12 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         data: {
-                            "id_training_group": id_training_group
+                            "id_training_group": id_training_group,
+                            "cancel_candidate": cancel_candidate
                         },
                         success: function (response) {
-                            training_group_response = response;
                             console.log(response);
+                            training_group_response = response;
                             if (response.length != 0) {
                                 for (var i = 0; i < response['group_training'].length; i++) {
                                     $("input[name='start_date_training']").val(response['group_training'][i].training_date);
@@ -627,18 +670,26 @@
                                     $("#training_comment").val(response['group_training'][i].comment);
                                 }
                                 for (var i = 0; i < response['candidate'].length; i++) {
-                                    if (response['candidate'][i].attempt_status_id == 5) {
+                                    if (response['candidate'][i].attempt_status_id == 5 && cancel_candidate == 0) {
                                         var html = '<a class="list-group-item nocheck" onclick = "onclickRowLeft(this)" id=' + response['candidate'][i].id + '>' +
                                             response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
                                             '<input type="checkbox" class="pull-left" style="display: block">' +
                                             '</a>';
                                         $('#list_candidate').append(html);
-                                    } else if (response['candidate'][i].attempt_status_id == 6) {
+                                    } else if (response['candidate'][i].attempt_status_id == 6  && cancel_candidate == 0) {
                                         var html = '<a class="list-group-item nocheck" onclick = "onclickRowRight(this)" id=' + response['candidate'][i].id + '>' +
                                             response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
                                             '<input type="checkbox" class="pull-right" style="display: block">' +
                                             '</a>';
                                         $('#list_candidate_choice').append(html);
+                                    }
+                                    else if (cancel_candidate == 1) {
+
+                                        console.log(cancel_candidate);
+                                        var html = '<a class="list-group-item nocheck" id=' + response['candidate'][i].id + '>' +
+                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
+                                            '</a>';
+                                        $('#list_candidate_choice_cancel').append(html);
                                     }
                                 }
                             } else {
@@ -654,9 +705,13 @@
                 clearModalBasicInfo();
                 clearLeftColumn();
                 is_open = 0;
+                cancel_candidate = 0;
                 saving_type = 1;
                 $('#all-put-right').prop('checked',false);
                 $('#all-put-left').prop('checked',false);
+                $("#save_button").css({'display':'block'});
+                $("#modal_full").css({'display':'block'});
+                $("#modal_cancel").css({'display':'none'});
             });
             //tabela dostępnych szkoleń
             var table_activ_training_group = $('#activ_training_group').DataTable({
@@ -729,7 +784,7 @@
                                         $('#succes_delete_training').fadeIn(1000);
                                         $('#succes_delete_training').delay(3000).fadeOut(1000);
                                         table_activ_training_group.ajax.reload();
-
+                                        table_cancel_training_group.ajax.reload();
                                     }
                                 }
                             });
@@ -790,13 +845,29 @@
                             return data.last_name+' '+data.first_name;
                         },"name":"edit_cadre.last_name"
                     },
-                    {
+                    { "width": "10%",
                         "data": function (data, type, dataToSet) {
                             return action_row_end_cancel;
                         },"searchable": false,"orderable": false
                     }
-                ]
-            });
+                ],"fnDrawCallback": function(settings){
+                        $('.info_cancel').on('click',function (e) {
+                            $("#modal_full").css({'display':'none'});
+                            $("#modal_cancel").css({'display':'block'});
+                            $("#save_button").css({'display':'none'});
+                            saving_type = 0;
+                            cancel_candidate = 1;
+                            //główny wiersz
+                            var tr = $(this).closest('tr');
+                            id_training_group = tr.attr('id');
+                            $('#myModalgroup').modal("show");
+                        });
+                    },"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+                        // Dodanie id do wiersza
+                        $(nRow).attr('id', aData.id);
+                        return nRow;
+                    }
+                    });
 
 
         });

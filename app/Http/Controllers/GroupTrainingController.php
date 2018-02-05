@@ -94,7 +94,11 @@ class GroupTrainingController extends Controller
                 ->join('group_training', 'group_training.id', 'candidate_training.training_id')
                 ->where('group_training.id','=',$request->id_training_group)
                 ->get()->toArray();
-            $merge_array = array_merge($candidate_choice,$candidate_avaible);
+            if($request->cancel_candidate == 1)
+            {
+                $merge_array = $candidate_choice;
+            }else
+                $merge_array = array_merge($candidate_choice,$candidate_avaible);
 
             $object_array['group_training'] = $group_training ;
             $object_array['candidate'] = $merge_array ;
