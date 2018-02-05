@@ -8,6 +8,7 @@ use App\CandidateSource;
 use App\Department_info;
 use App\Candidate;
 use App\RecruitmentAttempt;
+use App\GroupTraining;
 use App\RecruitmentStory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -158,8 +159,14 @@ class RecruitmentAttemptController extends Controller
                 ->where('recruitment_attempt.interview_date', 'like', date('Y-m-d') . '%')
                 ->get();
 
+        $total_trainings = GroupTraining::where('cadre_id', '=', Auth::user()->id)->count();
+
+        $incoming_trening = GroupTraining::where('leader_id', '=', Auth::user()->id)->where('status', '!=', 0)->get();
+
         return view('recruitment.interviewsAll')
+            ->with('incoming_trening', $incoming_trening)
             ->with('today_interviews', $today_interviews[0]->sum)
+            ->with('total_trainings', $total_trainings)
             ->with('active_recruitments', $active_recruitments);
     }
 
@@ -183,4 +190,6 @@ class RecruitmentAttemptController extends Controller
             return $candidates;
         }
     }
+
+   
 }

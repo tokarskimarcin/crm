@@ -14,10 +14,17 @@ use App\RecruitmentStory;
 
 class CandidateController extends Controller
 {
+
+    /**
+     * Zwrocenie templatki z wszystkimi kandydatami
+     */
     public function all_candidates() {
         return view('recruitment.allCandidates');
     }
 
+    /**
+     * Zwraca dane wszystkich kandydatow
+     */
     public function datatableShowCandidates(Request $request) {
         $data = DB::table('candidate')
             ->select(DB::raw('
@@ -27,6 +34,24 @@ class CandidateController extends Controller
             '))
             ->join('users', 'users.id', 'candidate.cadre_id')
             ->orderBy('candidate.last_name')
+            ->get();
+
+        return datatables($data)->make(true);
+    }
+
+    /**
+     * Zwraca dane kandydatow dla danego rekrutera
+     */
+    public function datatableShowCadreCandidates(Request $request) {
+        $data = DB::table('candidate')
+            ->select(DB::raw('
+                candidate.*,
+                users.first_name as cadre_name,
+                users.last_name as cadre_surname
+            '))
+            ->join('users', 'users.id', 'candidate.cadre_id')
+            ->orderBy('candidate.last_name')
+            ->where('candidate.cadre_id', '=', Auth::user()->id)
             ->get();
 
         return datatables($data)->make(true);
