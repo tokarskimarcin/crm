@@ -21,4 +21,8 @@ class GroupTraining extends Model
     public function dapartment_info() {
         return $this->belongsTo('App\Department_info', 'department_info_id');
     }
+
+    public function candidates() {
+        return $this->belongsToMany('App\Candidate', 'candidate_training', 'training_id', 'candidate_id');
+    }
 }
