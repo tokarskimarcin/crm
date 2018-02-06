@@ -69,6 +69,22 @@
                                                 </div></br></br>
                                             </form>
                                         </div>
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                Legenda
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="alert alert-success">
+                                                    <h1>Wypłaty liczone są wg następujacego schematu:</h1>
+                                                    <h3>
+                                                        Podstawa wypłaty jest nienaruszalna - w przypadku kary/kosztu janków przekraczających premię/prowizję, wszystkie kary i premie są zerowane a pracownik dostaje wypracowaną podstawę.
+                                                    </h3>
+                                                    <h3>
+                                                        W każdym innym przypadku suma kar odejmowana jest od sumy premii/prowizji, a suma wypłaty dla danego pracownika to podstawa + pozostała premia.
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                                 @if(isset($month))
                                                             @php
@@ -171,7 +187,35 @@
                                                                                          $bonus_per_hour = 0;
                                                                                       }
                                                                                 $bonus_salary = $rbh * $bonus_per_hour;
-                                                                                $salary_total = $standart_salary+$bonus_salary-$janky_cost+$bonus_penalty;
+                                                                                if ($bonus_salary <= 0) { // brak systemu prowizyjnego
+                                                                                    if ($bonus_penalty <= 0) {
+                                                                                        $bonus_penalty = 0;
+                                                                                        $janky_cost = 0;
+                                                                                    } else if ($bonus_penalty > 0 && ($bonus_penalty - $janky_cost) <= 0) {
+                                                                                        $bonus_penalty = 0;
+                                                                                        $janky_cost = 0;
+                                                                                    }
+                                                                                } else { //system prowizyjny
+                                                                                    
+                                                                                    if ($bonus_penalty < 0  && ($bonus_salary + $bonus_penalty - $janky_cost) <= 0) {
+                                                                                        //Gdy jest kara i nie mamy od czego odjąć tej kary
+                                                                                        $bonus_salary = 0;
+                                                                                        $bonus_penalty = 0;
+                                                                                        $janky_cost = 0;
+                                                                                    } else if ($bonus_penalty > 0 && (($bonus_salary + $bonus_penalty) - $janky_cost) <= 0) {
+                                                                                        //JEzeli mamy premie i koszt jankow jest wiekszy niz premia i prowizja
+                                                                                        $bonus_salary = 0;
+                                                                                        $bonus_penalty = 0;
+                                                                                        $janky_cost = 0;
+                                                                                    }else if ($bonus_penalty == 0 && ($bonus_salary - $janky_cost) <= 0) {
+                                                                                        //JEzeli nie ma kary ani premii i koszt jankow nie przekracza prowizji
+                                                                                        $bonus_salary = 0;
+                                                                                        $bonus_penalty = 0;
+                                                                                        $janky_cost = 0;
+                                                                                    }
+                                                                                }
+                                                                                
+                                                                                $salary_total = $standart_salary+$bonus_salary - $janky_cost+$bonus_penalty;
                                                                                 if($salary_total <0)
                                                                                     $salary_total = 0;
                                                                                 $salary_total_all += $salary_total;

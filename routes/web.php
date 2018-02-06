@@ -156,6 +156,7 @@ Route::POST('/addToTraining', 'CandidateController@addToTraining')->name('api.ad
 Route::POST('/uniqueCandidatePhone', 'CandidateController@uniqueCandidatePhone')->name('api.uniqueCandidatePhone');
 
 Route::POST('/datatableShowCandidates', 'CandidateController@datatableShowCandidates')->name('api.datatableShowCandidates');
+Route::POST('/datatableShowCadreCandidates', 'CandidateController@datatableShowCadreCandidates')->name('api.datatableShowCadreCandidates');
 
 Route::POST('/myInterviews', 'RecruitmentAttemptController@myInterviews')->name('api.myInterviews');
 
