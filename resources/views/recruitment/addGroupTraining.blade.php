@@ -1,6 +1,9 @@
 @extends('layouts.main')
 @section('content')
     <style>
+        th,td{
+            text-align: center;
+        }
         .myLabel {
             color: #aaa;
             font-size: 20px;
@@ -64,6 +67,10 @@
 
 
 
+
+
+
+
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">
@@ -71,6 +78,12 @@
             </div>
         </div>
     </div>
+
+
+
+
+
+
 
     <button data-toggle="modal" class="btn btn-default training_to_modal" data-target="#myModalgroup" data-category_id="{{1}}" title="Dodaj szkolenie" style="margin-bottom: 14px">
         <span class="glyphicon glyphicon-plus"></span> <span>Dodaj szkolenie</span>
@@ -229,29 +242,25 @@
                         <div class="col-md-12" id="modal_end" style="display: none">
                             <div class="col-md-12">
                                 <label class="myLabel">Osoby biorące udział w szkoleniu:</label>
-                                <div class="search_candidate">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="right_search_end" placeholder="Wyszukaj osobe na szkoleniu"/>
-                                        <div class="input-group-addon">
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="form-group">
                                     <div class="right-container">
                                         <div class="list_group" id="list_candidate_choice_end">
+                                            <table class="table table-striped type_table thead-inverse">
+                                                <thead>
+                                                <tr>
+                                                    <th style="width:5%">Lp.</th>
+                                                    <th>Imie i nazwisko</th>
+                                                    <th class="category_column">Komentarz</th>
+                                                    <th class="category_column">Zatrudnij</th>
+                                                    <th class="category_column">Odrzuć</th>
+                                                    <th class="category_column">Status końcowy</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody id="candidate_end_training_decision">
 
-                                            <a class="list-group-item checked">
-                                                Jan Kowalski
-                                                <input type="checkbox" class="pull-left" style="display: block">
-                                            </a>
-                                            <a class="list-group-item">
-                                                Jan Kowalski
-                                                <input type="checkbox" class="pull-left" style="display: block">
-                                            </a>
-                                            <a class="list-group-item">
-                                                Jan Kowalski
-                                                <input type="checkbox" class="pull-left" style="display: block">
-                                            </a>
+                                                </tbody>
+                                            </table>
+
                                         </div>
                                     </div>
                                 </div>
@@ -391,6 +400,96 @@
             '</a>';
 
 
+        function  accept_candidate_finaly(e) {
+            let row = $(e).closest('tr');
+            let candidate_id_end = $(e).closest('tr').attr('id');
+            let id_training = $(e).closest('tr').attr('data-id');
+            let comment_text = $(e).closest('tr').find('.commnet').val();
+            swal({
+                title: 'Jesteś pewien?',
+                text: "Spowoduje to zakończenie szkolenia kandydata, ze statusem pozytywnym!",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Tak, zakończ szkolenie kandydata!'
+            }).then((result) => {
+                if(result.value)
+                    {
+                        $.ajax({
+                            type: "POST",
+                            url: '{{ route('api.EndGroupTrainingForCandidate') }}',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            data: {
+                                "candidate_id_end": candidate_id_end,
+                                "training_group_id": id_training,
+                                "status": 1,
+                                "comment": comment_text,
+                            },
+                            success: function (response) {
+                                if (response == 1) {
+                                    swal(
+                                        'Szkolenie kandydata zostało zakończone!',
+                                        'Szkolenie kandydata zostało zakończone.',
+                                        'success'
+                                    )
+                                    $(e).closest('tr').find('.candidate_status').find('span').text('Kandydat Przyjęty');
+                                    $(e).closest('tr').find('.glyphicon-ok').css({'color': 'gray'});
+                                    $(e).closest('tr').find('.glyphicon-remove').css({'color': 'gray'});
+                                    $(e).closest('tr').find('.candidate_status').find('span').text('Kandydat Przyjęty');
+                                }
+                            }
+                        });
+                    }
+                });
+        }
+        function cancel_candidate_finaly(e) {
+            let row = $(e).closest('tr');
+            let candidate_id_end = $(e).closest('tr').attr('id');
+            let id_training = $(e).closest('tr').attr('data-id');
+            let comment_text = $(e).closest('tr').find('.commnet').val();
+            swal({
+                title: 'Jesteś pewien?',
+                text: "Spowoduje to zakończenie szkolenia kandydata, ze statusem odrzucony!",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Tak, zakończ szkolenie kandydata!'
+            }).then((result) => {
+                if(result.value)
+            {
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.EndGroupTrainingForCandidate') }}',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        "candidate_id_end": candidate_id_end,
+                        "training_group_id": id_training,
+                        "status": 0,
+                        "comment": comment_text,
+                    },
+                    success: function (response) {
+                        if (response == 1) {
+                            swal(
+                                'Szkolenie kandydata zostało zakończone!',
+                                'Szkolenie kandydata zostało zakończone.',
+                                'success'
+                            )
+                            $(e).closest('tr').find('.glyphicon-ok').css({'color': 'gray'});
+                            $(e).closest('tr').find('.glyphicon-remove').css({'color': 'gray'});
+                            $(e).closest('tr').find('.candidate_status').find('span').text('Kandydat Odrzucony');
+                        }
+                    }
+                });
+            }
+        });
+
+        }
 
 
         function onclickRowLeft(e)
@@ -698,6 +797,8 @@
                         success: function (response) {
                             console.log(response);
                             training_group_response = response;
+                            let lp = 1;
+                            $('#candidate_end_training_decision tr').remove();
                             if (response.length != 0) {
                                 for (var i = 0; i < response['group_training'].length; i++) {
                                     $("input[name='start_date_training']").val(response['group_training'][i].training_date);
@@ -725,8 +826,56 @@
                                             '</a>';
                                         if(cancel_candidate == 1)
                                             $('#list_candidate_choice_cancel').append(html);
-                                        else if(cancel_candidate  == 2)
-                                            $('#list_candidate_choice_end').append(html);
+                                        else if(cancel_candidate  == 2){
+                                            var status_ended = '';
+                                            var span_color_succes = 'green';
+                                            var span_color_faild = 'red';
+                                            var fucnction_on_click_succes = 'onclick=accept_candidate_finaly(this)';
+                                            var fucnction_on_click_cancel = 'onclick=cancel_candidate_finaly(this)';
+                                            var comment_text = response['candidate'][i].recruitment_story_comment;
+                                            if(comment_text == null)
+                                            {
+                                                comment_text= '';
+                                            }
+                                            if(response['candidate'][i].completed_training != null)
+                                            {
+                                                if(response['candidate'][i].recruitment_story_id == 8)
+                                                {
+                                                    var status_ended ='<td class="candidate_status">'+
+                                                        '<span>Kandydat Przyjęty</span>'+
+                                                        '</td>';
+                                                }else{
+                                                    status_ended = '<td class="candidate_status">'+
+                                                        '<span>Kandydat Odrzucony</span>'+
+                                                        '</td>';
+                                                }
+                                                span_color_succes = span_color_faild= 'gray';
+                                                fucnction_on_click_succes= '';
+                                                fucnction_on_click_cancel= '';
+
+                                            }else{
+                                                status_ended = '<td class="candidate_status">'+
+                                                    '<span>Oczekuje na weryfikacje</span>'+
+                                                    '</td>';
+                                            }
+
+                                            html = '<tr id='+response['candidate'][i].id+' data-id='+id_training_group+'>'+
+                                                '<td>'+(lp++)+'</td>'+
+                                                '<td>'+response['candidate'][i].first_name+' '+ response['candidate'][i].last_name+'</td>'+
+                                                '<td>'+
+                                                ' <input type="text" class="form-control commnet" value="'+comment_text+'">'+
+                                                ' </input>'+
+                                                ' </td>'+
+                                                '<td>'+
+                                                '<span style="color:'+span_color_succes+';font-size: 20px;margin-right: 5px" class="glyphicon glyphicon-ok" '+fucnction_on_click_succes+'></span>'+
+                                                ' </td>'+
+                                                '<td>'+
+                                                '<span style="color:'+span_color_faild+';font-size: 20px;" class="glyphicon glyphicon-remove" '+fucnction_on_click_cancel+' ></span>'+
+                                                '</td>';
+
+                                            html +=status_ended+'</tr>';
+                                            $('#candidate_end_training_decision').append(html);
+                                        }
                                     }
                                 }
                             }
@@ -734,6 +883,7 @@
                     });
                 }
             }
+
             //cancel modal
             $('#myModalgroup').on('hidden.bs.modal',function () {
                 id_training_group = 0;
@@ -893,7 +1043,7 @@
                     {"data": "training_date"},
                     {"data": "training_hour"},
                     {"data": "candidate_count"},
-                    {
+                    { "width": "10%",
                         "data": function (data, type, dataToSet) {
                             return action_row_end;
                         }

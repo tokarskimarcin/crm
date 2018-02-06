@@ -38,6 +38,49 @@ class GroupTrainingController extends Controller
         return datatables($group_training)->make(true);
     }
 
+    public function EndGroupTrainingForCandidate(Request $request)
+    {
+        if($request->ajax())
+        {
+            $candidate_id = $request->candidate_id_end;
+            $training_group = $request->training_group_id;
+            $status = $request->status;
+            $candidate = Candidate::find($candidate_id);
+            $comment = $request->comment;
+            if($comment == null)
+            {
+                $comment = "Brak komentarza";
+            }
+            if($status == 1)
+                $candidate->attempt_status_id = 8;
+            else{
+                $candidate->attempt_status_id = 9;
+            }
+            $candidate->save();
+
+            $candidate_story_old = RecruitmentStory::where('candidate_id','=',$candidate_id)
+                ->orderBy('id', 'desc')->first();
+            $candidate_story_new = new RecruitmentStory();
+            $candidate_story_new->cadre_id = Auth::user()->id;
+            $candidate_story_new->cadre_edit_id = Auth::user()->id;
+            $candidate_story_new->candidate_id = $candidate_id;
+            $candidate_story_new->recruitment_attempt_id = $candidate_story_old->recruitment_attempt_id;
+            if($status == 1)
+                $candidate_story_new->attempt_status_id = 8;
+            else{
+                $candidate_story_new->attempt_status_id = 9;
+            }
+            $candidate_story_new->comment = $comment;
+            $candidate_story_new->save();
+
+            $CandidateTraining = CandidateTraining::where('training_id','=',$training_group)
+                ->where('candidate_id','=',$candidate_id)
+                ->update(['completed_training' => $candidate_story_new->id]);
+            return 1;
+
+        }
+    }
+
     public function EndGroupTraining(Request $request)
     {
         if($request->ajax())
@@ -122,9 +165,13 @@ class GroupTrainingController extends Controller
 
             $candidate_choice = DB::table('candidate')
                 ->select(DB::raw('
-                candidate.*         
+                candidate.*,
+                candidate_training.completed_training,
+                recruitment_story.attempt_status_id as recruitment_story_id,    
+                recruitment_story.comment  as recruitment_story_comment
             '))
                 ->join('candidate_training', 'candidate_training.candidate_id', 'candidate.id')
+                ->leftjoin('recruitment_story', 'recruitment_story.id', 'candidate_training.completed_training')
                 ->join('group_training', 'group_training.id', 'candidate_training.training_id')
                 ->where('group_training.id','=',$request->id_training_group)
                 ->get()->toArray();
