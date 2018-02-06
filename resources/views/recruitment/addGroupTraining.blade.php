@@ -164,10 +164,10 @@
                             </div>
 
                             <div class="col-md-2" id="button_move_area">
-                                <button id="move_right" class="btn btn-default center-block add" style="margin-bottom: 15px">
+                                <button id="move_right" class="btn btn-default center-block add" style="width: 100px;margin-bottom: 15px">
                                     <i class="glyphicon glyphicon-chevron-right"></i>
                                 </button>
-                                <button id="move_left" class="btn btn-default center-block remove">
+                                <button id="move_left" class="btn btn-default center-block remove" style="width: 100px;">
                                     <i class="glyphicon glyphicon-chevron-left"></i>
                                 </button>
                             </div>
@@ -266,9 +266,16 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-12">
+                            <div class="col-md-5"></div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-success btn-block" id="save_button">Dodaj szkolenie</button>
+                            </div>
+                            <div class="col-md-5"></div>
+                        </div>
                     </div>
-                    <button type="button" class="btn btn-primary" id="save_button">Dodaj szkolenie</button>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
                 </div>
@@ -383,10 +390,10 @@
             '<a class="btn btn-default info_active" href="#">'+
             '<span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły'+
             '</a>'+
-            '<a class="btn btn-default end_active" href="#">'+
+            '<a class="btn btn-default end_active" href="#" style="width:106px">'+
             '<span style="color: green" class="glyphicon glyphicon glyphicon-pencil"></span> Zakończ'+
             '</a>'+
-            '<a class="btn btn-default cancle_active" data-id ={{1}} href="#">'+
+            '<a class="btn btn-default cancle_active" style="width:106px" data-id ={{1}} href="#">'+
             '<span style="color: green" class="glyphicon glyphicon glyphicon-trash"></span> Usuń'+
             '</a>';
 
@@ -923,7 +930,7 @@
                             return data.last_name+' '+data.first_name;
                         },"name":"leader.last_name"
                     },
-                    {
+                    {"width":"10%",
                         "data": function (data, type, dataToSet) {
                             return action_row;
                         },"searchable": false,"orderable": false
