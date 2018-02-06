@@ -99,6 +99,7 @@ class UsersController extends Controller
             $redirect = 1;
             $user->user_type_id = $request->user_type;
             $user->department_info_id = $request->department_info;
+            $user->main_department_id = $request->department_info;
         }else
         {
             if (Auth::user()->user_type_id == 13) {
@@ -107,6 +108,7 @@ class UsersController extends Controller
                 $user->user_type_id = 1;
             }
             $user->department_info_id = Auth::user()->department_info_id;
+            $user->main_department_id = Auth::user()->department_info_id;
         }
         $user->dating_type = ($request->dating_type != null)? $request->dating_type : 0 ;
         $user->start_work = $request->start_date;
@@ -264,6 +266,7 @@ class UsersController extends Controller
                 return view('errors.404');
             }
             $user->department_info_id = $request->department_info_id;
+            $user->main_department_id = $request->department_info_id;
         }
         if ($request->user_type != null && $request->user_type != 0) {
             $user->user_type_id = $request->user_type;
