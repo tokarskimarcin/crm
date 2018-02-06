@@ -58,7 +58,7 @@
 
                                                 <label for ="ipadress">Miesiąc:</label>
                                                 <select class="form-control" name="month">
-                                                    @for ($i = 0; $i < 2; $i++)
+                                                    @for ($i = 0; $i < 3; $i++)
                                                         {{$date = date("Y-m",mktime(0,0,0,date("m")-$i,1,date("Y")))}}
                                                         @if(isset($response_month))
                                                             @if($response_month == $date)
