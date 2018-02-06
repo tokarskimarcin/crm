@@ -31,7 +31,7 @@ class FinancesController extends Controller
         $date = $request->search_money_month.'%';
         $agencies = Agencies::all();
         $salary = DB::table(DB::raw("users"))
-            ->whereNotIn('users.user_type_id',[1,2])
+            ->whereNotIn('users.user_type_id',[1,2,14])
             ->where('users.agency_id', '!=', 4)
             ->where('users.salary','>',0)
             ->selectRaw('
@@ -58,6 +58,89 @@ class FinancesController extends Controller
             ->groupBy('users.id')
 
             ->orderBy('users.last_name')->get();
+
+        /**
+         * Pobranie danych osób którzy nie pracowali całego miesiąca
+         */
+        $days_in_month = date('t', strtotime($request->search_money_month . "-01"));
+
+        $last_day = $request->search_money_month . '-' . $days_in_month;
+        $first_day = $request->search_money_month . '-01';
+
+        $working_days = [];
+        $work_days_stop = [];
+
+        $users_by_start = DB::table('users')
+            ->select(DB::raw("
+                id,
+                start_work,
+                salary
+            "))
+            ->where('start_work', 'like', $date)
+            ->whereNotIn('user_type_id', [1,2,14])
+            ->get();
+
+        foreach($users_by_start as $item) {
+
+            $date_diff = strtotime($last_day) - strtotime($item->start_work);
+
+            $user_salary_per_day = $item->salary / $days_in_month;
+
+            $user_salary = $user_salary_per_day * (($date_diff / 3600 / 24) + 1);
+
+            $working_days[$item->id] = round($user_salary, 0);
+        }
+    
+        foreach($salary as $value) {
+            foreach($working_days as $key => $item) {
+                if ($value->id == $key) {
+                    $value->salary = $item;
+                }
+            }
+        }
+
+        /**
+        *Zakończenie pracy
+        */
+        $users_by_stop = DB::table('users')
+            ->select(DB::raw("
+                id,
+                end_work,
+                salary
+            "))
+            ->where('end_work', 'like', $date)
+            ->whereNotIn('user_type_id', [1,2,14])
+            ->get();
+
+        foreach($users_by_stop as $item) {
+
+            $date_diff = strtotime($item->end_work) - strtotime($first_day);
+
+            $user_salary_per_day = $item->salary / $days_in_month;
+
+            $user_salary = $user_salary_per_day * (($date_diff / 3600 / 24) + 1);
+
+            $work_days_stop[$item->id] = round($user_salary, 0);
+        }
+     
+
+        foreach($salary as $value) {
+            foreach($work_days_stop as $key => $item) {
+                if ($value->id == $key) {
+                    $value->salary = $item;
+                }
+            }
+        }
+// dd(DB::table('users')
+//     ->select(DB::raw("
+//         id,
+//         end_work,
+//         salary
+//     "))
+//     ->where('end_work', 'like', $date)
+//     ->where('start_work', 'like', $date)
+//     ->whereNotIn('user_type_id', [1,2,14])
+//     ->get());
         return view('finances.viewPaymentCadre')
             ->with('month',$date)
             ->with('salary',$salary->groupby('agency_id'))
