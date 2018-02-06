@@ -290,7 +290,7 @@
                                             <select class="form-control" style="font-size:18px;" name="department_info_id" id="department_info_id">
                                                 @foreach($department_info as $dep)
                                                     @if($dep->id != 13)
-                                                        <option @if($dep->id == $user->department_info_id) selected @endif value="{{$dep->id}}">{{$dep->departments->name . ' ' . $dep->department_type->name}}</option>
+                                                        <option @if($dep->id == $user->main_department_id) selected @endif value="{{$dep->id}}">{{$dep->departments->name . ' ' . $dep->department_type->name}}</option>
                                                     @endif
                                                 @endforeach
                                             </select>
