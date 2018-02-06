@@ -128,7 +128,7 @@ class GroupTrainingController extends Controller
                 ->join('group_training', 'group_training.id', 'candidate_training.training_id')
                 ->where('group_training.id','=',$request->id_training_group)
                 ->get()->toArray();
-            if($request->cancel_candidate == 1)
+            if($request->cancel_candidate == 1 || $request->cancel_candidate == 2 )
             {
                 $merge_array = $candidate_choice;
             }else

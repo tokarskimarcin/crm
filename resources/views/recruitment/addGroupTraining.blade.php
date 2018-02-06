@@ -62,6 +62,8 @@
 
     </style>
 
+
+
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">
@@ -229,14 +231,14 @@
                                 <label class="myLabel">Osoby biorące udział w szkoleniu:</label>
                                 <div class="search_candidate">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" id="right_search_cancle" placeholder="Wyszukaj osobe na szkoleniu"/>
+                                        <input type="text" class="form-control" id="right_search_end" placeholder="Wyszukaj osobe na szkoleniu"/>
                                         <div class="input-group-addon">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="right-container">
-                                        <div class="list_group" id="list_candidate_choice_cancel">
+                                        <div class="list_group" id="list_candidate_choice_end">
 
                                             <a class="list-group-item checked">
                                                 Jan Kowalski
@@ -383,6 +385,12 @@
             '<a class="btn btn-default info_cancel" href="#">'+
             '<span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły'+
             '</a>';
+        var action_row_end =
+            '<a class="btn btn-default info_end" href="#">'+
+            '<span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły'+
+            '</a>';
+
+
 
 
         function onclickRowLeft(e)
@@ -452,9 +460,6 @@
                 myObjects.splice(what_delete,1);
             return myObjects;
         }
-
-
-
         $(document).ready(function() {
             $('.form_date').datetimepicker({
                 language: 'pl',
@@ -473,8 +478,6 @@
                 maxView: 1,
                 forceParse: 0
             });
-
-
             $('#save_button').on('click',function (e) {
                 var start_date_training = $("input[name='start_date_training']").val();
                 var start_hour_training = $("input[id='start_time_training']").val();
@@ -531,7 +534,6 @@
 
                 }
             });
-
             // zaznacz wszystko z lewej kolumny
             $('#all-put-left').change(function (e) {
                 $('#list_candidate a').each(function (key, value) {
@@ -569,10 +571,6 @@
                     }
                 })
             });
-
-
-
-
             // przeniesienie do prawej tabeli (wybrani użytkownicy)
             $('#move_right').on('click',function (e) {
                 // kod html z tabelą
@@ -627,9 +625,13 @@
                 $("#list_candidate_choice_cancel a").filter(function (e) {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                 })
-            })
-
-
+            });
+            $('#right_search_end').on('keyup', function (e) {
+                let value = $(this).val().toLowerCase();
+                $("#list_candidate_choice_end a").filter(function (e) {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                })
+            });
             // open modal
             $('#myModalgroup').on('show.bs.modal', function() {
                 if(is_open == 0)
@@ -717,17 +719,16 @@
                                             '</a>';
                                         $('#list_candidate_choice').append(html);
                                     }
-                                    else if (cancel_candidate == 1) {
-
-                                        console.log(cancel_candidate);
+                                    else if (cancel_candidate != 0) {
                                         var html = '<a class="list-group-item nocheck" id=' + response['candidate'][i].id + '>' +
                                             response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
                                             '</a>';
-                                        $('#list_candidate_choice_cancel').append(html);
+                                        if(cancel_candidate == 1)
+                                            $('#list_candidate_choice_cancel').append(html);
+                                        else if(cancel_candidate  == 2)
+                                            $('#list_candidate_choice_end').append(html);
                                     }
                                 }
-                            } else {
-
                             }
                         }
                     });
@@ -746,6 +747,7 @@
                 $("#save_button").css({'display':'block'});
                 $("#modal_full").css({'display':'block'});
                 $("#modal_cancel").css({'display':'none'});
+                $("#modal_end").css({'display':'none'});
             });
             //tabela dostępnych szkoleń
             var table_activ_training_group = $('#activ_training_group').DataTable({
@@ -893,10 +895,29 @@
                     {"data": "candidate_count"},
                     {
                         "data": function (data, type, dataToSet) {
-                            return action_row_end_cancel;
+                            return action_row_end;
                         }
                     }
-                ]
+                ],"fnDrawCallback": function(settings){
+                    $('.info_end').on('click',function (e) {
+
+                        $("#modal_full").css({'display':'none'});
+                        $("#modal_cancel").css({'display':'none'});
+                        $("#modal_end").css({'display':'block'});
+
+                        $("#save_button").css({'display':'none'});
+                        saving_type = 0;
+                        cancel_candidate = 2;
+                        //główny wiersz
+                        var tr = $(this).closest('tr');
+                        id_training_group = tr.attr('id');
+                        $('#myModalgroup').modal("show");
+                    });
+                },"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+                    // Dodanie id do wiersza
+                    $(nRow).attr('id', aData.id);
+                    return nRow;
+                }
             });
             // tabela skaswoanych szkoleń
             var table_cancel_training_group = $('#cancel_training_group').DataTable({
@@ -929,6 +950,7 @@
                 ],"fnDrawCallback": function(settings){
                         $('.info_cancel').on('click',function (e) {
                             $("#modal_full").css({'display':'none'});
+                            $("#modal_end").css({'display':'none'});
                             $("#modal_cancel").css({'display':'block'});
                             $("#save_button").css({'display':'none'});
                             saving_type = 0;
