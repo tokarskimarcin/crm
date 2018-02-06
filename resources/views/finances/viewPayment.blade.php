@@ -202,16 +202,19 @@
                                                                                         $bonus_salary = 0;
                                                                                         $bonus_penalty = 0;
                                                                                         $janky_cost = 0;
+                                                                                        $bonus_per_hour = 0;
                                                                                     } else if ($bonus_penalty > 0 && (($bonus_salary + $bonus_penalty) - $janky_cost) <= 0) {
                                                                                         //JEzeli mamy premie i koszt jankow jest wiekszy niz premia i prowizja
                                                                                         $bonus_salary = 0;
                                                                                         $bonus_penalty = 0;
                                                                                         $janky_cost = 0;
+                                                                                        $bonus_per_hour = 0;
                                                                                     }else if ($bonus_penalty == 0 && ($bonus_salary - $janky_cost) <= 0) {
                                                                                         //JEzeli nie ma kary ani premii i koszt jankow nie przekracza prowizji
                                                                                         $bonus_salary = 0;
                                                                                         $bonus_penalty = 0;
                                                                                         $janky_cost = 0;
+                                                                                        $bonus_per_hour = 0;
                                                                                     }
                                                                                 }
                                                                                 
