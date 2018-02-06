@@ -49,8 +49,12 @@ class FinancesController extends Controller
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$date.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `bonus`')
             ->where('users.status_work',1)
             ->join('department_info','department_info.id','users.main_department_id')
+            ->join('work_hours', 'work_hours.id_user', 'users.id')
             ->join('departments','departments.id','department_info.id_dep')
             ->join('department_type','department_type.id','department_info.id_dep_type')
+
+            ->where('work_hours.date', 'like', $date)
+            ->groupBy('users.id')
 
             ->orderBy('users.last_name')->get();
         return view('finances.viewPaymentCadre')
