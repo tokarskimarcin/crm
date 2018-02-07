@@ -296,6 +296,8 @@ class UsersController extends Controller
             'documents' => $request->documents,
             'additional_salary' => $request->additional_salary,
             'status_work' => $request->status_work,
+            'start_work' => $request->start_date,
+            'stop_work' => $request->stop_date,
             'guid' => base64_encode($request->password)
         ];
 
