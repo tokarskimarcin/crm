@@ -68,7 +68,7 @@ table = $('#candidates').DataTable({
             var myName = data.cadre_name + " " + data.cadre_surname;
             return myName;
         },"orderable": true, "searchable": true, "name": "cadre_surname"},
-        {"data": "created_at"},
+        {"data": "attempt_name"},
         {"data": function (data, type, dataToSet) {
             return "<a href='{{ URL::to('/candidateProfile') }}/" + data.id +"' class='btn btn-info'><span class='glyphicon glyphicon-pencil'></span> Szczegóły</a>";
         },"orderable": false, "searchable": false},

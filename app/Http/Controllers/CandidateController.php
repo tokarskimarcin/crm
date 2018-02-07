@@ -30,9 +30,11 @@ class CandidateController extends Controller
             ->select(DB::raw('
                 candidate.*,
                 users.first_name as cadre_name,
-                users.last_name as cadre_surname
+                users.last_name as cadre_surname,
+                attempt_status.name as attempt_name
             '))
             ->join('users', 'users.id', 'candidate.cadre_id')
+            ->join('attempt_status', 'attempt_status.id', 'candidate.attempt_status_id')
             ->orderBy('candidate.last_name')
             ->get();
 
@@ -43,15 +45,17 @@ class CandidateController extends Controller
      * Zwraca dane kandydatow dla danego rekrutera
      */
     public function datatableShowCadreCandidates(Request $request) {
+
+        $id = (!$request->id) ? Auth::user()->id : $request->id ;
+
         $data = DB::table('candidate')
             ->select(DB::raw('
                 candidate.*,
-                users.first_name as cadre_name,
-                users.last_name as cadre_surname
+                attempt_status.name as attempt_name
             '))
-            ->join('users', 'users.id', 'candidate.cadre_id')
+            ->join('attempt_status', 'attempt_status.id', 'candidate.attempt_status_id')
             ->orderBy('candidate.last_name')
-            ->where('candidate.cadre_id', '=', Auth::user()->id)
+            ->where('candidate.cadre_id', '=', $id)
             ->get();
 
         return datatables($data)->make(true);

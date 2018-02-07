@@ -12,6 +12,7 @@ use App\GroupTraining;
 use App\RecruitmentStory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\User;
 
 class RecruitmentAttemptController extends Controller
 {
@@ -143,27 +144,29 @@ class RecruitmentAttemptController extends Controller
     }
 
     /**
-     * Funkcja zwracająca wszystkie rozmowy kwalifikacyjne
+     * Funkcja zwracająca panel administracyjny dla rekrutera
      */
     public function interviewsAllGet() {
         $active_recruitments = Candidate::where('cadre_id', '=', Auth::user()->id)->whereNotIn('attempt_status_id', [10])->count();
 
         $today_interviews = DB::table('recruitment_attempt')
                 ->select(DB::raw('
-                    SUM(candidate.id) as sum
+                    COUNT(candidate.id) as sum
                 '))
                 ->join('candidate', 'candidate.id', 'recruitment_attempt.candidate_id')
                 ->where('candidate.attempt_status_id', '=', 3)
-                ->where('recruitment_attempt.status', '=', 0)
                 ->where('interview_cadre', '=', Auth::user()->id)
                 ->where('recruitment_attempt.interview_date', 'like', date('Y-m-d') . '%')
                 ->get();
+
+        $sum_interviews = Candidate::where('cadre_id', '=', Auth::user()->id)->count();
 
         $total_trainings = GroupTraining::where('cadre_id', '=', Auth::user()->id)->count();
 
         $incoming_trening = GroupTraining::where('leader_id', '=', Auth::user()->id)->where('status', '!=', 0)->get();
 
         return view('recruitment.interviewsAll')
+            ->with('sum_interviews', $sum_interviews)
             ->with('incoming_trening', $incoming_trening)
             ->with('today_interviews', $today_interviews[0]->sum)
             ->with('total_trainings', $total_trainings)
@@ -191,5 +194,113 @@ class RecruitmentAttemptController extends Controller
         }
     }
 
-   
+   /**
+    * Główne statystyki rekrutacji
+    */
+    public function recruitment_admin() { $id =4796;
+        
+        /**
+         * Ilość aktywnych rekrutacji
+         */
+        $active_recruitments = Candidate::whereNotIn('attempt_status_id', [10,11])->count();
+        
+        /**
+         * Ilość dodanych szkoleń
+         */
+        $training_sum = GroupTraining::count();
+
+        /**
+         * Ilość rekruterów
+         */
+        $recruiter_sum = DB::table('candidate')
+            ->select(DB::raw('
+                DISTINCT(cadre_id) as cadre
+            '))
+            ->get();
+
+        $cadre_array = [];
+
+        foreach($recruiter_sum as $item) {
+            $cadre_array[] = $item->cadre;
+        }
+
+        /**
+         * Liczba pozytywnych rekrutacji
+         */
+        $recruitment_ok = Candidate::where('attempt_status_id', '=', 11)->count();
+
+        /**
+         * Dane rekruterów
+         */
+        $recruiters = User::whereIn('id', $cadre_array)->get();
+
+        return view('recruitment.recruitmentStatistics')
+            ->with('training_sum', $training_sum)
+            ->with('recruiters', $recruiters)
+            ->with('recruitment_ok', $recruitment_ok)
+            ->with('recruiter_sum', count($cadre_array))
+            ->with('active_recruitments', $active_recruitments);
+    }
+
+    /**
+     * Dane dotyczące pojedyńczego rekrutera
+     */
+    public function recruiterData(Request $request) {
+        if ($request->ajax()) {
+            $id = $request->id;
+
+            $user = User::find($id);
+
+            /**
+             * Sprawdzenie czy użytkownik istenieje
+             */
+            if (!$user) {
+                return 0;
+            }
+
+            /**
+             * Pobranie ilości idanych rekrutacji
+             */
+            $recruitment_sum = $user->userCandidates->where('attempt_status_id', '=', 10)->count();
+
+            /**
+             * Pobranie ilości szkoleń
+             */
+            $all_sum = $user->userCandidates->count();
+
+            /**
+             * Pobranie ilości kandydatów umówionych na rozmowę kwalifikacyjną
+             */
+            $interviews_sum = $user->userCandidates->where('attempt_status_id', '=', 3)->count();
+
+            /**
+             * Pobranie danych dotyczących szkoleń prowadzonych przez rekrutera 
+             */
+            //$training_data = $user->userTrainings;
+
+            $training_data = DB::table('group_training')
+                ->select(DB::raw('
+                    group_training.*,
+                    count(candidate_training.candidate_id) as candidate_sum,
+                    SUM(CASE WHEN completed_training is null THEN 1 ELSE 0 END) as not_judged,
+                    SUM(CASE WHEN recruitment_story.attempt_status_id = 8 THEN 1 ELSE 0 END) as candidate_pass,
+                    SUM(CASE WHEN recruitment_story.attempt_status_id = 9 THEN 1 ELSE 0 END) as candidate_not_pass
+                '))
+                ->leftJoin('candidate_training', 'candidate_training.training_id', 'group_training.id')
+                ->leftJoin('recruitment_story', 'recruitment_story.id', 'candidate_training.completed_training')
+                ->where('leader_id', '=', $id)
+                ->groupBy('group_training.id')
+                ->get();
+
+            $data = [
+                'user'              => $user,
+                'recruitment_sum'   => $recruitment_sum,
+                'all_sum'           => $all_sum,
+                'interviews_sum'    => $interviews_sum,
+                'training_data'     => $training_data
+            ];
+
+            return $data;
+        }
+    }
 }
