@@ -249,10 +249,31 @@ class WorkHoursController extends Controller
     public function viewHourGet()
     {
         $department_id = Auth::user()->department_info_id;
-        $users = User::where('status_work',1)->wherein('user_type_id',[1,2])
+
+        $users = User::where('status_work',1)->wherein('user_type_id',[1,2,14])
             ->where('department_info_id',$department_id)->orderBy('last_name')->get();
+
+        $last_month = date("Y-m", strtotime("first day of previous month"));
+        $current_month = date("Y-m");
+        // zwolnieni miesiąc temu
+        $users_fired_last_month =  User::where('department_info_id', Auth::user()->department_info_id)
+            ->whereIn('user_type_id', [1, 2,14])
+            ->where('status_work', '=', 0)
+            ->where('end_work', 'like', $last_month.'%')
+            ->orderBy('last_name')
+            ->get();
+        // zwolnieni w tym miesiącu
+        $users_fired_current_month =  User::where('department_info_id', Auth::user()->department_info_id)
+            ->whereIn('user_type_id', [1, 2,14])
+            ->where('status_work', '=', 0)
+            ->where('end_work', 'like', $current_month.'%')
+            ->orderBy('last_name')
+            ->get();
+        $merge_array = $users->merge($users_fired_last_month);
+        $merge_array = $merge_array->merge($users_fired_current_month);
+
         return view('workhours.viewHour')
-            ->with('users',$users);
+            ->with('users',$merge_array->sortBy('last_name'));
     }
     public function viewHourGetCadre()
     {
@@ -320,8 +341,30 @@ class WorkHoursController extends Controller
         Session::put('count_agreement', $count_agreement);
         $user_info = $this->user_info($userid,$month);
         $department_id = Auth::user()->department_info_id;
+
         $users = User::where('status_work',1)->wherein('user_type_id',[1,2])
             ->where('department_info_id',$department_id)->orderBy('last_name')->get();
+
+        $last_month = date("Y-m", strtotime("first day of previous month"));
+        $current_month = date("Y-m");
+        // zwolnieni miesiąc temu
+        $users_fired_last_month =  User::where('department_info_id', Auth::user()->department_info_id)
+            ->whereIn('user_type_id', [1, 2,14])
+            ->where('status_work', '=', 0)
+            ->where('end_work', 'like', $last_month.'%')
+            ->orderBy('last_name')
+            ->get();
+        // zwolnieni w tym miesiącu
+        $users_fired_current_month =  User::where('department_info_id', Auth::user()->department_info_id)
+            ->whereIn('user_type_id', [1, 2,14])
+            ->where('status_work', '=', 0)
+            ->where('end_work', 'like', $current_month.'%')
+            ->orderBy('last_name')
+            ->get();
+        $merge_array = $users->merge($users_fired_last_month);
+        $merge_array = $merge_array->merge($users_fired_current_month);
+
+
         $user = User::find($userid);
         if ($user == null) {
             return view('errors.404');
@@ -333,7 +376,7 @@ class WorkHoursController extends Controller
         }
         $request->session()->forget('add_hour_success');
         return view('workhours.viewHour')
-            ->with('users',$users)
+            ->with('users',$merge_array->sortBy('last_name'))
             ->with('response_userid',$userid)
             ->with('response_month',$month)
             ->with('agreement',$count_agreement)
