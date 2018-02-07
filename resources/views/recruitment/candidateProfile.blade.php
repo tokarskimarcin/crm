@@ -228,14 +228,14 @@
                                         <div class="col-md-4">
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <button data-toggle="modal" data-target="#nextLevel" class="btn btn-success" style="width: 100%" @if($item->status == 1) disabled title="Rekrutacja zakończona!" @endif>  
+                                                    <button data-toggle="modal" data-target="#nextLevel" class="btn btn-success" style="width: 100%" @if(($item->status == 1) || ($candidate->attempt_status_id > 5 && $candidate->attempt_status_id <= 9)) disabled @endif>  
                                                         <span class="glyphicon glyphicon-ok"></span> Następny etap
                                                     </button>
                                                 </div>
                                             </div>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <button data-toggle="modal" data-target="#add_training" class="btn btn-warning" style="width: 100%" @if($item->status == 1) disabled title="Rekrutacja zakończona!" @endif>  
+                                                    <button data-toggle="modal" data-target="#add_training" class="btn btn-warning" style="width: 100%" @if(($item->status == 1) || ($candidate->attempt_status_id > 5 && $candidate->attempt_status_id <= 9)) disabled @endif>  
                                                         <span class="glyphicon glyphicon-envelope"></span> Zapisz na szkolenie
                                                     </button>
                                                 </div>
@@ -279,9 +279,7 @@
                         <div class="form-group">
                             <label class="myLabel">Wybierz etap rekrutacji:</label>
                             <select class="form-control" id="new_recruitment_status">
-                                @foreach($status as $item)
-                                    <option value="{{$item->id}}">{{$item->name}}</option>
-                                @endforeach
+                                <option value="1">Rozpoczęcie rekrutacji</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -354,7 +352,7 @@
                         <div class="form-group">
                             <label class="myLabel">Wybierz etap rekrutacji:</label>
                             <select class="form-control" id="add_level_status">
-                                @foreach($status as $item)
+                                @foreach($status_to_change as $item)
                                     <option value="{{$item->id}}">{{$item->name}}</option>
                                 @endforeach
                             </select>
@@ -372,11 +370,6 @@
                             <div class="col-md-6">
                                 <label class="myLabel">Dodaj godzinę rozmowy kwalifikacyjnej</label>
                                 <input type="time" class="form-control" id="interview_time" required>
-                                {{--  <div class="input-group date form_time col-md-5" data-date="" data-date-format="hh:ii" data-link-field="dtp_input3" data-link-format="hh:ii">
-                                    <input id="register_stop" class="form-control" size="16" type="text" value="" readonly>
-                                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-                                    <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
-                                </div>  --}}
                             </div>
                         </div>
                         <div class="form-group">
@@ -443,19 +436,6 @@ $('.form_date').datetimepicker({
     pickTime: false,
 });
 
-$(function() {
-    $('.form_time').datetimepicker({
-        language:  'pl',
-        weekStart: 1,
-        todayBtn:  1,
-        autoclose: 1,
-        todayHighlight: 1,
-        startView: 1,
-        minView: 0,
-        maxView: 1,
-        forceParse: 0
-    });
-});
 
 $(document).ready(() => {
 
@@ -582,8 +562,10 @@ $(document).ready(() => {
 
     function stopRecruitment(stopType) {
         var candidate_id = $('#candidate_id').val();
-        var stop_recruitment_status = $('#stop_recruitment_status').val();
+        //var stop_recruitment_status = $('#stop_recruitment_status').val();
         var stop_recruitment_comment = $('#stop_recruitment_comment').val();
+
+        var stop_recruitment_status = (stopType == 0) ? 11 : 10 ;
 
         if (stop_recruitment_comment == '') {
             swal('Dodaj komentarz!')
@@ -601,7 +583,7 @@ $(document).ready(() => {
             },
             data: {
                 "candidate_id": candidate_id,
-                "stop_recruitment_status": 10,
+                "stop_recruitment_status": stop_recruitment_status,
                 "stop_recruitment_comment": stop_recruitment_comment,
                 "stopType": stopType
             },
