@@ -343,9 +343,9 @@
                         $('row c[r^="I"]', sheet).each( function () {
                                 if($('is t', this).text() != 'Kara(Janki)')
                                 {
-                                    $text = $('is t', this).text();
-                                    var penatly_bonus = $text.split(" ");
-                                    if(penatly_bonus[0] < 0)
+                                    $text = $('is t', this).context.textContent;
+                                    var penatly_bonus = $text;
+                                    if(parseInt(penatly_bonus) < 0)
                                     {
                                         $(this).attr( 's', '35' );
                                     }
@@ -355,9 +355,9 @@
                         $('row c[r^="K"]', sheet).each( function () {
                             if($('is t', this).text() != 'Premia - Kara')
                             {
-                                $text = $('is t', this).text();
-                                var penatly_bonus = $text.split(" ");
-                                if(penatly_bonus[0] < 0)
+                                $text = $('is t', this).context.textContent;
+                                var penatly_bonus = $text;
+                                if(penatly_bonus < 0)
                                 {
                                     $(this).attr( 's', '35' );
                                 }
@@ -393,9 +393,9 @@
                         $('row c[r^="I"]', sheet).each( function () {
                             if($('is t', this).text() != 'Kara(Janki)')
                             {
-                                $text = $('is t', this).text();
-                                var penatly_bonus = $text.split(" ");
-                                if(penatly_bonus[0] < 0)
+                                $text = $('is t', this).context.textContent;
+                                var penatly_bonus = $text;
+                                if(penatly_bonus < 0)
                                 {
                                     $(this).attr( 's', '35' );
                                 }
@@ -405,8 +405,8 @@
                         $('row c[r^="K"]', sheet).each( function () {
                             if($('is t', this).text() != 'Premia - Kara')
                             {
-                                $text = $('is t', this).text();
-                                var penatly_bonus = $text.split(" ");
+                                $text = $('is t', this).context.textContent;
+                                var penatly_bonus = $text;
                                 if(penatly_bonus[0] < 0)
                                 {
                                     $(this).attr( 's', '35' );
@@ -442,9 +442,9 @@
                         $('row c[r^="I"]', sheet).each( function () {
                             if($('is t', this).text() != 'Kara(Janki)')
                             {
-                                $text = $('is t', this).text();
-                                var penatly_bonus = $text.split(" ");
-                                if(penatly_bonus[0] < 0)
+                                $text = $('is t', this).context.textContent;
+                                var penatly_bonus = $text;
+                                if(penatly_bonus < 0)
                                 {
                                     $(this).attr( 's', '35' );
                                 }
@@ -454,9 +454,9 @@
                         $('row c[r^="K"]', sheet).each( function () {
                             if($('is t', this).text() != 'Premia - Kara')
                             {
-                                $text = $('is t', this).text();
-                                var penatly_bonus = $text.split(" ");
-                                if(penatly_bonus[0] < 0)
+                                $text = $('is t', this).context.textContent;
+                                var penatly_bonus = $text;
+                                if(penatly_bonus < 0)
                                 {
                                     $(this).attr( 's', '35' );
                                 }
