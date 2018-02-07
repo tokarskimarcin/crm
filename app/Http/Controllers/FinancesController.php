@@ -283,22 +283,64 @@ class FinancesController extends Controller
 
     public function viewPenaltyBonusGet()
     {
+
+        // użytkownicy pracujący
         $users =  User::where('department_info_id', Auth::user()->department_info_id)
             ->whereIn('user_type_id', [1, 2])
             ->where('status_work', '=', 1)
             ->orderBy('last_name')
             ->get();
+        $last_month = date("Y-m", strtotime("first day of previous month"));
+        $current_month = date("Y-m");
+        // zwolnieni miesiąc temu
+        $users_fired_last_month =  User::where('department_info_id', Auth::user()->department_info_id)
+            ->whereIn('user_type_id', [1, 2])
+            ->where('status_work', '=', 0)
+            ->where('end_work', 'like', $last_month.'%')
+            ->orderBy('last_name')
+            ->get();
+        // zwolnieni w tym miesiącu
+        $users_fired_current_month =  User::where('department_info_id', Auth::user()->department_info_id)
+            ->whereIn('user_type_id', [1, 2])
+            ->where('status_work', '=', 0)
+            ->where('end_work', 'like', $current_month.'%')
+            ->orderBy('last_name')
+            ->get();
+        $merge_array = $users->merge($users_fired_last_month);
+        $merge_array = $merge_array->merge($users_fired_current_month);
+
         return view('finances.viewPenaltyBonus')
-            ->with('users',$users);
+            ->with('users',$merge_array->sortBy('last_name'));
     }
     public function viewPenaltyBonusPOST(Request $request)
     {
+        // użytkownicy pracujący
         $users =  User::where('department_info_id', Auth::user()->department_info_id)
             ->whereIn('user_type_id', [1, 2])
             ->where('status_work', '=', 1)
             ->orderBy('last_name')
             ->get();
-        $view = view('finances.viewPenaltyBonus')->with('users',$users);
+
+        $last_month = date("Y-m", strtotime("first day of previous month"));
+        $current_month = date("Y-m");
+        // zwolnieni miesiąc temu
+        $users_fired_last_month =  User::where('department_info_id', Auth::user()->department_info_id)
+            ->whereIn('user_type_id', [1, 2])
+            ->where('status_work', '=', 0)
+            ->where('end_work', 'like', $last_month.'%')
+            ->orderBy('last_name')
+            ->get();
+        // zwolnieni w tym miesiącu
+        $users_fired_current_month =  User::where('department_info_id', Auth::user()->department_info_id)
+            ->whereIn('user_type_id', [1, 2])
+            ->where('status_work', '=', 0)
+            ->where('end_work', 'like', $current_month.'%')
+            ->orderBy('last_name')
+            ->get();
+        $merge_array = $users->merge($users_fired_last_month);
+        $merge_array = $merge_array->merge($users_fired_current_month);
+
+        $view = view('finances.viewPenaltyBonus')->with('users',$merge_array->sortBy('last_name'));
 
         $date_start = $request->date_penalty_show_start;
         $date_stop = $request->date_penalty_show_stop;
