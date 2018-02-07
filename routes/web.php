@@ -160,6 +160,9 @@ Route::POST('/datatableShowCadreCandidates', 'CandidateController@datatableShowC
 
 Route::POST('/myInterviews', 'RecruitmentAttemptController@myInterviews')->name('api.myInterviews');
 
+Route::POST('/recruiterData', 'RecruitmentAttemptController@recruiterData')->name('api.recruiterData');
+Route::POST('/recruiterTrainingsData', 'RecruitmentAttemptController@recruiterTrainingsData')->name('api.recruiterTrainingsData');
+
 
 
 /** */
@@ -474,6 +477,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/all_candidates', 'CandidateController@all_candidates');
 
     Route::get('/interviews_all', 'RecruitmentAttemptController@interviewsAllGet');
+
+    Route::get('/recruitment_admin', 'RecruitmentAttemptController@recruitment_admin');
 
     /**REKRUTACJA STOP */
 });
