@@ -1,5 +1,6 @@
 @extends('layouts.main')
 @section('content')
+    <link href="{{ asset('/css/dataTables.bootstrap.min.css')}}" rel="stylesheet">
     <style>
         th,td{
             text-align: center;
@@ -98,7 +99,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-12" id="header_modal">
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="myLabel">Data:</label>
@@ -131,7 +132,7 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="myLabel">Komentarz:</label>
-                                    <textarea id="training_comment" class="form-control"></textarea>
+                                    <textarea id="training_comment" class="form-control" style="height: 34px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -296,6 +297,13 @@
                 <div class="alert alert-danger" style = "display:none" id="succes_delete_training">
                     <span colspan="1">Szkolenie zostało usuniete</span>
                 </div>
+                <div class="alert alert-info" style = "display:none" id="succes_end_training">
+                    <span colspan="1">Szkolenie zostało zakończone</span>
+                </div>
+                <div class="alert alert-warning" style = "display:none" id="succes_edit_training">
+                    <span colspan="1">Szkolenie zostało zmodyfikowane</span>
+                </div>
+
                 <div class="panel-body">
                     <div class="row">
                         <ul class="nav nav-tabs" style="margin-bottom: 25px">
@@ -314,7 +322,7 @@
                                                     <td>Data</td>
                                                     <td>Godzina</td>
                                                     <td>Liczba osób</td>
-                                                    <td>Prowadząca</td>
+                                                    <td>Osoba Prowadząca</td>
                                                     <td>Akcja</td>
                                                 </tr>
                                                 </thead>
@@ -336,6 +344,7 @@
                                                     <td>Data</td>
                                                     <td>Godzina</td>
                                                     <td>Liczba osób</td>
+                                                    <td>Osoba Prowadząca</td>
                                                     <td>Akcja</td>
                                                 </tr>
                                                 </thead>
@@ -378,6 +387,7 @@
 
 @endsection
 @section('script')
+    <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
         var candidate_to_left = [];
         var candidate_to_right = [];
@@ -442,10 +452,11 @@
                                         'Szkolenie kandydata zostało zakończone.',
                                         'success'
                                     )
-                                    $(e).closest('tr').find('.candidate_status').find('span').text('Kandydat Przyjęty');
+                                    $(e).closest('tr').find('.candidate_status').find('span').text('Szkolenie zakończone pozytywnie');
                                     $(e).closest('tr').find('.glyphicon-ok').css({'color': 'gray'});
+                                    $(e).closest('tr').find('.glyphicon-ok').attr('onclick','');
                                     $(e).closest('tr').find('.glyphicon-remove').css({'color': 'gray'});
-                                    $(e).closest('tr').find('.candidate_status').find('span').text('Kandydat Przyjęty');
+                                    $(e).closest('tr').find('.glyphicon-remove').attr('onclick','');
                                 }
                             }
                         });
@@ -488,8 +499,10 @@
                                 'success'
                             )
                             $(e).closest('tr').find('.glyphicon-ok').css({'color': 'gray'});
+                            $(e).closest('tr').find('.glyphicon-ok').attr('onclick','');
                             $(e).closest('tr').find('.glyphicon-remove').css({'color': 'gray'});
-                            $(e).closest('tr').find('.candidate_status').find('span').text('Kandydat Odrzucony');
+                            $(e).closest('tr').find('.glyphicon-remove').attr('onclick','');
+                            $(e).closest('tr').find('.candidate_status').find('span').text('Szkolenie zakończone negatywnie');
                         }
                     }
                 });
@@ -627,8 +640,16 @@
                             if(response == 1)
                             {
                                 $('#myModalgroup').modal('hide');
-                                $('#succes_add_training').fadeIn(1000);
-                                $('#succes_add_training').delay(3000).fadeOut(1000);
+                                if(id_training_group  == 0 )
+                                {
+                                    $('#succes_add_training').fadeIn(1000);
+                                    $('#succes_add_training').delay(3000).fadeOut(1000);
+                                }else{
+                                    $('#succes_edit_training').fadeIn(1000);
+                                    $('#succes_edit_training').delay(3000).fadeOut(1000);
+                                }
+
+
                                 $("#save_button").attr('disabled', false);
                                 table_activ_training_group.ajax.reload();
 
@@ -742,8 +763,17 @@
             $('#myModalgroup').on('show.bs.modal', function() {
                 if(is_open == 0)
                 {
+
+                    console.log(cancel_candidate);
                     if(saving_type == 1){
                         $("input[name='start_date_training']").val("{{date('Y-m-d')}}");
+                    }
+                    if(cancel_candidate == 1 || cancel_candidate == 2)
+                    {
+                        $('#header_modal input,select,textarea').prop('disabled',true).off();
+                        $('#training_comment').prop('disabled',false).on();
+
+                        $('#header_modal .input-group-addon').hide();
                     }
                     clearLeftColumn();
                     getGroupTrainingInfo();
@@ -893,6 +923,9 @@
 
             //cancel modal
             $('#myModalgroup').on('hidden.bs.modal',function () {
+                $('#header_modal input,select,textarea').prop('disabled',false).on();
+
+                $('.input-group-addon').show();
                 id_training_group = 0;
                 clearModalBasicInfo();
                 clearLeftColumn();
@@ -975,8 +1008,8 @@
                                                 'Szkolenie zostało zakończone.',
                                                 'success'
                                             )
-                                            $('#succes_delete_training').fadeIn(1000);
-                                            $('#succes_delete_training').delay(3000).fadeOut(1000);
+                                            $('#succes_end_training').fadeIn(1000);
+                                            $('#succes_end_training').delay(3000).fadeOut(1000);
                                             table_activ_training_group.ajax.reload();
                                             table_cancel_training_group.ajax.reload();
                                             table_end_training_group.ajax.reload();
@@ -1050,10 +1083,15 @@
                     {"data": "training_date"},
                     {"data": "training_hour"},
                     {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.last_name+' '+data.first_name;
+                        },"name":"leader.last_name"
+                    },
                     { "width": "10%",
                         "data": function (data, type, dataToSet) {
                             return action_row_end;
-                        }
+                        },"searchable": false,"orderable": false
                     }
                 ],"fnDrawCallback": function(settings){
                     $('.info_end').on('click',function (e) {
