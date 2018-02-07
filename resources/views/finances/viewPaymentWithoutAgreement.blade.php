@@ -178,16 +178,16 @@
                                                                                 <td>{{($item2->first_name)}}</td>
                                                                                 <td>{{($item2->last_name)}}</td>
                                                                                 <td>{{($item2->username)}}</td>
-                                                                                <td>{{($item2->rate)}} PLN</td>
+                                                                                <td>{{($item2->rate)}}</td>
                                                                                 <td>{{$rbh}}</td>
                                                                                 {{--<td>{{($janky_proc)}} %</td>--}}
                                                                                 {{--<td>{{($janky_cost*(-1))}} PLN</td>--}}
-                                                                                <td>{{($standart_salary)}} PLN</td>
-                                                                                <td>{{($bonus_penalty)}} PLN</td>
+                                                                                <td>{{($standart_salary)}}</td>
+                                                                                <td>{{($bonus_penalty)}}</td>
                                                                                 <td>{{($student)}}</td>
                                                                                 <td>{{($documents)}}</td>
                                                                                 <td>{{(($item2->salary_to_account == 0) ? "Nie" : "Tak")}}</td>
-                                                                                <td>{{(round($salary_total,2))}} PLN</td>
+                                                                                <td>{{(round($salary_total,2))}}</td>
                                                                             </tr>
                                                                         @endforeach
                                                                         @php
