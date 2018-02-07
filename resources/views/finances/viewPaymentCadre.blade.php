@@ -137,13 +137,13 @@
                                                                                 <td>{{($item2->last_name)}}</td>
                                                                                 <td>{{($item2->username)}}</td>
                                                                                 <td>{{($item2->dep_name.' '.$item2->dep_type)}}</td>
-                                                                                <td>{{$salary}} PLN</td>
-                                                                                <td>{{$additional_salary}} PLN</td>
-                                                                                <td>{{$bonus}} PLN</td>
-                                                                                <td>{{$penatly*(-1)}} PLN</td>
+                                                                                <td>{{$salary}}</td>
+                                                                                <td>{{$additional_salary}}</td>
+                                                                                <td>{{$bonus}}</td>
+                                                                                <td>{{$penatly*(-1)}}</td>
                                                                                 <td>{{$student}}</td>
                                                                                 <td>{{$documents}}</td>
-                                                                                <td>{{$total_one_salary}} PLN</td>
+                                                                                <td>{{$total_one_salary}}</td>
                                                                             </tr>
                                                                         @endforeach
                                                                         <tr>
@@ -158,7 +158,7 @@
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td> Suma:</td>
-                                                                            <td>{{$salary_total_all}} PLN</td>
+                                                                            <td>{{$salary_total_all}}</td>
 
                                                                         </tr>
                                                                             </tbody>

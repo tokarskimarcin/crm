@@ -233,21 +233,21 @@
                                                                                 <td>{{($item2->last_name)}}</td>
                                                                                 <td>{{($item2->username)}}</td>
                                                                                 @if($bonus_per_hour != 0)
-                                                                                    <td>{{($item2->rate.'(+'.$bonus_per_hour.')')}} PLN</td>
+                                                                                    <td>{{($item2->rate.'(+'.$bonus_per_hour.')')}}</td>
                                                                                 @else
-                                                                                    <td>{{($item2->rate)}} PLN</td>
+                                                                                    <td>{{($item2->rate)}}</td>
                                                                                 @endif
                                                                                 <td>{{($avg)}}</td>
                                                                                 <td>{{$rbh}}</td>
                                                                                 <td>{{($janky_proc)}} %</td>
-                                                                                <td>{{($janky_cost*(-1))}} PLN</td>
-                                                                                <td>{{($standart_salary)}} PLN</td>
-                                                                                <td>{{($bonus_penalty)}} PLN</td>
-                                                                                <td>{{($bonus_salary)}} PLN</td>
+                                                                                <td>{{($janky_cost*(-1))}}</td>
+                                                                                <td>{{($standart_salary)}}</td>
+                                                                                <td>{{($bonus_penalty)}}</td>
+                                                                                <td>{{($bonus_salary)}}</td>
                                                                                 <td>{{($student)}}</td>
                                                                                 <td>{{($documents)}}</td>
                                                                                 <td>{{(($item2->salary_to_account == 0) ? "Nie" : "Tak")}}</td>
-                                                                                <td>{{(round($salary_total,2))}} PLN</td>
+                                                                                <td>{{(round($salary_total,2))}}</td>
                                                                             </tr>
                                                                         @endif
                                                                         @endforeach
@@ -268,7 +268,7 @@
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td> Suma:</td>
-                                                                            <td>{{round($salary_total_all,2)}} PLN</td>
+                                                                            <td>{{round($salary_total_all,2)}}</td>
                                                                         </tr>
                                                                             </tbody>
                                                                         </table>

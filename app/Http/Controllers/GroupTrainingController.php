@@ -21,6 +21,7 @@ class GroupTrainingController extends Controller
             ->where('status_work','=',1)
             ->get();
 
+
         return view('recruitment.addGroupTraining')
             ->with('cadre',$cadre);
     }
