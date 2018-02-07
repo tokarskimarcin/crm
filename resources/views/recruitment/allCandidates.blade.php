@@ -72,28 +72,6 @@ table = $('#candidates').DataTable({
         {"data": function (data, type, dataToSet) {
             return "<a href='{{ URL::to('/candidateProfile') }}/" + data.id +"' class='btn btn-info'><span class='glyphicon glyphicon-pencil'></span> Szczegóły</a>";
         },"orderable": false, "searchable": false},
-
-
-        {{--  {"data": "name"},
-        {"data": function (data, type, dataToSet) {
-            var myType = data.status;
-            if (myType == 1) {
-                return 'Wykreowany';
-            } else if (myType == 2) {
-                return 'Aktywowany';
-            } else if (myType == 3) {
-                return 'Zakończony';
-            } else if (myType == 4) {
-                return 'Oceniono';
-            }
-        },"orderable": true, "searchable": false, "name": "status"},
-        {"data": function (data, type, dataToSet) {
-            var myName = data.first_name + " " + data.last_name;
-            return myName;
-        },"orderable": false, "searchable": true, "name": "last_name"},
-        {"data": function (data, type, dataToSet) {
-            return '<a class="btn btn-default" href="{{ URL::to('show_test_for_admin') }}/' + data.id + '">Szczegóły</a>';
-        },"orderable": false, "searchable": false },  --}}
     ]
 });
 

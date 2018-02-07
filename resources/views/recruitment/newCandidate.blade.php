@@ -135,6 +135,8 @@
 <script>
 
 $(document).ready(() => {
+
+    //Funkcja dodajaca nowego kandydata
     $('#add_submit').click(() => {
         var candidate_name = $('#candidate_name').val();
         var candidate_surname = $('#candidate_surname').val();
@@ -156,7 +158,7 @@ $(document).ready(() => {
         if (candidate_phone == '') {
             swal('Podaj telefon kandydata!')
             return false;
-        } else if (isNaN(candidate_phone) || (candidate_phone.length < 8)) {
+        } else if (isNaN(candidate_phone) || (candidate_phone.length < 7)) {
             swal('Podaj prawidłowy numer telefonu!')
             return false;
         }

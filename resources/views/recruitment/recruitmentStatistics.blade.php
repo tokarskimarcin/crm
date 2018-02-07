@@ -220,6 +220,43 @@
                 </div>
                 <hr>
                 <div class="row">
+                    <div class="col-md-6">
+                        <h4 style="color: #aaa">Etapy zakończenia rekrutacji</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped thead-inverse">
+                                <thead>
+                                    <tr>
+                                        <th>Etap</th>
+                                        <th>Ilość kandydatów</th>
+                                        <th>%</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recruiter_fails">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h4 style="color: #aaa">Źródła rekrutacji</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped thead-inverse">
+                                <thead>
+                                    <tr>
+                                        <th>Źródło</th>
+                                        <th>Ilość kandydatów</th>
+                                        <th>%</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recruiter_sources">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
                     <div class="col-md-12">
                         <div class="panel panel-default panel-body">
                             <h4 style="color: #aaa">Kandydaci</h4>
@@ -264,7 +301,7 @@
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
-                                <a class="btn btn-info" href="{{ URL::to('/') }}">
+                                <a class="btn btn-info" href="{{ URL::to('/add_group_training') }}">
                                     Przejdź do szczegółów szkoleń
                                 </a>
                             </div>
@@ -289,6 +326,10 @@
 
 $(document).ready(function() {
 
+    $('#recruiter_info').on('shown.bs.modal', function () {
+        
+    });
+
     $('.recruiter_click').click(function(e) {
         var id = $(this).data('id');
         
@@ -304,16 +345,28 @@ $(document).ready(function() {
                 "id": id
             },
             success: function (response) {
-                console.log(response);
+                console.log(response)
 
-                $('#recruiter_name_data').html(response.user.last_name + " " + response.user.first_name)
+                // Podmiana imienia oraz  nazwiska w modalu
+                $('#recruiter_name_data').html(response.user.last_name + " " + response.user.first_name);
+                // Podmiana ilości zrekrutowanych osob
                 $('#modal_recruitment_sum').html(response.recruitment_sum);
+                // Podmiana ilości rekrutacji
                 $('#modal_all_sum').html(response.all_sum);
+                // Podmiania ilości zaplanowanych rozmów
                 $('#modal_interviews_sum').html(response.interviews_sum);
 
+                // Wyczyszczenie tabel
                 $('#modal_training_table tr').remove();
-                var content ='';
+                $('#recruiter_fails tr').remove();
+                $('#recruiter_sources tr').remove();
 
+                // Zdefiniowanie nowych tabel
+                var content ='';
+                var failContent = '';
+                var sourceContent = '';
+
+                // Loop przez wszystkie szkolenia użytkownika
                 $.each(response.training_data, function(key, value){
                     content += `
                         <tr>
@@ -325,9 +378,77 @@ $(document).ready(function() {
                     `;
                 });
 
+                // Sprawdzenie czy użytkownik miał jakiekolwiek szkolenia
                 content = (content != '') ? content : '<tr class="text-center"><td colspan="4">Użytkownik nie prowadził jeszcze szkoleń.</td></tr>' ;
 
+                //Dodanie szkoleń do tabeli
                 $('#modal_training_table').append(content);
+
+                //Loop przez nieudane rekrutacje
+                $.each(response.recuitment_by_types, function(key, value){
+                    var proc = (Number(Number(value.value) / Number(response.recruitemnt_sum_total)) * 100).toFixed(2) ;
+                    failContent += `
+                        <tr>
+                            <td>${value.name}</td>
+                            <td>${value.value}</td>
+                            <td>${proc} %</td>
+                        </tr>
+                    `;
+                });
+
+                // Sprawdzenie czy użytkownik miał jakiekolwiek szkolenia
+                failContent = (failContent != '') ? failContent : '<tr class="text-center"><td colspan="3">Rekruter nie ma zakończonych negatywnie rekrutacji!.</td></tr>' ;
+                
+                //Dodanie etapow rekrutacji do tabeli
+                $('#recruiter_fails').append(failContent);
+
+                // Loop przez źródła rekrutacji
+                $.each(response.recruiter_sources, function(key, value) {
+                    var proc = (Number(Number(value.sum) / Number(response.all_sum)) * 100).toFixed(2);
+                    sourceContent += `
+                        <tr>
+                            <td>${value.name}</td>
+                            <td>${value.sum}</td>
+                            <td>${proc} %</td>
+                        </tr>
+                    `;
+                });
+
+                // Sprawdzenie czy użytkownik miał jakiekolwiek rekrutacje
+                sourceContent = (sourceContent != '') ? sourceContent : '<tr class="text-center"><td colspan="4">Użytkownik nie prowadził jeszcze rekrutacji.</td></tr>' ;
+
+                //Dodanie szkoleń do tabeli
+                $('#recruiter_sources').append(sourceContent);
+
+                //Dodanie tabeli z kandydatami konkretnego rerkrutera
+                table = $('#recruiter_candidates_datatable').DataTable({
+                    "autoWidth": false,
+                    "processing": true,
+                    "bDestroy": true,
+                    "serverSide": true,
+                    "drawCallback": function( settings ) {
+                    },
+                    "ajax": {
+                        'url': "{{ route('api.datatableShowCadreCandidates') }}",
+                        'type': 'POST',
+                        'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                        'data': {'id': id}
+                    },
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+                    },"columns":[
+                        {"data": function (data, type, dataToSet) {
+                            var myName = data.first_name + " " + data.last_name;
+                            return myName;
+                        },"orderable": true, "searchable": true, "name": "last_name"},
+                        {"data": "created_at"},
+                        {"data": "attempt_name"},
+                        {"data": function (data, type, dataToSet) {
+                            return "<a href='{{ URL::to('/candidateProfile') }}/" + data.id +"' class='btn btn-info'><span class='glyphicon glyphicon-pencil'></span> Szczegóły</a>";
+                        },"orderable": false, "searchable": false},
+                    ]
+                });
+
             }, error: function(response) {
                 swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
             }

@@ -133,26 +133,27 @@ class ActivityRecorder extends Model
         //     Storage::put($type, $contents);
         // }
 
-        $day = date('d');
-        if ($day == 1) {
-            $this->clearLogs();
-        }
+        /** CHWILOWO WYŁĄCZONE KASOWANIE DANYCH Z PLIKU */
+        // $day = date('d');
+        // if ($day == 1) {
+        //     $this->clearLogs();
+        // }
     }
 
     private function clearLogs() {
-      $checkIfCleared = File::get(storage_path('app/logData.txt'));
-      $pos = strpos($checkIfCleared, date('y-m'));
-      if (!$pos) {
-          foreach($this->logTypes as $type) {
-              $file = File::get(storage_path('app/' . $type));
-              $how_much = strlen($file);
-              $contents = substr($file, $how_much / 2 );
-              Storage::put($type, $contents);
-          }
+        $checkIfCleared = File::get(storage_path('app/logData.txt'));
+        $pos = strpos($checkIfCleared, date('y-m'));
+        if (!$pos) {
+            foreach($this->logTypes as $type) {
+                $file = File::get(storage_path('app/' . $type));
+                $how_much = strlen($file);
+                $contents = substr($file, $how_much / 2 );
+                Storage::put($type, $contents);
+            }
 
-          $contents = Storage::get('logData.txt');
-          Storage::append('logData.txt', date('Y-m'));
-      }
+            $contents = Storage::get('logData.txt');
+            Storage::append('logData.txt', date('Y-m'));
+        }
 
 
     }

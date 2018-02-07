@@ -115,10 +115,12 @@ class CandidateController extends Controller
         $department_info = Department_info::where('id', '!=', 13)->get();
         $sources = CandidateSource::all();
         $status = AttemptStatus::all();
+        $status_to_change = AttemptStatus::where('attempt_order', '!=', null)->orderBy('attempt_order')->get();
 
         return view('recruitment.candidateProfile')
             ->with('sources', $sources)
             ->with('status', $status)
+            ->with('status_to_change', $status_to_change)
             ->with('candidate_status', $candidate_status)
             ->with('department_info', $department_info)
             ->with('candidate', $candidate);

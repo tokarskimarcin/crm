@@ -21,6 +21,6 @@ use App\User;
 /**
  * Ścieżka do danych http://localhost/api/userApi/cokolwiek/cokolwiek
  */
-Route::get('userApi/{day}/{month}', function($day, $month) {
-    return dd($day . ' ' . $month);
+Route::get('userApi/{id}', function($id) {
+    return User::find($id);
 });

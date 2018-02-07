@@ -197,8 +197,7 @@ class RecruitmentAttemptController extends Controller
    /**
     * Główne statystyki rekrutacji
     */
-    public function recruitment_admin() { $id =4796;
-        
+    public function recruitment_admin() {
         /**
          * Ilość aktywnych rekrutacji
          */
@@ -276,7 +275,6 @@ class RecruitmentAttemptController extends Controller
             /**
              * Pobranie danych dotyczących szkoleń prowadzonych przez rekrutera 
              */
-            //$training_data = $user->userTrainings;
 
             $training_data = DB::table('group_training')
                 ->select(DB::raw('
@@ -292,12 +290,96 @@ class RecruitmentAttemptController extends Controller
                 ->groupBy('group_training.id')
                 ->get();
 
+            /**
+             * Zliczenie ilośi etapów na jakiej kończy się rekrutację
+             */
+            $data = DB::table('candidate')
+                ->select(DB::raw('
+                    recruitment_attempt.id,
+                    recruitment_story.attempt_status_id
+                '))
+                ->join('recruitment_attempt', 'recruitment_attempt.candidate_id', 'candidate.id')
+                ->join('recruitment_story', 'recruitment_story.recruitment_attempt_id','recruitment_attempt.id')
+                ->where('candidate.cadre_id', '=', $id)
+                ->orderBy('recruitment_story.created_at', 'desc')
+                ->get();
+    
+            /**
+             * Pogrupowanie wyników z podziałem na próby rekrutacji
+             */
+            $data = $data->groupBy('id');
+            
+            /**
+             * Zdefiniowanie tabeli z nieudanymi rekrutacjami 
+             */
+            $recruitments_fails = [];
+
+            /**
+             * Przypisanie liczby nieudanych rekrutacji do tabeli
+             */
+            foreach($data as $item) {
+                foreach($item as $story) {
+                    if ($story->attempt_status_id == 11) {
+                        $recruitments_fails[] = $item;
+                    }
+                }
+            }
+    
+            $types = [];
+            foreach($recruitments_fails as $item) {
+                $types[] = $item[1]->attempt_status_id;
+            }
+    
+            /**
+             * Sumowanie ilości nieudanych rekrutacji
+             */
+            $types = array_count_values($types);
+
+            /**
+             * Pobranie etapow rekrutacji
+             */
+            $attempt_status = AttemptStatus::all();
+
+            $recuitment_by_types = [];
+            $recruitemnt_sum_total = array_sum($types);
+
+            /**
+             * Podmiana ID na nazwę etapu
+             */
+            foreach($attempt_status as $item) {
+                foreach ($types as $key => $value) {
+                    if ($item->id == $key) {
+                        $recuitment_by_types[$item->id]['name'] = $item->name;
+                        $recuitment_by_types[$item->id]['value'] = $value;
+                    }
+                }
+            }
+
+            /**
+             * Pobranie źródeł rekrutacji dla danego rekrutera
+             */
+            $recruiter_sources = DB::table('candidate')
+                ->select(DB::raw('
+                    candidate_source.name,
+                    count(candidate.id) as sum
+                '))
+                ->join('candidate_source', 'candidate_source.id', 'candidate.candidate_source_id')
+                ->where('candidate.cadre_id', '=', $id)
+                ->groupBy('candidate.candidate_source_id')
+                ->get();
+
+            /**
+             * Zwrócenie potężnej ilości danych
+             */
             $data = [
-                'user'              => $user,
-                'recruitment_sum'   => $recruitment_sum,
-                'all_sum'           => $all_sum,
-                'interviews_sum'    => $interviews_sum,
-                'training_data'     => $training_data
+                'user'                  => $user,
+                'recruitment_sum'       => $recruitment_sum,
+                'all_sum'               => $all_sum,
+                'interviews_sum'        => $interviews_sum,
+                'training_data'         => $training_data,
+                'recuitment_by_types'   => $recuitment_by_types,
+                'recruitemnt_sum_total' => $recruitemnt_sum_total,
+                'recruiter_sources'     => $recruiter_sources
             ];
 
             return $data;
