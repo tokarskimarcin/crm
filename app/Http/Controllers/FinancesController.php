@@ -65,12 +65,21 @@ class FinancesController extends Controller
          */
         $days_in_month = date('t', strtotime($request->search_money_month . "-01"));
 
+        //Zdefiniownie ostatniego dnia miesiąca
         $last_day = $request->search_money_month . '-' . $days_in_month;
+        //zdefiniowanie pierwszego dnia miesiaca
         $first_day = $request->search_money_month . '-01';
 
+        /**
+         * Puste tablice przechowujące dane osob ktorych pensja musi się zmienic
+         */
         $working_days = [];
         $work_days_stop = [];
+        $work_days_in_between = [];
 
+        /**
+         * Pobranie danych osob ktore rozpoczeły prace w tym miesiącu
+         */
         $users_by_start = DB::table('users')
             ->select(DB::raw("
                 id,
@@ -81,6 +90,9 @@ class FinancesController extends Controller
             ->whereNotIn('user_type_id', [1,2,14])
             ->get();
 
+        /**
+         * Obliczenie średniej dziennej pensji oraz ilosci przepracowanych dni
+         */
         foreach($users_by_start as $item) {
 
             $date_diff = strtotime($last_day) - strtotime($item->start_work);
@@ -101,7 +113,7 @@ class FinancesController extends Controller
         }
 
         /**
-        *Zakończenie pracy
+        * Pobranie danych osob ktore zakończyły prace w tym miesiącu
         */
         $users_by_stop = DB::table('users')
             ->select(DB::raw("
@@ -113,6 +125,9 @@ class FinancesController extends Controller
             ->whereNotIn('user_type_id', [1,2,14])
             ->get();
 
+        /**
+         * Obliczenie średniej dziennej pensji oraz ilosci przepracowanych dni
+         */
         foreach($users_by_stop as $item) {
 
             $date_diff = strtotime($item->end_work) - strtotime($first_day);
@@ -132,16 +147,44 @@ class FinancesController extends Controller
                 }
             }
         }
-// dd(DB::table('users')
-//     ->select(DB::raw("
-//         id,
-//         end_work,
-//         salary
-//     "))
-//     ->where('end_work', 'like', $date)
-//     ->where('start_work', 'like', $date)
-//     ->whereNotIn('user_type_id', [1,2,14])
-//     ->get());
+
+        /**
+         * Pobranie danych osób które rozpoczeły i zakończyły prace w danym miesiącu
+         */
+        $in_between = DB::table('users')
+            ->select(DB::raw("
+                id,
+                start_work,
+                end_work,
+                salary
+            "))
+            ->where('end_work', 'like', $date)
+            ->where('start_work', 'like', $date)
+            ->whereNotIn('user_type_id', [1,2,14])
+            ->get();
+
+        /**
+         * Obliczenie średniej dziennej pensji oraz ilosci przepracowanych dni
+         */
+        foreach($in_between as $item) {
+
+            $date_diff = strtotime($item->end_work) - strtotime($item->start_work);
+
+            $user_salary_per_day = $item->salary / $days_in_month;
+
+            $user_salary = $user_salary_per_day * (($date_diff / 3600 / 24) + 1);            
+
+            $work_days_in_between[$item->id] = round($user_salary, 0);
+        }
+
+        foreach($salary as $value) {
+            foreach($work_days_in_between as $key => $item) {
+                if ($value->id == $key) {
+                    $value->salary = $item;
+                }
+            }
+        }
+
         return view('finances.viewPaymentCadre')
             ->with('month',$date_to_post)
             ->with('salary',$salary->groupby('agency_id'))

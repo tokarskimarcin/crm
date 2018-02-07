@@ -89,4 +89,12 @@ class User extends Authenticatable
     public function userTests() {
         return $this->hasMany('App\UserTest', 'user_id');
     }
+
+    public function userCandidates() {
+        return $this->hasMany('App\Candidate', 'cadre_id');
+    }
+
+    public function userTrainings() {
+        return $this->hasMany('App\GroupTraining', 'leader_id');
+    }
 }

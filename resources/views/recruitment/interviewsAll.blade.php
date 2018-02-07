@@ -36,13 +36,13 @@
                                 <span class="glyphicon glyphicon-plus myIcon" style="color: #2cb74f"></span>
                             </div>
                             <div class="col-md-6">
-                                <span class="pull-right" style="font-size: 50px; color: #aaa">23</span>
+                                <span class="pull-right" style="font-size: 50px; color: #aaa">{{($sum_interviews != null) ? $sum_interviews : 0 }}</span>
                             </div>
                         </div>
                         <hr>
                         <div class="row">
                             <div class="col-md-12 myUnderLine">
-                                Liczba udanych rekrutacji
+                                Suma rekrutacji
                             </div>
                         </div>
                     </div>
@@ -222,7 +222,8 @@
                             <tr>
                                 <th>Imie i nazwisko</th>
                                 <th>Data dodania</th>
-                                <th>Szczegóły</th>
+                                <th>Status</th>
+                                <th style="width: 15%">Szczegóły</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -423,31 +424,10 @@ table = $('#candidates').DataTable({
             return myName;
         },"orderable": true, "searchable": true, "name": "last_name"},
         {"data": "created_at"},
+        {"data": "attempt_name"},
         {"data": function (data, type, dataToSet) {
             return "<a href='{{ URL::to('/candidateProfile') }}/" + data.id +"' class='btn btn-info'><span class='glyphicon glyphicon-pencil'></span> Szczegóły</a>";
         },"orderable": false, "searchable": false},
-
-
-         {{-- {"data": "name"},
-        {"data": function (data, type, dataToSet) {
-            var myType = data.status;
-            if (myType == 1) {
-                return 'Wykreowany';
-            } else if (myType == 2) {
-                return 'Aktywowany';
-            } else if (myType == 3) {
-                return 'Zakończony';
-            } else if (myType == 4) {
-                return 'Oceniono';
-            }
-        },"orderable": true, "searchable": false, "name": "status"},
-        {"data": function (data, type, dataToSet) {
-            var myName = data.first_name + " " + data.last_name;
-            return myName;
-        },"orderable": false, "searchable": true, "name": "last_name"},
-        {"data": function (data, type, dataToSet) {
-            return '<a class="btn btn-default" href="{{ URL::to('show_test_for_admin') }}/' + data.id + '">Szczegóły</a>';
-        },"orderable": false, "searchable": false },  --}}
     ]
 });
 
