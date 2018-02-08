@@ -57,7 +57,7 @@ class RecruitmentAttemptController extends Controller
             $attempt_status->name = $request->name;
             $attempt_status->updated_at = date('Y-m-d H:i:s');
             $attempt_status->save();
-    
+
             return 1;
         }
     }
@@ -147,7 +147,7 @@ class RecruitmentAttemptController extends Controller
      * Funkcja zwracająca panel administracyjny dla rekrutera
      */
     public function interviewsAllGet() {
-        $active_recruitments = Candidate::where('cadre_id', '=', Auth::user()->id)->whereNotIn('attempt_status_id', [10])->count();
+        $active_recruitments = Candidate::where('cadre_id', '=', Auth::user()->id)->whereNotIn('attempt_status_id', [10,11])->count();
 
         $today_interviews = DB::table('recruitment_attempt')
                 ->select(DB::raw('
@@ -182,7 +182,8 @@ class RecruitmentAttemptController extends Controller
                 ->select(DB::raw('
                     recruitment_attempt.*,
                     candidate.first_name as user_name,
-                    candidate.last_name as user_surname
+                    candidate.last_name as user_surname,
+                    candidate.id as candidate_id
                 '))
                 ->join('candidate', 'candidate.id', 'recruitment_attempt.candidate_id')
                 ->where('candidate.attempt_status_id', '=', 3)
@@ -226,7 +227,7 @@ class RecruitmentAttemptController extends Controller
         /**
          * Liczba pozytywnych rekrutacji
          */
-        $recruitment_ok = Candidate::where('attempt_status_id', '=', 11)->count();
+        $recruitment_ok = Candidate::where('attempt_status_id', '=', 10)->count();
 
         /**
          * Dane rekruterów
@@ -368,7 +369,7 @@ class RecruitmentAttemptController extends Controller
                 ->groupBy('candidate.candidate_source_id')
                 ->get();
 
-            /**
+            /**l
              * Zwrócenie potężnej ilości danych
              */
             $data = [
