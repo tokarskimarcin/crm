@@ -95,7 +95,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Ustalanie szkolenia<span id="modal_category"></span></h4>
+                    <h4 class="modal-title" id="modal_title">Ustalanie szkolenia<span id="modal_category"></span></h4>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -106,6 +106,8 @@
                                     <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
                                         <input class="form-control" name="start_date_training" type="text" value="{{date("Y-m-d")}}" readonly />
                                         <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                        <div class="input-group-addon" id="hidden_content_date">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -116,13 +118,17 @@
                                         <input id="start_time_training" class="form-control" size="16" type="text" value="" readonly/>
                                         <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                                         <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
+                                        <div class="input-group-addon" id="hidden_content_time">
+                                        </div>
                                     </div>
+
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="myLabel">Prowadzący:</label>
                                     <select class="form-control" id="id_user">
+                                        <option id="0" value="0">Wybierz</option>
                                         @foreach($cadre as $item)
                                             <option id={{$item->id}} value={{$item->id}} >{{$item->last_name.' '.$item->first_name}}</option>
                                         @endforeach
@@ -132,10 +138,11 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="myLabel">Komentarz:</label>
-                                    <textarea id="training_comment" class="form-control" style="height: 34px;"></textarea>
+                                    <textarea id="training_comment" class="form-control" style="height: 34px;" placeholder="Wprowadź na komentarz"></textarea>
                                 </div>
                             </div>
                         </div>
+
                         <div class="col-md-12" id="modal_full" >
                             <div class="col-md-5">
                                 <label class="myLabel">Dostępni kandydaci:</label>
@@ -452,7 +459,7 @@
                                         'Szkolenie kandydata zostało zakończone.',
                                         'success'
                                     )
-                                    $(e).closest('tr').find('.candidate_status').find('span').text('Szkolenie zakończone pozytywnie');
+                                    $(e).closest('tr').find('.candidate_status').find('span').text('Zaakceptowany');
                                     $(e).closest('tr').find('.glyphicon-ok').css({'color': 'gray'});
                                     $(e).closest('tr').find('.glyphicon-ok').attr('onclick','');
                                     $(e).closest('tr').find('.glyphicon-remove').css({'color': 'gray'});
@@ -502,7 +509,7 @@
                             $(e).closest('tr').find('.glyphicon-ok').attr('onclick','');
                             $(e).closest('tr').find('.glyphicon-remove').css({'color': 'gray'});
                             $(e).closest('tr').find('.glyphicon-remove').attr('onclick','');
-                            $(e).closest('tr').find('.candidate_status').find('span').text('Szkolenie zakończone negatywnie');
+                            $(e).closest('tr').find('.candidate_status').find('span').text('Odrzucony');
                         }
                     }
                 });
@@ -608,6 +615,9 @@
                 if(start_hour_training.trim() == 0)
                 {
                     swal("Nie wyznaczyłeś godziny szkolenia.")
+                }else if(cadre_id == 0)
+                {
+                    swal("Wyznacz osobę prowadzącą szkolenie.")
                 }else{
                     $("#save_button").attr('disabled', true);
 
@@ -761,19 +771,28 @@
             });
             // open modal
             $('#myModalgroup').on('show.bs.modal', function() {
+                $('#modal_title').text('Nowe Szkolenie');
+                $('#save_button').text('Dodaj szkolenie');
                 if(is_open == 0)
                 {
-
-                    console.log(cancel_candidate);
                     if(saving_type == 1){
                         $("input[name='start_date_training']").val("{{date('Y-m-d')}}");
                     }
                     if(cancel_candidate == 1 || cancel_candidate == 2)
                     {
+                        if(cancel_candidate == 2){
+                            $('#modal_title').text('Szkolenie zakończone');
+                        }else{
+                            $('#modal_title').text('Szkolenie usuniete');
+                        }
                         $('#header_modal input,select,textarea').prop('disabled',true).off();
-                        $('#training_comment').prop('disabled',false).on();
-
                         $('#header_modal .input-group-addon').hide();
+                        $('#hidden_content_time').css({"display":"table-cell"});
+                        $('#hidden_content_date').css({"display":"table-cell"});
+                    }else{
+
+                        $('#hidden_content_time').css({"display":"none"});
+                        $('#hidden_content_date').css({"display":"none"});
                     }
                     clearLeftColumn();
                     getGroupTrainingInfo();
@@ -879,11 +898,11 @@
                                                 if(response['candidate'][i].recruitment_story_id == 8)
                                                 {
                                                     var status_ended ='<td class="candidate_status">'+
-                                                        '<span>Kandydat Przyjęty</span>'+
+                                                        '<span>Zaakceptowany</span>'+
                                                         '</td>';
                                                 }else{
                                                     status_ended = '<td class="candidate_status">'+
-                                                        '<span>Kandydat Odrzucony</span>'+
+                                                        '<span>Odrzucony</span>'+
                                                         '</td>';
                                                 }
                                                 span_color_succes = span_color_faild= 'gray';
@@ -924,8 +943,10 @@
             //cancel modal
             $('#myModalgroup').on('hidden.bs.modal',function () {
                 $('#header_modal input,select,textarea').prop('disabled',false).on();
-
+                $('#hidden_content_date').css({"display":"none"});
+                $('#hidden_content_time').css({"display":"none"});
                 $('.input-group-addon').show();
+                $('.hidden_content').hide();
                 id_training_group = 0;
                 clearModalBasicInfo();
                 clearLeftColumn();
@@ -976,6 +997,8 @@
                         var tr = $(this).closest('tr');
                         id_training_group = tr.attr('id');
                         $('#myModalgroup').modal("show");
+                        $('#modal_title').text('Szczegóły szkolenia');
+                        $('#save_button').text('Zapisz zmiany');
                     });
                     // zakończenie szkolenia
                     $('.end_active').click(function (e) {
@@ -1004,7 +1027,7 @@
                                         if(response == 1)
                                         {
                                             swal(
-                                                'Usunięto zakończone!',
+                                                'Szkolenie zakończone!',
                                                 'Szkolenie zostało zakończone.',
                                                 'success'
                                             )
@@ -1095,7 +1118,6 @@
                     }
                 ],"fnDrawCallback": function(settings){
                     $('.info_end').on('click',function (e) {
-
                         $("#modal_full").css({'display':'none'});
                         $("#modal_cancel").css({'display':'none'});
                         $("#modal_end").css({'display':'block'});

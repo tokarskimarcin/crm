@@ -350,6 +350,7 @@ class NotificationController extends Controller
       if ($checkUser == null || $checkUser->status_work == 0) {
           return view('errors.404');
       }
+      $current_month = date('Y-m').'%';
       $data = DB::table('judge_results')
           ->select(DB::raw('
               first_name,
@@ -366,7 +367,21 @@ class NotificationController extends Controller
           ->leftJoin('users', 'users.id', '=', 'judge_results.it_id')
           ->leftJoin('notifications', 'notifications.id', '=', 'judge_results.notification_id')
           ->where('judge_results.it_id', '=', $id)
+          ->where('notifications.created_at','like',$current_month)
           ->get();
+
+
+        $story_of_problem = DB::table('notifications')
+            ->select(DB::raw('
+                notifications.*,
+                users.first_name as first_name,
+                users.last_name as last_name,
+                judge_results.judge_sum as judge_sum
+            '))
+            ->leftJoin('users', 'users.id', '=', 'notifications.user_id')
+            ->leftJoin('judge_results', 'judge_results.notification_id', '=', 'notifications.id')
+            ->where('notifications.displayed_by', '=', $id)
+            ->get();
 
         $comments = DB::table('judge_results')
             ->select(DB::raw('
@@ -381,8 +396,10 @@ class NotificationController extends Controller
             ->get();
 
         return view('notifications.it_worker')
+            ->with('user_data',$checkUser)
             ->with('user_results', $data)
-            ->with('comments', $comments);
+            ->with('comments', $comments)
+            ->with('story_of_problem',$story_of_problem);
     }
 
     public function viewNotification($id) {
