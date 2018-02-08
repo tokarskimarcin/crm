@@ -299,26 +299,96 @@ class StatisticsController extends Controller
 
     // przygotowanie danych do miesiecznego raportu telemarketingu
     private function monthReportTelemarketing($month,$year){
-        
-        $list=array();
-        for($d=1; $d<=31; $d++)
-        {
-            $time=mktime(12, 0, 0, $month, $d, $year);
-            if (date('m', $time)==$month)
-                $list[]=date('N', $time);
-        }
-        $normal_day = 0;
-        $weekend_day = 0;
+        //Pobranie danych na temat ilości przepracowanych dni w danym miesiącu
+        $check_working_days = DB::table('hour_report')
+            ->select(DB::raw('
+                DISTINCT(report_date),
+                department_info_id,
+                department_info.dep_aim as normal_day,
+                department_info.dep_aim_week as week_day
+            '))
+            ->join('department_info', 'department_info.id', 'hour_report.department_info_id')
+            ->whereBetween('report_date', [$year . '-' . $month . '-01', $year . '-' . $month . '-31'])
+            ->where('average', '!=', 0)
+            ->get();
 
-        foreach($list as $item) {
-            if ($item == '6') {
-                $weekend_day++;
-            } elseif ($item != '7' && $item != '6') {
-                $normal_day++;
+        
+        //Zdefiniowanie głównej tablicy do przekazania do widoku
+        $result_days = array();
+        //Zdefiniowanie tablicy tymczasowej
+        $list = array();
+
+        //Pogrupowanie danych ze względu na departamenty 
+        $departments_keys = $check_working_days->groupBy('department_info_id');
+
+        //ilteracja po poszczegolnych oddziałach 
+        foreach($departments_keys as $key => $value) {
+            
+            //Iteracja 31 razy
+            for($d = 1; $d <= 31; $d++)
+            {
+                //Zdefioniowanie czasu
+                $time=mktime(12, 0, 0, $month, $d, $year);
+                //przepierdolenie czasu do czytelnego formatu
+                $time_format = date('Y-m-d', $time);
+
+                //Flaga (ustala czy oddział pracował w danym dniu i dzien się wlicza)
+                $add_date = false;
+
+                //Sprawdzenie czy dzien był dla oddziału pracujący
+                foreach ($value as $key2 => $value2) {
+                    if($value2->report_date == $time_format) {
+                        $add_date = true;
+                        break;
+                    }
+                }
+
+                //Jezeli dzien miesci się w zakresie dni z danego miesiaca i dzien był dla oddziału pracujący
+                if (date('m', $time)==$month && $add_date == true) {
+                    //dodanie dnia do listy
+                    $list[$key][]=date('N', $time);
+                }
             }
         }
 
-        $days_list = ['normal_day' => $normal_day, 'weekend_day' => $weekend_day];
+        //Sumowanie dni dla poszczegolnych oddziałów (z podziałem na dni zwykłe/weekendowe)
+        foreach($list as $key => $item) {
+            $normal_day = 0;
+            $weekend_day = 0;
+
+            foreach($item as $value) {
+                //sprawdzenie typu dnia
+                if ($value == '6' || $value == '7') {
+                    $weekend_day++;
+                } else {
+                    $normal_day++;
+                }
+            }
+
+            $result_days[$key]['normal_day'] = $normal_day;
+            $result_days[$key]['week_day'] = $weekend_day;
+        }
+
+        //dd($result_days);
+
+        // for($d=1; $d<=31; $d++)
+        // {
+        //     $time=mktime(12, 0, 0, $month, $d, $year);
+        //     if (date('m', $time)==$month)
+        //         $list[]=date('N', $time);
+        // }
+        // $normal_day = 0;
+        // $weekend_day = 0;
+
+        // foreach($list as $item) {
+        //     if ($item == '6') {
+        //         $weekend_day++;
+        //     } elseif ($item != '7' && $item != '6') {
+        //         $normal_day++;
+        //     }
+        // }
+
+        //$days_list = ['normal_day' => $normal_day, 'weekend_day' => $weekend_day];
         $month_name = $this::monthReverseName($month);
         $date = $year . "-" . $month . "-%";
         $month = date('Y') . '-' . $month . '%';
@@ -367,42 +437,43 @@ class StatisticsController extends Controller
             'month_name' => $month_name,
             'reports' => $reports,
             'work_hours' => $work_hours,
-            //'hours' => $hours,
-            'days_list' => $days_list,
+            'result_days' => $result_days
+            //'days_list' => $days_list,
         ];
         
         return $data;
     }
 // Wysłanie maila z raportem miesiecznym
     public function MailmonthReportTelemarketing() {
-    $month = date('m') - 1;
-    if ($month < 10) {
-        $month = '0' . $month;
-    }
-    $year = date('Y');
+        $month = date('m') - 1;
+        if ($month < 10) {
+            $month = '0' . $month;
+        }
+        $year = date('Y');
 
-    if ($month == 12) {
-        $year -= 1;
-    }
-    $data = $this::monthReportTelemarketing($month,$year);
+        if ($month == 12) {
+            $year -= 1;
+        }
+        $data = $this::monthReportTelemarketing($month,$year);
 
-    $title = 'Raport miesięczny telemarketing';
-    $this->sendMailByVerona('monthReportTelemarketing', $data, $title);
+        $title = 'Raport miesięczny telemarketing';
+        $this->sendMailByVerona('monthReportTelemarketing', $data, $title);
     }
     // wyswietlenie raportu miesiecznego
     public function pageMonthReportTelemarketing()
     {
         $month = date('m');
-                                                                    $month = date('m') - 1;
-                                                                if ($month < 10) {
-                                                                    $month = '0' . $month;
-                                                                }
+    // Tymczasowo dla testow
+    //     $month = date('m') - 1;
+    // if ($month < 10) {
+    //     $month = '0' . $month;
+    // } 
         $year = date('Y');
         $data = $this::monthReportTelemarketing($month,$year);
         return view('reportpage.MonthReportTelemarketing')
             ->with('work_hours', $data['work_hours'])
             ->with('month_name', $data['month_name'])
-            ->with('days_list', $data['days_list'])
+            ->with('result_days', $data['result_days'])
             ->with('reports', $data['reports']);
     }
 

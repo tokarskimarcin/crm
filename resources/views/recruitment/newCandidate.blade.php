@@ -26,7 +26,7 @@
                     <div class="col-md-3 text-center">
                         <div class="row">
                             <div class="col-md-12">
-                                <span style="font-size: 150px; color: #aaa" class="glyphicon glyphicon-user"></span>
+                                <span style="font-size: 150px; color: #aaa" class="glyphicon glyphicon-user" onclick="easterEgg()"></span>
                             </div>
                         </div>
                         <div class="row">
@@ -133,6 +133,27 @@
 @endsection
 @section('script')
 <script>
+var easterEggCounter = 0;
+function easterEgg() {
+    easterEggCounter++;
+
+    if (easterEggCounter == 3) {
+        var size = 100;
+        var size2 = 1;
+        var side = 1;
+        setInterval(function(){ 
+            $('input, textarea, select, span').css('width', size);
+            $('input, textarea, select, span').css('height', size2);
+            size += side;
+            size2 += side;
+
+            if (size >= 200 || size <= 0) {
+                side *= -1;
+            }
+        }, 1);
+        
+    }
+}
 
 $(document).ready(() => {
 

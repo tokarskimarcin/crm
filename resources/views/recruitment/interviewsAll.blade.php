@@ -157,8 +157,9 @@
                                 <thead>
                                     <th>Dane kandydata</th>
                                     <th>Komentarz</th>
-                                    <th>Data</th>
-                                    <th>Godzina</th>
+                                    <th style="width: 15%">Data</th>
+                                    <th style="width: 15%">Godzina</th>
+                                    <th style="width: 15%">Szczegóły</th>
                                 </thead>
                                 <tbody id="my_interviews">
 
@@ -215,7 +216,7 @@
     <div class="col-md-12">
         <div class="panel panel-default">
             <div class="panel-body">
-                <h3>Zrekrutowani kandydaci</h3>
+                <h3>Wszyscy kandydaci</h3>
                 <div class="table-responsive">
                     <table class="table table-striped thead-inverse" id="candidates">
                         <thead>
@@ -333,6 +334,11 @@ function myInterviews(start_search, stop_search) {
                         <td>Komentarz</td>
                         <td>${value.interview_date.substr(0, 10)}</td>
                         <td>${value.interview_date.substr(11, 20)}</td>
+                        <td>
+                            <a class="btn btn-info" href="{{ URL::to('/candidateProfile') }}/${value.candidate_id}">
+                                <span class="glyphicon glyphicon-ok"></span> Profil kandydata
+                            </a>
+                        </td>
                     </tr>
                 `;
             });
@@ -383,7 +389,6 @@ $(document).ready(() => {
                 "cancel_candidate":  1
             },
             success: function (response) {
-                console.log();
                 var content = '';
 
                 $.each(response.candidate, function(key, value) {
