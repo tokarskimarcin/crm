@@ -235,7 +235,7 @@
                                             </div>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <button data-toggle="modal" data-target="#add_training" class="btn btn-warning" style="width: 100%" @if(($item->status == 1) || ($candidate->attempt_status_id > 5 && $candidate->attempt_status_id <= 9)) disabled @endif>  
+                                                    <button data-toggle="modal" data-target="#add_training" class="btn btn-warning" style="width: 100%" @if(($item->status == 1) || (in_array($candidate->attempt_status_id, [6,7,9,12,13,14,15,16]))) disabled @endif>  
                                                         <span class="glyphicon glyphicon-envelope"></span> Zapisz na szkolenie
                                                     </button>
                                                 </div>
@@ -425,6 +425,7 @@
 </div>
 
 <input type="hidden" id="candidate_id" value="{{$candidate->id}}" />
+<input type="hidden" id="candidate_id" value="{{$candidate->id}}" />
 @endsection
 @section('script')
 <script>
@@ -591,6 +592,8 @@ $(document).ready(() => {
                 if (response == 1) {
                     swal('Rekrutacja została zakończona!')
                     location.reload();
+                } else if (response == 2) {
+                    window.location.href = "{{ URL::to('/add_consultant') }}";
                 } else {
                     swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
                 }

@@ -302,14 +302,14 @@ class RecruitmentAttemptController extends Controller
                 ->join('recruitment_attempt', 'recruitment_attempt.candidate_id', 'candidate.id')
                 ->join('recruitment_story', 'recruitment_story.recruitment_attempt_id','recruitment_attempt.id')
                 ->where('candidate.cadre_id', '=', $id)
+                ->where('recruitment_attempt.status', '=', 1)
                 ->orderBy('recruitment_story.created_at', 'desc')
                 ->get();
-    
+                
             /**
              * Pogrupowanie wyników z podziałem na próby rekrutacji
              */
             $data = $data->groupBy('id');
-            
             /**
              * Zdefiniowanie tabeli z nieudanymi rekrutacjami 
              */
@@ -325,17 +325,17 @@ class RecruitmentAttemptController extends Controller
                     }
                 }
             }
-    
+            
             $types = [];
             foreach($recruitments_fails as $item) {
                 $types[] = $item[1]->attempt_status_id;
             }
-    
+            
             /**
              * Sumowanie ilości nieudanych rekrutacji
              */
             $types = array_count_values($types);
-
+        
             /**
              * Pobranie etapow rekrutacji
              */

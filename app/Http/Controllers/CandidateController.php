@@ -11,6 +11,7 @@ use App\Department_info;
 use App\Candidate;
 use App\RecruitmentAttempt;
 use App\RecruitmentStory;
+use Illuminate\Support\Facades\Session;
 
 class CandidateController extends Controller
 {
@@ -185,6 +186,11 @@ class CandidateController extends Controller
         if ($request->ajax()) {
             $id = $request->candidate_id;
 
+            $find_candidate = Candidate::find($id);
+
+            $find_candidate->training_stage = 1;
+            $find_candidate->save();
+
             /**
              * Sprawdzenie czy kandydat nie ma już aktywnej rekrutacji
              */
@@ -242,7 +248,15 @@ class CandidateController extends Controller
              */
             $this->addStory($id, $recruitmentAttempt->id, $request->stop_recruitment_status, $request->stop_recruitment_comment);
 
-            return 1;
+            if ($request->stop_recruitment_status == 11) {
+                return 1;
+            } elseif($request->stop_recruitment_status == 10) {
+                $candidate = Candidate::find($id);
+
+                Session::put('candidate_data', $candidate);
+
+                return 2;
+            }
         }
     }
 

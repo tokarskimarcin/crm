@@ -1,7 +1,15 @@
 @extends('layouts.main')
 @section('content')
 
+@if(Session::has('candidate_data'))
+@php
+    $candidate = Session::get('candidate_data');
+    $candidate_first_name = $candidate->first_name;
+    $candidate_last_name = $candidate->last_name;
+    $candidate_phone = $candidate->phone;
+@endphp
 
+@endif
 {{--Header page --}}
 <div class="col-md-12">
     <hr>
@@ -25,7 +33,7 @@
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Imię:</b></td>
                                 <td>
-                                    <input type="text" class="form-control" name="first_name" placeholder="Imię" value="">
+                                    <input type="text" class="form-control" name="first_name" placeholder="Imię" value="@isset($candidate_first_name) {{$candidate_first_name}} @endif">
                                 </td>
                             </tr>
                             <tr class="alert alert-danger" style="display: none" id="alert_name">
@@ -35,7 +43,7 @@
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Nazwisko:</b></td>
                                 <td>
-                                    <input type="text" class="form-control" placeholder="Nazwisko" name="last_name"  value="">
+                                    <input type="text" class="form-control" placeholder="Nazwisko" name="last_name"  value="@isset($candidate_last_name) {{$candidate_last_name}} @endif">
                                 </td>
                             </tr>
                             <tr class="alert alert-danger" style="display: none" id="alert_last_name">
@@ -67,7 +75,7 @@
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Telefon prywatny:</b></td>
                                 <td>
-                                    <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="private_phone" value="">
+                                    <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" name="private_phone" value="@isset($candidate_phone) {{$candidate_phone}} @endif">
                                 </td>
                             </tr>
                             <tr class="alert alert-danger" style="display: none" id="alert_user_phone">
