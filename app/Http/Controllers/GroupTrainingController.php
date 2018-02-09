@@ -46,7 +46,8 @@ class GroupTrainingController extends Controller
             $group_training = $group_training->join('users','users.id','group_training.edit_cadre_id');
 
         $group_training = $group_training->where('group_training.status','=',$list_type)
-            ->where('group_training.department_info_id','=',Auth::user()->department_info_id);
+            ->where('group_training.department_info_id','=',Auth::user()->department_info_id)
+            ->where('training_stage','=',$request->training_stage);
         return datatables($group_training)->make(true);
     }
 
