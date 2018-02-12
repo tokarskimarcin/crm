@@ -136,14 +136,10 @@ Route::POST('/EndGroupTrainingForCandidate', 'GroupTrainingController@EndGroupTr
 Route::POST('/getCandidateForGroupTrainingInfo','GroupTrainingController@getCandidateForGroupTrainingInfo')->name('api.getCandidateForGroupTrainingInfo');
 Route::POST('/datatableTrainingGroupList','GroupTrainingController@datatableTrainingGroupList')->name('api.datatableTrainingGroupList');
 Route::POST('/getGroupTrainingInfo','GroupTrainingController@getGroupTrainingInfo')->name('api.getGroupTrainingInfo');
-Route::POST('/getAttemptLevel', 'RecruitmentAttemptController@getAttemptLevel')->name('api.getAttemptLevel');
-Route::POST('/addAttemptLevel', 'RecruitmentAttemptController@addAttemptLevel')->name('api.addAttemptLevel');
-Route::POST('/editAttemptLevel', 'RecruitmentAttemptController@editAttemptLevel')->name('api.editAttemptLevel');
-Route::POST('/deleteAttemptLevel', 'RecruitmentAttemptController@deleteAttemptLevel')->name('api.deleteAttemptLevel');
 
 Route::POST('/getCandidateSource', 'RecruitmentAttemptController@getCandidateSource')->name('api.getCandidateSource');
 Route::POST('/addCandidateSource', 'RecruitmentAttemptController@addCandidateSource')->name('api.addCandidateSource');
-Route::POST('/editCandidateSource', 'CandidateController@editCandidateSource')->name('api.editCandidateSource');
+Route::POST('/editCandidateSource', 'RecruitmentAttemptController@editCandidateSource')->name('api.editCandidateSource');
 Route::POST('/deleteCandidateSource', 'RecruitmentAttemptController@deleteCandidateSource')->name('api.deleteCandidateSource');
 
 Route::POST('/addNewCandidate', 'CandidateController@addNewCandidate')->name('api.addNewCandidate');

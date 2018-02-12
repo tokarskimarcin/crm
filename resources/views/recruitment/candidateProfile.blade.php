@@ -163,11 +163,11 @@
 @endif
 
 @php
-    $i = 0;
+    $i = $candidate->recruitment_attempt->count() + 1;
 @endphp
-@foreach($candidate->recruitment_attempt as $item)
+@foreach($candidate->recruitment_attempt->sortByDesc('created_at') as $item)
 @php
-    $i++;
+    $i--;
 @endphp
 <div class="row">
     <div class="col-md-12">
@@ -459,7 +459,7 @@ $(document).ready(() => {
         var candidate_source = $('#candidate_source').val();
         var candidate_desc = $('#candidate_desc').val();
 
-        if (candidate_name == '') {
+        if (candidate_name == '' || (candidate_name.trim().length == 0)) {
             swal('Podaj imie kandydata!')
             return false;
         }
@@ -469,7 +469,7 @@ $(document).ready(() => {
             return false;
         }
 
-        if (candidate_phone == '') {
+        if (candidate_phone == '' || (candidate_phone.trim().length == 0)) {
             swal('Podaj telefon kandydata!')
             return false;
         } else if (isNaN(candidate_phone) || (candidate_phone.length < 8)) {
@@ -487,7 +487,7 @@ $(document).ready(() => {
             return false;
         }
 
-        if (candidate_desc == '') {
+        if (candidate_desc == '' || (candidate_desc.trim().length == 0)) {
             swal('Dodaj opis kandydata!')
             return false;
         }
@@ -527,7 +527,7 @@ $(document).ready(() => {
         var new_recruitment_status = $('#new_recruitment_status').val();
         var new_recruitment_comment = $('#new_recruitment_comment').val();
 
-        if (new_recruitment_comment == '') {
+        if (new_recruitment_comment == '' || (new_recruitment_comment.trim().length == 0)) {
             swal('Dodaj komentarz!')
             return false;
         }
@@ -568,7 +568,7 @@ $(document).ready(() => {
 
         var stop_recruitment_status = (stopType == 0) ? 11 : 10 ;
 
-        if (stop_recruitment_comment == '') {
+        if (stop_recruitment_comment == '' || (stop_recruitment_comment.trim().length == 0)) {
             swal('Dodaj komentarz!')
             return false;
         }
@@ -618,7 +618,7 @@ $(document).ready(() => {
         var add_level_status = $('#add_level_status').val();
         var add_level_comment = $('#add_level_comment').val();
 
-        if (add_level_comment == '') {
+        if (add_level_comment == '' || (add_level_comment.trim().length == 0)) {
             swal('Dodaj komentarz!')
             return false;
         }
@@ -670,7 +670,7 @@ $(document).ready(() => {
         var candidate_id = $('#candidate_id').val();
         var add_training_comment = $('#add_training_comment').val();
 
-        if (add_training_comment == '') {
+        if (add_training_comment == '' || (add_training_comment.trim().length == 0)) {
             swal('Dodaj komentarz!')
             return false;
         }
