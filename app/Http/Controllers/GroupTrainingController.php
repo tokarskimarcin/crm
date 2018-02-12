@@ -25,6 +25,17 @@ class GroupTrainingController extends Controller
         return view('recruitment.addGroupTraining')
             ->with('cadre',$cadre);
     }
+    public function add_group_training_2()
+    {
+        $cadre = User::whereIN('user_type_id',[4,5,12])
+            ->where('department_info_id',Auth::user()->department_info_id)
+            ->where('status_work','=',1)
+            ->get();
+
+
+        return view('recruitment.addGroupTraining')
+            ->with('cadre',$cadre);
+    }
     public  function  datatableTrainingGroupList(Request $request)
     {
         $list_type = $request->list_type;
@@ -35,7 +46,8 @@ class GroupTrainingController extends Controller
             $group_training = $group_training->join('users','users.id','group_training.edit_cadre_id');
 
         $group_training = $group_training->where('group_training.status','=',$list_type)
-            ->where('group_training.department_info_id','=',Auth::user()->department_info_id);
+            ->where('group_training.department_info_id','=',Auth::user()->department_info_id)
+            ->where('training_stage','=',$request->training_stage);
         return datatables($group_training)->make(true);
     }
 

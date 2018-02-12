@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\HourReport;
+use App\PBXDKJTeam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -552,6 +553,23 @@ class StatisticsController extends Controller
         $this->sendMailByVerona('dayReportMissedRepo', $data, $title);
     }
     // Przygotowanie danych do raportu godzinnego DKJ
+    private function hourReportDkj_PBX_READY() {
+
+        $date = date('Y-m-d');
+        $hour = date('H') . ':00:00'; //tutaj zmienic przy wydawaniu na produkcję na  date('H') - 1
+
+        $reports = PBXDKJTeam::where('report_date', '=', $date)
+            ->where('hour', $hour)
+            ->get();
+        $data = [
+            'hour' => $hour,
+            'date' => $date,
+            'reports' => $reports
+        ];
+        return $data;
+    }
+
+    // Przygotowanie danych do raportu godzinnego DKJ
     private function hourReportDkj() {
         $today = date('Y-m-d');
 
@@ -586,20 +604,31 @@ class StatisticsController extends Controller
 
     }
 
-    // Mail do godzinnego raportu DKJ
-    public function MailhourReportDkj() {
-        $data = $this::hourReportDkj();
 
-        $title = 'Raport godzinny DKJ '.date('Y-m-d');
-        $this->sendMailByVerona('hourReportDkj', $data, $title);
-    }
-    public function pageHourReportDKJ()
+    // Mail do godzinnego raportu DKJ
+    public function MailhourReportDkj()
     {
         $data = $this::hourReportDkj();
+        $title = 'Raport godzinny DKJ ' . date('Y-m-d');
+        $this->sendMailByVerona('hourReportDkj', $data, $title);
+    }
 
-        return view('reportpage.hourReportDkj')
-            ->with('date_stop', date('H') . ':00:00')
-            ->with('dkj', $data['dkj']);
+    public function pageHourReportDKJ()
+    {
+
+            //wersja na pobx
+//        $data = $this::hourReportDkj();
+//        return view('reportpage.hourReportDkj')
+//            ->with('date', $data['hour'])
+//            ->with('hour', date('H') . ':00:00')
+//            ->with('reports', $data['reports']);
+
+
+            $data = $this::hourReportDkj();
+
+            return view('reportpage.hourReportDkj')
+                ->with('date_stop', date('H') . ':00:00')
+                ->with('dkj', $data['dkj']);
     }
 
     private function dayReportDkjData($type) {
