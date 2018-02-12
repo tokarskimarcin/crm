@@ -491,3 +491,6 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 //////////////////////Testing ORM///////////////
 
   Route::get('/testorm', 'TestORM@test');
+
+  //Dane DKJ dla oddziałów
+  Route::get('/TeamDKJHourData', 'PBXDataAPI@TeamDKJHourData');
