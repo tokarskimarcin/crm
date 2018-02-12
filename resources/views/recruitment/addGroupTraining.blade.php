@@ -86,11 +86,11 @@
 
 
 
-    <button data-toggle="modal" class="btn btn-default training_to_modal" data-target="#myModalgroup" data-category_id="{{1}}" title="Dodaj szkolenie (Etap 1)" style="margin-bottom: 14px">
+    <button data-toggle="modal" class="btn btn-default training_to_modal" id="training_to_modal_stage1" data-target="#myModalgroup" data-id="1" title="Dodaj szkolenie (Etap 1)" style="margin-bottom: 14px">
         <span class="glyphicon glyphicon-plus"></span> <span>Dodaj szkolenie (Etap 1)</span>
     </button>
     <br>
-    <button data-toggle="modal" class="btn btn-default training_to_modal" data-target="#myModalgroup" data-category_id="{{1}}" title="Dodaj szkolenie (Etap 2)" style="margin-bottom: 14px">
+    <button data-toggle="modal" class="btn btn-default training_to_modal_stage2" id="training_to_modal_stage2" data-target="#myModalgroup" data-id="2" title="Dodaj szkolenie (Etap 2)" style="margin-bottom: 14px">
         <span class="glyphicon glyphicon-plus"></span> <span>Dodaj szkolenie (Etap 2)</span>
     </button>
 
@@ -479,6 +479,8 @@
         var is_open = 0;
         var cancel_candidate = 0;
         var saving_type = 1; // 1 - nowy wpis, 0 - edycja
+        // wybrany etap szkolenia
+        var actual_stage = 0;
         var action_row =
             '<a class="btn btn-default info_active" href="#">'+
             '<span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły'+
@@ -688,6 +690,7 @@
                 var check_all = true;
                 var avaible_candidate = [];
                 var choice_candidate = [];
+
                 if(start_hour_training.trim() == 0)
                 {
                     swal("Nie wyznaczyłeś godziny szkolenia.")
@@ -705,7 +708,6 @@
                     $('#list_candidate_choice a').each(function (key, value) {
                         choice_candidate.push(value.id) ;
                     });
-
                     $.ajax({
                         type: "POST",
                         url: '{{ route('api.saveGroupTraining') }}',
@@ -720,9 +722,11 @@
                             "avaible_candidate":avaible_candidate,
                             "choice_candidate":choice_candidate,
                             "saving_type":saving_type,
-                            "id_training_group" : id_training_group
+                            "id_training_group" : id_training_group,
+                            "actual_stage" : actual_stage
                         },
                         success: function (response) {
+                            console.log(actual_stage)
                             if(response == 1)
                             {
                                 $('#myModalgroup').modal('hide');
@@ -738,7 +742,7 @@
 
                                 $("#save_button").attr('disabled', false);
                                 table_activ_training_group.ajax.reload();
-
+                                activ_training_group_stage2.ajax.reload();
                             }else if(response == 0){
                                 swal('Wystąpił problem z zapise, skontaktuj się z administratorem !!')
                             }
@@ -783,6 +787,18 @@
                         }
                     }
                 })
+            });
+
+            //po kliknieciu na dodaj szkolenie
+            $('#training_to_modal_stage1,#training_to_modal_stage2').on('click',function (e) {
+
+                let stage_name = $(this).attr('id');
+                if(stage_name == 'training_to_modal_stage2')
+                {
+                    actual_stage = 2;
+                }else{
+                    actual_stage = 1;
+                }
             });
             // przeniesienie do prawej tabeli (wybrani użytkownicy)
             $('#move_right').on('click',function (e) {
@@ -846,9 +862,17 @@
                 })
             });
             // open modal
-            $('#myModalgroup').on('show.bs.modal', function() {
-                $('#modal_title').text('Nowe Szkolenie');
-                $('#save_button').text('Dodaj szkolenie');
+            $('#myModalgroup').on('show.bs.modal', function(e) {
+
+                if(actual_stage == 1)
+                {
+                    $('#modal_title').text('Nowe Szkolenie (Etap 1)');
+                    $('#save_button').text('Dodaj szkolenie');
+                }else{
+                    $('#modal_title').text('Nowe Szkolenie (Etap 2)');
+                    $('#save_button').text('Dodaj szkolenie');
+                }
+
                 if(is_open == 0)
                 {
                     if(saving_type == 1){
@@ -899,7 +923,8 @@
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
-                        data: {},
+                        data: {'training_stage': actual_stage},
+
                         success: function (response) {
                             if (response.length != 0) {
                                 for (var i = 0; i < response.length; i++) {
@@ -907,7 +932,7 @@
                                         response[i].first_name + ' ' + response[i].last_name +
                                         '<input type="checkbox" class="pull-left" style="display: block">' +
                                         '</a>';
-                                    if (response[i].attempt_status_id == 5) {
+                                    if (response[i].attempt_status_id == 5 || response[i].attempt_status_id == 12) {
                                         $('#list_candidate').append(html);
                                     }
                                 }
@@ -924,7 +949,8 @@
                         },
                         data: {
                             "id_training_group": id_training_group,
-                            "cancel_candidate": cancel_candidate
+                            "cancel_candidate": cancel_candidate,
+                            'training_stage': actual_stage
                         },
                         success: function (response) {
                             console.log(response);
@@ -939,6 +965,7 @@
                                     $("#training_comment").val(response['group_training'][i].comment);
                                 }
                                 for (var i = 0; i < response['candidate'].length; i++) {
+                                                            //ETAP 1
                                     if (response['candidate'][i].attempt_status_id == 5 && cancel_candidate == 0) {
                                         var html = '<a class="list-group-item nocheck" onclick = "onclickRowLeft(this)" id=' + response['candidate'][i].id + '>' +
                                             response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
@@ -946,6 +973,19 @@
                                             '</a>';
                                         $('#list_candidate').append(html);
                                     } else if (response['candidate'][i].attempt_status_id == 6  && cancel_candidate == 0) {
+                                        var html = '<a class="list-group-item nocheck" onclick = "onclickRowRight(this)" id=' + response['candidate'][i].id + '>' +
+                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
+                                            '<input type="checkbox" class="pull-right" style="display: block">' +
+                                            '</a>';
+                                        $('#list_candidate_choice').append(html);
+                                    }               //ETAP 2
+                                    else if (response['candidate'][i].attempt_status_id == 12 && cancel_candidate == 0) {
+                                        var html = '<a class="list-group-item nocheck" onclick = "onclickRowLeft(this)" id=' + response['candidate'][i].id + '>' +
+                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
+                                            '<input type="checkbox" class="pull-left" style="display: block">' +
+                                            '</a>';
+                                        $('#list_candidate').append(html);
+                                    } else if (response['candidate'][i].attempt_status_id == 13  && cancel_candidate == 0) {
                                         var html = '<a class="list-group-item nocheck" onclick = "onclickRowRight(this)" id=' + response['candidate'][i].id + '>' +
                                             response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
                                             '<input type="checkbox" class="pull-right" style="display: block">' +
@@ -1038,135 +1078,7 @@
             });
 
 
-            // Dostępne szkolenia etapu 2
-            var activ_training_group_stage2 =$('#activ_training_group_stage2').DataTable({
-                "autoWidth": false,
-                "processing": true,
-                "serverSide": true,
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
-                },"ajax": {
-                    'url': "{{ route('api.datatableTrainingGroupList') }}",
-                    'type': 'POST',
-                    'data': function (d) {
-                        d.list_type = 1;
-                        d.training_stage = 2;
-                    },
-                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
-                },
-                "columns": [
-                    {"data": "training_date"},
-                    {"data": "training_hour"},
-                    {"data": "candidate_count"},
-                    {
-                        "data": function (data, type, dataToSet) {
-                            return data.last_name+' '+data.first_name;
-                        },"name":"leader.last_name"
-                    },
-                    {"width":"10%",
-                        "data": function (data, type, dataToSet) {
-                            return action_row;
-                        },"searchable": false,"orderable": false
-                    }
-                ],"fnDrawCallback": function(settings){ // działanie po wyrenderowaniu widoku
-                    // po kliknięcu w szczegóły otwórz modal z możliwością edycji
-                    $('.info_active').on('click',function (e) {
-                        saving_type = 0;
-                        //główny wiersz
-                        var tr = $(this).closest('tr');
-                        id_training_group = tr.attr('id');
-                        $('#myModalgroup').modal("show");
-                        $('#modal_title').text('Szczegóły szkolenia');
-                        $('#save_button').text('Zapisz zmiany');
-                    });
-                    // zakończenie szkolenia
-                    $('.end_active').click(function (e) {
-                        let training_group_to_end = $(this).closest('tr').attr('id');
-                        swal({
-                            title: 'Jesteś pewien?',
-                            text: "Spowoduje to zakończenie szkolenia, bez możliwości cofnięcia zmian!",
-                            type: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Tak, zakończ szkolenie!'
-                        }).then((result) => {
-                            if (result.value)
-                        {
-                            $.ajax({
-                                type: "POST",
-                                url: '{{ route('api.EndGroupTraining') }}',
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                                data: {
-                                    "training_group_to_end" : training_group_to_end
-                                },
-                                success: function (response) {
-                                    if(response == 1)
-                                    {
-                                        swal(
-                                            'Szkolenie zakończone!',
-                                            'Szkolenie zostało zakończone.',
-                                            'success'
-                                        )
-                                        $('#succes_end_training').fadeIn(1000);
-                                        $('#succes_end_training').delay(3000).fadeOut(1000);
-                                        table_activ_training_group.ajax.reload();
-                                        table_cancel_training_group.ajax.reload();
-                                        table_end_training_group.ajax.reload();
-                                    }
-                                }
-                            });
-                        }
-                    });
-                    });
-                    //usunięcie szkolenia
-                    $('.cancle_active').on('click',function (e) {
-                        let id_training_group_to_delete = $(this).closest('tr').attr('id');
-                        swal({
-                            title: 'Jesteś pewien?',
-                            text: "Spowoduje to usuniecie szkolenia, cofnięcie zmian nie będzie możliwe!",
-                            type: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Tak, usuń szkolenie!'
-                        }).then((result) => {
-                            if (result.value) {
-                            $.ajax({
-                                type: "POST",
-                                url: '{{ route('api.deleteGroupTraining') }}',
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                                data: {
-                                    "id_training_group_to_delete" : id_training_group_to_delete
-                                },
-                                success: function (response) {
-                                    if(response == 1)
-                                    {
-                                        swal(
-                                            'Usunięto szkolenie!',
-                                            'Szkolenie zostało usunięte. Kandydaci zostali umieszczeni w poczekali',
-                                            'success'
-                                        )
-                                        $('#succes_delete_training').fadeIn(1000);
-                                        $('#succes_delete_training').delay(3000).fadeOut(1000);
-                                        table_activ_training_group.ajax.reload();
-                                        table_cancel_training_group.ajax.reload();
-                                    }
-                                }
-                            });
-                        }
-                    });
-                    });
-                },"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                    // Dodanie id do wiersza
-                    $(nRow).attr('id', aData.id);
-                    return nRow;
-                }
-            });
+
             //tabela dostępnych szkoleń
             var table_activ_training_group = $('#activ_training_group').DataTable({
                 "autoWidth": false,
@@ -1199,8 +1111,9 @@
                     }
                 ],"fnDrawCallback": function(settings){ // działanie po wyrenderowaniu widoku
                     // po kliknięcu w szczegóły otwórz modal z możliwością edycji
-                    $('.info_active').on('click',function (e) {
+                    $('#activ_training_group .info_active').on('click',function (e) {
                         saving_type = 0;
+                        actual_stage  = 1;
                         //główny wiersz
                         var tr = $(this).closest('tr');
                         id_training_group = tr.attr('id');
@@ -1209,7 +1122,7 @@
                         $('#save_button').text('Zapisz zmiany');
                     });
                     // zakończenie szkolenia
-                    $('.end_active').click(function (e) {
+                    $('#activ_training_group .end_active').click(function (e) {
                         let training_group_to_end = $(this).closest('tr').attr('id');
                         swal({
                             title: 'Jesteś pewien?',
@@ -1244,6 +1157,11 @@
                                             table_activ_training_group.ajax.reload();
                                             table_cancel_training_group.ajax.reload();
                                             table_end_training_group.ajax.reload();
+
+                                            activ_training_group_stage2.ajax.reload();
+                                            table_end_training_group_stage2.ajax.reload();
+                                            table_cancel_training_group_stage2.ajax.reload();
+
                                         }
                                     }
                                 });
@@ -1251,7 +1169,7 @@
                         });
                     });
                     //usunięcie szkolenia
-                    $('.cancle_active').on('click',function (e) {
+                    $(' #activ_training_group .cancle_active').on('click',function (e) {
                         let id_training_group_to_delete = $(this).closest('tr').attr('id');
                         swal({
                             title: 'Jesteś pewien?',
@@ -1394,6 +1312,243 @@
                     }
                     });
 
+            // Dostępne szkolenia etapu 2
+
+            var activ_training_group_stage2 =$('#activ_training_group_stage2').DataTable({
+                "autoWidth": false,
+                "processing": true,
+                "serverSide": true,
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+                },"ajax": {
+                    'url': "{{ route('api.datatableTrainingGroupList') }}",
+                    'type': 'POST',
+                    'data': function (d) {
+                        d.list_type = 1;
+                        d.training_stage = 2;
+                    },
+                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+                },
+                "columns": [
+                    {"data": "training_date"},
+                    {"data": "training_hour"},
+                    {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.last_name+' '+data.first_name;
+                        },"name":"leader.last_name"
+                    },
+                    {"width":"10%",
+                        "data": function (data, type, dataToSet) {
+                            return action_row;
+                        },"searchable": false,"orderable": false
+                    }
+                ],"fnDrawCallback": function(settings){ // działanie po wyrenderowaniu widoku
+                    // po kliknięcu w szczegóły otwórz modal z możliwością edycji
+                    $('#activ_training_group_stage2 .info_active').on('click',function (e) {
+                        saving_type = 0;
+                        //główny wiersz
+                        var tr = $(this).closest('tr');
+                        id_training_group = tr.attr('id');
+                        actual_stage  = 2;
+                        $('#myModalgroup').modal("show");
+                        $('#modal_title').text('Szczegóły szkolenia');
+                        $('#save_button').text('Zapisz zmiany');
+                    });
+                    // zakończenie szkolenia
+                    $('#activ_training_group_stage2 .end_active').click(function (e) {
+                        let training_group_to_end = $(this).closest('tr').attr('id');
+                        swal({
+                            title: 'Jesteś pewien?',
+                            text: "Spowoduje to zakończenie szkolenia, bez możliwości cofnięcia zmian!",
+                            type: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Tak, zakończ szkolenie!'
+                        }).then((result) => {
+                            if (result.value)
+                        {
+                            $.ajax({
+                                type: "POST",
+                                url: '{{ route('api.EndGroupTraining') }}',
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                data: {
+                                    "training_group_to_end" : training_group_to_end
+                                },
+                                success: function (response) {
+                                    if(response == 1)
+                                    {
+                                        swal(
+                                            'Szkolenie zakończone!',
+                                            'Szkolenie zostało zakończone.',
+                                            'success'
+                                        )
+                                        $('#succes_end_training').fadeIn(1000);
+                                        $('#succes_end_training').delay(3000).fadeOut(1000);
+                                        table_activ_training_group.ajax.reload();
+                                        table_cancel_training_group.ajax.reload();
+                                        table_end_training_group.ajax.reload();
+
+                                        activ_training_group_stage2.ajax.reload();
+                                        table_end_training_group_stage2.ajax.reload();
+                                        table_cancel_training_group_stage2.ajax.reload();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    });
+                    //usunięcie szkolenia
+                    $('#activ_training_group_stage2 .cancle_active').on('click',function (e) {
+                        let id_training_group_to_delete = $(this).closest('tr').attr('id');
+                        swal({
+                            title: 'Jesteś pewien?',
+                            text: "Spowoduje to usuniecie szkolenia, cofnięcie zmian nie będzie możliwe!",
+                            type: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Tak, usuń szkolenie!'
+                        }).then((result) => {
+                            if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                url: '{{ route('api.deleteGroupTraining') }}',
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                data: {
+                                    "id_training_group_to_delete" : id_training_group_to_delete
+                                },
+                                success: function (response) {
+                                    if(response == 1)
+                                    {
+                                        swal(
+                                            'Usunięto szkolenie!',
+                                            'Szkolenie zostało usunięte. Kandydaci zostali umieszczeni w poczekali',
+                                            'success'
+                                        )
+                                        $('#succes_delete_training').fadeIn(1000);
+                                        $('#succes_delete_training').delay(3000).fadeOut(1000);
+                                        table_activ_training_group.ajax.reload();
+                                        table_cancel_training_group.ajax.reload();
+
+                                        activ_training_group_stage2.ajax.reload();
+                                        table_cancel_training_group_stage_2.ajax.reload();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    });
+                },"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+                    // Dodanie id do wiersza
+                    $(nRow).attr('id', aData.id);
+                    return nRow;
+                }
+            });
+
+            // tabela zakończonych szkoleń
+            var table_end_training_group_stage2 = $('#end_training_group_stage2').DataTable({
+                "autoWidth": false,
+                "processing": true,
+                "serverSide": true,
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+                },"ajax": {
+                    'url': "{{ route('api.datatableTrainingGroupList') }}",
+                    'type': 'POST',
+                    'data': function (d) {
+                        d.list_type = 2;
+                        d.training_stage = 1;
+                    },
+                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+                },"columns": [
+                    {"data": "training_date"},
+                    {"data": "training_hour"},
+                    {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.last_name+' '+data.first_name;
+                        },"name":"leader.last_name"
+                    },
+                    { "width": "10%",
+                        "data": function (data, type, dataToSet) {
+                            return action_row_end;
+                        },"searchable": false,"orderable": false
+                    }
+                ],"fnDrawCallback": function(settings){
+                    $('.info_end').on('click',function (e) {
+                        $("#modal_full").css({'display':'none'});
+                        $("#modal_cancel").css({'display':'none'});
+                        $("#modal_end").css({'display':'block'});
+
+                        $("#save_button").css({'display':'none'});
+                        saving_type = 0;
+                        cancel_candidate = 2;
+                        //główny wiersz
+                        var tr = $(this).closest('tr');
+                        id_training_group = tr.attr('id');
+                        $('#myModalgroup').modal("show");
+                    });
+                },"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+                    // Dodanie id do wiersza
+                    $(nRow).attr('id', aData.id);
+                    return nRow;
+                }
+            });
+
+            // tabela skaswoanych szkoleń
+            var table_cancel_training_group_stage2 = $('#cancel_training_group_stage2').DataTable({
+                "autoWidth": false,
+                "processing": true,
+                "serverSide": true,
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+                },"ajax": {
+                    'url': "{{ route('api.datatableTrainingGroupList') }}",
+                    'type': 'POST',
+                    'data': function (d) {
+                        d.list_type = 0;
+                        d.training_stage = 1;
+                    },
+                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+                },"columns": [
+                    {"data": "training_date"},
+                    {"data": "training_hour"},
+                    {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.last_name+' '+data.first_name;
+                        },"name":"edit_cadre.last_name"
+                    },
+                    { "width": "10%",
+                        "data": function (data, type, dataToSet) {
+                            return action_row_end_cancel;
+                        },"searchable": false,"orderable": false
+                    }
+                ],"fnDrawCallback": function(settings){
+                    $('.info_cancel').on('click',function (e) {
+                        $("#modal_full").css({'display':'none'});
+                        $("#modal_end").css({'display':'none'});
+                        $("#modal_cancel").css({'display':'block'});
+                        $("#save_button").css({'display':'none'});
+                        saving_type = 0;
+                        cancel_candidate = 1;
+                        //główny wiersz
+                        var tr = $(this).closest('tr');
+                        id_training_group = tr.attr('id');
+                        $('#myModalgroup').modal("show");
+                    });
+                },"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+                    // Dodanie id do wiersza
+                    $(nRow).attr('id', aData.id);
+                    return nRow;
+                }
+            });
 
         });
     </script>

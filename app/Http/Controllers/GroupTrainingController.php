@@ -65,7 +65,7 @@ class GroupTrainingController extends Controller
                 $comment = "Brak komentarza";
             }
             if($status == 1)
-                $candidate->attempt_status_id = 8;
+                $candidate->attempt_status_id = 12;
             else{
                 $candidate->attempt_status_id = 9;
             }
@@ -86,9 +86,23 @@ class GroupTrainingController extends Controller
             $candidate_story_new->comment = $comment;
             $candidate_story_new->save();
 
+
+
             $CandidateTraining = CandidateTraining::where('training_id','=',$training_group)
                 ->where('candidate_id','=',$candidate_id)
                 ->update(['completed_training' => $candidate_story_new->id]);
+            // zapisanie na szkolenie etap 2
+            if($candidate_story_new->attempt_status_id == 8){
+                $candidate_story_new = new RecruitmentStory();
+                $candidate_story_new->cadre_id = Auth::user()->id;
+                $candidate_story_new->cadre_edit_id = Auth::user()->id;
+                $candidate_story_new->candidate_id = $candidate_id;
+                $candidate_story_new->recruitment_attempt_id = $candidate_story_old->recruitment_attempt_id;
+                $candidate_story_new->attempt_status_id = 12;
+                $candidate_story_new->comment = $comment;
+                $candidate_story_new->save();
+            }
+
             return 1;
 
         }
@@ -129,11 +143,17 @@ class GroupTrainingController extends Controller
     }
     public function getCandidateForGroupTrainingInfo(Request $request)
     {
-
         if($request->ajax())
         {
-            $candidate = Candidate::where('attempt_status_id','=',5)
-                ->where('department_info_id','=',Auth::user()->department_info_id)->get();
+            if($request->training_stage == 1)
+            {
+                $candidate = Candidate::where('attempt_status_id','=',5)
+                    ->where('department_info_id','=',Auth::user()->department_info_id)->get();
+
+            }else{
+                $candidate = Candidate::where('attempt_status_id','=',12)
+                    ->where('department_info_id','=',Auth::user()->department_info_id)->get();
+            }
             return $candidate;
         }
     }
@@ -172,9 +192,14 @@ class GroupTrainingController extends Controller
             $group_training = GroupTraining::
             where('id','=',$request->id_training_group)->get();
 
-            $candidate_avaible = Candidate::whereIn('attempt_status_id',[5])
-                ->where('department_info_id','=',Auth::user()->department_info_id)->get()
-                ->toArray();
+            if($request->training_stage == 1)
+                $candidate_avaible = Candidate::whereIn('attempt_status_id',[5])
+                    ->where('department_info_id','=',Auth::user()->department_info_id)->get()
+                    ->toArray();
+            else
+                $candidate_avaible = Candidate::whereIn('attempt_status_id',[12])
+                    ->where('department_info_id','=',Auth::user()->department_info_id)->get()
+                    ->toArray();
 
             $candidate_choice = DB::table('candidate')
                 ->select(DB::raw('
@@ -229,6 +254,12 @@ class GroupTrainingController extends Controller
             $training->training_hour = $start_hour_training;
             $training->status = 1; // dotępne szkolenie 2 - zakończone 0 - anulowane
 
+            if($request->actual_stage == '1'){
+                $training->training_stage = 1;
+            }else if($request->actual_stage == '2'){
+                $training->training_stage = 2;
+            }
+
             // Próba zapisu
             if($training->save())
             {
@@ -246,11 +277,17 @@ class GroupTrainingController extends Controller
                 for($i = 0 ;$i < count($choice_candidate) ; $i++){
 
                     $candidate = Candidate::find($choice_candidate[$i]);
-                    $candidate->attempt_status_id = 6;
+                    if($request->actual_stage == '1')
+                        $candidate->attempt_status_id = 6;
+                    else if($request->actual_stage == '2')
+                        $candidate->attempt_status_id = 13;
                     $candidate->save();
                     $candidate_story = RecruitmentStory::where('candidate_id','=',$choice_candidate[$i])
                         ->orderBy('id', 'desc')->first();
-                    $candidate_story->attempt_status_id = 6;
+                    if($request->actual_stage == '1')
+                        $candidate_story->attempt_status_id = 6;
+                    else   if($request->actual_stage == '1')
+                        $candidate_story->attempt_status_id = 13;
                     $candidate_story->save();
                     $new_relation = new CandidateTraining();
                     $new_relation->training_id = $id;
@@ -259,11 +296,18 @@ class GroupTrainingController extends Controller
                 }
                 for($i =  0 ;$i < count($avaible_candidate) ; $i++){// osoby które zostły zdjęce ze szkolenia( znowu dostepne
                     $candidate = Candidate::find($avaible_candidate[$i]);
-                    $candidate->attempt_status_id = 5;
+                    if($request->actual_stage == 1)
+                     $candidate->attempt_status_id = 5;
+                    else  if($request->actual_stage == 2)
+                        $candidate->attempt_status_id = 12;
                     $candidate->save();
-                    $candidate_story = RecruitmentStory::where('candidate_id','=',$avaible_candidate[$i])
-                        ->orderBy('id', 'desc')->first();
-                    $candidate_story->attempt_status_id = 5;
+                        $candidate_story = RecruitmentStory::where('candidate_id','=',$avaible_candidate[$i])
+                            ->orderBy('id', 'desc')->first();
+
+                    if($request->actual_stage == '1')
+                        $candidate_story->attempt_status_id = 5;
+                    else  if($request->actual_stage == '2')
+                        $candidate_story->attempt_status_id = 12;
                     $candidate_story->save();
                 }
                 return 1;
