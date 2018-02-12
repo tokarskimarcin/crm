@@ -67,7 +67,7 @@ class CandidateController extends Controller
      */
     public function add_candidate() {
         $department_info = Department_info::where('id', '!=', 13)->get();
-        $sources = CandidateSource::all();
+        $sources = CandidateSource::where('deleted', '=', 0)->get();
         $status = AttemptStatus::all();
 
         return view('recruitment.newCandidate')

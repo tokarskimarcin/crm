@@ -18,69 +18,6 @@ class RecruitmentAttemptController extends Controller
 {
 
     /**
-     * Funkcja zwracająca wszystkie etapy rekrutacji
-     */
-    public function getAttemptLevel(Request $request) {
-        $data = AttemptStatus::where('status', '=', 0)->get();
-
-        return $data;
-    }
-
-    /**
-     * Funkcja dodająca kolejny etap rekrutacji
-     */
-    public function addAttemptLevel(Request $request) {
-        if ($request->ajax()) {
-            $attempt_status = new AttemptStatus();
-
-            $attempt_status->name = $request->name;
-            $attempt_status->status = 0;
-            $attempt_status->created_at = date('Y-m-d H:i:s');
-            $attempt_status->updated_at = date('Y-m-d H:i:s');
-            $attempt_status->save();
-    
-            return 1;
-        }
-    }
-
-    /**
-     * Funkcja edytująca etapy rekrutacji
-     */
-    public function editAttemptLevel(Request $request) {
-        if ($request->ajax()) {
-            $attempt_status = AttemptStatus::find($request->id);
-
-            if ($attempt_status == null) {
-                return 0;
-            }
-
-            $attempt_status->name = $request->name;
-            $attempt_status->updated_at = date('Y-m-d H:i:s');
-            $attempt_status->save();
-
-            return 1;
-        }
-    }
-
-    /**
-     * Funkcja usuwająca etapy rekrutacji (zmiana statusu na 1)
-     */
-    public function deleteAttemptLevel(Request $request) {
-        if ($request->ajax()) {
-            $attempt_status = AttemptStatus::find($request->id);
-
-            if ($attempt_status == null) {
-                return 0;
-            }
-
-            $attempt_status->status = 1;
-            $attempt_status->save();
-
-            return 1;
-        }
-    }
-
-    /**
      * Funkcja zwracająca wszystkie źródła kandydatów
      */
     public function getCandidateSource(Request $request) {
@@ -92,7 +29,7 @@ class RecruitmentAttemptController extends Controller
     }
 
     /**
-     * Funkcja dodająca źródła kandydató
+     * Funkcja dodająca źródła kandydatów
      */
     public function addCandidateSource(Request $request) {
         if ($request->ajax()) {
@@ -127,12 +64,23 @@ class RecruitmentAttemptController extends Controller
     }
 
     /**
-     * TO DO
-     * Funkcja usuwająca źródłą kandydatów (brak pola status w bazie dancyh)
+     * Funkcja usuwająca/przywracająca źródła kandydatów
      */
     public function deleteCandidateSource(Request $request) {
         if ($request->ajax()) {
+            $id = $request->id;
 
+            $source = CandidateSource::find($id);
+
+            if (!$source) {
+                return 0;
+            }
+
+            $source->deleted = $request->deleted;
+            $source->updated_at = date('Y-m-d H:i:s');
+            $source->save();
+
+            return 1;
         }
     }
 
