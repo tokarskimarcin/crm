@@ -115,17 +115,20 @@
         <div class="panel panel-default">
             <div class="panel-body">
                 <h3 style="color: #aaa">Statystyki rekruterów</h3>
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Wyszukaj..." id="recruiter_search_table" />
+                </div>
                 <div class="table-responsive">
                     <table class="table table-striped thead-inverse">
                         <thead>
-                            <th>Imie  nazwisko</th>
+                            <th>Imie i nazwisko</th>
                             <th>Oddział</th>
                             <th>Suma rekrutacji</th>
                             <th>Aktywnych</th>
                             <th>Pozytywnych</th>
                             <th>Szczegóły</th>
                         </thead>
-                        <tbody>
+                        <tbody id="recruiter_table">
                             @foreach($recruiters as $item)
                                 <tr>
                                     <td>{{$item->last_name . ' ' . $item->first_name}}</td>
@@ -143,6 +146,148 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default panel-body">
+            <h3 style="color: #aaa;">Statystyki osób prowadzących szkolenie</h3>
+            <div class="form-group">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="trainer_search_table" placeholder="Wyszukaj..."/>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped thead-inverse">
+                    <thead>
+                        <tr>
+                            <td>Imie i nazwisko</td>
+                            <td>Oddział</td>
+                            <td>Suma szkoleń</td>
+                            <td style="width: 15%">Szczegóły</td>
+                        </tr>
+                    </thead>
+                    <tbody id="trainer_table">
+                        @foreach($trainers as $item)
+                            <tr>
+                                <td>{{$item->first_name . ' ' . $item->last_name}}</td>
+                                <td>{{$item->dep_name . ' ' . $item->dep_type_name}}</td>
+                                <td>{{$item->trainer_sum}}</td>
+                                <td>
+                                    <button class="btn btn-info trainer_click" data-id="{{$item->id}}" data-toggle="modal" data-target="#trainer_info">
+                                        <span class="glyphicon glyphicon-search"></span> Szczegóły
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="trainer_info" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width: 90%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 style="color: #aaa" class="modal-title">Trener: <span id="trainer_id_data"></span></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default panel-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="panel panel-default panel-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <span class="glyphicon glyphicon-education mySmallIcon" style="color: #2cb79d"></span>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <span class="pull-right" style="font-size: 35px; color: #aaa" id="trainer_trainings_sum"></span>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-md-12" style="color: #aaa">
+                                                Suma szkoleń
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="panel panel-default panel-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <span class="glyphicon glyphicon-home mySmallIcon" style="color: #f46841"></span>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <span class="pull-right" style="font-size: 25px; color: #aaa" id="trainer_department">Lublin telemarketing</span>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-md-12" style="color: #aaa">
+                                                Oddział
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="panel panel-default panel-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <span class="glyphicon glyphicon-user mySmallIcon" style="color: #2cb79d"></span>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <span class="pull-right" style="font-size: 35px; color: #aaa" id="trainer_candidate_sum"></span>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-md-12" style="color: #aaa">
+                                                Suma przeszkolonych osób
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="form-group">
+                                <label class="myLabel">Szukaj:</label>
+                                <input type="text" class="form-control" placeholder="Wyszukaj..." id="trainer_trainings_search"/>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped thead-inverse">
+                                    <thead>
+                                        <tr>
+                                            <th>Data szkolenia</th>
+                                            <th>Godzina szkolenia</th>
+                                            <th>Ilość osób na szkoleniu</th>
+                                            <th>Etap szkolenia</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="trainer_trainings">
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <a class="btn btn-info">
+                                <span></span> Przejdź do działu szkoleń
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
             </div>
         </div>
     </div>
@@ -326,13 +471,62 @@
 
 $(document).ready(function() {
 
-    $('#recruiter_info').on('shown.bs.modal', function () {
-        
+    // Pobranie danch dotyczących trenera
+    $('.trainer_click').click(function(e) {
+        var id = $(this).data('id');
+
+        $.ajax({
+            type: "POST",
+            url: '{{ route('api.trainerData') }}',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: {
+                "id": id
+            },
+            success: function (response) {
+                // Wyczyszczenie tabeli ze szkoleniami danego trenera
+                $('#trainer_trainings tr').remove();
+
+                // Przypisanie danych
+                var user = response.user;
+                var userTrainings = response.userTrainings;
+                var user_department = response.user_department;
+                var candidate_sum = response.candidate_sum;
+                var user_training_count = response.user_training_count;
+
+                // Podmiana imienia i nazwiska trenera
+                $('#trainer_id_data').html(user.first_name + ' ' + user.last_name);
+
+                // Zdefiniowanie nowej pustej tabeli
+                var content = '';
+
+                // Dodanie danych do tabeli 
+                $.each(userTrainings, function(key, value) {
+                    content += `
+                        <tr>
+                            <td>${value.training_date}</td>
+                            <td>${value.training_hour}</td>
+                            <td>${value.candidate_count}</td>
+                            <td>Etap ${value.training_stage}</td>
+                        </tr>
+                    `;
+                });
+
+                // Dodanie danych do tabeli
+                $('#trainer_trainings').append(content);
+                $('#trainer_trainings_sum').html(user_training_count);
+                $('#trainer_department').html(user_department);
+                $('#trainer_candidate_sum').html(candidate_sum);
+
+            }, error: function(response) {
+                swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
+            }
+        });
     });
 
     $('.recruiter_click').click(function(e) {
         var id = $(this).data('id');
-        
 
         //Pobranie danych dotyczacych rekrutera
         $.ajax({
@@ -345,7 +539,6 @@ $(document).ready(function() {
                 "id": id
             },
             success: function (response) {
-                console.log(response)
 
                 // Podmiana imienia oraz  nazwiska w modalu
                 $('#recruiter_name_data').html(response.user.last_name + " " + response.user.first_name);
@@ -454,6 +647,30 @@ $(document).ready(function() {
             }
         });
         
+    });
+
+    //wyszukiwanie kategegorii
+    $("#trainer_trainings_search").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#trainer_trainings tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+
+    //wyszukiwanie rekruterów
+    $("#recruiter_search_table").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#recruiter_table tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+
+    //wyszukiwanie rekruterów
+    $("#trainer_search_table").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#trainer_table tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
     });
 
 });
