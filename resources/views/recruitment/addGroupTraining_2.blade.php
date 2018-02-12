@@ -86,14 +86,9 @@
 
 
 
-    <button data-toggle="modal" class="btn btn-default training_to_modal" data-target="#myModalgroup" data-category_id="{{1}}" title="Dodaj szkolenie (Etap 1)" style="margin-bottom: 14px">
-        <span class="glyphicon glyphicon-plus"></span> <span>Dodaj szkolenie (Etap 1)</span>
+    <button data-toggle="modal" class="btn btn-default training_to_modal" data-target="#myModalgroup" data-category_id="{{1}}" title="Dodaj szkolenie" style="margin-bottom: 14px">
+        <span class="glyphicon glyphicon-plus"></span> <span>Dodaj szkolenie</span>
     </button>
-    <br>
-    <button data-toggle="modal" class="btn btn-default training_to_modal" data-target="#myModalgroup" data-category_id="{{1}}" title="Dodaj szkolenie (Etap 2)" style="margin-bottom: 14px">
-        <span class="glyphicon glyphicon-plus"></span> <span>Dodaj szkolenie (Etap 2)</span>
-    </button>
-
 
     <div id="myModalgroup" class="modal fade" role="dialog">
         <div class="modal-dialog modal-lg" style="width: 90%">
@@ -319,12 +314,9 @@
                 <div class="panel-body">
                     <div class="row">
                         <ul class="nav nav-tabs" style="margin-bottom: 25px">
-                            <li class="active"><a data-toggle="tab" href="#home">Dostępne (Etap 1)</a></li>
-                            <li><a data-toggle="tab" href="#menu1">Zakończone (Etap 1)</a></li>
-                            <li><a data-toggle="tab" href="#menu2">Usuniete (Etap 1)</a></li>
-                            <li><a data-toggle="tab" href="#menu3">Dostępne (Etap 2)</a></li>
-                            <li><a data-toggle="tab" href="#menu4">Zakończone (Etap 2)</a></li>
-                            <li><a data-toggle="tab" href="#menu5">Usuniete (Etap 2)</a></li>
+                            <li class="active"><a data-toggle="tab" href="#home">Dostępne</a></li>
+                            <li><a data-toggle="tab" href="#menu1">Zakończone</a></li>
+                            <li><a data-toggle="tab" href="#menu2">Usuniete</a></li>
                         </ul>
                         <div class="tab-content">
                             <div id="home" class="tab-pane fade in active">
@@ -375,74 +367,6 @@
                                     <div class="panel-body">
                                         <row>
                                             <table id="cancel_training_group" class="table thead-inverse table-striped table-bordered" cellspacing="0" width="100%" >
-                                                <thead>
-                                                <tr>
-                                                    <td>Data</td>
-                                                    <td>Godzina</td>
-                                                    <td>Liczba osób</td>
-                                                    <td>Usunieto przez</td>
-                                                    <td>Akcja</td>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                </tbody>
-                                            </table>
-                                        </row>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{--ETAP 2--}}
-                            <div id="menu3" class="tab-pane fade">
-                                <div class="panel panel-default">
-                                    <div class="panel-body">
-                                        <row>
-                                            <table id="activ_training_group_stage2" class="table thead-inverse table-striped table-bordered" cellspacing="0" width="100%" >
-                                                <thead>
-                                                <tr>
-                                                    <td>Data</td>
-                                                    <td>Godzina</td>
-                                                    <td>Liczba osób</td>
-                                                    <td>Osoba Prowadząca</td>
-                                                    <td>Akcja</td>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                </tbody>
-                                            </table>
-                                        </row>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="menu4" class="tab-pane fade">
-                                <div class="panel panel-default">
-                                    <div class="panel-body">
-                                        <row>
-                                            <table id="end_training_group_stage2" class="table thead-inverse table-striped table-bordered" cellspacing="0" width="100%" >
-                                                <thead>
-                                                <tr>
-                                                    <td>Data</td>
-                                                    <td>Godzina</td>
-                                                    <td>Liczba osób</td>
-                                                    <td>Osoba Prowadząca</td>
-                                                    <td>Akcja</td>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                </tbody>
-                                            </table>
-                                        </row>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <div id="menu5" class="tab-pane fade">
-                                <div class="panel panel-default">
-                                    <div class="panel-body">
-                                        <row>
-                                            <table id="cancel_training_group_stage2" class="table thead-inverse table-striped table-bordered" cellspacing="0" width="100%" >
                                                 <thead>
                                                 <tr>
                                                     <td>Data</td>
@@ -1036,137 +960,6 @@
                 $("#modal_cancel").css({'display':'none'});
                 $("#modal_end").css({'display':'none'});
             });
-
-
-            // Dostępne szkolenia etapu 2
-            var activ_training_group_stage2 =$('#activ_training_group_stage2').DataTable({
-                "autoWidth": false,
-                "processing": true,
-                "serverSide": true,
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
-                },"ajax": {
-                    'url': "{{ route('api.datatableTrainingGroupList') }}",
-                    'type': 'POST',
-                    'data': function (d) {
-                        d.list_type = 1;
-                        d.training_stage = 2;
-                    },
-                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
-                },
-                "columns": [
-                    {"data": "training_date"},
-                    {"data": "training_hour"},
-                    {"data": "candidate_count"},
-                    {
-                        "data": function (data, type, dataToSet) {
-                            return data.last_name+' '+data.first_name;
-                        },"name":"leader.last_name"
-                    },
-                    {"width":"10%",
-                        "data": function (data, type, dataToSet) {
-                            return action_row;
-                        },"searchable": false,"orderable": false
-                    }
-                ],"fnDrawCallback": function(settings){ // działanie po wyrenderowaniu widoku
-                    // po kliknięcu w szczegóły otwórz modal z możliwością edycji
-                    $('.info_active').on('click',function (e) {
-                        saving_type = 0;
-                        //główny wiersz
-                        var tr = $(this).closest('tr');
-                        id_training_group = tr.attr('id');
-                        $('#myModalgroup').modal("show");
-                        $('#modal_title').text('Szczegóły szkolenia');
-                        $('#save_button').text('Zapisz zmiany');
-                    });
-                    // zakończenie szkolenia
-                    $('.end_active').click(function (e) {
-                        let training_group_to_end = $(this).closest('tr').attr('id');
-                        swal({
-                            title: 'Jesteś pewien?',
-                            text: "Spowoduje to zakończenie szkolenia, bez możliwości cofnięcia zmian!",
-                            type: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Tak, zakończ szkolenie!'
-                        }).then((result) => {
-                            if (result.value)
-                        {
-                            $.ajax({
-                                type: "POST",
-                                url: '{{ route('api.EndGroupTraining') }}',
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                                data: {
-                                    "training_group_to_end" : training_group_to_end
-                                },
-                                success: function (response) {
-                                    if(response == 1)
-                                    {
-                                        swal(
-                                            'Szkolenie zakończone!',
-                                            'Szkolenie zostało zakończone.',
-                                            'success'
-                                        )
-                                        $('#succes_end_training').fadeIn(1000);
-                                        $('#succes_end_training').delay(3000).fadeOut(1000);
-                                        table_activ_training_group.ajax.reload();
-                                        table_cancel_training_group.ajax.reload();
-                                        table_end_training_group.ajax.reload();
-                                    }
-                                }
-                            });
-                        }
-                    });
-                    });
-                    //usunięcie szkolenia
-                    $('.cancle_active').on('click',function (e) {
-                        let id_training_group_to_delete = $(this).closest('tr').attr('id');
-                        swal({
-                            title: 'Jesteś pewien?',
-                            text: "Spowoduje to usuniecie szkolenia, cofnięcie zmian nie będzie możliwe!",
-                            type: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Tak, usuń szkolenie!'
-                        }).then((result) => {
-                            if (result.value) {
-                            $.ajax({
-                                type: "POST",
-                                url: '{{ route('api.deleteGroupTraining') }}',
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                                data: {
-                                    "id_training_group_to_delete" : id_training_group_to_delete
-                                },
-                                success: function (response) {
-                                    if(response == 1)
-                                    {
-                                        swal(
-                                            'Usunięto szkolenie!',
-                                            'Szkolenie zostało usunięte. Kandydaci zostali umieszczeni w poczekali',
-                                            'success'
-                                        )
-                                        $('#succes_delete_training').fadeIn(1000);
-                                        $('#succes_delete_training').delay(3000).fadeOut(1000);
-                                        table_activ_training_group.ajax.reload();
-                                        table_cancel_training_group.ajax.reload();
-                                    }
-                                }
-                            });
-                        }
-                    });
-                    });
-                },"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                    // Dodanie id do wiersza
-                    $(nRow).attr('id', aData.id);
-                    return nRow;
-                }
-            });
             //tabela dostępnych szkoleń
             var table_activ_training_group = $('#activ_training_group').DataTable({
                 "autoWidth": false,
@@ -1179,7 +972,6 @@
                     'type': 'POST',
                     'data': function (d) {
                         d.list_type = 1;
-                        d.training_stage = 1;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -1308,7 +1100,6 @@
                     'type': 'POST',
                     'data': function (d) {
                         d.list_type = 2;
-                        d.training_stage = 1;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"columns": [
@@ -1357,7 +1148,6 @@
                     'type': 'POST',
                     'data': function (d) {
                         d.list_type = 0;
-                        d.training_stage = 1;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"columns": [

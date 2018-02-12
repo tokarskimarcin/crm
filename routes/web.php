@@ -471,6 +471,10 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     /**REKRUTACJA START */
     Route::get('add_group_training', 'GroupTrainingController@add_group_training');
+
+    Route::get('add_group_training_2', 'GroupTrainingController@add_group_training_2');
+
+
     Route::get('/add_candidate', 'CandidateController@add_candidate');
     Route::get('/candidateProfile/{id}', 'CandidateController@candidateProfile');
 
@@ -487,3 +491,6 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 //////////////////////Testing ORM///////////////
 
   Route::get('/testorm', 'TestORM@test');
+
+  //Dane DKJ dla oddziałów
+  Route::get('/TeamDKJHourData', 'PBXDataAPI@TeamDKJHourData');

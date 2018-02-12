@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\HourReport;
+use App\PBXDKJTeam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -553,53 +554,34 @@ class StatisticsController extends Controller
     }
     // Przygotowanie danych do raportu godzinnego DKJ
     private function hourReportDkj() {
-        $today = date('Y-m-d');
 
-        $hour_stop = $today . ' ' . '23:00:00'; //tutaj zmienic przy wydawaniu na produkcję na  date('H') - 1
-        $hour_start = $today . ' 07:00:00';
+        $date = date('Y-m-d');
+        $hour = date('H') . ':00:00'; //tutaj zmienic przy wydawaniu na produkcję na  date('H') - 1
 
-        $dkj = DB::table('dkj')
-            ->select(DB::raw('
-              dkj.department_info_id,
-              departments.name as dep_name,
-              department_type.name as dep_name_type,
-              department_info.type,
-              count(dkj.id) as liczba_odsluchanych,
-              sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as badania,
-              sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as wysylka,
-              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 0 THEN 1 ELSE 0 END) as bad_badania,
-              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 1 THEN 1 ELSE 0 END) as bad_wysylka
-          '))
-            ->join('users', 'users.id', '=', 'dkj.id_user')
-            ->join('department_info', 'department_info.id', '=', 'dkj.department_info_id')
-            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-            ->whereBetween('add_date', [$hour_start, $hour_stop])
-            ->groupBy('users.department_info_id')
-            ->groupBy('users.dating_type')
+        $reports = PBXDKJTeam::where('report_date', '=', $date)
+            ->where('hour', $hour)
             ->get();
         $data = [
-            'dkj' => $dkj,
-            'date_stop' => date('H') . ':00:00'
+            'hour' => $hour,
+            'date' => $date,
+            'reports' => $reports
         ];
         return $data;
-
     }
 
     // Mail do godzinnego raportu DKJ
     public function MailhourReportDkj() {
         $data = $this::hourReportDkj();
-
         $title = 'Raport godzinny DKJ '.date('Y-m-d');
         $this->sendMailByVerona('hourReportDkj', $data, $title);
     }
     public function pageHourReportDKJ()
     {
         $data = $this::hourReportDkj();
-
         return view('reportpage.hourReportDkj')
-            ->with('date_stop', date('H') . ':00:00')
-            ->with('dkj', $data['dkj']);
+            ->with('date', $data['hour'])
+            ->with('hour', date('H') . ':00:00')
+            ->with('reports', $data['reports']);
     }
 
     private function dayReportDkjData($type) {
