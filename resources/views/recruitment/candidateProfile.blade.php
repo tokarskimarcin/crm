@@ -228,7 +228,7 @@
                                         <div class="col-md-4">
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <button data-toggle="modal" data-target="#nextLevel" class="btn btn-success" style="width: 100%" @if(($item->status == 1) || ($candidate->attempt_status_id > 5 && $candidate->attempt_status_id <= 9)) disabled @endif>  
+                                                    <button data-toggle="modal" data-target="#nextLevel" class="btn btn-success" style="width: 100%" @if(($item->status == 1) || ($candidate->attempt_status_id > 5 && $candidate->attempt_status_id <= 16)) disabled @endif>  
                                                         <span class="glyphicon glyphicon-ok"></span> Następny etap
                                                     </button>
                                                 </div>

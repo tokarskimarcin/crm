@@ -279,7 +279,7 @@ class RecruitmentAttemptController extends Controller
             }
 
             /**
-             * Pobranie ilości idanych rekrutacji
+             * Pobranie ilości udanych rekrutacji
              */
             $recruitment_sum = $user->userCandidates->where('attempt_status_id', '=', 10)->count();
 
@@ -325,7 +325,7 @@ class RecruitmentAttemptController extends Controller
                 ->where('recruitment_attempt.status', '=', 1)
                 ->orderBy('recruitment_story.created_at', 'desc')
                 ->get();
-                
+
             /**
              * Pogrupowanie wyników z podziałem na próby rekrutacji
              */
@@ -421,16 +421,36 @@ class RecruitmentAttemptController extends Controller
             }
 
             /**
+             * Pobranie danych departamentu użytkownika
+             */
+            $user_department = '';
+            $user_department .= $user->department_info->departments->name . ' ';
+            $user_department .= $user->department_info->department_type->name;
+
+            /**
              * Pobranie danych na temat wszystkich szkoleń przeprowadzonych przez trenera
              */
             $userTrainings = GroupTraining::where('leader_id', '=', $id)->orderBy('training_date', 'desc')->get();
+
+            /**
+             * Pobranie sumy osob na szkoleniu
+             */
+            $candidate_sum = $userTrainings->sum('candidate_count');
+
+            /**
+             * Pobranie sumy szkoleń dla danego trenera
+             */
+            $user_training_count = $userTrainings->count();
 
             /**
              * Zwrócenie mniej potężnej ilości danych
              */
             $data = [
                 'user' => $user,
-                'userTrainings' => $userTrainings
+                'userTrainings' => $userTrainings,
+                'user_department' => $user_department,
+                'candidate_sum' => $candidate_sum,
+                'user_training_count' => $user_training_count
             ];
 
             return $data;
