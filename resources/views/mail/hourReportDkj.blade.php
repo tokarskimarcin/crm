@@ -53,7 +53,7 @@
 
 
     @php
-        $all_bad_proc = $all_good_proc = 0;
+        $all_bad_proc = $all_good_proc = $all_check_proc = 0;
             if($sum_all != 0)
             {
                 $all_bad_proc = round(($sum_bad*100) / $sum_all,2);
