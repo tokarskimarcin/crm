@@ -36,7 +36,7 @@
                     $sum_good += $report->count_good_check;
                     $sum_all += $report->count_all_check;
                     $sum_succes += $report->success;
-                    $proc_good = $proc_bad = 0;
+                    $proc_good = $proc_bad = $proc_check = 0;
                     if($report->count_all_check != 0)
                     {
                         $proc_good = round(($report->count_good_check*100) / $report->count_all_check,2);
