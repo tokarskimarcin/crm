@@ -529,6 +529,7 @@
                                 "training_group_id": id_training,
                                 "status": 1,
                                 "comment": comment_text,
+                                'training_stage': actual_stage
                             },
                             success: function (response) {
                                 if (response == 1) {
@@ -575,6 +576,7 @@
                         "training_group_id": id_training,
                         "status": 0,
                         "comment": comment_text,
+                        'training_stage': actual_stage
                     },
                     success: function (response) {
                         if (response == 1) {
@@ -1011,9 +1013,9 @@
                                             }
                                             if(response['candidate'][i].completed_training != null)
                                             {
-                                                if(response['candidate'][i].recruitment_story_id == 8)
+                                                if(response['candidate'][i].recruitment_story_id == 8 || response['candidate'][i].recruitment_story_id == 15)
                                                 {
-                                                    var status_ended ='<td class="candidate_status">'+
+                                                    status_ended ='<td class="candidate_status">'+
                                                         '<span>Zaakceptowany</span>'+
                                                         '</td>';
                                                 }else{
@@ -1142,7 +1144,8 @@
                                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                     },
                                     data: {
-                                        "training_group_to_end" : training_group_to_end
+                                        "training_group_to_end" : training_group_to_end,
+                                        "training_stage":1
                                     },
                                     success: function (response) {
                                         if(response == 1)
@@ -1188,7 +1191,8 @@
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
                                 data: {
-                                    "id_training_group_to_delete" : id_training_group_to_delete
+                                    "id_training_group_to_delete" : id_training_group_to_delete,
+                                    "training_stage":1
                                 },
                                 success: function (response) {
                                     if(response == 1)
@@ -1244,7 +1248,7 @@
                         },"searchable": false,"orderable": false
                     }
                 ],"fnDrawCallback": function(settings){
-                    $('.info_end').on('click',function (e) {
+                    $('#end_training_group .info_end').on('click',function (e) {
                         $("#modal_full").css({'display':'none'});
                         $("#modal_cancel").css({'display':'none'});
                         $("#modal_end").css({'display':'block'});
@@ -1252,6 +1256,7 @@
                         $("#save_button").css({'display':'none'});
                         saving_type = 0;
                         cancel_candidate = 2;
+                        actual_stage = 1;
                         //główny wiersz
                         var tr = $(this).closest('tr');
                         id_training_group = tr.attr('id');
@@ -1376,7 +1381,8 @@
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
                                 data: {
-                                    "training_group_to_end" : training_group_to_end
+                                    "training_group_to_end" : training_group_to_end,
+                                    "training_stage":2
                                 },
                                 success: function (response) {
                                     if(response == 1)
@@ -1421,7 +1427,8 @@
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
                                 data: {
-                                    "id_training_group_to_delete" : id_training_group_to_delete
+                                    "id_training_group_to_delete" : id_training_group_to_delete,
+                                    "training_stage":2
                                 },
                                 success: function (response) {
                                     if(response == 1)
@@ -1437,7 +1444,7 @@
                                         table_cancel_training_group.ajax.reload();
 
                                         activ_training_group_stage2.ajax.reload();
-                                        table_cancel_training_group_stage_2.ajax.reload();
+                                        table_cancel_training_group_stage2.ajax.reload();
                                     }
                                 }
                             });
@@ -1463,7 +1470,7 @@
                     'type': 'POST',
                     'data': function (d) {
                         d.list_type = 2;
-                        d.training_stage = 1;
+                        d.training_stage = 2;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"columns": [
@@ -1481,7 +1488,7 @@
                         },"searchable": false,"orderable": false
                     }
                 ],"fnDrawCallback": function(settings){
-                    $('.info_end').on('click',function (e) {
+                    $('#end_training_group_stage2 .info_end').on('click',function (e) {
                         $("#modal_full").css({'display':'none'});
                         $("#modal_cancel").css({'display':'none'});
                         $("#modal_end").css({'display':'block'});
@@ -1492,6 +1499,7 @@
                         //główny wiersz
                         var tr = $(this).closest('tr');
                         id_training_group = tr.attr('id');
+                        actual_stage = 2;
                         $('#myModalgroup').modal("show");
                     });
                 },"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
@@ -1513,7 +1521,7 @@
                     'type': 'POST',
                     'data': function (d) {
                         d.list_type = 0;
-                        d.training_stage = 1;
+                        d.training_stage = 2;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"columns": [
@@ -1531,7 +1539,7 @@
                         },"searchable": false,"orderable": false
                     }
                 ],"fnDrawCallback": function(settings){
-                    $('.info_cancel').on('click',function (e) {
+                    $('#cancel_training_group_stage2 .info_cancel').on('click',function (e) {
                         $("#modal_full").css({'display':'none'});
                         $("#modal_end").css({'display':'none'});
                         $("#modal_cancel").css({'display':'block'});
