@@ -163,6 +163,7 @@ Route::POST('/datatableShowCadreCandidates', 'CandidateController@datatableShowC
 Route::POST('/myInterviews', 'RecruitmentAttemptController@myInterviews')->name('api.myInterviews');
 
 Route::POST('/recruiterData', 'RecruitmentAttemptController@recruiterData')->name('api.recruiterData');
+Route::POST('/trainerData', 'RecruitmentAttemptController@trainerData')->name('api.trainerData');
 Route::POST('/recruiterTrainingsData', 'RecruitmentAttemptController@recruiterTrainingsData')->name('api.recruiterTrainingsData');
 
 

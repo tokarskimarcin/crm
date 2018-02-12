@@ -234,8 +234,28 @@ class RecruitmentAttemptController extends Controller
          */
         $recruiters = User::whereIn('id', $cadre_array)->get();
 
+        /**
+         * Pobranie danych osób prowadzących szkolenia
+         */
+        $trainers = DB::table('group_training')
+            ->select(DB::raw('
+                COUNT(group_training.id) as trainer_sum,
+                first_name,
+                last_name,
+                users.id,
+                departments.name as dep_name,
+                department_type.name as dep_type_name
+            '))
+            ->join('users', 'users.id', 'group_training.leader_id')
+            ->join('department_info', 'department_info.id', 'users.department_info_id')
+            ->join('departments', 'departments.id', 'department_info.id_dep')
+            ->join('department_type', 'department_info.id_dep_type', 'department_type.id')
+            ->groupBy('users.id')
+            ->get();
+
         return view('recruitment.recruitmentStatistics')
             ->with('training_sum', $training_sum)
+            ->with('trainers', $trainers)
             ->with('recruiters', $recruiters)
             ->with('recruitment_ok', $recruitment_ok)
             ->with('recruiter_sum', count($cadre_array))
@@ -381,6 +401,36 @@ class RecruitmentAttemptController extends Controller
                 'recuitment_by_types'   => $recuitment_by_types,
                 'recruitemnt_sum_total' => $recruitemnt_sum_total,
                 'recruiter_sources'     => $recruiter_sources
+            ];
+
+            return $data;
+        }
+    }
+
+    public function trainerData(Request $request) {
+        if ($request->ajax()) {
+            $id = $request->id;
+
+            /**
+             * Pobranie danych trenera
+             */
+            $user = User::find($id);
+
+            if ($user == null) {
+                return 0;
+            }
+
+            /**
+             * Pobranie danych na temat wszystkich szkoleń przeprowadzonych przez trenera
+             */
+            $userTrainings = GroupTraining::where('leader_id', '=', $id)->orderBy('training_date', 'desc')->get();
+
+            /**
+             * Zwrócenie mniej potężnej ilości danych
+             */
+            $data = [
+                'user' => $user,
+                'userTrainings' => $userTrainings
             ];
 
             return $data;

@@ -77,10 +77,10 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="myLabel">Oddział:</label>
-                                        <select class="form-control" id="candidate_department">
+                                        <select class="form-control" id="candidate_department" disabled title="Możesz dodawać pracowników tylko do swojego oddziału.">
                                             <option>Wybierz</option>
                                             @foreach($department_info as $item)
-                                                <option value="{{$item->id}}">{{$item->departments->name . ' ' . $item->department_type->name}}</option>
+                                                <option @if($item->id == Auth::user()->department_info_id) selected @endif value="{{$item->id}}">{{$item->departments->name . ' ' . $item->department_type->name}}</option>
                                             @endforeach
                                         </select>
                                     </div>

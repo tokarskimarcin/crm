@@ -95,7 +95,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="myLabel">Oddział:</label>
-                                        <select class="form-control" id="candidate_department">
+                                        <select class="form-control" id="candidate_department" disabled>
                                             @foreach($department_info as $item)
                                                 <option @if($item->id == $candidate->department_info_id) selected @endif value="{{$item->id}}">{{$item->departments->name . ' ' . $item->department_type->name}}</option>
                                             @endforeach
