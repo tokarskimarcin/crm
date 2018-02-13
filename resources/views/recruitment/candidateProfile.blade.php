@@ -228,14 +228,14 @@
                                         <div class="col-md-4">
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <button data-toggle="modal" data-target="#nextLevel" class="btn btn-success" style="width: 100%" @if(($item->status == 1) || ($candidate->attempt_status_id > 5 && $candidate->attempt_status_id <= 16)) disabled @endif>  
+                                                    <button data-toggle="modal" data-target="#nextLevel" class="btn btn-success" style="width: 100%" @if(($item->status == 1) || ($candidate->attempt_status_id >= 5 && $candidate->attempt_status_id <= 16)) disabled @endif>  
                                                         <span class="glyphicon glyphicon-ok"></span> Następny etap
                                                     </button>
                                                 </div>
                                             </div>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <button data-toggle="modal" data-target="#add_training" class="btn btn-warning" style="width: 100%" @if(($item->status == 1) || (in_array($candidate->attempt_status_id, [6,7,9,12,13,14,15,16]))) disabled @endif>  
+                                                    <button data-toggle="modal" data-target="#add_training" class="btn btn-warning" style="width: 100%" @if(($item->status == 1) || (in_array($candidate->attempt_status_id, [5,6,7,9,12,13,14,15,16]))) disabled @endif>  
                                                         <span class="glyphicon glyphicon-envelope"></span> Zapisz na szkolenie
                                                     </button>
                                                 </div>
@@ -277,10 +277,8 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label class="myLabel">Wybierz etap rekrutacji:</label>
-                            <select class="form-control" id="new_recruitment_status">
-                                <option value="1">Rozpoczęcie rekrutacji</option>
-                            </select>
+                            <label class="myLabel">Etap rekrutacji:</label>
+                            <input type="text" readonly class="form-control" value="Rozpoczęcie rekrutacji">
                         </div>
                         <div class="form-group">
                             <label class="myLabel">Komentarz:</label>
@@ -353,7 +351,7 @@
                             <label class="myLabel">Wybierz etap rekrutacji:</label>
                             <select class="form-control" id="add_level_status">
                                 @foreach($status_to_change as $item)
-                                    <option value="{{$item->id}}">{{$item->name}}</option>
+                                    <option style="font-size: 20px" value="{{$item->id}}">{{$item->name}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -524,7 +522,6 @@ $(document).ready(() => {
 
     $('#new_recruitment_submit').click(() => {
         var candidate_id = $('#candidate_id').val();
-        var new_recruitment_status = $('#new_recruitment_status').val();
         var new_recruitment_comment = $('#new_recruitment_comment').val();
 
         if (new_recruitment_comment == '' || (new_recruitment_comment.trim().length == 0)) {
@@ -542,7 +539,7 @@ $(document).ready(() => {
             },
             data: {
                 "candidate_id": candidate_id,
-                "new_recruitment_status": new_recruitment_status,
+                "new_recruitment_status": 1,
                 "new_recruitment_comment": new_recruitment_comment
             },
             success: function (response) {

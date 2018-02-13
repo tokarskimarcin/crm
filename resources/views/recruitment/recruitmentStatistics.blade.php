@@ -206,7 +206,7 @@
                                     <div class="panel panel-default panel-body">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <span class="glyphicon glyphicon-education mySmallIcon" style="color: #2cb79d"></span>
+                                                <span class="glyphicon glyphicon-education mySmallIcon" style="color: #2cb79d;"></span>
                                             </div>
                                             <div class="col-md-6">
                                                 <span class="pull-right" style="font-size: 35px; color: #aaa" id="trainer_trainings_sum"></span>
@@ -224,7 +224,7 @@
                                     <div class="panel panel-default panel-body">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <span class="glyphicon glyphicon-home mySmallIcon" style="color: #f46841"></span>
+                                                <span class="glyphicon glyphicon-home mySmallIcon" style="color: #f46841;"></span>
                                             </div>
                                             <div class="col-md-6">
                                                 <span class="pull-right" style="font-size: 25px; color: #aaa" id="trainer_department">Lublin telemarketing</span>
@@ -242,7 +242,7 @@
                                     <div class="panel panel-default panel-body">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <span class="glyphicon glyphicon-user mySmallIcon" style="color: #2cb79d"></span>
+                                                <span class="glyphicon glyphicon-user mySmallIcon" style="color: #45f442;"></span>
                                             </div>
                                             <div class="col-md-6">
                                                 <span class="pull-right" style="font-size: 35px; color: #aaa" id="trainer_candidate_sum"></span>
