@@ -162,6 +162,10 @@ Route::POST('/recruiterData', 'RecruitmentAttemptController@recruiterData')->nam
 Route::POST('/trainerData', 'RecruitmentAttemptController@trainerData')->name('api.trainerData');
 Route::POST('/recruiterTrainingsData', 'RecruitmentAttemptController@recruiterTrainingsData')->name('api.recruiterTrainingsData');
 
+Route::POST('/delete_notification', 'NotificationController@delete_notification')->name('api.delete_notification');
+
+
+
 
 
 /** */

@@ -1,107 +1,108 @@
 @extends('layouts.main')
 @section('content')
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="page-header">
-            <div class="alert gray-nav ">Pomoc / Szczegóły problemu</div>
-        </div>
-    </div>
-</div>
 
-<div class="row">
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                Pracownik IT:
-            </div>
-            <div class="panel-body">
-                @if(isset($notification->displayed_by) && $it_user != null)
-                    {{$it_user->first_name . ' ' . $it_user->last_name}}
-                @else
-                    Brak
-                @endif
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                Typ problemu:
-            </div>
-            <div class="panel-body">
-                {{$notification->notification_type->name}}
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                Status:
-            </div>
-            <div class="panel-body">
-                @if($notification->status == 1)
-                    Zgłoszono
-                @elseif($notification->status == 2)
-                    Przyjęto do realizacji
-                @elseif($notification->status == 3)
-                    Zakończono
-                @endif
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                Tytuł
-            </div>
-            <div class="panel-body">
-                {{$notification->title}}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="alert gray-nav ">Pomoc / Opis problemu</div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                Treść
-            </div>
-            <div class="panel-body">
-                {{$notification->content}}
-            </div>
-        </div>
-    </div>
-</div>
+    @if(isset($message))
+        <div class="alert alert-success">{{$message}}</div>
+    @endif
 
-@if($notification->comments->count() > 0)
+    @if (Session::has('message_ok'))
+        <div class="alert alert-success">{{ Session::get('message_ok') }}</div>
+    @endif
+
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-default">
-                <div class="panel-heading">
-                    Komentarze
-                </div>
+                <div class="panel-heading">{{$notification->title}}</div>
                 <div class="panel-body">
-                    @foreach($notification->comments as $comment)
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <b>Dodał: {{$comment->user->first_name . ' ' . $comment->user->last_name}} | {{$comment->created_at}}</b>
+
+                        <b>Problem zgłoszony przez:</b>
+                        {{$notification->user->first_name . ' ' . $notification->user->last_name}}
+                        <br />
+                        <hr>
+
+
+                        <b>Pracownik IT:</b>
+                        @if(isset($notification->displayed_by) && $it_user != null)
+                            {{$it_user->first_name . ' ' . $it_user->last_name}}
+                        @else
+                            Brak
+                        @endif
+                        <br />
+                        <hr>
+
+
+                        <b>Oddział:</b>
+                        {{$notification->department_info->departments->name . ' ' . $notification->department_info->department_type->name}}
+                        <br />
+                        <hr>
+
+
+
+                        <b>Treść problemu:</b>
+                        {{$notification->content}}
+                        <br />
+                        <hr>
+
+                        <b>Status:</b>
+                        @if($notification->status == 1)
+                            Zgłoszono
+                        @elseif($notification->status == 2)
+                            Przyjęto do realizacji
+                        @elseif($notification->status == 3)
+                            Zakończono
+                        @endif
+                        <br />
+                        <hr>
+
+
+                    <p>
+                    <div class="col-md-8">
+                        <form method="POST" action="{{URL::to('/add_comment_notifications/')}}/{{$notification->id}}" id="form_comment">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <div class="form-group">
+                                <label for="content">Dodaj komentarz:</label>
+                                <textarea id="content" name="content" placeholder="Tutaj wpisz treść komentarza" class="form-control"></textarea>
                             </div>
-                            <div class="panel-body">
-                                {{$comment->content}}
+                            <div class="alert alert-danger" style="display: none" id="alert_comment">
+                                Podaj treść komentarza!
                             </div>
-                        </div>
-                    @endforeach
+                            <div class="form-group">
+                                <input id="add_comment" type="submit" class="btn btn-default" value="Dodaj komentarz" />
+                            </div>
+                        </form>
+                    </div>
+                    </p>
+                    <div class="col-md-12">
+                        <hr>
+                        @if($notification->comments != null)
+                            <h3>Komentarze:</h3>
+                            @foreach($notification->comments as $comment)
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        Dodał: {{$comment->user->first_name . ' ' . $comment->user->last_name}}
+                                    </div>
+                                    <div class="panel-body">
+                                        <small>Data dodania: {{$comment->created_at}}</small>
+                                        <p>{{$comment->content}}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-@endif
-
 @endsection
 @section('script')
 <script>
