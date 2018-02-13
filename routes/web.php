@@ -418,6 +418,10 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageWeekReportDatabaseUse', 'DatabaseURLController@pageWeekRaportDatabaseUse');
     Route::get('/pageMonthReportDatabaseUse', 'DatabaseURLController@pageMonthRaportDatabaseUse');
 
+
+    Route::get('/pageHourReportTimeOnRecord', 'StatisticsController@pageHourReportTimeOnRecord');
+
+
     //Report Page STOP
 
     //TESTS START //
@@ -489,5 +493,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
   Route::get('/testorm', 'TestORM@test');
 
-  //Dane DKJ dla oddziałów
-  Route::get('/TeamDKJHourData', 'PBXDataAPI@TeamDKJHourData');
+    //Dane DKJ dla oddziałów
+    Route::get('/TeamDKJHourData', 'PBXDataAPI@TeamDKJHourData');
+    //Dane Czasu na rekord
+    Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
+
