@@ -12,6 +12,7 @@ use App\Candidate;
 use App\RecruitmentAttempt;
 use App\RecruitmentStory;
 use Illuminate\Support\Facades\Session;
+use App\ActivityRecorder;
 
 class CandidateController extends Controller
 {
@@ -97,6 +98,19 @@ class CandidateController extends Controller
 
             $candidate->save();
 
+            $data = [
+                'Dodanie kandydata' => '',
+                'Imie' => $request->candidate_name,
+                'Nazwisko' => $request->candidate_surname,
+                'Telefon' => $request->candidate_phone,
+                'Oddział' => $request->candidate_department,
+                'Źródło' => $request->candidate_source,
+                'Opis' => $request->candidate_desc,
+                'Pracownik kadry' => Auth::user()->id
+            ];
+
+            //new ActivityRecorder(8, $data);
+
             return $candidate->id;
         }
     }
@@ -149,6 +163,18 @@ class CandidateController extends Controller
 
             $candidate->save();
 
+            $data = [
+                'Edycja danych kandydata' => '',
+                'Imie' => $request->candidate_name,
+                'Nazwisko' => $request->candidate_surname,
+                'Telefon' => $request->candidate_phone,
+                'Oddział' => $request->candidate_department,
+                'Źródło' => $request->candidate_source,
+                'Opis' => $request->candidate_desc,
+                'Pracownik kadry' => Auth::user()->id
+            ];
+            //new ActivityRecorder(8, $data);
+
             return 1;
         }
     }
@@ -169,6 +195,16 @@ class CandidateController extends Controller
         $newStory->updated_at = date('Y-m-d H:i:s');
 
         $newStory->save();
+
+        $data = [
+            'Dodanie etapu rekrutacji' => '',
+            'Id kandydata' => $candidate_id,
+            'Id rekrutacji' => $attempt_id,
+            'Status rekrutacji' => $status,
+            'Komentarz' => $comment
+        ];
+
+        //new ActivityRecorder(8, $data);
 
         /**
          * Zaktualizowanie etapu rekrutacji w danych kandydata
@@ -213,6 +249,14 @@ class CandidateController extends Controller
             
             $newAttempt->save();
 
+            $data = [
+                'Rozpoczęcie nowej rekrutacji' => '',
+                'Id kandydata' => $newAttempt->candidate_id,
+                'Id pracownika kadry' => Auth::user()->id
+            ];
+
+            //new ActivityRecorder(8, $data);
+
             /**
              * Dodanie pierwszego atepu w tej rekrutacji
              */
@@ -242,6 +286,14 @@ class CandidateController extends Controller
             $recruitmentAttempt->updated_at = date('Y-m-d H:i:s');
 
             $recruitmentAttempt->save();
+
+            $data = [
+                'Zakończenie procesu rekrutacji' => '',
+                'Status zakończenia' => $request->stop_recruitment_status,
+                'Id Kandydata' => $id
+            ];
+
+            //new ActivityRecorder(8, $data);
 
             /**
              * Dodanie etapu w tej rekrutacji
@@ -328,5 +380,12 @@ class CandidateController extends Controller
         $recruitment->interview_date = $recruitment_date;
         $recruitment->interview_cadre = Auth::user()->id;
         $recruitment->save();
+
+        $data = [
+            'Dodanie rozmowy kwalifikacyjnej' => '',
+            'Id kandydata' => $recruitment->candidate_id,
+            'Data rozmowy' => $recruitment_date
+        ];
+        //new ActivityRecorder(8, $data);
     }
 }

@@ -66,12 +66,6 @@
 
     </style>
 
-
-
-
-
-
-
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">
@@ -79,12 +73,6 @@
             </div>
         </div>
     </div>
-
-
-
-
-
-
 
     <button data-toggle="modal" class="btn btn-default training_to_modal" id="training_to_modal_stage1" data-target="#myModalgroup" data-id="1" title="Dodaj szkolenie (Etap 1)" style="margin-bottom: 14px">
         <span class="glyphicon glyphicon-plus"></span> <span>Dodaj szkolenie (Etap 1)</span>
@@ -264,7 +252,7 @@
                                                     <th style="width:5%">Lp.</th>
                                                     <th>Imie i nazwisko</th>
                                                     <th class="category_column">Komentarz</th>
-                                                    <th class="category_column">Zatrudnij</th>
+                                                    <th class="category_column">Dodaj</th>
                                                     <th class="category_column">Odrzuć</th>
                                                     <th class="category_column">Status końcowy</th>
                                                 </tr>
