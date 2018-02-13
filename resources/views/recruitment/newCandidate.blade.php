@@ -166,12 +166,12 @@ $(document).ready(() => {
         var candidate_source = $('#candidate_source').val();
         var candidate_desc = $('#candidate_desc').val();
 
-        if (candidate_name == '') {
+        if (candidate_name == '' || (candidate_name.trim().length == 0)) {
             swal('Podaj imie kandydata!')
             return false;
         }
 
-        if (candidate_surname == '') {
+        if (candidate_surname == '' || (candidate_surname.trim().length == 0)) {
             swal('Podaj nazwisko kandydata!')
             return false;
         }
@@ -194,7 +194,7 @@ $(document).ready(() => {
             return false;
         }
 
-        if (candidate_desc == '') {
+        if (candidate_desc == '' || (candidate_desc.trim().length == 0)) {
             swal('Dodaj opis kandydata!')
             return false;
         }

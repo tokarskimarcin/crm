@@ -136,6 +136,7 @@ class RecruitmentAttemptController extends Controller
                 ->join('candidate', 'candidate.id', 'recruitment_attempt.candidate_id')
                 ->where('candidate.attempt_status_id', '=', 3)
                 ->where('interview_cadre', '=', Auth::user()->id)
+                ->where('recruitment_attempt.status', '=', 0)
                 ->whereBetween('recruitment_attempt.interview_date', [$request->start_search . ' 00:00:00', $request->stop_search . ' 23:00:00'])
                 ->get();
 

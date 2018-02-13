@@ -20,7 +20,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="well gray-nav">Rekrutacja / Rozmowy kwalifikacyjne</div>
+            <div class="well gray-nav">Rekrutacja / Twoi kandydaci</div>
         </div>
     </div>
 </div>
