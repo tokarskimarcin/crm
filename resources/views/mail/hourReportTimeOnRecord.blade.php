@@ -19,9 +19,13 @@
       @php
         $lp = 1;
       @endphp
-      @foreach($reports as $report)
+      @foreach($reports->sortby('time_on_record') as $report)
           @if($report->team_name == 'LUBLIN_POTWIERDZENIA')
-              <tr>
+              @if($report->time_on_record < '00:02:30')
+                  <tr style="background-color: #e25454a3;">
+              @else
+                  <tr>
+              @endif
                   <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$lp++}}</td>
                   <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->campain}}</td>
                   <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->consultant_name}}</td>
@@ -54,9 +58,13 @@
     @php
         $lp = 1;
     @endphp
-    @foreach($reports as $report)
+    @foreach($reports->sortby('time_on_record') as $report)
         @if($report->team_name == 'Potwierdzenia_Wysylka')
-            <tr>
+            @if($report->time_on_record < '00:02:30')
+                <tr style="background-color: #e25454a3;">
+             @else
+                <tr>
+            @endif
                 <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$lp++}}</td>
                 <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->campain}}</td>
                 <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->consultant_name}}</td>
