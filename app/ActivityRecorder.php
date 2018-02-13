@@ -19,7 +19,8 @@ class ActivityRecorder extends Model
         'jankyActivity.txt',
         'workHoursActivity.txt',
         'equipmentActivity.txt',
-        'activity.txt'
+        'activity.txt',
+        'recruitmentActivity.txt'
     ];
 
     /*
@@ -45,6 +46,7 @@ class ActivityRecorder extends Model
       5 - work hours actiity
       6 - equipment Activity
       7 - other
+      8 - recruitment activity
     */
 
     public function __construct($type, $action) {
@@ -118,6 +120,14 @@ class ActivityRecorder extends Model
             $size = File::size(storage_path('app/activity.txt'));
             if ($size < 104857600) {
                 Storage::append('activity.txt', $content);
+            }
+            break;
+
+          case '8':
+            $contents = Storage::get('recruitmentActivity.txt');
+            $size = File::size(storage_path('app/recruitmentActivity.txt'));
+            if ($size < 104857600) {
+                Storage::append('recruitmentActivity.txt', $content);
             }
             break;
 

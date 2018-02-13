@@ -13,6 +13,7 @@ use App\RecruitmentStory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\User;
+use App\ActivityRecorder;
 
 class RecruitmentAttemptController extends Controller
 {
@@ -59,6 +60,14 @@ class RecruitmentAttemptController extends Controller
             $candidate_source->updated_at = date('Y-m-d H:i:s');     
             $candidate_source->save();
 
+            $data = [
+                'Edycja źródła kandydata' => '',
+                'Nowa nazwa' => $request->name,
+                'Id źródła' => $candidate_source->id
+            ];
+
+            //new ActivityRecorder(8, $data);
+
             return 1;
         }
     }
@@ -79,6 +88,14 @@ class RecruitmentAttemptController extends Controller
             $source->deleted = $request->deleted;
             $source->updated_at = date('Y-m-d H:i:s');
             $source->save();
+
+            $data = [
+                'Zmiana statusu źródła: 1 - wyłączone, 0 - włączone' => '',
+                'Nowy status' => $request->deleted,
+                'ID źródła' => $source->id
+            ];
+
+            //new ActivityRecorder(8, $data);
 
             return 1;
         }
@@ -243,7 +260,7 @@ class RecruitmentAttemptController extends Controller
             $interviews_sum = $user->userCandidates->where('attempt_status_id', '=', 3)->count();
 
             /**
-             * Pobranie danych dotyczących szkoleń prowadzonych przez rekrutera 
+             * Pobranie danych dotyczących szkoleń prowadzonych przez rekrutera
              */
 
             $training_data = DB::table('group_training')
