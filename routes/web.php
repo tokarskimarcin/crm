@@ -191,6 +191,7 @@ Route::get('/hourReportChecked', 'StatisticsController@hourReportChecked');
 Route::get('/dayReportChecked', 'StatisticsController@dayReportChecked');
 Route::get('/weekReportChecked', 'StatisticsController@weekReportChecked');
 
+Route::get('/hourReportTimeOnRecord', 'StatisticsController@MailhourReportTimeOnRecord');
 
 // maile dotyczące bazy danych (telefonów) maile
 
