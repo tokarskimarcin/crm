@@ -127,4 +127,13 @@ class HomeController extends Controller
             return $notifications_count;
         }
     }
+
+    /**
+     * Pobieranie powiadomień bootstrapowych 
+     */
+    public function getBootstrapNotifications(Request $request) {
+        if ($request->ajax()) {
+            return 1;
+        }
+    }
 }

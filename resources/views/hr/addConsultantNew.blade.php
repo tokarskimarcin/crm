@@ -193,7 +193,7 @@
                             </tr>
                             @endif
                             <tr>
-                                <td style="width: 170px;height:52px;"><b>Całość na konto:</b></td>
+                                <td style="width: 170px;height:52px;"><b>CNK:</b></td>
                                 <td>
                                     <select class="form-control" style="font-size:18px;" name="salary_to_account">
                                         <option>Wybierz</option>
@@ -203,7 +203,7 @@
                                 </td>
                             </tr>
                             <tr class="alert alert-danger" style="display: none" id="alert_ck">
-                                <td colspan="1">Wybierz wartość CK!</td>
+                                <td colspan="1">Wybierz wartość CNK!</td>
                                 <td></td>
                             </tr>
                             <tr>
@@ -300,6 +300,8 @@
 @section('script')
 
 <script>
+
+   
 
     $(document).ready(function() {
 

@@ -165,7 +165,11 @@ Route::POST('/recruiterTrainingsData', 'RecruitmentAttemptController@recruiterTr
 Route::POST('/delete_notification', 'NotificationController@delete_notification')->name('api.delete_notification');
 
 
+//Bootstrap notifications //
 
+Route::post('getBootstrapNotifications', 'HomeController@getBootstrapNotifications')->name('getBootstrapNotifications');
+
+//bootstrap notifications end //
 
 
 /** */
@@ -206,8 +210,6 @@ Route::get('/dayReportDatabaseUse', 'DatabaseURLController@MailDayRaportDatabase
 Route::get('/weekReportDatabaseUse', 'DatabaseURLController@MailWeekRaportDatabaseUse');
 Route::get('/monthReportDatabaseUse', 'DatabaseURLController@MailMonthRaportDatabaseUse');
 //End emails
-
-
 
 
 

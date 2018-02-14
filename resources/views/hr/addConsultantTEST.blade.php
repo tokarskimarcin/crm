@@ -157,9 +157,9 @@
                                     <td>
                                         <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
                                             @if(isset($user->end_work))
-                                                <input class="form-control stop_date" name="stop_date" type="text" value="{{$user->end_work}}" readonly >
+                                                <input class="form-control stop_date" id="stop_date" name="stop_date" type="text" value="{{$user->end_work}}" readonly >
                                             @else
-                                                <input class="form-control stop_date" name="stop_date" type="text" value="{{date('Y-m-d')}}" readonly >
+                                                <input class="form-control stop_date" id="stop_date" name="stop_date" type="text" value="{{date('Y-m-d')}}" readonly >
                                             @endif
 
                                             <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
@@ -214,7 +214,7 @@
                                     </td>
                                 </tr>
                                 <tr class="alert alert-danger" style="display: none" id="alert_ck">
-                                    <td colspan="1">Wybierz wartość CK!</td>
+                                    <td colspan="1">Wybierz wartość CNK!</td>
                                     <td></td>
                                 </tr>
                                 <tr>
@@ -347,6 +347,8 @@
 @section('script')
 
 <script>
+        var checkEndWorkStatus = Number({{$user->status_work}});
+        var checkEndWorkDate = '{{$user->end_work}}';
 
     $('.form_date').datetimepicker({
         language: 'pl',
@@ -362,13 +364,15 @@
     var validation_user = false;
 
     $("#edit_button").on('click', function(){
-
         var first_name = $("input[name='first_name']").val();
         var last_name = $("input[name='last_name']").val();
         var private_phone = $("input[name='private_phone']").val();
         var username = $("input[name='username']").val();
         var password = $("input[name='password']").val();
         var login_phone = $("input[name='login_phone']").val();
+        var status_work = $("#status_work").val();
+        var end_work_new = $("#stop_date").val();
+
         $('#edit_user').submit(function(){
             validation_user = true;
             $(this).find(':submit').attr('disabled','disabled');
@@ -421,6 +425,15 @@
         } else {
             $('#alert_pbx').fadeOut();
         }
+
+        //Sprawdzenie czy zmieniany jest status pracy na "niepracujący"
+        if (checkEndWorkStatus == 1 && status_work == 0) {
+            if (end_work_new === checkEndWorkDate) {
+                swal('Wybierz datę zakończenia pracy!');
+                validationCheck = false;
+            }
+        }
+
         return validationCheck;
     });
 
