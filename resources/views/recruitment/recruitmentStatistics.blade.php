@@ -273,14 +273,14 @@
                                         </tr>
                                     </thead>
                                     <tbody id="trainer_trainings">
-                                        
+
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                         <div class="form-group">
-                            <a class="btn btn-info">
-                                <span></span> Przejdź do działu szkoleń
+                            <a class="btn btn-info" href="{{ URL::to('/add_group_training') }}">
+                                <span class="glyphicon glyphicon-education"></span> Przejdź do działu szkoleń
                             </a>
                         </div>
                     </div>

@@ -490,6 +490,9 @@ $(document).ready(() => {
             return false;
         }
 
+        //Czasowe zablokowanie przycisku
+        $('#edit_submit').attr('disabled', true);
+
         //Edycja danych kandydata
         $.ajax({
             type: "POST",
@@ -514,8 +517,12 @@ $(document).ready(() => {
                 } else {
                     swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
                 }
+                //Odblokowanie przycisku
+                $('#edit_submit').attr('disabled', false);
             }, error: function(response) {
                 swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
+                //Odblokowanie przycisku
+                $('#edit_submit').attr('disabled', false);
             }
         });
     });
