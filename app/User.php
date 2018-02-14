@@ -97,4 +97,8 @@ class User extends Authenticatable
     public function userTrainings() {
         return $this->hasMany('App\GroupTraining', 'leader_id');
     }
+
+    public function userBootstrapNotifications() {
+        return $this->hasMany('App\BootstrapNotify', 'user_id');
+    }
 }
