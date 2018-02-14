@@ -44,6 +44,9 @@
     {{-- Include JS for users table--}}
     @include('partials.js_includes._users_table')
 
+    {{-- Include JS for bootstrap notifications --}}
+    @include('partials.nav_includes._bootstrap_notifications')
+
 {{-- End of includes --}}
 
 <script>
