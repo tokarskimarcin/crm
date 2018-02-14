@@ -11,6 +11,8 @@
     <link href="{{ asset('/css/toogle.css')}}" rel="stylesheet">
     <!-- Bootstrap Core CSS -->
     <link href="{{ asset('/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.2.3/animate.min.css"  rel="stylesheet"/>
     <!-- MetisMenu CSS -->
     <link href="{{ asset('/vendor/metisMenu/metisMenu.min.css')}}" rel="stylesheet">
 
