@@ -131,7 +131,7 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="myLabel">Komentarz:</label>
-                                    <textarea id="training_comment" class="form-control" style="height: 34px;" placeholder="Wprowadź na komentarz"></textarea>
+                                    <textarea id="training_comment" class="form-control" style="height: 50px;" placeholder="Wprowadź na komentarz"></textarea>
                                 </div>
                             </div>
                         </div>
