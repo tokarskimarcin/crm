@@ -116,15 +116,15 @@ table = $('#datatable').DataTable({
                                     table.ajax.reload();
                                 }else if(response == 2){
                                     swal(
-                                        'Złoszenie może usunąć tylko osoba zgłaszająca.',
-                                        'Złoszenie może usunąć tylko osoba zgłaszająca.',
+                                        'Zgłoszenie może usunąć tylko osoba zgłaszająca.',
+                                        'Zgłoszenie może usunąć tylko osoba zgłaszająca.',
                                         'error'
                                     )
                                 }
                                 else if(response == 0){
                                     swal(
-                                        'Złoszenia nie można usunąć, ponieważ jest już w trakcie realizacji.',
-                                        'Złoszenia nie można usunąć.',
+                                        'Zgłoszenia nie można usunąć, ponieważ jest już w trakcie realizacji.',
+                                        'Zgłoszenia nie można usunąć.',
                                         'error'
                                     )
                                 }else{
