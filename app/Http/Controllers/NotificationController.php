@@ -292,6 +292,7 @@ class NotificationController extends Controller
                 users.last_name as last_name
             '))
             ->leftJoin('users', 'users.id', '=', 'notifications.displayed_by')
+            ->where('status','!=',0)
             ->where('user_id', '=', Auth::user()->id)
             ->get();
 
@@ -414,5 +415,27 @@ class NotificationController extends Controller
         return view('notifications.view_notification')
             ->with('it_user', $it_user)
             ->with('notification', $notification);
+    }
+    public function delete_notification (Request $request)
+    {
+        if($request->ajax())
+        {
+            $notification = Notifications::find($request->notification_id);
+
+            if($notification->user_id == Auth::user()->id)
+            {
+                if($notification->status == 1)
+                {
+                    $notification->status = 0;
+                    $notification->save();
+                    return 1;
+                }else
+                    return 0;
+            }else{
+                return 2;
+            }
+
+
+        }
     }
 }
