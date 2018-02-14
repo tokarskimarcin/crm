@@ -110,7 +110,7 @@ $(document).ready(() => {
         //pobranie treści nowego etapu
         var newSource = $('#new_source').val();
 
-        if (newSource == '') {
+        if (newSource == '' || (newSource.trim().length == 0)) {
             swal('Podaj nazwę źródła!')
             $('#add_new_source').attr('disabled', false);
             return false;
