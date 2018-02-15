@@ -229,6 +229,7 @@ $(document).ready(() => {
     $('#all_user_fired').on('click','tr',function (e) {
         if($(this).hasClass('selected')){
             $(this).removeClass('selected');
+            ex_id_user = null;
         }else{
             fired_user_table.$('tr.selected').removeClass('selected');
             $(this).addClass('selected');
@@ -247,7 +248,6 @@ $(document).ready(() => {
         var candidate_desc = $('#candidate_desc').val();
         var candidate_experience = $('#candidate_experience').val();
         var ex_candidate_id = $('#ex_candidate').val();
-        console.log(ex_id_user);
         if(ex_candidate_id == 1 && ex_id_user == null){
             swal('Wybierz byłego pracownika z listy')
             return false;

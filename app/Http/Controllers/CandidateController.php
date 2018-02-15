@@ -129,12 +129,15 @@ class CandidateController extends Controller
      */
     public function candidateProfile($id) {
         $candidate = Candidate::find($id);
-
         $candidate_status = ($candidate->attempt_level_data != null) ? $candidate->attempt_level_data->name : 'Brak aktywnej rekrutacji';
 
         if ($candidate == null) {
             return view('errors.404');
         }
+        $fired_user = User::where('status_work','=',1)
+            ->where('department_info_id','=',Auth::user()->department_info_id)
+            ->whereIn('user_type_id',[1,2])
+            ->get();
 
         $department_info = Department_info::where('id', '!=', 13)->get();
         $sources = CandidateSource::all();
@@ -147,7 +150,8 @@ class CandidateController extends Controller
             ->with('status_to_change', $status_to_change)
             ->with('candidate_status', $candidate_status)
             ->with('department_info', $department_info)
-            ->with('candidate', $candidate);
+            ->with('candidate', $candidate)
+            ->with('fired_user',$fired_user);
     }
 
     /**
@@ -167,6 +171,8 @@ class CandidateController extends Controller
             $candidate->department_info_id = $request->candidate_department;
             $candidate->candidate_source_id = $request->candidate_source;
             $candidate->comment = $request->candidate_desc;
+            $candidate->experience = $request->candidate_experience;
+            $candidate->id_user = $request->ex_id_user;
             $candidate->cadre_edit_id = Auth::user()->id;
             $candidate->updated_at = date('Y-m-d H:i:s');
 
@@ -180,6 +186,8 @@ class CandidateController extends Controller
                 'Oddział' => $request->candidate_department,
                 'Źródło' => $request->candidate_source,
                 'Opis' => $request->candidate_desc,
+                'User_id' => $request->ex_id_user,
+                'Experience' => $request->candidate_experience,
                 'Pracownik kadry' => Auth::user()->id
             ];
             //new ActivityRecorder(8, $data);

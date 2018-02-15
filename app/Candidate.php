@@ -14,6 +14,10 @@ class Candidate extends Model
         return $this->belongsTo('App\User', 'cadre_id');
     }
 
+    public function ex_user() {
+        return $this->belongsTo('App\User', 'id_user');
+    }
+
     public function edit_cadre() {
         return $this->belongsTo('App\User', 'cadre_edit_id');
     }
