@@ -425,4 +425,14 @@ class UsersController extends Controller
         return datatables($data)->make(true);
     }
 
+    /**
+     * Sprawdzenie czy numer kolejki pbx jest unikalny
+     */
+    public function uniquePBX(Request $request) {
+        if ($request->ajax()) {
+            $user = User::where('login_phone', '=', $request->login_phone)->count();
+
+            return ($user > 0) ? 1 : 0 ;
+        }
+    }
 }

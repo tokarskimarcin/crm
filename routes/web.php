@@ -26,6 +26,7 @@ Route::POST('/addAcceptHour','WorkHoursController@addAcceptHour')->name('api.add
 
 Route::POST('/uniqueUsername','UsersController@uniqueUsername')->name('api.uniqueUsername');
 Route::POST('/uniquerEmail','UsersController@uniqueEmail')->name('api.uniqueEmail');
+Route::POST('/uniquePBX','UsersController@uniquePBX')->name('api.uniquePBX');
 Route::POST('/datatableEmployeeManagement','UsersController@datatableEmployeeManagement')->name('api.datatableEmployeeManagement');
 
 Route::POST('/datatableCadreManagement','UsersController@datatableCadreManagement')->name('api.datatableCadreManagement');
