@@ -19,11 +19,15 @@ use App\PenaltyBonus;
 
 class UsersController extends Controller
 {
+    /**
+     * Wyświetlanie widou dla telemarketera
+     */
     public function add_consultantGet()
     {
         $agencies = Agencies::all();
         $user = User::find(Auth::user()->id);
-        return view('hr.addConsultantNew')
+        
+        return view('hr.addNewUser')
             ->with('agencies',$agencies)
             ->with('send_type',$user->department_info->type)
             ->with('type', 1);
@@ -34,7 +38,8 @@ class UsersController extends Controller
         $agencies = Agencies::all();
         $user_types = UserTypes::all();
         $department_info = Department_info::all();
-        return view('hr.addConsultantNew')->with('agencies',$agencies)
+        return view('hr.addNewUser')
+            ->with('agencies',$agencies)
             ->with('department_info',$department_info)
             ->with('user_types',$user_types)
             ->with('type', 2);
@@ -44,13 +49,9 @@ class UsersController extends Controller
     {
         if($request->ajax())
         {
-            $user = User::where('username', '=',$request->username)->get();
+            $user = User::where('username', '=',$request->username)->count();
    
-            if($user->count() > 0) {
-                return 1;
-            } else {
-                return 0;
-            }
+            return ($user > 0) ? 1 : 0 ;
         }
     }
 
@@ -166,7 +167,7 @@ class UsersController extends Controller
             return view('404');
         }
 
-        return view('hr.addConsultantTEST')->with('agencies',$agencies)
+        return view('hr.editUser')->with('agencies',$agencies)
           ->with('user',$user)
           ->with('department_info', $department_info)
           ->with('userTypes', $userTypes)
@@ -214,7 +215,7 @@ class UsersController extends Controller
 
          $userTypes = UserTypes::all();
 
-        return view('hr.addConsultantTEST')
+        return view('hr.editUser')
             ->with('agencies', $agencies)
             ->with('userTypes', $userTypes)
             ->with('user', $user)
