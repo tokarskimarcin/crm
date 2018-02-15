@@ -193,7 +193,7 @@
                             </tr>
                             @endif
                             <tr>
-                                <td style="width: 170px;height:52px;"><b>Całość na konto:</b></td>
+                                <td style="width: 170px;height:52px;"><b>CNK:</b></td>
                                 <td>
                                     <select class="form-control" style="font-size:18px;" name="salary_to_account">
                                         <option>Wybierz</option>
@@ -203,17 +203,17 @@
                                 </td>
                             </tr>
                             <tr class="alert alert-danger" style="display: none" id="alert_ck">
-                                <td colspan="1">Wybierz wartość CK!</td>
+                                <td colspan="1">Wybierz wartość CNK!</td>
                                 <td></td>
                             </tr>
                             <tr>
                                 <td style="width: 170px;height:52px;"><b>Numer kolejki PBX:</b></td>
                                 <td>
-                                    <input type="text" class="form-control" placeholder="Login z programu do dzwonienia" name="login_phone" value="">
+                                    <input type="number" class="form-control" placeholder="Login z programu do dzwonienia" name="login_phone" value="">
                                 </td>
                             </tr>
                             <tr class="alert alert-danger" style="display: none" id="alert_pbx">
-                                <td colspan="1">Podaj numer kolejki PBX!</td>
+                                <td colspan="1">Podaj unikalny numer kolejki PBX!</td>
                                 <td></td>
                             </tr>
                             @if($type == 2)
@@ -300,6 +300,8 @@
 @section('script')
 
 <script>
+
+   
 
     $(document).ready(function() {
 
@@ -403,6 +405,34 @@
                             validationCheck = true;
                         }
                     }
+                }
+            }
+
+            //Sprawdzenie czy numer kolejki pbx jest unikalny
+            if (login_phone != null) {
+                if (login_phone.trim().length == 0) {
+                    $('#alert_pbx').fadeIn(1000);
+                    validationCheck = false;
+                }else
+                {
+                    var check = 0;
+                    $.ajax({
+                        type: "POST",
+                        async: false,
+                        url: '{{ route('api.uniquePBX') }}',
+                        data: {"login_phone":login_phone},
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            if (response == 1) {
+                                swal('Podany numer kolejki PBX jest już w bazie!');
+                                validationCheck = false;
+                            } else if(response != 1 && response != 0) {
+                                swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!');
+                            }
+                        }
+                    });
                 }
             }
 

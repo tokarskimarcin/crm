@@ -147,7 +147,7 @@
                                     <td class="td-class"><b>Rozpoczęcie Pracy:</b></td>
                                     <td>
                                         <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                            <input class="form-control" name="start_date" type="text" value="{{$user->start_work}}" readonly >
+                                            <input class="form-control" id="start_date" name="start_date" type="text" value="{{$user->start_work}}" readonly >
                                             <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                         </div>
                                     </td>
@@ -157,9 +157,9 @@
                                     <td>
                                         <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
                                             @if(isset($user->end_work))
-                                                <input class="form-control stop_date" name="stop_date" type="text" value="{{$user->end_work}}" readonly >
+                                                <input class="form-control stop_date" id="stop_date" name="stop_date" type="text" value="{{$user->end_work}}" readonly >
                                             @else
-                                                <input class="form-control stop_date" name="stop_date" type="text" value="{{date('Y-m-d')}}" readonly >
+                                                <input class="form-control stop_date" id="stop_date" name="stop_date" type="text" value="0000-00-00" readonly >
                                             @endif
 
                                             <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
@@ -214,7 +214,7 @@
                                     </td>
                                 </tr>
                                 <tr class="alert alert-danger" style="display: none" id="alert_ck">
-                                    <td colspan="1">Wybierz wartość CK!</td>
+                                    <td colspan="1">Wybierz wartość CNK!</td>
                                     <td></td>
                                 </tr>
                                 <tr>
@@ -254,7 +254,7 @@
                                 <tr>
                                     <td class="td-class"><b>Numer kolejki PBX:</b></td>
                                     <td>
-                                        <input type="text" class="form-control" placeholder="Login z programu do dzwonienia" name="login_phone" value="{{$user->login_phone}}">
+                                        <input type="number" class="form-control" placeholder="Login z programu do dzwonienia" name="login_phone" value="{{$user->login_phone}}">
                                     </td>
                                 </tr>
                                 <tr class="alert alert-danger" style="display: none" id="alert_pbx">
@@ -347,6 +347,8 @@
 @section('script')
 
 <script>
+        var checkEndWorkStatus = Number({{$user->status_work}});
+        var checkEndWorkDate = '{{$user->end_work}}';
 
     $('.form_date').datetimepicker({
         language: 'pl',
@@ -361,14 +363,25 @@
 
     var validation_user = false;
 
-    $("#edit_button").on('click', function(){
+    $('#status_work').change(function() {
+        //Sprawdzenie czy zmieniany jest status pracy na "niepracujący"
+        var status_work = $("#status_work").val();
+        if (checkEndWorkStatus == 1 && status_work == 0) {
+            swal('Wybierz datę zakończenia pracy');
+            //wiem ze tutaj cos trzeeba dodac
+        }
+    });
 
+    $("#edit_button").on('click', function(){
         var first_name = $("input[name='first_name']").val();
         var last_name = $("input[name='last_name']").val();
         var private_phone = $("input[name='private_phone']").val();
         var username = $("input[name='username']").val();
         var password = $("input[name='password']").val();
         var login_phone = $("input[name='login_phone']").val();
+        var start_date = $('#start_date').val();
+        var stop_date = $('#stop_date').val();
+
         $('#edit_user').submit(function(){
             validation_user = true;
             $(this).find(':submit').attr('disabled','disabled');
@@ -421,6 +434,44 @@
         } else {
             $('#alert_pbx').fadeOut();
         }
+
+        //Porównanie czy data zakończenia jest wyższa niż data rozpoczęcia
+        var d1 = Date.parse(stop_date);
+        var d2 = Date.parse(start_date);
+
+        if (d1 < d2) {
+            swal('Data zakończenia pracy nie może być niższa niż data jej rozpoczęcia!');
+            validationCheck = false;
+        }
+
+        //Sprawdzenie czy numer kolejki pbx jest unikalny
+        if (login_phone != null) {
+            if (login_phone.trim().length == 0) {
+                $('#alert_pbx').fadeIn(1000);
+                validationCheck = false;
+            }else
+            {
+                var check = 0;
+                $.ajax({
+                    type: "POST",
+                    async: false,
+                    url: '{{ route('api.uniquePBX') }}',
+                    data: {"login_phone":login_phone},
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response == 1) {
+                            swal('Podany numer kolejki PBX jest już w bazie!');
+                            validationCheck = false;
+                        } else if(response != 1 && response != 0) {
+                            swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!');
+                        }
+                    }
+                });
+            }
+        }
+
         return validationCheck;
     });
 

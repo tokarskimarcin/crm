@@ -26,6 +26,7 @@ Route::POST('/addAcceptHour','WorkHoursController@addAcceptHour')->name('api.add
 
 Route::POST('/uniqueUsername','UsersController@uniqueUsername')->name('api.uniqueUsername');
 Route::POST('/uniquerEmail','UsersController@uniqueEmail')->name('api.uniqueEmail');
+Route::POST('/uniquePBX','UsersController@uniquePBX')->name('api.uniquePBX');
 Route::POST('/datatableEmployeeManagement','UsersController@datatableEmployeeManagement')->name('api.datatableEmployeeManagement');
 
 Route::POST('/datatableCadreManagement','UsersController@datatableCadreManagement')->name('api.datatableCadreManagement');
@@ -165,7 +166,11 @@ Route::POST('/recruiterTrainingsData', 'RecruitmentAttemptController@recruiterTr
 Route::POST('/delete_notification', 'NotificationController@delete_notification')->name('api.delete_notification');
 
 
+//Bootstrap notifications //
 
+Route::post('getBootstrapNotifications', 'HomeController@getBootstrapNotifications')->name('getBootstrapNotifications');
+
+//bootstrap notifications end //
 
 
 /** */
@@ -206,8 +211,6 @@ Route::get('/dayReportDatabaseUse', 'DatabaseURLController@MailDayRaportDatabase
 Route::get('/weekReportDatabaseUse', 'DatabaseURLController@MailWeekRaportDatabaseUse');
 Route::get('/monthReportDatabaseUse', 'DatabaseURLController@MailMonthRaportDatabaseUse');
 //End emails
-
-
 
 
 
