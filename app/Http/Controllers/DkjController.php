@@ -105,14 +105,21 @@ class DkjController extends Controller
         if ($department_type == null) {
             return view('errors.404');
         }
-        $users = User::where('department_info_id',$department_id_info)
+        // zmiana wykazu użytkowników DKJ
+        $users = DB::table('users')
+            ->select(DB::raw('users.*'))
+            ->join('work_hours','work_hours.id_user','users.id')
+            ->where('department_info_id',$department_id_info)
             ->where('status_work',1)
-            ->where('user_type_id',1);
-            if ($request->department_id_info<0) {
-              $users = $users->where('dating_type',$dating_type);
-            }else if($department_type->type == 'Badania/Wysyłka')
-                $users = $users->where('dating_type',$dating_type);
-            $users = $users->orderBy('users.last_name')->get();
+            ->where('user_type_id',1)
+            ->whereBetween('work_hours.date',[$request->start_date,$request->stop_date]);
+        if ($request->department_id_info<0) {
+            $users = $users->where('dating_type',$dating_type);
+        }else if($department_type->type == 'Badania/Wysyłka')
+            $users = $users->where('dating_type',$dating_type);
+        $users = $users->groupBy('id')->orderBy('users.last_name')->get();
+
+
 
         return view('dkj.dkjRaport')
         ->with('departments',$departments)

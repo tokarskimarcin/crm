@@ -48,6 +48,16 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="myLabel"></label>
+                                <button class="btn btn-info" style="width: 100%" id="add_submit">
+                                    <span class="glyphicon glyphicon-ok"></span> Dodaj kandydata
+                                </button>
+                            </div>
+                        </div>
+                        </div>
                     </div>
                     <div class="col-md-9">
                         <div class="row">
@@ -108,10 +118,11 @@
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label class="myLabel"></label>
-                                        <button class="btn btn-info" style="width: 100%" id="add_submit">  
-                                            <span class="glyphicon glyphicon-ok"></span> Dodaj kandydata
-                                        </button>
+                                        <label class="myLabel">Doświadczenie:</label>
+                                        <select class="form-control" id="candidate_experience">
+                                            <option value="0" selected>Brak</option>
+                                            <option value="1">Tak</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -119,6 +130,43 @@
                                 <div class="form-group">
                                     <label class="myLabel">Opis:</label>
                                     <textarea rows="5" style="height: 100%" class="form-control" placeholder="Opis pracownika" id="candidate_desc"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="myLabel">Były pracownik:</label>
+                                        <select class="form-control" id="ex_candidate">
+                                            <option value="0" selected>Nie</option>
+                                            <option value="1">Tak</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="col-md-12">
+                                    <div class="find_user_table" style="display: none">
+                                        <table id="all_user_fired" class="table table-striped thead-inverse">
+                                            <thead>
+                                            <tr>
+                                                <th>Imie i nazwisko</th>
+                                                <th class="category_column">Data rozpoczęcia</th>
+                                                <th class="category_column">Data zakończenia</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($fired_user as $item)
+                                                    <tr id={{$item->id}}>
+                                                        <td>{{$item->first_name.' '.$item->last_name}}</td>
+                                                        <td>{{$item->start_work}}</td>
+                                                        <td>{{$item->end_work}}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -134,6 +182,7 @@
 @section('script')
 <script>
 var easterEggCounter = 0;
+var ex_id_user = null;
 function easterEgg() {
     easterEggCounter++;
 
@@ -156,6 +205,38 @@ function easterEgg() {
 }
 
 $(document).ready(() => {
+    //Funkcja wyświetlająca tabele z wyborem byłego pracownika
+    $('#ex_candidate').val(0);
+    $('#ex_candidate').on('change',function () {
+        if($(this).val() == 0)
+        {
+            $('.find_user_table').css("display","none");
+            ex_id_user = null;
+            fired_user_table.$('tr.selected').removeClass('selected');
+        }else if($(this).val() == 1)
+        {
+            $('.find_user_table').css("display","block");
+        }
+});
+    //tablela z byłymi pracownikami
+    var fired_user_table = $('#all_user_fired').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+        }
+    });
+
+    // event, po kliknięciu wiersza w tabeli z byłymi pracownikami
+    $('#all_user_fired').on('click','tr',function (e) {
+        if($(this).hasClass('selected')){
+            $(this).removeClass('selected');
+            ex_id_user = null;
+        }else{
+            fired_user_table.$('tr.selected').removeClass('selected');
+            $(this).addClass('selected');
+            ex_id_user = fired_user_table.row('.selected').data()['DT_RowId'];
+        }
+    });
+
 
     //Funkcja dodajaca nowego kandydata
     $('#add_submit').click(() => {
@@ -165,6 +246,12 @@ $(document).ready(() => {
         var candidate_department = $('#candidate_department').val();
         var candidate_source = $('#candidate_source').val();
         var candidate_desc = $('#candidate_desc').val();
+        var candidate_experience = $('#candidate_experience').val();
+        var ex_candidate_id = $('#ex_candidate').val();
+        if(ex_candidate_id == 1 && ex_id_user == null){
+            swal('Wybierz byłego pracownika z listy')
+            return false;
+        }
 
         if (candidate_name == '' || (candidate_name.trim().length == 0)) {
             swal('Podaj imie kandydata!')
@@ -232,7 +319,10 @@ $(document).ready(() => {
                             "candidate_phone": candidate_phone,
                             "candidate_department": candidate_department,
                             "candidate_source": candidate_source,
-                            "candidate_desc": candidate_desc
+                            "candidate_desc": candidate_desc,
+                            "candidate_experience": candidate_experience,
+                            "ex_id_user": ex_id_user
+
                         },
                         success: function (response) {
                             if (response > 0) {

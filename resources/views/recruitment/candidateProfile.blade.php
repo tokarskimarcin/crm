@@ -66,6 +66,16 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="myLabel"></label>
+                                    <button class="btn btn-info" style="width: 100%" id="edit_submit">
+                                        <span class="glyphicon glyphicon-envelope"></span> Zapisz zmiany
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-9">
                         <div class="row">
@@ -124,10 +134,16 @@
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label class="myLabel"></label>
-                                        <button class="btn btn-info" style="width: 100%" id="edit_submit">  
-                                            <span class="glyphicon glyphicon-envelope"></span> Zapisz zmiany
-                                        </button>
+                                        <label class="myLabel">Doświadczenie:</label>
+                                        <select class="form-control" id="candidate_experience">
+                                            @if($candidate->experience == 0 )
+                                                <option value="0" selected>Brak</option>
+                                                <option value="1">Tak</option>
+                                            @elseif( $candidate->experience == 1)
+                                                <option value="0">Brak</option>
+                                                <option value="1" selected>Tak</option>
+                                            @endif
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -135,6 +151,72 @@
                                 <div class="form-group">
                                     <label class="myLabel">Opis:</label>
                                     <textarea rows="5" style="height: 100%" class="form-control" id="candidate_desc" placeholder="Opis pracownika">{{$candidate->comment}}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <label class="myLabel">Były pracownik:</label>
+                                                <select class="form-control" id="ex_candidate_status">
+                                                    @if($candidate->id_user == null )
+                                                        <option value="0" selected>Nie</option>
+                                                        <option value="1">Tak</option>
+                                                    @elseif( $candidate->id_user != null)
+                                                        <option value="0">Nie</option>
+                                                        <option value="1" selected>Tak</option>
+                                                    @endif
+                                                </select>
+                                            </div>
+                                        </div>
+                                    @php
+                                        $name = '';
+                                     if($candidate->id_user != null)
+                                        $name = $candidate->ex_user->first_name.' '.$candidate->ex_user->last_name;
+
+                                    @endphp
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label class="myLabel">Dane konta z godzinówki:</label>
+                                            <input type="text" class="form-control" id="candidate_ex_date"  value="{{$name}}" disabled/>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label class="myLabel" style="color:white">_</label>
+                                            <button  class="btn btn-warning" id="edit_ex_user" style="width: 100%" @if($candidate->id_user == null) disabled @endif>
+                                                <span class="glyphicon glyphicon-envelope"></span> Edycja
+                                            </button>
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="col-md-12">
+                                    <div class="find_user_table" style="display:none" >
+                                        <table id="all_user_fired" class="table table-striped thead-inverse">
+                                            <thead>
+                                            <tr>
+                                                <th>Imie i nazwisko</th>
+                                                <th class="category_column">Data rozpoczęcia</th>
+                                                <th class="category_column">Data zakończenia</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            @foreach($fired_user as $item)
+                                                @if($candidate->id_user == $item->id)
+                                                    <tr id={{$item->id}} class="selected">
+                                                @else
+                                                    <tr id={{$item->id}}>
+                                                @endif
+                                                    <td>{{$item->first_name.' '.$item->last_name}}</td>
+                                                    <td>{{$item->start_work}}</td>
+                                                    <td>{{$item->end_work}}</td>
+                                                </tr>
+                                            @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -428,6 +510,8 @@
 @section('script')
 <script>
 
+    var ex_id_user = '{{$candidate->id_user}}';
+
 $('.form_date').datetimepicker({
     language: 'pl',
     autoclose: 1,
@@ -437,6 +521,62 @@ $('.form_date').datetimepicker({
 
 
 $(document).ready(() => {
+
+    var ex_candidate_date = $('#candidate_ex_date').val();
+
+    $('#ex_candidate_status').on('change',function (e) {
+        if($(this).val() == 0)
+        {
+            $('#candidate_ex_date').val('');
+            $('#edit_ex_user').attr("disabled",true);
+            ex_id_user = null;
+            $('.find_user_table').css("display","none");
+            ex_candidate_date = '';
+
+            if($('#edit_ex_user').hasClass('is_open'))
+            {
+                $('#edit_ex_user').removeClass('is_open');
+                $('.find_user_table').css("display","none");
+            }
+        }else if($(this).val() == 1)
+        {
+            $('#candidate_ex_date').val(ex_candidate_date);
+            $('#edit_ex_user').attr("disabled",false);
+        }
+    });
+
+        //tablela z byłymi pracownikami
+        var fired_user_table = $('#all_user_fired').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+            }
+        });
+
+        // event, po kliknięciu wiersza w tabeli z byłymi pracownikami
+        $('#all_user_fired').on('click','tr',function (e) {
+            if($(this).hasClass('selected')){
+                $(this).removeClass('selected');
+                ex_id_user = null;
+                $('#candidate_ex_date').val('');
+                ex_candidate_date = '';
+            }else{
+                fired_user_table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+                ex_id_user = fired_user_table.row('.selected').data()['DT_RowId'];
+                ex_candidate_date = fired_user_table.row('.selected').data()[0];
+                $('#candidate_ex_date').val(ex_candidate_date);
+            }
+        });
+        $('#edit_ex_user').on('click',function (e) {
+            if($(this).hasClass('is_open'))
+            {
+                $(this).removeClass('is_open');
+                $('.find_user_table').css("display","none");
+            }else{
+                $(this).addClass('is_open');
+                $('.find_user_table').css("display","block");
+            }
+        })
 
     $('#add_level_status').change(() => {
         var add_level_status = $('#add_level_status').val();
@@ -456,6 +596,14 @@ $(document).ready(() => {
         var candidate_department = $('#candidate_department').val();
         var candidate_source = $('#candidate_source').val();
         var candidate_desc = $('#candidate_desc').val();
+        var candidate_experience = $('#candidate_experience').val();
+        var ex_candidate_status = $('#ex_candidate_status').val();
+        if(ex_id_user == '')
+            ex_id_user = null;
+        if(ex_candidate_status == 1 && ex_id_user == null ){
+            swal('Wybierz byłego pracownika z listy')
+            return false;
+        }
 
         if (candidate_name == '' || (candidate_name.trim().length == 0)) {
             swal('Podaj imie kandydata!')
@@ -507,7 +655,9 @@ $(document).ready(() => {
                 "candidate_phone": candidate_phone,
                 "candidate_department": candidate_department,
                 "candidate_source": candidate_source,
-                "candidate_desc": candidate_desc
+                "candidate_desc": candidate_desc,
+                "candidate_experience":candidate_experience,
+                "ex_id_user":ex_id_user
             },
             success: function (response) {
                 if (response == 1) {
