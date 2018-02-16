@@ -238,12 +238,14 @@
                         </div>
                         @endif
                     <div class="row">
+                        @if($type == 1)
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label class="myLabel">Numer PBX:</label>
                                 <input type="number" class="form-control" placeholder="Login z programu do dzwonienia" id="login_phone" name="login_phone" value="{{$user->login_phone}}">
                             </div>
                         </div>
+                        @endif
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label class="myLabel">Opis:</label>
@@ -431,7 +433,7 @@ $(document).ready(function() {
             return false;
         }
 
-        if (login_phone.trim().length == 0) {
+        if (login_phone != null && login_phone.trim().length == 0) {
             swal('Podaj numer kolejki PBX!');
             return false;
         }

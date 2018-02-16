@@ -204,18 +204,24 @@
                                 </div>
                             </div>
                         @endif
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label class="myLabel">Numer PBX:</label>
-                                <input type="number" class="form-control" placeholder="000" id="login_phone" name="login_phone" value="">
+                    </div>
+                    <div class="row">
+                        @if($type == 1)
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="myLabel">Numer PBX:</label>
+                                    <input type="number" class="form-control" placeholder="000" id="login_phone" name="login_phone" value="">
+                                </div>
                             </div>
-                        </div>
+                        @endif
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label class="myLabel">Opis:</label>
                                 <textarea class="form-control" name="description" id="description" placeholder="Opis dodawany do pracownika np. z jakiego ogłoszenia o pracę">@if(isset($candidate_comment)){{$candidate_comment}}@endif</textarea>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
                                 <button class="btn btn-info text-center" id="add_medical_package" style="width: 100%">
@@ -223,6 +229,7 @@
                                 </button>
                             </div>
                         </div>
+                        
                         @include('hr.addMedicalPackage')
                         <div class="col-md-12">
                             <div class="form-group">
@@ -342,7 +349,7 @@ $(document).ready(function() {
             return false;
         }
 
-        if (login_phone.trim().length == 0) {
+        if (login_phone != null && login_phone.trim().length == 0) {
             swal('Podaj numer kolejki PBX!');
             return false;
         }

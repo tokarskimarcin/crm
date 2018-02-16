@@ -120,7 +120,7 @@ class UsersController extends Controller
         $user->student = $request->student;
         $user->salary_to_account = $request->salary_to_account;
         $user->agency_id = $request->agency_id;
-        $user->login_phone = $request->login_phone;
+        $user->login_phone = ($request->login_phone != null) ? $request->login_phone : 0 ;
         if($request->rate == 'Nie dotyczy')
             $request->rate = 0;
         $user->rate = $request->rate;
@@ -252,7 +252,7 @@ class UsersController extends Controller
         $user->student = $request->student;
         $user->salary_to_account = $request->salary_to_account;
         $user->agency_id = $request->agency_id;
-        $user->login_phone = $request->login_phone;
+        $user->login_phone = ($request->login_phone != null) ? $request->login_phone : 0 ;
         $user->rate = $request->rate;
         $user->salary = $request->salary;
         $user->documents = $request->documents;
