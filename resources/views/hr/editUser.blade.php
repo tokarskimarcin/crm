@@ -56,7 +56,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label class="myLabel">Login godzinówka:</label>
-                                <input type="text" class="form-control" id="username" placeholder="Login" name="username"  value="{{$user->username}}">
+                                <input readonly type="text" class="form-control" id="username" placeholder="Login" name="username"  value="{{$user->username}}">
                             </div>
                         </div>
                     </div>
