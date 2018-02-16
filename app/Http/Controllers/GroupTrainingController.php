@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use App\AttemptResult;
 use App\Candidate;
 use App\CandidateTraining;
 use App\GroupTraining;
@@ -20,6 +21,10 @@ class GroupTrainingController extends Controller
             ->where('department_info_id',Auth::user()->department_info_id)
             ->where('status_work','=',1)
             ->get();
+        $attemptResult = AttemptResult::find(1);
+        dd($attemptResult->attemptStatus);
+
+
 
 
         return view('recruitment.addGroupTraining')
