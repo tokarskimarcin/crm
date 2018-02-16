@@ -8,4 +8,9 @@ class AttemptStatus extends Model
 {
     protected $table = 'attempt_status';
 
+    public function attemptResult()
+    {
+        return $this->belongsToMany('App\AttemptResult');
+    }
+
 }

@@ -188,8 +188,8 @@
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label class="myLabel" style="color:white">_</label>
-                                            <button  class="btn btn-warning" id="edit_ex_user" style="width: 100%" @if($candidate->id_user == null) disabled @endif>
-                                                <span class="glyphicon glyphicon-envelope"></span> Edycja
+                                            <button  class="btn btn-info" id="edit_ex_user" style="width: 100%" @if($candidate->id_user == null) disabled @endif>
+                                                <span class="glyphicon glyphicon-edit"></span> Edycja
                                             </button>
                                         </div>
                                     </div>
@@ -695,6 +695,7 @@ $(document).ready(() => {
                     swal('Zmiany zapisano!')
                     var newName = candidate_name + " " + candidate_surname;
                     $('#name_surname').html(newName);
+                    $('.find_user_table').css("display","none");
                 } else {
                     swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
                 }
