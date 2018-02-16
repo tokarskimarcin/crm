@@ -10,12 +10,12 @@
             font-size: 20px;
         }
         .left-container{
-            height: 300px;
+            height: 500px;
             overflow-y: auto;
             border: 1px solid #e5e5e5;
         }
         .right-container{
-            height: 300px;
+            height: 210px;
             overflow-y: auto;
             border: 1px solid #e5e5e5;
         }
@@ -60,9 +60,10 @@
             border-color: #2e6da4;
         }
 
-        #button_move_area{
+        #button_move_area, #button_move_area_absent{
             margin-top: 150px;
         }
+
 
     </style>
 
@@ -135,7 +136,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-md-12" id="modal_full" >
                             <div class="col-md-5">
                                 <label class="myLabel">Dostępni kandydaci:</label>
@@ -158,53 +158,92 @@
                                                 Jan Kowalski
                                                 <input type="checkbox" class="pull-left" style="display: block">
                                             </a>
-
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-md-7">
+                                <div class="col-md-12">
+                                    <div class="col-md-2" id="button_move_area">
+                                        <button id="move_right" class="btn btn-default center-block add" style="margin-bottom: 15px">
+                                            <i class="glyphicon glyphicon-chevron-right"></i>
+                                        </button>
+                                        <button id="move_left" class="btn btn-default center-block remove">
+                                            <i class="glyphicon glyphicon-chevron-left"></i>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <label class="myLabel">Osoby obecne na szkoleniu:</label>
+                                        <div class="search_candidate">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="right_search" placeholder="Wyszukaj osobe na szkoleniu"/>
+                                                <div class="input-group-addon">
+                                                    <input type="checkbox" id="all-put-right" style="display: block">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="right-container">
+                                                <div class="list_group" id="list_candidate_choice">
 
-                            <div class="col-md-2" id="button_move_area">
-                                <button id="move_right" class="btn btn-default center-block add" style="width: 100px;margin-bottom: 15px">
-                                    <i class="glyphicon glyphicon-chevron-right"></i>
-                                </button>
-                                <button id="move_left" class="btn btn-default center-block remove" style="width: 100px;">
-                                    <i class="glyphicon glyphicon-chevron-left"></i>
-                                </button>
-                            </div>
-                            <div class="col-md-5">
-                                <label class="myLabel">Osoby na szkolenie:</label>
-                                <div class="search_candidate">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="right_search" placeholder="Wyszukaj osobe na szkoleniu"/>
-                                        <div class="input-group-addon">
-                                            <input type="checkbox" id="all-put-right" style="display: block">
+                                                    <a class="list-group-item checked">
+                                                        Jan Kowalski
+                                                        <input type="checkbox" class="pull-left" style="display: block">
+                                                    </a>
+                                                    <a class="list-group-item">
+                                                        Jan Kowalski
+                                                        <input type="checkbox" class="pull-left" style="display: block">
+                                                    </a>
+                                                    <a class="list-group-item">
+                                                        Jan Kowalski
+                                                        <input type="checkbox" class="pull-left" style="display: block">
+                                                    </a>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <div class="right-container">
-                                        <div class="list_group" id="list_candidate_choice">
-
-                                            <a class="list-group-item checked">
-                                                Jan Kowalski
-                                                <input type="checkbox" class="pull-left" style="display: block">
-                                            </a>
-                                            <a class="list-group-item">
-                                                Jan Kowalski
-                                                <input type="checkbox" class="pull-left" style="display: block">
-                                            </a>
-                                            <a class="list-group-item">
-                                                Jan Kowalski
-                                                <input type="checkbox" class="pull-left" style="display: block">
-                                            </a>
-
+                                <div class="col-md-12">
+                                    <div class="col-md-2" id="button_move_area_absent">
+                                        <button id="move_right_absent" class="btn btn-default center-block add" style="margin-bottom: 15px">
+                                            <i class="glyphicon glyphicon-chevron-right"></i>
+                                        </button>
+                                        <button id="move_left_absent" class="btn btn-default center-block remove">
+                                            <i class="glyphicon glyphicon-chevron-left"></i>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <label class="myLabel">Osoby nieobecne na szkoleniu:</label>
+                                        <div class="search_candidate_absent">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="right_search_absent" placeholder="Wyszukaj osobe na szkoleniu"/>
+                                                <div class="input-group-addon">
+                                                    <input type="checkbox" id="all-put-right_absent" style="display: block">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="right-container">
+                                                <div class="list_group" id="list_candidate_choice_absent">
+                                                    <a class="list-group-item checked">
+                                                        Jan Kowalski
+                                                        <input type="checkbox" class="pull-left" style="display: block">
+                                                    </a>
+                                                    <a class="list-group-item">
+                                                        Jan Kowalski
+                                                        <input type="checkbox" class="pull-left" style="display: block">
+                                                    </a>
+                                                    <a class="list-group-item">
+                                                        Jan Kowalski
+                                                        <input type="checkbox" class="pull-left" style="display: block">
+                                                    </a>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                         {{--modal dla usunietych szkoleń--}}
                         <div class="col-md-12" id="modal_cancel" style="display: none">
                             <div class="col-md-12">
@@ -268,23 +307,19 @@
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <div class="col-md-5"></div>
-                            <div class="col-md-2">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6">
                                 <button type="button" class="btn btn-success btn-block" id="save_button">Dodaj szkolenie</button>
                             </div>
-                            <div class="col-md-5"></div>
                         </div>
                     </div>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
                 </div>
             </div>
         </div>
     </div>
-
-
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-default">
@@ -462,6 +497,8 @@
     <script>
         var candidate_to_left = [];
         var candidate_to_right = [];
+        var candidate_to_right_absent = [];
+        var candidate_to_left_absent = [];
         var id_training_group = 0;
         var training_group_response;
         var is_open = 0;
@@ -594,7 +631,6 @@
             var class_name = a_row.attr('class');
             var candidate_name = a_row.text();
             class_name = class_name.split(" ");
-
             //zaznaczony kandydat do szkolenia
             if(class_name[1] == 'nocheck'){
                 a_row.find('[type=checkbox]').prop('checked', true);
@@ -790,6 +826,26 @@
                     actual_stage = 1;
                 }
             });
+
+            $('#move_right_absent').on('click',function (e) {
+                // kod html z tabelą
+                var html_right_column = '';
+                for(var i = 0;i < candidate_to_right.length; i++)
+                {
+                    html_right_column += '<a class="list-group-item nocheck" onclick = "onclickRowRight(this)" id=' + candidate_to_right[i].id + '>' +
+                        candidate_to_right[i].name +
+                        '<input type="checkbox" class="pull-right" style="display: block">' +
+                        '</a>';
+                    // usunięcie użytkownika z lewej tabeli
+                    $('#'+candidate_to_right[i].id).remove();
+                }
+                $('#list_candidate_choice_absent').append(html_right_column);
+                candidate_to_right = [];
+                // oddznaczenie 'select all'
+                $('#all-put-left').prop('checked',false);
+
+            });
+
             // przeniesienie do prawej tabeli (wybrani użytkownicy)
             $('#move_right').on('click',function (e) {
                 // kod html z tabelą
@@ -807,6 +863,21 @@
                 candidate_to_right = [];
                 // oddznaczenie 'select all'
                 $('#all-put-left').prop('checked',false);
+            });
+
+            $('#move_left_absent').on('click',function (e) {
+                var html_left_column = '';
+                for(var i = 0;i < candidate_to_left.length; i++)
+                {
+                    html_left_column += '<a class="list-group-item nocheck" onclick = "onclickRowLeft(this)" id=' + candidate_to_left[i].id + '>' +
+                        candidate_to_left[i].name +
+                        '<input type="checkbox" class="pull-left" style="display: block">' +
+                        '</a>';
+                    $('#'+candidate_to_left[i].id).remove();
+                }
+                $('#list_candidate').append(html_left_column);
+                candidate_to_left = [];
+                $('#all-put-right').prop('checked',false);
             });
 
             $('#move_left').on('click',function (e) { // analogiczne
@@ -894,6 +965,8 @@
             {
                 candidate_to_right = [];
                 candidate_to_left = [];
+                candidate_to_right_absent = [];
+                candidate_to_left_absent = [];
                 $(".list_group a").remove();
             }
             // usuniecie podstawowych infromacji o szkoleniu
