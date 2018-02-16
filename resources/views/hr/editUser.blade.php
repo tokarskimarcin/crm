@@ -326,6 +326,8 @@
 
 $(document).ready(function() {
 
+    var user_id = Number({{$user->id}});
+
     //Zabokowanie przesyłania formularza po naciścnięciu entera (rozwijał się przycisk z pakietem medycznym) 
     $(window).keydown(function(event){
         if(event.keyCode == 13) {
@@ -460,6 +462,35 @@ $(document).ready(function() {
 
         if (department_info != null && department_info == 'Wybierz') {
             swal('Wybierz oddział!');
+            return false;
+        }
+
+        //
+        var ajaxCheck = true;
+
+        if (email != null) {
+            $.ajax({
+                type: "POST",
+                async: false,
+                url: '{{ route('api.uniquerEmailEdit') }}',
+                data: {
+                    "email":email,
+                    "user_id": user_id
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    console.log(response);
+                    if (response  == 1) {
+                        swal('Ten email jest już zajęty!');
+                        ajaxCheck = false;
+                    }
+                }
+            });
+        }
+
+        if (ajaxCheck == false) {
             return false;
         }
 
