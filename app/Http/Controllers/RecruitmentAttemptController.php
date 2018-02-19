@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\User;
 use App\ActivityRecorder;
+use App\AttemptResult;
 
 class RecruitmentAttemptController extends Controller
 {
@@ -105,7 +106,12 @@ class RecruitmentAttemptController extends Controller
      * Widok z zarządzaniem etapami i źródłami
      */
     public function recruitment_resources() {
-        return view('recruitment.recruitmentResources');
+        $attempt_status = AttemptStatus::all();
+        $attempt_results = AttemptResult::all();
+
+        return view('recruitment.recruitmentResources')
+            ->with('attempt_results', $attempt_results)
+            ->with('attempt_status', $attempt_status);
     }
 
     /**
@@ -420,6 +426,39 @@ class RecruitmentAttemptController extends Controller
             ];
 
             return $data;
+        }
+    }
+
+    /**
+     * Zarządzanie rezultatami etapów
+     */
+    public function getStatusResults(Request $request) {
+        if ($request->ajax()) {
+            $data = AttemptStatus::find($request->selected_status);
+            $data = $data->attemptResult;
+            return $data;
+        }
+    }
+
+    /**
+     * Dodawanie/usuwanie rezultatów etapów
+     */
+    public function statusResultChange(Request $request) {
+        if ($request->ajax()) {
+            if ($request->type == 'add') {
+                DB::table('attempt_result_attempt_status')
+                    ->insert([
+                        'attempt_status_id' => $request->selected_status,
+                        'attempt_result_id' => $request->selected_result
+                    ]);
+                return $request->type;
+            } elseif ($request->type == 'delete') {
+                DB::table('attempt_result_attempt_status')
+                    ->where('attempt_status_id', '=', $request->selected_status)
+                    ->where('attempt_result_id', '=', $request->selected_result)
+                    ->delete();
+                return $request->type;
+            }
         }
     }
 }

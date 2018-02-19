@@ -27,6 +27,12 @@
         font-size: 20px;
       }
 </style>
+@php
+    $temp1 = $status_to_change->where('id', '=', 2);
+    $phone_call_status = $temp1[0]->attemptResult;
+    $temp2 = $status_to_change->where('id', '=', 17);
+    $interview_status = $temp2[2]->attemptResult;
+@endphp
 
 <div class="row">
     <div class="col-md-12">
@@ -445,7 +451,10 @@
                                 <div class=form-group"">
                                     <label class="myLabel">Wybierz status etapu:</label>
                                     <select class="form-control" id="after_call">
-                                        <option>Wybierz</option>
+                                        <option>Wybierz</option> 
+                                        @foreach($phone_call_status as $item)
+                                            <option value="{{$item->id}}">{{$item->name}}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -456,6 +465,9 @@
                                     <label class="myLabel">Wybierz status etapu:</label>
                                     <select class="form-control" id="after_interview">
                                         <option>Wybierz</option>
+                                        @foreach($interview_status as $item)
+                                            <option value="{{$item->id}}">{{$item->name}}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -838,7 +850,6 @@ $(document).ready(() => {
             return false;
         }
 
-
         $('#add_level_submit').prop('disabled', 'disabled');
 
         $.ajax({
@@ -851,7 +862,9 @@ $(document).ready(() => {
                 "candidate_id": candidate_id,
                 "add_level_status": add_level_status,
                 "add_level_comment": add_level_comment,
-                "interview": interview
+                "interview": interview,
+                "after_call": after_call,
+                "after_interview": after_interview
             },
             success: function (response) {
                 if (response == 1) {
