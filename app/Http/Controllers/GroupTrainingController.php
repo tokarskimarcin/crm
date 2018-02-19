@@ -142,9 +142,9 @@ class GroupTrainingController extends Controller
                 foreach ($all_candidate as $item)
                 {
                     $candidate = Candidate::find($item->candidate_id);
-                    if($request->training_stage == 1)
+                    if($request->training_stage == 1 && ($candidate->attempt_status_id != 18 && $candidate->attempt_status_id != 19))
                         $candidate->attempt_status_id = 7;
-                    else
+                    else if($request->training_stage != 1 && ($candidate->attempt_status_id != 18 && $candidate->attempt_status_id != 19))
                         $candidate->attempt_status_id = 14;
 
 
@@ -158,9 +158,9 @@ class GroupTrainingController extends Controller
                     $candidate_story_new->cadre_edit_id = Auth::user()->id;
                     $candidate_story_new->candidate_id = $item->candidate_id;
                     $candidate_story_new->recruitment_attempt_id = $candidate_story_old->recruitment_attempt_id;
-                    if($request->training_stage == 1)
+                    if($request->training_stage == 1 && ($candidate->attempt_status_id != 18 && $candidate->attempt_status_id != 19))
                         $candidate_story_new->attempt_status_id = 7;
-                    else
+                    else if($request->training_stage != 1 && ($candidate->attempt_status_id != 18 && $candidate->attempt_status_id != 19))
                         $candidate_story_new->attempt_status_id = 14;
                     $candidate_story_new->comment = "Szkolenie zakończone";
                     $candidate_story_new->save();
@@ -247,6 +247,7 @@ class GroupTrainingController extends Controller
                 ->join('group_training', 'group_training.id', 'candidate_training.training_id')
                 ->where('group_training.id','=',$request->id_training_group)
                 ->get()->toArray();
+
             if($request->cancel_candidate == 1 || $request->cancel_candidate == 2 )
             {
                 $merge_array = $candidate_choice;
