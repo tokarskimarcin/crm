@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use App\AttemptResult;
+use App\AttemptStatus;
 use App\Candidate;
 use App\CandidateTraining;
 use App\GroupTraining;
@@ -83,6 +84,7 @@ class GroupTrainingController extends Controller
             $candidate_story_old = RecruitmentStory::where('candidate_id','=',$candidate_id)
                 ->orderBy('id', 'desc')->first();
             $candidate_story_new = new RecruitmentStory();
+            $candidate_story_new->attempt_result_id  = $request->attempt_result_status;
             $candidate_story_new->cadre_id = Auth::user()->id;
             $candidate_story_new->cadre_edit_id = Auth::user()->id;
             $candidate_story_new->candidate_id = $candidate_id;
@@ -146,8 +148,6 @@ class GroupTrainingController extends Controller
                         $candidate->attempt_status_id = 7;
                     else if($request->training_stage != 1 && ($candidate->attempt_status_id != 18 && $candidate->attempt_status_id != 19))
                         $candidate->attempt_status_id = 14;
-
-
                     $candidate->save();
 
                     $candidate_story_old = RecruitmentStory::where('candidate_id','=',$item->candidate_id)
@@ -162,8 +162,18 @@ class GroupTrainingController extends Controller
                         $candidate_story_new->attempt_status_id = 7;
                     else if($request->training_stage != 1 && ($candidate->attempt_status_id != 18 && $candidate->attempt_status_id != 19))
                         $candidate_story_new->attempt_status_id = 14;
+                    else
+                        $candidate_story_new->attempt_status_id = $candidate_story_old->attempt_status_id;
+
                     $candidate_story_new->comment = "Szkolenie zakończone";
                     $candidate_story_new->save();
+
+                    if(($candidate->attempt_status_id == 18 || $candidate->attempt_status_id == 19))
+                    $CandidateTraining = CandidateTraining::where('training_id','=',$training_group_id)
+                        ->where('candidate_id','=',$item->candidate_id)
+                        ->update(['completed_training' => $candidate_story_new->id]);
+
+
                 }
                 return 1;
             }
@@ -227,20 +237,31 @@ class GroupTrainingController extends Controller
             where('id','=',$request->id_training_group)->get();
 
             if($request->training_stage == 1)
+            {
                 $candidate_avaible = Candidate::whereIn('attempt_status_id',[5])
                     ->where('department_info_id','=',Auth::user()->department_info_id)->get()
                     ->toArray();
-            else
+                // pobernie statusów dla zakończonego etapu 1
+                $attempt_result = AttemptStatus::find(7)->attemptResult;
+            }
+
+            else{
                 $candidate_avaible = Candidate::whereIn('attempt_status_id',[12])
                     ->where('department_info_id','=',Auth::user()->department_info_id)->get()
                     ->toArray();
+
+                // pobernie statusów dla zakończonego etapu 2
+                $attempt_result = AttemptStatus::find(7)->attemptResult;
+            }
+
 
             $candidate_choice = DB::table('candidate')
                 ->select(DB::raw('
                 candidate.*,
                 candidate_training.completed_training,
                 recruitment_story.attempt_status_id as recruitment_story_id,    
-                recruitment_story.comment  as recruitment_story_comment
+                recruitment_story.comment  as recruitment_story_comment,
+                recruitment_story.attempt_result_id  as recruitment_attempt_result_id
             '))
                 ->join('candidate_training', 'candidate_training.candidate_id', 'candidate.id')
                 ->leftjoin('recruitment_story', 'recruitment_story.id', 'candidate_training.completed_training')
@@ -256,6 +277,7 @@ class GroupTrainingController extends Controller
 
             $object_array['group_training'] = $group_training ;
             $object_array['candidate'] = $merge_array ;
+            $object_array['attempt_status'] = $attempt_result;
             return $object_array;
         }
     }
