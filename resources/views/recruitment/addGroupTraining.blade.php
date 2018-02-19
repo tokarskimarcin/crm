@@ -214,14 +214,6 @@
                                     </div>
                                     <div class="col-md-10">
                                         <label class="myLabel">Osoby nieobecne na szkoleniu:</label>
-                                        <div class="search_candidate_absent">
-                                            <div class="input-group">
-                                                <input type="text" class="form-control" id="right_search_absent" placeholder="Wyszukaj osobe na szkoleniu"/>
-                                                <div class="input-group-addon">
-                                                    <input type="checkbox" id="all-put-right_absent" style="display: block">
-                                                </div>
-                                            </div>
-                                        </div>
                                         <div class="form-group">
                                             <div class="right-container">
                                                 <div class="list_group" id="list_candidate_choice_absent">
@@ -716,7 +708,7 @@
                 var check_all = true;
                 var avaible_candidate = [];
                 var choice_candidate = [];
-
+                var choice_candidate_ansent = [];
                 if(start_hour_training.trim() == 0)
                 {
                     swal("Nie wyznaczyłeś godziny szkolenia.")
@@ -734,6 +726,11 @@
                     $('#list_candidate_choice a').each(function (key, value) {
                         choice_candidate.push(value.id) ;
                     });
+
+                    $('#list_candidate_choice_absent a').each(function (key,value) {
+                        choice_candidate_ansent.push(value.id);
+                    });
+
                     $.ajax({
                         type: "POST",
                         url: '{{ route('api.saveGroupTraining') }}',
@@ -749,7 +746,8 @@
                             "choice_candidate":choice_candidate,
                             "saving_type":saving_type,
                             "id_training_group" : id_training_group,
-                            "actual_stage" : actual_stage
+                            "actual_stage" : actual_stage,
+                            "choice_candidate_ansent":choice_candidate_ansent
                         },
                         success: function (response) {
                             console.log(actual_stage)
@@ -1054,6 +1052,12 @@
                                             '<input type="checkbox" class="pull-right" style="display: block">' +
                                             '</a>';
                                         $('#list_candidate_choice').append(html);
+                                    }else if (response['candidate'][i].attempt_status_id == 18  && cancel_candidate == 0) {
+                                        var html = '<a class="list-group-item nocheck" onclick = "onclickRowRight(this)" id=' + response['candidate'][i].id + '>' +
+                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
+                                            '<input type="checkbox" class="pull-right" style="display: block">' +
+                                            '</a>';
+                                        $('#list_candidate_choice_absent').append(html);
                                     }
                                     else if (cancel_candidate != 0) {
                                         var html = '<a class="list-group-item nocheck" id=' + response['candidate'][i].id + '>' +
@@ -1161,7 +1165,11 @@
                 "columns": [
                     {"data": "training_date"},
                     {"data": "training_hour"},
-                    {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.candidate_choise_count+'/'+data.candidate_absent_count+'/'+data.candidate_avaible_count;
+                        },"name":"group_training.candidate_choise_count"
+                    },
                     {
                         "data": function (data, type, dataToSet) {
                             return data.last_name+' '+data.first_name;
@@ -1297,7 +1305,11 @@
                 },"columns": [
                     {"data": "training_date"},
                     {"data": "training_hour"},
-                    {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.candidate_choise_count+'/'+data.candidate_absent_count+'/'+data.candidate_avaible_count;
+                        },"name":"group_training.candidate_choise_count"
+                    },
                     {
                         "data": function (data, type, dataToSet) {
                             return data.last_name+' '+data.first_name;
@@ -1347,7 +1359,11 @@
                 },"columns": [
                     {"data": "training_date"},
                     {"data": "training_hour"},
-                    {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.candidate_choise_count+'/'+data.candidate_absent_count+'/'+data.candidate_avaible_count;
+                        },"name":"group_training.candidate_choise_count"
+                    },
                     {
                         "data": function (data, type, dataToSet) {
                             return data.last_name+' '+data.first_name;
@@ -1398,7 +1414,11 @@
                 "columns": [
                     {"data": "training_date"},
                     {"data": "training_hour"},
-                    {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.candidate_choise_count+'/'+data.candidate_absent_count+'/'+data.candidate_avaible_count;
+                        },"name":"group_training.candidate_choise_count"
+                    },
                     {
                         "data": function (data, type, dataToSet) {
                             return data.last_name+' '+data.first_name;
@@ -1537,7 +1557,11 @@
                 },"columns": [
                     {"data": "training_date"},
                     {"data": "training_hour"},
-                    {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.candidate_choise_count+'/'+data.candidate_absent_count+'/'+data.candidate_avaible_count;
+                        },"name":"group_training.candidate_choise_count"
+                    },
                     {
                         "data": function (data, type, dataToSet) {
                             return data.last_name+' '+data.first_name;
@@ -1588,7 +1612,11 @@
                 },"columns": [
                     {"data": "training_date"},
                     {"data": "training_hour"},
-                    {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.candidate_choise_count+'/'+data.candidate_absent_count+'/'+data.candidate_avaible_count;
+                        },"name":"group_training.candidate_choise_count"
+                    },
                     {
                         "data": function (data, type, dataToSet) {
                             return data.last_name+' '+data.first_name;
