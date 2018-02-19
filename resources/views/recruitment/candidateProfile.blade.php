@@ -23,7 +23,16 @@
         text-align: left;
         vertical-align: middle;
       }
+      option {
+        font-size: 20px;
+      }
 </style>
+@php
+    $temp1 = $status_to_change->where('id', '=', 2);
+    $phone_call_status = $temp1[0]->attemptResult;
+    $temp2 = $status_to_change->where('id', '=', 17);
+    $interview_status = $temp2[2]->attemptResult;
+@endphp
 
 <div class="row">
     <div class="col-md-12">
@@ -433,9 +442,35 @@
                             <label class="myLabel">Wybierz etap rekrutacji:</label>
                             <select class="form-control" id="add_level_status">
                                 @foreach($status_to_change as $item)
-                                    <option style="font-size: 20px" value="{{$item->id}}">{{$item->name}}</option>
+                                    <option value="{{$item->id}}">{{$item->name}}</option>
                                 @endforeach
                             </select>
+                        </div>
+                        <div class="row" id="phone_call_status_div">
+                            <div class="col-md-12">
+                                <div class=form-group"">
+                                    <label class="myLabel">Wybierz status etapu:</label>
+                                    <select class="form-control" id="after_call">
+                                        <option>Wybierz</option> 
+                                        @foreach($phone_call_status as $item)
+                                            <option value="{{$item->id}}">{{$item->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="after_interview_div" style="display: none">
+                            <div class="col-md-12">
+                                <div class=form-group"">
+                                    <label class="myLabel">Wybierz status etapu:</label>
+                                    <select class="form-control" id="after_interview">
+                                        <option>Wybierz</option>
+                                        @foreach($interview_status as $item)
+                                            <option value="{{$item->id}}">{{$item->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="row" id="inverview_date_div" style="display:none;">
                             <div class="col-md-6">
@@ -583,8 +618,16 @@ $(document).ready(() => {
 
         if (add_level_status == 3) {
             $('#inverview_date_div').fadeIn(500);
-        } else {
+            $('#phone_call_status_div').fadeOut(500);      
+            $('#after_interview_div').fadeOut(500);      
+        } else if(add_level_status == 2) {
             $('#inverview_date_div').fadeOut(500);
+            $('#after_interview_div').fadeOut(500);
+            $('#phone_call_status_div').fadeIn(500);
+        } else if (add_level_status == 17) {
+            $('#phone_call_status_div').fadeOut(500);
+            $('#inverview_date_div').fadeOut(500);
+            $('#after_interview_div').fadeIn(500);
         }
     });
 
@@ -772,6 +815,8 @@ $(document).ready(() => {
         var candidate_id = $('#candidate_id').val();
         var add_level_status = $('#add_level_status').val();
         var add_level_comment = $('#add_level_comment').val();
+        var after_interview = $('#after_interview').val();
+        var after_call = $('#after_call').val();
 
         if (add_level_comment == '' || (add_level_comment.trim().length == 0)) {
             swal('Dodaj komentarz!')
@@ -793,6 +838,17 @@ $(document).ready(() => {
             var interview = null;
         }
 
+        //Jezeli jest to rozmowa telefoniczna
+        if (add_level_status == 2 && after_call == 'Wybierz') {
+            swal('Wybierz status etapu!');
+            return false;
+        }
+
+        //Jezeli jest to wynik romzowy kwalifikacyjnej
+        if (add_level_status == 17 && after_interview == 'Wybierz') {
+            swal('Wybierz status etapu!');
+            return false;
+        }
 
         $('#add_level_submit').prop('disabled', 'disabled');
 
@@ -806,7 +862,9 @@ $(document).ready(() => {
                 "candidate_id": candidate_id,
                 "add_level_status": add_level_status,
                 "add_level_comment": add_level_comment,
-                "interview": interview
+                "interview": interview,
+                "after_call": after_call,
+                "after_interview": after_interview
             },
             success: function (response) {
                 if (response == 1) {

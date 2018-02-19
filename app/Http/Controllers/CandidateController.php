@@ -199,7 +199,7 @@ class CandidateController extends Controller
     /**
      * Dodanie etapu rekrutacji 
      */
-    public function addStory($candidate_id, $attempt_id, $status, $comment) {
+    public function addStory($candidate_id, $attempt_id, $status, $comment, $attempt_result = null) {
         $newStory = new RecruitmentStory();
 
         $newStory->candidate_id = $candidate_id;
@@ -207,6 +207,7 @@ class CandidateController extends Controller
         $newStory->cadre_edit_id = Auth::user()->id;
         $newStory->recruitment_attempt_id = $attempt_id;
         $newStory->attempt_status_id = $status;
+        $newStory->attempt_result_id = $attempt_result;
         $newStory->comment = $comment;
         $newStory->created_at = date('Y-m-d H:i:s');
         $newStory->updated_at = date('Y-m-d H:i:s');
@@ -343,9 +344,19 @@ class CandidateController extends Controller
             }
 
             /**
+             * Sprawdzenie czy dodajemy rezultat dla danego statusu
+             */
+            if ($request->add_level_status == 2) {
+                $attempt_result = $request->after_call;
+            } elseif ($request->add_level_status == 17) {
+                $attempt_result = $request->after_interview;
+            } else {
+                $attempt_result = null;
+            }
+            /**
              * Dodanie etapu w tej rekrutacji
              */
-            $this->addStory($id, $recruitmentAttempt->id, $request->add_level_status, $request->add_level_comment);
+            $this->addStory($id, $recruitmentAttempt->id, $request->add_level_status, $request->add_level_comment, $attempt_result);
 
             if ($request->add_level_status == 3) {
                 $date_time = $request->interview;

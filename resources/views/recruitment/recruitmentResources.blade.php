@@ -9,9 +9,15 @@
         outline: none !important;
         box-shadow: none !important;
    }
-   .btn-info {
+    .btn-danger {
        width: 100%;
-   }
+    }
+    .btn-warning {
+        width: 100%;
+    }
+    .btn-info {
+        width: 100%;
+    }
 </style>
 
 <div class="row">
@@ -54,6 +60,71 @@
         </div>
     </div>
 </div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Administracja wynikami etapów
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <select class="form-control" id="selected_status">
+                            <option>Wybierz</option>
+                            @foreach($attempt_status as $item)
+                                <option value="{{$item->id}}">{{$item->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-warning" id="check_result">
+                            <span class="glyphicon glyphicon-ok"></span> Wybierz status
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-control" id="selected_result">
+                            <option>Wybierz</option>
+                            @foreach($attempt_results as $item)
+                                <option value="{{$item->id}}">{{$item->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-warning" id="add_result">
+                            <span class="glyphicon glyphicon-ok"></span> Dodaj rezultat
+                        </button>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-striped thead-inverse">
+                            <thead>
+                                <tr>
+                                    <th>Rezultat</th>
+                                    <th style="width: 20%">Usuń</th>
+                                </tr>
+                            </thead>
+                            <tbody id="status_result">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="alert alert-danger" id="no_results" style="display: none">
+                    Brak rezultatów dla danego etapu!
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@php
+    for($i = 1; $i <= 10; $i++) { 
+        echo "<br />";
+    }
+@endphp
 
 @endsection
 @section('script')
@@ -216,6 +287,118 @@ function deleteSource(e) {
     });
     //Reload danych
     getCandidateSource();
+}
+
+$('#check_result').click((e) => {
+    var selected_status = $('#selected_status').val();
+    
+    if (selected_status == 'Wybierz') {
+        swal('Wybierz etap!');
+        return false;
+    }
+
+    $('#status_result tr').remove();
+
+    $.ajax({
+        type: "POST",
+        url: '{{ route('api.getStatusResults') }}',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        data: {
+            "selected_status":selected_status
+        },
+        success: function (response) {
+            content = "";
+
+            $.each(response, function(key, value) {
+                content += `
+                    <tr>
+                        <td>${value.name}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="statusDelete(this)" data-id="${value.id}">
+                                <span></span> Usuń
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            $('#status_result').append(content);
+
+            if (content == '') {
+                $('#no_results').fadeIn(500);
+            } else {
+                $('#no_results').fadeOut(500);
+            }
+
+        }, error: function(response) {
+            swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
+        }
+    });
+});
+
+$('#add_result').click((e) => {
+    var selected_status = $('#selected_status').val();
+    var selected_result = $('#selected_result').val();
+
+    if (selected_status == 'Wybierz') {
+        swal('Wybierz etap!');
+        return false;
+    }
+
+    if (selected_result == 'Wybierz') {
+        swal('Wybierz rezultat!');
+        return false;
+    }
+
+    changeStatus('add', selected_status, selected_result);
+
+});
+
+function statusDelete(e) {
+    var selected_result = $(e).data('id');
+    var selected_status = $('#selected_status').val();
+
+    swal({
+        title: '',
+        text: "Usunąć?",
+        type: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Tak'
+        }).then((result) => {
+        if (result.value) {
+            changeStatus('delete', selected_status, selected_result);
+        }
+    })
+}
+
+function changeStatus(type, selected_status, selected_result) {
+    
+    $.ajax({
+        type: "POST",
+        url: '{{ route('api.statusResultChange') }}',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        data: {
+            "type":type,
+            "selected_status":selected_status,
+            "selected_result":selected_result
+        },
+        success: function (response) {
+            if (response == 'add') {
+                swal('Dodano pomyślnie!');
+            } else if (response == 'delete') {
+                swal('Usunięto pomyślnie!');
+            }
+            $('#check_result').click();
+        }, error: function(response) {
+            swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
+        }
+    });
 }
 
 </script>

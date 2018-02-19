@@ -26,6 +26,7 @@ Route::POST('/addAcceptHour','WorkHoursController@addAcceptHour')->name('api.add
 
 Route::POST('/uniqueUsername','UsersController@uniqueUsername')->name('api.uniqueUsername');
 Route::POST('/uniquerEmail','UsersController@uniqueEmail')->name('api.uniqueEmail');
+Route::POST('/uniquerEmailEdit','UsersController@uniquerEmailEdit')->name('api.uniquerEmailEdit');
 Route::POST('/uniquePBX','UsersController@uniquePBX')->name('api.uniquePBX');
 Route::POST('/datatableEmployeeManagement','UsersController@datatableEmployeeManagement')->name('api.datatableEmployeeManagement');
 
@@ -158,6 +159,9 @@ Route::POST('/datatableShowCandidates', 'CandidateController@datatableShowCandid
 Route::POST('/datatableShowCadreCandidates', 'CandidateController@datatableShowCadreCandidates')->name('api.datatableShowCadreCandidates');
 
 Route::POST('/myInterviews', 'RecruitmentAttemptController@myInterviews')->name('api.myInterviews');
+
+Route::POST('/getStatusResults', 'RecruitmentAttemptController@getStatusResults')->name('api.getStatusResults');
+Route::POST('/statusResultChange', 'RecruitmentAttemptController@statusResultChange')->name('api.statusResultChange');
 
 Route::POST('/recruiterData', 'RecruitmentAttemptController@recruiterData')->name('api.recruiterData');
 Route::POST('/trainerData', 'RecruitmentAttemptController@trainerData')->name('api.trainerData');

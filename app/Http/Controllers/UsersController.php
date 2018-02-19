@@ -436,4 +436,24 @@ class UsersController extends Controller
             return ($user > 0) ? 1 : 0 ;
         }
     }
+
+    /**
+     * Sprawdzenie czy email jest unikalny edycja
+     */
+    public function uniquerEmailEdit(Request $request) {
+        if ($request->ajax()) {
+            $email = $request->email;
+            $id = $request->user_id;
+
+            $check = User::where('email_off', '=', $email)->get();
+
+            if ($check->count() == 0) {
+                return 0;
+            } else if ($check->count() > 0 && $check[0]->id != $id) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+    }
 }
