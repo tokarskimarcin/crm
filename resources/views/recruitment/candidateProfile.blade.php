@@ -240,6 +240,30 @@
                         </div>
                     </div>
                 @endif
+
+                @if($candidate->attempt_status_id == 5)
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-3"></div>
+                            <div class="col-md-7">
+                                <div class="alert alert-danger" style="color: #616366; font-size: 15px;">
+                                    Data szkolenia:
+                                    <div id="training_date_input" style="display: initial;">
+                                        <b>{{$candidate->recruitment_attempt->where('status', '=', 0)->first()->training_date}}</b>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <button  class="btn btn-info" id="edit_training_date" style="width: 100%; padding: 15px">
+                                        <span class="glyphicon glyphicon-edit"></span> Edycja
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
             </div>
         </div>
     </div>
@@ -640,6 +664,12 @@ $(document).ready(() => {
         }
     });
 
+    // Edycja daty szkolenia
+    $('#edit_training_date').click(() => {
+        //
+        var input_div = $('#training_date_input b').remove();
+        input_div.append();
+    });
     $('#edit_submit').click(() => {
         var candidate_id = $('#candidate_id').val();
         var candidate_name = $('#candidate_name').val();
