@@ -240,6 +240,30 @@
                         </div>
                     </div>
                 @endif
+
+                @if($candidate->attempt_status_id == 5)
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-3"></div>
+                            <div class="col-md-7">
+                                <div class="alert alert-danger" style="color: #616366; font-size: 15px;">
+                                    Data szkolenia:
+                                    <div id="training_date_input" style="display: initial;">
+                                        <b>{{$candidate->recruitment_attempt->where('status', '=', 0)->first()->training_date}}</b>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <button  class="btn btn-info" id="edit_training_date" style="width: 100%; padding: 15px">
+                                        <span class="glyphicon glyphicon-edit"></span> Edycja
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
             </div>
         </div>
     </div>
@@ -524,6 +548,15 @@
                             <label class="myLabel">Komentarz:</label>
                             <textarea class="form-control" rows="5" placeholder="Dodaj komentarz..." id="add_training_comment"></textarea>
                         </div>
+
+                        <div class="form-group">
+                            <label class="myLabel">Data szkolenia</label>
+                            <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                <input class="form-control" id="training_date" name="training_date" type="text" value="{{date("Y-m-d")}}" >
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <button style="width: 100%" class="btn btn-warning" id="add_training_submit">
                                 <span class="glyphicon glyphicon-ok"></span> Zapisz na szkolenie
@@ -631,6 +664,12 @@ $(document).ready(() => {
         }
     });
 
+    // Edycja daty szkolenia
+    $('#edit_training_date').click(() => {
+        //
+        var input_div = $('#training_date_input b').remove();
+        input_div.append();
+    });
     $('#edit_submit').click(() => {
         var candidate_id = $('#candidate_id').val();
         var candidate_name = $('#candidate_name').val();
@@ -881,6 +920,7 @@ $(document).ready(() => {
 
     $('#add_training_submit').click(() => {
         var candidate_id = $('#candidate_id').val();
+        var date_training = $('#training_date').val();
         var add_training_comment = $('#add_training_comment').val();
 
         if (add_training_comment == '' || (add_training_comment.trim().length == 0)) {
@@ -899,7 +939,8 @@ $(document).ready(() => {
             data: {
                 "candidate_id": candidate_id,
                 "add_training_comment": add_training_comment,
-                "add_level_status": 5
+                "add_level_status": 5,
+                "date_training":date_training
             },
             success: function (response) {
                 if (response == 1) {
