@@ -199,9 +199,8 @@ class CandidateController extends Controller
     /**
      * Dodanie etapu rekrutacji 
      */
-    public function addStory($candidate_id, $attempt_id, $status, $comment, $attempt_result = null) {
+    public function addStory($candidate_id, $attempt_id, $status, $comment, $attempt_result = null,$date_training = null) {
         $newStory = new RecruitmentStory();
-
         $newStory->candidate_id = $candidate_id;
         $newStory->cadre_id = Auth::user()->id;
         $newStory->cadre_edit_id = Auth::user()->id;
@@ -211,15 +210,20 @@ class CandidateController extends Controller
         $newStory->comment = $comment;
         $newStory->created_at = date('Y-m-d H:i:s');
         $newStory->updated_at = date('Y-m-d H:i:s');
-
         $newStory->save();
 
+        $recruitment_attempt = RecruitmentAttempt::where('candidate_id','=',$candidate_id)
+            ->orderby('id','desc')
+            ->first();
+        $recruitment_attempt->training_date = $date_training;
+        $recruitment_attempt->save();
         $data = [
             'Dodanie etapu rekrutacji' => '',
             'Id kandydata' => $candidate_id,
             'Id rekrutacji' => $attempt_id,
             'Status rekrutacji' => $status,
-            'Komentarz' => $comment
+            'Komentarz' => $comment,
+            'Data Szkolenia' => $date_training
         ];
 
         //new ActivityRecorder(8, $data);
@@ -374,7 +378,9 @@ class CandidateController extends Controller
         if ($request->ajax()) {
             $id = $request->candidate_id;
 
-            $recruitmentAttempt = RecruitmentAttempt::where('candidate_id', '=', $id)->where('status', '=', 0)->first();
+            $recruitmentAttempt = RecruitmentAttempt::where('candidate_id', '=', $id)
+                            ->where('status', '=', 0)
+                            ->first();
 
             if ($recruitmentAttempt == null) {
                 return 0;
@@ -383,7 +389,8 @@ class CandidateController extends Controller
             /**
              * Dodanie etapu w tej rekrutacji
              */
-            $this->addStory($id, $recruitmentAttempt->id, $request->add_level_status, $request->add_training_comment);
+            $this
+                ->addStory($id, $recruitmentAttempt->id, $request->add_level_status, $request->add_training_comment,null,$request->date_training);
 
             return 1;
         }

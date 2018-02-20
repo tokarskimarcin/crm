@@ -524,6 +524,15 @@
                             <label class="myLabel">Komentarz:</label>
                             <textarea class="form-control" rows="5" placeholder="Dodaj komentarz..." id="add_training_comment"></textarea>
                         </div>
+
+                        <div class="form-group">
+                            <label class="myLabel">Data szkolenia</label>
+                            <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                <input class="form-control" id="training_date" name="training_date" type="text" value="{{date("Y-m-d")}}" >
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <button style="width: 100%" class="btn btn-warning" id="add_training_submit">
                                 <span class="glyphicon glyphicon-ok"></span> Zapisz na szkolenie
@@ -881,6 +890,7 @@ $(document).ready(() => {
 
     $('#add_training_submit').click(() => {
         var candidate_id = $('#candidate_id').val();
+        var date_training = $('#training_date').val();
         var add_training_comment = $('#add_training_comment').val();
 
         if (add_training_comment == '' || (add_training_comment.trim().length == 0)) {
@@ -899,7 +909,8 @@ $(document).ready(() => {
             data: {
                 "candidate_id": candidate_id,
                 "add_training_comment": add_training_comment,
-                "add_level_status": 5
+                "add_level_status": 5,
+                "date_training":date_training
             },
             success: function (response) {
                 if (response == 1) {
