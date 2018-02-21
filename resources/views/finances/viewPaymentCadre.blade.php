@@ -117,7 +117,7 @@
                                                                             </thead>
                                                                             <tbody>
 
-                                                                        @foreach($key as $item2)
+                                                                        @foreach($key->sortBy('dep_name') as $item2)
                                                                             @php
                                                                                     $student = ($item2->student == 0) ? "Nie" : "Tak";
                                                                                     $documents = ($item2->documents == 0) ? "Nie" : "Tak";
@@ -217,18 +217,94 @@
     @endif
 
 <script>
-
+    //colors
+    var bgcolorArray = [
+        '#51ff93',
+        '#d9ff1d',
+        '#ffc497',
+        '#F2B0B0',
+        '#8bd9ba',
+        '#00d65b',
+        '#C6BD0B',
+        '#F2EDB0',
+        '#B0F2EA',
+        '#C1D1F2',
+        '#E9DCF2',
+        '#DCF2E7',
+        '#00d5d1',
+        '#42df00'];
+    var addCount = 14;
     $(document).ready(function() {
         $('thead > tr> th').css({ 'min-width': '1px', 'max-width': '100px' });
+
         table = $('#datatable1').DataTable({
             dom: 'Bfrtip',
             buttons: [
                 {
                     extend: 'excelHtml5',
-                    title: 'Umowy Szkoleniowe'
+                    title: 'Umowy Szkoleniowe Kadra',
+                    customize: function( xlsx ) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        var styles = xlsx.xl['styles.xml'];
+
+
+                        var fillscount = +$('fills', styles).attr('count');
+                        $('fills', styles).attr('count', addCount + fillscount + '');
+                        var cellXfscount = +$('cellXfs', styles).attr('count');
+                        $('cellXfs', styles).attr('count', addCount + cellXfscount + '');
+
+
+                        var fills = $('fills', styles)[0];
+                        var cellXfs = $('cellXfs', styles)[0];
+                        var namespace = styles.lookupNamespaceURI(null);
+
+
+                        for (var i = 0; i < bgcolorArray.length; i++)
+                        {
+                            var bgcolor = bgcolorArray[i];
+                            var fill = styles.createElementNS(namespace, 'fill');
+                            var patternFill = styles.createElementNS(namespace, 'patternFill');
+                            patternFill.setAttribute("patternType", "solid");
+                            var fgColor = styles.createElementNS(namespace, 'fgColor');
+                            fgColor.setAttribute("rgb", bgcolor.substring(1));
+                            var bgColor = styles.createElementNS(namespace, 'bgColor');
+                            bgColor.setAttribute("indexed", "64");
+                            patternFill.appendChild(fgColor);
+                            patternFill.appendChild(bgColor);
+                            fill.appendChild(patternFill);
+                            fills.appendChild(fill);
+
+                            var xf = styles.createElementNS(namespace, 'xf');
+                            xf.setAttribute("numFmtId", "0");
+                            xf.setAttribute("fontId", "0");
+                            xf.setAttribute("fillId", "" + (fillscount + i));
+                            xf.setAttribute("borderId", "0");
+                            xf.setAttribute("applyFont", "1");
+                            xf.setAttribute("applyFill", "1");
+                            xf.setAttribute("applyBorder", "1");
+                            cellXfs.appendChild(xf);
+                        }
+                        $('row c[r^="E"]', sheet).each( function (key,value) {
+                            if($('is t', this).text() != 'Całość na konto')
+                            {
+                                var text = $('is t', this).context.textContent;
+                                    for(var l=0;l<departments.length;l++)
+                                    {
+                                        if(departments[l].dep_name+" "+departments[l].dep_type == text)
+                                        {
+                                            let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                            row_number = row_number.substring(1);
+                                            $('row:nth-child('+row_number+') c', sheet).attr('s', (cellXfscount + departments[l].id) + '');
+                                        }
+                                    }
+                                }
+                        });
+                        $('row:nth-child(2) c', sheet).attr( 's', '42' );
+                        $('row:first c', sheet).attr( 's', '51','1','2' );
+                        $('row:last c', sheet).attr( 's', '2' );
+                    }
                 }
             ],
-            responsive: true,
             "autoWidth": false,
             "searching": false,
             "ordering": false,
@@ -240,7 +316,67 @@
             buttons: [
                 {
                     extend: 'excelHtml5',
-                    title: 'APT Job Center Service'
+                    title: 'APT Job Center Service Kadra',
+                    customize: function( xlsx ) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        var styles = xlsx.xl['styles.xml'];
+
+
+                        var fillscount = +$('fills', styles).attr('count');
+                        $('fills', styles).attr('count', addCount + fillscount + '');
+                        var cellXfscount = +$('cellXfs', styles).attr('count');
+                        $('cellXfs', styles).attr('count', addCount + cellXfscount + '');
+
+
+                        var fills = $('fills', styles)[0];
+                        var cellXfs = $('cellXfs', styles)[0];
+                        var namespace = styles.lookupNamespaceURI(null);
+
+
+                        for (var i = 0; i < bgcolorArray.length; i++)
+                        {
+                            var bgcolor = bgcolorArray[i];
+                            var fill = styles.createElementNS(namespace, 'fill');
+                            var patternFill = styles.createElementNS(namespace, 'patternFill');
+                            patternFill.setAttribute("patternType", "solid");
+                            var fgColor = styles.createElementNS(namespace, 'fgColor');
+                            fgColor.setAttribute("rgb", bgcolor.substring(1));
+                            var bgColor = styles.createElementNS(namespace, 'bgColor');
+                            bgColor.setAttribute("indexed", "64");
+                            patternFill.appendChild(fgColor);
+                            patternFill.appendChild(bgColor);
+                            fill.appendChild(patternFill);
+                            fills.appendChild(fill);
+
+                            var xf = styles.createElementNS(namespace, 'xf');
+                            xf.setAttribute("numFmtId", "0");
+                            xf.setAttribute("fontId", "0");
+                            xf.setAttribute("fillId", "" + (fillscount + i));
+                            xf.setAttribute("borderId", "0");
+                            xf.setAttribute("applyFont", "1");
+                            xf.setAttribute("applyFill", "1");
+                            xf.setAttribute("applyBorder", "1");
+                            cellXfs.appendChild(xf);
+                        }
+                        $('row c[r^="E"]', sheet).each( function (key,value) {
+                            if($('is t', this).text() != 'Całość na konto')
+                            {
+                                var text = $('is t', this).context.textContent;
+                                for(var l=0;l<departments.length;l++)
+                                {
+                                    if(departments[l].dep_name+" "+departments[l].dep_type == text)
+                                    {
+                                        let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                        row_number = row_number.substring(1);
+                                        $('row:nth-child('+row_number+') c', sheet).attr('s', (cellXfscount + departments[l].id) + '');
+                                    }
+                                }
+                            }
+                        });
+                        $('row:nth-child(2) c', sheet).attr( 's', '42' );
+                        $('row:first c', sheet).attr( 's', '51','1','2' );
+                        $('row:last c', sheet).attr( 's', '2' );
+                    }
                 }
             ],
             "autoWidth": false,
@@ -254,7 +390,67 @@
             buttons: [
                 {
                     extend: 'excelHtml5',
-                    title: 'Fruit Garden'
+                    title: 'Fruit Garden Kadra',
+                    customize: function( xlsx ) {
+                    var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                    var styles = xlsx.xl['styles.xml'];
+
+
+                    var fillscount = +$('fills', styles).attr('count');
+                    $('fills', styles).attr('count', addCount + fillscount + '');
+                    var cellXfscount = +$('cellXfs', styles).attr('count');
+                    $('cellXfs', styles).attr('count', addCount + cellXfscount + '');
+
+
+                    var fills = $('fills', styles)[0];
+                    var cellXfs = $('cellXfs', styles)[0];
+                    var namespace = styles.lookupNamespaceURI(null);
+
+
+                    for (var i = 0; i < bgcolorArray.length; i++)
+                    {
+                        var bgcolor = bgcolorArray[i];
+                        var fill = styles.createElementNS(namespace, 'fill');
+                        var patternFill = styles.createElementNS(namespace, 'patternFill');
+                        patternFill.setAttribute("patternType", "solid");
+                        var fgColor = styles.createElementNS(namespace, 'fgColor');
+                        fgColor.setAttribute("rgb", bgcolor.substring(1));
+                        var bgColor = styles.createElementNS(namespace, 'bgColor');
+                        bgColor.setAttribute("indexed", "64");
+                        patternFill.appendChild(fgColor);
+                        patternFill.appendChild(bgColor);
+                        fill.appendChild(patternFill);
+                        fills.appendChild(fill);
+
+                        var xf = styles.createElementNS(namespace, 'xf');
+                        xf.setAttribute("numFmtId", "0");
+                        xf.setAttribute("fontId", "0");
+                        xf.setAttribute("fillId", "" + (fillscount + i));
+                        xf.setAttribute("borderId", "0");
+                        xf.setAttribute("applyFont", "1");
+                        xf.setAttribute("applyFill", "1");
+                        xf.setAttribute("applyBorder", "1");
+                        cellXfs.appendChild(xf);
+                    }
+                    $('row c[r^="E"]', sheet).each( function (key,value) {
+                        if($('is t', this).text() != 'Całość na konto')
+                        {
+                            var text = $('is t', this).context.textContent;
+                            for(var l=0;l<departments.length;l++)
+                            {
+                                if(departments[l].dep_name+" "+departments[l].dep_type == text)
+                                {
+                                    let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                    row_number = row_number.substring(1);
+                                    $('row:nth-child('+row_number+') c', sheet).attr('s', (cellXfscount + departments[l].id) + '');
+                                }
+                            }
+                        }
+                    });
+                    $('row:nth-child(2) c', sheet).attr( 's', '42' );
+                    $('row:first c', sheet).attr( 's', '51','1','2' );
+                    $('row:last c', sheet).attr( 's', '2' );
+                }
                 }
             ],
             "autoWidth": false,
@@ -268,7 +464,66 @@
             buttons: [
                 {
                     extend: 'excelHtml5',
-                    title: 'Fruit Garden'
+                    title: 'Fruit Garden', customize: function( xlsx ) {
+                    var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                    var styles = xlsx.xl['styles.xml'];
+
+
+                    var fillscount = +$('fills', styles).attr('count');
+                    $('fills', styles).attr('count', addCount + fillscount + '');
+                    var cellXfscount = +$('cellXfs', styles).attr('count');
+                    $('cellXfs', styles).attr('count', addCount + cellXfscount + '');
+
+
+                    var fills = $('fills', styles)[0];
+                    var cellXfs = $('cellXfs', styles)[0];
+                    var namespace = styles.lookupNamespaceURI(null);
+
+
+                    for (var i = 0; i < bgcolorArray.length; i++)
+                    {
+                        var bgcolor = bgcolorArray[i];
+                        var fill = styles.createElementNS(namespace, 'fill');
+                        var patternFill = styles.createElementNS(namespace, 'patternFill');
+                        patternFill.setAttribute("patternType", "solid");
+                        var fgColor = styles.createElementNS(namespace, 'fgColor');
+                        fgColor.setAttribute("rgb", bgcolor.substring(1));
+                        var bgColor = styles.createElementNS(namespace, 'bgColor');
+                        bgColor.setAttribute("indexed", "64");
+                        patternFill.appendChild(fgColor);
+                        patternFill.appendChild(bgColor);
+                        fill.appendChild(patternFill);
+                        fills.appendChild(fill);
+
+                        var xf = styles.createElementNS(namespace, 'xf');
+                        xf.setAttribute("numFmtId", "0");
+                        xf.setAttribute("fontId", "0");
+                        xf.setAttribute("fillId", "" + (fillscount + i));
+                        xf.setAttribute("borderId", "0");
+                        xf.setAttribute("applyFont", "1");
+                        xf.setAttribute("applyFill", "1");
+                        xf.setAttribute("applyBorder", "1");
+                        cellXfs.appendChild(xf);
+                    }
+                    $('row c[r^="E"]', sheet).each( function (key,value) {
+                        if($('is t', this).text() != 'Całość na konto')
+                        {
+                            var text = $('is t', this).context.textContent;
+                            for(var l=0;l<departments.length;l++)
+                            {
+                                if(departments[l].dep_name+" "+departments[l].dep_type == text)
+                                {
+                                    let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                    row_number = row_number.substring(1);
+                                    $('row:nth-child('+row_number+') c', sheet).attr('s', (cellXfscount + departments[l].id) + '');
+                                }
+                            }
+                        }
+                    });
+                    $('row:nth-child(2) c', sheet).attr( 's', '42' );
+                    $('row:first c', sheet).attr( 's', '51','1','2' );
+                    $('row:last c', sheet).attr( 's', '2' );
+                }
                 }
             ],
             "autoWidth": false,
