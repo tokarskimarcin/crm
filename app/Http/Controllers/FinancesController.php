@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Agencies;
 use App\Department_info;
 use App\Department_types;
+use App\Departments;
 use App\JankyPenatlyProc;
 use App\PenaltyBonus;
 use App\SummaryPayment;
@@ -33,7 +34,6 @@ class FinancesController extends Controller
         $agencies = Agencies::all();
         $salary = DB::table(DB::raw("users"))
             ->whereNotIn('users.user_type_id',[1,2,14])
-            ->where('users.agency_id', '!=', 4)
             ->where('users.salary','>',0)
             ->selectRaw('
             `users`.`id`,
@@ -184,11 +184,13 @@ class FinancesController extends Controller
                 }
             }
         }
+        $departments = Departments::all();
 
         return view('finances.viewPaymentCadre')
             ->with('month',$date_to_post)
             ->with('salary',$salary->groupby('agency_id'))
-            ->with('agencies',$agencies);
+            ->with('agencies',$agencies)
+            ->with('departments',$departments);
     }
 
     public function viewPaymentPOST(Request $request)

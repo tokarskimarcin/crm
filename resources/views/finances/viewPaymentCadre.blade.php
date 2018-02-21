@@ -196,6 +196,8 @@
                 var rbh_total = <?php echo json_encode($rbh_total); ?>;
                 var month = <?php echo json_encode($month); ?>;
                 var user_total = <?php echo json_encode($users_total); ?>;
+                var departments = <?php echo json_encode($departments); ?>;
+                console.log(departments);
                 $.ajax({
                     type: "POST",
                     url: '{{ route('api.summary_payment_save') }}',
@@ -215,6 +217,7 @@
     @endif
 
 <script>
+
     $(document).ready(function() {
         $('thead > tr> th').css({ 'min-width': '1px', 'max-width': '100px' });
         table = $('#datatable1').DataTable({
@@ -247,6 +250,20 @@
             "bInfo": false,
         });
         table3 = $('#datatable3').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    title: 'Fruit Garden'
+                }
+            ],
+            "autoWidth": false,
+            "searching": false,
+            "ordering": false,
+            "paging": false,
+            "bInfo": false,
+        });
+        table4 = $('#datatable4').DataTable({
             dom: 'Bfrtip',
             buttons: [
                 {
