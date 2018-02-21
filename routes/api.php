@@ -24,3 +24,8 @@ use App\User;
 Route::get('userApi/{id}', function($id) {
     return User::find($id);
 });
+Route::get('getMedicalScan/{name}', function($name){
+    //return 1;
+    $path = storage_path('app/medicalscan/' . $name);
+    return response()->download($path);
+});
