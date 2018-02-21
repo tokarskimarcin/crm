@@ -184,7 +184,15 @@ class FinancesController extends Controller
                 }
             }
         }
-        $departments = Departments::all();
+
+        /**
+         *  Pobranie informacji o departamentach
+         */
+        $departments = DB::table('department_info')
+            ->select(DB::raw('department_info.id as id,departments.name as dep_name,department_type.name as dep_type'))
+            ->join('departments','departments.id','department_info.id_dep')
+            ->join('department_type','department_type.id','department_info.id_dep_type')
+            ->get();
 
         return view('finances.viewPaymentCadre')
             ->with('month',$date_to_post)
