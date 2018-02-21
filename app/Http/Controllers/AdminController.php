@@ -240,6 +240,25 @@ class AdminController extends Controller
             $departments->desc = $request->desc;
             $departments->save();
 
+            if($request->type != 'Wybierz' && $selected_department->type != 'Badania/Wysyłka')
+            {
+                if($selected_department->type != $request->type){
+                    if( $request->type == 'Badania'){
+                        //dd(1);
+                        DB::table('users')
+                            ->where('department_info_id',$request->selected_department_info_id)
+                            ->where('user_type_id',1)
+                            ->update(['dating_type' => 0]);
+                    }else{
+                        //dd(2);
+                        DB::table('users')
+                            ->where('department_info_id',$request->selected_department_info_id)
+                            ->where('user_type_id',1)
+                            ->update(['dating_type' => 1]);
+                    }
+                }
+            }
+
             $selected_department->size = ($request->size != null) ? $request->size : 0 ;
             $selected_department->commission_avg = ($request->commission_avg) ? $request->commission_avg : 0 ;
             $selected_department->commission_hour = ($request->commission_hour) ? $request->commission_hour : 0 ;
@@ -251,7 +270,6 @@ class AdminController extends Controller
             $selected_department->type = ($request->type != 'Wybierz') ? $request->type : '' ;
             $selected_department->janky_system_id = ($request->janky_system_id) ? $request->janky_system_id : 0 ;
             $selected_department->pbx_id = ($request->pbx_id != null) ? $request->pbx_id : 0 ;
-
             $selected_department->save();
         }
 
