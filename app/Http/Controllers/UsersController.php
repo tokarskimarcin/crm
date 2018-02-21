@@ -438,7 +438,8 @@ class UsersController extends Controller
      */
     public function uniquePBX(Request $request) {
         if ($request->ajax()) {
-            $user = User::where('login_phone', '=', $request->login_phone)->count();
+            $user = User::where('login_phone', '=', $request->login_phone)
+                ->where('status_work','=','1')->count();
 
             return ($user > 0) ? 1 : 0 ;
         }
