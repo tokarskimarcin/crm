@@ -249,13 +249,17 @@
                                 <div class="alert alert-danger" style="color: #616366; font-size: 15px;">
                                     Data szkolenia:
                                     <div id="training_date_input" style="display: initial;">
-                                        <b>{{$candidate->recruitment_attempt->where('status', '=', 0)->first()->training_date}}</b>
+                                        <b id="training_date_edit_old_date">{{$candidate->recruitment_attempt->where('status', '=', 0)->first()->training_date}}</b>
+                                        <div id="training_date_edit_new_date" class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width: 100%; display: none;">
+                                            <input class="form-control" id="training_date_edit" name="training_date_edit" type="text" value="{{$candidate->recruitment_attempt->where('status', '=', 0)->first()->training_date}}" disabled>
+                                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <button  class="btn btn-info" id="edit_training_date" style="width: 100%; padding: 15px">
+                                    <button  class="btn btn-info" id="edit_training_date_button" style="width: 100%; padding: 15px">
                                         <span class="glyphicon glyphicon-edit"></span> Edycja
                                     </button>
                                 </div>
@@ -579,7 +583,10 @@
 <script>
 
     var ex_id_user = '{{$candidate->id_user}}';
-
+    //ilość kiliknięć edycji szkolenia
+    var click = 0;
+    //zapisanie daty szkolenia
+    var input_div_text = '';
 $('.form_date').datetimepicker({
     language: 'pl',
     autoclose: 1,
@@ -665,10 +672,37 @@ $(document).ready(() => {
     });
 
     // Edycja daty szkolenia
-    $('#edit_training_date').click(() => {
-        //
-        var input_div = $('#training_date_input b').remove();
-        input_div.append();
+    $('#edit_training_date_button').click(() => {
+        // gdy została kliknięta edycja przycisku
+
+        if(click == 0){
+            $('#training_date_edit_old_date').hide();
+            $('#training_date_edit_new_date').show();
+            $('#edit_training_date_button').html('<span class="glyphicon glyphicon-edit"></span> Zapisz');
+            click++;
+        }else{
+            //Edycja daty szkolenia
+            var training_date = $('#training_date_edit').val();
+            $.ajax({
+                type: "POST",
+                url: '{{ route('api.editTrainingDate') }}',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    "training_date": training_date,
+                    "candidate_id": $('#candidate_id').val()
+                },
+                success: function (response) {
+                    console.log(response);
+                    $('#training_date_edit_old_date').text(training_date);
+                    $('#training_date_edit_old_date').show();
+                    $('#training_date_edit_new_date').hide();
+                    $('#edit_training_date_button').html('<span class="glyphicon glyphicon-edit"></span> Edycja');
+                    click--;
+                }
+            });
+        }
     });
     $('#edit_submit').click(() => {
         var candidate_id = $('#candidate_id').val();

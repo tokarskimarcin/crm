@@ -8,6 +8,7 @@ use App\AttemptStatus;
 use App\Candidate;
 use App\CandidateTraining;
 use App\GroupTraining;
+use App\RecruitmentAttempt;
 use App\RecruitmentStory;
 use App\User;
 use Illuminate\Http\Request;
@@ -249,12 +250,9 @@ class GroupTrainingController extends Controller
                 $candidate_avaible = Candidate::whereIn('attempt_status_id',[12])
                     ->where('department_info_id','=',Auth::user()->department_info_id)->get()
                     ->toArray();
-
                 // pobernie statusów dla zakończonego etapu 2
                 $attempt_result = AttemptStatus::find(7)->attemptResult;
             }
-
-
             $candidate_choice = DB::table('candidate')
                 ->select(DB::raw('
                 candidate.*,
@@ -267,18 +265,30 @@ class GroupTrainingController extends Controller
                 ->leftjoin('recruitment_story', 'recruitment_story.id', 'candidate_training.completed_training')
                 ->join('group_training', 'group_training.id', 'candidate_training.training_id')
                 ->where('group_training.id','=',$request->id_training_group)
-                ->get()->toArray();
+                ->get()
+                ->toArray();
 
             if($request->cancel_candidate == 1 || $request->cancel_candidate == 2 )
             {
                 $merge_array = $candidate_choice;
             }else
                 $merge_array = array_merge($candidate_choice,$candidate_avaible);
-
             $object_array['group_training'] = $group_training ;
             $object_array['candidate'] = $merge_array ;
             $object_array['attempt_status'] = $attempt_result;
             return $object_array;
+        }
+    }
+
+    public function editTrainingDate(Request $request)
+    {
+        if($request->ajax())
+        {
+            RecruitmentAttempt::
+            where('candidate_id','=',$request->candidate_id)
+            ->where('status','=',0)
+            ->update(['training_date' => $request->training_date]);
+            return 1;
         }
     }
     public function saveGroupTraining (Request $request)
