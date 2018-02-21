@@ -228,6 +228,7 @@
         '#C6BD0B',
         '#F2EDB0',
         '#B0F2EA',
+        '#e2f2de',
         '#C1D1F2',
         '#E9DCF2',
         '#DCF2E7',
