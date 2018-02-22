@@ -334,12 +334,12 @@
                 <div class="panel-body">
                     <div class="row">
                         <ul class="nav nav-tabs" style="margin-bottom: 25px">
-                            <li class="active"><a data-toggle="tab" href="#home">Dostępne (Etap 1)</a></li>
-                            <li><a data-toggle="tab" href="#menu1">Zakończone (Etap 1)</a></li>
-                            <li><a data-toggle="tab" href="#menu2">Usuniete (Etap 1)</a></li>
-                            <li><a data-toggle="tab" href="#menu3">Dostępne (Etap 2)</a></li>
-                            <li><a data-toggle="tab" href="#menu4">Zakończone (Etap 2)</a></li>
-                            <li><a data-toggle="tab" href="#menu5">Usuniete (Etap 2)</a></li>
+                            <li class="active"><a data-toggle="tab" href="#home" id="#home">Dostępne (Etap 1)</a></li>
+                            <li><a data-toggle="tab" href="#menu1" id="#menu1">Zakończone (Etap 1)</a></li>
+                            <li><a data-toggle="tab" href="#menu2" id="#menu2">Usuniete (Etap 1)</a></li>
+                            <li><a data-toggle="tab" href="#menu3" id="#menu3">Dostępne (Etap 2)</a></li>
+                            <li><a data-toggle="tab" href="#menu4" id="#menu4">Zakończone (Etap 2)</a></li>
+                            <li><a data-toggle="tab" href="#menu5" id="#menu5">Usuniete (Etap 2)</a></li>
                         </ul>
                         <div class="tab-content">
                             <div id="home" class="tab-pane fade in active">
@@ -351,7 +351,7 @@
                                                 <tr>
                                                     <td>Data</td>
                                                     <td>Godzina</td>
-                                                    <td>Liczba osób</td>
+                                                    <td>Liczba osób <br> (Obecne/Nieobecne/Dostępne)</td>
                                                     <td>Osoba Prowadząca</td>
                                                     <td>Akcja</td>
                                                 </tr>
@@ -373,7 +373,7 @@
                                                 <tr>
                                                     <td>Data</td>
                                                     <td>Godzina</td>
-                                                    <td>Liczba osób</td>
+                                                    <td>Liczba osób <br> (Obecne/Nieobecne/Dostępne)</td>
                                                     <td>Osoba Prowadząca</td>
                                                     <td>Akcja</td>
                                                 </tr>
@@ -394,7 +394,7 @@
                                                 <tr>
                                                     <td>Data</td>
                                                     <td>Godzina</td>
-                                                    <td>Liczba osób</td>
+                                                    <td>Liczba osób <br> (Obecne/Nieobecne/Dostępne)</td>
                                                     <td>Usunieto przez</td>
                                                     <td>Akcja</td>
                                                 </tr>
@@ -417,7 +417,7 @@
                                                 <tr>
                                                     <td>Data</td>
                                                     <td>Godzina</td>
-                                                    <td>Liczba osób</td>
+                                                    <td>Liczba osób <br> (Obecne/Nieobecne/Dostępne)</td>
                                                     <td>Osoba Prowadząca</td>
                                                     <td>Akcja</td>
                                                 </tr>
@@ -439,7 +439,7 @@
                                                 <tr>
                                                     <td>Data</td>
                                                     <td>Godzina</td>
-                                                    <td>Liczba osób</td>
+                                                    <td>Liczba osób <br> (Obecne/Nieobecne/Dostępne)</td>
                                                     <td>Osoba Prowadząca</td>
                                                     <td>Akcja</td>
                                                 </tr>
@@ -462,7 +462,7 @@
                                                 <tr>
                                                     <td>Data</td>
                                                     <td>Godzina</td>
-                                                    <td>Liczba osób</td>
+                                                    <td>Liczba osób <br> (Obecne/Nieobecne/Dostępne)</td>
                                                     <td>Usunieto przez</td>
                                                     <td>Akcja</td>
                                                 </tr>
@@ -494,7 +494,7 @@
         var id_training_group = 0;
         var training_group_response;
         var is_open = 0;
-        var cancel_candidate = 0;
+        var cancel_candidate = 0; // 1- usuniete szkolenie, 2 - zakończone szkolenie, 0 brak stanu nowe
         var saving_type = 1; // 1 - nowy wpis, 0 - edycja
         // wybrany etap szkolenia
         var actual_stage = 0;
@@ -508,7 +508,7 @@
             '<a class="btn btn-default cancle_active" style="width:106px" data-id ={{1}} href="#">'+
             '<span style="color: green" class="glyphicon glyphicon glyphicon-trash"></span> Usuń'+
             '</a>';
-
+        var first_load = true;
         var action_row_end_cancel =
             '<a class="btn btn-default info_cancel" href="#">'+
             '<span style="color: green" class="glyphicon glyphicon glyphicon-info-sign"></span> Szczegóły'+
@@ -689,6 +689,7 @@
             return myObjects;
         }
         $(document).ready(function() {
+
             $('.form_date').datetimepicker({
                 language: 'pl',
                 autoclose: 1,
@@ -732,7 +733,7 @@
                     $('#list_candidate_choice a').each(function (key, value) {
                         choice_candidate.push(value.id) ;
                     });
-
+                    //Kandydaci nieobecni
                     $('#list_candidate_choice_absent a').each(function (key,value) {
                         choice_candidate_ansent.push(value.id);
                     });
@@ -756,7 +757,6 @@
                             "choice_candidate_ansent":choice_candidate_ansent
                         },
                         success: function (response) {
-                            console.log(actual_stage)
                             if(response == 1)
                             {
                                 $('#myModalgroup').modal('hide');
@@ -768,11 +768,15 @@
                                     $('#succes_edit_training').fadeIn(1000);
                                     $('#succes_edit_training').delay(3000).fadeOut(1000);
                                 }
-
-
                                 $("#save_button").attr('disabled', false);
                                 table_activ_training_group.ajax.reload();
                                 activ_training_group_stage2.ajax.reload();
+                                if(actual_stage == 1){
+                                    console.log(1);
+                                    $('.nav-tabs a[href="#home"]').tab('show');
+                                }else if(actual_stage == 2){
+                                    $('.nav-tabs a[href="#menu3"]').tab('show');
+                                }
                             }else if(response == 0){
                                 swal('Wystąpił problem z zapise, skontaktuj się z administratorem !!')
                             }
@@ -826,8 +830,10 @@
                 if(stage_name == 'training_to_modal_stage2')
                 {
                     actual_stage = 2;
+                    $('.nav-tabs a[href="#menu3"]').tab('show');
                 }else{
                     actual_stage = 1;
+                    $('.nav-tabs a[href="#home"]').tab('show');
                 }
             });
 
@@ -926,6 +932,10 @@
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                 })
             });
+            $("input[name='start_date_training']").on('change',function (e) {
+                clearLeftColumn();
+                getGroupTrainingInfo();
+            });
             // open modal
             $('#myModalgroup').on('show.bs.modal', function(e) {
 
@@ -980,7 +990,7 @@
                 $("#id_user").prop("selectedIndex", 0);
                 $("#training_comment").val("");
             }
-            // pobranie danych o szkoleniu
+            // pobranie danych o szkoleniu nowym gdy id_training_group  == 0 lub istniejącym != 0
             function getGroupTrainingInfo() {
                 // gdy tworzone jest nowe szkolenie
                 if(id_training_group == 0){
@@ -990,9 +1000,12 @@
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
-                        data: {'training_stage': actual_stage},
-
+                        data: {
+                            'training_stage': actual_stage,
+                            'date_training': $("input[name='start_date_training']").val()
+                        },
                         success: function (response) {
+                            console.log(response);
                             if (response.length != 0) {
                                 for (var i = 0; i < response.length; i++) {
                                     var html = '<a class="list-group-item nocheck" onclick = "onclickRowLeft(this)" id=' + response[i].id + '>' +
@@ -1016,6 +1029,7 @@
                         },
                         data: {
                             "id_training_group": id_training_group,
+                            'date_training': $("input[name='start_date_training']").val(),
                             "cancel_candidate": cancel_candidate,
                             'training_stage': actual_stage
                         },
@@ -1026,10 +1040,16 @@
                             $('#candidate_end_training_decision tr').remove();
                             if (response.length != 0) {
                                 for (var i = 0; i < response['group_training'].length; i++) {
-                                    $("input[name='start_date_training']").val(response['group_training'][i].training_date);
-                                    $("input[id='start_time_training']").val(response['group_training'][i].training_hour.slice(0, -3));
-                                    $("#id_user").val(response['group_training'][i].leader_id);
-                                    $("#training_comment").val(response['group_training'][i].comment);
+                                    // pobranie danych przy pierwszym otworzeniu modala, poźniej pomijaj ten etap.
+                                    if(first_load == true)
+                                    {
+                                        $("input[name='start_date_training']").val(response['group_training'][i].training_date);
+                                        $("input[id='start_time_training']").val(response['group_training'][i].training_hour.slice(0, -3));
+                                        $("#id_user").val(response['group_training'][i].leader_id);
+                                        $("#training_comment").val(response['group_training'][i].comment);
+                                        first_load = false;
+                                    }
+
                                 }
                                 for (var i = 0; i < response['candidate'].length; i++) {
                                                             //ETAP 1
@@ -1058,7 +1078,7 @@
                                             '<input type="checkbox" class="pull-right" style="display: block">' +
                                             '</a>';
                                         $('#list_candidate_choice').append(html);
-                                    }else if (response['candidate'][i].attempt_status_id == 18  && cancel_candidate == 0) {
+                                    }else if ((response['candidate'][i].attempt_status_id == 18 ||response['candidate'][i].attempt_status_id == 19 )  && cancel_candidate == 0) {
                                         var html = '<a class="list-group-item nocheck" onclick = "onclickRowRight(this)" id=' + response['candidate'][i].id + '>' +
                                             response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
                                             '<input type="checkbox" class="pull-right" style="display: block">' +
@@ -1154,6 +1174,9 @@
                 $('#hidden_content_time').css({"display":"none"});
                 $('.input-group-addon').show();
                 $('.hidden_content').hide();
+                // pierwsze otworzenie modala
+                first_load = true;
+                // id szkolenia
                 id_training_group = 0;
                 clearModalBasicInfo();
                 clearLeftColumn();
@@ -1170,6 +1193,7 @@
 
             //tabela dostępnych szkoleń
             var table_activ_training_group = $('#activ_training_group').DataTable({
+                "order": [[ 0, "desc" ]],
                 "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
@@ -1267,6 +1291,9 @@
                                             table_end_training_group_stage2.ajax.reload();
                                             table_cancel_training_group_stage2.ajax.reload();
 
+                                            //przekierowanie do zakłądki z zakończonymi szkoleniami
+                                            // etap 1
+                                            $('.nav-tabs a[href="#menu1"]').tab('show');
                                         }
                                     }
                                 });
@@ -1308,6 +1335,10 @@
                                         $('#succes_delete_training').delay(3000).fadeOut(1000);
                                         table_activ_training_group.ajax.reload();
                                         table_cancel_training_group.ajax.reload();
+
+                                        //przekierowanie do zakłądki z usunietymi szkoleniami
+                                        // etap 1
+                                        $('.nav-tabs a[href="#menu2"]').tab('show');
                                     }
                                 }
                             });
@@ -1322,6 +1353,7 @@
             });
             // tabela zakończonych szkoleń
             var table_end_training_group = $('#end_training_group').DataTable({
+                "order": [[ 0, "desc" ]],
                 "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
@@ -1376,6 +1408,7 @@
             });
             // tabela skaswoanych szkoleń
             var table_cancel_training_group = $('#cancel_training_group').DataTable({
+                "order": [[ 0, "desc" ]],
                 "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
@@ -1430,6 +1463,7 @@
             // Dostępne szkolenia etapu 2
 
             var activ_training_group_stage2 =$('#activ_training_group_stage2').DataTable({
+                "order": [[ 0, "desc" ]],
                 "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
@@ -1523,6 +1557,9 @@
                                         activ_training_group_stage2.ajax.reload();
                                         table_end_training_group_stage2.ajax.reload();
                                         table_cancel_training_group_stage2.ajax.reload();
+                                        //przekierowanie do zakłądki z zakończonymi szkoleniami
+                                        // etap 2
+                                        $('.nav-tabs a[href="#menu4"]').tab('show');
                                     }
                                 }
                             });
@@ -1567,6 +1604,10 @@
 
                                         activ_training_group_stage2.ajax.reload();
                                         table_cancel_training_group_stage2.ajax.reload();
+
+                                        //przekierowanie do zakłądki z usuniętymi szkoleniami
+                                        // etap 2
+                                        $('.nav-tabs a[href="#menu5"]').tab('show');
                                     }
                                 }
                             });
@@ -1582,6 +1623,7 @@
 
             // tabela zakończonych szkoleń
             var table_end_training_group_stage2 = $('#end_training_group_stage2').DataTable({
+                "order": [[ 0, "desc" ]],
                 "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
@@ -1621,6 +1663,7 @@
 
                         $("#save_button").css({'display':'none'});
                         saving_type = 0;
+                        //Zakończone szkolenie etap 2
                         cancel_candidate = 2;
                         //główny wiersz
                         var tr = $(this).closest('tr');
@@ -1637,6 +1680,7 @@
 
             // tabela skaswoanych szkoleń
             var table_cancel_training_group_stage2 = $('#cancel_training_group_stage2').DataTable({
+                "order": [[ 0, "desc" ]],
                 "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
@@ -1675,6 +1719,7 @@
                         $("#modal_cancel").css({'display':'block'});
                         $("#save_button").css({'display':'none'});
                         saving_type = 0;
+                        //Usuniete szkolenia
                         cancel_candidate = 1;
                         //główny wiersz
                         var tr = $(this).closest('tr');
