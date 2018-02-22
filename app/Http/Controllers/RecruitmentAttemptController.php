@@ -461,4 +461,37 @@ class RecruitmentAttemptController extends Controller
             }
         }
     }
+
+    /**
+     * Wyświetlanie strony ze statystykami wszystkich pracowników HR
+     */
+
+    public function recruitment_statistics_leaderGET(){
+
+//        $query = RecruitmentAttempt::select('recruitment_attempt.created_at','cadre.first_name as cadre_first_name',
+//            'cadre.last_name as cadre_last_name','candidate.first_name','candidate.last_name')
+//            ->join('users as cadre','cadre.id','recruitment_attempt.interview_cadre')
+//            ->join('users as candidate','candidate.id','recruitment_attempt.candidate_id')
+//            ->where('recruitment_attempt.status','=','1')->get();
+//        dd($query);
+        return view('recruitment.recruitmentStatisticsLeader');
+    }
+
+
+    /**
+     * Przygotowanie danych do datatable (Statystyki HR)
+     */
+
+    public function datatableRecruitmentStatisticsLeader(Request $request){
+        if($request->ajax()){
+
+            $query = RecruitmentAttempt::select('recruitment_attempt.created_at','cadre.first_name as cadre_first_name',
+                'cadre.last_name as cadre_last_name','candidate.first_name as candidate_first_name','candidate.last_name as candidate_last_name')
+                ->join('users as cadre','cadre.id','recruitment_attempt.interview_cadre')
+                ->join('users as candidate','candidate.id','recruitment_attempt.candidate_id')
+                ->where('recruitment_attempt.status','=','1');
+
+            return datatables($query)->make(true);
+        }
+    }
 }

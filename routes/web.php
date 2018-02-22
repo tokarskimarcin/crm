@@ -140,6 +140,9 @@ Route::POST('/getCandidateForGroupTrainingInfo','GroupTrainingController@getCand
 Route::POST('/datatableTrainingGroupList','GroupTrainingController@datatableTrainingGroupList')->name('api.datatableTrainingGroupList');
 Route::POST('/getGroupTrainingInfo','GroupTrainingController@getGroupTrainingInfo')->name('api.getGroupTrainingInfo');
 
+Route::POST('/datatableRecruitmentStatisticsLeader','RecruitmentAttemptController@datatableRecruitmentStatisticsLeader')->name('api.datatableRecruitmentStatisticsLeader');
+
+
 Route::POST('/getCandidateSource', 'RecruitmentAttemptController@getCandidateSource')->name('api.getCandidateSource');
 Route::POST('/addCandidateSource', 'RecruitmentAttemptController@addCandidateSource')->name('api.addCandidateSource');
 Route::POST('/editCandidateSource', 'RecruitmentAttemptController@editCandidateSource')->name('api.editCandidateSource');
@@ -499,6 +502,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/interviews_all', 'RecruitmentAttemptController@interviewsAllGet');
 
     Route::get('/recruitment_admin', 'RecruitmentAttemptController@recruitment_admin');
+
+
+    Route::get('/recruitment_statistics_leader', 'RecruitmentAttemptController@recruitment_statistics_leaderGET');
 
     /**REKRUTACJA STOP */
 });
