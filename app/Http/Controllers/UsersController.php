@@ -183,53 +183,60 @@ class UsersController extends Controller
     }
 
     public function edit_cadreGet($id) {
-        $user = User::find($id);
 
-        $agencies = Agencies::all();
-        $department_info = Department_info::all();
-        $month = date('m');
-        $months_names = ['Styczeń', 'Luty', 'Marzec', 'Kwiecien', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Padziernik', 'Listopad', 'Grudzień'];
+        if(Auth::user()->user_type->all_departments == 1) {
+            $user = User::find($id);
 
-        function month_reverse($mnt) {
-            if ($mnt < 0) {
-                $mnt += 12;
+            $agencies = Agencies::all();
+            $department_info = Department_info::all();
+            $month = date('m');
+            $months_names = ['Styczeń', 'Luty', 'Marzec', 'Kwiecien', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Padziernik', 'Listopad', 'Grudzień'];
+
+            function month_reverse($mnt)
+            {
+                if ($mnt < 0) {
+                    $mnt += 12;
+                }
+                return $mnt;
             }
-            return $mnt;
-        }
-        $months = [$months_names[month_reverse($month - 1)], $months_names[month_reverse($month - 2)]];
-        $actual_month = date('Y-m') . '%';
-        $previous_month = date('Y-m', strtotime(date('Y-m')." -1 month")) . "%";
 
-         $penalty_bonuses[0] = DB::table('penalty_bonus')
-            ->select(DB::raw('
+            $months = [$months_names[month_reverse($month - 1)], $months_names[month_reverse($month - 2)]];
+            $actual_month = date('Y-m') . '%';
+            $previous_month = date('Y-m', strtotime(date('Y-m') . " -1 month")) . "%";
+
+            $penalty_bonuses[0] = DB::table('penalty_bonus')
+                ->select(DB::raw('
                 SUM(CASE WHEN `type` = 2 AND `status` = 1 THEN `amount` ELSE 0 END) as premia ,
                 SUM(CASE WHEN `type` = 1 AND `status` = 1 THEN `amount` ELSE 0 END) as kara
             '))
-            ->where('id_user', '=', $id)
-            ->where('status', '=', 1)
-            ->where('event_date', 'like', $actual_month)
-            ->get();
+                ->where('id_user', '=', $id)
+                ->where('status', '=', 1)
+                ->where('event_date', 'like', $actual_month)
+                ->get();
 
             $penalty_bonuses[1] = DB::table('penalty_bonus')
-               ->select(DB::raw('
+                ->select(DB::raw('
                    SUM(CASE WHEN `type` = 2 AND `status` = 1 THEN `amount` ELSE 0 END) as premia ,
                    SUM(CASE WHEN `type` = 1 AND `status` = 1 THEN `amount` ELSE 0 END) as kara
                '))
-               ->where('id_user', '=', $id)
-               ->where('status', '=', 1)
-               ->where('event_date', 'like', $previous_month)
-               ->get();
+                ->where('id_user', '=', $id)
+                ->where('status', '=', 1)
+                ->where('event_date', 'like', $previous_month)
+                ->get();
 
-         $userTypes = UserTypes::all();
+            $userTypes = UserTypes::all();
 
-        return view('hr.editUser')
-            ->with('agencies', $agencies)
-            ->with('userTypes', $userTypes)
-            ->with('user', $user)
-            ->with('penalty_bonuses', $penalty_bonuses)
-            ->with('month', $months)
-            ->with('department_info', $department_info)
-            ->with('type', 2);
+            return view('hr.editUser')
+                ->with('agencies', $agencies)
+                ->with('userTypes', $userTypes)
+                ->with('user', $user)
+                ->with('penalty_bonuses', $penalty_bonuses)
+                ->with('month', $months)
+                ->with('department_info', $department_info)
+                ->with('type', 2);
+        }else{
+            return Redirect::back();
+        }
     }
 
     public function edit_cadrePOST($id, Request $request) {
@@ -453,7 +460,8 @@ class UsersController extends Controller
      */
     public function uniquePBX(Request $request) {
         if ($request->ajax()) {
-            $user = User::where('login_phone', '=', $request->login_phone)->count();
+            $user = User::where('login_phone', '=', $request->login_phone)
+                ->where('status_work','=','1')->count();
 
             return ($user > 0) ? 1 : 0 ;
         }

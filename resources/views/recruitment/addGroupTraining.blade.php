@@ -214,14 +214,6 @@
                                     </div>
                                     <div class="col-md-10">
                                         <label class="myLabel">Osoby nieobecne na szkoleniu:</label>
-                                        <div class="search_candidate_absent">
-                                            <div class="input-group">
-                                                <input type="text" class="form-control" id="right_search_absent" placeholder="Wyszukaj osobe na szkoleniu"/>
-                                                <div class="input-group-addon">
-                                                    <input type="checkbox" id="all-put-right_absent" style="display: block">
-                                                </div>
-                                            </div>
-                                        </div>
                                         <div class="form-group">
                                             <div class="right-container">
                                                 <div class="list_group" id="list_candidate_choice_absent">
@@ -291,8 +283,8 @@
                                                     <th style="width:5%">Lp.</th>
                                                     <th>Imie i nazwisko</th>
                                                     <th class="category_column">Komentarz</th>
-                                                    <th class="category_column">Dodaj</th>
-                                                    <th class="category_column">Odrzuć</th>
+                                                    <th class="category_column">Następny etap</th>
+                                                    <th class="category_column" colspan="2">Odrzuć</th>
                                                     <th class="category_column">Status końcowy</th>
                                                 </tr>
                                                 </thead>
@@ -534,12 +526,12 @@
             let comment_text = $(e).closest('tr').find('.commnet').val();
             swal({
                 title: 'Jesteś pewien?',
-                text: "Spowoduje to zakończenie szkolenia kandydata, ze statusem pozytywnym!",
+                text: "Spowoduje to przejście kandydata do etapu 2",
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Tak, zakończ szkolenie kandydata!'
+                confirmButtonText: 'Tak, zakończ szkolenie etapu 1.'
             }).then((result) => {
                 if(result.value)
                     {
@@ -579,6 +571,10 @@
             let candidate_id_end = $(e).closest('tr').attr('id');
             let id_training = $(e).closest('tr').attr('data-id');
             let comment_text = $(e).closest('tr').find('.commnet').val();
+            let attempt_result_status = $(e).closest('tr').find('.attempt_status_stage_one').val();
+            if(attempt_result_status == 0){
+                swal('Wybierz powód odrzucenia kandydata')
+            }else
             swal({
                 title: 'Jesteś pewien?',
                 text: "Spowoduje to zakończenie szkolenia kandydata, ze statusem odrzucony!",
@@ -601,7 +597,8 @@
                         "training_group_id": id_training,
                         "status": 0,
                         "comment": comment_text,
-                        'training_stage': actual_stage
+                        'training_stage': actual_stage,
+                        'attempt_result_status': attempt_result_status
                     },
                     success: function (response) {
                         if (response == 1) {
@@ -614,6 +611,7 @@
                             $(e).closest('tr').find('.glyphicon-ok').attr('onclick','');
                             $(e).closest('tr').find('.glyphicon-remove').css({'color': 'gray'});
                             $(e).closest('tr').find('.glyphicon-remove').attr('onclick','');
+                            $(e).closest('tr').find('.candidate_status').find('span').text('Odrzucony');
                             $(e).closest('tr').find('.candidate_status').find('span').text('Odrzucony');
                         }
                     }
@@ -716,7 +714,7 @@
                 var check_all = true;
                 var avaible_candidate = [];
                 var choice_candidate = [];
-
+                var choice_candidate_ansent = [];
                 if(start_hour_training.trim() == 0)
                 {
                     swal("Nie wyznaczyłeś godziny szkolenia.")
@@ -734,6 +732,11 @@
                     $('#list_candidate_choice a').each(function (key, value) {
                         choice_candidate.push(value.id) ;
                     });
+
+                    $('#list_candidate_choice_absent a').each(function (key,value) {
+                        choice_candidate_ansent.push(value.id);
+                    });
+
                     $.ajax({
                         type: "POST",
                         url: '{{ route('api.saveGroupTraining') }}',
@@ -749,7 +752,8 @@
                             "choice_candidate":choice_candidate,
                             "saving_type":saving_type,
                             "id_training_group" : id_training_group,
-                            "actual_stage" : actual_stage
+                            "actual_stage" : actual_stage,
+                            "choice_candidate_ansent":choice_candidate_ansent
                         },
                         success: function (response) {
                             console.log(actual_stage)
@@ -1054,6 +1058,12 @@
                                             '<input type="checkbox" class="pull-right" style="display: block">' +
                                             '</a>';
                                         $('#list_candidate_choice').append(html);
+                                    }else if (response['candidate'][i].attempt_status_id == 18  && cancel_candidate == 0) {
+                                        var html = '<a class="list-group-item nocheck" onclick = "onclickRowRight(this)" id=' + response['candidate'][i].id + '>' +
+                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
+                                            '<input type="checkbox" class="pull-right" style="display: block">' +
+                                            '</a>';
+                                        $('#list_candidate_choice_absent').append(html);
                                     }
                                     else if (cancel_candidate != 0) {
                                         var html = '<a class="list-group-item nocheck" id=' + response['candidate'][i].id + '>' +
@@ -1067,19 +1077,25 @@
                                             var span_color_faild = 'red';
                                             var fucnction_on_click_succes = 'onclick=accept_candidate_finaly(this)';
                                             var fucnction_on_click_cancel = 'onclick=cancel_candidate_finaly(this)';
+                                            var select_status = '';
                                             var comment_text = response['candidate'][i].recruitment_story_comment;
                                             if(comment_text == null)
                                             {
                                                 comment_text= '';
                                             }
-                                            if(response['candidate'][i].completed_training != null)
+                                            if(response['candidate'][i].completed_training != null || (response['candidate'][i].recruitment_story_id == 19 || response['candidate'][i].recruitment_story_id == 18))
                                             {
                                                 if(response['candidate'][i].recruitment_story_id == 8 || response['candidate'][i].recruitment_story_id == 15)
                                                 {
                                                     status_ended ='<td class="candidate_status">'+
-                                                        '<span>Zaakceptowany</span>'+
+                                                        '<span>Zaakceptowany do etapu 2</span>'+
                                                         '</td>';
-                                                }else{
+                                                }else if(response['candidate'][i].recruitment_story_id == 19 || response['candidate'][i].recruitment_story_id == 18){
+                                                    status_ended ='<td class="candidate_status">'+
+                                                        '<span>Nieobecny na szkoleniu</span>'+
+                                                        '</td>';
+                                                }
+                                                else{
                                                     status_ended = '<td class="candidate_status">'+
                                                         '<span>Odrzucony</span>'+
                                                         '</td>';
@@ -1087,6 +1103,7 @@
                                                 span_color_succes = span_color_faild= 'gray';
                                                 fucnction_on_click_succes= '';
                                                 fucnction_on_click_cancel= '';
+                                                select_status = 'disabled';
 
                                             }else{
                                                 status_ended = '<td class="candidate_status">'+
@@ -1105,8 +1122,19 @@
                                                 '<span style="color:'+span_color_succes+';font-size: 20px;margin-right: 5px" class="glyphicon glyphicon-ok" '+fucnction_on_click_succes+'></span>'+
                                                 ' </td>'+
                                                 '<td>'+
+                                                '<select class="form-control attempt_status_stage_one" '+select_status+'>' +
+                                                '<option value=0>Wybierz</option>';
+                                                for (var j = 0; j < response['attempt_status'].length; j++) {
+                                                    if(response['candidate'][i].recruitment_attempt_result_id == response['attempt_status'][j].id){
+                                                        html += '<option selected value='+response['attempt_status'][j].id+'>'+response['attempt_status'][j].name+'</option>';
+                                                    }else
+                                                        html += '<option value='+response['attempt_status'][j].id+'>'+response['attempt_status'][j].name+'</option>';
+                                                }
+                                            html +='</select>' +
+                                                '</td>'+
+                                                '<td>'+
                                                 '<span style="color:'+span_color_faild+';font-size: 20px;" class="glyphicon glyphicon-remove" '+fucnction_on_click_cancel+' ></span>'+
-                                                '</td>';
+                                                ' </td>';
 
                                             html +=status_ended+'</tr>';
                                             $('#candidate_end_training_decision').append(html);
@@ -1140,8 +1168,6 @@
                 $("#modal_end").css({'display':'none'});
             });
 
-
-
             //tabela dostępnych szkoleń
             var table_activ_training_group = $('#activ_training_group').DataTable({
                 "autoWidth": false,
@@ -1161,7 +1187,11 @@
                 "columns": [
                     {"data": "training_date"},
                     {"data": "training_hour"},
-                    {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.candidate_choise_count+'/'+data.candidate_absent_count+'/'+data.candidate_avaible_count;
+                        },"name":"group_training.candidate_choise_count"
+                    },
                     {
                         "data": function (data, type, dataToSet) {
                             return data.last_name+' '+data.first_name;
@@ -1186,7 +1216,18 @@
                     });
                     // zakończenie szkolenia
                     $('#activ_training_group .end_active').click(function (e) {
+                        //pobranie id szkolenia
                         let training_group_to_end = $(this).closest('tr').attr('id');
+                        //pobranie informacji o liczbie kandydatów (wybrni/nieobecni/dostępni)
+                        // nie przepuszczej gdy ktoś jest dostępny
+                        let row_with_count_info = $(this).closest('tr').find('td:eq(2)').text();
+                        // liczba osób dosępnych do wybrania
+                        let avaible_candidate = row_with_count_info.split("/");
+                        avaible_candidate = avaible_candidate[2];
+                        if(parseInt(avaible_candidate) > 0)
+                        {
+                            swal('Aby zakończyć szkolenie musisz określić wszystkich kandydatów')
+                        }else
                         swal({
                             title: 'Jesteś pewien?',
                             text: "Spowoduje to zakończenie szkolenia, bez możliwości cofnięcia zmian!",
@@ -1297,7 +1338,11 @@
                 },"columns": [
                     {"data": "training_date"},
                     {"data": "training_hour"},
-                    {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.candidate_choise_count+'/'+data.candidate_absent_count+'/'+data.candidate_avaible_count;
+                        },"name":"group_training.candidate_choise_count"
+                    },
                     {
                         "data": function (data, type, dataToSet) {
                             return data.last_name+' '+data.first_name;
@@ -1347,7 +1392,11 @@
                 },"columns": [
                     {"data": "training_date"},
                     {"data": "training_hour"},
-                    {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.candidate_choise_count+'/'+data.candidate_absent_count+'/'+data.candidate_avaible_count;
+                        },"name":"group_training.candidate_choise_count"
+                    },
                     {
                         "data": function (data, type, dataToSet) {
                             return data.last_name+' '+data.first_name;
@@ -1398,7 +1447,11 @@
                 "columns": [
                     {"data": "training_date"},
                     {"data": "training_hour"},
-                    {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.candidate_choise_count+'/'+data.candidate_absent_count+'/'+data.candidate_avaible_count;
+                        },"name":"group_training.candidate_choise_count"
+                    },
                     {
                         "data": function (data, type, dataToSet) {
                             return data.last_name+' '+data.first_name;
@@ -1424,6 +1477,14 @@
                     // zakończenie szkolenia
                     $('#activ_training_group_stage2 .end_active').click(function (e) {
                         let training_group_to_end = $(this).closest('tr').attr('id');
+                        let row_with_count_info = $(this).closest('tr').find('td:eq(2)').text();
+                        // liczba osób dosępnych do wybrania
+                        let avaible_candidate = row_with_count_info.split("/");
+                        avaible_candidate = avaible_candidate[2];
+                        if(parseInt(avaible_candidate) > 0)
+                        {
+                            swal('Aby zakończyć szkolenie musisz określić wszystkich kandydatów')
+                        }else
                         swal({
                             title: 'Jesteś pewien?',
                             text: "Spowoduje to zakończenie szkolenia, bez możliwości cofnięcia zmian!",
@@ -1537,7 +1598,11 @@
                 },"columns": [
                     {"data": "training_date"},
                     {"data": "training_hour"},
-                    {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.candidate_choise_count+'/'+data.candidate_absent_count+'/'+data.candidate_avaible_count;
+                        },"name":"group_training.candidate_choise_count"
+                    },
                     {
                         "data": function (data, type, dataToSet) {
                             return data.last_name+' '+data.first_name;
@@ -1588,7 +1653,11 @@
                 },"columns": [
                     {"data": "training_date"},
                     {"data": "training_hour"},
-                    {"data": "candidate_count"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.candidate_choise_count+'/'+data.candidate_absent_count+'/'+data.candidate_avaible_count;
+                        },"name":"group_training.candidate_choise_count"
+                    },
                     {
                         "data": function (data, type, dataToSet) {
                             return data.last_name+' '+data.first_name;

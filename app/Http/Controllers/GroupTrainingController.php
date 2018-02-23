@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use App\AttemptResult;
+use App\AttemptStatus;
 use App\Candidate;
 use App\CandidateTraining;
 use App\GroupTraining;
@@ -83,6 +84,7 @@ class GroupTrainingController extends Controller
             $candidate_story_old = RecruitmentStory::where('candidate_id','=',$candidate_id)
                 ->orderBy('id', 'desc')->first();
             $candidate_story_new = new RecruitmentStory();
+            $candidate_story_new->attempt_result_id  = $request->attempt_result_status;
             $candidate_story_new->cadre_id = Auth::user()->id;
             $candidate_story_new->cadre_edit_id = Auth::user()->id;
             $candidate_story_new->candidate_id = $candidate_id;
@@ -142,12 +144,10 @@ class GroupTrainingController extends Controller
                 foreach ($all_candidate as $item)
                 {
                     $candidate = Candidate::find($item->candidate_id);
-                    if($request->training_stage == 1)
+                    if($request->training_stage == 1 && ($candidate->attempt_status_id != 18 && $candidate->attempt_status_id != 19))
                         $candidate->attempt_status_id = 7;
-                    else
+                    else if($request->training_stage != 1 && ($candidate->attempt_status_id != 18 && $candidate->attempt_status_id != 19))
                         $candidate->attempt_status_id = 14;
-
-
                     $candidate->save();
 
                     $candidate_story_old = RecruitmentStory::where('candidate_id','=',$item->candidate_id)
@@ -158,12 +158,22 @@ class GroupTrainingController extends Controller
                     $candidate_story_new->cadre_edit_id = Auth::user()->id;
                     $candidate_story_new->candidate_id = $item->candidate_id;
                     $candidate_story_new->recruitment_attempt_id = $candidate_story_old->recruitment_attempt_id;
-                    if($request->training_stage == 1)
+                    if($request->training_stage == 1 && ($candidate->attempt_status_id != 18 && $candidate->attempt_status_id != 19))
                         $candidate_story_new->attempt_status_id = 7;
-                    else
+                    else if($request->training_stage != 1 && ($candidate->attempt_status_id != 18 && $candidate->attempt_status_id != 19))
                         $candidate_story_new->attempt_status_id = 14;
+                    else
+                        $candidate_story_new->attempt_status_id = $candidate_story_old->attempt_status_id;
+
                     $candidate_story_new->comment = "Szkolenie zakończone";
                     $candidate_story_new->save();
+
+                    if(($candidate->attempt_status_id == 18 || $candidate->attempt_status_id == 19))
+                    $CandidateTraining = CandidateTraining::where('training_id','=',$training_group_id)
+                        ->where('candidate_id','=',$item->candidate_id)
+                        ->update(['completed_training' => $candidate_story_new->id]);
+
+
                 }
                 return 1;
             }
@@ -227,26 +237,38 @@ class GroupTrainingController extends Controller
             where('id','=',$request->id_training_group)->get();
 
             if($request->training_stage == 1)
+            {
                 $candidate_avaible = Candidate::whereIn('attempt_status_id',[5])
                     ->where('department_info_id','=',Auth::user()->department_info_id)->get()
                     ->toArray();
-            else
+                // pobernie statusów dla zakończonego etapu 1
+                $attempt_result = AttemptStatus::find(7)->attemptResult;
+            }
+
+            else{
                 $candidate_avaible = Candidate::whereIn('attempt_status_id',[12])
                     ->where('department_info_id','=',Auth::user()->department_info_id)->get()
                     ->toArray();
+
+                // pobernie statusów dla zakończonego etapu 2
+                $attempt_result = AttemptStatus::find(7)->attemptResult;
+            }
+
 
             $candidate_choice = DB::table('candidate')
                 ->select(DB::raw('
                 candidate.*,
                 candidate_training.completed_training,
                 recruitment_story.attempt_status_id as recruitment_story_id,    
-                recruitment_story.comment  as recruitment_story_comment
+                recruitment_story.comment  as recruitment_story_comment,
+                recruitment_story.attempt_result_id  as recruitment_attempt_result_id
             '))
                 ->join('candidate_training', 'candidate_training.candidate_id', 'candidate.id')
                 ->leftjoin('recruitment_story', 'recruitment_story.id', 'candidate_training.completed_training')
                 ->join('group_training', 'group_training.id', 'candidate_training.training_id')
                 ->where('group_training.id','=',$request->id_training_group)
                 ->get()->toArray();
+
             if($request->cancel_candidate == 1 || $request->cancel_candidate == 2 )
             {
                 $merge_array = $candidate_choice;
@@ -255,6 +277,7 @@ class GroupTrainingController extends Controller
 
             $object_array['group_training'] = $group_training ;
             $object_array['candidate'] = $merge_array ;
+            $object_array['attempt_status'] = $attempt_result;
             return $object_array;
         }
     }
@@ -267,11 +290,12 @@ class GroupTrainingController extends Controller
             $comment_about_training = $request->comment_about_training;
             $avaible_candidate = $request->avaible_candidate;
             $choice_candidate = $request->choice_candidate;
+            $choice_candidate_absent = $request->choice_candidate_ansent;
             $saving_type = $request->saving_type;
             $flag = true;
 
             // nowe szkolenie lub instniejące
-            if($saving_type == 1 && $request->id_training_group == 0) // 1 - nowy wpisz, 0 - edycja
+            if($saving_type == 1 && $request->id_training_group == 0) // 1 - nowy wpis, 0 - edycja
             {
                 $training = new GroupTraining();
 
@@ -283,7 +307,9 @@ class GroupTrainingController extends Controller
             $training->leader_id = $cadre_id;
             $training->department_info_id = Auth::user()->department_info_id;
             $training->comment = $comment_about_training;
-            $training->candidate_count = count($choice_candidate);
+            $training->candidate_choise_count = count($choice_candidate);
+            $training->candidate_absent_count = count($choice_candidate_absent);
+            $training->candidate_avaible_count = count($avaible_candidate);
             $training->training_date = $start_date_training;
             $training->training_hour = $start_hour_training;
             $training->status = 1; // dotępne szkolenie 2 - zakończone 0 - anulowane
@@ -311,16 +337,16 @@ class GroupTrainingController extends Controller
                 for($i = 0 ;$i < count($choice_candidate) ; $i++){
 
                     $candidate = Candidate::find($choice_candidate[$i]);
-                    if($request->actual_stage == '1')
+                    if($request->actual_stage == 1)
                         $candidate->attempt_status_id = 6;
-                    else if($request->actual_stage == '2')
+                    else if($request->actual_stage == 2)
                         $candidate->attempt_status_id = 13;
                     $candidate->save();
                     $candidate_story = RecruitmentStory::where('candidate_id','=',$choice_candidate[$i])
                         ->orderBy('id', 'desc')->first();
                     if($request->actual_stage == '1')
                         $candidate_story->attempt_status_id = 6;
-                    else   if($request->actual_stage == '1')
+                    else if($request->actual_stage == '2')
                         $candidate_story->attempt_status_id = 13;
                     $candidate_story->save();
                     $new_relation = new CandidateTraining();
@@ -343,6 +369,29 @@ class GroupTrainingController extends Controller
                     else  if($request->actual_stage == '2')
                         $candidate_story->attempt_status_id = 12;
                     $candidate_story->save();
+                }
+
+                // kandydaci nieobecni
+                for($i =  0 ;$i < count($choice_candidate_absent) ; $i++){// osoby nieobecne na szkoleniu
+                    $candidate = Candidate::find($choice_candidate_absent[$i]);
+                    if($request->actual_stage == 1)
+                        $candidate->attempt_status_id = 18;
+                    else  if($request->actual_stage == 2)
+                        $candidate->attempt_status_id = 19;
+                    $candidate->save();
+                    $candidate_story = RecruitmentStory::where('candidate_id','=',$choice_candidate_absent[$i])
+                        ->orderBy('id', 'desc')->first();
+
+                    if($request->actual_stage == '1')
+                        $candidate_story->attempt_status_id = 18;
+                    else  if($request->actual_stage == '2')
+                        $candidate_story->attempt_status_id = 19;
+                    $candidate_story->save();
+
+                    $new_relation = new CandidateTraining();
+                    $new_relation->training_id = $id;
+                    $new_relation->candidate_id = $choice_candidate_absent[$i];
+                    $new_relation->save();
                 }
                 return 1;
             }else

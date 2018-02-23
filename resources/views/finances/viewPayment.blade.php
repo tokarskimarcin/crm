@@ -176,10 +176,19 @@
                                                                                         for ($step = $department_info->commission_step; $step <= 20; $step = ($step+0.5)) {
                                                                                               $avg_min = ($department_info->commission_avg-0.25)+(0.25*$lp);
                                                                                               $avg_max = $department_info->commission_avg+(0.25*$lp);
-                                                                                              if ($avg > $avg_min AND $avg <= $avg_max) {
-                                                                                                  $bonus_per_hour = $step;
-                                                                                              } else if ($avg == $department_info->commission_avg) {
-                                                                                                $bonus_per_hour = $department_info->commission_step;
+                                                                                              if( $department_info->commission_avg == 2.5) // zmienic na department_type_badania
+                                                                                              {
+                                                                                                  if ($avg >= $avg_min AND $avg < $avg_max) {
+                                                                                                      $bonus_per_hour = $step;
+                                                                                                  } else if ($avg == $department_info->commission_avg) {
+                                                                                                    $bonus_per_hour = $department_info->commission_step;
+                                                                                                  }
+                                                                                              }else{
+                                                                                                  if ($avg > $avg_min AND $avg <= $avg_max) {
+                                                                                                      $bonus_per_hour = $step;
+                                                                                                  } else if ($avg == $department_info->commission_avg) {
+                                                                                                    $bonus_per_hour = $department_info->commission_step;
+                                                                                                  }
                                                                                               }
                                                                                           $lp++;
                                                                                         }
@@ -363,6 +372,19 @@
                                 }
                             }
                         });
+                        $('row c[r^="O"]', sheet).each( function (key,value) {
+                            if($('is t', this).text() != 'Całość na konto')
+                            {
+                                $text = $('is t', this).context.textContent;
+
+                                if($text == 'Tak')
+                                {
+                                    let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                    row_number = row_number.substring(1);
+                                    $('row:nth-child('+row_number+') c', sheet).attr( 's', '45' );
+                                }
+                            }
+                        });
                         $('row:nth-child(2) c', sheet).attr( 's', '42' );
                         $('row:first c', sheet).attr( 's', '51','1','2' );
                         $('row:last c', sheet).attr( 's', '2' );
@@ -413,6 +435,19 @@
                                 }
                             }
                         });
+                        $('row c[r^="O"]', sheet).each( function (key,value) {
+                            if($('is t', this).text() != 'Całość na konto')
+                            {
+                                $text = $('is t', this).context.textContent;
+
+                                if($text == 'Tak')
+                                {
+                                    let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                    row_number = row_number.substring(1);
+                                    $('row:nth-child('+row_number+') c', sheet).attr( 's', '45' );
+                                }
+                            }
+                        });
                         $('row:nth-child(2) c', sheet).attr( 's', '42' );
                         $('row:first c', sheet).attr( 's', '51','1','2' );
                         $('row:last c', sheet).attr( 's', '2' );
@@ -459,6 +494,19 @@
                                 if(penatly_bonus < 0)
                                 {
                                     $(this).attr( 's', '35' );
+                                }
+                            }
+                        });
+                        $('row c[r^="O"]', sheet).each( function (key,value) {
+                            if($('is t', this).text() != 'Całość na konto')
+                            {
+                                $text = $('is t', this).context.textContent;
+
+                                if($text == 'Tak')
+                                {
+                                    let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                    row_number = row_number.substring(1);
+                                    $('row:nth-child('+row_number+') c', sheet).attr( 's', '45' );
                                 }
                             }
                         });
