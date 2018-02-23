@@ -11,28 +11,25 @@
         $('#family_selected').fadeOut(0);
         $('#partner_selected').fadeOut(0);
         $('#partner_selected div').remove();
-        $('#old_members').remove();
+        $('#old_members div').remove();
     }
 
     //Podmiana dodatkowych opcji
     $('#package_variable').change(function(e) {
         var package_variable = $('#package_variable').val();
+        clearPackages();
 
         if (package_variable == 'Wybierz') {
-            clearPackages();
             totalMemberCounter(0, 0);
         } else if (package_variable == 'RODZINNY') {
-            clearPackages();
             totalMemberCounter(1, 1);
             $('#new_members').fadeIn(0);
             $('#family_selected').fadeIn(0);
         } else if (package_variable == 'PARTNERSKI') {
-            clearPackages();
             $('#partner_selected').fadeIn(0);
             totalMemberCounter(1, 2);
             addPartnerTemplate();
         } else if (package_variable == 'INDYWIDUALNY') {
-            clearPackages();
             totalMemberCounter(1, 1);
         }
     });

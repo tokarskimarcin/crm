@@ -7,20 +7,21 @@ if (medicalPackageShow == true || showEditMedical == true) {
 var package_variable = $('#package_variable').val();
 var package_name = $('#package_name').val();
 
-
-
+// Sprawdzenie czy został wybrany pakiet
 if (package_name == 'Wybierz') {
 swal('Wybierz pakiet!');
 validationResult = false;
 return false;
 }
 
+// Sprawdzenie czy został wybrany rodzaj pakietu
 if (package_variable == 'Wybierz') {
 swal('Wybierz wariant pakietu!');
 validationResult = false;
 return false;
 }
 
+// Sprawdzenie czy podane są wsyzstkie numery domow
 $("input[name='house_number[]']").each(function(key, value){
 if ($(value).val().trim().length == 0) {
 swal('Podaj numery domów!');
@@ -29,6 +30,7 @@ return false;
 }
 });
 
+// Sprawdzenie czy podane sa wszystkie nazwy ulic
 $("input[name='street[]']").each(function(key, value){
 if ($(value).val().trim().length == 0) {
 swal('Podaj wszystkie nazwy ulic!');
@@ -37,6 +39,7 @@ return false;
 }
 });
 
+// Sprawdzenie czy podane sa wszystkie kody pocztowe
 $("input[name='postal_code[]']").each(function(key, value){
 if ($(value).val().trim().length == 0) {
 swal('Podaj wszystkie kody pocztowe!');
@@ -45,6 +48,7 @@ return false;
 }
 });
 
+//Sprawdzenie czy podane sa wszystkie miasta
 $("input[name='city[]']").each(function(key, value){
 if ($(value).val().trim().length == 0) {
 swal('Podaj wszystkie nazwy miejscowości!');
@@ -53,6 +57,7 @@ return false;
 }
 });
 
+//Sprawdzenie czy podane sa numery telefonow
 $("input[name='phone_number[]']").each(function(key, value){
 if ($(value).val().trim().length == 0) {
 swal('Podaj wszystkie numery telefonów!');
@@ -61,6 +66,7 @@ return false;
 }
 });
 
+//SPrawdzenue czy podane sa wszystkie imiona
 $("input[name='user_last_name[]']").each(function(key, value){
 if ($(value).val().trim().length == 0) {
 swal('Podaj wszystkie nazwiska!');
@@ -69,6 +75,7 @@ return false;
 }
 });
 
+// Sprawdzenie czy podane sa wszystkie nazwiska
 $("input[name='user_first_name[]']").each(function(key, value){
 if ($(value).val().trim().length == 0) {
 swal('Podaj wszystkie imiona!');
@@ -77,6 +84,7 @@ return false;
 }
 });
 
+//Sprawdzenie czy podane są poprawne pesele lub daty urodzenia w formacie "u0000-00-00"
 if ($('#pesel').val().trim().length == 0 && $('#birth_date').val().trim().length == 0) {
 swal('Podaj numer pesel lub datę urodzenia w formacie "u000-00-00"!');
 validationResult = false;

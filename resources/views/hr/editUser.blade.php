@@ -7,18 +7,6 @@
     }
 </style>
 
-@if(Session::has('candidate_data'))
-    <!-- Te dane pobierane są jeżeli dodajemy pracownika z proflilu kandydata  -->
-    @php
-        $candidate = Session::get('candidate_data');
-        $candidate_first_name = $candidate->first_name;
-        $candidate_last_name = $candidate->last_name;
-        $candidate_phone = $candidate->phone;
-        $candidate_comment = $candidate->comment;
-        Session::forget('candidate_data');
-    @endphp
-@endif
-
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
@@ -340,6 +328,47 @@
         }
     });
 
+    //Usuwanie całości pakietu medycznego
+    $('#delete_all_packages').click(function (e) {
+        e.preventDefault();
+        var medical_stop = $('#medical_stop').val();
+        var user_id = Number('{{$user->id}}');
+        swal({
+            title: '',
+            text: "Usunąć pakiet medyczny?",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Tak'
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.deleteMedicalPackage') }}',
+                    data: {
+                        "medical_stop":medical_stop,
+                        "user_id":user_id
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response == 1) {
+                            swal('Usunięto pakiet medyczny!');
+                            window.location.reload();
+                        } else {
+                            swal('Ups! Coś poszło nie tak, skontatkuj się z admnistratorem!');
+                        }
+                    }, error: function(response) {
+                        swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!');
+                    }
+                });
+            }
+        })
+    });
+
     /** Koniec edycji pakietu medycznego **/
 
     /******** Do pakietu medycznego *********/
@@ -401,13 +430,17 @@ $(document).ready(function() {
         if (medicalPackageShow == true) {
             $('#add_medical_package_div').slideUp();
             $('#span_medical').removeClass('glyphicon-minus').addClass('glyphicon-plus');
+            $('#medical_package_active').val(0);
             medicalPackageShow = false;
         } else {
             $('#add_medical_package_div').slideDown();
             $('#span_medical').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+            $('#medical_package_active').val(1);
             medicalPackageShow = true;
         }
     });
+
+
 
     $('#add_submit').click((e) => {
 
@@ -546,6 +579,8 @@ $(document).ready(function() {
         //** Dodanie procesu walidacji dla pakietu medycznego **/
         @include('hr.medicalPackageValidation')
 
+        $('#add_submit').attr('disabled', true);
+        $('#consultant_add').submit();
     });
 
     $('.form_date').datetimepicker({

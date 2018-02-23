@@ -138,12 +138,6 @@ class UsersController extends Controller
          * Dodanie pakietu medycznego
          */
         if ($request->medical_package_active > 0) {
-            $file_extension = $request->file('user_scan')->getClientOriginalExtension();
-            $file_name = $request->first_name . '_' . $request->last_name;
-            $store_name = $file_name . '_' . time() . '.' . $file_extension;
-            $request->file('user_scan')->storeAs('medicalscan', $store_name);
-            $request->store_name = $store_name;
-
             $this->addMedicalPackage($request, $user->id);
         }
 
@@ -253,10 +247,10 @@ class UsersController extends Controller
         }
 
         /**
-         * Opcja dodania pakietu medycznego (Jezeli zmienna $request->medical_package_is_new == 1)
-         * Lub zmiany gdy zmienna $request->medical_package_is_edited ==1
+         * Opcja dodania pakietu medycznego (Jezeli zmienna $request->medical_package_is_new == 1 && $request->medical_package_active == 1)
+         * Lub zmiany gdy zmienna $request->medical_package_is_edited == 1
          */
-        if ($request->medical_package_is_new == 1) {
+        if ($request->medical_package_is_new == 1 && $request->medical_package_active == 1) {
             $this->addMedicalPackage($request, $user->id);
         } else if ($request->medical_package_is_edited == 1) {
             $this->changeMedicalPackage($request, $user);
@@ -491,6 +485,15 @@ class UsersController extends Controller
     public function addMedicalPackage(Request $request, $id) {
 
         /**
+         * Dodanie pliku
+         */
+        $file_extension = $request->file('user_scan')->getClientOriginalExtension();
+        $file_name = $request->first_name . '_' . $request->last_name;
+        $store_name = $file_name . '_' . time() . '.' . $file_extension;
+        $request->file('user_scan')->storeAs('medicalscan', $store_name);
+        $request->store_name = $store_name;
+
+        /**
          * Pobranie ilości osób w pakiecie medycznym
          */
         $sum = $request->totalMemberSum;
@@ -515,8 +518,10 @@ class UsersController extends Controller
             $medicalPackage->package_variable   = $request->package_variable;
             $medicalPackage->cadre_id           = Auth::user()->id;
             $medicalPackage->package_scope      = ($i > 0) ? 'R-OM' : 'P-OM' ;
-            $medicalPackage->scan_path          = $request->store_name;
+            $medicalPackage->scan_path          = $store_name;
             $medicalPackage->month_start        = $request->medical_start;
+            $medicalPackage->created_at         = date('Y-m-d H:i:s');
+            $medicalPackage->updated_at         = null;
 
             $medicalPackage->save();
         }
@@ -542,6 +547,7 @@ class UsersController extends Controller
                 $medicalPackage->deleted = 1;
                 $medicalPackage->updated_by = Auth::user()->id;
                 $medicalPackage->updated_at = date('Y-m-d H:i:s');
+                $medicalPackage->month_stop = date('Y-m-d H:i:s');
 
                 $medicalPackage->save();
             }
@@ -551,14 +557,17 @@ class UsersController extends Controller
          * Sprawdzenie czy podmieniony został plik z umową dla użytkownika
          */
         if ($request->file('user_scan') != null) {
+            // Pobranie rozszerzenia pliku
             $file_extension = $request->file('user_scan')->getClientOriginalExtension();
+            // Konkatenacja imienia i nazwiska pracownika
             $file_name = $request->first_name . '_' . $request->last_name;
+            // Utworzenie nazwy pliku - imie, nazwisko, aktualny czas + rozszerzenie
             $store_name = $file_name . '_' . time() . '.' . $file_extension;
+            // Zapis pliku do lokalizacji /storage/app/medicalscan
             $request->file('user_scan')->storeAs('medicalscan', $store_name);
             $scan_path = $store_name;
         } else {
-            $path = $user->medicalPackages->where('deleted', '=', 1)->first()->get();
-            $scan_path = $path->scan_path;
+            $scan_path = $user->medicalPackages->where('deleted', '=', 0)->first()->scan_path;
         }
 
         /**
@@ -615,11 +624,109 @@ class UsersController extends Controller
                 $medicalPackage->deleted            = 0;
                 $medicalPackage->package_name       = $request->package_name;
                 $medicalPackage->package_variable   = $request->package_variable;
-                $medicalPackage->scan_path          = $request->store_name;
+                $medicalPackage->scan_path          = $scan_path;
                 $medicalPackage->month_start        = $request->medical_start;
+                $medicalPackage->updated_by         = Auth::user()->id;
+                $medicalPackage->updated_at         = date('Y-m-d H:i:s');
 
                 $medicalPackage->save();
             }
         }
+    }
+
+    /**
+     * Funkcja usuwająca całkowicie pakiet medyczny
+     */
+    public function deleteMedicalPackage(Request $request) {
+        if ($request->ajax()) {
+
+            /**
+             * Pobranie wszystkich aktywnych wpisów dla danego użytkownika
+             */
+            $packages = MedicalPackage::where('user_id', '=', $request->user_id)
+                ->where('deleted', '=', 0)
+                ->get();
+
+            foreach ($packages as $package) {
+
+                $package->deleted = 1;
+                $package->updated_by = Auth::user()->id;
+                $package->month_stop = $request->medical_stop;
+                $package->updated_at = date('Y-m-d H:i:s');
+
+                $package->save();
+            }
+            return 1;
+        }
+    }
+
+    /**
+     * Dane na temat pakietów medycznych
+     */
+    public function medical_packages_all() {
+        $check_month = date('Y-m') . '%';
+
+        /**
+         * Pobranie pakietow ktore sa nie edytowane i starsze niz miesiac
+         */
+        $packagesOldNotEdited = MedicalPackage::where('deleted', '=', 0)
+            ->where('updated_at', 'not like', $check_month)
+            ->orWhere('updated_at', '=', null)
+            ->where('month_start', 'not like', $check_month)
+            ->orderBy('user_last_name')
+            ->get();
+
+        /**
+         * Edytowane w tym miesiącu
+         */
+        $packagesOldEdited = MedicalPackage::where('deleted', '=', 0)
+            ->where('month_start', 'not like', $check_month)
+            ->where('updated_at', 'like', $check_month)
+            ->orderBy('user_last_name')
+            ->get();
+
+        /**
+         * Nowe w tym miesiącu
+         */
+        $packagesNewMonth = MedicalPackage::where('deleted', '=', 0)
+            ->where('month_start', 'like', $check_month)
+            ->orderBy('user_last_name')
+            ->get();
+
+        /**
+         * Usunięte w tym miesiącu
+         */
+        $packagedDeletedThisMonth = MedicalPackage::where('deleted', '=', 1)
+            ->where('month_stop', 'like', $check_month)
+            ->orderBy('user_last_name')
+            ->get();
+
+        $packagesOldNotEdited = $packagesOldNotEdited->map(function($item) {
+            $item['flag'] = 0;
+            return $item;
+        });
+
+        $packagesOldEdited = $packagesOldEdited->map(function($item) {
+            $item['flag'] = 1;
+            return $item;
+        });
+
+        $packagesNewMonth = $packagesNewMonth->map(function($item) {
+            $item['flag'] = 2;
+            return $item;
+        });
+
+        $packagedDeletedThisMonth = $packagedDeletedThisMonth->map(function($item) {
+            $item['flag'] = 3;
+            return $item;
+        });
+
+        $merged = $packagesOldNotEdited;
+        $merged = $merged->merge($packagesOldEdited);
+        $merged = $merged->merge($packagesNewMonth);
+        $merged = $merged->merge($packagedDeletedThisMonth);
+
+        return view('hr.allMedicalPackages')
+            ->with('packages', $merged);
     }
 }

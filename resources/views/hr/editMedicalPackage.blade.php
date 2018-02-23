@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="form-group">
-            <button class="btn btn-info text-center" id="edit_medical_package" style="width: 100%">
+            <button class="btn btn-info text-center" id="edit_medical_package" title="Opcja dostepna wkrótce" style="width: 100%" disabled="true">
                 <span id="span_edit_medical" class="glyphicon glyphicon-plus"></span> <span>Edytuj pakiet medyczny</span>
             </button>
         </div>
@@ -49,8 +49,22 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Zakres obowiązywania do:</label>
+                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                            <input class="form-control" name="medical_stop" id="medical_stop" type="text" value="{{date('Y-m-d')}}" readonly >
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
                     <a class="btn btn-info" href="/api/getMedicalScan/{{$package->scan_path}}" download="{{$package->scan_path}}">Pobierz skan umowy</a>
+                </div>
+                <div class="col-md-8">
+                    <button class="btn btn-danger pull-right" id="delete_all_packages">
+                        <span class="glyphicon glyphicon-remove"></span> Usuń pakiet medyczny
+                    </button>
                 </div>
             </div>
             <hr>
@@ -226,9 +240,9 @@
                             <h3>Dane osobowe członka rodziny:</h3>
                         </div>
                         <div class="col-md-6">
-                            <button class="btn btn-danger pull-right" style="margin-top: 15px" type="button" onclick="deleteOldMember({{$package->id}})">
-                                <span class="glyphicon glyphicon-minus"></span> Usuń członka
-                            </button>
+                            {{--<button class="btn btn-danger pull-right" style="margin-top: 15px" type="button" onclick="deleteOldMember({{$package->id}})">--}}
+                                {{--<span class="glyphicon glyphicon-minus"></span> Usuń członka--}}
+                            {{--</button>--}}
                         </div>
                     </div>
                     <div class="row">
