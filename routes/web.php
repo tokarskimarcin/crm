@@ -134,10 +134,14 @@ Route::POST('/saveGroupTraining', 'GroupTrainingController@saveGroupTraining')->
 Route::POST('/EndGroupTraining', 'GroupTrainingController@EndGroupTraining')->name('api.EndGroupTraining');
 Route::POST('/EndGroupTrainingForCandidate', 'GroupTrainingController@EndGroupTrainingForCandidate')->name('api.EndGroupTrainingForCandidate');
 
+Route::post('editTrainingDate', 'GroupTrainingController@editTrainingDate')->name('api.editTrainingDate');
 
 Route::POST('/getCandidateForGroupTrainingInfo','GroupTrainingController@getCandidateForGroupTrainingInfo')->name('api.getCandidateForGroupTrainingInfo');
 Route::POST('/datatableTrainingGroupList','GroupTrainingController@datatableTrainingGroupList')->name('api.datatableTrainingGroupList');
 Route::POST('/getGroupTrainingInfo','GroupTrainingController@getGroupTrainingInfo')->name('api.getGroupTrainingInfo');
+
+Route::POST('/datatableRecruitmentStatisticsLeader','RecruitmentAttemptController@datatableRecruitmentStatisticsLeader')->name('api.datatableRecruitmentStatisticsLeader');
+
 
 Route::POST('/getCandidateSource', 'RecruitmentAttemptController@getCandidateSource')->name('api.getCandidateSource');
 Route::POST('/addCandidateSource', 'RecruitmentAttemptController@addCandidateSource')->name('api.addCandidateSource');
@@ -498,6 +502,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/interviews_all', 'RecruitmentAttemptController@interviewsAllGet');
 
     Route::get('/recruitment_admin', 'RecruitmentAttemptController@recruitment_admin');
+
+
+    Route::get('/recruitment_statistics_leader', 'RecruitmentAttemptController@recruitment_statistics_leaderGET');
 
     /**REKRUTACJA STOP */
 });

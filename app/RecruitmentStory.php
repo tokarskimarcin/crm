@@ -27,7 +27,19 @@ class RecruitmentStory extends Model
         return $this->belongsTo('App\AttemptStatus', 'attempt_status_id');
     }
 
+    public function attemptResult() {
+        return $this->belongsTo('App\AttemptResult', 'attempt_result_id');
+    }
+
     public function attemptLevel() {
         return $this->belongsTo('App\AttemptStatus', 'attempt_status_id');
+    }
+
+    public function lastAttemptResult() {
+        return $this->belongsTo('App\AttemptResult', 'last_attempt_result_id');
+    }
+
+    public function lastAttemptLevel() {
+        return $this->belongsTo('App\AttemptStatus', 'last_attempt_status_id');
     }
 }
