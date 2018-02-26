@@ -320,10 +320,14 @@
         if (showEditMedical == true) {
             $('#edit_medical_data').fadeOut(0);
             $('#span_edit_medical').removeClass('glyphicon-minus').addClass('glyphicon-plus');
+            $('#edit_span_message').html('Edytuj pakiet medyczny');
+            $('#medical_package_active').val(0);
             showEditMedical = false;
         } else {
             $('#edit_medical_data').fadeIn(0);
             $('#span_edit_medical').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+            $('#edit_span_message').html('Cofnij edycję pakietu');
+            $('#medical_package_active').val(1);
             showEditMedical = true;
         }
     });

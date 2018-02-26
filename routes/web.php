@@ -297,7 +297,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/cadre_hr', 'UsersController@cadreHRGet');
 
-    Route::get('/medical_packages_all', 'UsersController@medical_packages_all');
+    Route::get('/medical_packages_all', 'UsersController@medicalPackagesAllGet');
+    Route::POST('/medical_packages_all', 'UsersController@medicalPackagesAllPost');
     // Users -- STOP--
 
 

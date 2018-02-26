@@ -1,13 +1,27 @@
 <div class="row">
     <div class="col-md-12">
         <div class="form-group">
-            <button class="btn btn-info text-center" id="edit_medical_package" title="Opcja dostepna wkrótce" style="width: 100%" disabled="true">
-                <span id="span_edit_medical" class="glyphicon glyphicon-plus"></span> <span>Edytuj pakiet medyczny</span>
+            <button class="btn btn-info text-center" id="edit_medical_package" title="Opcja dostepna wkrótce" style="width: 100%">
+                <span id="span_edit_medical" class="glyphicon glyphicon-plus"></span> <span id="edit_span_message">Edytuj pakiet medyczny</span>
             </button>
         </div>
     </div>
 </div>
 <div id="edit_medical_data" style="display: none;">
+    <div class="col-md-12 alert alert-info" >
+        <div class="col-md-1">
+            <span style="font-size: 50px;color: #64beeb" class="glyphicon glyphicon-info-sign"></span>
+        </div>
+        <div class="col-md-11" style="font-size: 20px;">
+            <b>Obsługa pakietów medycznych:</b>
+            <p>
+                W przypadku zmiany pakietu należy zakończyć poprzedni wybierając datę jego zakończenia oraz dodać nowy pakiet obowiązuwujący od kolejnego miesiąca.
+            </p>
+            <p>
+                W przypadku edycji danych osobowych należy zatwierdzić te zmiany przyciskiem "Zapisz zmiany".
+            </p>
+        </div>
+    </div>
     <input type="hidden" id="medical_package_active" name="medical_package_active" value="0"/>
     <input type="hidden" id="totalMemberSum" name="totalMemberSum" value="0"/>
     <input type="hidden" name="medical_package_is_edited" value="1"/>
@@ -17,20 +31,23 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label>Pakiet:</label>
-                        <select class="form-control" name="package_name" id="package_name">
+                        <select disabled class="form-control" id="package_name">
                             <option>Wybierz</option>
-                            <option @if($package->package_name == 'STANDARD') selected @endif>STANDARD</option>
+                            <option value="STANDARD" @if($package->package_name == 'STANDARD') selected @endif>STANDARD</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label>Wariant:</label>
-                        <select class="form-control" name="package_variable" id="package_variable">
+                        <!-- Tymczasowy input niezbedny przy edycji pakietu (pola disabled nie wysyłają się i zerowane są zmienne) -->
+                        <input type="hidden" name="package_name" value="{{$package->package_name}}">
+                        <input type="hidden" name="package_variable" value="{{$package->package_variable}}">
+                        <select disabled class="form-control" id="package_variable">
                             <option>Wybierz</option>
-                            <option @if($package->package_variable == 'INDYWIDUALNY') selected @endif>INDYWIDUALNY</option>
-                            <option @if($package->package_variable == 'PARTNERSKI') selected @endif>PARTNERSKI</option>
-                            <option @if($package->package_variable == 'RODZINNY') selected @endif>RODZINNY</option>
+                            <option value="INDYWIDUALNY" @if($package->package_variable == 'INDYWIDUALNY') selected @endif>INDYWIDUALNY</option>
+                            <option value="PARTNERSKI" @if($package->package_variable == 'PARTNERSKI') selected @endif>PARTNERSKI</option>
+                            <option value="RODZINNY" @if($package->package_variable == 'RODZINNY') selected @endif>RODZINNY</option>
                         </select>
                     </div>
                 </div>
@@ -230,7 +247,7 @@
             @if($package->package_variable == 'RODZINNY' && $package->family_member == 1)
 
                 @php
-                    $add_family_by_default = true;
+                    $add_family_by_default = false;
                 @endphp
 
                 <div class="check_for_family" id="oldmember{{$package->id}}">

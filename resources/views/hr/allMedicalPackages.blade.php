@@ -15,6 +15,42 @@
         </div>
     </div>
 </div>
+<form method="POST" action="{{ URL::to('/medical_packages_all') }}">
+    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <select class="form-control" name="medical_type">
+                    <option value="0">Wszystkie</option>
+                    <option value="1">Nowe</option>
+                    <option value="2">Usunięte</option>
+                    <option value="3">Edycja danych</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <select class="form-control" name="medical_year">
+                    <option value="2018">2018</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <select class="form-control" name="medical_month">
+                    @foreach($months as $item)
+                        <option @if($selected_month == $item['id']) selected @endif value="{{$item['id']}}">{{$item['name']}}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <input type="submit" style="width: 100%" class="btn btn-info" value="Wybierz"/>
+            </div>
+        </div>
+    </div>
+</form>
 
 <div class="row">
     <div class="col-md-3">

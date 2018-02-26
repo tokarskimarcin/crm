@@ -259,7 +259,7 @@ class UsersController extends Controller
          */
         if ($request->medical_package_is_new == 1 && $request->medical_package_active == 1) {
             $this->addMedicalPackage($request, $user->id);
-        } else if ($request->medical_package_is_edited == 1) {
+        } else if ($request->medical_package_is_edited == 1 && $request->medical_package_active == 1) {
             $this->changeMedicalPackage($request, $user);
         }
 
@@ -538,7 +538,7 @@ class UsersController extends Controller
     /**
      * Edycja pakietu medycznego
      */
-    private function changeMedicalPackage(Request $request, User $user) {
+    private function changeMedicalPackage(Request $request, User $user) { //dd($request);
         $old_medical_ids = $user->medicalPackages->where('deleted', '=', 0);
         $old_medical_ids = $old_medical_ids->pluck('id')->toArray();
 
@@ -663,50 +663,71 @@ class UsersController extends Controller
                 $package->updated_at = date('Y-m-d H:i:s');
 
                 $package->save();
+
+                $data = [
+                    'Usunięcie pakietu medycznego' => '',
+                    'ID wpisu' => $package->id
+                ];
+
+                new ActivityRecorder(9, $data);
             }
             return 1;
         }
     }
 
     /**
-     * Dane na temat pakietów medycznych
+     * Dane na temat pakietów medycznych (domyślnie)
      */
-    public function medical_packages_all() {
-        $check_month = date('Y-m') . '%';
+    public function medicalPackagesAllGet() {
+        return $this->getMedicalPackagesData(date('Y'), date('m'));
+    }
 
+    /**
+     * Dane na temat pakietów medycznych (wybór)
+     */
+    public function medicalPackagesAllPost(Request $request) {
+        return $this->getMedicalPackagesData($request->medical_year, $request->medical_month);
+    }
+
+    /**
+     * Metoda pobierająca dane na temat
+     */
+    private function getMedicalPackagesData($year, $selectedMonth) {
+        $month = $year . '-' . $selectedMonth . '%';
+        $monthLimit = $year . '-' . $selectedMonth . '-01';
+        $prevMonth = $this->getPreviousMonth($year, $selectedMonth);
         /**
          * Pobranie pakietow ktore sa nie edytowane i starsze niz miesiac
          */
         $packagesOldNotEdited = MedicalPackage::where('deleted', '=', 0)
-            ->where('updated_at', 'not like', $check_month)
+            ->where('updated_at', 'not like', $month)
             ->orWhere('updated_at', '=', null)
-            ->where('month_start', 'not like', $check_month)
-            ->orderBy('user_last_name')
+            ->where('month_start', 'not like', $month)
+            //->orderBy('user_last_name')
             ->get();
 
         /**
-         * Edytowane w tym miesiącu
+         * Edytowane w tym miesiącu (Edycja dotyczy zmian danych pakietów które nie są nowe)
          */
         $packagesOldEdited = MedicalPackage::where('deleted', '=', 0)
-            ->where('month_start', 'not like', $check_month)
-            ->where('updated_at', 'like', $check_month)
-            ->orderBy('user_last_name')
+            ->where('month_start', 'not like', $month)
+            ->where('updated_at', 'like', $month)
+            //->orderBy('user_last_name')
             ->get();
 
         /**
-         * Nowe w tym miesiącu
+         * Nowe w tym miesiącu OK
          */
-        $packagesNewMonth = MedicalPackage::where('deleted', '=', 0)
-            ->where('month_start', 'like', $check_month)
-            ->orderBy('user_last_name')
+        $packagesNewMonth = MedicalPackage::where('month_start', 'like', $month)
+            //->orderBy('user_last_name')
             ->get();
 
         /**
-         * Usunięte w tym miesiącu
+         * Usunięte w tym miesiącu OK
          */
         $packagedDeletedThisMonth = MedicalPackage::where('deleted', '=', 1)
-            ->where('month_stop', 'like', $check_month)
-            ->orderBy('user_last_name')
+            ->where('month_stop', 'like', $prevMonth)
+            //->orderBy('user_last_name')
             ->get();
 
         $packagesOldNotEdited = $packagesOldNotEdited->map(function($item) {
@@ -734,7 +755,43 @@ class UsersController extends Controller
         $merged = $merged->merge($packagesNewMonth);
         $merged = $merged->merge($packagedDeletedThisMonth);
 
+        /**
+         * Tablica z miesiącami
+         */
+        $months = collect([
+            ['id' => '01', 'name' => 'Styczeń'],
+            ['id' => '02', 'name' => 'Luty'],
+            ['id' => '03', 'name' => 'Marzec'],
+            ['id' => '04', 'name' => 'Kwiecień'],
+            ['id' => '05', 'name' => 'Maj'],
+            ['id' => '06', 'name' => 'Czerwiec'],
+            ['id' => '07', 'name' => 'Lipiec'],
+            ['id' => '08', 'name' => 'Sierpień'],
+            ['id' => '09', 'name' => 'Wrzesień'],
+            ['id' => '10', 'name' => 'Październik'],
+            ['id' => '11', 'name' => 'Listopad'],
+            ['id' => '12', 'name' => 'Grudzień']
+        ]);
+
         return view('hr.allMedicalPackages')
+            ->with('months', $months)
+            ->with('selected_month', $selectedMonth)
             ->with('packages', $merged);
+    }
+
+    /**
+     * Pobranie danych poprzedniego miesiąca
+     */
+    private function getPreviousMonth($year, $month) {
+        $month = intval($month);
+        $month -= 1;
+        if ($month <= 0) {
+            $month += 12;
+            $year -= 1;
+        }
+
+        $month = ($month < 10) ? '0' . $month : $month;
+
+        return $year . '-' . $month . '%';
     }
 }

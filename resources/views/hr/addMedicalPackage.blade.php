@@ -1,13 +1,25 @@
 <div class="row">
     <div class="col-md-12">
         <div class="form-group">
-            <button class="btn btn-info text-center" id="add_medical_package" title="Opcja dostepna wkrótce" disabled="true" style="width: 100%">
+            <button class="btn btn-info text-center" id="add_medical_package" title="Opcja dostepna wkrótce" style="width: 100%">
                 <span id="span_medical" class="glyphicon glyphicon-plus"></span> <span id="span_medical_text">Dodaj pakiet medyczny</span>
             </button>
         </div>
     </div>
 </div>
 <div id="add_medical_package_div" style="display: none;">
+    <div class="col-md-12 alert alert-info" >
+        <div class="col-md-1">
+            <span style="font-size: 50px;color: #64beeb" class="glyphicon glyphicon-info-sign"></span>
+        </div>
+        <div class="col-md-11" style="font-size: 20px;">
+            <b>Dodawanie pakietów medycznych:</b>
+            <p>
+                Dodając pakiet medyczny wybieramy jego początkowy zakres obowiązywania - jest to data rozpoczęcia świadczenia usług medycznych.
+                Należy również dodać skan umowy w formacie PDF.
+            </p>
+        </div>
+    </div>
     <input type="hidden" id="medical_package_active" name="medical_package_active" value="0"/>
     <input type="hidden" id="totalMemberSum" name="totalMemberSum" value="0"/>
     <input type="hidden" name="medical_package_is_new" value="1"/>
@@ -17,7 +29,7 @@
                 <label>Pakiet:</label>
                 <select class="form-control" name="package_name" id="package_name">
                     <option>Wybierz</option>
-                    <option>STANDARD</option>
+                    <option selected>STANDARD</option>
                 </select>
             </div>
         </div>
