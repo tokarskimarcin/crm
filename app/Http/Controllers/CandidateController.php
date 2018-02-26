@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AttemptResult;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -142,6 +143,7 @@ class CandidateController extends Controller
         $department_info = Department_info::where('id', '!=', 13)->get();
         $sources = CandidateSource::all();
         $status = AttemptStatus::all();
+        $attempt_result = AttemptResult::all();
         $status_to_change = AttemptStatus::where('attempt_order', '!=', null)->orderBy('attempt_order')->get();
 
         return view('recruitment.candidateProfile')
@@ -151,7 +153,8 @@ class CandidateController extends Controller
             ->with('candidate_status', $candidate_status)
             ->with('department_info', $department_info)
             ->with('candidate', $candidate)
-            ->with('fired_user',$fired_user);
+            ->with('fired_user',$fired_user)
+            ->with('attempt_result',$attempt_result);
     }
 
     /**
@@ -200,13 +203,28 @@ class CandidateController extends Controller
      * Dodanie etapu rekrutacji 
      */
     public function addStory($candidate_id, $attempt_id, $status, $comment, $attempt_result = null,$date_training = null) {
+        //Ostatni etap rekrutacji
+        $old_recritment_story = RecruitmentStory::where('recruitment_attempt_id','=',$attempt_id)
+                                ->where('candidate_id','=',$candidate_id)
+                                ->orderby('id','desc')
+                                ->first();
         $newStory = new RecruitmentStory();
         $newStory->candidate_id = $candidate_id;
         $newStory->cadre_id = Auth::user()->id;
         $newStory->cadre_edit_id = Auth::user()->id;
         $newStory->recruitment_attempt_id = $attempt_id;
+
+        // Przypisanie poprzednich statusów rekrutacji i ich wyników
+        if(isset($old_recritment_story)){
+            $newStory->last_attempt_status_id = $old_recritment_story->attempt_status_id;
+            $newStory->last_attempt_result_id = $old_recritment_story->attempt_result_id;
+        }else{
+            $newStory->last_attempt_status_id = null;
+            $newStory->last_attempt_result_id = null;
+        }
         $newStory->attempt_status_id = $status;
         $newStory->attempt_result_id = $attempt_result;
+
         $newStory->comment = $comment;
         $newStory->created_at = date('Y-m-d H:i:s');
         $newStory->updated_at = date('Y-m-d H:i:s');
