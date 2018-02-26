@@ -181,12 +181,24 @@ class GroupTrainingController extends Controller
                     $candidate_story_new->candidate_id              = $item->candidate_id;
                     $candidate_story_new->recruitment_attempt_id    = $candidate_story_old->recruitment_attempt_id;
 
-                    if($request->training_stage == 1 && ($candidate->attempt_status_id != 18 && $candidate->attempt_status_id != 19))
+                    if($request->training_stage == 1 && ($candidate->attempt_status_id != 18 && $candidate->attempt_status_id != 19)) {
                         $candidate_story_new->attempt_status_id = 7;
-                    else if($request->training_stage != 1 && ($candidate->attempt_status_id != 18 && $candidate->attempt_status_id != 19))
+                    }
+                    else if($request->training_stage != 1 && ($candidate->attempt_status_id != 18 && $candidate->attempt_status_id != 19)) {
                         $candidate_story_new->attempt_status_id = 14;
-                    else
+                    }
+                    else {
+                        $result_status = 0;
+                        if( $candidate_story_old->attempt_status_id == 18){
+                            $result_status = 14;
+                        }else if($candidate_story_old->attempt_status_id == 19)
+                        {
+                            $result_status = 15;
+                        }
                         $candidate_story_new->attempt_status_id = $candidate_story_old->attempt_status_id;
+                        $candidate_story_new->attempt_result_id = $result_status;
+
+                    }
 
                     $candidate_story_new->comment = "Szkolenie zakończone";
                     $candidate_story_new->save();
@@ -478,18 +490,24 @@ class GroupTrainingController extends Controller
                 // kandydaci nieobecni
                 for($i =  0 ;$i < count($choice_candidate_absent) ; $i++){// osoby nieobecne na szkoleniu
                     $candidate = Candidate::find($choice_candidate_absent[$i]);
-                    if($request->actual_stage == 1)
+                    if($request->actual_stage == 1){
                         $candidate->attempt_status_id = 18;
-                    else  if($request->actual_stage == 2)
+                    }
+                    else if($request->actual_stage == 2){
                         $candidate->attempt_status_id = 19;
+                    }
                     $candidate->save();
                     $candidate_story = RecruitmentStory::where('candidate_id','=',$choice_candidate_absent[$i])
                         ->orderBy('id', 'desc')->first();
 
-                    if($request->actual_stage == '1')
+                    if($request->actual_stage == '1'){
                         $candidate_story->attempt_status_id = 18;
-                    else  if($request->actual_stage == '2')
+                        $candidate_story->attempt_result_id = 14;
+                    }
+                    else  if($request->actual_stage == '2'){
                         $candidate_story->attempt_status_id = 19;
+                        $candidate_story->attempt_result_id = 15;
+                    }
                     $candidate_story->save();
 
                     $new_relation               = new CandidateTraining();
