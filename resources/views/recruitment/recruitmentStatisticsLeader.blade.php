@@ -139,6 +139,9 @@
                     },"name":"candidate_last_name"
                 },
                 {"data": "created_at"},
+                {"data": "attempt_status_name"},
+                {"data": "attempt_result_name"},
+                {"data": "comment"},
             ]
         });
 

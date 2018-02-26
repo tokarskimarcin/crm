@@ -13,4 +13,7 @@ class AttemptStatus extends Model
         return $this->belongsToMany('App\AttemptResult');
     }
 
+    public function defaultAttemptResult(){
+        return $this->belongsTo('App\AttemptResult','default_attempt_result_id');
+    }
 }

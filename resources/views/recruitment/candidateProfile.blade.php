@@ -324,23 +324,38 @@
                                 </div>
                                 <div class="panel-body">
                                     <div class="row">
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="myLabel">Rekruter:</label>
                                                 <input type="text" class="form-control" readonly value="{{$story->cadre->first_name . ' ' . $story->cadre->last_name}}"/>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="myLabel">Data:</label>
                                                 <input type="text" class="form-control" value="{{$story->updated_at}}" readonly/>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="myLabel">Etap rekrutacji:</label>
                                                 <input type="text" class="form-control" readonly value="{{$story->attemptLevel->name}}"/>
                                             </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="myLabel">Wynik Etapu</label>
+                                            @php
+                                                $attempt_result_last = 'Brak';
+                                                if(isset($story->attemptResult->name)){
+                                                    $attempt_result_last = $story->attemptResult->name;
+                                                }else if(isset($story->lastAttemptLevel->defaultAttemptResult) && $story->attempt_status_id == 11){
+                                                    $attempt_result_last = $story->lastAttemptLevel->defaultAttemptResult->name;
+                                                }else  if(isset($story->lastAttemptResult) && $story->attempt_status_id == 11){
+                                                    $attempt_result_last = $story->lastAttemptResult->name;
+                                                }
+                                            @endphp
+
+                                            <input type="text" class="form-control" readonly value="{{$attempt_result_last}}"/>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -430,7 +445,15 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label class="myLabel">Etap rekrutacji:</label>
-                            <input class="form-control" id="stop_recruitment_status" value="Zakończenie rekrutacji" readonly>
+                            <input class="form-control" id="stop_recruitment_status" value="Zakończenie rekrutacji ({{$candidate->attempt_level_data->name}})" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="myLabel">Wynik Etapu:</label>
+                            <select class="form-control" id="select_last_attempt_result">
+                                @foreach($attempt_result as $item)
+                                    <option>{{$item}}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="form-group">
                             <label class="myLabel">Powód:</label>
