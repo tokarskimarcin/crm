@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\AttemptResult;
+use App\CandidateTraining;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -324,6 +325,12 @@ class CandidateController extends Controller
             if ($recruitmentAttempt == null) {
                 return 0;
             }
+            /**
+             * usunięcie wpisu ze szkoleń
+             */
+            CandidateTraining::where('candidate_id','=',$id)
+                                ->where('completed_training','=',null)
+                                ->delete();
 
             $recruitmentAttempt->status = 1;
             $recruitmentAttempt->cadre_edit_id = Auth::user()->id;
