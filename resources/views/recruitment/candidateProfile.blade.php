@@ -32,6 +32,7 @@
     $phone_call_status = $temp1[0]->attemptResult;
     $temp2 = $status_to_change->where('id', '=', 17);
     $interview_status = $temp2[2]->attemptResult;
+    $attempt_result_last_active = '';
 @endphp
 
 <div class="row">
@@ -347,6 +348,9 @@
                                             @php
                                                 $attempt_result_last = 'Brak';
                                                 if(isset($story->attemptResult->name)){
+                                                        if($item->status == 0){
+                                                            $attempt_result_last_active = $story->attemptResult->name;
+                                                        }
                                                     $attempt_result_last = $story->attemptResult->name;
                                             }
                                             @endphp
@@ -447,7 +451,11 @@
                             <label class="myLabel">Wynik Etapu:</label>
                             <select class="form-control" id="select_last_attempt_result">
                                        @foreach($candidate->attempt_level_data->attemptResult as $item)
-                                           <option value={{$item->id}}>{{$item->name}}</option>
+                                            @if($attempt_result_last_active == $item->name)
+                                                <option selected value={{$item->id}}>{{$item->name.' '}}</option>
+                                            @else
+                                                <option value={{$item->id}}>{{$item->name.' '}}</option>
+                                            @endif
                                        @endforeach
                             </select>
                         </div>
