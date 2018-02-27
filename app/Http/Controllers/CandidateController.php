@@ -144,6 +144,7 @@ class CandidateController extends Controller
         $sources = CandidateSource::all();
         $status = AttemptStatus::all();
         $attempt_result = AttemptResult::all();
+        $attempt_status = AttemptStatus::all();
         $status_to_change = AttemptStatus::where('attempt_order', '!=', null)->orderBy('attempt_order')->get();
 
         return view('recruitment.candidateProfile')
@@ -154,7 +155,8 @@ class CandidateController extends Controller
             ->with('department_info', $department_info)
             ->with('candidate', $candidate)
             ->with('fired_user',$fired_user)
-            ->with('attempt_result',$attempt_result);
+            ->with('attempt_result',$attempt_result)
+            ->with('attempt_status',$attempt_status);
     }
 
     /**
@@ -338,7 +340,7 @@ class CandidateController extends Controller
             /**
              * Dodanie etapu w tej rekrutacji
              */
-            $this->addStory($id, $recruitmentAttempt->id, $request->stop_recruitment_status, $request->stop_recruitment_comment);
+            $this->addStory($id, $recruitmentAttempt->id, $request->stop_recruitment_status, $request->stop_recruitment_comment,$request->last_attempt_result);
 
             if ($request->stop_recruitment_status == 11) {
                 return 1;
