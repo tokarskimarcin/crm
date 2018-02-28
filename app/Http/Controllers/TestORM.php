@@ -130,6 +130,14 @@ class TestORM extends Controller
                             }
 
                             $spreadsheet_data[$lp]['janky_count'] = $janky_count;
+                            if($i == 7)
+                            {
+                                if($spreadsheet_data[$lp]['average'] != 0){
+                                    $spreadsheet_data[$lp]['hour_time_use'] = round($spreadsheet_data[$lp]['success']/$spreadsheet_data[$lp]['average'],2);
+                                }else{
+                                    $spreadsheet_data[$lp]['hour_time_use'] = 0;
+                                }
+                            }
                         }
                         $i++;
                     }
@@ -138,7 +146,6 @@ class TestORM extends Controller
             }
             fclose($handle);
         }
-        //dd($spreadsheet_data);
         HourReport::insert($spreadsheet_data);
 
     }

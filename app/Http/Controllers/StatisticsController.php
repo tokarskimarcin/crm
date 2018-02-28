@@ -142,14 +142,15 @@ class StatisticsController extends Controller
 // Przygotowanie danych do raportu tygodniowego telemarketing
     private function weekReportTelemarketing()
     {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-42,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-35,date("Y")));
 
         $reports = DB::table('hour_report')
             ->select(DB::raw(
                 'SUM(call_time)/count(`call_time`) as sum_call_time,
-                  SUM(average)/count(`call_time`) as avg_average,
+                  SUM(success)/sum(`hour_time_use`) as avg_average,
                   SUM(success) as sum_success,
+                  sum(`hour_time_use`) as hour_time_use,
                   SUM(wear_base)/count(`call_time`) as avg_wear_base,
                   SUM(janky_count)/count(`call_time`)  as sum_janky_count,
                   department_type.name as dep_name,
@@ -397,7 +398,8 @@ class StatisticsController extends Controller
         $reports = DB::table('hour_report')
             ->select(DB::raw(
                     'SUM(call_time)/count(`call_time`) as sum_call_time,
-                      SUM(average)/count(`call_time`) as avg_average,
+                       SUM(success)/sum(`hour_time_use`) as avg_average,
+                       sum(`hour_time_use`) as hour_time_use,
                       SUM(success) as sum_success,
                       SUM(wear_base)/count(`call_time`) as avg_wear_base,
                       SUM(janky_count)/count(`call_time`)  as sum_janky_count,
