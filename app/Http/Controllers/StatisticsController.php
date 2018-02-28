@@ -142,8 +142,8 @@ class StatisticsController extends Controller
 // Przygotowanie danych do raportu tygodniowego telemarketing
     private function weekReportTelemarketing()
     {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-42,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-35,date("Y")));
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
 
         $reports = DB::table('hour_report')
             ->select(DB::raw(
