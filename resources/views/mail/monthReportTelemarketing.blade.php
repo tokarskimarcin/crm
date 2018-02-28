@@ -20,7 +20,7 @@
     <tbody>
 
       @php
-          $total_avg_average = 0;
+          $total_hour_time_use = 0;
           $total_realRBH = 0;
           $total_sum_success = 0;
           $total_sum_janky_count = 0;
@@ -41,30 +41,8 @@
             $add_column = true;
         @endphp
             <tr>
-                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->dep_name . ' ' . $report->dep_type_name}}</td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->dep_type_name}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($report->avg_average, 2)}}</td>
-                @php
-                    {{--  if ($report->id == 2) {
-                        $temporary_avg = 2.77;
-                    } else if ($report->id == 3) {
-                        $temporary_avg = 3.33;
-                    } else if ($report->id == 5) {
-                        $temporary_avg = 3.14;
-                    } else if ($report->id == 6) {
-                        $temporary_avg = 3.38;
-                    } else if ($report->id == 7) {
-                        $temporary_avg = 3.02;
-                    } else if ($report->id == 8) {
-                        $temporary_avg = 3.03;
-                    } else if ($report->id == 9) {
-                        $temporary_avg = 3.96;
-                    } else if ($report->id == 10) {
-                        $temporary_avg = 2.53;
-                    } else if ($report->id == 11) {
-                        $temporary_avg = 2.88;
-                    }  --}}
-                @endphp
-                {{--  <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$temporary_avg}}</td>  --}}
                 @foreach($work_hours as $work_hour)
                     @if($work_hour->id == $report->id && $work_hour->realRBH != null)
                     @php $total_realRBH += $work_hour->realRBH;@endphp
@@ -83,7 +61,7 @@
             </tr>
 
             @php
-                $total_avg_average += $report->avg_average;
+                $total_hour_time_use += $report->hour_time_use;
                 $total_sum_success += $report->sum_success;
                 $total_sum_janky_count += $report->sum_janky_count;
                 $total_janky += $report->sum_janky_count;
@@ -108,7 +86,7 @@
                   $total_goal_proc = round($total_goal / $count, 2);
                   $total_avg_wear_base_proc = round($total_avg_wear_base / $count, 2);
                   $total_janky_proc = round($total_janky / $count, 2);
-                  $total_avg_average_proc = round($total_avg_average / $count, 2);
+                  $total_avg_average_proc = round($total_sum_success / $total_hour_time_use, 2);
                   $total_sum_call_time_poc = round($total_sum_call_time / $count, 2);
                   $total_goal_proc = round($total_goal / $count, 2);
                   $total_realRBH = round($total_realRBH, 2);
