@@ -663,13 +663,6 @@ class UsersController extends Controller
                 $package->updated_at = date('Y-m-d H:i:s');
 
                 $package->save();
-
-                $data = [
-                    'Usunięcie pakietu medycznego' => '',
-                    'ID wpisu' => $package->id
-                ];
-
-                new ActivityRecorder(9, $data);
             }
             return 1;
         }

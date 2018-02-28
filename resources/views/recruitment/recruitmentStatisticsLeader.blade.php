@@ -36,14 +36,14 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for ="ipadress">Data od:</label>
                             <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
                                 <input  onchange="myFunction()"  id="start_date" class="form-control" name="od" type="text" value="{{date("Y-m-d")}}" readonly >
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for ="ipadress">Data do:</label>
                             <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
                                 <input onchange="myFunction()" id="stop_date" class="form-control" name="do" type="text" value="{{date("Y-m-d")}}"readonly >
@@ -51,24 +51,41 @@
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <label>Status:</label>
+                            <select class="form-control" id="attempt_by_status" onchange="myFunction()" >
+                                <option value="0">Wszystkie</option>
+                                <option value="1">Zakończone</option>
+                                <option value="2">Aktywne</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="col-md-12">
                         <div class="col-md-4">
                             <label>Pracownik HR</label>
-                            <select class="form-control">
-                                <option>1</option>
+                            <select class="form-control" id="hr_user" onchange="myFunction()">
+                                <option value="0">Wszyscy</option>
+                                @foreach($hr as $item)
+                                    <option value="{{$item->id}}">{{$item->last_name . ' ' . $item->first_name}}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label>Status rozmowy</label>
-                            <select class="form-control">
-                                <option>1</option>
+                            <select class="form-control" id="attempt_status" onchange="myFunction()">
+                                <option value="0">Wszystkie</option>
+                                @foreach($attemptStatus as $item)
+                                    <option value="{{$item->id}}">{{$item->name}}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label>Wynik statusu</label>
-                            <select class="form-control">
-                                <option>1</option>
+                            <select class="form-control" id="attempt_result" onchange="myFunction()">
+                                <option value="0">Wszystkie</option>
+                                @foreach($attemptResult as $item)
+                                    <option value="{{$item->id}}">{{$item->name}}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -113,7 +130,14 @@
         pickTime: false
         });
 
-        var recruitment_statistics = $('#candidates').DataTable({
+        var recruitment_statistics;
+
+        function myFunction() {
+            recruitment_statistics.ajax.reload();
+
+        }
+
+        recruitment_statistics = $('#candidates').DataTable({
             "order": [[0, "desc"]],
             "autoWidth": false,
             "processing": true,
@@ -124,7 +148,12 @@
                 'url': "{{ route('api.datatableRecruitmentStatisticsLeader') }}",
                 'type': 'POST',
                 'data': function (d) {
-
+                    d.hr_user = $('#hr_user').val();
+                    d.attempt_status = $('#attempt_status').val();
+                    d.attempt_result = $('#attempt_result').val();
+                    d.start_date = $('#start_date').val();
+                    d.stop_date = $('#stop_date').val();
+                    d.attempt_by_status = $('#attempt_by_status').val();
                 },
                 'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
             }, "columns": [
