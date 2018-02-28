@@ -110,11 +110,15 @@ class StatisticsController extends Controller
         $reports = HourReport::where('report_date', '=', $date)
             ->where('hour', $hour)
             ->get();
+        $last_reports = HourReport::where('report_date', '=', $date)
+            ->where('hour', date('H')-1 . ':00:00')
+            ->get();
 
         $data = [
             'hour' => $hour,
             'date' => $date,
-            'reports' => $reports
+            'reports' => $reports,
+            'last_reports' => $last_reports
         ];
         return $data;
     }
@@ -137,7 +141,8 @@ class StatisticsController extends Controller
         return view('reportpage.HourReportTelemarketing')
             ->with('reports', $data['reports'])
             ->with('hour', $data['hour'])
-            ->with('date', $data['date']);
+            ->with('date', $data['date'])
+            ->with('last_reports', $data['last_reports']);
     }
 // Przygotowanie danych do raportu tygodniowego telemarketing
     private function weekReportTelemarketing()

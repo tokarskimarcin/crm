@@ -16,7 +16,7 @@
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">% Janków</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">% Wykorzystania Bazy</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">% Czas Rozmów</th>
-        <th style="border:1px solid #231f20;padding:3px;background:#231f20">% Celu</th>
+        <th style="border:1px solid #231f20;padding:3px;background:#231f20">% Średnia z godziny</th>
     </tr>
 </thead>
     <tbody>
@@ -29,6 +29,8 @@
           $total_wear_base = 0;
           $total_success_proc = 0;
           $sum = 0;
+          $difference_succes_total = 0;
+          $difference_hour_time_use_total = 0;
       @endphp
       @foreach($reports as $report)
         @if($report->department_info->id_dep_type == 2)
@@ -40,7 +42,7 @@
               <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->employee_count}}</td>
               <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->janky_count}} %</td>
               <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->wear_base}} %</td>
-              <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->call_time}} %</td>
+
               @if(date('N') <= 5)
                   <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->success / $report->department_info->dep_aim) * 100, 2)}} %</td>
                   @php $total_success_proc += round(($report->success / $report->department_info->dep_aim) * 100, 2); @endphp
@@ -55,8 +57,26 @@
                   $total_janky_count += $report->janky_count;
                   $total_call_time += $report->call_time;
                   $total_wear_base += $report->wear_base;
+                  $last_reports_date = $last_reports->where('department_info_id','=',$report->department_info_id)->first();
+                  $difference_succes = 0;
+                  $difference_hour_time_use = 0;
                   $sum++;
+                  if(isset($last_reports_date))
+                  {
+                      $difference_succes = ($report->success)-($last_reports_date->success);
+                      $difference_hour_time_use = $report->hour_time_use - $last_reports_date->hour_time_use;
+                      $difference_succes_total += $difference_succes;
+                      $difference_hour_time_use_total += $difference_hour_time_use;
+                      if($difference_hour_time_use != 0)
+                        $avg_per_hour = round($difference_succes/$difference_hour_time_use,2);
+                      else
+                        $avg_per_hour=0;
+                  }else{
+                        $avg_per_hour="Brak informacji";
+                  }
+
               @endphp
+              <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$avg_per_hour}}</td>
           </tr>
         @endif
       @endforeach
@@ -73,7 +93,12 @@
           $total_avg_proc = round($total_average / $sum, 2);
           $total_janky_count = round($total_janky_count / $sum, 2);
           $total_call_time = round($total_call_time / $sum, 2);
-          }
+
+          if($difference_hour_time_use_total != 0)
+              $total_diffrence_avg = $difference_succes_total/$difference_hour_time_use_total;
+          else
+                $total_diffrence_avg = 0;
+      }
       @endphp
       <tr>
           <td colspan="2" style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px"><b>Total</b></td>
@@ -83,7 +108,7 @@
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_janky_count}} %</td>
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_wear_proc}} %</td>
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_call_time}} %</td>
-          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_success_proc}} %</td>
+          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round($total_diffrence_avg)}} %</td>
       </tr>
     </tbody>
 </table>
