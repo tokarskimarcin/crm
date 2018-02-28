@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="form-group">
-            <button class="btn btn-info text-center" id="add_medical_package" title="Opcja dostepna wkrótce" style="width: 100%">
+            <button class="btn btn-info text-center" id="add_medical_package" disabled="true"  title="Opcja dostepna wkrótce" style="width: 100%">
                 <span id="span_medical" class="glyphicon glyphicon-plus"></span> <span id="span_medical_text">Dodaj pakiet medyczny</span>
             </button>
         </div>
