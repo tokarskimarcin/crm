@@ -233,10 +233,34 @@
                     </div>
                 </div>
                 @if($candidate->attempt_status_id == 3)
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="alert alert-danger" style="color: #616366; font-size: 20px;">
-                                    Data rozmowy kwalifikacyjnej: <b>{{$candidate->recruitment_attempt->where('status', '=', 0)->first()->interview_date}}</b>
+                    <div class="container-fluid">
+                        <div class="panel panel-default panel-body" style="color: #616366; font-size: 20px;">
+                            <div class="col-md-6">
+                                Data rozmowy kwalifikacyjnej: <b>{{$candidate->recruitment_attempt->where('status', '=', 0)->first()->interview_date}}</b>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-info pull-right" id="edit_interview_date_on">
+                                    <span class="glyphicon glyphicon-edit"></span> Edytuj
+                                </button>
+                            </div>
+                            <div id="edit_interview_date_div" style="display: none;">
+                                <div class="col-md-4">
+                                    <label>Data:</label>
+                                    <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                        <input class="form-control" id="interview_date_edit" name="interview_date_edit" type="text" value="{{date("Y-m-d")}}" >
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Godzina:</label>
+                                    <input type="time" class="form-control" id="edit_interview_hour">
+                                </div>
+                                <div class="col-md-4">
+                                    <label style="color: #fff;">.</label>
+                                    <button id="edit_interview_submit" class="btn btn-success" style="width: 100%">
+                                        <span class="glyphicon glyphicon-envelope"></span> Zapisz zmiany
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -260,7 +284,7 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <button  class="btn btn-info" id="edit_training_date_button" style="width: 100%; padding: 15px">
+                                    <button class="btn btn-info" id="edit_training_date_button" style="width: 100%; padding: 15px">
                                         <span class="glyphicon glyphicon-edit"></span> Edycja
                                     </button>
                                 </div>
@@ -604,7 +628,6 @@
 </div>
 
 <input type="hidden" id="candidate_id" value="{{$candidate->id}}" />
-<input type="hidden" id="candidate_id" value="{{$candidate->id}}" />
 @endsection
 @section('script')
 <script>
@@ -623,6 +646,58 @@ $('.form_date').datetimepicker({
 
 
 $(document).ready(() => {
+
+    /**
+     * Edycja daty rozmowy kwalifikacyjnej
+     */
+    $('#edit_interview_date_on').click((e) => {
+        $('#edit_interview_date_div').toggle(0);
+    });
+
+    /**
+     * Zapis zmian (data i godz rozmowy kwalifikacyjnej)
+     */
+    $('#edit_interview_submit').click((e) => {
+        var interview_date_edit = $('#interview_date_edit').val();
+        var edit_interview_hour = $('#edit_interview_hour').val();
+
+        var validate = true;
+
+        if (interview_date_edit == '') {
+            swal('Podaj datę rozmowy!');
+            validate = false;
+        }
+
+        if (edit_interview_hour == '') {
+            swal('Podaj godzinę rozmowy kwalifikacyjnej!');
+            validate = false;
+        }
+
+        if (validate == false) {
+            return false;
+        }
+
+        var result = interview_date_edit + " " + edit_interview_hour + ":00";
+        var candidate_id = $('#candidate_id').val();
+
+        $.ajax({
+            type: "POST",
+            url: '{{ route('api.editInterviewDate') }}',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: {
+                "candidate_id": candidate_id,
+                "result": result
+            },
+            success: function (response) {
+                swal(response);
+            },
+            error: function() {
+                swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!');
+            }
+        });
+    });
 
     var ex_candidate_date = $('#candidate_ex_date').val();
 
@@ -904,13 +979,38 @@ $(document).ready(() => {
     }
 
     $('#stop_recruitment_submit').click(() => {
-        var stopType = 0; // tutaj jezeli nie dodajemy jako konsultanta
-        stopRecruitment(stopType);
+        swal({
+                 title: '',
+                 text: "Zakończyć rekrutację negatywnie?",
+                 type: 'warning',
+                 showCancelButton: true,
+                 confirmButtonColor: '#3085d6',
+                 cancelButtonColor: '#d33',
+                 confirmButtonText: 'Tak'
+             }).then((result) => {
+        if (result.value) {
+            var stopType = 0; // tutaj jezeli nie dodajemy jako konsultanta
+            stopRecruitment(stopType);
+            }
+        })
     });
 
     $('#stop_recruitment_add').click(() => {
-        var stopType = 1; // tutaj jezeli dodajemy jako konsultanta
-        stopRecruitment(stopType);
+        swal({
+                 title: '',
+                 text: "Zakończyć rekrutację pozytywnie?",
+                 type: 'warning',
+                 showCancelButton: true,
+                 confirmButtonColor: '#3085d6',
+                 cancelButtonColor: '#d33',
+                 confirmButtonText: 'Tak'
+             }).then((result) => {
+        if (result.value) {
+            var stopType = 1; // tutaj jezeli dodajemy jako konsultanta
+            stopRecruitment(stopType);
+            }
+        })
+
     });
 
     $('#add_level_submit').click(() => {

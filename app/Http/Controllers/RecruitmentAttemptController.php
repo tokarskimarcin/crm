@@ -481,7 +481,7 @@ class RecruitmentAttemptController extends Controller
 
             $maxIds = DB::table('recruitment_story')
                 ->select(DB::raw('
-                MAX(id) as id
+                    MAX(id) as id
                 '))
                 ->groupBy('recruitment_attempt_id')
                 ->get();
@@ -490,24 +490,49 @@ class RecruitmentAttemptController extends Controller
                 return $item->id;
             });
 
-            $query = DB::table('recruitment_story')
-                ->select(DB::raw('
-                users.first_name as cadre_first_name,
-                users.last_name as cadre_last_name,
-                candidate.first_name as candidate_first_name,
-                candidate.last_name as candidate_last_name,
-                attempt_status.name as attempt_status_name,
-                attempt_result.name as attempt_result_name,
-                recruitment_attempt.created_at as created_at,
-                recruitment_story.comment as comment
-            '))
-                ->join('recruitment_attempt', 'recruitment_attempt.id', 'recruitment_story.recruitment_attempt_id')
-                ->join('users', 'users.id', 'recruitment_attempt.cadre_id')
-                ->join('candidate', 'candidate.id', 'recruitment_attempt.candidate_id')
-                ->leftJoin('attempt_result', 'attempt_result.id', 'recruitment_story.attempt_result_id')
-                ->leftJoin('attempt_status', 'attempt_status.id', 'recruitment_story.attempt_status_id')
-                ->whereIn('recruitment_story.id', $ids[0]->toArray())
-                ->whereBetween('recruitment_story.created_at', [$request->start_date . ' 01:00:00', $request->stop_date . ' 23:00:00']);
+            if ($request->attempt_by_status != 0) {
+                if ($request->attempt_by_status == 1) {
+                    $query = DB::table('recruitment_story')
+                        ->select(DB::raw('
+                            users.first_name as cadre_first_name,
+                            users.last_name as cadre_last_name,
+                            candidate.first_name as candidate_first_name,
+                            candidate.last_name as candidate_last_name,
+                            attempt_status.name as attempt_status_name,
+                            attempt_result.name as attempt_result_name,
+                            recruitment_attempt.created_at as created_at,
+                            recruitment_story.comment as comment
+                        '))
+                        ->join('recruitment_attempt', 'recruitment_attempt.id', 'recruitment_story.recruitment_attempt_id')
+                        ->join('users', 'users.id', 'recruitment_attempt.cadre_id')
+                        ->join('candidate', 'candidate.id', 'recruitment_attempt.candidate_id')
+                        ->leftJoin('attempt_result', 'attempt_result.id', 'recruitment_story.last_attempt_result_id')
+                        ->leftJoin('attempt_status', 'attempt_status.id', 'recruitment_story.last_attempt_status_id')
+                        ->whereIn('recruitment_story.id', $ids[0]->toArray())
+                        ->where('recruitment_attempt.status', '=', 1)
+                        ->whereBetween('recruitment_story.created_at', [$request->start_date . ' 01:00:00', $request->stop_date . ' 23:00:00']);
+                } else if ($request->attempt_by_status == 2) {
+                    $query = DB::table('recruitment_story')
+                        ->select(DB::raw('
+                            users.first_name as cadre_first_name,
+                            users.last_name as cadre_last_name,
+                            candidate.first_name as candidate_first_name,
+                            candidate.last_name as candidate_last_name,
+                            attempt_status.name as attempt_status_name,
+                            attempt_result.name as attempt_result_name,
+                            recruitment_attempt.created_at as created_at,
+                            recruitment_story.comment as comment
+                        '))
+                        ->join('recruitment_attempt', 'recruitment_attempt.id', 'recruitment_story.recruitment_attempt_id')
+                        ->join('users', 'users.id', 'recruitment_attempt.cadre_id')
+                        ->join('candidate', 'candidate.id', 'recruitment_attempt.candidate_id')
+                        ->leftJoin('attempt_result', 'attempt_result.id', 'recruitment_story.attempt_result_id')
+                        ->leftJoin('attempt_status', 'attempt_status.id', 'recruitment_story.attempt_status_id')
+                        ->whereIn('recruitment_story.id', $ids[0]->toArray())
+                        ->where('recruitment_attempt.status', '=', 0)
+                        ->whereBetween('recruitment_story.created_at', [$request->start_date . ' 01:00:00', $request->stop_date . ' 23:00:00']);
+                }
+            }
 
             if ($request->hr_user != 0) {
                 $query->where('recruitment_attempt.cadre_id', '=', $request->hr_user);
@@ -519,14 +544,6 @@ class RecruitmentAttemptController extends Controller
 
             if ($request->attempt_result != 0) {
                 $query->where('recruitment_story.attempt_result_id', '=', $request->attempt_result);
-            }
-
-            if ($request->attempt_by_status != 0) {
-                if ($request->attempt_by_status == 1) {
-                    $query->where('recruitment_attempt.status', '=', 1);
-                } else if ($request->attempt_by_status == 2) {
-                    $query->where('recruitment_attempt.status', '=', 0);
-                }
             }
 
             return datatables($query)->make(true);

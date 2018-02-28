@@ -54,7 +54,6 @@
                         <div class="col-md-4">
                             <label>Status:</label>
                             <select class="form-control" id="attempt_by_status" onchange="myFunction()" >
-                                <option value="0">Wszystkie</option>
                                 <option value="1">Zakończone</option>
                                 <option value="2">Aktywne</option>
                             </select>
