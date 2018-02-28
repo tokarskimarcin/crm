@@ -7,18 +7,6 @@
     }
 </style>
 
-@if(Session::has('candidate_data'))
-    <!-- Te dane pobierane są jeżeli dodajemy pracownika z proflilu kandydata  -->
-    @php
-        $candidate = Session::get('candidate_data');
-        $candidate_first_name = $candidate->first_name;
-        $candidate_last_name = $candidate->last_name;
-        $candidate_phone = $candidate->phone;
-        $candidate_comment = $candidate->comment;
-        Session::forget('candidate_data');
-    @endphp
-@endif
-
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
@@ -33,7 +21,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <form method="post" action="{{URL::to('/edit_cadre/')}}/{{$user->id}}" id="consultant_add">
+        <form method="post" action="{{URL::to('/edit_cadre/')}}/{{$user->id}}" id="consultant_add"  enctype="multipart/form-data">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -274,14 +262,11 @@
                             </div>
                         @endif
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <button class="btn btn-info text-center" id="add_medical_package" style="width: 100%">
-                                <span id="span_medical" class="glyphicon glyphicon-plus"></span> <snap id="span_medical_text">Pakiet medyczny</span>
-                            </button>
-                        </div>
-                    </div>
-                    @include('hr.addMedicalPackage')
+                    @if($user->medicalPackages->where('deleted', '=', 0)->count() == 0)
+                        @include('hr.addMedicalPackage')
+                    @else
+                        @include('hr.editMedicalPackage')
+                    @endif
                     <div class="col-md-12">
                         <div class="form-group">
                             <button class="btn btn-success text-center" style="width: 100%" id="add_submit">
@@ -324,11 +309,103 @@
 
 <script>
 
+    /** Do edycji pakietu medycznego **/
+    var showEditMedical = false;
+    var medicalStatus = Number('{{$user->medicalPackages->where("deleted", '=', 0)->count()}}');
+    var medicalScanIsSet = (medicalStatus == 0) ? false : true;
+
+    $('#edit_medical_package').click(function(e) {
+        e.preventDefault();
+
+        if (showEditMedical == true) {
+            $('#edit_medical_data').fadeOut(0);
+            $('#span_edit_medical').removeClass('glyphicon-minus').addClass('glyphicon-plus');
+            $('#edit_span_message').html('Edytuj pakiet medyczny');
+            $('#medical_package_active').val(0);
+            showEditMedical = false;
+        } else {
+            $('#edit_medical_data').fadeIn(0);
+            $('#span_edit_medical').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+            $('#edit_span_message').html('Cofnij edycję pakietu');
+            $('#medical_package_active').val(1);
+            showEditMedical = true;
+        }
+    });
+
+    //Usuwanie całości pakietu medycznego
+    $('#delete_all_packages').click(function (e) {
+        e.preventDefault();
+        var medical_stop = $('#medical_stop').val();
+        var user_id = Number('{{$user->id}}');
+        swal({
+            title: '',
+            text: "Usunąć pakiet medyczny?",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Tak'
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.deleteMedicalPackage') }}',
+                    data: {
+                        "medical_stop":medical_stop,
+                        "user_id":user_id
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response == 1) {
+                            swal('Usunięto pakiet medyczny!');
+                            window.location.reload();
+                        } else {
+                            swal('Ups! Coś poszło nie tak, skontatkuj się z admnistratorem!');
+                        }
+                    }, error: function(response) {
+                        swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!');
+                    }
+                });
+            }
+        })
+    });
+
+    /** Koniec edycji pakietu medycznego **/
+
+    /******** Do pakietu medycznego *********/
+    //Suma członków w pakiecie
+    var totalMemberSum = 0;
+
+    function totalMemberCounter(diff, forceValue = null) {
+        if (forceValue === null) {
+            totalMemberSum += diff;
+        } else {
+            totalMemberSum = forceValue;
+        }
+
+        $('#totalMemberSum').val(totalMemberSum);
+    }
+
+    //Usunięcie danego członka
+    function deleteMember(id) {
+        $('#member' + id).remove();
+        totalMemberCounter(-1);
+    }
+    //Usunięcie starego członka
+    function deleteOldMember(id) {
+        $('#oldmember' + id).remove();
+        totalMemberCounter(-1);
+    }
+    /************* Koniec pakietu medycznego *************/
+
 $(document).ready(function() {
 
     var user_id = Number({{$user->id}});
 
-    //Zabokowanie przesyłania formularza po naciścnięciu entera (rozwijał się przycisk z pakietem medycznym) 
+    //Zabokowanie przesyłania formularza po naciścnięciu entera (rozwijał się przycisk z pakietem medycznym)
     $(window).keydown(function(event){
         if(event.keyCode == 13) {
             event.preventDefault();
@@ -350,20 +427,24 @@ $(document).ready(function() {
 
     var medicalPackageShow = false;
 
-    // Obsługa pokazania/ukrycia panelu pakietu medycznego 
+    // Obsługa pokazania/ukrycia panelu pakietu medycznego
     $('#add_medical_package').click(function(e) {
         e.preventDefault();
 
         if (medicalPackageShow == true) {
             $('#add_medical_package_div').slideUp();
             $('#span_medical').removeClass('glyphicon-minus').addClass('glyphicon-plus');
+            $('#medical_package_active').val(0);
             medicalPackageShow = false;
         } else {
             $('#add_medical_package_div').slideDown();
             $('#span_medical').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+            $('#medical_package_active').val(1);
             medicalPackageShow = true;
         }
     });
+
+
 
     $('#add_submit').click((e) => {
 
@@ -379,14 +460,10 @@ $(document).ready(function() {
         var salary_to_account = $('#salary_to_account').val();
         var start_date = $('#start_date').val();
         var stop_date = $('#stop_date').val();
-        var rate = $('#rate').val();
         var email = $('#email').val();
         var phone = $('#phone').val();
-        var salary = $('#salary').val();
-        var additional_salary = $('#additional_salary').val();
         var user_type = $('#user_type').val();
         var department_info = $('#department_info').val();
-        var dating_type = $('#dating_type').val();
         var login_phone = $('#login_phone').val();
         var description = $('#description').val();
 
@@ -503,14 +580,23 @@ $(document).ready(function() {
             return false;
         }
 
-        //Tutaj ewentualna walidacja pakietu medycznego
+        //** Dodanie procesu walidacji dla pakietu medycznego **/
+        @include('hr.medicalPackageValidation')
 
+        $('#add_submit').attr('disabled', true);
+        $('#consultant_add').submit();
     });
 
     $('.form_date').datetimepicker({
         language:  'pl',
         autoclose: 1,
         minView : 2,
+        pickTime: false,
+    });
+    $('.medical_date').datetimepicker({
+        language:  'pl',
+        autoclose: 1,
+        minView : 1,
         pickTime: false,
     });
 
@@ -770,4 +856,7 @@ $(document).ready(function() {
 });
 
 </script>
+
+    /** Dodanie templatek dla pakietu medycznego **/
+    @include('hr.medicalPackageAddTemplates')
 @endsection

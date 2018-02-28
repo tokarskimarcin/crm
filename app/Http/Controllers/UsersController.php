@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use App\ActivityRecorder;
 use Illuminate\Support\Facades\URL;
 use App\PenaltyBonus;
+use App\MedicalPackage;
 
 class UsersController extends Controller
 {
@@ -67,7 +68,6 @@ class UsersController extends Controller
            echo 1;
     }
 
-
     public function add_userPOST(Request $request)
     {
         $redirect = 0;
@@ -79,7 +79,7 @@ class UsersController extends Controller
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
         if ($request->email == null) {
-            $user->email_off = null;//strtolower($request->first_name) . '.' . strtolower($request->last_name) . '@veronaconsulting.pl';
+            $user->email_off = null;
         } else {
             $user->email_off = $request->email;
         }
@@ -133,6 +133,13 @@ class UsersController extends Controller
         );
 
         new ActivityRecorder(1, 'Dodanie użytkownika: ' . $request->first_name . ' ' . $request->last_name . ', login: ' . $request->login_phone);
+
+        /**
+         * Dodanie pakietu medycznego
+         */
+        if ($request->medical_package_active > 0) {
+            $this->addMedicalPackage($request, $user->id);
+        }
 
         Session::flash('message_ok', "Użytkownik dodany pomyślnie!");
         return Redirect::back();
@@ -241,11 +248,21 @@ class UsersController extends Controller
         }
 
         $user = User::find($id);
-        // $check_user_type = UserTypes::find($request->user_type);
 
         if ($user == null) {
             return view('errors.404');
         }
+
+        /**
+         * Opcja dodania pakietu medycznego (Jezeli zmienna $request->medical_package_is_new == 1 && $request->medical_package_active == 1)
+         * Lub zmiany gdy zmienna $request->medical_package_is_edited == 1
+         */
+        if ($request->medical_package_is_new == 1 && $request->medical_package_active == 1) {
+            $this->addMedicalPackage($request, $user->id);
+        } else if ($request->medical_package_is_edited == 1 && $request->medical_package_active == 1) {
+            $this->changeMedicalPackage($request, $user);
+        }
+
 
         $user->username = $request->username;
         $user->email_off = $request->username;
@@ -310,6 +327,11 @@ class UsersController extends Controller
         ];
 
         new ActivityRecorder(1, $data);
+
+        /**
+         * Ewentualna zmiana pakietów medycznych
+         */
+
 
         Session::flash('message_edit', "Dane zostały zaktualizowane!");
         return Redirect::back();
@@ -462,6 +484,323 @@ class UsersController extends Controller
             } else {
                 return 0;
             }
+        }
+    }
+
+    /**
+     * Funkcja dodająca pakiety medyczne dla nowych pracowników
+     */
+    public function addMedicalPackage(Request $request, $id) {
+
+        /**
+         * Dodanie pliku
+         */
+        $file_extension = $request->file('user_scan')->getClientOriginalExtension();
+        $file_name = $request->first_name . '_' . $request->last_name;
+        $store_name = $file_name . '_' . time() . '.' . $file_extension;
+        $request->file('user_scan')->storeAs('medicalscan', $store_name);
+        $request->store_name = $store_name;
+
+        /**
+         * Pobranie ilości osób w pakiecie medycznym
+         */
+        $sum = $request->totalMemberSum;
+
+        for ($i = 0; $i < $sum; $i++) {
+            $medicalPackage = new MedicalPackage();
+
+            $medicalPackage->user_id            = $id;
+            $medicalPackage->pesel              = $request->pesel[$i];
+            $medicalPackage->user_first_name    = $request->user_first_name[$i];
+            $medicalPackage->user_last_name     = $request->user_last_name[$i];
+            $medicalPackage->birth_date         = $request->birth_date[$i];
+            $medicalPackage->postal_code        = $request->postal_code[$i];
+            $medicalPackage->city               = $request->city[$i];
+            $medicalPackage->street             = $request->street[$i];
+            $medicalPackage->house_number       = $request->house_number[$i];
+            $medicalPackage->flat_number        = $request->flat_number[$i];
+            $medicalPackage->phone_number       = $request->phone_number[$i];
+            $medicalPackage->family_member      = ($i > 0) ? 1 : null ;
+            $medicalPackage->deleted            = 0;
+            $medicalPackage->package_name       = $request->package_name;
+            $medicalPackage->package_variable   = $request->package_variable;
+            $medicalPackage->cadre_id           = Auth::user()->id;
+            $medicalPackage->package_scope      = ($i > 0) ? 'R-OM' : 'P-OM' ;
+            $medicalPackage->scan_path          = $store_name;
+            $medicalPackage->month_start        = $request->medical_start;
+            $medicalPackage->created_at         = date('Y-m-d H:i:s');
+            $medicalPackage->updated_at         = null;
+
+            $medicalPackage->save();
+        }
+    }
+
+    /**
+     * Edycja pakietu medycznego
+     */
+    private function changeMedicalPackage(Request $request, User $user) { //dd($request);
+        $old_medical_ids = $user->medicalPackages->where('deleted', '=', 0);
+        $old_medical_ids = $old_medical_ids->pluck('id')->toArray();
+
+        $medical_ids_from_form = $request->medical_id;
+        /**
+         *  $to_delete - tablica z ID osób którym usuwamy opiekę medyczną
+         */
+        if (is_array($medical_ids_from_form)) {
+            $to_delete = array_diff($old_medical_ids, $medical_ids_from_form);
+
+            foreach ($to_delete as $key => $value) {
+                $medicalPackage = MedicalPackage::find($value);
+
+                $medicalPackage->deleted = 1;
+                $medicalPackage->updated_by = Auth::user()->id;
+                $medicalPackage->updated_at = date('Y-m-d H:i:s');
+                $medicalPackage->month_stop = date('Y-m-d H:i:s');
+
+                $medicalPackage->save();
+            }
+        }
+
+        /**
+         * Sprawdzenie czy podmieniony został plik z umową dla użytkownika
+         */
+        if ($request->file('user_scan') != null) {
+            // Pobranie rozszerzenia pliku
+            $file_extension = $request->file('user_scan')->getClientOriginalExtension();
+            // Konkatenacja imienia i nazwiska pracownika
+            $file_name = $request->first_name . '_' . $request->last_name;
+            // Utworzenie nazwy pliku - imie, nazwisko, aktualny czas + rozszerzenie
+            $store_name = $file_name . '_' . time() . '.' . $file_extension;
+            // Zapis pliku do lokalizacji /storage/app/medicalscan
+            $request->file('user_scan')->storeAs('medicalscan', $store_name);
+            $scan_path = $store_name;
+        } else {
+            $scan_path = $user->medicalPackages->where('deleted', '=', 0)->first()->scan_path;
+        }
+
+        /**
+         * Trzeba przekręcić wszystkie wpisy z formularza, jezeli medical_id == 0 dodajemy nowy, jezeli jest już id to podmieniamy
+         */
+        $count_form = count($request->medical_id);
+
+        for ($i = 0; $i < $count_form; $i++) {
+
+            if ($request->medical_id[$i] == 0) {
+                /**
+                 * Jezeli dodajemy nowego posiadacza opieki
+                 */
+                $medicalPackage = new MedicalPackage();
+
+                $medicalPackage->user_id            = $user->id;
+                $medicalPackage->pesel              = $request->pesel[$i];
+                $medicalPackage->user_first_name    = $request->user_first_name[$i];
+                $medicalPackage->user_last_name     = $request->user_last_name[$i];
+                $medicalPackage->birth_date         = $request->birth_date[$i];
+                $medicalPackage->postal_code        = $request->postal_code[$i];
+                $medicalPackage->city               = $request->city[$i];
+                $medicalPackage->street             = $request->street[$i];
+                $medicalPackage->house_number       = $request->house_number[$i];
+                $medicalPackage->flat_number        = $request->flat_number[$i];
+                $medicalPackage->phone_number       = $request->phone_number[$i];
+                $medicalPackage->family_member      = ($i > 0) ? 1 : null ;
+                $medicalPackage->deleted            = 0;
+                $medicalPackage->package_name       = $request->package_name;
+                $medicalPackage->package_variable   = $request->package_variable;
+                $medicalPackage->cadre_id           = Auth::user()->id;
+                $medicalPackage->package_scope      = ($i > 0) ? 'R-OM' : 'P-OM' ;
+                $medicalPackage->scan_path          = $scan_path;
+                $medicalPackage->month_start        = $request->medical_start;
+
+                $medicalPackage->save();
+            } else {
+                /**
+                 * Edycja istniejacych danych
+                 */
+                $medicalPackage = MedicalPackage::find(intval($request->medical_id[$i]));
+
+                $medicalPackage->pesel              = $request->pesel[$i];
+                $medicalPackage->user_first_name    = $request->user_first_name[$i];
+                $medicalPackage->user_last_name     = $request->user_last_name[$i];
+                $medicalPackage->birth_date         = $request->birth_date[$i];
+                $medicalPackage->postal_code        = $request->postal_code[$i];
+                $medicalPackage->city               = $request->city[$i];
+                $medicalPackage->street             = $request->street[$i];
+                $medicalPackage->house_number       = $request->house_number[$i];
+                $medicalPackage->flat_number        = $request->flat_number[$i];
+                $medicalPackage->phone_number       = $request->phone_number[$i];
+                $medicalPackage->family_member      = ($i > 0) ? 1 : null ;
+                $medicalPackage->deleted            = 0;
+                $medicalPackage->package_name       = $request->package_name;
+                $medicalPackage->package_variable   = $request->package_variable;
+                $medicalPackage->scan_path          = $scan_path;
+                $medicalPackage->month_start        = $request->medical_start;
+                $medicalPackage->updated_by         = Auth::user()->id;
+                $medicalPackage->updated_at         = date('Y-m-d H:i:s');
+
+                $medicalPackage->save();
+            }
+        }
+    }
+
+    /**
+     * Funkcja usuwająca całkowicie pakiet medyczny
+     */
+    public function deleteMedicalPackage(Request $request) {
+        if ($request->ajax()) {
+
+            /**
+             * Pobranie wszystkich aktywnych wpisów dla danego użytkownika
+             */
+            $packages = MedicalPackage::where('user_id', '=', $request->user_id)
+                ->where('deleted', '=', 0)
+                ->get();
+
+            foreach ($packages as $package) {
+
+                $package->deleted = 1;
+                $package->updated_by = Auth::user()->id;
+                $package->month_stop = $request->medical_stop;
+                $package->updated_at = date('Y-m-d H:i:s');
+
+                $package->save();
+            }
+            return 1;
+        }
+    }
+
+    /**
+     * Dane na temat pakietów medycznych (domyślnie)
+     */
+    public function medicalPackagesAllGet() {
+        return $this->getMedicalPackagesData(date('Y'), date('m'));
+    }
+
+    /**
+     * Dane na temat pakietów medycznych (wybór)
+     */
+    public function medicalPackagesAllPost(Request $request) {
+        return $this->getMedicalPackagesData($request->medical_year, $request->medical_month);
+    }
+
+    /**
+     * Metoda pobierająca dane na temat
+     */
+    private function getMedicalPackagesData($year, $selectedMonth) {
+        $month = $year . '-' . $selectedMonth . '%';
+        $monthLimit = $year . '-' . $selectedMonth . '-01';
+        $prevMonth = $this->getPreviousMonth($year, $selectedMonth);
+        /**
+         * Pobranie pakietow ktore sa nie edytowane i starsze niz miesiac
+         */
+        $packagesOldNotEdited = MedicalPackage::where('deleted', '=', 0)
+            ->where('updated_at', 'not like', $month)
+            ->orWhere('updated_at', '=', null)
+            ->where('month_start', 'not like', $month)
+            //->orderBy('user_last_name')
+            ->get();
+
+        /**
+         * Edytowane w tym miesiącu (Edycja dotyczy zmian danych pakietów które nie są nowe)
+         */
+        $packagesOldEdited = MedicalPackage::where('deleted', '=', 0)
+            ->where('month_start', 'not like', $month)
+            ->where('updated_at', 'like', $month)
+            //->orderBy('user_last_name')
+            ->get();
+
+        /**
+         * Nowe w tym miesiącu OK
+         */
+        $packagesNewMonth = MedicalPackage::where('month_start', 'like', $month)
+            //->orderBy('user_last_name')
+            ->get();
+
+        /**
+         * Usunięte w tym miesiącu OK
+         */
+        $packagedDeletedThisMonth = MedicalPackage::where('deleted', '=', 1)
+            ->where('month_stop', 'like', $prevMonth)
+            //->orderBy('user_last_name')
+            ->get();
+
+        $packagesOldNotEdited = $packagesOldNotEdited->map(function($item) {
+            $item['flag'] = 0;
+            return $item;
+        });
+
+        $packagesOldEdited = $packagesOldEdited->map(function($item) {
+            $item['flag'] = 1;
+            return $item;
+        });
+
+        $packagesNewMonth = $packagesNewMonth->map(function($item) {
+            $item['flag'] = 2;
+            return $item;
+        });
+
+        $packagedDeletedThisMonth = $packagedDeletedThisMonth->map(function($item) {
+            $item['flag'] = 3;
+            return $item;
+        });
+
+        $merged = $packagesOldNotEdited;
+        $merged = $merged->merge($packagesOldEdited);
+        $merged = $merged->merge($packagesNewMonth);
+        $merged = $merged->merge($packagedDeletedThisMonth);
+
+        /**
+         * Tablica z miesiącami
+         */
+        $months = collect([
+            ['id' => '01', 'name' => 'Styczeń'],
+            ['id' => '02', 'name' => 'Luty'],
+            ['id' => '03', 'name' => 'Marzec'],
+            ['id' => '04', 'name' => 'Kwiecień'],
+            ['id' => '05', 'name' => 'Maj'],
+            ['id' => '06', 'name' => 'Czerwiec'],
+            ['id' => '07', 'name' => 'Lipiec'],
+            ['id' => '08', 'name' => 'Sierpień'],
+            ['id' => '09', 'name' => 'Wrzesień'],
+            ['id' => '10', 'name' => 'Październik'],
+            ['id' => '11', 'name' => 'Listopad'],
+            ['id' => '12', 'name' => 'Grudzień']
+        ]);
+
+        return view('hr.allMedicalPackages')
+            ->with('months', $months)
+            ->with('selected_month', $selectedMonth)
+            ->with('packages', $merged);
+    }
+
+    /**
+     * Pobranie danych poprzedniego miesiąca
+     */
+    private function getPreviousMonth($year, $month) {
+        $month = intval($month);
+        $month -= 1;
+        if ($month <= 0) {
+            $month += 12;
+            $year -= 1;
+        }
+
+        $month = ($month < 10) ? '0' . $month : $month;
+
+        return $year . '-' . $month . '%';
+    }
+
+    /**
+     * Zmiana daty rozmowy kwalifikacyjnej
+     */
+    public function editInterviewDate(Request $request) {
+        if ($request->ajax()) {
+            $candidate_id = $request->candidate_id;
+            $newDate = $request->result;
+
+            $candidate = Candidate::find($candidate_id);
+
+            $data = $candidate->recruitment_attempt->where('status', '=', 0)->first();
+
+            return $data;
         }
     }
 }

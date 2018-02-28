@@ -47,6 +47,7 @@ class ActivityRecorder extends Model
       6 - equipment Activity
       7 - other
       8 - recruitment activity
+      9 - medical packages
     */
 
     public function __construct($type, $action) {
@@ -130,6 +131,14 @@ class ActivityRecorder extends Model
                 Storage::append('recruitmentActivity.txt', $content);
             }
             break;
+
+            case '9':
+                $contents = Storage::get('medicalPackagesActivity.txt');
+                $size = File::size(storage_path('app/medicalPackagesActivity.txt'));
+                if ($size < 104857600) {
+                    Storage::append('medicalPackagesActivity.txt', $content);
+                }
+                break;
 
           default:
 

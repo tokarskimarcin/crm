@@ -66,6 +66,9 @@ Route::POST('/deletePenaltyBonus','FinancesController@deletePenaltyBonus')->name
 
 Route::POST('/getUserDepartmentInfo','DkjController@getUserDepartmentInfo')->name('api.getUserDepartmentInfo');
 
+Route::POST('/deleteMedicalPackage','UsersController@deleteMedicalPackage')->name('api.deleteMedicalPackage');
+
+Route::POST('/editInterviewDate','UsersController@editInterviewDate')->name('api.editInterviewDate');
 
 Route::POST('/get_stats','DkjController@getStats')->name('api.getStats');
 Route::POST('/get_stats_dkj','DkjController@getStatsDkjMaster')->name('api.getStatsDkj');
@@ -298,6 +301,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::POST('/add_cadre','UsersController@add_userPOST');
 
     Route::get('/cadre_hr', 'UsersController@cadreHRGet');
+
+    Route::get('/medical_packages_all', 'UsersController@medicalPackagesAllGet');
+    Route::POST('/medical_packages_all', 'UsersController@medicalPackagesAllPost');
     // Users -- STOP--
 
 

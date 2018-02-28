@@ -37,7 +37,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <form method="post" action="add_consultant" id="consultant_add">
+        <form method="post" action="add_consultant" id="consultant_add" enctype="multipart/form-data">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -221,16 +221,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <button class="btn btn-info text-center" id="add_medical_package" style="width: 100%">
-                                    <span id="span_medical" class="glyphicon glyphicon-plus"></span> <snap id="span_medical_text">Dodaj pakiet medyczny</span>
-                                </button>
-                            </div>
-                        </div>
-                        
                         @include('hr.addMedicalPackage')
+                    <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
                                 <button class="btn btn-success text-center" style="width: 100%" id="add_submit">
@@ -251,6 +243,27 @@
 @section('script')
 
 <script>
+    /******** Do pakietu medycznego *********/
+    //Suma członków w pakiecie
+    var totalMemberSum = 0;
+    var medicalScanIsSet = false;
+
+    function totalMemberCounter(diff, forceValue = null) {
+        if (forceValue === null) {
+            totalMemberSum += diff;
+        } else {
+            totalMemberSum = forceValue;
+        }
+
+        $('#totalMemberSum').val(totalMemberSum);
+    }
+
+    //Usunięcie danego członka
+    function deleteMember(id) {
+        $('#member' + id).remove();
+        totalMemberCounter(-1);
+    }
+    /************* Koniec pakietu medycznego *************/
 
 $(document).ready(function() {
 
@@ -262,6 +275,7 @@ $(document).ready(function() {
         }
     });
 
+    //Sprawdzenie czy pakiet medyczny jest dodawany
     var medicalPackageShow = false;
 
     // Obsługa dodania/odebrania pakietu medycznego 
@@ -271,17 +285,23 @@ $(document).ready(function() {
         if (medicalPackageShow == true) {
             $('#add_medical_package_div').fadeOut(0);
             $('#span_medical').removeClass('glyphicon-minus').addClass('glyphicon-plus');
+            $('#span_medical_text').html('Dodaj pakiet medyczny');
+            totalMemberCounter(0, 0);
+            $('#medical_package_active').val(0);
             medicalPackageShow = false;
+            $('#package_variable').val('Wybierz');
         } else {
             $('#add_medical_package_div').fadeIn(0);
             $('#span_medical').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+            $('#span_medical_text').html('Cofnij pakiet medyczny');
+            $('#medical_package_active').val(1);
             medicalPackageShow = true;
         }
         
     });
 
     $('#add_submit').click((e) => {
-
+        /************ Walidacja dla danych uzytkownika *****************/
         //Pobranie danych z inputów
         var first_name = $('#first_name').val();
         var last_name = $('#last_name').val();
@@ -292,15 +312,10 @@ $(document).ready(function() {
         var student = $('#student').val();
         var agency_id = $('#agency_id').val();
         var salary_to_account = $('#salary_to_account').val();
-        var start_date = $('#start_date').val();
-        var rate = $('#rate').val();
         var email = $('#email').val();
         var phone = $('#phone').val();
-        var salary = $('#salary').val();
-        var additional_salary = $('#additional_salary').val();
         var user_type = $('#user_type').val();
         var department_info = $('#department_info').val();
-        var dating_type = $('#dating_type').val();
         var login_phone = $('#login_phone').val();
         var description = $('#description').val();
 
@@ -414,7 +429,7 @@ $(document).ready(function() {
                 }
             });
         }
-       
+
         if (login_phone != null) {
             $.ajax({
                 type: "POST",
@@ -430,18 +445,20 @@ $(document).ready(function() {
                         swal('Ten numer kolejki PBX jest już w bazie danych!');
                     }
                 }
-            });    
+            });
         }
-        
+
         if (ajaxCheck == false) {
             return false;
         }
 
+        /*************** Koniec walidacji dla danych użytkownika*****************/
+
+        /** Dodanie procesu walidacji dla pakietu medycznego **/
+        @include('hr.medicalPackageValidation')
+
         $("#add_submit").attr("disabled", true);
         $('#consultant_add').submit();
-
-        //Tutaj ewentualna walidacja pakietu medycznego
-
     });
 
     $('.form_date').datetimepicker({
@@ -451,7 +468,16 @@ $(document).ready(function() {
         pickTime: false,
     });
 
+    $('.medical_date').datetimepicker({
+        language:  'pl',
+        autoclose: 1,
+        minView : 2,
+        pickTime: false,
+    });
+
 });
 
 </script>
+    /** Dodanie templatek dla pakietu medycznego **/
+    @include('hr.medicalPackageAddTemplates')
 @endsection

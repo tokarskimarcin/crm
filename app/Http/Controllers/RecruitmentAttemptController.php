@@ -171,6 +171,34 @@ class RecruitmentAttemptController extends Controller
     * Główne statystyki rekrutacji
     */
     public function recruitment_admin() {
+//        $id = 1364;
+//        $maxIds = DB::table('recruitment_story')
+//            ->select(DB::raw('
+//                MAX(recruitment_story.id) as id
+//                '))
+//            ->join('recruitment_attempt', 'recruitment_attempt.id', 'recruitment_story.recruitment_attempt_id')
+//            ->where('recruitment_attempt.cadre_id', '=', $id)
+//            ->where('recruitment_attempt.status', '=', 1)
+//            ->groupBy('recruitment_attempt_id')
+//            ->get();
+//        $ids = [];
+//        $ids[] = $maxIds->map(function($item) {
+//            return $item->id;
+//        });
+//
+//        $query = DB::table('recruitment_story')
+//            ->select(DB::raw('
+//                count(recruitment_story.id) as sum,
+//                attempt_status.name as attempt_status_name,
+//                attempt_result.name as attempt_result_name
+//            '))
+//            ->join('recruitment_attempt', 'recruitment_attempt.id', 'recruitment_story.recruitment_attempt_id')
+//            ->leftJoin('attempt_result', 'attempt_result.id', 'recruitment_story.attempt_result_id')
+//            ->leftJoin('attempt_status', 'attempt_status.id', 'recruitment_story.attempt_status_id')
+//            ->whereIn('recruitment_story.id', $ids[0]->toArray())
+//            ->groupBy('attempt_status.id', 'attempt_result.id')
+//            ->get();
+//dd($query);
         /**
          * Ilość aktywnych rekrutacji
          */
@@ -286,67 +314,34 @@ class RecruitmentAttemptController extends Controller
             /**
              * Zliczenie ilośi etapów na jakiej kończy się rekrutację
              */
-            $data = DB::table('candidate')
+            $maxIds = DB::table('recruitment_story')
                 ->select(DB::raw('
-                    recruitment_attempt.id,
-                    recruitment_story.attempt_status_id
+                MAX(recruitment_story.id) as id
                 '))
-                ->join('recruitment_attempt', 'recruitment_attempt.candidate_id', 'candidate.id')
-                ->join('recruitment_story', 'recruitment_story.recruitment_attempt_id','recruitment_attempt.id')
-                ->where('candidate.cadre_id', '=', $id)
+                ->join('recruitment_attempt', 'recruitment_attempt.id', 'recruitment_story.recruitment_attempt_id')
+                ->where('recruitment_attempt.cadre_id', '=', $id)
                 ->where('recruitment_attempt.status', '=', 1)
-                ->orderBy('recruitment_story.created_at', 'desc')
+                ->groupBy('recruitment_attempt_id')
+                ->get();
+            $ids = [];
+            $ids[] = $maxIds->map(function($item) {
+                return $item->id;
+            });
+
+            $query = DB::table('recruitment_story')
+                ->select(DB::raw('
+                count(recruitment_story.id) as sum,
+                attempt_status.name as attempt_status_name,
+                attempt_result.name as attempt_result_name
+            '))
+                ->join('recruitment_attempt', 'recruitment_attempt.id', 'recruitment_story.recruitment_attempt_id')
+                ->leftJoin('attempt_result', 'attempt_result.id', 'recruitment_story.last_attempt_result_id')
+                ->leftJoin('attempt_status', 'attempt_status.id', 'recruitment_story.last_attempt_status_id')
+                ->whereIn('recruitment_story.id', $ids[0]->toArray())
+                ->groupBy('attempt_status.id', 'attempt_result.id')
                 ->get();
 
-            /**
-             * Pogrupowanie wyników z podziałem na próby rekrutacji
-             */
-            $data = $data->groupBy('id');
-            /**
-             * Zdefiniowanie tabeli z nieudanymi rekrutacjami 
-             */
-            $recruitments_fails = [];
-
-            /**
-             * Przypisanie liczby nieudanych rekrutacji do tabeli
-             */
-            foreach($data as $item) {
-                foreach($item as $story) {
-                    if ($story->attempt_status_id == 11) {
-                        $recruitments_fails[] = $item;
-                    }
-                }
-            }
-            
-            $types = [];
-            foreach($recruitments_fails as $item) {
-                $types[] = $item[1]->attempt_status_id;
-            }
-            
-            /**
-             * Sumowanie ilości nieudanych rekrutacji
-             */
-            $types = array_count_values($types);
-        
-            /**
-             * Pobranie etapow rekrutacji
-             */
-            $attempt_status = AttemptStatus::all();
-
-            $recuitment_by_types = [];
-            $recruitemnt_sum_total = array_sum($types);
-
-            /**
-             * Podmiana ID na nazwę etapu
-             */
-            foreach($attempt_status as $item) {
-                foreach ($types as $key => $value) {
-                    if ($item->id == $key) {
-                        $recuitment_by_types[$item->id]['name'] = $item->name;
-                        $recuitment_by_types[$item->id]['value'] = $value;
-                    }
-                }
-            }
+            $recruitement_sum_total = $query->sum('sum');
 
             /**
              * Pobranie źródeł rekrutacji dla danego rekrutera
@@ -361,7 +356,7 @@ class RecruitmentAttemptController extends Controller
                 ->groupBy('candidate.candidate_source_id')
                 ->get();
 
-            /**l
+            /**
              * Zwrócenie potężnej ilości danych
              */
             $data = [
@@ -370,9 +365,9 @@ class RecruitmentAttemptController extends Controller
                 'all_sum'               => $all_sum,
                 'interviews_sum'        => $interviews_sum,
                 'training_data'         => $training_data,
-                'recuitment_by_types'   => $recuitment_by_types,
-                'recruitemnt_sum_total' => $recruitemnt_sum_total,
-                'recruiter_sources'     => $recruiter_sources
+                'recruitement_sum_total'=> $recruitement_sum_total,
+                'recruiter_sources'     => $recruiter_sources,
+                'query'                 => $query
             ];
 
             return $data;
@@ -467,10 +462,15 @@ class RecruitmentAttemptController extends Controller
      */
 
     public function recruitment_statistics_leaderGET(){
+        $hr = User::where('user_type_id', '=', 3)->get();
+        $attemptStatus = AttemptStatus::all();
+        $attemptResult = AttemptResult::all();
 
-        return view('recruitment.recruitmentStatisticsLeader');
+        return view('recruitment.recruitmentStatisticsLeader')
+            ->with('attemptStatus', $attemptStatus)
+            ->with('attemptResult', $attemptResult)
+            ->with('hr', $hr);
     }
-
 
     /**
      * Przygotowanie danych do datatable (Statystyki HR)
@@ -479,17 +479,72 @@ class RecruitmentAttemptController extends Controller
     public function datatableRecruitmentStatisticsLeader(Request $request){
         if($request->ajax()){
 
-            $query = RecruitmentAttempt::select('recruitment_attempt.created_at','cadre.first_name as cadre_first_name',
-                'cadre.last_name as cadre_last_name','candidate.first_name as candidate_first_name','candidate.last_name as candidate_last_name',
-                'attempt_status.name as attempt_status_name','attempt_result.name as attempt_result_name','recruitment_story.comment')
-                ->join('users as cadre','cadre.id','recruitment_attempt.interview_cadre')
-                ->join('users as candidate','candidate.id','recruitment_attempt.candidate_id')
-                ->join('recruitment_story', 'recruitment_story.recruitment_attempt_id','recruitment_attempt.id')
-                ->leftjoin('attempt_result', 'attempt_result.id','recruitment_story.attempt_result_id')
-                ->join('attempt_status', 'attempt_status.id','recruitment_story.attempt_status_id')
-                ->where('recruitment_attempt.status','=','1');
+            $maxIds = DB::table('recruitment_story')
+                ->select(DB::raw('
+                    MAX(id) as id
+                '))
+                ->groupBy('recruitment_attempt_id')
+                ->get();
+            $ids = [];
+            $ids[] = $maxIds->map(function($item) {
+                return $item->id;
+            });
 
+            if ($request->attempt_by_status != 0) {
+                if ($request->attempt_by_status == 1) {
+                    $query = DB::table('recruitment_story')
+                        ->select(DB::raw('
+                            users.first_name as cadre_first_name,
+                            users.last_name as cadre_last_name,
+                            candidate.first_name as candidate_first_name,
+                            candidate.last_name as candidate_last_name,
+                            attempt_status.name as attempt_status_name,
+                            attempt_result.name as attempt_result_name,
+                            recruitment_attempt.created_at as created_at,
+                            recruitment_story.comment as comment
+                        '))
+                        ->join('recruitment_attempt', 'recruitment_attempt.id', 'recruitment_story.recruitment_attempt_id')
+                        ->join('users', 'users.id', 'recruitment_attempt.cadre_id')
+                        ->join('candidate', 'candidate.id', 'recruitment_attempt.candidate_id')
+                        ->leftJoin('attempt_result', 'attempt_result.id', 'recruitment_story.last_attempt_result_id')
+                        ->leftJoin('attempt_status', 'attempt_status.id', 'recruitment_story.last_attempt_status_id')
+                        ->whereIn('recruitment_story.id', $ids[0]->toArray())
+                        ->where('recruitment_attempt.status', '=', 1)
+                        ->whereBetween('recruitment_story.created_at', [$request->start_date . ' 01:00:00', $request->stop_date . ' 23:00:00']);
+                } else if ($request->attempt_by_status == 2) {
+                    $query = DB::table('recruitment_story')
+                        ->select(DB::raw('
+                            users.first_name as cadre_first_name,
+                            users.last_name as cadre_last_name,
+                            candidate.first_name as candidate_first_name,
+                            candidate.last_name as candidate_last_name,
+                            attempt_status.name as attempt_status_name,
+                            attempt_result.name as attempt_result_name,
+                            recruitment_attempt.created_at as created_at,
+                            recruitment_story.comment as comment
+                        '))
+                        ->join('recruitment_attempt', 'recruitment_attempt.id', 'recruitment_story.recruitment_attempt_id')
+                        ->join('users', 'users.id', 'recruitment_attempt.cadre_id')
+                        ->join('candidate', 'candidate.id', 'recruitment_attempt.candidate_id')
+                        ->leftJoin('attempt_result', 'attempt_result.id', 'recruitment_story.attempt_result_id')
+                        ->leftJoin('attempt_status', 'attempt_status.id', 'recruitment_story.attempt_status_id')
+                        ->whereIn('recruitment_story.id', $ids[0]->toArray())
+                        ->where('recruitment_attempt.status', '=', 0)
+                        ->whereBetween('recruitment_story.created_at', [$request->start_date . ' 01:00:00', $request->stop_date . ' 23:00:00']);
+                }
+            }
 
+            if ($request->hr_user != 0) {
+                $query->where('recruitment_attempt.cadre_id', '=', $request->hr_user);
+            }
+
+            if ($request->attempt_status != 0) {
+                $query->where('recruitment_story.attempt_status_id', '=', $request->attempt_status);
+            }
+
+            if ($request->attempt_result != 0) {
+                $query->where('recruitment_story.attempt_result_id', '=', $request->attempt_result);
+            }
 
             return datatables($query)->make(true);
         }

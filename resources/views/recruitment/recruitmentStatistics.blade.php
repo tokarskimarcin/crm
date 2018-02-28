@@ -268,7 +268,9 @@
                                         <tr>
                                             <th>Data szkolenia</th>
                                             <th>Godzina szkolenia</th>
-                                            <th>Ilość osób na szkoleniu</th>
+                                            <th>Ilość zapisanych osób</th>
+                                            <th>Obecnych</th>
+                                            <th>Nieobecnych</th>
                                             <th>Etap szkolenia</th>
                                         </tr>
                                     </thead>
@@ -372,6 +374,7 @@
                                 <thead>
                                     <tr>
                                         <th>Etap</th>
+                                        <th>Rezultat</th>
                                         <th>Ilość kandydatów</th>
                                         <th>%</th>
                                     </tr>
@@ -503,11 +506,14 @@ $(document).ready(function() {
 
                 // Dodanie danych do tabeli 
                 $.each(userTrainings, function(key, value) {
+                    var total_user_sum = value.candidate_avaible_count + value.candidate_absent_count;
                     content += `
                         <tr>
                             <td>${value.training_date}</td>
                             <td>${value.training_hour}</td>
-                            <td>${value.candidate_count}</td>
+                            <td>${total_user_sum}</td>
+                            <td>${value.candidate_choise_count}</td>
+                            <td>${value.candidate_absent_count}</td>
                             <td>Etap ${value.training_stage}</td>
                         </tr>
                     `;
@@ -578,12 +584,14 @@ $(document).ready(function() {
                 $('#modal_training_table').append(content);
 
                 //Loop przez nieudane rekrutacje
-                $.each(response.recuitment_by_types, function(key, value){
-                    var proc = (Number(Number(value.value) / Number(response.recruitemnt_sum_total)) * 100).toFixed(2) ;
+                $.each(response.query, function(key, value){
+                    var proc = (Number(Number(value.sum) / Number(response.recruitement_sum_total)) * 100).toFixed(2);
+                    var temp_name = (value.attempt_result_name == null) ? 'Brak rezultatu' : value.attempt_result_name ;
                     failContent += `
                         <tr>
-                            <td>${value.name}</td>
-                            <td>${value.value}</td>
+                            <td>${value.attempt_status_name}</td>
+                            <td>${temp_name}</td>
+                            <td>${value.sum}</td>
                             <td>${proc} %</td>
                         </tr>
                     `;

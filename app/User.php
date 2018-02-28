@@ -101,4 +101,8 @@ class User extends Authenticatable
     public function userBootstrapNotifications() {
         return $this->hasMany('App\BootstrapNotify', 'user_id');
     }
+
+    public function medicalPackages() {
+        return $this->hasMany('App\MedicalPackage', 'user_id');
+    }
 }
