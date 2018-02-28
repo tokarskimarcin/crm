@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\AttemptResult;
+use App\CandidateTraining;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -224,9 +225,11 @@ class CandidateController extends Controller
             $newStory->last_attempt_status_id = null;
             $newStory->last_attempt_result_id = null;
         }
-        $newStory->attempt_status_id = $status;
         $newStory->attempt_result_id = $attempt_result;
-
+        if($status == 5){
+            $newStory->attempt_result_id = 18;
+        }
+        $newStory->attempt_status_id = $status;
         $newStory->comment = $comment;
         $newStory->created_at = date('Y-m-d H:i:s');
         $newStory->updated_at = date('Y-m-d H:i:s');
@@ -322,6 +325,12 @@ class CandidateController extends Controller
             if ($recruitmentAttempt == null) {
                 return 0;
             }
+            /**
+             * usunięcie wpisu ze szkoleń
+             */
+            CandidateTraining::where('candidate_id','=',$id)
+                                ->where('completed_training','=',null)
+                                ->delete();
 
             $recruitmentAttempt->status = 1;
             $recruitmentAttempt->cadre_edit_id = Auth::user()->id;
