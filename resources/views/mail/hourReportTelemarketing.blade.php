@@ -16,7 +16,7 @@
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">% Janków</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">% Wykorzystania Bazy</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">% Czas Rozmów</th>
-        <th style="border:1px solid #231f20;padding:3px;background:#231f20">% Średnia z godziny</th>
+        <th style="border:1px solid #231f20;padding:3px;background:#231f20">Średnia z godziny</th>
     </tr>
 </thead>
     <tbody>
@@ -108,7 +108,7 @@
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_janky_count}} %</td>
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_wear_proc}} %</td>
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_call_time}} %</td>
-          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round($total_diffrence_avg)}} %</td>
+          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round($total_diffrence_avg)}}</td>
       </tr>
     </tbody>
 </table>
