@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\AttemptResult;
+use App\CandidateTraining;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -144,6 +145,7 @@ class CandidateController extends Controller
         $sources = CandidateSource::all();
         $status = AttemptStatus::all();
         $attempt_result = AttemptResult::all();
+        $attempt_status = AttemptStatus::all();
         $status_to_change = AttemptStatus::where('attempt_order', '!=', null)->orderBy('attempt_order')->get();
 
         return view('recruitment.candidateProfile')
@@ -154,7 +156,8 @@ class CandidateController extends Controller
             ->with('department_info', $department_info)
             ->with('candidate', $candidate)
             ->with('fired_user',$fired_user)
-            ->with('attempt_result',$attempt_result);
+            ->with('attempt_result',$attempt_result)
+            ->with('attempt_status',$attempt_status);
     }
 
     /**
@@ -222,9 +225,11 @@ class CandidateController extends Controller
             $newStory->last_attempt_status_id = null;
             $newStory->last_attempt_result_id = null;
         }
-        $newStory->attempt_status_id = $status;
         $newStory->attempt_result_id = $attempt_result;
-
+        if($status == 5){
+            $newStory->attempt_result_id = 18;
+        }
+        $newStory->attempt_status_id = $status;
         $newStory->comment = $comment;
         $newStory->created_at = date('Y-m-d H:i:s');
         $newStory->updated_at = date('Y-m-d H:i:s');
@@ -320,6 +325,12 @@ class CandidateController extends Controller
             if ($recruitmentAttempt == null) {
                 return 0;
             }
+            /**
+             * usunięcie wpisu ze szkoleń
+             */
+            CandidateTraining::where('candidate_id','=',$id)
+                                ->where('completed_training','=',null)
+                                ->delete();
 
             $recruitmentAttempt->status = 1;
             $recruitmentAttempt->cadre_edit_id = Auth::user()->id;
@@ -338,7 +349,7 @@ class CandidateController extends Controller
             /**
              * Dodanie etapu w tej rekrutacji
              */
-            $this->addStory($id, $recruitmentAttempt->id, $request->stop_recruitment_status, $request->stop_recruitment_comment);
+            $this->addStory($id, $recruitmentAttempt->id, $request->stop_recruitment_status, $request->stop_recruitment_comment,$request->last_attempt_result);
 
             if ($request->stop_recruitment_status == 11) {
                 return 1;

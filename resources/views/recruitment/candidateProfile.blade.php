@@ -32,6 +32,7 @@
     $phone_call_status = $temp1[0]->attemptResult;
     $temp2 = $status_to_change->where('id', '=', 17);
     $interview_status = $temp2[2]->attemptResult;
+    $attempt_result_last_active = '';
 @endphp
 
 <div class="row">
@@ -347,12 +348,11 @@
                                             @php
                                                 $attempt_result_last = 'Brak';
                                                 if(isset($story->attemptResult->name)){
+                                                        if($item->status == 0){
+                                                            $attempt_result_last_active = $story->attemptResult->name;
+                                                        }
                                                     $attempt_result_last = $story->attemptResult->name;
-                                                }else if(isset($story->lastAttemptLevel->defaultAttemptResult) && $story->attempt_status_id == 11){
-                                                    $attempt_result_last = $story->lastAttemptLevel->defaultAttemptResult->name;
-                                                }else  if(isset($story->lastAttemptResult) && $story->attempt_status_id == 11){
-                                                    $attempt_result_last = $story->lastAttemptResult->name;
-                                                }
+                                            }
                                             @endphp
 
                                             <input type="text" class="form-control" readonly value="{{$attempt_result_last}}"/>
@@ -450,9 +450,13 @@
                         <div class="form-group">
                             <label class="myLabel">Wynik Etapu:</label>
                             <select class="form-control" id="select_last_attempt_result">
-                                @foreach($attempt_result as $item)
-                                    <option>{{$item}}</option>
-                                @endforeach
+                                       @foreach($candidate->attempt_level_data->attemptResult as $item)
+                                            @if($attempt_result_last_active == $item->name)
+                                                <option selected value={{$item->id}}>{{$item->name.' '}}</option>
+                                            @else
+                                                <option value={{$item->id}}>{{$item->name.' '}}</option>
+                                            @endif
+                                       @endforeach
                             </select>
                         </div>
                         <div class="form-group">
@@ -869,7 +873,8 @@ $(document).ready(() => {
 
         $('#stop_recruitment_submit').prop('disabled', true);
         $('#stop_recruitment_add').prop('disabled', true);
-
+        // result attempt id
+        var last_attempt_result = $('#select_last_attempt_result').val();
         $.ajax({
             type: "POST",
             url: '{{ route('api.stopRecruitment') }}',
@@ -880,7 +885,8 @@ $(document).ready(() => {
                 "candidate_id": candidate_id,
                 "stop_recruitment_status": stop_recruitment_status,
                 "stop_recruitment_comment": stop_recruitment_comment,
-                "stopType": stopType
+                "stopType": stopType,
+                "last_attempt_result" : last_attempt_result
             },
             success: function (response) {
                 if (response == 1) {

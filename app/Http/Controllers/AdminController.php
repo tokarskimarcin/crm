@@ -240,17 +240,15 @@ class AdminController extends Controller
             $departments->desc = $request->desc;
             $departments->save();
 
-            if($request->type != 'Wybierz' && $selected_department->type != 'Badania/Wysyłka')
+            if($request->type != 'Wybierz' && $request->type != 'Badania/Wysyłka')
             {
                 if($selected_department->type != $request->type){
                     if( $request->type == 'Badania'){
-                        //dd(1);
                         DB::table('users')
                             ->where('department_info_id',$request->selected_department_info_id)
                             ->where('user_type_id',1)
                             ->update(['dating_type' => 0]);
                     }else{
-                        //dd(2);
                         DB::table('users')
                             ->where('department_info_id',$request->selected_department_info_id)
                             ->where('user_type_id',1)
