@@ -452,4 +452,25 @@ class CandidateController extends Controller
         ];
         //new ActivityRecorder(8, $data);
     }
+
+    /**
+     * Zmiana daty rozmowy kwalifikacyjnej
+     */
+    public function editInterviewDateTime(Request $request) {
+        if ($request->ajax()) {
+            $candidate_id = 2;
+            $newDate = $request->result;
+
+            $candidate = Candidate::find($candidate_id);
+
+            $data = $candidate->recruitment_attempt->where('status', '=', 0)->first();
+
+            $data->interview_date = $newDate;
+            $data->updated_at = date('Y-m-d H:i:s');
+            $data->cadre_edit_id = Auth::user()->id;
+            $data->save();
+
+            return 1;
+        }
+    }
 }

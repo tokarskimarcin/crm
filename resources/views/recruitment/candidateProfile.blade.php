@@ -645,8 +645,6 @@ $('.form_date').datetimepicker({
 });
 
 
-$(document).ready(() => {
-
     /**
      * Edycja daty rozmowy kwalifikacyjnej
      */
@@ -677,27 +675,34 @@ $(document).ready(() => {
             return false;
         }
 
-        var result = interview_date_edit + " " + edit_interview_hour + ":00";
-        var candidate_id = $('#candidate_id').val();
+        var edit_result = interview_date_edit + " " + edit_interview_hour + ":00";
+        var edit_candidate_id = $('#candidate_id').val();
 
         $.ajax({
             type: "POST",
-            url: '{{ route('api.editInterviewDate') }}',
+            url: '{{ route('api.editInterviewDateTime') }}',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             data: {
-                "candidate_id": candidate_id,
-                "result": result
+                "candidate_id": edit_candidate_id,
+                "result": edit_result
             },
             success: function (response) {
-                swal(response);
+                if (response == 1) {
+                    swal('Data rozmowy zmieniona pomyślnie!');
+                    location.reload();
+                } else {
+                    swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!');
+                }
             },
             error: function() {
                 swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!');
             }
         });
     });
+
+$(document).ready(() => {
 
     var ex_candidate_date = $('#candidate_ex_date').val();
 
@@ -819,12 +824,12 @@ $(document).ready(() => {
         if(ex_id_user == '')
             ex_id_user = null;
         if(ex_candidate_status == 1 && ex_id_user == null ){
-            swal('Wybierz byłego pracownika z listy')
+            swal('Wybierz byłego pracownika z listy');
             return false;
         }
 
         if (candidate_name == '' || (candidate_name.trim().length == 0)) {
-            swal('Podaj imie kandydata!')
+            swal('Podaj imie kandydata!');
             return false;
         }
 

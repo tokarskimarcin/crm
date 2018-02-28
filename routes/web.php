@@ -68,7 +68,7 @@ Route::POST('/getUserDepartmentInfo','DkjController@getUserDepartmentInfo')->nam
 
 Route::POST('/deleteMedicalPackage','UsersController@deleteMedicalPackage')->name('api.deleteMedicalPackage');
 
-Route::POST('/editInterviewDate','UsersController@editInterviewDate')->name('api.editInterviewDate');
+Route::POST('/editInterviewDateTime','CandidateController@editInterviewDateTime')->name('api.editInterviewDateTime');
 
 Route::POST('/get_stats','DkjController@getStats')->name('api.getStats');
 Route::POST('/get_stats_dkj','DkjController@getStatsDkjMaster')->name('api.getStatsDkj');

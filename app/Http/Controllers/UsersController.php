@@ -788,19 +788,4 @@ class UsersController extends Controller
         return $year . '-' . $month . '%';
     }
 
-    /**
-     * Zmiana daty rozmowy kwalifikacyjnej
-     */
-    public function editInterviewDate(Request $request) {
-        if ($request->ajax()) {
-            $candidate_id = $request->candidate_id;
-            $newDate = $request->result;
-
-            $candidate = Candidate::find($candidate_id);
-
-            $data = $candidate->recruitment_attempt->where('status', '=', 0)->first();
-
-            return $data;
-        }
-    }
 }
