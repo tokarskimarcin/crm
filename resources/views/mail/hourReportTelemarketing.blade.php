@@ -31,6 +31,7 @@
           $sum = 0;
           $difference_succes_total = 0;
           $difference_hour_time_use_total = 0;
+          $color = '#ffffff';
       @endphp
       @foreach($reports as $report)
         @if($report->department_info->id_dep_type == 2)
@@ -71,12 +72,30 @@
                         $avg_per_hour = round($difference_succes/$difference_hour_time_use,2);
                       else
                         $avg_per_hour=0;
+                         if($report->department_info_id == 2 || $report->department_info_id==8 || $report->department_info_id== 14)
+                         {
+                               if($avg_per_hour !=0){
+                                if($avg_per_hour< 2.0 || $avg_per_hour >3.0){
+                                    $color = '#e46464';
+                                }
+                               }else{
+                                    $color = '#ffffff';
+                               }
+                         }else{
+                              if($avg_per_hour !=0){
+                                if($avg_per_hour< 2.5 || $avg_per_hour >3.5){
+                                     $color = '#e46464';
+                                }else{
+                                    $color = '#ffffff';
+                                }
+                             }
+                         }
                   }else{
                         $avg_per_hour="Brak informacji";
                   }
 
               @endphp
-              <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$avg_per_hour}}</td>
+              <td style="background-color:{{$color}} font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$avg_per_hour}}</td>
           </tr>
         @endif
       @endforeach
