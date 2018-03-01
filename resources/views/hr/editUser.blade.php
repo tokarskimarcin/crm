@@ -857,6 +857,5 @@ $(document).ready(function() {
 
 </script>
 
-    /** Dodanie templatek dla pakietu medycznego **/
     @include('hr.medicalPackageAddTemplates')
 @endsection
