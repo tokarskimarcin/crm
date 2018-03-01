@@ -93,6 +93,7 @@
                                                                     <br />
                                                                 <div class="panel panel-default">
                                                                     <div class="panel-body">
+                                                                    <div class="table-responsive">
                                                                       <div class="wrapper{{++$wrapper_scroll}}">
                                                                       <div class="div{{$wrapper_scroll}}"></div>
                                                                       </div>
@@ -167,6 +168,7 @@
                                                                     </div>
                                                                       </div>
                                                                     </div>
+                                                                    </div>
                                                                 </div>
                                                                 @endif
                                                                 @endforeach
@@ -187,7 +189,7 @@
     <script src="{{ asset('/js/jszip.min.js')}}"></script>
     <script src="{{ asset('/js/buttons.html5.min.js')}}"></script>
     @if(isset($payment_total))
-        print_R($payment_total);
+
         @if($payment_total !=0)
             <script>
                 var payment_total =  <?php echo json_encode($payment_total); ?>;

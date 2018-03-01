@@ -512,6 +512,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/recruitment_statistics_leader', 'RecruitmentAttemptController@recruitment_statistics_leaderGET');
 
+    Route::get('/pageReportInterviews', 'RecruitmentStoryController@pageReportInterviewsGet');
+    Route::post('/pageReportInterviews', 'RecruitmentStoryController@pageReportInterviewsPost');
     /**REKRUTACJA STOP */
 });
 //////////////////////Testing ORM///////////////

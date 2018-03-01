@@ -40,8 +40,11 @@ return false;
 });
 
 // Sprawdzenie czy podane sa wszystkie kody pocztowe
+
+var postalCodeRegex = /[0-9][0-9]-[0-9][0-9][0-9]/;
+
 $("input[name='postal_code[]']").each(function(key, value){
-if ($(value).val().trim().length == 0) {
+if ($(value).val().trim().length == 0  || !$(value).val().match(postalCodeRegex)) {
 swal('Podaj wszystkie kody pocztowe!');
 validationResult = false;
 return false;
@@ -143,6 +146,18 @@ return false;
 //Sprawdzenie czy dodany został skan umowy
 if($('#user_scan')[0].files.length == 0 && medicalScanIsSet == false) {
 swal('Dodaj skan umowy pakietu medycznego w formacie PDF!');
+validationResult = false;
+return false;
+}
+
+if ($('#user_scan')[0].files[0].size > 2097152) {
+swal('Rozmiar pliku przekracza 2 MB!');
+validationResult = false;
+return false;
+}
+
+if ($('#user_scan')[0].files[0].type != 'application/pdf') {
+swal('Wymagany format pliku to PDF!');
 validationResult = false;
 return false;
 }

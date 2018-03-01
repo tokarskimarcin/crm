@@ -693,10 +693,12 @@ class UsersController extends Controller
          * Pobranie pakietow ktore sa nie edytowane i starsze niz miesiac
          */
         $packagesOldNotEdited = MedicalPackage::where('deleted', '=', 0)
-            ->where('updated_at', 'not like', $month)
-            ->orWhere('updated_at', '=', null)
+            ->where(function($query) use ($month) {
+                $query->where('updated_at', 'not like', $month)
+                    ->orWhere('updated_at', '=', null);
+            })
             ->where('month_start', 'not like', $month)
-            //->orderBy('user_last_name')
+            ->where('month_start', '<=', $monthLimit)
             ->get();
 
         /**
@@ -705,14 +707,12 @@ class UsersController extends Controller
         $packagesOldEdited = MedicalPackage::where('deleted', '=', 0)
             ->where('month_start', 'not like', $month)
             ->where('updated_at', 'like', $month)
-            //->orderBy('user_last_name')
             ->get();
 
         /**
          * Nowe w tym miesiącu OK
          */
         $packagesNewMonth = MedicalPackage::where('month_start', 'like', $month)
-            //->orderBy('user_last_name')
             ->get();
 
         /**
@@ -720,7 +720,6 @@ class UsersController extends Controller
          */
         $packagedDeletedThisMonth = MedicalPackage::where('deleted', '=', 1)
             ->where('month_stop', 'like', $prevMonth)
-            //->orderBy('user_last_name')
             ->get();
 
         $packagesOldNotEdited = $packagesOldNotEdited->map(function($item) {
