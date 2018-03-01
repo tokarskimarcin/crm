@@ -95,7 +95,7 @@
                   }
 
               @endphp
-              <td style="background-color:{{$color}} font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$avg_per_hour}}</td>
+              <td style="background-color:{{$color}}; font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$avg_per_hour}}</td>
           </tr>
         @endif
       @endforeach
