@@ -25,7 +25,7 @@ class PBXDataAPI extends Controller
         $department_id = null;
         $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=30&groupType=" . $this->report_type_array[$report_type];
         //$url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=30&groupType=TEAM&date=2018-02-10";
-        $header_array = array('department_info_id', 'online_consultant', 'success', 'consultant_without_check', 'count_all_check', 'count_good_check', 'count_bad_check');
+        $header_array = array('department_info_id','success','count_all_check','count_good_check','count_bad_check','','','online_consultant',  'consultant_without_check','all_jaky_disagreement','','good_jaky_disagreement');
         if (!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
         if (($handle = fopen($url, "r")) !== FALSE) {
             while (($data1 = fgetcsv($handle, 1000, ";")) !== FALSE) {
@@ -57,7 +57,7 @@ class PBXDataAPI extends Controller
                         } else if (!$dont_save) {
                             if ($item == '-' || $item == 'null')
                                 $item = 0;
-                            if ($i == 1 || $i == 2 || $i == 3 || $i == 4 || $i == 5 || $i == 6) {
+                            if ($i == 1 || $i == 2 || $i == 3 || $i == 4 || $i == 7 || $i == 8 ||$i == 9 ||$i == 11 ) {
                                 $spreadsheet_data[$lp][$header_array[$i]] = utf8_encode($item);
                             }
 

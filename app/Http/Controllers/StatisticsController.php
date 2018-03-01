@@ -110,11 +110,15 @@ class StatisticsController extends Controller
         $reports = HourReport::where('report_date', '=', $date)
             ->where('hour', $hour)
             ->get();
+        $last_reports = HourReport::where('report_date', '=', $date)
+            ->where('hour', date('H')-1 . ':00:00')
+            ->get();
 
         $data = [
             'hour' => $hour,
             'date' => $date,
-            'reports' => $reports
+            'reports' => $reports,
+            'last_reports' => $last_reports
         ];
         return $data;
     }
@@ -137,7 +141,8 @@ class StatisticsController extends Controller
         return view('reportpage.HourReportTelemarketing')
             ->with('reports', $data['reports'])
             ->with('hour', $data['hour'])
-            ->with('date', $data['date']);
+            ->with('date', $data['date'])
+            ->with('last_reports', $data['last_reports']);
     }
 // Przygotowanie danych do raportu tygodniowego telemarketing
     private function weekReportTelemarketing()
@@ -148,8 +153,9 @@ class StatisticsController extends Controller
         $reports = DB::table('hour_report')
             ->select(DB::raw(
                 'SUM(call_time)/count(`call_time`) as sum_call_time,
-                  SUM(average)/count(`call_time`) as avg_average,
+                  SUM(success)/sum(`hour_time_use`) as avg_average,
                   SUM(success) as sum_success,
+                  sum(`hour_time_use`) as hour_time_use,
                   SUM(wear_base)/count(`call_time`) as avg_wear_base,
                   SUM(janky_count)/count(`call_time`)  as sum_janky_count,
                   department_type.name as dep_name,
@@ -397,7 +403,8 @@ class StatisticsController extends Controller
         $reports = DB::table('hour_report')
             ->select(DB::raw(
                     'SUM(call_time)/count(`call_time`) as sum_call_time,
-                      SUM(average)/count(`call_time`) as avg_average,
+                       SUM(success)/sum(`hour_time_use`) as avg_average,
+                       sum(`hour_time_use`) as hour_time_use,
                       SUM(success) as sum_success,
                       SUM(wear_base)/count(`call_time`) as avg_wear_base,
                       SUM(janky_count)/count(`call_time`)  as sum_janky_count,
@@ -609,6 +616,7 @@ class StatisticsController extends Controller
     public function MailhourReportDkj()
     {
         $data = $this::hourReportDkj();
+        //$data = $this::hourReportDkj_PBX_READY(); Gotowe na pbx
         $title = 'Raport godzinny DKJ ' . date('Y-m-d');
         $this->sendMailByVerona('hourReportDkj', $data, $title);
     }
@@ -623,8 +631,8 @@ class StatisticsController extends Controller
 //            ->with('hour', date('H') . ':00:00')
 //            ->with('reports', $data['reports']);
 
-
-            $data = $this::hourReportDkj();
+        $data = $this::hourReportDkj();
+        //$data = $this::hourReportDkj_PBX_READY(); Gotowe na pbx
 
             return view('reportpage.hourReportDkj')
                 ->with('date_stop', date('H') . ':00:00')
