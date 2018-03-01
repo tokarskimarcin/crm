@@ -3,11 +3,50 @@
 namespace App\Http\Controllers;
 
 use App\RecruitmentAttempt;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class RecruitmentStoryController extends Controller
 {
+    /**
+     * Zwrócenie danych na temat ilości nowych kont w godziniówce
+     */
+    public function pageReportNewAccountGet(){
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $select_type = 0;
+
+        $data = $this->getReportNewAccountData($date_start, $date_stop);
+
+        $date1 = User::
+                    where('user_type_id','=',5)
+                    ->get();
+
+        dd($date1);
+
+
+
+        return view('recruitment.reportRecruitmentNewAccount')
+            ->with('date_start', $date_start)
+            ->with('date_stop', $date_stop)
+            ->with('select_type', $select_type)
+            ->with('data', $data);
+    }
+
+    /**
+     * Wyszukanie danych na temat ilości nowych kont w godziniówce
+     */
+    public function pageReportNewAccountPost(Request $request){
+        return view('recruitment.reportRecruitmentNewAccount');
+    }
+
+    /**
+     *  Przygotowanie danych do raportu
+     */
+    public function getReportNewAccountData($date_start, $date_stop){
+
+    }
     /**
      * Zwrócenie danych na temat ilości rozmów rekrutacyjnych
      */
