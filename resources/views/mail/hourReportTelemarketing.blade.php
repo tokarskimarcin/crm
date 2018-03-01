@@ -86,6 +86,7 @@
             $total_success_proc = 0;
             $total_wear_proc = 0;
             $total_avg_proc = 0;
+            $total_diffrence_avg = 0;
         }else
           {
           $total_success_proc = round($total_success_proc / $sum, 2);
