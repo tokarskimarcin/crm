@@ -43,14 +43,14 @@
               <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->employee_count}}</td>
               <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->janky_count}} %</td>
               <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->wear_base}} %</td>
-
-              @if(date('N') <= 5)
-                  <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->success / $report->department_info->dep_aim) * 100, 2)}} %</td>
-                  @php $total_success_proc += round(($report->success / $report->department_info->dep_aim) * 100, 2); @endphp
-              @else
-                  <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->success / $report->department_info->dep_aim_week) * 100, 2)}} %</td>
-                  @php $total_success_proc += round(($report->success / $report->department_info->dep_aim_week) * 100, 2); @endphp
-              @endif
+              <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->call_time}} %</td>
+              {{--@if(date('N') <= 5)--}}
+                  {{--<td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->success / $report->department_info->dep_aim) * 100, 2)}} %</td>--}}
+                  {{--@php $total_success_proc += round(($report->success / $report->department_info->dep_aim) * 100, 2); @endphp--}}
+              {{--@else--}}
+                  {{--<td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round(($report->success / $report->department_info->dep_aim_week) * 100, 2)}} %</td>--}}
+                  {{--@php $total_success_proc += round(($report->success / $report->department_info->dep_aim_week) * 100, 2); @endphp--}}
+              {{--@endif--}}
               @php
                   $total_average += $report->average;
                   $total_success += $report->success;
