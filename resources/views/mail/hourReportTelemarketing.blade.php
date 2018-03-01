@@ -67,7 +67,7 @@
                       $difference_hour_time_use = $report->hour_time_use - $last_reports_date->hour_time_use;
                       $difference_succes_total += $difference_succes;
                       $difference_hour_time_use_total += $difference_hour_time_use;
-                      if($difference_hour_time_use != 0)
+                      if($difference_hour_time_use > 0)
                         $avg_per_hour = round($difference_succes/$difference_hour_time_use,2);
                       else
                         $avg_per_hour=0;
@@ -108,7 +108,7 @@
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_janky_count}} %</td>
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_wear_proc}} %</td>
           <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$total_call_time}} %</td>
-          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round($total_diffrence_avg)}}</td>
+          <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round($total_diffrence_avg,2)}}</td>
       </tr>
     </tbody>
 </table>
