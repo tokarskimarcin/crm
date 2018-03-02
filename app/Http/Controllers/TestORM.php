@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\CsvReader;
 use App\Department_info;
 use App\HourReport;
+use App\PBXDKJTeam;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -22,28 +23,6 @@ class TestORM extends Controller
 
         $hour_stop = $today . ' ' . '23:00:00'; //tutaj zmienic przy wydawaniu na produkcję na  date('H') - 1
         $hour_start = $today . ' ' . '00:00:00';
-
-        $dkj = DB::table('dkj')
-            ->select(DB::raw('
-              users.department_info_id,
-              departments.name as dep_name,
-              department_type.name as dep_name_type,
-              department_info.type,
-              count(dkj.id) as liczba_odsluchanych,
-              sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as badania,
-              sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as wysylka,
-              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 0 THEN 1 ELSE 0 END) as bad_badania,
-              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 1 THEN 1 ELSE 0 END) as bad_wysylka
-          '))
-            ->join('users', 'users.id', '=', 'dkj.id_user')
-            ->join('department_info', 'department_info.id', '=', 'users.department_info_id')
-            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-            ->whereBetween('add_date', [$hour_start, $hour_stop])
-            ->groupBy('users.department_info_id')
-            ->groupBy('users.dating_type')
-            ->get();
-
 
         $lp = 0;
         $dont_save = false;
@@ -95,33 +74,15 @@ class TestORM extends Controller
                             $spreadsheet_data[$lp]['report_date'] = date('Y-m-d');
                             $spreadsheet_data[$lp]['is_send'] = 0;
 
-                            if($department_id->id == 13)
-                            {
-                                $colection = $dkj->where('department_info_id',4)->where('badania','!=',0)->first();
-                                if(isset($colection->liczba_odsluchanych) && $colection->liczba_odsluchanych != null)
-                                {
-                                    $count_cehck = $colection->liczba_odsluchanych;
-                                    $janky = $colection->bad_badania;
-                                }
+                            $dkj = PBXDKJTeam::
+                            where('department_info_id','=',$spreadsheet_data[$lp]['department_info_id'])
+                                ->where('hour','=',date('H').":00:00")
+                                ->where('report_date','like',date('Y-m-d'))
+                                ->first();
 
-                            }else if($department_id->id == 4){
-                                $colection = $dkj->where('department_info_id',$spreadsheet_data[$lp]['department_info_id'])->where('wysylka','!=',0)->first();
-                                if(isset($colection->liczba_odsluchanych) && $colection->liczba_odsluchanych != null)
-                                {
-                                    $count_cehck = $colection->liczba_odsluchanych;
-                                    $janky = $colection->bad_wysylka;
-                                }
-                            }else{
-                                $colection = $dkj->where('department_info_id',$spreadsheet_data[$lp]['department_info_id'])->first();
-                                if(isset($colection->liczba_odsluchanych) && $colection->liczba_odsluchanych != null) {
-                                    if ($colection->type == 'Badania') {
-                                        $count_cehck = $colection->liczba_odsluchanych;
-                                        $janky = $colection->bad_badania;
-                                    } else if ($colection->type == 'Wysyłka') {
-                                        $count_cehck = $colection->liczba_odsluchanych;
-                                        $janky = $colection->bad_wysylka;
-                                    }
-                                }
+                            if(isset($dkj)){
+                                $count_cehck = $dkj->count_all_check;
+                                $janky = $dkj->count_bad_check;
                             }
                             if($count_cehck != 0){
                                 $janky_count = round($janky / $count_cehck * 100, 2);
@@ -130,6 +91,8 @@ class TestORM extends Controller
                             }
 
                             $spreadsheet_data[$lp]['janky_count'] = $janky_count;
+                            $count_cehck = 0;
+
                             if($i == 7)
                             {
                                 if($spreadsheet_data[$lp]['average'] != 0){
