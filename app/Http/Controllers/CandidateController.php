@@ -141,6 +141,8 @@ class CandidateController extends Controller
             ->whereIn('user_type_id',[1,2])
             ->get();
 
+        $isInUsers = User::where('candidate_id', '=', $candidate->id)->count();
+
         $department_info = Department_info::where('id', '!=', 13)->get();
         $sources = CandidateSource::all();
         $status = AttemptStatus::all();
@@ -149,6 +151,7 @@ class CandidateController extends Controller
         $status_to_change = AttemptStatus::where('attempt_order', '!=', null)->orderBy('attempt_order')->get();
 
         return view('recruitment.candidateProfile')
+            ->with('is_in_users', $isInUsers)
             ->with('sources', $sources)
             ->with('status', $status)
             ->with('status_to_change', $status_to_change)
@@ -185,16 +188,16 @@ class CandidateController extends Controller
             $candidate->save();
 
             $data = [
-                'Edycja danych kandydata' => '',
-                'Imie' => $request->candidate_name,
-                'Nazwisko' => $request->candidate_surname,
-                'Telefon' => $request->candidate_phone,
-                'Oddział' => $request->candidate_department,
-                'Źródło' => $request->candidate_source,
-                'Opis' => $request->candidate_desc,
-                'User_id' => $request->ex_id_user,
-                'Experience' => $request->candidate_experience,
-                'Pracownik kadry' => Auth::user()->id
+                'Edycja danych kandydata'   => '',
+                'Imie'                      => $request->candidate_name,
+                'Nazwisko'                  => $request->candidate_surname,
+                'Telefon'                   => $request->candidate_phone,
+                'Oddział'                   => $request->candidate_department,
+                'Źródło'                    => $request->candidate_source,
+                'Opis'                      => $request->candidate_desc,
+                'User_id'                   => $request->ex_id_user,
+                'Experience'                => $request->candidate_experience,
+                'Pracownik kadry'           => Auth::user()->id
             ];
             //new ActivityRecorder(8, $data);
 
@@ -241,12 +244,12 @@ class CandidateController extends Controller
         $recruitment_attempt->training_date = $date_training;
         $recruitment_attempt->save();
         $data = [
-            'Dodanie etapu rekrutacji' => '',
-            'Id kandydata' => $candidate_id,
-            'Id rekrutacji' => $attempt_id,
-            'Status rekrutacji' => $status,
-            'Komentarz' => $comment,
-            'Data Szkolenia' => $date_training
+            'Dodanie etapu rekrutacji'  =>   '',
+            'Id kandydata'              => $candidate_id,
+            'Id rekrutacji'             => $attempt_id,
+            'Status rekrutacji'         => $status,
+            'Komentarz'                 => $comment,
+            'Data Szkolenia'            => $date_training
         ];
 
         //new ActivityRecorder(8, $data);
@@ -295,9 +298,9 @@ class CandidateController extends Controller
             $newAttempt->save();
 
             $data = [
-                'Rozpoczęcie nowej rekrutacji' => '',
-                'Id kandydata' => $newAttempt->candidate_id,
-                'Id pracownika kadry' => Auth::user()->id
+                'Rozpoczęcie nowej rekrutacji'  => '',
+                'Id kandydata'                  => $newAttempt->candidate_id,
+                'Id pracownika kadry'           => Auth::user()->id
             ];
 
             //new ActivityRecorder(8, $data);
@@ -469,6 +472,18 @@ class CandidateController extends Controller
             $data->updated_at = date('Y-m-d H:i:s');
             $data->cadre_edit_id = Auth::user()->id;
             $data->save();
+
+            return 1;
+        }
+    }
+
+    /**
+     * Dodanie danych kandydata do sesji
+     */
+    public function addConsultantToSession(Request $request) {
+        if ($request->ajax()) {
+            $candidate = Candidate::find($request->candidate_id);
+            Session::put('candidate_data', $candidate);
 
             return 1;
         }

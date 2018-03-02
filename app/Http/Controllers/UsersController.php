@@ -112,6 +112,7 @@ class UsersController extends Controller
             $user->main_department_id = Auth::user()->department_info_id;
         }
         $user->dating_type = ($request->dating_type != null)? $request->dating_type : 0 ;
+        $user->candidate_id = ($request->candidate_id != null) ? $request->candidate_id : null ;
         $user->start_work = $request->start_date;
         $user->status_work = 1;
         $user->phone = $request->phone;
@@ -699,6 +700,7 @@ class UsersController extends Controller
             })
             ->where('month_start', 'not like', $month)
             ->where('month_start', '<=', $monthLimit)
+            ->where('hard_deleted', '=', null)
             ->get();
 
         /**
@@ -707,12 +709,14 @@ class UsersController extends Controller
         $packagesOldEdited = MedicalPackage::where('deleted', '=', 0)
             ->where('month_start', 'not like', $month)
             ->where('updated_at', 'like', $month)
+            ->where('hard_deleted', '=', null)
             ->get();
 
         /**
          * Nowe w tym miesiącu OK
          */
         $packagesNewMonth = MedicalPackage::where('month_start', 'like', $month)
+            ->where('hard_deleted', '=', null)
             ->get();
 
         /**
@@ -720,6 +724,7 @@ class UsersController extends Controller
          */
         $packagedDeletedThisMonth = MedicalPackage::where('deleted', '=', 1)
             ->where('month_stop', 'like', $prevMonth)
+            ->where('hard_deleted', '=', null)
             ->get();
 
         $packagesOldNotEdited = $packagesOldNotEdited->map(function($item) {

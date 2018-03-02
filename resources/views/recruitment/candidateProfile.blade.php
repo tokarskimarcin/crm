@@ -293,6 +293,16 @@
                     </div>
                 @endif
 
+                @if($candidate->attempt_status_id == 10 && $is_in_users == 0)
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-warning" style="width: 100%;" id="add_as_consultant">
+                                <span class="glyphicon glyphicon-plus"></span> Dodaj jako konsultanta
+                            </button>
+                        </div>
+                    </div>
+                @endif
+
             </div>
         </div>
     </div>
@@ -703,6 +713,33 @@ $('.form_date').datetimepicker({
     });
 
 $(document).ready(() => {
+
+    /**
+     * Opcja dodania jako konsultanta
+     */
+    $('#add_as_consultant').click((e) => {
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: '{{ route('api.addConsultantToSession') }}',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: {
+                "candidate_id": $('#candidate_id').val()
+            },
+            success: function (response) {
+                console.log(response);
+                if (response == 1) {
+                    window.location.href = "{{ URL::to('/add_consultant') }}";
+                } else {
+                    swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!');
+                }
+            }, error: function() {
+                swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!');
+            }
+        });
+    });
 
     var ex_candidate_date = $('#candidate_ex_date').val();
 
