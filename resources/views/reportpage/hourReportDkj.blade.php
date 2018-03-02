@@ -15,7 +15,6 @@
                             <div id="start_stop">
                                 <div class="panel-body">
                                         @include('mail.hourReportDkj')
-                                        {{--@include('mail.hourReportDkjFOR_PBX_READY')--}}
                                 </div>
                                 </div>
                             </div>

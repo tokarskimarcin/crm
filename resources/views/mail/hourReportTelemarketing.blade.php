@@ -72,7 +72,8 @@
                         $avg_per_hour = round($difference_succes/$difference_hour_time_use,2);
                       else
                         $avg_per_hour=0;
-                         if($report->department_info_id == 2 || $report->department_info_id==8 || $report->department_info_id== 14)
+                        $color = '#ffffff';
+                         if($report->department_info_id == 2 || $report->department_info_id== 8 || $report->department_info_id== 14)
                          {
                                if($avg_per_hour !=0){
                                 if($avg_per_hour< 2.0 || $avg_per_hour >3.0){

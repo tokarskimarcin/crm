@@ -615,8 +615,8 @@ class StatisticsController extends Controller
     // Mail do godzinnego raportu DKJ
     public function MailhourReportDkj()
     {
-        $data = $this::hourReportDkj();
-        //$data = $this::hourReportDkj_PBX_READY(); Gotowe na pbx
+        //$data = $this::hourReportDkj();
+        $data = $this::hourReportDkj_PBX_READY(); //Gotowe na pbx
         $title = 'Raport godzinny DKJ ' . date('Y-m-d');
         $this->sendMailByVerona('hourReportDkj', $data, $title);
     }
@@ -631,12 +631,12 @@ class StatisticsController extends Controller
 //            ->with('hour', date('H') . ':00:00')
 //            ->with('reports', $data['reports']);
 
-        $data = $this::hourReportDkj();
-        //$data = $this::hourReportDkj_PBX_READY(); Gotowe na pbx
+        //$data = $this::hourReportDkj();
+        $data = $this::hourReportDkj_PBX_READY();// Gotowe na pbx
 
             return view('reportpage.hourReportDkj')
-                ->with('date_stop', date('H') . ':00:00')
-                ->with('dkj', $data['dkj']);
+                ->with('date', date('H') . ':00:00')
+                ->with('reports', $data['reports']);
     }
 
     private function dayReportDkjData($type) {

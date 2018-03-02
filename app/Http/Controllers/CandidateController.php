@@ -73,7 +73,7 @@ class CandidateController extends Controller
         $department_info = Department_info::where('id', '!=', 13)->get();
         $sources = CandidateSource::where('deleted', '=', 0)->get();
         $status = AttemptStatus::all();
-        $fired_user = User::where('status_work','=',1)
+        $fired_user = User::where('status_work','=',0)
             ->where('department_info_id','=',Auth::user()->department_info_id)
             ->whereIn('user_type_id',[1,2])
             ->get();
