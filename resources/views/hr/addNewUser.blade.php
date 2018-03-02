@@ -11,6 +11,7 @@
     <!-- Te dane pobierane są jeżeli dodajemy pracownika z proflilu kandydata  -->
     @php
         $candidate = Session::get('candidate_data');
+        $candidate_id = $candidate->id;
         $candidate_first_name = $candidate->first_name;
         $candidate_last_name = $candidate->last_name;
         $candidate_phone = $candidate->phone;
@@ -235,6 +236,7 @@
                 <!-- End panel-body  -->
             </div>
             <!-- End panel panel-default -->
+            <input type="hidden" name="candidate_id" value="@if(isset($candidate_id)) {{$candidate_id}} @endif">
         </form>
     </div>
 </div>
@@ -478,6 +480,6 @@ $(document).ready(function() {
 });
 
 </script>
-    /** Dodanie templatek dla pakietu medycznego **/
+
     @include('hr.medicalPackageAddTemplates')
 @endsection
