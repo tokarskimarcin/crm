@@ -55,7 +55,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="table-responsive">
-                            <table class="table table-striped thead-inverse">
+                            <table id="table_interview_count" class="table table-striped thead-inverse">
                                 <thead>
                                     <tr>
                                         <th>Imie</th>
@@ -71,7 +71,9 @@
                                         <tr>
                                             <td>{{$item->first_name}}</td>
                                             <td>{{$item->last_name}}</td>
-                                            <td>{{$item->counted}}</td>
+                                            <td>{{$item->name}}</td>
+                                            <td>{{$item->add_user}}</td>
+                                            <td>{{$item->add_candidate}}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -99,6 +101,12 @@ $('.form_date').datetimepicker({
     minView: 2,
     pickTime: false,
 });
+
+    $('#table_interview_count').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+        }
+    });
 
 
 </script>
