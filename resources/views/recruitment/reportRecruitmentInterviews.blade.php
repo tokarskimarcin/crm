@@ -65,7 +65,7 @@
                 <div class="col-md-12">
                     <div class="table-responsive">
                         @if($select_type == 0)
-                            <table class="table table-striped thead-inverse">
+                            <table id="table_interview_count" class="table table-striped thead-inverse">
                                 <thead>
                                     <tr>
                                         <th>Oddział</th>
@@ -123,6 +123,13 @@ $('.form_date').datetimepicker({
     autoclose: 1,
     minView: 2,
     pickTime: false,
+});
+
+
+$('#table_interview_count').DataTable({
+    "language": {
+        "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+    }
 });
 
 
