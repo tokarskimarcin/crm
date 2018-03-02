@@ -524,14 +524,25 @@
             let candidate_id_end = $(e).closest('tr').attr('id');
             let id_training = $(e).closest('tr').attr('data-id');
             let comment_text = $(e).closest('tr').find('.commnet').val();
+
+            let text_swal_text = "";
+            let text_confirm_text = "";
+
+            if(actual_stage == 1){
+                text_swal = "Spowoduje to przejście kandydata do etapu 2";
+                text_confirm_text = "Tak, zakończ szkolenie etapu 1";
+            }else{
+                text_swal = "Spowoduje to pozytywne zakończenie procesu szkolenia";
+                text_confirm_text = "Tak, zakończ szkolenie etapu 2";
+            }
             swal({
-                title: 'Jesteś pewien?',
-                text: "Spowoduje to przejście kandydata do etapu 2",
+                title: text_swal,
+                text: "",
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Tak, zakończ szkolenie etapu 1.'
+                confirmButtonText: text_confirm_text
             }).then((result) => {
                 if(result.value)
                     {

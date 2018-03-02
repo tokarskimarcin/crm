@@ -501,13 +501,15 @@ class RecruitmentAttemptController extends Controller
                             attempt_status.name as attempt_status_name,
                             attempt_result.name as attempt_result_name,
                             recruitment_attempt.created_at as created_at,
-                            recruitment_story.comment as comment
+                            recruitment_story.comment as comment,
+                            a_r.name as ar_name
                         '))
                         ->join('recruitment_attempt', 'recruitment_attempt.id', 'recruitment_story.recruitment_attempt_id')
                         ->join('users', 'users.id', 'recruitment_attempt.cadre_id')
                         ->join('candidate', 'candidate.id', 'recruitment_attempt.candidate_id')
                         ->leftJoin('attempt_result', 'attempt_result.id', 'recruitment_story.last_attempt_result_id')
                         ->leftJoin('attempt_status', 'attempt_status.id', 'recruitment_story.last_attempt_status_id')
+                        ->leftJoin('attempt_result as a_r', 'a_r.id', 'recruitment_story.attempt_result_id')
                         ->whereIn('recruitment_story.id', $ids[0]->toArray())
                         ->where('recruitment_attempt.status', '=', 1)
                         ->whereBetween('recruitment_story.created_at', [$request->start_date . ' 01:00:00', $request->stop_date . ' 23:00:00']);

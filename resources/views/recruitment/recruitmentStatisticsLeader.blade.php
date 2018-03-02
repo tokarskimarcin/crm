@@ -168,7 +168,14 @@
                 },
                 {"data": "created_at"},
                 {"data": "attempt_status_name"},
-                {"data": "attempt_result_name"},
+                {
+                    "data": function (data, type, dataToSet) {
+                        if(data.ar_name == null){
+                            return data.attempt_result_name;
+                        }else
+                            return data.ar_name;
+                    },"name":"attempt_result_name"
+                },
                 {"data": "comment"},
             ]
         });
