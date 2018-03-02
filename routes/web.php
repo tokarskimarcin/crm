@@ -160,6 +160,8 @@ Route::POST('/stopRecruitment', 'CandidateController@stopRecruitment')->name('ap
 Route::POST('/addRecruitmentLevel', 'CandidateController@addRecruitmentLevel')->name('api.addRecruitmentLevel');
 Route::POST('/addToTraining', 'CandidateController@addToTraining')->name('api.addToTraining');
 
+Route::POST('/addConsultantToSession', 'CandidateController@addConsultantToSession')->name('api.addConsultantToSession');
+
 Route::POST('/uniqueCandidatePhone', 'CandidateController@uniqueCandidatePhone')->name('api.uniqueCandidatePhone');
 
 Route::POST('/datatableShowCandidates', 'CandidateController@datatableShowCandidates')->name('api.datatableShowCandidates');
@@ -175,6 +177,10 @@ Route::POST('/trainerData', 'RecruitmentAttemptController@trainerData')->name('a
 Route::POST('/recruiterTrainingsData', 'RecruitmentAttemptController@recruiterTrainingsData')->name('api.recruiterTrainingsData');
 
 Route::POST('/delete_notification', 'NotificationController@delete_notification')->name('api.delete_notification');
+
+Route::POST('/getMedicalPackagesAdminData', 'AdminController@getMedicalPackagesAdminData')->name('api.getMedicalPackagesAdminData');
+Route::POST('/getMedicalPackageData', 'AdminController@getMedicalPackageData')->name('api.getMedicalPackageData');
+Route::POST('/saveMedicalPackageData', 'AdminController@saveMedicalPackageData')->name('api.saveMedicalPackageData');
 
 
 //Bootstrap notifications //
@@ -258,6 +264,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/check_all_tests', 'AdminController@check_all_tests');
 
     Route::get('/show_test_for_admin/{id}', 'AdminController@show_test_for_admin');
+
+    Route::get('/edit_medical_package', 'AdminController@edit_medical_package');
     // Admin_Panel --Stop--
 
     // Password change --START--
