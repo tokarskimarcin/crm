@@ -286,6 +286,8 @@ class UsersController extends Controller
         $user->status_work = $request->status_work;
         $user->dating_type = $request->dating_type;
         $user->start_work = $request->start_date;
+        if($request->candidate_id != null)
+            $user->candidate_id = $request->candidate_id;
         if ($request->department_info_id != null) {
             $check_department = Department_info::find($request->department_info_id);
             if ($check_department == null) {

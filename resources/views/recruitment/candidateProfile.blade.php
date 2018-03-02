@@ -731,7 +731,10 @@ $(document).ready(() => {
             success: function (response) {
                 console.log(response);
                 if (response == 1) {
-                    window.location.href = "{{ URL::to('/add_consultant') }}";
+                    if(ex_id_user != null)
+                        window.location.href = "{{ URL::to('/edit_consultant') }}/"+ex_id_user;
+                    else
+                        window.location.href = "{{ URL::to('/add_consultant') }}";
                 } else {
                     swal('Ups! Coś poszło nie tak, skontaktuj się z administratorem!');
                 }

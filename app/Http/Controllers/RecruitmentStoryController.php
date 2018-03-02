@@ -18,15 +18,6 @@ class RecruitmentStoryController extends Controller
         $select_type = 0;
 
         $data = $this->getReportNewAccountData($date_start, $date_stop);
-
-        $date1 = User::
-                    where('user_type_id','=',5)
-                    ->get();
-
-        dd($date1);
-
-
-
         return view('recruitment.reportRecruitmentNewAccount')
             ->with('date_start', $date_start)
             ->with('date_stop', $date_stop)
@@ -38,6 +29,18 @@ class RecruitmentStoryController extends Controller
      * Wyszukanie danych na temat ilości nowych kont w godziniówce
      */
     public function pageReportNewAccountPost(Request $request){
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
+        $select_type = 0;
+
+        $data = $this->getReportNewAccountData($date_start, $date_stop);
+        //dd($data);
+
+        return view('recruitment.reportRecruitmentNewAccount')
+            ->with('date_start', $date_start)
+            ->with('date_stop', $date_stop)
+            ->with('select_type', $select_type)
+            ->with('data', $data);
         return view('recruitment.reportRecruitmentNewAccount');
     }
 
@@ -46,6 +49,16 @@ class RecruitmentStoryController extends Controller
      */
     public function getReportNewAccountData($date_start, $date_stop){
 
+        $date = DB::table('users')->
+        select(DB::raw('count(`users`.`id_manager`) as add_user,count(`users`.`candidate_id`) add_candidate,
+            user.first_name,user.last_name,departments.name'))
+            ->join('users as user','user.id','users.id_manager')
+            ->join('department_info','department_info.id','users.department_info_id')
+            ->join('departments','departments.id','department_info.id_dep')
+            ->whereBetween('users.created_at', [$date_start . ' 01:00:00', $date_stop . ' 23:00:00'])
+            ->groupby('users.id_manager')
+            ->get();
+        return $date;
     }
     /**
      * Zwrócenie danych na temat ilości rozmów rekrutacyjnych
