@@ -973,7 +973,10 @@ $(document).ready(() => {
                     swal('Rekrutacja została zakończona!')
                     location.reload();
                 } else if (response == 2) {
-                    window.location.href = "{{ URL::to('/add_consultant') }}";
+                    if(ex_id_user != null)
+                        window.location.href = "{{ URL::to('/edit_consultant') }}/"+ex_id_user;
+                    else
+                        window.location.href = "{{ URL::to('/add_consultant') }}";
                 } else {
                     swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
                 }
