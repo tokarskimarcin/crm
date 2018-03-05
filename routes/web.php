@@ -525,6 +525,11 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/pageReportNewAccount', 'RecruitmentStoryController@pageReportNewAccountGet');
     Route::post('/pageReportNewAccount', 'RecruitmentStoryController@pageReportNewAccountPost');
+
+    Route::get('/pageReportRecruitmentFlow', 'RecruitmentStoryController@pageReportRecruitmentFlowGet');
+    Route::post('/pageReportRecruitmentFlow', 'RecruitmentStoryController@pageReportRecruitmentFlowPost');
+
+
     /**REKRUTACJA STOP */
 });
 //////////////////////Testing ORM///////////////

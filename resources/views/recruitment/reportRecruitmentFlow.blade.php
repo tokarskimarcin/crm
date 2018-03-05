@@ -10,7 +10,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="well gray-nav">Rekrutacja / Statystyki nowych kont</div>
+            <div class="well gray-nav">Rekrutacja / Statystyki spływu rekrutacji</div>
         </div>
     </div>
 </div>
@@ -18,7 +18,7 @@
 <div class="row">
     <div class="panel panel-default">
         <div class="panel-heading">
-            Statystyki nowych kont
+            Statystyki spływu rekrutacji
         </div>
         <div class="panel-body">
             <div class="row">
@@ -67,15 +67,15 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($data as  $item)
-                                        <tr>
-                                            <td>{{$item->first_name}}</td>
-                                            <td>{{$item->last_name}}</td>
-                                            <td>{{$item->name}}</td>
-                                            <td>{{$item->add_user}}</td>
-                                            <td>{{$item->add_candidate}}</td>
-                                        </tr>
-                                    @endforeach
+                                    {{--@foreach($data as  $item)--}}
+                                        {{--<tr>--}}
+                                            {{--<td>{{$item->first_name}}</td>--}}
+                                            {{--<td>{{$item->last_name}}</td>--}}
+                                            {{--<td>{{$item->name}}</td>--}}
+                                            {{--<td>{{$item->add_user}}</td>--}}
+                                            {{--<td>{{$item->add_candidate}}</td>--}}
+                                        {{--</tr>--}}
+                                    {{--@endforeach--}}
                                 </tbody>
                             </table>
                     </div>
