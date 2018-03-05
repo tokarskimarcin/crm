@@ -62,6 +62,7 @@ class HomeController extends Controller
             $work_hour->date = $this->actuall_date;
             $work_hour->click_start = $this->actuall_hour;
             $work_hour->id_user = Auth::id();
+            $work_hour->created_at = date('Y-m-d H:i:s');
             $work_hour->save();
         }
     }
@@ -71,7 +72,7 @@ class HomeController extends Controller
         {
             Work_Hour::where('id_user', Auth::id())
                 ->where('date',$this->actuall_date)
-                ->update(['status' => 2,'click_stop' => $this->actuall_hour]);
+                ->update(['status' => 2,'click_stop' => $this->actuall_hour, 'updated_at' => date('Y-m-d H:i:s')]);
         }
     }
     public function checkStatusWork()
