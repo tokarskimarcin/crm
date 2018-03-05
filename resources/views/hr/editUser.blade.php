@@ -19,6 +19,13 @@
     <div class="alert alert-success">{{ Session::get('message_edit') }}</div>
 @endif
 
+@if(Session::has('candidate_data'))
+    @php
+        $candidate = Session::get('candidate_data');
+        $candidate_id = $candidate->id;
+        Session::forget('candidate_data');
+    @endphp
+@endif
 <div class="row">
     <div class="col-md-12">
         <form method="post" action="{{URL::to('/edit_cadre/')}}/{{$user->id}}" id="consultant_add"  enctype="multipart/form-data">
@@ -278,6 +285,7 @@
                 <!-- End panel-body  -->
             </div>
             <!-- End panel panel-default -->
+            <input type="hidden" name="candidate_id" value="@if(isset($candidate_id)) {{$candidate_id}} @endif">
         </form>
     </div>
     <!-- End col-md-12 -->

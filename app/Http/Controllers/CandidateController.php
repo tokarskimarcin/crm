@@ -136,7 +136,7 @@ class CandidateController extends Controller
         if ($candidate == null) {
             return view('errors.404');
         }
-        $fired_user = User::where('status_work','=',1)
+        $fired_user = User::where('status_work','=',0)
             ->where('department_info_id','=',Auth::user()->department_info_id)
             ->whereIn('user_type_id',[1,2])
             ->get();

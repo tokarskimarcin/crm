@@ -10,7 +10,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="well gray-nav">Rekrutacja / Statystyki rozmów kwalifikacyjnych</div>
+            <div class="well gray-nav">Rekrutacja / Statystyki spływu rekrutacji</div>
         </div>
     </div>
 </div>
@@ -18,13 +18,13 @@
 <div class="row">
     <div class="panel panel-default">
         <div class="panel-heading">
-            Ilość rozmów kwalifikacyjnych
+            Statystyki spływu rekrutacji
         </div>
         <div class="panel-body">
             <div class="row">
-                <form method="POST" action="{{ URL::to('/pageReportInterviews') }}">
+                <form method="POST" action="{{ URL::to('/pageReportNewAccount') }}">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label class="myLabel">Zakres od:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -33,7 +33,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label class="myLabel">Zakres do:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -42,16 +42,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label class="myLabel">Podział:</label>
-                            <select class="form-control" name="select_type">
-                                <option @if($select_type == 0) selected @endif value="0">Oddziały</option>
-                                <option @if($select_type == 1) selected @endif value="1">Użytkownicy</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label class="myLabel" style="color: #fff;">.</label>
                             <button class="btn btn-info" style="width: 100%">
@@ -64,43 +55,29 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="table-responsive">
-                        @if($select_type == 0)
                             <table id="table_interview_count" class="table table-striped thead-inverse">
-                                <thead>
-                                    <tr>
-                                        <th>Oddział</th>
-                                        <th>Ilośc rozmów</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($data as $item)
-                                        <tr>
-                                            <td>{{$item->dep_name . ' ' . $item->dep_name_type}}</td>
-                                            <td>{{$item->counted}}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        @elseif($select_type == 1)
-                            <table class="table table-striped thead-inverse">
                                 <thead>
                                     <tr>
                                         <th>Imie</th>
                                         <th>Nazwisko</th>
-                                        <th>Ilość rozmów</th>
+                                        <th>Oddział</th>
+                                        <th>Ilość dodanych kont</th>
+                                        <th>Ilość kont reaktywowanych</th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($data as  $item)
-                                        <tr>
-                                            <td>{{$item->first_name}}</td>
-                                            <td>{{$item->last_name}}</td>
-                                            <td>{{$item->counted}}</td>
-                                        </tr>
-                                    @endforeach
+                                    {{--@foreach($data as  $item)--}}
+                                        {{--<tr>--}}
+                                            {{--<td>{{$item->first_name}}</td>--}}
+                                            {{--<td>{{$item->last_name}}</td>--}}
+                                            {{--<td>{{$item->name}}</td>--}}
+                                            {{--<td>{{$item->add_user}}</td>--}}
+                                            {{--<td>{{$item->add_candidate}}</td>--}}
+                                        {{--</tr>--}}
+                                    {{--@endforeach--}}
                                 </tbody>
                             </table>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -125,12 +102,11 @@ $('.form_date').datetimepicker({
     pickTime: false,
 });
 
-
-$('#table_interview_count').DataTable({
-    "language": {
-        "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
-    }
-});
+    $('#table_interview_count').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+        }
+    });
 
 
 </script>

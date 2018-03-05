@@ -9,6 +9,23 @@ use Illuminate\Support\Facades\DB;
 
 class RecruitmentStoryController extends Controller
 {
+
+
+
+
+    /**
+     *   Zwrócenie danych na temat ilości spływu rekrutacji
+     */
+    public function  pageReportRecruitmentFlowGet(){
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        return view('recruitment.reportRecruitmentFlow')
+            ->with('date_start', $date_start)
+            ->with('date_stop', $date_stop);
+    }
+    public function  pageReportRecruitmentFlowPost(Request $request){
+        return view('recruitment.reportRecruitmentFlow');
+    }
     /**
      * Zwrócenie danych na temat ilości nowych kont w godziniówce
      */
@@ -18,15 +35,6 @@ class RecruitmentStoryController extends Controller
         $select_type = 0;
 
         $data = $this->getReportNewAccountData($date_start, $date_stop);
-
-        $date1 = User::
-                    where('user_type_id','=',5)
-                    ->get();
-
-        dd($date1);
-
-
-
         return view('recruitment.reportRecruitmentNewAccount')
             ->with('date_start', $date_start)
             ->with('date_stop', $date_stop)
@@ -38,6 +46,18 @@ class RecruitmentStoryController extends Controller
      * Wyszukanie danych na temat ilości nowych kont w godziniówce
      */
     public function pageReportNewAccountPost(Request $request){
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
+        $select_type = 0;
+
+        $data = $this->getReportNewAccountData($date_start, $date_stop);
+        //dd($data);
+
+        return view('recruitment.reportRecruitmentNewAccount')
+            ->with('date_start', $date_start)
+            ->with('date_stop', $date_stop)
+            ->with('select_type', $select_type)
+            ->with('data', $data);
         return view('recruitment.reportRecruitmentNewAccount');
     }
 
@@ -46,6 +66,19 @@ class RecruitmentStoryController extends Controller
      */
     public function getReportNewAccountData($date_start, $date_stop){
 
+        $date_start_combine = $date_start.' 01:00:00';
+        $date_stop_combine = $date_stop.' 23:00:00';
+        $date = DB::table('users')->
+        select(DB::raw('sum(case when `users`.`start_work` between "'.$date_start_combine.'" and "'.$date_stop_combine.'" then 1 else 0 end) as add_user,
+         sum(Case when `users`.`candidate_id` is not null and `users`.`start_work` between "'.$date_start.'" and "'.$date_stop.'" then 1 else 0 end ) as add_candidate
+         ,`user`.`first_name`,`user`.`last_name`,`departments`.`name`'))
+            ->join('users as user','user.id','users.id_manager')
+            ->join('department_info','department_info.id','users.department_info_id')
+            ->join('departments','departments.id','department_info.id_dep')
+            ->groupby('users.id_manager')
+            ->having('add_user','!=',0)
+            ->get();
+        return $date;
     }
     /**
      * Zwrócenie danych na temat ilości rozmów rekrutacyjnych
