@@ -114,4 +114,32 @@ class RecruitmentStoryController extends Controller
 
         return $data;
     }
+
+    /**
+     * Wyświetlenie danych na temat szkoleń
+     */
+    public function pageReportTrainingGet() {
+        return view('recruitment.reportTraining');
+    }
+
+    /**
+     * Dane dotyczące ilości szkoleń
+     */
+    public function datatableTrainingData(Request $request) {
+        $data = DB::table('group_training')
+            ->select(DB::raw('
+                sum(candidate_choise_count) as sum_choise,
+                sum(candidate_absent_count) as sum_absent,
+                departments.name as dep_name,
+                department_type.name as dep_name_type
+            '))
+            ->join('department_info', 'group_training.department_info_id', 'department_info.id')
+            ->join('departments', 'departments.id', 'department_info.id_dep')
+            ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
+            ->whereBetween('training_date', [$request->date_start, $request->date_stop])
+            ->groupBy('department_info.id')
+            ->get();
+
+        return datatables($data)->make(true);
+    }
 }

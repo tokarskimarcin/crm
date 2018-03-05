@@ -303,6 +303,16 @@ class UsersController extends Controller
             $user->password = bcrypt($request->password);
             $user->guid = base64_encode($request->password);
         };
+        /**
+         * automatyczne rozwiązanie pakietu medycznego w przypadku zakończenia pracy
+         */
+        if ($request->status_work == 0) {
+            $month_to_end = date('Y-m-t', strtotime($request->stop_date));
+            MedicalPackage::where('user_id', '=', $user->id)
+                ->where('deleted', '=', 0)
+                ->where('month_stop', '=', null)
+                ->update(['deleted' => 1, 'month_stop' => $month_to_end]);
+        }
         $user->save();
 
         $data = [
