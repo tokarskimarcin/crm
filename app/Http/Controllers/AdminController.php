@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\URL;
 use App\Firewall;
 use App\FirewallPrivileges;
 use App\UserTest;
+use App\MedicalPackage;
 
 class AdminController extends Controller
 {
@@ -457,4 +458,86 @@ class AdminController extends Controller
             ->with('test', $test);
     }
 
+    /**
+     * Edycja pakietów medycznych("trwałe" usuwanie)
+     */
+    public function edit_medical_package() {
+        $months = collect([
+            ['id' => '01', 'name' => 'Styczeń'],
+            ['id' => '02', 'name' => 'Luty'],
+            ['id' => '03', 'name' => 'Marzec'],
+            ['id' => '04', 'name' => 'Kwiecień'],
+            ['id' => '05', 'name' => 'Maj'],
+            ['id' => '06', 'name' => 'Czerwiec'],
+            ['id' => '07', 'name' => 'Lipiec'],
+            ['id' => '08', 'name' => 'Sierpień'],
+            ['id' => '09', 'name' => 'Wrzesień'],
+            ['id' => '10', 'name' => 'Październik'],
+            ['id' => '11', 'name' => 'Listopad'],
+            ['id' => '12', 'name' => 'Grudzień']
+        ]);
+
+        return view('admin.editMedicalPackages')
+            ->with('months', $months);
+    }
+
+    /**
+     * Pobranie danych miesięcznych na temat pakietów medycznych
+     */
+    public function getMedicalPackagesAdminData(Request $request) {
+        if ($request->ajax()) {
+            $date = $request->year_selected . '-' . $request->month_selected . '%';
+            $data = MedicalPackage::where('created_at', 'like', $date)
+                ->get();
+
+            return $data;
+        }
+    }
+
+    /**
+     * Pobranie danych dla pojedyńczego pakeitu medycznego
+     */
+    public function getMedicalPackageData(Request $request) {
+        if ($request->ajax()) {
+            return MedicalPackage::find($request->id);
+        }
+    }
+
+    /**
+     * Zapis danych dla pakeitu medycznego
+     */
+    public function saveMedicalPackageData(Request $request) {
+        if ($request->ajax()) {
+            $package = MedicalPackage::find($request->package_id);
+
+            $package->user_id           = $request->user_id;
+            $package->user_first_name   = $request->user_first_name;
+            $package->user_last_name    = $request->user_last_name;
+            $package->pesel             = $request->pesel;
+            $package->birth_date        = $request->birth_date;
+            $package->city              = $request->city;
+            $package->street            = $request->street;
+            $package->house_number      = $request->house_number;
+            $package->flat_number       = $request->flat_number;
+            $package->postal_code       = $request->postal_code;
+            $package->phone_number      = $request->phone_number;
+            $package->package_name      = $request->package_name;
+            $package->package_variable  = $request->package_variable;
+            $package->package_scope     = $request->package_scope;
+            $package->month_start       = $request->month_start;
+            $package->month_stop        = $request->month_stop;
+            $package->deleted           = $request->deleted;
+            if ($request->hard_deleted == 1) {
+                $package->hard_deleted  = 1;
+            } else {
+                $package->hard_deleted  = null;
+            }
+            $package->updated_at        = date('Y-m-d H:i:s');
+            $package->updated_by        = Auth::user()->id;
+
+            $package->save();
+
+            return 1;
+        }
+    }
 }

@@ -175,6 +175,7 @@ Route::POST('/statusResultChange', 'RecruitmentAttemptController@statusResultCha
 Route::POST('/recruiterData', 'RecruitmentAttemptController@recruiterData')->name('api.recruiterData');
 Route::POST('/trainerData', 'RecruitmentAttemptController@trainerData')->name('api.trainerData');
 Route::POST('/recruiterTrainingsData', 'RecruitmentAttemptController@recruiterTrainingsData')->name('api.recruiterTrainingsData');
+Route::POST('/datatableTrainingData', 'RecruitmentStoryController@datatableTrainingData')->name('api.datatableTrainingData');
 
 Route::POST('/delete_notification', 'NotificationController@delete_notification')->name('api.delete_notification');
 
@@ -526,6 +527,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageReportNewAccount', 'RecruitmentStoryController@pageReportNewAccountGet');
     Route::post('/pageReportNewAccount', 'RecruitmentStoryController@pageReportNewAccountPost');
 
+    Route::get('/pageReportTraining', 'RecruitmentStoryController@pageReportTrainingGet');
     Route::get('/pageReportRecruitmentFlow', 'RecruitmentStoryController@pageReportRecruitmentFlowGet');
     Route::post('/pageReportRecruitmentFlow', 'RecruitmentStoryController@pageReportRecruitmentFlowPost');
 
