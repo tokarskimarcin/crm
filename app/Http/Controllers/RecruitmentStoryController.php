@@ -66,10 +66,8 @@ class RecruitmentStoryController extends Controller
      */
     public function getReportNewAccountData($date_start, $date_stop){
 
-        $date_start_combine = $date_start.' 01:00:00';
-        $date_stop_combine = $date_stop.' 23:00:00';
         $date = DB::table('users')->
-        select(DB::raw('sum(case when `users`.`start_work` between "'.$date_start_combine.'" and "'.$date_stop_combine.'" then 1 else 0 end) as add_user,
+        select(DB::raw('sum(case when `users`.`start_work` between "'.$date_start.'" and "'.$date_stop.'" then 1 else 0 end) as add_user,
          sum(Case when `users`.`candidate_id` is not null and `users`.`start_work` between "'.$date_start.'" and "'.$date_stop.'" then 1 else 0 end ) as add_candidate
          ,`user`.`first_name`,`user`.`last_name`,`departments`.`name`'))
             ->join('users as user','user.id','users.id_manager')
