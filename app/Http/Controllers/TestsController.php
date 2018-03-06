@@ -303,7 +303,7 @@ class TestsController extends Controller
                         $new_test->cadre_id = Auth::user()->id;
                         $new_test->user_id = $request->id_user_tab[$i];
                         $new_test->status = 1;
-                        $new_test->template_id = $request->template_id;
+                        $new_test->template_id = ($request->template_id != 0) ? $request->template_id : null ;
                         $new_test->name = $request->subject;
                         $new_test->save();
                         $id_test = $new_test->id;
@@ -359,7 +359,7 @@ class TestsController extends Controller
                             $new_test->cadre_id = Auth::user()->id;
                             $new_test->user_id = $request->id_user;
                             $new_test->status = 1;
-                            $new_test->template_id = $request->template_id;
+                            $new_test->template_id = ($request->template_id != 0) ? $request->template_id : null ;
                             $new_test->name = $request->subject;
                             $new_test->save();
                             $id_test = $new_test->id;
