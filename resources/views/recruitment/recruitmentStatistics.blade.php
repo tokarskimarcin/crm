@@ -495,7 +495,6 @@ $(document).ready(function() {
                 var user = response.user;
                 var userTrainings = response.userTrainings;
                 var user_department = response.user_department;
-                var candidate_sum = response.candidate_sum;
                 var user_training_count = response.user_training_count;
 
                 // Podmiana imienia i nazwiska trenera
@@ -504,9 +503,15 @@ $(document).ready(function() {
                 // Zdefiniowanie nowej pustej tabeli
                 var content = '';
 
-                // Dodanie danych do tabeli 
+                //zdefinioanie pustej zmimennej dla sumy przeszkolonych kandydatów
+                var totalUsersByRecruiter = 0;
+
+                // Dodanie danych do tabeli
                 $.each(userTrainings, function(key, value) {
-                    var total_user_sum = value.candidate_avaible_count + value.candidate_absent_count;
+                    var total_user_sum = value.candidate_choise_count + value.candidate_absent_count;
+
+                    totalUsersByRecruiter += value.candidate_choise_count;
+
                     content += `
                         <tr>
                             <td>${value.training_date}</td>
@@ -523,7 +528,7 @@ $(document).ready(function() {
                 $('#trainer_trainings').append(content);
                 $('#trainer_trainings_sum').html(user_training_count);
                 $('#trainer_department').html(user_department);
-                $('#trainer_candidate_sum').html(candidate_sum);
+                $('#trainer_candidate_sum').html(totalUsersByRecruiter);
 
             }, error: function(response) {
                 swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
