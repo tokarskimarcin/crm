@@ -1239,9 +1239,11 @@ class StatisticsController extends Controller
     public function pageDayReportRecruitmentFlow(){
         $date_start = date('Y-m-d');
         $date_stop = date('Y-m-d');
-        $data = RecruitmentStory::getReportFlowData($date_start,$date_stop);
+        $data = [
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
+        ];
         return view('reportpage.recruitmentReport.DayReportRecruitmentFlow')
-            ->with('data',$data);
+            ->with('data',$data['data']);
     }
 
     /**
@@ -1251,7 +1253,9 @@ class StatisticsController extends Controller
     public function MaildayReportRecruitmentFlow() {
         $date_start = date('Y-m-d');
         $date_stop = date('Y-m-d');
-        $data = RecruitmentStory::getReportFlowData($date_start,$date_stop);
+        $data = [
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
+        ];
         $title = 'Raport Dzienny Spływu Rekrutacji ' . date('Y-m-d');
         $this->sendMailByVerona('recruitmentMail.dayReportRecruitmentFlow', $data, $title);
     }
@@ -1268,10 +1272,10 @@ class StatisticsController extends Controller
 
     private function sendMailByVerona($mail_type, $data, $mail_title) {
         $email = [];
+        $mail_type_pom = $mail_type;
         $mail_without_folder = explode(".",$mail_type);
         //jeśli widok jest pod folderem
         $mail_type = $mail_without_folder[count($mail_without_folder)-1];
-
         $mail_type2 = ucfirst($mail_type);
         $mail_type2 = 'page' . $mail_type2;
         $accepted_users = DB::table('users')
@@ -1296,11 +1300,15 @@ class StatisticsController extends Controller
 
 
 
+
+
+
     $accepted_users = [
         'cytawa.verona@gmail.com',
         'jarzyna.verona@gmail.com'
     ];
 
+        $mail_type = $mail_type_pom;
      Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
      {
         $message->from('noreply.verona@gmail.com', 'Verona Consulting');
