@@ -230,6 +230,11 @@ Route::get('/weekReportDatabaseUse', 'DatabaseURLController@MailWeekRaportDataba
 Route::get('/monthReportDatabaseUse', 'DatabaseURLController@MailMonthRaportDatabaseUse');
 //End emails
 
+// maila dotyczące rekrutacji
+Route::get('/dayReportRecruitmentFlow', 'StatisticsController@MaildayReportRecruitmentFlow');
+
+
+
 
 
 Auth::routes();
@@ -452,6 +457,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/pageHourReportTimeOnRecord', 'StatisticsController@pageHourReportTimeOnRecord');
 
+
+    Route::get('/pageDayReportRecruitmentFlow','StatisticsController@pageDayReportRecruitmentFlow');
 
     //Report Page STOP
 

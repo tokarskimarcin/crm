@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Candidate;
 use App\RecruitmentAttempt;
+use App\RecruitmentStory;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,14 +21,14 @@ class RecruitmentStoryController extends Controller
     public function  pageReportRecruitmentFlowGet(){
         $date_start = date('Y-m-d');
         $date_stop = date('Y-m-d');
-        $flow_count = $this->getReportFlowData($date_start,$date_stop);
+        $flow_count = RecruitmentStory::getReportFlowData($date_start,$date_stop);
         return view('recruitment.reportRecruitmentFlow')
             ->with('date_start', $date_start)
             ->with('date_stop', $date_stop)
             ->with('flow_count',$flow_count);
     }
     public function  pageReportRecruitmentFlowPost(Request $request){
-        $flow_count = $this->getReportFlowData($request->date_start,$request->date_stop);
+        $flow_count = RecruitmentStory::getReportFlowData($request->date_start,$request->date_stop);
         return view('recruitment.reportRecruitmentFlow')
             ->with('date_start', $request->date_start)
             ->with('date_stop', $request->date_stop)
@@ -35,18 +36,7 @@ class RecruitmentStoryController extends Controller
     }
 
 
-    public function getReportFlowData($data_start,$data_stop){
-        $result = DB::table('candidate')
-                ->select(DB::Raw("users.first_name,users.last_name,count(candidate.id) as count_flow,
-                `departments`.`name`"))
-                ->join('users','users.id','candidate.cadre_id')
-                ->join('department_info','department_info.id','users.department_info_id')
-                ->join('departments','departments.id','department_info.id_dep')
-                ->wherebetween('candidate.created_at',[$data_start.' 00:00:00',$data_stop.' 23:00:00'])
-                ->groupBy('candidate.cadre_id')
-                ->get();
-        return $result;
-    }
+
     /**
      * Zwrócenie danych na temat ilości nowych kont w godziniówce
      */

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\HourReport;
 use App\PBXDKJTeam;
+use App\RecruitmentStory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -1210,6 +1211,11 @@ class StatisticsController extends Controller
 
         return $data;
     }
+
+
+
+
+
 // Mail do raportu godzinnego Czas na rekord
     public function MailhourReportTimeOnRecord() {
         $data = $this::hourReportTimeOnRecord();
@@ -1227,6 +1233,31 @@ class StatisticsController extends Controller
     }
 
 
+    /**
+     * Wyswietlanie spływu rekrutacji dzienny
+     */
+    public function pageDayReportRecruitmentFlow(){
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = RecruitmentStory::getReportFlowData($date_start,$date_stop);
+        return view('reportpage.recruitmentReport.DayReportRecruitmentFlow')
+            ->with('data',$data);
+    }
+
+    /**
+     * Mail spływu rekrutacji dzienny
+     */
+
+    public function MaildayReportRecruitmentFlow() {
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = RecruitmentStory::getReportFlowData($date_start,$date_stop);
+        $title = 'Raport Dzienny Spływu Rekrutacji ' . date('Y-m-d');
+        $this->sendMailByVerona('recruitmentMail.dayReportRecruitmentFlow', $data, $title);
+    }
+
+
+
 
     /******** Główna funkcja do wysyłania emaili*************/
     /*
@@ -1237,6 +1268,9 @@ class StatisticsController extends Controller
 
     private function sendMailByVerona($mail_type, $data, $mail_title) {
         $email = [];
+        $mail_without_folder = explode(".",$mail_type);
+        //jeśli widok jest pod folderem
+        $mail_type = $mail_without_folder[count($mail_without_folder)-1];
 
         $mail_type2 = ucfirst($mail_type);
         $mail_type2 = 'page' . $mail_type2;
