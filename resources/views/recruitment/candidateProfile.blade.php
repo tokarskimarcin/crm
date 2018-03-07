@@ -729,7 +729,10 @@ $(document).ready(() => {
                 "candidate_id": $('#candidate_id').val()
             },
             success: function (response) {
-                console.log(response);
+
+                if(ex_id_user == '' || ex_id_user == null)
+                    ex_id_user = null;
+
                 if (response == 1) {
                     if(ex_id_user != null)
                         window.location.href = "{{ URL::to('/edit_consultant') }}/"+ex_id_user;
@@ -1013,6 +1016,10 @@ $(document).ready(() => {
                     swal('Rekrutacja została zakończona!')
                     location.reload();
                 } else if (response == 2) {
+
+                    if(ex_id_user == '' || ex_id_user == null)
+                        ex_id_user = null;
+
                     if(ex_id_user != null)
                         window.location.href = "{{ URL::to('/edit_consultant') }}/"+ex_id_user;
                     else
