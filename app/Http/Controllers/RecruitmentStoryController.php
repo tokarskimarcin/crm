@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Candidate;
 use App\RecruitmentAttempt;
 use App\User;
 use Illuminate\Http\Request;
@@ -19,12 +20,32 @@ class RecruitmentStoryController extends Controller
     public function  pageReportRecruitmentFlowGet(){
         $date_start = date('Y-m-d');
         $date_stop = date('Y-m-d');
+        $flow_count = $this->getReportFlowData($date_start,$date_stop);
         return view('recruitment.reportRecruitmentFlow')
             ->with('date_start', $date_start)
-            ->with('date_stop', $date_stop);
+            ->with('date_stop', $date_stop)
+            ->with('flow_count',$flow_count);
     }
     public function  pageReportRecruitmentFlowPost(Request $request){
-        return view('recruitment.reportRecruitmentFlow');
+        $flow_count = $this->getReportFlowData($request->date_start,$request->date_stop);
+        return view('recruitment.reportRecruitmentFlow')
+            ->with('date_start', $request->date_start)
+            ->with('date_stop', $request->date_stop)
+            ->with('flow_count',$flow_count);
+    }
+
+
+    public function getReportFlowData($data_start,$data_stop){
+        $result = DB::table('candidate')
+                ->select(DB::Raw("users.first_name,users.last_name,count(candidate.id) as count_flow,
+                `departments`.`name`"))
+                ->join('users','users.id','candidate.cadre_id')
+                ->join('department_info','department_info.id','users.department_info_id')
+                ->join('departments','departments.id','department_info.id_dep')
+                ->wherebetween('candidate.created_at',[$data_start.' 00:00:00',$data_stop.' 23:00:00'])
+                ->groupBy('candidate.cadre_id')
+                ->get();
+        return $result;
     }
     /**
      * Zwrócenie danych na temat ilości nowych kont w godziniówce
@@ -68,9 +89,12 @@ class RecruitmentStoryController extends Controller
 
         $date = DB::table('users')->
         select(DB::raw('sum(case when `users`.`start_work` between "'.$date_start.'" and "'.$date_stop.'" then 1 else 0 end) as add_user,
-         sum(Case when `users`.`candidate_id` is not null and `users`.`start_work` between "'.$date_start.'" and "'.$date_stop.'" then 1 else 0 end ) as add_candidate
+         sum(Case when `users`.`candidate_id` is not null and `users`.`start_work` between "'.$date_start.'" and "'.$date_stop.'" 
+          and `candidate`.`created_at` < `users`.`created_at`
+         then 1 else 0 end ) as add_candidate
          ,`user`.`first_name`,`user`.`last_name`,`departments`.`name`'))
             ->join('users as user','user.id','users.id_manager')
+            ->leftjoin('candidate','candidate.id','users.candidate_id')
             ->join('department_info','department_info.id','users.department_info_id')
             ->join('departments','departments.id','department_info.id_dep')
             ->groupby('users.id_manager')

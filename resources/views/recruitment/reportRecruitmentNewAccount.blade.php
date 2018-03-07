@@ -93,6 +93,10 @@
     <script src="{{ asset('/js/dataTables.buttons.min.js')}}"></script>
     <script src="{{ asset('/js/buttons.bootstrap.min.js')}}"></script>
     <script src="{{ asset('/js/dataTables.select.min.js')}}"></script>
+
+    <script src="{{ asset('/js/dataTables.buttons.min.js')}}"></script>
+    <script src="{{ asset('/js/jszip.min.js')}}"></script>
+    <script src="{{ asset('/js/buttons.html5.min.js')}}"></script>
 <script>
 
 $('.form_date').datetimepicker({
@@ -103,6 +107,14 @@ $('.form_date').datetimepicker({
 });
 
     $('#table_interview_count').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'excelHtml5',
+                title: 'Statystyki nowych kont',
+                fontSize: '15',
+            }
+        ],
         "language": {
             "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
         }

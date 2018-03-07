@@ -67,6 +67,9 @@
 <script src="{{ asset('/js/dataTables.buttons.min.js')}}"></script>
 <script src="{{ asset('/js/buttons.bootstrap.min.js')}}"></script>
 <script src="{{ asset('/js/dataTables.select.min.js')}}"></script>
+<script src="{{ asset('/js/dataTables.buttons.min.js')}}"></script>
+<script src="{{ asset('/js/jszip.min.js')}}"></script>
+<script src="{{ asset('/js/buttons.html5.min.js')}}"></script>
 <script>
 
 $('.form_date').datetimepicker({
@@ -83,6 +86,15 @@ function refreash() {
 $(document).ready(function() {
 
     recruitment_statistics = $('#table').DataTable({
+        dom: 'Bfrtip',
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'excelHtml5',
+                title: 'Raport przeprowadzonych szkoleń',
+                fontSize: '15',
+            }
+        ],
         "order": [[0, "desc"]],
         "autoWidth": false,
         "processing": true,
