@@ -196,6 +196,8 @@ class AdminController extends Controller
         $department_info->type = ($request->type != 'Wybierz') ? $request->type : '' ;
         $department_info->janky_system_id = ($request->janky_system_id) ? $request->janky_system_id : 0 ;
         $department_info->pbx_id = ($request->pbx_id) ? $request->pbx_id : 0 ;
+        $department_info->working_hours_normal = ($request->work_hour > 0) ? $request->work_hour : 0 ;
+        $department_info->working_hours_week = ($request->work_hour_weekend > 0) ? $request->work_hour_weekend : 0 ;
         $department_info->blocked = 0;
 
         $department_info->save();
@@ -269,6 +271,8 @@ class AdminController extends Controller
             $selected_department->type = ($request->type != 'Wybierz') ? $request->type : '' ;
             $selected_department->janky_system_id = ($request->janky_system_id) ? $request->janky_system_id : 0 ;
             $selected_department->pbx_id = ($request->pbx_id != null) ? $request->pbx_id : 0 ;
+            $selected_department->working_hours_normal = ($request->work_hour > 0) ? $request->work_hour : 0 ;
+            $selected_department->working_hours_week = ($request->work_hour_weekend > 0) ? $request->work_hour_weekend : 0 ;
             $selected_department->save();
         }
 
@@ -453,7 +457,7 @@ class AdminController extends Controller
         if ($test == null) {
             return view('errors.404');
         }
-        
+
         return view('tests.testResult')
             ->with('test', $test);
     }
