@@ -236,7 +236,10 @@ Route::get('/dayReportTrainingGroup', 'StatisticsController@MaildayReportTrainin
 Route::get('/dayReportInterviews', 'StatisticsController@MaildayReportInterviews');
 Route::get('/dayReportireCandidate', 'StatisticsController@MaildayReportHireCandidate');
 
-
+Route::get('/weekReportRecruitmentFlow', 'StatisticsController@MailweekReportRecruitmentFlow');
+Route::get('/weekReportTrainingGroup', 'StatisticsController@MailweekReportTrainingGroup');
+Route::get('/weekReportInterviews', 'StatisticsController@MailweekReportInterviews');
+Route::get('/weekReportireCandidate', 'StatisticsController@MailweekReportHireCandidate');
 
 Auth::routes();
 //'check-firewall'
@@ -470,6 +473,11 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageDayReportTrainingGroup','StatisticsController@pageDayReportTrainingGroup');
     Route::get('/pageDayReportInterviews','StatisticsController@pageDayReportInterviews');
     Route::get('/pageDayReportHireCandidate','StatisticsController@pageDayReportHireCandidate');
+
+    Route::get('/pageWeekReportRecruitmentFlow','StatisticsController@pageWeekReportRecruitmentFlow');
+    Route::get('/pageWeekReportTrainingGroup','StatisticsController@pageWeekReportTrainingGroup');
+    Route::get('/pageWeekReportInterviews','StatisticsController@pageWeekReportInterviews');
+    Route::get('/pageWeekReportHireCandidate','StatisticsController@pageWeekReportHireCandidate');
 
     //Report Page STOP
 
