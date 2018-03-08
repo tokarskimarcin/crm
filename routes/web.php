@@ -373,6 +373,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/view_summary_payment','FinancesController@viewSummaryPaymentGet');
     Route::Post('/view_summary_payment','FinancesController@viewSummaryPaymentPOST');
 
+    Route::get('/medicalPackagesRaportExtended','UsersController@medicalPackagesRaportExtendedGet');
+    Route::post('/medicalPackagesRaportExtended','UsersController@medicalPackagesRaportExtendedPost');
+
     // Finances -- STOP --
 
     // Equipment -- START --
@@ -414,6 +417,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::Post('/hour_report', 'StatisticsController@hourReportPost');
 
     Route::Post('/hour_report_edit', 'StatisticsController@hourReportEditPost');
+
+    Route::get('/departmentsStats', 'StatisticsController@departmentsStatsGet');
+    Route::post('/departmentsStats', 'StatisticsController@departmentsStatsPost');
     //Statistics Stop
 
     //Report Page Start
