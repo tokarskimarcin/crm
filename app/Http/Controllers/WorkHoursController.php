@@ -81,6 +81,9 @@ class WorkHoursController extends Controller
         if($request->ajax()) {
             $start_date = $request->start_date;
             $stop_date = $request->stop_date;
+            $isChecked = $request->withCheck;
+            $yesterday = date('Y-m-d', strtotime("-1 days"));
+            $today = date('Y-m-d');
             $query = DB::table('work_hours')
                 ->join('users', 'work_hours.id_user', '=', 'users.id')
                 ->select(DB::raw(
@@ -92,12 +95,29 @@ class WorkHoursController extends Controller
                     work_hours.register_start,
                     work_hours.register_stop,
                     work_hours.date,
-                    SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time'))
-                ->whereIn('work_hours.status', [2,3])
+                    SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time'));
+                    //Checking whether checkbox is checked then displaying proper status
+                    if($isChecked == 1) {
+                      $query = $query
+                      ->where('work_hours.status', '=', 1);
+                    }
+                    else {
+                      $query = $query
+                      ->whereIn('work_hours.status', [2,3]);
+                    }
+                    $query = $query
                 ->where('users.department_info_id', '=', Auth::user()->department_info_id)
                 ->whereIn('users.user_type_id', [1,2])
-                ->where('work_hours.id_manager', '=', null)
-                ->whereBetween('date',[$start_date,$stop_date]);
+                ->where('work_hours.id_manager', '=', null);
+                //"If" for proper date interval displaying
+                if($isChecked == 1 && $stop_date == $today) {
+                  $query = $query
+                  ->whereBetween('date',[$start_date,$yesterday]);
+                }
+                else {
+                  $query = $query
+                  ->whereBetween('date',[$start_date,$stop_date]);
+                }
             return datatables($query)->make(true);
         }
     }
