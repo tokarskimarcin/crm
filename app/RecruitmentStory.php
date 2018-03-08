@@ -106,4 +106,25 @@ class RecruitmentStory extends Model
         }
         return $data;
     }
+
+    /**
+     *  Przygotowanie danych do raportu nowych kont
+     */
+    public static function getReportNewAccountData($date_start, $date_stop){
+
+        $date = DB::table('users')->
+        select(DB::raw('sum(case when `users`.`start_work` between "'.$date_start.'" and "'.$date_stop.'" then 1 else 0 end) as add_user,
+         sum(Case when `users`.`candidate_id` is not null and `users`.`start_work` between "'.$date_start.'" and "'.$date_stop.'" 
+          and `candidate`.`created_at` < `users`.`created_at`
+         then 1 else 0 end ) as add_candidate
+         ,`user`.`first_name`,`user`.`last_name`,`departments`.`name`'))
+            ->join('users as user','user.id','users.id_manager')
+            ->leftjoin('candidate','candidate.id','users.candidate_id')
+            ->join('department_info','department_info.id','users.department_info_id')
+            ->join('departments','departments.id','department_info.id_dep')
+            ->groupby('users.id_manager')
+            ->having('add_user','!=',0)
+            ->get();
+        return $date;
+    }
 }
