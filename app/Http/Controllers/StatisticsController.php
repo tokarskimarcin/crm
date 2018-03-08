@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\HourReport;
 use App\PBXDKJTeam;
 use App\RecruitmentStory;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -1260,6 +1261,66 @@ class StatisticsController extends Controller
         $this->sendMailByVerona('recruitmentMail.dayReportRecruitmentFlow', $data, $title);
     }
 
+    /**
+     * Wyswietlanie spływu rekrutacji Tygodniowego
+     */
+    public function pageWeekReportRecruitmentFlow(){
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $data = [
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
+        ];
+        return view('reportpage.recruitmentReport.WeekReportRecruitmentFlow')
+            ->with('data',$data['data']);
+    }
+
+    /**
+     * Mail spływu rekrutacji Tygodniowego
+     */
+
+    public function MailweekReportRecruitmentFlow() {
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $data = [
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
+        ];
+        $title = 'Raport Tygodniowy Spływu Rekrutacji '.$date_start.' - '.$date_stop;
+        $this->sendMailByVerona('recruitmentMail.weekReportRecruitmentFlow', $data, $title);
+    }
+
+
+    /**
+     * Wyswietlanie spływu rekrutacji Miesięczny
+     */
+    public function pageMonthReportRecruitmentFlow(){
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
+        ];
+        return view('reportpage.recruitmentReport.MonthReportRecruitmentFlow')
+            ->with('data',$data['data']);
+    }
+
+    /**
+     * Mail spływu rekrutacji Miesięczny
+     */
+
+    public function MailmonthReportRecruitmentFlow() {
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
+
+        $data = [
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
+        ];
+        $title = 'Miesięczny Raport Spływu Rekrutacji '.$date_start.' - '.$date_stop;
+        $this->sendMailByVerona('recruitmentMail.monthReportRecruitmentFlow', $data, $title);
+    }
+
 
     /**
      * Wyświetlanie przeprowadzonych szkoleń Dzienny
@@ -1285,6 +1346,62 @@ class StatisticsController extends Controller
         ];
         $title = 'Raport Dzienny Szkoleń '. date('Y-m-d');
         $this->sendMailByVerona('recruitmentMail.dayReportRecruitmentTrainingGroup', $data, $title);
+    }
+
+    /**
+     * Wyświetlanie przeprowadzonych szkoleń Tygodniowy
+     */
+    public function pageWeekReportTrainingGroup(){
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $data = [
+            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
+        ];
+        return view('reportpage.recruitmentReport.WeekReportRecruitmentTrainingGroup')
+            ->with('data',$data['data']);
+    }
+
+    /**
+     * Mail przeprowadzonych szkoleń Tygodniowy
+     */
+    public function MailweekReportTrainingGroup() {
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $data = [
+            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
+        ];
+        $title = 'Tygodniowy Raport Szkoleń '.$date_start.' - '.$date_stop;
+        $this->sendMailByVerona('recruitmentMail.weekReportRecruitmentTrainingGroup', $data, $title);
+    }
+
+    /**
+     * Wyświetlanie przeprowadzonych szkoleń Miesięczny
+     */
+    public function pageMonthReportTrainingGroup(){
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
+        ];
+        return view('reportpage.recruitmentReport.MonthReportRecruitmentTrainingGroup')
+            ->with('data',$data['data']);
+    }
+
+    /**
+     * Mail przeprowadzonych szkoleń Miesięczny
+     */
+    public function MailmonthReportTrainingGroup() {
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
+        ];
+        $title = 'Miesięczny Raport Szkoleń '.$date_start.' - '.$date_stop;
+        $this->sendMailByVerona('recruitmentMail.monthReportRecruitmentTrainingGroup', $data, $title);
     }
 
     /**
@@ -1315,6 +1432,65 @@ class StatisticsController extends Controller
     }
 
     /**
+     *  Wyświetlanie ilości przeprowadzonych rozmów Tygodniowy
+     */
+
+    public function pageWeekReportInterviews(){
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $data = [
+            'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
+        ];
+        return view('reportpage.recruitmentReport.WeekReportInterviews')
+            ->with('data',$data['data']);
+    }
+
+    /**
+     *  Maila przeprowadzonych rozmów Tygodniowy
+     */
+    public function MailweekReportInterviews(){
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $data = [
+            'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
+        ];
+        $title = 'Tygodniowy Raport Rozmów Rekrutacyjnych '.$date_start.' - '.$date_stop;
+        $this->sendMailByVerona('recruitmentMail.weekReportInterviews', $data, $title);
+    }
+
+
+    /**
+     *  Wyświetlanie ilości przeprowadzonych rozmów Miesięczny
+     */
+
+    public function pageMonthReportInterviews(){
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
+        ];
+        return view('reportpage.recruitmentReport.MonthReportInterviews')
+            ->with('data',$data['data']);
+    }
+
+    /**
+     *  Maila przeprowadzonych rozmów Miesięczny
+     */
+    public function MailmonthReportInterviews(){
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
+        ];
+        $title = 'Miesięczny Raport Rozmów Rekrutacyjnych '.$date_start.' - '.$date_stop;
+        $this->sendMailByVerona('recruitmentMail.monthReportInterviews', $data, $title);
+    }
+
+    /**
      * Raport zatrudnienie
      */
     public function pageDayReportHireCandidate(){
@@ -1338,6 +1514,64 @@ class StatisticsController extends Controller
         ];
         $title = 'Dzienny Raport Rozmów Rekrutacyjnych '. date('Y-m-d');
         $this->sendMailByVerona('recruitmentMail.dayReportInterviews', $data, $title);
+    }
+
+
+    /**
+     * Raport zatrudnienie Tygodniowy
+     */
+    public function pageWeekReportHireCandidate(){
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $data = [
+            'data' => RecruitmentStory::getReportNewAccountData($date_start,$date_stop,0)
+        ];
+        return view('reportpage.recruitmentReport.WeekReportHireCandidate')
+            ->with('data',$data['data']);
+    }
+
+    /**
+     *  Maila przeprowadzonych rozmów Tygodniowy
+     */
+    public function MailweekReportHireCandidate(){
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $data = [
+            'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
+        ];
+        $title = 'Tygodniowy Raport Rozmów Rekrutacyjnych '.$date_start.' - '.$date_stop;
+        $this->sendMailByVerona('recruitmentMail.weekReportInterviews', $data, $title);
+    }
+
+
+    /**
+     * Raport zatrudnienie Miesięczny
+     */
+    public function pageMonthReportHireCandidate(){
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportNewAccountData($date_start,$date_stop,0)
+        ];
+        return view('reportpage.recruitmentReport.MonthReportHireCandidate')
+            ->with('data',$data['data']);
+    }
+
+    /**
+     *  Maila przeprowadzonych rozmów Miesięczny
+     */
+    public function MailmonthReportHireCandidate(){
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
+        ];
+        $title = 'Miesięczny Raport Rozmów Rekrutacyjnych '.$date_start.' - '.$date_stop;
+        $this->sendMailByVerona('recruitmentMail.monthReportInterviews', $data, $title);
     }
 
 
