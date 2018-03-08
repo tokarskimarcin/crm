@@ -469,15 +469,21 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 
     //Raporty Rekrutacji
+    //Dzienny
     Route::get('/pageDayReportRecruitmentFlow','StatisticsController@pageDayReportRecruitmentFlow');
     Route::get('/pageDayReportTrainingGroup','StatisticsController@pageDayReportTrainingGroup');
     Route::get('/pageDayReportInterviews','StatisticsController@pageDayReportInterviews');
     Route::get('/pageDayReportHireCandidate','StatisticsController@pageDayReportHireCandidate');
-
+    //Tygodniowy
     Route::get('/pageWeekReportRecruitmentFlow','StatisticsController@pageWeekReportRecruitmentFlow');
     Route::get('/pageWeekReportTrainingGroup','StatisticsController@pageWeekReportTrainingGroup');
     Route::get('/pageWeekReportInterviews','StatisticsController@pageWeekReportInterviews');
     Route::get('/pageWeekReportHireCandidate','StatisticsController@pageWeekReportHireCandidate');
+    //Miesięczny
+    Route::get('/pageMonthReportRecruitmentFlow','StatisticsController@pageMonthReportRecruitmentFlow');
+    Route::get('/pageMonthReportTrainingGroup','StatisticsController@pageMonthReportTrainingGroup');
+    Route::get('/pageMonthReportInterviews','StatisticsController@pageMonthReportInterviews');
+    Route::get('/pageMonthReportHireCandidate','StatisticsController@pageMonthReportHireCandidate');
 
     //Report Page STOP
 
