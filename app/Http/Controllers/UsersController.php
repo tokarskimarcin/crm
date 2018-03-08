@@ -299,12 +299,26 @@ class UsersController extends Controller
         if ($request->user_type != null && $request->user_type != 0) {
             $user->user_type_id = $request->user_type;
         }
-        $user->end_work = $request->stop_date;
+        if ($request->status_work == 1) {
+            $user->end_work = null;
+        } else {
+            $user->end_work = $request->stop_date;
+        }
         if($request->password != '')
         {
             $user->password = bcrypt($request->password);
             $user->guid = base64_encode($request->password);
         };
+        /**
+         * automatyczne rozwiązanie pakietu medycznego w przypadku zakończenia pracy
+         */
+        if ($request->status_work == 0) {
+            $month_to_end = date('Y-m-t', strtotime($request->stop_date));
+            MedicalPackage::where('user_id', '=', $user->id)
+                ->where('deleted', '=', 0)
+                ->where('month_stop', '=', null)
+                ->update(['deleted' => 1, 'month_stop' => $month_to_end]);
+        }
         $user->save();
 
         $data = [
@@ -794,4 +808,89 @@ class UsersController extends Controller
         return $year . '-' . $month . '%';
     }
 
+    /**
+     * Rozszerzony raport pakietów medycznych
+     */
+    public function medicalPackagesRaportExtendedGet() {
+        $data = $this->getMedicalPackagesExtendedData(date('Y-m'));
+
+        return view('admin.medicalReportExtended')
+            ->with('packages', $data['packages'])
+            ->with('selected_year', date('Y'))
+            ->with('selected_month', date('m'))
+            ->with('months', $data['months']);
+    }
+
+    /**
+     * Rozszerzony raport pakeitów medycznych (wybór)
+     */
+    public function medicalPackagesRaportExtendedPost(Request $request) {
+        $data = $this->getMedicalPackagesExtendedData($request->year . '-' . $request->month);
+
+        return view('admin.medicalReportExtended')
+            ->with('packages', $data['packages'])
+            ->with('selected_year', $request->year)
+            ->with('selected_month', $request->month)
+            ->with('months', $data['months']);
+    }
+
+    /**
+     * Pobranie danych na temat pakietów medycznych
+     */
+    private function getMedicalPackagesExtendedData($month) {
+        /**
+         * Tablica z miesiącami
+         */
+        $months = collect([
+            ['id' => '01', 'name' => 'Styczeń'],
+            ['id' => '02', 'name' => 'Luty'],
+            ['id' => '03', 'name' => 'Marzec'],
+            ['id' => '04', 'name' => 'Kwiecień'],
+            ['id' => '05', 'name' => 'Maj'],
+            ['id' => '06', 'name' => 'Czerwiec'],
+            ['id' => '07', 'name' => 'Lipiec'],
+            ['id' => '08', 'name' => 'Sierpień'],
+            ['id' => '09', 'name' => 'Wrzesień'],
+            ['id' => '10', 'name' => 'Październik'],
+            ['id' => '11', 'name' => 'Listopad'],
+            ['id' => '12', 'name' => 'Grudzień']
+        ]);
+
+        $first_day_of_month = $month . '-01';
+
+        $last_day = date('t', strtotime($month));
+
+        $last_day_of_month = $month . '-' . $last_day;
+
+        /**
+         * Dane pakietów z danego miesiąca
+         */
+        $medicalPackages = DB::table('medical_packages')
+            ->select(DB::raw('
+                SUM(CASE WHEN users.user_type_id IN (1,2) THEN 1 ELSE 0 END) as consultant_sum,
+                SUM(CASE WHEN users.user_type_id NOT IN (1,2) THEN 1 ELSE 0 END) as cadre_sum,
+                COUNT(medical_packages.id) as total_sum,
+                departments.name AS dep_name,
+                department_type.name AS dep_name_type
+            '))
+            ->join('users', 'users.id', 'medical_packages.user_id')
+            ->join('department_info', 'department_info.id', 'users.department_info_id')
+            ->join('departments', 'department_info.id_dep', 'departments.id')
+            ->join('department_type', 'department_info.id_dep_type', 'department_type.id')
+            ->where('medical_packages.month_start', '<=', $last_day_of_month)
+            ->where(function($query) use ($last_day_of_month) {
+                $query->where('medical_packages.month_stop', '<=', $last_day_of_month)
+                    ->orWhere('medical_packages.month_stop', '=', null);
+            })
+            ->where('medical_packages.family_member', '=', null)
+            ->groupBy('department_info.id')
+            ->get();
+
+        $data = [
+            'months' => $months,
+            'packages' => $medicalPackages
+        ];
+
+        return $data;
+    }
 }

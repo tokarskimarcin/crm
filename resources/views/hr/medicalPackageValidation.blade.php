@@ -44,8 +44,8 @@ return false;
 var postalCodeRegex = /[0-9][0-9]-[0-9][0-9][0-9]/;
 
 $("input[name='postal_code[]']").each(function(key, value){
-if ($(value).val().trim().length == 0  || !$(value).val().match(postalCodeRegex)) {
-swal('Podaj wszystkie kody pocztowe!');
+if ($(value).val().trim().length == 0  || !$(value).val().match(postalCodeRegex) || $(value).val().trim().length > 6) {
+swal('Podaj prawidłowe kody pocztowe!');
 validationResult = false;
 return false;
 }

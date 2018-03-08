@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\HourReport;
 use App\PBXDKJTeam;
+use App\RecruitmentStory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -1210,6 +1211,11 @@ class StatisticsController extends Controller
 
         return $data;
     }
+
+
+
+
+
 // Mail do raportu godzinnego Czas na rekord
     public function MailhourReportTimeOnRecord() {
         $data = $this::hourReportTimeOnRecord();
@@ -1227,6 +1233,87 @@ class StatisticsController extends Controller
     }
 
 
+    /**
+     * Wyswietlanie spływu rekrutacji dzienny
+     */
+    public function pageDayReportRecruitmentFlow(){
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
+        ];
+        return view('reportpage.recruitmentReport.DayReportRecruitmentFlow')
+            ->with('data',$data['data']);
+    }
+
+    /**
+     * Mail spływu rekrutacji dzienny
+     */
+
+    public function MaildayReportRecruitmentFlow() {
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
+        ];
+        $title = 'Raport Dzienny Spływu Rekrutacji ' . date('Y-m-d');
+        $this->sendMailByVerona('recruitmentMail.dayReportRecruitmentFlow', $data, $title);
+    }
+
+
+    /**
+     * Wyświetlanie przeprowadzonych szkoleń Dzienny
+     */
+    public function pageDayReportTrainingGroup(){
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
+        ];
+        return view('reportpage.recruitmentReport.DayReportRecruitmentTrainingGroup')
+            ->with('data',$data['data']);
+    }
+
+    /**
+     * Mail przeprowadzonych szkoleń
+     */
+    public function MaildayReportTrainingGroup() {
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
+        ];
+        $title = 'Raport Dzienny Szkoleń '. date('Y-m-d');
+        $this->sendMailByVerona('recruitmentMail.dayReportRecruitmentTrainingGroup', $data, $title);
+    }
+
+    /**
+     *  Wyświetlanie ilości przeprowadzonych rozmów Dzienny
+     */
+
+    public function pageDayReportInterviews(){
+        $date_start = "2018-01-01";//date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
+        ];
+        return view('reportpage.recruitmentReport.DayReportInterviews')
+            ->with('data',$data['data']);
+    }
+
+    /**
+     *  Maila przeprowadzonych rozmów Dzienny
+     */
+    public function MaildayReportInterviews(){
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
+        ];
+        $title = 'Dzienny Raport Rozmów Rekrutacyjnych '. date('Y-m-d');
+        $this->sendMailByVerona('recruitmentMail.dayReportInterviews', $data, $title);
+    }
+
 
     /******** Główna funkcja do wysyłania emaili*************/
     /*
@@ -1237,7 +1324,10 @@ class StatisticsController extends Controller
 
     private function sendMailByVerona($mail_type, $data, $mail_title) {
         $email = [];
-
+        $mail_type_pom = $mail_type;
+        $mail_without_folder = explode(".",$mail_type);
+        //jeśli widok jest pod folderem
+        $mail_type = $mail_without_folder[count($mail_without_folder)-1];
         $mail_type2 = ucfirst($mail_type);
         $mail_type2 = 'page' . $mail_type2;
         $accepted_users = DB::table('users')
@@ -1261,35 +1351,39 @@ class StatisticsController extends Controller
             $accepted_users->push($szczesny);
 
 
-//
-//    $accepted_users = [
-//        'cytawa.verona@gmail.com',
-//        'jarzyna.verona@gmail.com'
-//    ];
-//
-//     Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
-//     {
-//        $message->from('noreply.verona@gmail.com', 'Verona Consulting');
-//        foreach ($accepted_users as $key => $user) {
-//          if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
-//              $message->to($user)->subject($mail_title);
-//          }
-//        }
-//     });
+
+
+
+
+    $accepted_users = [
+        'cytawa.verona@gmail.com',
+        'jarzyna.verona@gmail.com'
+    ];
+
+        $mail_type = $mail_type_pom;
+     Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
+     {
+        $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+        foreach ($accepted_users as $key => $user) {
+          if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
+              $message->to($user)->subject($mail_title);
+          }
+        }
+     });
 
 
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
-       Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
-       {
-           $message->from('noreply.verona@gmail.com', 'Verona Consulting');
-           foreach($accepted_users as $user) {
-            if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
-                $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
-             }
-             if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
-                $message->to($user->email_off, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
-             }
-           }
-       });
+//       Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
+//       {
+//           $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+//           foreach($accepted_users as $user) {
+//            if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
+//                $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
+//             }
+//             if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
+//                $message->to($user->email_off, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
+//             }
+//           }
+//       });
     }
 }

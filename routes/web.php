@@ -175,6 +175,7 @@ Route::POST('/statusResultChange', 'RecruitmentAttemptController@statusResultCha
 Route::POST('/recruiterData', 'RecruitmentAttemptController@recruiterData')->name('api.recruiterData');
 Route::POST('/trainerData', 'RecruitmentAttemptController@trainerData')->name('api.trainerData');
 Route::POST('/recruiterTrainingsData', 'RecruitmentAttemptController@recruiterTrainingsData')->name('api.recruiterTrainingsData');
+Route::POST('/datatableTrainingData', 'RecruitmentStoryController@datatableTrainingData')->name('api.datatableTrainingData');
 
 Route::POST('/delete_notification', 'NotificationController@delete_notification')->name('api.delete_notification');
 
@@ -228,6 +229,12 @@ Route::get('/dayReportDatabaseUse', 'DatabaseURLController@MailDayRaportDatabase
 Route::get('/weekReportDatabaseUse', 'DatabaseURLController@MailWeekRaportDatabaseUse');
 Route::get('/monthReportDatabaseUse', 'DatabaseURLController@MailMonthRaportDatabaseUse');
 //End emails
+
+// maila dotyczące rekrutacji
+Route::get('/dayReportRecruitmentFlow', 'StatisticsController@MaildayReportRecruitmentFlow');
+Route::get('/dayReportTrainingGroup', 'StatisticsController@MaildayReportTrainingGroup');
+Route::get('/dayReportInterviews', 'StatisticsController@MaildayReportInterviews');
+
 
 
 
@@ -372,6 +379,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/view_summary_payment','FinancesController@viewSummaryPaymentGet');
     Route::Post('/view_summary_payment','FinancesController@viewSummaryPaymentPOST');
 
+    Route::get('/medicalPackagesRaportExtended','UsersController@medicalPackagesRaportExtendedGet');
+    Route::post('/medicalPackagesRaportExtended','UsersController@medicalPackagesRaportExtendedPost');
+
     // Finances -- STOP --
 
     // Equipment -- START --
@@ -413,6 +423,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::Post('/hour_report', 'StatisticsController@hourReportPost');
 
     Route::Post('/hour_report_edit', 'StatisticsController@hourReportEditPost');
+
+    Route::get('/departmentsStats', 'StatisticsController@departmentsStatsGet');
+    Route::post('/departmentsStats', 'StatisticsController@departmentsStatsPost');
     //Statistics Stop
 
     //Report Page Start
@@ -450,6 +463,12 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 
     Route::get('/pageHourReportTimeOnRecord', 'StatisticsController@pageHourReportTimeOnRecord');
+
+
+    //Raporty Rekrutacji
+    Route::get('/pageDayReportRecruitmentFlow','StatisticsController@pageDayReportRecruitmentFlow');
+    Route::get('/pageDayReportTrainingGroup','StatisticsController@pageDayReportTrainingGroup');
+    Route::get('/pageDayReportInterviews','StatisticsController@pageDayReportInterviews');
 
 
     //Report Page STOP
@@ -525,6 +544,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/pageReportNewAccount', 'RecruitmentStoryController@pageReportNewAccountGet');
     Route::post('/pageReportNewAccount', 'RecruitmentStoryController@pageReportNewAccountPost');
+
+    Route::get('/pageReportTraining', 'RecruitmentStoryController@pageReportTrainingGet');
 
     Route::get('/pageReportRecruitmentFlow', 'RecruitmentStoryController@pageReportRecruitmentFlowGet');
     Route::post('/pageReportRecruitmentFlow', 'RecruitmentStoryController@pageReportRecruitmentFlowPost');

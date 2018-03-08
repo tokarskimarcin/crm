@@ -171,34 +171,6 @@ class RecruitmentAttemptController extends Controller
     * Główne statystyki rekrutacji
     */
     public function recruitment_admin() {
-//        $id = 1364;
-//        $maxIds = DB::table('recruitment_story')
-//            ->select(DB::raw('
-//                MAX(recruitment_story.id) as id
-//                '))
-//            ->join('recruitment_attempt', 'recruitment_attempt.id', 'recruitment_story.recruitment_attempt_id')
-//            ->where('recruitment_attempt.cadre_id', '=', $id)
-//            ->where('recruitment_attempt.status', '=', 1)
-//            ->groupBy('recruitment_attempt_id')
-//            ->get();
-//        $ids = [];
-//        $ids[] = $maxIds->map(function($item) {
-//            return $item->id;
-//        });
-//
-//        $query = DB::table('recruitment_story')
-//            ->select(DB::raw('
-//                count(recruitment_story.id) as sum,
-//                attempt_status.name as attempt_status_name,
-//                attempt_result.name as attempt_result_name
-//            '))
-//            ->join('recruitment_attempt', 'recruitment_attempt.id', 'recruitment_story.recruitment_attempt_id')
-//            ->leftJoin('attempt_result', 'attempt_result.id', 'recruitment_story.attempt_result_id')
-//            ->leftJoin('attempt_status', 'attempt_status.id', 'recruitment_story.attempt_status_id')
-//            ->whereIn('recruitment_story.id', $ids[0]->toArray())
-//            ->groupBy('attempt_status.id', 'attempt_result.id')
-//            ->get();
-//dd($query);
         /**
          * Ilość aktywnych rekrutacji
          */
@@ -400,11 +372,6 @@ class RecruitmentAttemptController extends Controller
             $userTrainings = GroupTraining::where('leader_id', '=', $id)->orderBy('training_date', 'desc')->get();
 
             /**
-             * Pobranie sumy osob na szkoleniu
-             */
-            $candidate_sum = $userTrainings->sum('candidate_count');
-
-            /**
              * Pobranie sumy szkoleń dla danego trenera
              */
             $user_training_count = $userTrainings->count();
@@ -416,7 +383,6 @@ class RecruitmentAttemptController extends Controller
                 'user' => $user,
                 'userTrainings' => $userTrainings,
                 'user_department' => $user_department,
-                'candidate_sum' => $candidate_sum,
                 'user_training_count' => $user_training_count
             ];
 
