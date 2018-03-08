@@ -461,6 +461,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     //Raporty Rekrutacji
     Route::get('/pageDayReportRecruitmentFlow','StatisticsController@pageDayReportRecruitmentFlow');
     Route::get('/pageDayReportTrainingGroup','StatisticsController@pageDayReportTrainingGroup');
+    Route::get('/pageDayReportInterviews','StatisticsController@pageDayReportInterviews');
+
 
     //Report Page STOP
 
