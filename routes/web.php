@@ -233,6 +233,7 @@ Route::get('/monthReportDatabaseUse', 'DatabaseURLController@MailMonthRaportData
 // maila dotyczące rekrutacji
 Route::get('/dayReportRecruitmentFlow', 'StatisticsController@MaildayReportRecruitmentFlow');
 Route::get('/dayReportTrainingGroup', 'StatisticsController@MaildayReportTrainingGroup');
+Route::get('/dayReportInterviews', 'StatisticsController@MaildayReportInterviews');
 
 
 
