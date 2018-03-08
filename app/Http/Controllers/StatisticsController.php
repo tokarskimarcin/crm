@@ -1261,6 +1261,32 @@ class StatisticsController extends Controller
     }
 
 
+    /**
+     * Wyświetlanie przeprowadzonych szkoleń Dzienny
+     */
+    public function pageDayReportTrainingGroup(){
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
+        ];
+        return view('reportpage.recruitmentReport.DayReportRecruitmentTrainingGroup')
+            ->with('data',$data['data']);
+    }
+
+    /**
+     * Mail przeprowadzonych szkoleń
+     */
+    public function MaildayReportTrainingGroup() {
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
+        ];
+        $title = 'Raport Dzienny Szkoleń' . date('Y-m-d');
+        $this->sendMailByVerona('recruitmentMail.dayReportRecruitmentTrainingGroup', $data, $title);
+    }
+
 
 
     /******** Główna funkcja do wysyłania emaili*************/

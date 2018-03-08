@@ -232,7 +232,7 @@ Route::get('/monthReportDatabaseUse', 'DatabaseURLController@MailMonthRaportData
 
 // maila dotyczące rekrutacji
 Route::get('/dayReportRecruitmentFlow', 'StatisticsController@MaildayReportRecruitmentFlow');
-
+Route::get('/dayReportTrainingGroup', 'StatisticsController@MaildayReportTrainingGroup');
 
 
 
@@ -458,7 +458,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageHourReportTimeOnRecord', 'StatisticsController@pageHourReportTimeOnRecord');
 
 
+    //Raporty Rekrutacji
     Route::get('/pageDayReportRecruitmentFlow','StatisticsController@pageDayReportRecruitmentFlow');
+    Route::get('/pageDayReportTrainingGroup','StatisticsController@pageDayReportTrainingGroup');
 
     //Report Page STOP
 
