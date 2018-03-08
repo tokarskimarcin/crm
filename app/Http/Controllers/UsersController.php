@@ -27,7 +27,7 @@ class UsersController extends Controller
     {
         $agencies = Agencies::all();
         $user = User::find(Auth::user()->id);
-        
+
         return view('hr.addNewUser')
             ->with('agencies',$agencies)
             ->with('send_type',$user->department_info->type)
@@ -51,7 +51,7 @@ class UsersController extends Controller
         if($request->ajax())
         {
             $user = User::where('username', '=',$request->username)->count();
-   
+
             return ($user > 0) ? 1 : 0 ;
         }
     }
@@ -175,11 +175,21 @@ class UsersController extends Controller
             return view('404');
         }
 
+        /*
+        *Wyszukuję użytkowników którzy pracują
+        */
+        //pobranie wszystkich użytkowników z danego działu
+        $workingUsers = User::where('status_work', '=', 1)
+        ->whereIn('user_type_id', [1,2])
+        ->where('department_info_id', '=', Auth::user()->department_info_id)
+        ->get();
+
         return view('hr.editUser')->with('agencies',$agencies)
           ->with('user',$user)
           ->with('department_info', $department_info)
           ->with('userTypes', $userTypes)
-          ->with('type', 1);
+          ->with('type', 1)
+          ->with('recomendingPeople', $workingUsers);
 
     }
 

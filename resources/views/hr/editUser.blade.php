@@ -35,7 +35,7 @@
                     Profil pracownika
                 </div>
                 <div class="panel-body">
-                    <div class="row">                        
+                    <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label class="myLabel">Imie:</label>
@@ -69,6 +69,29 @@
                             </div>
                         </div>
                     </div>
+                    @if($type == 1)
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="myLabel" for="recomended">Polecony przez</label>
+                                <select class="form-control" style="font-size:18px;" name="recomended" id="recomended">
+                                    @foreach($recomendingPeople as $rp)
+                                      <option>{{$rp->first_name . " " . $rp->last_name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                              <label class="myLabel" for="responsible_for">Prowadzący</label>
+                              <select class="form-control" style="font-size:18px;" name="responsible_for" id="responsible_for">
+                                <option value="c">a</option>
+                                <option value="d">b</option>
+                              </select>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
