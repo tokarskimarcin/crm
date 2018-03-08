@@ -81,6 +81,9 @@ class WorkHoursController extends Controller
         if($request->ajax()) {
             $start_date = $request->start_date;
             $stop_date = $request->stop_date;
+            $isChecked = $request->withCheck;
+            $yesterday = date('Y-m-d', strtotime("-1 days"));
+            $today = date('Y-m-d');
             $query = DB::table('work_hours')
                 ->join('users', 'work_hours.id_user', '=', 'users.id')
                 ->select(DB::raw(
@@ -92,12 +95,29 @@ class WorkHoursController extends Controller
                     work_hours.register_start,
                     work_hours.register_stop,
                     work_hours.date,
-                    SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time'))
-                ->whereIn('work_hours.status', [2,3])
+                    SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time'));
+                    //Checking whether checkbox is checked then displaying proper status
+                    if($isChecked == 1) {
+                      $query = $query
+                      ->where('work_hours.status', '=', 1);
+                    }
+                    else {
+                      $query = $query
+                      ->whereIn('work_hours.status', [2,3]);
+                    }
+                    $query = $query
                 ->where('users.department_info_id', '=', Auth::user()->department_info_id)
                 ->whereIn('users.user_type_id', [1,2])
-                ->where('work_hours.id_manager', '=', null)
-                ->whereBetween('date',[$start_date,$stop_date]);
+                ->where('work_hours.id_manager', '=', null);
+                //"If" for proper date interval displaying
+                if($isChecked == 1 && $stop_date == $today) {
+                  $query = $query
+                  ->whereBetween('date',[$start_date,$yesterday]);
+                }
+                else {
+                  $query = $query
+                  ->whereBetween('date',[$start_date,$stop_date]);
+                }
             return datatables($query)->make(true);
         }
     }
@@ -193,6 +213,7 @@ class WorkHoursController extends Controller
                         'accept_start' => $register_start,
                         'accept_stop' => $register_stop,
                         'status' => 4,
+                        'updated_at' => date('Y-m-d H:i:s'),
                         'success' => $succes]);}
 
             }else
@@ -202,6 +223,7 @@ class WorkHoursController extends Controller
                         'success' => $succes,
                         'accept_start' => $register_start,
                         'accept_stop' => $register_stop,
+                        'updated_at' => date('Y-m-d H:i:s'),
                         'status' => 4]);
             }
         }
@@ -234,7 +256,7 @@ class WorkHoursController extends Controller
 
             Work_Hour::where('id_user', Auth::id())
                 ->where('date', date('Y-m-d'))
-                ->update(['register_start' => $time_register_start,'register_stop' => $time_register_stop, 'status' => 3]);
+                ->update(['register_start' => $time_register_start,'register_stop' => $time_register_stop, 'status' => 3, 'updated_at' => date('Y-m-d H:i:s')]);
         }
     }
     //******************RegisterHour****************** Stop
@@ -474,6 +496,7 @@ class WorkHoursController extends Controller
                     'success' => 0,
                     'accept_start' => null,
                     'accept_stop' => null,
+                    'updated_at' => date('Y-m-d H:i:s'),
                     'status' => 6]);
             new ActivityRecorder(5, 'Usunięcie godzin pracy, wpis id godzin pracy: ' . $id);
             return 1;
@@ -497,6 +520,7 @@ class WorkHoursController extends Controller
                     'success' => $succes,
                     'accept_start' => $accept_start,
                     'accept_stop' => $accept_stop,
+                    'updated_at' => date('Y-m-d H:i:s'),
                     'status' => 5]);
             $data = [
                 'Edycja godzin pracy, wpis id godzin pracy:' => $id,
@@ -527,6 +551,7 @@ class WorkHoursController extends Controller
             $work_hour->accept_stop = $accept_stop;
             $work_hour->id_user = $date[0];
             $work_hour->id_manager = $id_manager;
+            $work_hour->created_at = date('Y-m-d H:i:s');
             $work_hour->save();
 
             $data = [
