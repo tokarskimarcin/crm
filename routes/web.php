@@ -234,7 +234,7 @@ Route::get('/monthReportDatabaseUse', 'DatabaseURLController@MailMonthRaportData
 Route::get('/dayReportRecruitmentFlow', 'StatisticsController@MaildayReportRecruitmentFlow');
 Route::get('/dayReportTrainingGroup', 'StatisticsController@MaildayReportTrainingGroup');
 Route::get('/dayReportInterviews', 'StatisticsController@MaildayReportInterviews');
-
+Route::get('/dayReportireCandidate', 'StatisticsController@MaildayReportHireCandidate');
 
 
 
@@ -463,7 +463,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageDayReportRecruitmentFlow','StatisticsController@pageDayReportRecruitmentFlow');
     Route::get('/pageDayReportTrainingGroup','StatisticsController@pageDayReportTrainingGroup');
     Route::get('/pageDayReportInterviews','StatisticsController@pageDayReportInterviews');
-
+    Route::get('/pageDayReportHireCandidate','StatisticsController@pageDayReportHireCandidate');
 
     //Report Page STOP
 

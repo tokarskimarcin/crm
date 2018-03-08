@@ -1292,7 +1292,7 @@ class StatisticsController extends Controller
      */
 
     public function pageDayReportInterviews(){
-        $date_start = "2018-01-01";//date('Y-m-d');
+        $date_start = date('Y-m-d');
         $date_stop = date('Y-m-d');
         $data = [
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
@@ -1313,6 +1313,35 @@ class StatisticsController extends Controller
         $title = 'Dzienny Raport Rozmów Rekrutacyjnych '. date('Y-m-d');
         $this->sendMailByVerona('recruitmentMail.dayReportInterviews', $data, $title);
     }
+
+    /**
+     * Raport zatrudnienie
+     */
+    public function pageDayReportHireCandidate(){
+        $date_start = "2018-01-01";//date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportNewAccountData($date_start,$date_stop,0)
+        ];
+        return view('reportpage.recruitmentReport.DayReportHireCandidate')
+            ->with('data',$data['data']);
+    }
+
+    /**
+     *  Maila przeprowadzonych rozmów Dzienny
+     */
+    public function MaildayReportHireCandidate(){
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = [
+            'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
+        ];
+        $title = 'Dzienny Raport Rozmów Rekrutacyjnych '. date('Y-m-d');
+        $this->sendMailByVerona('recruitmentMail.dayReportInterviews', $data, $title);
+    }
+
+
+
 
 
     /******** Główna funkcja do wysyłania emaili*************/
