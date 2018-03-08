@@ -100,7 +100,7 @@ class RecruitmentStoryController extends Controller
         $date_stop = date('Y-m-d');
         $select_type = 0;
 
-        $data = $this->getReportInterviewsData($date_start, $date_stop, $select_type);
+        $data = RecruitmentStory::getReportInterviewsData($date_start, $date_stop, $select_type);
 
         return view('recruitment.reportRecruitmentInterviews')
             ->with('date_start', $date_start)
@@ -117,7 +117,7 @@ class RecruitmentStoryController extends Controller
         $date_stop = $request->date_stop;
         $select_type = $request->select_type;
 
-        $data = $this->getReportInterviewsData($date_start, $date_stop, $select_type);
+        $data = RecruitmentStory::getReportInterviewsData($date_start, $date_stop, $select_type);
 
         return view('recruitment.reportRecruitmentInterviews')
             ->with('date_start', $date_start)
@@ -126,39 +126,7 @@ class RecruitmentStoryController extends Controller
             ->with('data', $data);
     }
 
-    /**
-     * Pobranie danych na temat ilości rozmów rekrutacyjnych
-     */
-    private function getReportInterviewsData($date_start, $date_stop, $select_type) {
-        if ($select_type == 0) {
-            $data = DB::table('recruitment_attempt')
-                ->select(DB::raw('
-                    departments.name as dep_name,
-                    department_type.name as dep_name_type,
-                    count(recruitment_attempt.id) as counted
-                '))
-                ->join('users', 'users.id', 'recruitment_attempt.cadre_id')
-                ->join('department_info', 'users.department_info_id', 'department_info.id')
-                ->join('departments', 'departments.id', 'department_info.id_dep')
-                ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
-                ->whereBetween('interview_date', [$date_start . ' 01:00:00', $date_stop . ' 23:00:00'])
-                ->groupBy('users.department_info_id')
-                ->get();
-        } else if ($select_type == 1) {
-            $data = DB::table('recruitment_attempt')
-                ->select(DB::raw('
-                    first_name,
-                    last_name,
-                    count(recruitment_attempt.id) as counted
-                '))
-                ->join('users', 'users.id', 'recruitment_attempt.cadre_id')
-                ->whereBetween('interview_date', [$date_start . ' 01:00:00', $date_stop . ' 23:00:00'])
-                ->groupBy('users.id')
-                ->get();
-        }
 
-        return $data;
-    }
 
     /**
      * Wyświetlenie danych na temat szkoleń
