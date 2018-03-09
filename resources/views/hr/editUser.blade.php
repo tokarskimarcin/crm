@@ -74,9 +74,10 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="myLabel" for="recomended">Polecony przez</label>
-                                <select class="form-control" style="font-size:18px;" name="recomended" id="recomended">
+                                <select class="form-control" style="font-size:18px;" name="recommended_by" id="recommended_by">
+                                    <option value="0" id="none">Brak</option>
                                     @foreach($recomendingPeople as $rp)
-                                      <option>{{$rp->first_name . " " . $rp->last_name}}</option>
+                                      <option value="{{$rp->id}}">{{$rp->first_name . " " . $rp->last_name}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -84,9 +85,11 @@
                         <div class="col-md-6">
                             <div class="form-group">
                               <label class="myLabel" for="responsible_for">Prowadzący</label>
-                              <select class="form-control" style="font-size:18px;" name="responsible_for" id="responsible_for">
-                                <option value="c">a</option>
-                                <option value="d">b</option>
+                              <select class="form-control" style="font-size:18px;" name="coach_id" id="responsible_for">
+                                  <option value="0" id="noTrainer">--Wybierz prowadzącego--</option>
+                                  @foreach($workingTreners as $wt)
+                                      <option value="{{$wt->id}}" @if (isset($user->coach_id) && $user->coach_id == $wt->id) selected @endif>{{$wt->first_name . " " . $wt->last_name}}</option>
+                                  @endforeach
                               </select>
                             </div>
                         </div>
@@ -485,6 +488,7 @@ $(document).ready(function() {
         var username = $('#username').val();
         var private_phone = $('#private_phone').val();
         var password = $('#password').val();
+        var trainer = $('#responsible_for').val();
         var documents = $('#documents').val();
         var student = $('#student').val();
         var agency_id = $('#agency_id').val();
@@ -520,6 +524,11 @@ $(document).ready(function() {
 
         if (password.trim().length == 0) {
             swal('Podaj hasło!');
+            return false;
+        }
+
+        if (trainer == "0") {
+            swal('Wybierz prowadzącego');
             return false;
         }
 

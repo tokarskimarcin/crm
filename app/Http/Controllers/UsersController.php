@@ -179,17 +179,23 @@ class UsersController extends Controller
         *Wyszukuję użytkowników którzy pracują
         */
         //pobranie wszystkich użytkowników z danego działu
-        $workingUsers = User::where('status_work', '=', 1)
+        $workingUsers = User::where('status_work', '=', 1) //są zatrudnieni
         ->whereIn('user_type_id', [1,2])
-        ->where('department_info_id', '=', Auth::user()->department_info_id)
+        ->where('department_info_id', '=', Auth::user()->department_info_id) // wybiera dział aktualnie zalogowanego użytkownika
         ->get();
+
+        $workingTreners = User::whereIn('user_type_id', [4,12])
+            ->where('status_work', '=', 1)
+            ->where('department_info_id', '=', Auth::user()->department_info_id)
+            ->get();
 
         return view('hr.editUser')->with('agencies',$agencies)
           ->with('user',$user)
           ->with('department_info', $department_info)
           ->with('userTypes', $userTypes)
           ->with('type', 1)
-          ->with('recomendingPeople', $workingUsers);
+          ->with('recomendingPeople', $workingUsers)
+            ->with('workingTreners', $workingTreners);
 
     }
 
@@ -281,6 +287,13 @@ class UsersController extends Controller
         $user->last_name = $request->last_name;
         $user->updated_at = date("Y-m-d H:i:s");
         $user->phone = $request->phone;
+        $user->coach_id = $request->coach_id;
+        if($request->recommended_by != 0) {
+            $user->recommended_by = $request->recommended_by;
+        }
+        else {
+            $user->recommended_by = $request->recommended_by;
+        }
         $user->email_off = $request->email;
         $user->private_phone = $request->private_phone;
         $user->description = $request->description;
