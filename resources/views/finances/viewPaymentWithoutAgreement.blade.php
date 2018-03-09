@@ -125,6 +125,7 @@
                                                                             </thead>
                                                                             <tbody>
                                                                         @foreach($key as $item2)
+                                                                          @if($item2->sum > 0)
                                                                             @php // set variable
                                                                                 $avg = 0;
                                                                                 $rbh = 0;
@@ -189,7 +190,9 @@
                                                                                 <td>{{(($item2->salary_to_account == 0) ? "Nie" : "Tak")}}</td>
                                                                                 <td>{{(round($salary_total,2))}}</td>
                                                                             </tr>
+                                                                            @endif
                                                                         @endforeach
+
                                                                         @php
                                                                             $payment_total += $salary_total_all;
                                                                         @endphp

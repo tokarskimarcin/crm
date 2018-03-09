@@ -49,7 +49,10 @@ class FinancesController extends Controller
             `users`.`documents`,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "'.$date.'" AND `penalty_bonus`.`type`=1 AND `penalty_bonus`.`status`=1) as `penalty`,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$date.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `bonus`')
-            //->where('users.status_work',1)
+            ->where(function ($query) use ($date){
+                $query->orwhere('users.promotion_date', 'not like', $date)
+                    ->orwhere('users.promotion_date','=',null);
+            })
             ->join('department_info','department_info.id','users.main_department_id')
             ->join('work_hours', 'work_hours.id_user', 'users.id')
             ->join('departments','departments.id','department_info.id_dep')
@@ -444,7 +447,11 @@ class FinancesController extends Controller
         $query = DB::table(DB::raw("users"))
             ->join('work_hours', 'work_hours.id_user', 'users.id')
             ->where('users.department_info_id',Auth::user()->department_info_id)
-            ->whereIn('users.user_type_id',[1,2])
+            ->where(function ($querry) use ($month){
+                $querry->orwhere('promotion_date','like',$month)
+                    ->orwhere('users.user_type_id','=',1)
+                    ->orwhere('users.user_type_id','=',2);
+            })
             ->where('work_hours.date','like',$month)
             ->selectRaw('
             `users`.`id`,
