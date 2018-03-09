@@ -4,7 +4,9 @@
 {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Raport Dzienny Odsłuch</h1>
+            <div class="page-header">
+                <div class="alert gray-nav">Raport Dzienny Odsłuch</div>
+            </div>
         </div>
     </div>
     <div class="row">

@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Przydziel dostęp spoza zaufanych IP</h1>
+            <div class="alert gray-nav">Przydziel dostęp spoza zaufanych IP</div>
         </div>
     </div>
 </div>
@@ -39,7 +39,7 @@
     <div class="col-md-6">
         <div class="table-responsive">
             <table class="table table-bordered">
-                <thead>
+                <thead style="color: white; background: #7A7A7A;">
                     <th>Użytkownik</th>
                     <th>Data dodania</th>
                     <th>Akcja</th>

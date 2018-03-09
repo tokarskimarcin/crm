@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Dodaj link</h1>
+            <div class="alert gray-nav">Dodaj link</div>
         </div>
     </div>
 </div>

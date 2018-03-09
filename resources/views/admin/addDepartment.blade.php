@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Dodaj oddział</h1>
+            <div class="alert gray-nav">Dodaj oddział</div>
         </div>
     </div>
 </div>
