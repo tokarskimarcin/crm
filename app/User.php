@@ -18,7 +18,7 @@ class User extends Authenticatable
         'first_name','last_name','username','last_login','password_date','user_type_id','department_info_id',
         'start_work','end_work','status_work','phone','desc','student','ck','agency_id','guid','login_phone','rate','priv_phone',
         'salary','add_to_salary',
-        'email', 'password','id_manager','documents','dating_type','coach_id'
+        'email', 'password','id_manager','documents','dating_type','coach_id','recommended_by','promotion_date','degradation_date'
     ];
 
     /**

@@ -73,7 +73,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="myLabel" for="recomended">Polecony przez</label>
+                                <label class="myLabel" for="recomended">Polecony przez:</label>
                                 <select class="form-control" style="font-size:18px;" name="recommended_by" id="recommended_by">
                                     <option value="0" id="none">Brak</option>
                                     @foreach($recomendingPeople as $rp)
@@ -84,7 +84,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                              <label class="myLabel" for="responsible_for">Prowadzący</label>
+                              <label class="myLabel" for="responsible_for">Prowadzący:</label>
                               <select class="form-control" style="font-size:18px;" name="coach_id" id="responsible_for">
                                   <option value="0" id="noTrainer">--Wybierz prowadzącego--</option>
                                   @foreach($workingTreners as $wt)
