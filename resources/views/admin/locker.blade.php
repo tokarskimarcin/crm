@@ -1,10 +1,10 @@
 @extends('layouts.main')
 @section('content')
-
+<div class="container-fluid">
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Blokowanie oddziałów</h1>
+            <div class="alert gray-nav">Blokowanie oddziałów</div>
         </div>
     </div>
 </div>
@@ -13,7 +13,7 @@
     <div class="col-md-5">
         <div class="table-responsive">
             <table class="table table-bordered">
-                <thead>
+                <thead style="color: white; background-color: #666564;">
                     <tr>
                         <th>Oddział</th>
                         <th>Akcja</th>
@@ -36,6 +36,7 @@
         <div>
     </div>
 </div>
+    </div>
 
 @endsection
 @section('script')

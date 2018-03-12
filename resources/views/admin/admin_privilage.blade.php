@@ -5,7 +5,9 @@
 {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Panel zarządzania</h1>
+            <div class="page-header">
+                <div class="alert gray-nav">Panel zarządzania</div>
+            </div>
         </div>
     </div>
 
@@ -22,7 +24,7 @@
                         <div class="col-lg-6">
                             <div id="start_stop" class="table-responsive">
                                 <table class="table table-bordered">
-                                    <thead>
+                                    <thead style="color: white; background-color: #666564;">
                                         <tr>
                                             <th>ID</th>
                                             <th>Grupa panelowa</th>
@@ -43,7 +45,7 @@
                         <div class="col-lg-6">
                             <div id="start_stop" class="table-responsive">
                                 <table class="table table-bordered">
-                                    <thead>
+                                    <thead style="color: white; background-color: #666564;">
                                     <tr>
                                         <th>ID</th>
                                         <th>Oddziały Ogólne</th>
@@ -64,7 +66,7 @@
                         <div class="col-lg-6">
                             <div id="start_stop" class="table-responsive">
                                 <table class="table table-bordered">
-                                    <thead>
+                                    <thead style="color: white; background-color: #666564;">
                                     <tr>
                                         <th>ID</th>
                                         <th>Dział</th>
@@ -85,7 +87,7 @@
                         <div class="col-lg-12">
                             <div id="start_stop" class="table-responsive">
                                 <table class="table table-bordered">
-                                    <thead>
+                                    <thead style="color: white; background-color: #666564;">
                                     <tr>
                                         <th>ID</th>
                                         <th>Oddział</th>
@@ -127,7 +129,7 @@
                             </div>
                             <div id="start_stop" class="table-responsive">
                                 <table class="table table-bordered" id="to_search">
-                                    <thead>
+                                    <thead style="color: white; background-color: #666564;">
                                     <tr>
                                         <th>Nazwa</th>
                                         <th>Adres</th>

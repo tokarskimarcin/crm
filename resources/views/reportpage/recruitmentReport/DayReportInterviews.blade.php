@@ -4,7 +4,9 @@
 {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Dzienny Raport Rozmów Rekrutacyjnych</h1>
+            <div class="page-header">
+                <div class="alert gray-nav">Dzienny Raport Rozmów Rekrutacyjnych</div>
+            </div>
         </div>
     </div>
     <div class="row">

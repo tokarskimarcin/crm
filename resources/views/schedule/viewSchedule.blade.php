@@ -101,7 +101,7 @@
                                         <div class="col-md-12">
                                         <div class="table-responsive">
                                             <table class="table table-bordered">
-                                                <div class="panel-heading" style="border:1px solid #d3d3d3;"><h4><b>Analiza Grafik Plan</b></h4></div>
+                                                <div class="panel-heading gray-nav" style="border:1px solid #d3d3d3;"><h4><b>Analiza Grafik Plan</b></h4></div>
                                                 <tr>
                                                     <td align="center"><b>Osoba</b></td>
                                                     <?php $week_array = ['Pon','Wt','Śr','Czw','Pt','Sob','Nie'];

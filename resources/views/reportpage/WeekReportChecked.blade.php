@@ -4,7 +4,9 @@
 {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Raport tygodniowy odsłuch</h1>
+            <div class="page-header">
+                <div class="alert gray-nav">Raport tygodniowy odsłuch</div>
+            </div>
         </div>
     </div>
     <div class="row">
