@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Edytuj oddział</h1>
+            <div class="alert gray-nav">Edytuj oddział</div>
         </div>
     </div>
 </div>
@@ -105,6 +105,14 @@
             <div class="form-group">
                 <label for="dep_aim_week">Cel weekendowy:<span style="color:red;">*</span></label>
                 <input type="text" class="form-control" placeholder="500" name="dep_aim_week" id="dep_aim_week" value="{{$selected_department->dep_aim_week}}"/>
+            </div>
+            <div class="form-group">
+                <label for="work_hour">Podaj liczbę godzin w których działa oddział od pn-pt:</label>
+                <input type="number" class="form-control" placeholder="Ilość miejsc.." name="work_hour" id="work_hour" value="{{$selected_department->working_hours_normal}}" />
+            </div>
+            <div class="form-group">
+                <label for="work_hour_weekend">Podaj liczbę godzin w których działa oddział od sb-nd:</label>
+                <input type="number" class="form-control" placeholder="Ilość miejsc.." name="work_hour_weekend" id="work_hour_weekend" value="{{$selected_department->working_hours_week}}" />
             </div>
             <div class="form-group">
                 <span style="color:red;">*</span> - Dotyczy oddziałów telemarketingu.

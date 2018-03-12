@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Przydzielanie oddziałów</h1>
+            <div class="alert gray-nav">Przydzielanie oddziałów</div>
         </div>
     </div>
 </div>

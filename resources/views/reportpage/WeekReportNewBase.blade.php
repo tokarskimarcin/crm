@@ -4,7 +4,9 @@
     {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Tygodniowy raport nowych zgód</h1>
+            <div class="page-header">
+                <div class="alert gray-nav">Tygodniowy raport nowych zgód</div>
+            </div>
         </div>
     </div>
     <div class="row">

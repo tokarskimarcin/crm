@@ -4,9 +4,7 @@
     {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
-            <div class="page-header">
-                <div class="alert gray-nav">Miesięczny Raport DKJ</div>
-            </div>
+            <h1 class="page-header">Raport Miesięczny Oddziały</h1>
         </div>
     </div>
     <div class="row">
@@ -16,7 +14,7 @@
                     <div class="col-lg-12">
                         <div id="start_stop">
                             <div class="panel-body">
-                                @include('mail.monthReportDkj')
+                                @include('mail.summaryReportDepartment')
                             </div>
                         </div>
                     </div>

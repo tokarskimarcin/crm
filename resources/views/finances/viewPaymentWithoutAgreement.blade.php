@@ -124,7 +124,7 @@
                                                                     <div style="margin-top: 18px;" class="panel-body">
                                                                         <div class="table-responsive">
                                                                         <table class="table table-striped table-bordered dt-responsive nowrap"cellspacing="0"  width="100%" id="datatable{{$agency->id}}">
-                                                                            <thead>
+                                                                            <thead style="color: white; background-color: #666564";>
                                                                             <tr>
                                                                                 <th>Lp.</th>
                                                                                 <th>Imię</th>

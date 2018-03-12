@@ -27,11 +27,22 @@ class UsersController extends Controller
     {
         $agencies = Agencies::all();
         $user = User::find(Auth::user()->id);
-        
+        $workingUsers = User::where('status_work', '=', 1) //są zatrudnieni
+        ->whereIn('user_type_id', [1,2])
+            ->where('department_info_id', '=', Auth::user()->department_info_id) // wybiera dział aktualnie zalogowanego użytkownika
+            ->get();
+
+        $workingTreners = User::whereIn('user_type_id', [4,12])
+            ->where('status_work', '=', 1)
+            ->where('department_info_id', '=', Auth::user()->department_info_id)
+            ->get();
+
         return view('hr.addNewUser')
             ->with('agencies',$agencies)
             ->with('send_type',$user->department_info->type)
-            ->with('type', 1);
+            ->with('type', 1)
+            ->with('recomendingPeople', $workingUsers)
+            ->with('workingTreners', $workingTreners);
 
     }
     public function add_CadreGet()
@@ -51,7 +62,7 @@ class UsersController extends Controller
         if($request->ajax())
         {
             $user = User::where('username', '=',$request->username)->count();
-   
+
             return ($user > 0) ? 1 : 0 ;
         }
     }
@@ -84,6 +95,18 @@ class UsersController extends Controller
             $user->email_off = $request->email;
         }
         $user->password = bcrypt($request->password);
+        if($user->coach_id != 0) {
+            $user->coach_id = $request->coach_id;
+        }
+        else {
+            $user->coach_id = null;
+        }
+        if($request->recommended_by != 0) {
+            $user->recommended_by = $request->recommended_by;
+        }
+        else {
+            $user->recommended_by = null;
+        }
         $user->salary = $request->salary;
         $user->additional_salary = $request->additional_salary;
         $user->created_at = date("Y-m-d H:i:s");
@@ -175,11 +198,27 @@ class UsersController extends Controller
             return view('404');
         }
 
+        /*
+        *Wyszukuję użytkowników którzy pracują
+        */
+        //pobranie wszystkich użytkowników z danego działu
+        $workingUsers = User::where('status_work', '=', 1) //są zatrudnieni
+        ->whereIn('user_type_id', [1,2])
+        ->where('department_info_id', '=', Auth::user()->department_info_id) // wybiera dział aktualnie zalogowanego użytkownika
+        ->get();
+
+        $workingTreners = User::whereIn('user_type_id', [4,12])
+            ->where('status_work', '=', 1)
+            ->where('department_info_id', '=', Auth::user()->department_info_id)
+            ->get();
+
         return view('hr.editUser')->with('agencies',$agencies)
           ->with('user',$user)
           ->with('department_info', $department_info)
           ->with('userTypes', $userTypes)
-          ->with('type', 1);
+          ->with('type', 1)
+          ->with('recomendingPeople', $workingUsers)
+            ->with('workingTreners', $workingTreners);
 
     }
 
@@ -271,6 +310,19 @@ class UsersController extends Controller
         $user->last_name = $request->last_name;
         $user->updated_at = date("Y-m-d H:i:s");
         $user->phone = $request->phone;
+        if($user->coach_id != 0) {
+            $user->coach_id = $request->coach_id;
+        }
+        else {
+            $user->coach_id = null;
+        }
+
+        if($request->recommended_by != 0) {
+            $user->recommended_by = $request->recommended_by;
+        }
+        else {
+            $user->recommended_by = null;
+        }
         $user->email_off = $request->email;
         $user->private_phone = $request->private_phone;
         $user->description = $request->description;

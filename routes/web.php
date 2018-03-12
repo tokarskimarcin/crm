@@ -243,6 +243,10 @@ Route::get('/weekReportTrainingGroup', 'StatisticsController@MailweekReportTrain
 Route::get('/weekReportInterviews', 'StatisticsController@MailweekReportInterviews');
 Route::get('/weekReportireCandidate', 'StatisticsController@MailweekReportHireCandidate');
 
+//Emaile dotyczące statystyk oddziałów
+Route::get('/monthReportSummaryDepartments', 'StatisticsController@MailMonthReportDepartments');
+
+
 
 //Maila dotyczące wyłączonych kont
 Route::GET('/disableUnusedAccount', 'UsersController@DisableUnusedAccount');
@@ -433,8 +437,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::Post('/hour_report_edit', 'StatisticsController@hourReportEditPost');
 
-    Route::get('/departmentsStats', 'StatisticsController@departmentsStatsGet');
-    Route::post('/departmentsStats', 'StatisticsController@departmentsStatsPost');
+    Route::get('/pageReportDepartments', 'StatisticsController@pageReportDepartmentsGet');
+    Route::post('/pageReportDepartments', 'StatisticsController@pageReportDepartmentsPost');
     //Statistics Stop
 
     //Report Page Start
@@ -472,6 +476,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 
     Route::get('/pageHourReportTimeOnRecord', 'StatisticsController@pageHourReportTimeOnRecord');
+
+    Route::get('/pageMailMonthReportDepartments', 'StatisticsController@pageMailMonthReportDepartments');
 
 
     //Raporty Rekrutacji

@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <h1>Zaufane adresy IP</h1>
+            <div class="alert gray-nav">Zaufane adresy IP</div>
         </div>
     </div>
 </div>

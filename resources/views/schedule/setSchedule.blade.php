@@ -108,7 +108,7 @@ function getStartAndEndDate($week, $year) {
                                         @if (isset($number_of_week))
                                         <div class="table-responsive">
                                             <table class="table table-bordered">
-                                                <div class="panel-heading" style="border:1px solid #d3d3d3;"><h4><b>Analiza Grafik Plan</b></h4></div>
+                                                <div class="panel-heading alert gray-nav" style="border:1px solid #d3d3d3;"><h4><b>Analiza Grafik Plan</b></h4></div>
                                                 <tr>
                                                     <td align="center"><b>Godzina</b></td>
                                                     <?php $week_array = ['Pon','Wt','Śr','Czw','Pt','Sob','Nie']; ?>
@@ -148,7 +148,7 @@ function getStartAndEndDate($week, $year) {
                                           </div>
                                           <div class="table-responsive">
                                             <table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
-                                                <thead>
+                                                <thead style="color: white; background: #666564;">
                                                 <tr>
                                                     <th></th>
                                                     <th>Imię</th>
