@@ -1800,7 +1800,7 @@ class StatisticsController extends Controller
      * funkcja wyświetlająca email miesięczny raport oddziały
      */
     public function pageMailMonthReportDepartments() {
-        $total_data = [];
+        $data = [];
 
         $prev_month = date('m', strtotime('-1 month', time()));
         $year = (intval($prev_month) == 12) ? intval(date('Y')) - 1 : date('Y') ;
@@ -1813,12 +1813,12 @@ class StatisticsController extends Controller
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
         foreach ($departments as $dep) {
-            $total_data[] = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep->id, $days_in_month);
+            $data[] = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep->id, $days_in_month);
         }
 
         return view('reportpage.SummaryMonthReportDepartment')
             ->with([
-                'total_data' => $total_data,
+                'data' => $data,
                 'send_month' => date('m'),
                 'total_days' => intval($days_in_month),
                 'departments'=> $departments
@@ -1844,6 +1844,14 @@ class StatisticsController extends Controller
         foreach ($departments as $dep) {
             $data[] = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep->id, $days_in_month);
         }
+
+        $data = [
+            'data' => $data,
+            'send_month' => $month,
+            'total_days' => intval($days_in_month),
+            'departments'=> $departments
+        ];
+
 
         $title = 'Miesięczny Raport Oddziały';
         $this->sendMailByVerona('summaryReportDepartment', $data, $title);
@@ -1889,35 +1897,35 @@ class StatisticsController extends Controller
 
 
 
-    $accepted_users = [
-        'cytawa.verona@gmail.com',
-        'jarzyna.verona@gmail.com'
-    ];
-
-        $mail_type = $mail_type_pom;
-     Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
-     {
-        $message->from('noreply.verona@gmail.com', 'Verona Consulting');
-        foreach ($accepted_users as $key => $user) {
-          if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
-              $message->to($user)->subject($mail_title);
-          }
-        }
-     });
-
+//    $accepted_users = [
+//        'cytawa.verona@gmail.com',
+//        'jarzyna.verona@gmail.com'
+//    ];
+//
+//        $mail_type = $mail_type_pom;
+//     Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
+//     {
+//        $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+//        foreach ($accepted_users as $key => $user) {
+//          if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
+//              $message->to($user)->subject($mail_title);
+//          }
+//        }
+//     });
+//
 
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
-//       Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
-//       {
-//           $message->from('noreply.verona@gmail.com', 'Verona Consulting');
-//           foreach($accepted_users as $user) {
-//            if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
-//                $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
-//             }
-//             if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
-//                $message->to($user->email_off, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
-//             }
-//           }
-//       });
+       Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
+       {
+           $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+           foreach($accepted_users as $user) {
+            if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
+                $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
+             }
+             if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
+                $message->to($user->email_off, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
+             }
+           }
+       });
     }
 }

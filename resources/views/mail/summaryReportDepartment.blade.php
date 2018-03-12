@@ -1,5 +1,4 @@
-@foreach($total_data as $dep)
-    {{--{{dd($dep)}}--}}
+@foreach($data as $dep)
     @php
         $date_start = $dep['date_start'];
         $date_stop = $dep['date_stop'];
