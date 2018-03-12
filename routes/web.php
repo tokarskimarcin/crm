@@ -241,6 +241,10 @@ Route::get('/weekReportTrainingGroup', 'StatisticsController@MailweekReportTrain
 Route::get('/weekReportInterviews', 'StatisticsController@MailweekReportInterviews');
 Route::get('/weekReportireCandidate', 'StatisticsController@MailweekReportHireCandidate');
 
+//Emaile dotyczące statystyk oddziałów
+Route::get('/monthReportSummaryDepartments', 'StatisticsController@MailMonthReportDepartments');
+
+
 Auth::routes();
 //'check-firewall'
 Route::middleware(['check-permission', 'check-firewall'])->group(function () {
@@ -466,6 +470,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 
     Route::get('/pageHourReportTimeOnRecord', 'StatisticsController@pageHourReportTimeOnRecord');
+
+    Route::get('/pageMailMonthReportDepartments', 'StatisticsController@pageMailMonthReportDepartments');
 
 
     //Raporty Rekrutacji

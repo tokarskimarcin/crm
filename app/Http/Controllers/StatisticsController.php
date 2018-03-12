@@ -1605,7 +1605,7 @@ class StatisticsController extends Controller
                 'total_days'        => intval($days_in_month),
                 'hour_reports'      => $data['hour_reports'],
                 'dep_info'          => $data['dep_info'],
-                'schedule_data'     =>$data['schedule_data'],
+                'schedule_data'     => $data['schedule_data'],
                 'month_selected'    => date('m'),
                 'departments'       => $departments,
                 'dep_id'            => $dep_id,
@@ -1796,6 +1796,59 @@ class StatisticsController extends Controller
         return $data;
     }
 
+    /**
+     * funkcja wyświetlająca email miesięczny raport oddziały
+     */
+    public function pageMailMonthReportDepartments() {
+        $total_data = [];
+
+        $prev_month = date('m', strtotime('-1 month', time()));
+        $year = (intval($prev_month) == 12) ? intval(date('Y')) - 1 : date('Y') ;
+
+        $first_day = $year . '-' . $prev_month . '-01';
+        $days_in_month = date('t', strtotime($year . '-' . $prev_month));
+        $last_day = date('Y-m-') . date('t', strtotime($year . '-' . $prev_month));
+        $month = $prev_month;
+
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        foreach ($departments as $dep) {
+            $total_data[] = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep->id, $days_in_month);
+        }
+
+        return view('reportpage.SummaryMonthReportDepartment')
+            ->with([
+                'total_data' => $total_data,
+                'send_month' => date('m'),
+                'total_days' => intval($days_in_month),
+                'departments'=> $departments
+            ]);
+    }
+
+    /**
+     *  funkcja wysyłająca email miesięczny raport oddziały
+     */
+    public function MailMonthReportDepartments() {
+        $data = [];
+
+        $prev_month = date('m', strtotime('-1 month', time()));
+        $year = (intval($prev_month) == 12) ? intval(date('Y')) - 1 : date('Y') ;
+
+        $first_day = $year . '-' . $prev_month . '-01';
+        $days_in_month = date('t', strtotime($year . '-' . $prev_month));
+        $last_day = date('Y-m-') . date('t', strtotime($year . '-' . $prev_month));
+        $month = $prev_month;
+
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        foreach ($departments as $dep) {
+            $data[] = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep->id, $days_in_month);
+        }
+
+        $title = 'Miesięczny Raport Oddziały';
+        $this->sendMailByVerona('summaryReportDepartment', $data, $title);
+    }
+
     /******** Główna funkcja do wysyłania emaili*************/
     /*
     * $mail_type - jaki mail ma być wysłany - typ to nazwa ścieżki z web.php
@@ -1807,7 +1860,7 @@ class StatisticsController extends Controller
         $email = [];
         $mail_type_pom = $mail_type;
         $mail_without_folder = explode(".",$mail_type);
-        //jeśli widok jest pod folderem
+        // podfoldery
         $mail_type = $mail_without_folder[count($mail_without_folder)-1];
         $mail_type2 = ucfirst($mail_type);
         $mail_type2 = 'page' . $mail_type2;
