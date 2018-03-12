@@ -78,7 +78,7 @@
                         </div>
 
                         @if($type == 1)
-                                <div class="col-md-6">
+                                <div class="col-md-6" hidden>
                                     <div class="form-group">
                                         <label class="myLabel" for="recomended">Polecony przez:</label>
                                         <select class="form-control" style="font-size:18px;" name="recommended_by" id="recommended_by">
@@ -89,7 +89,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6" hidden>
                                     <div class="form-group">
                                         <label class="myLabel" for="responsible_for">Prowadzący:</label>
                                         <select class="form-control" style="font-size:18px;" name="coach_id" id="responsible_for">
@@ -336,7 +336,7 @@ $(document).ready(function() {
         var username = $('#username').val();
         var private_phone = $('#private_phone').val();
         var password = $('#password').val();
-        var trainer = $('#responsible_for').val();
+        // var trainer = $('#responsible_for').val();
         var documents = $('#documents').val();
         var student = $('#student').val();
         var agency_id = $('#agency_id').val();
@@ -373,10 +373,10 @@ $(document).ready(function() {
             return false;
         }
 
-        if (trainer == "0") {
-            swal('Wybierz prowadzącego');
-            return false;
-        }
+        // if (trainer == "0") {
+        //     swal('Wybierz prowadzącego');
+        //     return false;
+        // }
 
         if (documents == 'Wybierz') {
             swal('Wybierz dokument!');

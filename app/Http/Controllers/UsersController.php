@@ -95,7 +95,12 @@ class UsersController extends Controller
             $user->email_off = $request->email;
         }
         $user->password = bcrypt($request->password);
-        $user->coach_id = $request->coach_id;
+        if($user->coach_id != 0) {
+            $user->coach_id = $request->coach_id;
+        }
+        else {
+            $user->coach_id = null;
+        }
         if($request->recommended_by != 0) {
             $user->recommended_by = $request->recommended_by;
         }
