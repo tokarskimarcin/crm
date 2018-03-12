@@ -1597,18 +1597,19 @@ class StatisticsController extends Controller
 
         return view('reportpage.ReportDepartments')
             ->with([
-                'date_start' => $data['date_start'],
-                'date_stop' => $data['date_stop'],
-                'month' => $data['month'],
-                'year' => $data['year'],
-                'send_month' => date('m'),
-                'total_days' => intval($days_in_month),
-                'hour_reports' => $data['hour_reports'],
-                'dep_info' => $data['dep_info'],
-                'schedule_data' =>$data['schedule_data'],
-                'month_selected' => date('m'),
-                'departments' => $departments,
-                'dep_id' => $dep_id
+                'date_start'        => $data['date_start'],
+                'date_stop'         => $data['date_stop'],
+                'month'             => $data['month'],
+                'year'              => $data['year'],
+                'send_month'        => date('m'),
+                'total_days'        => intval($days_in_month),
+                'hour_reports'      => $data['hour_reports'],
+                'dep_info'          => $data['dep_info'],
+                'schedule_data'     =>$data['schedule_data'],
+                'month_selected'    => date('m'),
+                'departments'       => $departments,
+                'dep_id'            => $dep_id,
+                'months'            => $data['months']
             ]);
     }
 
@@ -1627,18 +1628,19 @@ class StatisticsController extends Controller
 
         return view('reportpage.ReportDepartments')
             ->with([
-                'date_start' => $data['date_start'],
-                'date_stop' => $data['date_stop'],
-                'month' => $data['month'],
-                'year' => $data['year'],
-                'send_month' => date('m'),
-                'total_days' => intval($days_in_month),
-                'hour_reports' => $data['hour_reports'],
-                'dep_info' => $data['dep_info'],
-                'schedule_data' =>$data['schedule_data'],
-                'month_selected' => $request->month_selected,
-                'departments' => $departments,
-                'dep_id' => $dep_id
+                'date_start'        => $data['date_start'],
+                'date_stop'         => $data['date_stop'],
+                'month'             => $data['month'],
+                'year'              => $data['year'],
+                'send_month'        => date('m'),
+                'total_days'        => intval($days_in_month),
+                'hour_reports'      => $data['hour_reports'],
+                'dep_info'          => $data['dep_info'],
+                'schedule_data'     => $data['schedule_data'],
+                'month_selected'    => $request->month_selected,
+                'departments'       => $departments,
+                'dep_id'            => $dep_id,
+                'months'            => $data['months']
             ]);
     }
 
@@ -1762,6 +1764,24 @@ class StatisticsController extends Controller
          */
         $dep_info = Department_info::find($dep_id);
 
+        /**
+         * Tabela z miesiącami
+         */
+        $months = [
+            '01' => 'Styczeń',
+            '02' => 'Luty',
+            '03' => 'Marzec',
+            '04' => 'Kwiecień',
+            '05' => 'Maj',
+            '06' => 'Czerwiec',
+            '07' => 'Lipiec',
+            '08' => 'Sierpień',
+            '09' => 'Wrzesień',
+            '10' => 'Październik',
+            '11' => 'Listopad',
+            '12' => 'Grudzień'
+        ];
+
         $data = [
             'date_start' => $date_start,
             'date_stop' => $date_stop,
@@ -1769,7 +1789,8 @@ class StatisticsController extends Controller
             'year' => $year,
             'hour_reports' => $newHourReports,
             'dep_info' =>$dep_info,
-            'schedule_data' => $schedule_data
+            'schedule_data' => $schedule_data,
+            'months' => $months
         ];
 
         return $data;
