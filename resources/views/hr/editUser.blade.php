@@ -70,7 +70,7 @@
                         </div>
                     </div>
                     @if($type == 1)
-                    <div class="row">
+                    <div class="row" hidden>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="myLabel" for="recomended">Polecony przez:</label>
@@ -488,7 +488,7 @@ $(document).ready(function() {
         var username = $('#username').val();
         var private_phone = $('#private_phone').val();
         var password = $('#password').val();
-        var trainer = $('#responsible_for').val();
+        // var trainer = $('#responsible_for').val();
         var documents = $('#documents').val();
         var student = $('#student').val();
         var agency_id = $('#agency_id').val();
@@ -527,10 +527,10 @@ $(document).ready(function() {
             return false;
         }
 
-        if (trainer == "0") {
-            swal('Wybierz prowadzącego');
-            return false;
-        }
+        // if (trainer == "0") {
+        //     swal('Wybierz prowadzącego');
+        //     return false;
+        // }
 
         if (documents == 'Wybierz') {
             swal('Wybierz dokument!');

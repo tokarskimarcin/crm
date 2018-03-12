@@ -310,7 +310,13 @@ class UsersController extends Controller
         $user->last_name = $request->last_name;
         $user->updated_at = date("Y-m-d H:i:s");
         $user->phone = $request->phone;
-        $user->coach_id = $request->coach_id;
+        if($user->coach_id != 0) {
+            $user->coach_id = $request->coach_id;
+        }
+        else {
+            $user->coach_id = null;
+        }
+
         if($request->recommended_by != 0) {
             $user->recommended_by = $request->recommended_by;
         }
