@@ -30,7 +30,10 @@
     </div>
 </div>
 
-
+{{--Pomocnicza zmienna do przekzywanie informacji czy dane wypłaty można pobrać do csv--}}
+@php
+    $payment_saved_pom = 0;
+@endphp
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
@@ -46,7 +49,7 @@
                                             <form action="view_payment" method="post">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <div class="col-md-8">
-                                                    <select name="search_money_month" class="form-control" style="font-size:18px;">
+                                                    <select id="month_select" name="search_money_month" class="form-control" style="font-size:18px;">
                                                         @for ($i=0; $i < 3; $i++)
                                                             @php
                                                             $date = date("Y-m", mktime(0, 0, 0, date("m")-$i, 1, date("Y")));
@@ -81,8 +84,22 @@
                                                     <h3>
                                                         W każdym innym przypadku suma kar odejmowana jest od sumy premii, a suma wypłaty dla danego pracownika to podstawa + pozostała premia.
                                                     </h3>
+                                                    <h2>Wypłaty należy zaakceptować, klikając przycisk "Zaakceptuj wypłaty"</h2>
+                                                    <h3>
+                                                        Zaakceptowanie wypłat jest wiążące, należy wykonać tę czynność do 3 dnia każdego miesiąca.
+                                                        Brak akceptacji wypłat uniemożliwi ich wygenerowanie.
+                                                    </h3>
                                                 </div>
                                             </div>
+                                            @if(isset($month))
+                                                @if(!$payment_saved->isNotEmpty())
+                                                    <button class="btn btn-danger" id="accept_payment">Zaakceptuj wypłaty</button>
+                                                    @php $payment_saved_pom = 0 @endphp
+                                                @else
+                                                    @php $payment_saved_pom = 1 @endphp
+                                                    <button class="btn btn-success">Wypłaty zaakceptowane</button>
+                                                @endif
+                                            @endif
                                         </div>
                                     </div>
                                                 @if(isset($month))
@@ -263,6 +280,38 @@
 <script>
 
     $(document).ready(function() {
+        $('#accept_payment').on('click',function (e) {
+            console.log(123);
+            swal({
+                title: 'Jesteś pewien?',
+                text: "Spowoduje to zaakceptowanie wypłat, bez możliwości cofnięcia zmian!",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Zaakceptuj'
+            }).then((result) => {
+                if (result.value)
+            {
+                $.ajax({
+                    type:"POST",
+                    url: '{{route('api.paymentStory')}}',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        accetp_month: $('#month_select').val()
+                    },
+                    success: function(response) {
+                        location.reload();
+                    }
+                });
+            }
+        });
+        });
+
+
+
         $('thead > tr> th').css({ 'min-width': '1px', 'max-width': '100px' });
         table = $('#datatable1').DataTable({
             dom: 'Bfrtip',
@@ -451,6 +500,12 @@
             "paging": false,
             "bInfo": false,
         });
+
+        // Ukrycie klawisza pozwalającego wygenerować wypłatę w csv
+        var payment_saved = '{{$payment_saved_pom}}';
+        if(payment_saved == 0){
+            $(".buttons-html5").css('display','none');
+        }
     });
 
 

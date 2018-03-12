@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\AcceptedPayment;
 use App\Agencies;
 use App\Department_info;
 use App\Department_types;
 use App\Departments;
 use App\JankyPenatlyProc;
+use App\PaymentAgencyStory;
 use App\PenaltyBonus;
 use App\SummaryPayment;
 use App\User;
@@ -214,6 +216,12 @@ class FinancesController extends Controller
         $department_type = Department_types::find($department_info->id_dep_type);
         $count_agreement = $department_type->count_agreement;
 
+
+        $payment_saved = AcceptedPayment::
+        where('department_info_id','=',Auth::user()->department_info_id)
+            ->where('payment_month','like', $date.'%')
+            ->get();
+
         if($count_agreement == 1)
         {
             return view('finances.viewPayment')
@@ -221,7 +229,8 @@ class FinancesController extends Controller
                 ->with('salary',$salary)
                 ->with('department_info',$department_info)
                 ->with('janky_system',$janky_system)
-                ->with('agencies',$agencies);
+                ->with('agencies',$agencies)
+                ->with('payment_saved',$payment_saved);
         }
        else
         {
@@ -230,7 +239,8 @@ class FinancesController extends Controller
                 ->with('salary',$salary)
                 ->with('department_info',$department_info)
                 ->with('janky_system',$janky_system)
-                ->with('agencies',$agencies);
+                ->with('agencies',$agencies)
+                ->with('payment_saved',$payment_saved);
         }
     }
 
@@ -444,6 +454,19 @@ class FinancesController extends Controller
     //Custom Function
     private function getSalary($month)
     {
+            //Czy wypłata jest już zatwierdzona
+            $payment_saved = AcceptedPayment::
+            where('department_info_id','=',Auth::user()->department_info_id)
+            ->where('payment_month','like', $month)
+            ->get();
+            $string_to_sql = '';
+            if(!$payment_saved->isEmpty()){
+                $string_to_sql = "`payment_agency_story`.`agency_id`";
+            }else{
+                $string_to_sql = "`users`.`agency_id`";
+            }
+
+
         $query = DB::table(DB::raw("users"))
             ->join('work_hours', 'work_hours.id_user', 'users.id')
             ->where('users.department_info_id',Auth::user()->department_info_id)
@@ -455,7 +478,7 @@ class FinancesController extends Controller
             ->where('work_hours.date','like',$month)
             ->selectRaw('
             `users`.`id`,
-            `users`.`agency_id`,
+            '.$string_to_sql.',              
             `users`.`first_name`,
             `users`.`last_name`,
             `users`.`username`,
@@ -466,7 +489,15 @@ class FinancesController extends Controller
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "'.$month.'" AND `penalty_bonus`.`type`=1) as `kara`,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$month.'" AND `penalty_bonus`.`type`=2) as `premia`,
             SUM(`work_hours`.`success`) as `success`,
-            `salary_to_account`')
+            `salary_to_account`');
+            if(!$payment_saved->isEmpty()){
+                $query = $query
+                    ->leftjoin('payment_agency_story',function ($querry) use ($month){
+                        $querry->on('payment_agency_story.consultant_id','=','users.id')
+                            ->where('payment_agency_story.accept_month','like',$month);
+                    });
+            }
+            $query = $query
             ->groupBy('users.id')
             ->orderBy('users.last_name');
 
@@ -483,11 +514,13 @@ class FinancesController extends Controller
                    `deleted`=0 AND `dkj_status`=1 AND `add_date` LIKE  "'.$month.'"
                     GROUP by `dkj`.`id_user`) h'),'r.id','h.id_user'
                 )
-                ->selectRaw('`agency_id`,`first_name`,`last_name`,`username`,`rate`,`sum`,`student`,`documents`,`kara`,`premia`,`success`,
+                ->selectRaw('`id`,`agency_id`,`first_name`,`last_name`,`username`,`rate`,`sum`,`student`,`documents`,`kara`,`premia`,`success`,
             `f`.`ods`,
             `h`.`janki`,
             `salary_to_account`')->get();
             $final_salary = $r->groupBy('agency_id');
+
+
             return $final_salary;
     }
 
@@ -514,5 +547,45 @@ class FinancesController extends Controller
             }
         }
     }
+
+    /**
+     * @param Request $request
+     * @return Zapisanie informacji o aktualnym stanie wypłat
+     */
+    public function paymentStory(Request $request){
+        if($request->ajax()){
+
+
+            //Zapisanie infromacji o zaakceptowaniu wypłat
+            $is_exist = AcceptedPayment::
+              where('department_info_id','=',Auth::user()->department_info_id)
+            ->where('payment_month','like', $request->accetp_month.'%')
+            ->get();
+            if($is_exist->isEmpty()){
+                $accept_payment = new AcceptedPayment();
+                $accept_payment->cadre_id =  Auth::user()->id;
+                $accept_payment->payment_month = $request->accetp_month.'-01';
+                $accept_payment->department_info_id = Auth::user()->department_info_id;
+                    $salary = $this::getSalary($request->accetp_month.'%');
+                    $data = array();
+                    foreach ($salary as $item ){
+                        foreach ($item as $value){
+                            array_push($data,array('consultant_id' => $value->id,
+                                'agency_id' => $value->agency_id,
+                                'cadre_id' => Auth::user()->id,
+                                'department_info_id' => Auth::user()->department_info_id,
+                                'accept_month' => $request->accetp_month.'-01',
+                                'created_at' =>date('Y-m-d H:m:s:i'),
+                                'updated_at' => date('Y-m-d H:m:s:i')));
+                        }
+                    }
+                    PaymentAgencyStory::insert($data);
+                    $accept_payment->save();
+                    return $data;
+            }
+            return 0;
+        }
+    }
+
 
 }
