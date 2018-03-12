@@ -266,8 +266,18 @@
                                 <input type="number" class="form-control" placeholder="Login z programu do dzwonienia" id="login_phone" name="login_phone" value="{{$user->login_phone}}">
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="myLabel">Uprawnienia:</label>
+                                <select class="form-control" style="font-size:18px;" id="user_type" name="user_type">
+                                    @foreach($userTypes as $user_type)
+                                        <option value="{{$user_type->id}}" @if($user_type->id == $user->user_type_id) selected @endif>{{$user_type->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                         @endif
-                        <div class="col-md-8">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label class="myLabel">Opis:</label>
                                 <textarea class="form-control" name="description" id="description" placeholder="Opis dodawany do pracownika np. z jakiego ogłoszenia o pracę">{{$user->description}}</textarea>

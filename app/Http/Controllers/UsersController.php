@@ -348,8 +348,22 @@ class UsersController extends Controller
             $user->department_info_id = $request->department_info_id;
             $user->main_department_id = $request->department_info_id;
         }
+        $type_redirect = 0; // 0 - brak zaminay, 1 - przekierowanie do konsultanta, 2 - do kadry
         if ($request->user_type != null && $request->user_type != 0) {
-            $user->user_type_id = $request->user_type;
+            if($user->user_type_id == 1 || $user->user_type_id == 2){
+                if($request->user_type > 2){ // AWANS
+                    $user->promotion_date = date('Y-m-d');
+                    $type_redirect = 2;
+                }
+                $user->user_type_id = $request->user_type;
+            }else if($user->user_type_id > 2){
+                    if($request->user_type < 3){
+                        //Degradacja
+                        $user->degradation_date = date('Y-m-d');
+                        $type_redirect = 1;
+                    }
+                $user->user_type_id = $request->user_type;
+            }
         }
         if ($request->status_work == 1) {
             $user->end_work = null;
@@ -403,7 +417,14 @@ class UsersController extends Controller
 
 
         Session::flash('message_edit', "Dane zostały zaktualizowane!");
-        return Redirect::back();
+
+        if($type_redirect == 0 ){
+            return Redirect::back();
+        }else if($type_redirect == 1){
+            return Redirect::to('edit_consultant/'.$user->id);
+        }else{
+            return Redirect::to('edit_cadre/'.$user->id);
+        }
     }
 
     public function datatableEmployeeManagement(Request $request)

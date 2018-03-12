@@ -127,6 +127,8 @@ Route::POST('/deleteTester','TestsController@deleteTester')->name('api.deleteTes
 
 Route::POST('/datatableAllTests','AdminController@datatableAllTests')->name('api.datatableAllTests');
 
+Route::POST('/paymentStory','FinancesController@paymentStory')->name('api.paymentStory');
+
 /* TEST AJAX ROUTES STOP */
 
 //** RECRUITMENT AJAX */
@@ -243,6 +245,11 @@ Route::get('/weekReportireCandidate', 'StatisticsController@MailweekReportHireCa
 
 //Emaile dotyczące statystyk oddziałów
 Route::get('/monthReportSummaryDepartments', 'StatisticsController@MailMonthReportDepartments');
+
+
+
+//Maila dotyczące wyłączonych kont
+Route::GET('/disableUnusedAccount', 'UsersController@DisableUnusedAccount');
 
 
 Auth::routes();
@@ -388,7 +395,6 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/medicalPackagesRaportExtended','UsersController@medicalPackagesRaportExtendedGet');
     Route::post('/medicalPackagesRaportExtended','UsersController@medicalPackagesRaportExtendedPost');
-
     // Finances -- STOP --
 
     // Equipment -- START --

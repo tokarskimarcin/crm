@@ -105,4 +105,23 @@ class User extends Authenticatable
     public function medicalPackages() {
         return $this->hasMany('App\MedicalPackage', 'user_id');
     }
+
+    /**
+     *  Wyłączenie starych kont użytkowników (konta do wyłączenia, konta do wysłania informacji)
+     */
+    public function DisableUnusedAccount(&$disable_consultant,&$send_alert_consultant){
+        $date = date("Y-m-d");
+        $date_overdue = strtotime($date."-14 days");
+        $date_to_send = strtotime($date."-7 days");
+        //Użytkownicy do wyłączenia
+        $disable_consultant = User::where('status_work','=',1)
+            ->where('last_login',"<",date("Y-m-d",$date_overdue))
+            ->whereIn('user_type_id',[1,2])
+            ->get();
+        //Użytkownicy do przypomnienia
+        $send_alert_consultant = User::where('status_work','=',1)
+            ->whereBetween('last_login',[date("Y-m-d",$date_overdue),date("Y-m-d",$date_to_send)])
+            ->whereIn('user_type_id',[1,2])
+            ->get();
+    }
 }
