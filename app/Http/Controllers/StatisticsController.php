@@ -1605,7 +1605,7 @@ class StatisticsController extends Controller
                 'total_days'        => intval($days_in_month),
                 'hour_reports'      => $data['hour_reports'],
                 'dep_info'          => $data['dep_info'],
-                'schedule_data'     =>$data['schedule_data'],
+                'schedule_data'     => $data['schedule_data'],
                 'month_selected'    => date('m'),
                 'departments'       => $departments,
                 'dep_id'            => $dep_id,
@@ -1796,6 +1796,67 @@ class StatisticsController extends Controller
         return $data;
     }
 
+    /**
+     * funkcja wyświetlająca email miesięczny raport oddziały
+     */
+    public function pageMailMonthReportDepartments() {
+        $data = [];
+
+        $prev_month = date('m', strtotime('-1 month', time()));
+        $year = (intval($prev_month) == 12) ? intval(date('Y')) - 1 : date('Y') ;
+
+        $first_day = $year . '-' . $prev_month . '-01';
+        $days_in_month = date('t', strtotime($year . '-' . $prev_month));
+        $last_day = date('Y-m-') . date('t', strtotime($year . '-' . $prev_month));
+        $month = $prev_month;
+
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        foreach ($departments as $dep) {
+            $data[] = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep->id, $days_in_month);
+        }
+
+        return view('reportpage.SummaryMonthReportDepartment')
+            ->with([
+                'data' => $data,
+                'send_month' => date('m'),
+                'total_days' => intval($days_in_month),
+                'departments'=> $departments
+            ]);
+    }
+
+    /**
+     *  funkcja wysyłająca email miesięczny raport oddziały
+     */
+    public function MailMonthReportDepartments() {
+        $data = [];
+
+        $prev_month = date('m', strtotime('-1 month', time()));
+        $year = (intval($prev_month) == 12) ? intval(date('Y')) - 1 : date('Y') ;
+
+        $first_day = $year . '-' . $prev_month . '-01';
+        $days_in_month = date('t', strtotime($year . '-' . $prev_month));
+        $last_day = date('Y-m-') . date('t', strtotime($year . '-' . $prev_month));
+        $month = $prev_month;
+
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        foreach ($departments as $dep) {
+            $data[] = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep->id, $days_in_month);
+        }
+
+        $data = [
+            'data' => $data,
+            'send_month' => $month,
+            'total_days' => intval($days_in_month),
+            'departments'=> $departments
+        ];
+
+
+        $title = 'Miesięczny Raport Oddziały';
+        $this->sendMailByVerona('summaryReportDepartment', $data, $title);
+    }
+
     /******** Główna funkcja do wysyłania emaili*************/
     /*
     * $mail_type - jaki mail ma być wysłany - typ to nazwa ścieżki z web.php
@@ -1807,7 +1868,7 @@ class StatisticsController extends Controller
         $email = [];
         $mail_type_pom = $mail_type;
         $mail_without_folder = explode(".",$mail_type);
-        //jeśli widok jest pod folderem
+        // podfoldery
         $mail_type = $mail_without_folder[count($mail_without_folder)-1];
         $mail_type2 = ucfirst($mail_type);
         $mail_type2 = 'page' . $mail_type2;
@@ -1836,35 +1897,35 @@ class StatisticsController extends Controller
 
 
 
-    $accepted_users = [
-        'cytawa.verona@gmail.com',
-        'jarzyna.verona@gmail.com'
-    ];
-
-        $mail_type = $mail_type_pom;
-     Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
-     {
-        $message->from('noreply.verona@gmail.com', 'Verona Consulting');
-        foreach ($accepted_users as $key => $user) {
-          if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
-              $message->to($user)->subject($mail_title);
-          }
-        }
-     });
-
+//    $accepted_users = [
+//        'cytawa.verona@gmail.com',
+//        'jarzyna.verona@gmail.com'
+//    ];
+//
+//        $mail_type = $mail_type_pom;
+//     Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
+//     {
+//        $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+//        foreach ($accepted_users as $key => $user) {
+//          if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
+//              $message->to($user)->subject($mail_title);
+//          }
+//        }
+//     });
+//
 
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
-//       Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
-//       {
-//           $message->from('noreply.verona@gmail.com', 'Verona Consulting');
-//           foreach($accepted_users as $user) {
-//            if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
-//                $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
-//             }
-//             if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
-//                $message->to($user->email_off, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
-//             }
-//           }
-//       });
+       Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
+       {
+           $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+           foreach($accepted_users as $user) {
+            if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
+                $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
+             }
+             if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
+                $message->to($user->email_off, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
+             }
+           }
+       });
     }
 }
