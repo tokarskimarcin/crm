@@ -427,8 +427,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::Post('/hour_report_edit', 'StatisticsController@hourReportEditPost');
 
-    Route::get('/departmentsStats', 'StatisticsController@departmentsStatsGet');
-    Route::post('/departmentsStats', 'StatisticsController@departmentsStatsPost');
+    Route::get('/pageReportDepartments', 'StatisticsController@pageReportDepartmentsGet');
+    Route::post('/pageReportDepartments', 'StatisticsController@pageReportDepartmentsPost');
     //Statistics Stop
 
     //Report Page Start
