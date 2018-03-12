@@ -1584,13 +1584,6 @@ class StatisticsController extends Controller
 
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
-//        $first_day = '2018-01-01';
-//        $days_in_month = '31';
-//        $last_day = '2018-01-31';
-//        $month = '01';
-//        $year = date('Y');
-
-
         $dep_id = Auth::user()->department_info_id;
 
         $data = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep_id, $days_in_month);
@@ -1632,7 +1625,7 @@ class StatisticsController extends Controller
                 'date_stop'         => $data['date_stop'],
                 'month'             => $data['month'],
                 'year'              => $data['year'],
-                'send_month'        => date('m'),
+                'send_month'        => $month,
                 'total_days'        => intval($days_in_month),
                 'hour_reports'      => $data['hour_reports'],
                 'dep_info'          => $data['dep_info'],
@@ -1807,7 +1800,7 @@ class StatisticsController extends Controller
 
         $first_day = $year . '-' . $prev_month . '-01';
         $days_in_month = date('t', strtotime($year . '-' . $prev_month));
-        $last_day = date('Y-m-') . date('t', strtotime($year . '-' . $prev_month));
+        $last_day = date('Y-') . $prev_month . '-' . date('t', strtotime($year . '-' . $prev_month));
         $month = $prev_month;
 
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
