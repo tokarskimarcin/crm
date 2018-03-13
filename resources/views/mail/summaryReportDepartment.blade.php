@@ -105,6 +105,9 @@
                 //Obliczenie real RBH
                 $real_RBH = round(($report->time_sum_real_RBH / 3600) ,2);
 
+                //Oblicznenie czasu rozmów
+                $phone_time = ($report->call_time > 0) ? round(($real_RBH * $report->call_time) / 100, 2) : 0 ;
+
                 //Pobranie godzin z grafiku
                 //pobranie numeru tygodnia
 
@@ -147,7 +150,7 @@
                 $total_week_success += $report->success;
                 $week_schedule_goal += $schedule_goal;
                 $real_week_RBH += $real_RBH;
-                $real_week_phone_time += $report->hour_time_use;
+                $real_week_phone_time += $phone_time;
                 $total_week_checked += $report->count_all_check;
                 $total_week_bad += $report->count_bad_check;
                 $total_week_goal += $goal;
@@ -158,7 +161,7 @@
                 $total_success += $report->success;
                 $total_schedule_goal += $schedule_goal;
                 $total_real_RBH += $real_RBH;
-                $total_phone_time += $report->hour_time_use;
+                $total_phone_time += $phone_time;
                 $total_checked += $report->count_all_check;
                 $total_bad += $report->count_bad_check;
                 $total_goal += $goal;
@@ -189,7 +192,7 @@
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($schedule_goal)}}</td>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$real_RBH}}</td>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->success}}</td>
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->hour_time_use}}</td>
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$phone_time}}</td>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->count_all_check}}</td>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->count_bad_check}}</td>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$dep_info->size}}</td>
