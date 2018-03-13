@@ -1584,7 +1584,7 @@ class StatisticsController extends Controller
 
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
-        $dep_id = Auth::user()->department_info_id;
+        $dep_id = $departments->first()->id;
 
         $data = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep_id, $days_in_month);
 
