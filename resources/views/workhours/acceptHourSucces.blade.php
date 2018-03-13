@@ -67,6 +67,16 @@
                                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                             </div>
                                         </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="checkbox-container">
+                                                    <input type="checkbox" name="checkbox1" id="checkbox1" style="display:inline-block">
+                                                    <label for="checkbox1"> Pokaż <em>tylko</em> użytkowników z niezarejestrowanym czasem pracy</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -113,6 +123,7 @@
     <script>
 
         var table;
+        var givenCheckbox;
 
         function myFunction() {
             table.ajax.reload();
@@ -126,6 +137,7 @@
             });
 
         $(document).ready( function () {
+            var intValue;
 
             table = $('#datatable').DataTable({
                 "processing": true,
@@ -151,6 +163,20 @@
                     'data': function ( d ) {
                         d.start_date = $('#start_date').val();
                         d.stop_date = $('#stop_date').val();
+                        /*
+                        *withCheck sprawdza, czy pole checkboxa zostało zaznaczone
+                        */
+                        d.withCheck = function() {
+                            givenCheckbox = $('#checkbox1');
+                            if (givenCheckbox.is(':checked')) {
+                                intValue = 1;
+                                return intValue;
+                            }
+                            else {
+                                intValue = 0;
+                                return intValue;
+                            }
+                        };
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -219,6 +245,12 @@
                         "<input type='hidden' id='dtp_input3' value='' /><br/>"+
                         "</div>"
                     }]
+            });
+            /*
+            * Event listener responsible for refreshing ajax request after clicking on checkbox
+            */
+            $('#checkbox1').on('change', function(e) {
+                myFunction();
             });
         });
 
