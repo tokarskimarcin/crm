@@ -79,6 +79,10 @@
 
             $total_sum_call_time = 0;
             $total_sum_call_proc = 0;
+
+            $count_weeks = 0;
+            $start_day = true;
+            $sum_week = false;
         @endphp
 
         @for($i = 1; $i <= $total_days; $i++)
@@ -181,8 +185,21 @@
             */
             $current_day = date('N', strtotime($date));
             $add_week_total = false;
-            if ($current_day == 7) {
+            if ($start_day == false && $current_day == 1) {
+                $sum_week = true;
+            }
+            if ($start_day == true && $current_day == 1) {
+                $start_day = false;
+                $sum_week = true;
+            } else if ($start_day == true && $current_day != 1) {
+                $start_day = false;
+                $sum_week == false;
+            }
+            if ($current_day == 7 && $sum_week == true) {
                 $add_week_total = true;
+            }
+            if ($count_weeks > 2) {
+                $add_week_total = false;
             }
             @endphp
 
@@ -230,6 +247,7 @@
 
             @if($add_week_total == true || $i == $total_days)
                 @php
+                    $count_weeks++;
                     $total_week_real_schedule = ($week_schedule_goal != null && $week_schedule_goal > 0) ? round(($real_week_RBH / $week_schedule_goal) * 100, 2) : 0 ;
                     $total_week_avg = ($real_week_RBH != null && $real_week_RBH > 0) ? round(($total_week_success / $real_week_RBH), 2) : 0 ;
                     $total_week_proc_janky = ($total_week_success != null && $total_week_success > 0) ? round(($total_week_bad / $total_week_success) * 100, 2) : 0 ;
