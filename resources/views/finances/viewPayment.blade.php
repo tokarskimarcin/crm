@@ -362,6 +362,7 @@
             }).then((result) => {
                 if (result.value)
             {
+                $('#accept_payment').prop('disabled',true);
                 $.ajax({
                     type:"POST",
                     url: '{{route('api.paymentStory')}}',
