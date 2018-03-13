@@ -199,7 +199,7 @@
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->janky_count}} %</td>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->call_time}} %</td>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$real_schedule}} %</td>
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$lost_schedule}}</td>
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px">{{($lost_schedule < 0) ? $lost_schedule : 0 }}</td>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$proc_goal}} %</td>
                     <td style="border:1px solid #231f20; background-color: @if($rest_goal >= 0) #5eff80 @else #ff5e5e @endif;text-align:center;padding:3px">{{$rest_goal}}</td>
                 </tr>
