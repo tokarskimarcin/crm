@@ -108,11 +108,11 @@
             </div>
             <div class="form-group">
                 <label for="work_hour">Podaj liczbę godzin w których działa oddział od pn-pt:</label>
-                <input type="number" class="form-control" placeholder="Ilość miejsc.." name="work_hour" id="work_hour" value="{{$selected_department->working_hours_normal}}" />
+                <input type="number" class="form-control" placeholder="Godziny.." name="work_hour" id="work_hour" value="{{$selected_department->working_hours_normal}}" />
             </div>
             <div class="form-group">
                 <label for="work_hour_weekend">Podaj liczbę godzin w których działa oddział od sb-nd:</label>
-                <input type="number" class="form-control" placeholder="Ilość miejsc.." name="work_hour_weekend" id="work_hour_weekend" value="{{$selected_department->working_hours_week}}" />
+                <input type="number" class="form-control" placeholder="Godziny.." name="work_hour_weekend" id="work_hour_weekend" value="{{$selected_department->working_hours_week}}" />
             </div>
             <div class="form-group">
                 <span style="color:red;">*</span> - Dotyczy oddziałów telemarketingu.
