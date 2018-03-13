@@ -281,7 +281,6 @@
 
     $(document).ready(function() {
         $('#accept_payment').on('click',function (e) {
-            console.log(123);
             swal({
                 title: 'Jesteś pewien?',
                 text: "Spowoduje to zaakceptowanie wypłat, bez możliwości cofnięcia zmian!",
@@ -293,6 +292,7 @@
             }).then((result) => {
                 if (result.value)
             {
+                $('#accept_payment').prop('disabled',true);
                 $.ajax({
                     type:"POST",
                     url: '{{route('api.paymentStory')}}',
