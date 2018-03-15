@@ -19,7 +19,9 @@
         <form method="POST" action="{{URL::to('/set_multiple_department')}}">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="request_type" value="select_user">
+
               <div class="form-group">
+                  <label for="user_department">Wybierz użytkownika:</label>
                   <select id="user_department" name="user_department" class="form-control">
                       <option>Wybierz</option>
                       @foreach($users as $user)

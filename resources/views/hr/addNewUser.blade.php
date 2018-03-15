@@ -509,6 +509,21 @@ $(document).ready(function() {
         pickTime: false,
     });
 
+    ///Event listeners responsible for salary and additional_salary inputs validation
+    var salary = $('#salary');
+    var additional_salary = $('#additional_salary');
+    salary.on('change', function() {
+        if(salary.val() < 0) {
+            salary.val(0);
+        }
+    });
+
+    additional_salary.on('change', function() {
+        if(additional_salary.val() < 0) {
+            additional_salary.val(0);
+        }
+    });
+    //********END salary and additional salary inputs validation *****
 });
 
 </script>
