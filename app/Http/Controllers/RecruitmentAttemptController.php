@@ -38,8 +38,10 @@ class RecruitmentAttemptController extends Controller
             $candidate_source = new CandidateSource();
 
             $candidate_source->name = $request->name;
+            $candidate_source->cadre_id = Auth::user()->id;
             $candidate_source->created_at = date('Y-m-d H:i:s');
             $candidate_source->updated_at = date('Y-m-d H:i:s');
+            $candidate_source->deleted = 0;
             $candidate_source->save();
     
             return 1;

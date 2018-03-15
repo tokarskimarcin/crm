@@ -461,9 +461,8 @@ class CandidateController extends Controller
      */
     public function editInterviewDateTime(Request $request) {
         if ($request->ajax()) {
-            $candidate_id = 2;
             $newDate = $request->result;
-
+            $candidate_id = $request->candidate_id;
             $candidate = Candidate::find($candidate_id);
 
             $data = $candidate->recruitment_attempt->where('status', '=', 0)->first();
