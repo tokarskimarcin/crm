@@ -580,6 +580,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     /**REKRUTACJA STOP */
 });
 //////////////////////Testing ORM///////////////
+///
+Route::get('/testPag','AdminController@aMethod');
 
   Route::get('/testorm', 'TestORM@test');
 

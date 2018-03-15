@@ -544,4 +544,23 @@ class AdminController extends Controller
             return 1;
         }
     }
+    public function aMethod(Request $request) {
+        $table = [];
+        for ($i = 1; $i <= 20; $i++) {
+            $table[] = collect([
+                'username' => 'imie nazwisko' . $i,
+                'pole1' => $i,
+                'pole2' => $i,
+                'pole3' => $i,
+                'pole4' => $i,
+            ]);
+        }
+        $collection = collect($table);
+        foreach($collection as $item) {
+//            dd($item['username']);
+        }
+
+//        dd($collection);
+        return view('admin.testPag')->with('dane', $collection);
+    }
 }
