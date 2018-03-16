@@ -246,9 +246,7 @@ Route::get('/weekReportireCandidate', 'StatisticsController@MailweekReportHireCa
 //Emaile dotyczące statystyk oddziałów
 Route::get('/monthReportSummaryDepartments', 'StatisticsController@MailMonthReportDepartments');
 
-
-
-//Maila dotyczące wyłączonych kont
+//wyłączenie danych użytkowników którzy nie logowali się już 14 dni i więcej
 Route::GET('/disableUnusedAccount', 'UsersController@DisableUnusedAccount');
 
 

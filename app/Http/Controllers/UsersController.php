@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Agencies;
 use App\Department_info;
 use App\Departments;
+use App\DisableAccountInfo;
 use App\User;
 use App\UserTypes;
 use Illuminate\Http\Request;
@@ -965,5 +966,45 @@ class UsersController extends Controller
         ];
 
         return $data;
+    }
+
+
+    //Wyłączenie użytkowników którzy nie logowali się od 14 dni
+    public function DisableUnusedAccount(){
+        $today = date("Y-m-d");
+//        $date_warning = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_disable = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-14,date("Y")));
+
+
+//        $users_warning = User::
+//        wherebetween('last_login',[$date_disable,$date_warning])
+//            ->whereIn('users.user_type_id',[1,2])
+//            ->where('status_work','=',1)
+//            ->get();
+
+        $users_disable = User::
+        where('last_login','<',$date_disable)
+            ->whereIn('users.user_type_id',[1,2])
+            ->where('status_work','=',1)
+            ->get();
+
+        foreach ($users_disable as $iteam){
+            /**
+             * automatyczne rozwiązanie pakietu medycznego w przypadku zakończenia pracy
+             */
+            $user = $iteam;
+                $month_to_end = date('Y-m-t', strtotime($today));
+                MedicalPackage::where('user_id', '=', $user->id)
+                    ->where('deleted', '=', 0)
+                    ->where('month_stop', '=', null)
+                    ->update(['deleted' => 1, 'month_stop' => $month_to_end]);
+            $user -> end_work = $today;
+            $user -> status_work = 0;
+            $user -> save();
+            $disable_account_info = new DisableAccountInfo();
+            $disable_account_info -> user_id = $user->id;
+            $disable_account_info -> disable_date = $today;
+            $disable_account_info -> save();
+        }
     }
 }
