@@ -16,6 +16,7 @@
         $candidate_last_name = $candidate->last_name;
         $candidate_phone = $candidate->phone;
         $candidate_comment = $candidate->comment;
+        $candidate_recommended_by = $candidate->recommended_by;
         Session::forget('candidate_data');
     @endphp
 @endif
@@ -84,7 +85,7 @@
                                         <select class="form-control" style="font-size:18px;" name="recommended_by" id="recommended_by">
                                             <option value="0" id="none">Brak</option>
                                             @foreach($recomendingPeople as $rp)
-                                                <option value="{{$rp->id}}">{{$rp->first_name . " " . $rp->last_name}}</option>
+                                                <option @if(isset($candidate_recommended_by) && $candidate_recommended_by == $rp->id) selected @endif value="{{$rp->id}}">{{$rp->first_name . " " . $rp->last_name}}</option>
                                             @endforeach
                                         </select>
                                     </div>

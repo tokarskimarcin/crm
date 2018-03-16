@@ -77,7 +77,14 @@ class CandidateController extends Controller
             ->where('department_info_id','=',Auth::user()->department_info_id)
             ->whereIn('user_type_id',[1,2])
             ->get();
+        $users_for_recommendation = User::where('department_info_id', '=', Auth::user()->department_info_id)
+            ->whereIn('user_type_id', [1,2])
+            ->where('status_work', '=', 1)
+            ->orderBy('last_name')
+            ->get();
+
         return view('recruitment.newCandidate')
+            ->with('users_for_recommendation', $users_for_recommendation)
             ->with('sources', $sources)
             ->with('status', $status)
             ->with('department_info', $department_info)
@@ -97,7 +104,7 @@ class CandidateController extends Controller
             $candidate->department_info_id = $request->candidate_department;
             $candidate->candidate_source_id = $request->candidate_source;
             $candidate->comment = $request->candidate_desc;
-            $candidate->experience = $request->candidate_experience;
+            $candidate->recommended_by = ($request->recommended_by != 0) ? $request->recommended_by : null ;
             $candidate->id_user = $request->ex_id_user;
             $candidate->cadre_id = Auth::user()->id;
             $candidate->cadre_edit_id = Auth::user()->id;
@@ -116,7 +123,7 @@ class CandidateController extends Controller
                 'Źródło' => $request->candidate_source,
                 'Opis' => $request->candidate_desc,
                 'User_id' => $request->ex_id_user,
-                'Experience' => $request->candidate_experience,
+                'recommended_by' => $request->recommended_by,
                 'Pracownik kadry' => Auth::user()->id
             ];
 
@@ -150,10 +157,17 @@ class CandidateController extends Controller
         $attempt_status = AttemptStatus::all();
         $status_to_change = AttemptStatus::where('attempt_order', '!=', null)->orderBy('attempt_order')->get();
 
+        $users_for_recommendation = User::where('department_info_id', '=', Auth::user()->department_info_id)
+            ->whereIn('user_type_id', [1,2])
+            ->where('status_work', '=', 1)
+            ->orderBy('last_name')
+            ->get();
+
         return view('recruitment.candidateProfile')
             ->with('is_in_users', $isInUsers)
             ->with('sources', $sources)
             ->with('status', $status)
+            ->with('users_for_recommendation', $users_for_recommendation)
             ->with('status_to_change', $status_to_change)
             ->with('candidate_status', $candidate_status)
             ->with('department_info', $department_info)
@@ -180,7 +194,7 @@ class CandidateController extends Controller
             $candidate->department_info_id = $request->candidate_department;
             $candidate->candidate_source_id = $request->candidate_source;
             $candidate->comment = $request->candidate_desc;
-            $candidate->experience = $request->candidate_experience;
+            $candidate->recommended_by = ($request->recommended_by != 0) ? $request->recommended_by : null ;
             $candidate->id_user = $request->ex_id_user;
             $candidate->cadre_edit_id = Auth::user()->id;
             $candidate->updated_at = date('Y-m-d H:i:s');
@@ -196,7 +210,7 @@ class CandidateController extends Controller
                 'Źródło'                    => $request->candidate_source,
                 'Opis'                      => $request->candidate_desc,
                 'User_id'                   => $request->ex_id_user,
-                'Experience'                => $request->candidate_experience,
+                'recommended_by'            => $request->recommended_by,
                 'Pracownik kadry'           => Auth::user()->id
             ];
             //new ActivityRecorder(8, $data);
