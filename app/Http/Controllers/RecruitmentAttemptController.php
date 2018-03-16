@@ -430,7 +430,9 @@ class RecruitmentAttemptController extends Controller
      */
 
     public function recruitment_statistics_leaderGET(){
-        $hr = User::where('user_type_id', '=', 3)->get();
+        $hr = User::where('user_type_id', '=', 5)
+                    ->where('status_work','=',1)
+                    ->get();
         $attemptStatus = AttemptStatus::all();
         $attemptResult = AttemptResult::all();
 
