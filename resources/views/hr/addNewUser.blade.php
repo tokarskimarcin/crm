@@ -91,7 +91,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="myLabel" for="responsible_for">Prowadzący:</label>
+                                        <label class="myLabel" for="responsible_for">Lider:</label>
                                         <select class="form-control" style="font-size:18px;" name="coach_id" id="responsible_for">
                                             <option value="0" id="noTrainer">--Wybierz prowadzącego--</option>
                                             @foreach($workingTreners as $wt)
