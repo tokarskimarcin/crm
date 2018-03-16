@@ -143,18 +143,15 @@
                                     </div>
                                 </div>
                                 <div class="col-md-12">
-                                    {{--<div class="form-group">--}}
-                                        {{--<label class="myLabel">Doświadczenie:</label>--}}
-                                        {{--<select class="form-control" id="candidate_experience">--}}
-                                            {{--@if($candidate->experience == 0 )--}}
-                                                {{--<option value="0" selected>Brak</option>--}}
-                                                {{--<option value="1">Tak</option>--}}
-                                            {{--@elseif( $candidate->experience == 1)--}}
-                                                {{--<option value="0">Brak</option>--}}
-                                                {{--<option value="1" selected>Tak</option>--}}
-                                            {{--@endif--}}
-                                        {{--</select>--}}
-                                    {{--</div>--}}
+                                    <div class="form-group">
+                                        <label class="myLabel">Polecenie:</label>
+                                        <select class="form-control" id="recommended_by">
+                                            <option value="0">Brak</option>
+                                            @foreach($users_for_recommendation as $recommending)
+                                                <option @if($recommending->id == $candidate->recommended_by) selected @endif value="{{ $recommending->id }}">{{ $recommending->last_name . ' ' . $recommending->first_name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -862,7 +859,7 @@ $(document).ready(() => {
         var candidate_department = $('#candidate_department').val();
         var candidate_source = $('#candidate_source').val();
         var candidate_desc = $('#candidate_desc').val();
-        var candidate_experience = 0;
+        var recommended_by = $('#recommended_by').val();
         var ex_candidate_status = $('#ex_candidate_status').val();
         if(ex_id_user == '')
             ex_id_user = null;
@@ -922,7 +919,7 @@ $(document).ready(() => {
                 "candidate_department": candidate_department,
                 "candidate_source": candidate_source,
                 "candidate_desc": candidate_desc,
-                "candidate_experience":candidate_experience,
+                "recommended_by":recommended_by,
                 "ex_id_user":ex_id_user
             },
             success: function (response) {

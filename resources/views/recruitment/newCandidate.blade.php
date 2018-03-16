@@ -116,15 +116,17 @@
                                         <input type="text" readonly class="form-control" value="Dodanie kandydata" id="candidate_level">
                                     </div>
                                 </div>
-                                {{--<div class="col-md-12">--}}
-                                    {{--<div class="form-group">--}}
-                                        {{--<label class="myLabel">Doświadczenie:</label>--}}
-                                        {{--<select class="form-control" id="candidate_experience">--}}
-                                            {{--<option value="0" selected>Brak</option>--}}
-                                            {{--<option value="1">Tak</option>--}}
-                                        {{--</select>--}}
-                                    {{--</div>--}}
-                                {{--</div>--}}
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="myLabel">Polecenie:</label>
+                                        <select class="form-control" id="recommended_by">
+                                            <option value="0" selected>Brak</option>
+                                            @foreach($users_for_recommendation as $recommending)
+                                                <option value="{{ $recommending->id }}">{{ $recommending->last_name . ' ' . $recommending->first_name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -246,7 +248,7 @@ $(document).ready(() => {
         var candidate_department = $('#candidate_department').val();
         var candidate_source = $('#candidate_source').val();
         var candidate_desc = $('#candidate_desc').val();
-        var candidate_experience = 0;
+        var recommended_by = $('#recommended_by').val();
         var ex_candidate_id = $('#ex_candidate').val();
         if(ex_candidate_id == 1 && ex_id_user == null){
             swal('Wybierz byłego pracownika z listy')
@@ -320,7 +322,7 @@ $(document).ready(() => {
                             "candidate_department": candidate_department,
                             "candidate_source": candidate_source,
                             "candidate_desc": candidate_desc,
-                            "candidate_experience": candidate_experience,
+                            "recommended_by": recommended_by,
                             "ex_id_user": ex_id_user
 
                         },
