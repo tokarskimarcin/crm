@@ -20,6 +20,7 @@ class EditCandidateTable1 extends Migration
             $table->foreign('department_info_id')->references('id')->on('department_info');
             $table->foreign('attempt_status_id')->references('id')->on('attempt_status');
             $table->foreign('id_user')->references('id')->on('users');
+            $table->foreign('recommended_by')->references('id')->on('users');
         });
     }
 
@@ -37,6 +38,7 @@ class EditCandidateTable1 extends Migration
             $table->dropForeign(['department_info_id']);
             $table->dropForeign(['attempt_status_id']);
             $table->dropForeign(['id_user']);
+            $table->dropForeign(['recommended_by']);
         });
     }
 }

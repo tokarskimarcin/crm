@@ -546,9 +546,9 @@ class AdminController extends Controller
     }
     public function aMethod(Request $request) {
         $table = [];
-        for ($i = 1; $i <= 20; $i++) {
+        for ($i = 1; $i <= 30; $i++) {
             $table[] = collect([
-                'username' => 'imie nazwisko' . $i,
+                'username' => 'Paweł Gaweł' . $i,
                 'pole1' => $i,
                 'pole2' => $i,
                 'pole3' => $i,
@@ -560,7 +560,16 @@ class AdminController extends Controller
 //            dd($item['username']);
         }
 
-//        dd($collection);
-        return view('admin.testPag')->with('dane', $collection);
+        $parted_collection = $collection->chunk(8);
+
+//        dd($parted_collection);
+        return view('screens.testPag')->with('dane', $collection);
     }
+
+    public function screenMethod(Request $request) {
+        $departments = Departments::select('id', 'name', 'desc')->get();
+//        dd($departments);
+        return view('screens.screen_table')->with('dane', $departments);
+    }
+
 }

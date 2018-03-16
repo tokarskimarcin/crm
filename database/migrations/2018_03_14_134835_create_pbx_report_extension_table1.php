@@ -20,19 +20,14 @@ class CreatePbxReportExtensionTable1 extends Migration
             $table->integer('count_private_pause');
             $table->integer('count_lesson_pause');
             $table->integer('received_calls');
-            $table->integer('closed_arranged');
-            $table->integer('closed_bilingual');
-            $table->integer('away_contacts');
-            $table->integer('succes');
-            $table->integer('wrong_number');
-            $table->time('avg_time_pause');
-            $table->double('avg_time_wait_per_hour',10,2);
-            $table->time('avg_time_wait');
-            $table->decimal('avg_succes_per_hour',10,2);
-            $table->double('use_working_time',10,2);
-            $table->time('avg_decision_time');
-            $table->time('avg_delayed_time');
-            $table->timestamp('report_date');
+            $table->integer('success');
+            $table->float('average');
+            $table->float('base_use_proc');
+            $table->float('call_time_proc');
+            $table->integer('time_pause');
+            $table->float('dkj_proc');
+            $table->date('report_date');
+            $table->time('report_hour');
         });
     }
 

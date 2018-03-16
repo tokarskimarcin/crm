@@ -26,7 +26,7 @@ class CreateCandidateTable1 extends Migration
             $table->integer('attempt_status_id')->unsigned();
             $table->integer('training_stage');
             $table->integer('id_user')->unsigned();
-            $table->integer('experience');
+            $table->integer('recommended_by');
             $table->timestamps();
         });
     }
