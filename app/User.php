@@ -124,4 +124,12 @@ class User extends Authenticatable
             ->whereIn('user_type_id',[1,2])
             ->get();
     }
+
+    public function trainerConsultants() {
+        return $this->hasMany('App\User', 'coach_id');
+    }
+
+    public function trainer() {
+        return $this->belongsTo('App\User','coach_id');
+    }
 }

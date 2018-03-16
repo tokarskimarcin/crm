@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\HourReport;
+use App\Pbx_report_extension;
 use App\PBXDKJTeam;
 use App\RecruitmentStory;
 use DateTime;
@@ -1815,6 +1816,142 @@ class StatisticsController extends Controller
                 'send_month' => date('m'),
                 'total_days' => intval($days_in_month),
                 'departments'=> $departments
+            ]);
+    }
+
+    /**
+     * Wyśwetlanie raportu miesięczengo trenerzy
+     */
+    public function pageMonthReportCoachGet () {
+//        $table = [];
+//        for ($i = 1; $i <= 20; $i++) {
+//            $table[] = collect([
+//                'username' => 'imie nazwisko' . $i,
+//                'pole1' => $i,
+//                'pole2' => $i,
+//                'pole3' => $i,
+//                'pole4' => $i,
+//            ]);
+//        }
+//        $collection = collect($table);
+//        foreach($collection as $item) {
+//            dd($item['username']);
+//        }
+
+        $date_start = '2018-03-01';
+        $date_stop = '2018-03-31';
+
+        $uuu = User::find(4796);
+
+        $ids = $uuu->trainerConsultants->pluck('login_phone')->toArray();
+
+        $max_from_day = DB::table('pbx_report_extension')
+            ->select(DB::raw('
+                MAX(id) as id
+            '))
+            ->whereBetween('report_date', [$date_start, $date_stop])
+            ->whereIn('pbx_id', $ids)
+            ->groupBy('report_date')
+            ->groupBy('pbx_id')
+            ->get();
+
+        $pbx_data = Pbx_report_extension::whereBetween('report_date', [$date_start, $date_stop])
+            ->whereIn('pbx_id', $ids)
+            ->whereIn('id', $max_from_day->pluck('id')->toArray())
+            ->get();
+
+        $total_data = $pbx_data->groupBy('pbx_id');
+
+        $days_in_month = intval(date('t', strtotime($date_start)));
+
+        $terefere = $total_data->map(function($item, $key) use ($days_in_month, $date_start) {
+            $user_sum = [];
+
+            $consultant = User::where('login_phone', '=', $item->first()->pbx_id)
+                ->get();
+
+            for ($y = 1; $y <= 5; $y++) {
+                $user_sum[$y]['average'] = 0;
+                $user_sum[$y]['janky_proc'] = 0;
+                $user_sum[$y]['count_calls'] = 0;
+                $user_sum[$y]['success'] = 0;
+                $user_sum[$y]['proc_call_success'] = 0;
+                $user_sum[$y]['pause_time'] = 0;
+                $user_sum[$y]['login_time'] = 0;
+
+                $user_sum[$y]['first_name'] = $consultant->first()->first_name;
+                $user_sum[$y]['last_name'] = $consultant->first()->last_name;
+                $user_sum[$y]['week_num'] = $y;
+            }
+            $week_num = 1;
+            $week_yanky = 0;
+            $add_week_sum = true;
+            $start_day = true;
+
+            for ($i = 1; $i <= $days_in_month; $i++) {
+                $i_fixed = ($i < 10) ? '0' . $i : $i ;
+                $actual_loop_day = date('Y-m-', strtotime($date_start)) . $i_fixed;
+                $week_day = date('N', strtotime($actual_loop_day));
+
+                if ($item->where('report_date', '=', $actual_loop_day)->count() > 0) {
+                    $report = $item->where('report_date', '=', $actual_loop_day)->first();
+
+                    $work_time_array = explode(":", $report->login_time);
+                    $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]) / 3600, 2);
+
+                    $user_sum[$week_num]['success'] += $report->success;
+                    $user_sum[$week_num]['login_time'] += $work_time;
+                    $user_sum[$week_num]['pause_time'] += $report->time_pause;
+
+                    $week_yanky += ($report->success * ($report->dkj_proc / 100));
+                }
+
+                $add_week_sum = false;
+                if ($start_day == false && $week_day == 1) {
+                    $sum_week = true;
+                }
+
+                if (($week_day == 7 || $i == $days_in_month) &&  $add_week_sum == true) {
+                    $user_sum[$week_num]['janky_proc'] = ($user_sum[$week_num]['success'] > 0) ? round(($week_yanky / $user_sum[$week_num]['success']) * 100) : 0 ;
+                    $user_sum[$week_num]['average'] = ($user_sum[$week_num]['login_time']) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['login_time']), 2) : 0 ;
+                    $week_num++;
+                    $week_yanky = 0;
+                    $add_week_sum = true;
+                }
+
+            }
+            return $user_sum;
+        });
+
+//dd($terefere);
+        $coaches = User::whereIn('user_type_id', [4,12])->where('status_work', '=', 1)->get();
+
+        return view('reportpage.MonthReportCoach')
+            ->with([
+                'coaches' => $coaches,
+                'date_start' => $date_start,
+                'date_stop' => $date_stop,
+                'coachData' => $terefere
+            ]);
+    }
+
+    /**
+     * Wyświetlanie raportu miesięcznego trenerzy
+     */
+    public function pageMonthReportCoachPost(Request $request) {
+        $coach = User::find($request->coach_id);
+
+        $coaches = User::whereIn('user_type_id', [4,12])->where('status_work', '=', 1)->get();
+        $date_start = '2018-03-01';
+        $date_stop = '2018-03-31';
+
+        return view('reportpage.MonthReportCoach')
+            ->with([
+                'coaches' => $coaches,
+                'date_start' => $date_start,
+                'date_stop' => $date_stop,
+                'coachData' => 1,
+                'coach_id' => $coach->id
             ]);
     }
 

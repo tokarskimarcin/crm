@@ -479,6 +479,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/pageMailMonthReportDepartments', 'StatisticsController@pageMailMonthReportDepartments');
 
+    Route::get('/pageMonthReportCoach', 'StatisticsController@pageMonthReportCoachGet');
+    Route::post('/pageMonthReportCoach', 'StatisticsController@pageMonthReportCoachPost');
+
 
     //Raporty Rekrutacji
     //Dzienny
@@ -584,6 +587,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 Route::get('/testPag','AdminController@aMethod');
 
   Route::get('/testorm', 'TestORM@test');
+
+  Route::get('/testme', 'PBXDataAPI@PBXReportExtension');
 
     //Dane DKJ dla oddziałów
     Route::get('/TeamDKJHourData', 'PBXDataAPI@TeamDKJHourData');

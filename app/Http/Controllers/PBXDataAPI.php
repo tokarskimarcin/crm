@@ -6,6 +6,7 @@ use App\Department_info;
 use App\PBXDKJTeam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Pbx_report_extension;
 
 class PBXDataAPI extends Controller
 {
@@ -160,4 +161,86 @@ class PBXDataAPI extends Controller
         return html_entity_decode(mb_convert_encoding(strtr($text, $map), 'UTF-8', 'ISO-8859-2'), ENT_QUOTES, 'UTF-8');
     }
 
+    /**
+     * Pobranie danych dla raportu tygodniowego konsultanci
+     */
+    public function PBXReportExtension() {
+        $department_id = null;
+        $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=23&groupType=TERMINAL";
+
+        if (!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
+        if (($handle = fopen($url, "r")) !== FALSE) {
+
+            $row = 0;
+            $data_to_insert = [];
+            while (($rowData = fgetcsv($handle, 1000, ";")) !== false) {
+                if ($row > 2) {
+                    $temp_key = null;
+                    foreach ($rowData as $key => $rowItem) {
+                        $removeData = false;
+                        if ($key == 0) {
+                            $pbx_number_array = explode(' ', $rowItem);
+                            if (count($pbx_number_array) > 1) {
+                                $pbx_number = $pbx_number_array[count($pbx_number_array) - 1];
+                                $temp_key = $pbx_number;
+                                $data_to_insert[$temp_key]['pbx_id'] = $pbx_number;
+                            }
+                        } else if ($key == 1) {
+                            $data_to_insert[$temp_key]['average'] = $rowItem;
+                        } else if ($key == 2) {
+                            $data_to_insert[$temp_key]['success'] = $rowItem;
+                        } else if ($key == 3) {
+                            $data_to_insert[$temp_key]['count_private_pause'] = floatval($rowItem);
+                        } else if ($key == 4) {
+                            $data_to_insert[$temp_key]['count_lesson_pause'] = floatval($rowItem);
+                        } else if ($key == 5) {
+                            $data_to_insert[$temp_key]['base_use_proc'] = floatval($rowItem);
+                        } else if ($key == 6) {
+                            $data_to_insert[$temp_key]['call_time_proc'] = floatval($rowItem);
+                        } else if ($key == 7) {
+                            // Ten wiersz jest nieistotny
+                        } else if ($key == 8) {
+                            $data_to_insert[$temp_key]['login_time'] = $rowItem;
+                        } else if ($key == 9) {
+                            $data_to_insert[$temp_key]['dkj_proc'] = floatval($rowItem);
+
+                            $data_to_insert[$temp_key]['received_calls'] = 0;
+                            $data_to_insert[$temp_key]['report_date'] = date('Y-m-d');
+
+                            /**
+                             * Sumowanie danych
+                             */
+                            //zliczenie czasu przerw
+                            $sum_proc_pause = $data_to_insert[$temp_key]['count_private_pause'] + $data_to_insert[$temp_key]['count_lesson_pause'];
+                            $time_sum_sec_array = explode(":", $data_to_insert[$temp_key]['login_time']);
+                            $time_sum_sec = (($time_sum_sec_array[0] * 3600) + ($time_sum_sec_array[1] * 60) + $time_sum_sec_array[2]);
+                            $data_to_insert[$temp_key]['time_pause'] = intval(($time_sum_sec * $sum_proc_pause) / 100);
+
+                            //Tutaj sprawdzenie czy dodajemy ten wpis
+
+                            if ($data_to_insert[$temp_key]['login_time'] == '00:00:00') {
+                                $removeData = true;
+                            }
+                            if (!isset($data_to_insert[$temp_key]['pbx_id'])) {
+                                $removeData = true;
+                            }
+                        }
+
+                        if ($removeData !== null && $removeData === true) {
+                            unset($data_to_insert[$temp_key]);
+                        }
+                    }
+                }
+                $row++;
+            }
+            //echo "<pre>";
+            //print_r($data_to_insert);
+            echo 0;
+            Pbx_report_extension::insert($data_to_insert);
+            echo 1;
+            fclose($handle);
+
+        }
+
+    }
 }
