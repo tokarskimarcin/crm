@@ -116,15 +116,15 @@
                                         <input type="text" readonly class="form-control" value="Dodanie kandydata" id="candidate_level">
                                     </div>
                                 </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label class="myLabel">Doświadczenie:</label>
-                                        <select class="form-control" id="candidate_experience">
-                                            <option value="0" selected>Brak</option>
-                                            <option value="1">Tak</option>
-                                        </select>
-                                    </div>
-                                </div>
+                                {{--<div class="col-md-12">--}}
+                                    {{--<div class="form-group">--}}
+                                        {{--<label class="myLabel">Doświadczenie:</label>--}}
+                                        {{--<select class="form-control" id="candidate_experience">--}}
+                                            {{--<option value="0" selected>Brak</option>--}}
+                                            {{--<option value="1">Tak</option>--}}
+                                        {{--</select>--}}
+                                    {{--</div>--}}
+                                {{--</div>--}}
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -246,7 +246,7 @@ $(document).ready(() => {
         var candidate_department = $('#candidate_department').val();
         var candidate_source = $('#candidate_source').val();
         var candidate_desc = $('#candidate_desc').val();
-        var candidate_experience = $('#candidate_experience').val();
+        var candidate_experience = 0;
         var ex_candidate_id = $('#ex_candidate').val();
         if(ex_candidate_id == 1 && ex_id_user == null){
             swal('Wybierz byłego pracownika z listy')
@@ -266,7 +266,7 @@ $(document).ready(() => {
         if (candidate_phone == '') {
             swal('Podaj telefon kandydata!')
             return false;
-        } else if (isNaN(candidate_phone) || (candidate_phone.length < 7)) {
+        } else if (isNaN(candidate_phone) || (candidate_phone.length < 9)) {
             swal('Podaj prawidłowy numer telefonu!')
             return false;
         }
