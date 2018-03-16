@@ -464,7 +464,7 @@ class UsersController extends Controller
     {
         if($request->ajax()) {
             $query = DB::table('users')
-                ->join('department_info', 'department_info.id', '=', 'users.department_info_id')
+                ->join('department_info', 'department_info.id', '=', 'users.main_department_id')
                 ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
                 ->join('departments', 'department_info.id_dep', '=', 'departments.id')
                 ->join('user_types', 'users.user_type_id', '=', 'user_types.id')
