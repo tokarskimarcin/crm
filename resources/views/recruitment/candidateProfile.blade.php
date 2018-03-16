@@ -235,10 +235,10 @@
                 @if($candidate->attempt_status_id == 3)
                     <div class="container-fluid">
                         <div class="panel panel-default panel-body" style="color: #616366; font-size: 20px;">
-                            <div class="col-md-6">
+                            <div class="col-md-9">
                                 Data rozmowy kwalifikacyjnej: <b>{{$candidate->recruitment_attempt->where('status', '=', 0)->first()->interview_date}}</b>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <button class="btn btn-info pull-right" id="edit_interview_date_on">
                                     <span class="glyphicon glyphicon-edit"></span> Edytuj
                                 </button>
