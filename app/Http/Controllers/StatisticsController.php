@@ -1823,27 +1823,24 @@ class StatisticsController extends Controller
      * Wyśwetlanie raportu miesięczengo trenerzy
      */
     public function pageMonthReportCoachGet () {
-//        $table = [];
-//        for ($i = 1; $i <= 20; $i++) {
-//            $table[] = collect([
-//                'username' => 'imie nazwisko' . $i,
-//                'pole1' => $i,
-//                'pole2' => $i,
-//                'pole3' => $i,
-//                'pole4' => $i,
-//            ]);
-//        }
-//        $collection = collect($table);
-//        foreach($collection as $item) {
-//            dd($item['username']);
-//        }
+        $coaches = User::whereIn('user_type_id', [4,12])->where('status_work', '=', 1)->get();
 
-        $date_start = '2018-03-01';
-        $date_stop = '2018-03-31';
+        return view('reportpage.MonthReportCoach')
+            ->with([
+                'coaches' => $coaches
+            ]);
+    }
 
-        $uuu = User::find(4796);
+    /**
+     * Wyświetlanie raportu miesięcznego trenerzy
+     */
+    public function pageMonthReportCoachPost(Request $request) {
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
 
-        $ids = $uuu->trainerConsultants->pluck('login_phone')->toArray();
+        $leader = User::find($request->coach_id);
+
+        $ids = $leader->trainerConsultants->pluck('login_phone')->toArray();
 
         $max_from_day = DB::table('pbx_report_extension')
             ->select(DB::raw('
@@ -1870,7 +1867,7 @@ class StatisticsController extends Controller
             $consultant = User::where('login_phone', '=', $item->first()->pbx_id)
                 ->get();
 
-            for ($y = 1; $y <= 5; $y++) {
+            for ($y = 1; $y <= 4; $y++) {
                 $user_sum[$y]['average'] = 0;
                 $user_sum[$y]['janky_proc'] = 0;
                 $user_sum[$y]['count_calls'] = 0;
@@ -1882,16 +1879,23 @@ class StatisticsController extends Controller
                 $user_sum[$y]['first_name'] = $consultant->first()->first_name;
                 $user_sum[$y]['last_name'] = $consultant->first()->last_name;
                 $user_sum[$y]['week_num'] = $y;
+                $user_sum[$y]['first_week_day'] = null;
+                $user_sum[$y]['last_week_day'] = null;
             }
             $week_num = 1;
             $week_yanky = 0;
             $add_week_sum = true;
             $start_day = true;
+            $miss_first_week = false;
 
             for ($i = 1; $i <= $days_in_month; $i++) {
                 $i_fixed = ($i < 10) ? '0' . $i : $i ;
                 $actual_loop_day = date('Y-m-', strtotime($date_start)) . $i_fixed;
                 $week_day = date('N', strtotime($actual_loop_day));
+
+                if ($user_sum[$week_num]['first_week_day'] == null) {
+                    $user_sum[$week_num]['first_week_day'] = $actual_loop_day;
+                }
 
                 if ($item->where('report_date', '=', $actual_loop_day)->count() > 0) {
                     $report = $item->where('report_date', '=', $actual_loop_day)->first();
@@ -1906,12 +1910,27 @@ class StatisticsController extends Controller
                     $week_yanky += ($report->success * ($report->dkj_proc / 100));
                 }
 
-                $add_week_sum = false;
-                if ($start_day == false && $week_day == 1) {
-                    $sum_week = true;
+                if ($week_day == 7 && $start_day == false && $miss_first_week == false) {
+                    $add_week_sum = true;
                 }
 
-                if (($week_day == 7 || $i == $days_in_month) &&  $add_week_sum == true) {
+                if ($start_day == true && $week_day == 1) {
+                    $add_week_sum = true;
+                    $start_day = false;
+                } else if ($start_day == true && $week_day != 1) {
+                    $add_week_sum = false;
+                    $miss_first_week = true;
+                    $start_day = false;
+                }
+
+                if ($week_num == 4 && $week_day == 7 && $i < $days_in_month) {
+                    $add_week_sum = false;
+                }
+
+                if (($week_day == 7 || $i == $days_in_month) &&  $add_week_sum == true && $miss_first_week == false) {
+
+                    $user_sum[$week_num]['first_week_day'] == null;
+
                     $user_sum[$week_num]['janky_proc'] = ($user_sum[$week_num]['success'] > 0) ? round(($week_yanky / $user_sum[$week_num]['success']) * 100) : 0 ;
                     $user_sum[$week_num]['average'] = ($user_sum[$week_num]['login_time']) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['login_time']), 2) : 0 ;
                     $week_num++;
@@ -1919,11 +1938,16 @@ class StatisticsController extends Controller
                     $add_week_sum = true;
                 }
 
+                if  ($miss_first_week == true && $week_day == 7) {
+                    $miss_first_week = false;
+                }
+                if ($week_num == 4 && $week_day == 7 && $i < $days_in_month) {
+                    $add_week_sum = true;
+                }
+
             }
             return $user_sum;
         });
-
-//dd($terefere);
         $coaches = User::whereIn('user_type_id', [4,12])->where('status_work', '=', 1)->get();
 
         return view('reportpage.MonthReportCoach')
@@ -1931,27 +1955,8 @@ class StatisticsController extends Controller
                 'coaches' => $coaches,
                 'date_start' => $date_start,
                 'date_stop' => $date_stop,
-                'coachData' => $terefere
-            ]);
-    }
-
-    /**
-     * Wyświetlanie raportu miesięcznego trenerzy
-     */
-    public function pageMonthReportCoachPost(Request $request) {
-        $coach = User::find($request->coach_id);
-
-        $coaches = User::whereIn('user_type_id', [4,12])->where('status_work', '=', 1)->get();
-        $date_start = '2018-03-01';
-        $date_stop = '2018-03-31';
-
-        return view('reportpage.MonthReportCoach')
-            ->with([
-                'coaches' => $coaches,
-                'date_start' => $date_start,
-                'date_stop' => $date_stop,
-                'coachData' => 1,
-                'coach_id' => $coach->id
+                'coachData' => $terefere,
+                'leader' => $leader
             ]);
     }
 

@@ -19,7 +19,7 @@
                         <select class="form-control" name="coach_id" id="coach_id">
                             <option value="0">Wybierz</option>
                             @foreach($coaches as $coach)
-                                <option @if(isset($coach_id) && ($coach_id == $coach->id)) selected @endif value="{{ $coach->id }}">{{ $coach->last_name . ' ' . $coach->first_name }}</option>
+                                <option @if(isset($leader) && ($leader->id == $coach->id)) selected @endif value="{{ $coach->id }}">{{ $coach->last_name . ' ' . $coach->first_name }}</option>
                             @endforeach
                         </select>
                     </div>

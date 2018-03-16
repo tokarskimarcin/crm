@@ -432,11 +432,19 @@ class CandidateController extends Controller
                 return 0;
             }
 
+            $candidate = Candidate::find($id);
+
+            /**
+             * Sprawdzenie czy użytkownik nie nadpisuje etapu rekrutacji
+             */
+            if ($request->last_recruitment_story_id != $candidate->recruitment_attempt->where('status', 0)->first()->recruitment_story->last()->id) {
+                return 2;
+            }
+
             /**
              * Dodanie etapu w tej rekrutacji
              */
-            $this
-                ->addStory($id, $recruitmentAttempt->id, $request->add_level_status, $request->add_training_comment,null,$request->date_training);
+            $this->addStory($id, $recruitmentAttempt->id, $request->add_level_status, $request->add_training_comment,null,$request->date_training);
 
             return 1;
         }

@@ -37,7 +37,7 @@
             $total_login_time = 0;
         @endphp
 
-        @for($i = 1; $i <= 5; $i++)
+        @for($i = 1; $i <= 4; $i++)
 
             @foreach($coachData as $item)
                 @php
@@ -67,9 +67,9 @@
                 $week_average = ($week_success > 0) ? round(($week_success / $week_login_time), 2) : 0 ;
             @endphp
             <tr>
-                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA</b></td>
+                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $data['first_week_day'] }}</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_average }}</b></td>
-                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_janky_proc }}</b></td>
+                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_janky_proc }} %</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_call_times }}</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_success }}</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_call_success_proc }}</b></td>

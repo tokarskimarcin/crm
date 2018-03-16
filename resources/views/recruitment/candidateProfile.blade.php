@@ -635,6 +635,10 @@
 </div>
 
 <input type="hidden" id="candidate_id" value="{{$candidate->id}}" />
+@if(is_object($candidate->recruitment_attempt->where('status', 0)->first()))
+    <input type="hidden" id="last_recruitment_story_id" value="{{$candidate->recruitment_attempt->where('status', 0)->first()->recruitment_story->last()->id}}" />
+@endif
+
 @endsection
 @section('script')
 <script>
@@ -859,7 +863,7 @@ $(document).ready(() => {
         var candidate_department = $('#candidate_department').val();
         var candidate_source = $('#candidate_source').val();
         var candidate_desc = $('#candidate_desc').val();
-        var recommended_by = $('#recommended_by').val();
+        var candidate_experience = 0;
         var ex_candidate_status = $('#ex_candidate_status').val();
         if(ex_id_user == '')
             ex_id_user = null;
@@ -919,7 +923,7 @@ $(document).ready(() => {
                 "candidate_department": candidate_department,
                 "candidate_source": candidate_source,
                 "candidate_desc": candidate_desc,
-                "recommended_by":recommended_by,
+                "candidate_experience":candidate_experience,
                 "ex_id_user":ex_id_user
             },
             success: function (response) {
@@ -1137,9 +1141,15 @@ $(document).ready(() => {
         var candidate_id = $('#candidate_id').val();
         var date_training = $('#training_date').val();
         var add_training_comment = $('#add_training_comment').val();
+        var last_recruitment_story_id = $('#last_recruitment_story_id').val();
 
         if (add_training_comment == '' || (add_training_comment.trim().length == 0)) {
             swal('Dodaj komentarz!')
+            return false;
+        }
+
+        if (typeof(last_recruitment_story_id) == 'undefined') {
+            swal('Coś poszło nie tak, skontaktuj się z administratorem!');
             return false;
         }
 
@@ -1155,7 +1165,8 @@ $(document).ready(() => {
                 "candidate_id": candidate_id,
                 "add_training_comment": add_training_comment,
                 "add_level_status": 5,
-                "date_training":date_training
+                "date_training": date_training,
+                "last_recruitment_story_id": last_recruitment_story_id
             },
             success: function (response) {
                 if (response == 1) {
@@ -1165,6 +1176,14 @@ $(document).ready(() => {
                         timer: 3000
                     }).then((result) => {
                         window.location.href = "{{ URL::to('/add_group_training') }}";
+                    })
+                } else if (response == 2){
+                    swal({
+                        title: 'Nadpisujesz etap rekrutacji, strona zostanie przeładowana!',
+                        type: 'error',
+                        timer: 3000
+                    }).then((result) => {
+                        window.location.reload();
                     })
                 } else {
                     swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
