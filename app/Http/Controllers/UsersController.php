@@ -972,16 +972,8 @@ class UsersController extends Controller
     //Wyłączenie użytkowników którzy nie logowali się od 14 dni
     public function DisableUnusedAccount(){
         $today = date("Y-m-d");
-//        $date_warning = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
         $date_disable = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-14,date("Y")));
-
-
-//        $users_warning = User::
-//        wherebetween('last_login',[$date_disable,$date_warning])
-//            ->whereIn('users.user_type_id',[1,2])
-//            ->where('status_work','=',1)
-//            ->get();
-
+        //Pobranie użytkowników do zakończenia umowy
         $users_disable = User::
         where('last_login','<',$date_disable)
             ->whereIn('users.user_type_id',[1,2])
@@ -1003,6 +995,7 @@ class UsersController extends Controller
             $user -> save();
             $disable_account_info = new DisableAccountInfo();
             $disable_account_info -> user_id = $user->id;
+            $disable_account_info -> department_info_id = $user->department_info_id;
             $disable_account_info -> disable_date = $today;
             $disable_account_info -> save();
         }

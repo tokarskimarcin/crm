@@ -246,6 +246,9 @@ Route::get('/weekReportireCandidate', 'StatisticsController@MailweekReportHireCa
 //Emaile dotyczące statystyk oddziałów
 Route::get('/monthReportSummaryDepartments', 'StatisticsController@MailMonthReportDepartments');
 
+//Raport Usunietych kont
+Route::get('/weekReportUnuserdAccount','StatisticsController@MailWeekReportUnuserdAccount');
+
 //wyłączenie danych użytkowników którzy nie logowali się już 14 dni i więcej
 Route::GET('/disableUnusedAccount', 'UsersController@DisableUnusedAccount');
 
@@ -498,6 +501,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageMonthReportInterviews','StatisticsController@pageMonthReportInterviews');
     Route::get('/pageMonthReportHireCandidate','StatisticsController@pageMonthReportHireCandidate');
 
+
+    //Raport Usunietych kont
+    Route::get('/pageWeekReportUnuserdAccount','StatisticsController@pageWeekReportUnuserdAccount');
     //Report Page STOP
 
     //TESTS START //
