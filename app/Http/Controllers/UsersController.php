@@ -95,7 +95,7 @@ class UsersController extends Controller
             $user->email_off = $request->email;
         }
         $user->password = bcrypt($request->password);
-        if($user->coach_id != 0) {
+        if($request->coach_id != 0) {
             $user->coach_id = $request->coach_id;
         }
         else {
@@ -310,7 +310,7 @@ class UsersController extends Controller
         $user->last_name = $request->last_name;
         $user->updated_at = date("Y-m-d H:i:s");
         $user->phone = $request->phone;
-        if($user->coach_id != 0) {
+        if($request->coach_id != 0) {
             $user->coach_id = $request->coach_id;
         }
         else {
