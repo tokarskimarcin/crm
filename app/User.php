@@ -106,6 +106,10 @@ class User extends Authenticatable
         return $this->hasMany('App\MedicalPackage', 'user_id');
     }
 
+    public function pbx_report_extension() {
+        return $this->hasMany('App\Pbx_report_extension', 'pbx_id', 'login_phone');
+    }
+
     /**
      *  Wyłączenie starych kont użytkowników (konta do wyłączenia, konta do wysłania informacji)
      */
