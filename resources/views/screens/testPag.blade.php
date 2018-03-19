@@ -186,7 +186,7 @@
                                  window.location.reload(1);
                              }
                          }, 1000);
-                </script><span/></div>
+                </script></span></div>
         <div class="second">
             <div class="second-cont-inside">
                 <span id="second-span">
