@@ -206,6 +206,7 @@ class PBXDataAPI extends Controller
 
                             $data_to_insert[$temp_key]['received_calls'] = 0;
                             $data_to_insert[$temp_key]['report_date'] = date('Y-m-d');
+                            $data_to_insert[$temp_key]['report_hour'] = date('H:') . '00:00';
 
                             /**
                              * Sumowanie danych
@@ -233,14 +234,9 @@ class PBXDataAPI extends Controller
                 }
                 $row++;
             }
-            //echo "<pre>";
-            //print_r($data_to_insert);
-            echo 0;
+
             Pbx_report_extension::insert($data_to_insert);
-            echo 1;
             fclose($handle);
-
         }
-
     }
 }
