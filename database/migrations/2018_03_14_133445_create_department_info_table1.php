@@ -31,6 +31,7 @@ class CreateDepartmentInfoTable1 extends Migration
             $table->integer('pbx_id');
             $table->integer('working_hours_normal');
             $table->integer('working_hours_week');
+            $table->integer('menager_id');
         });
     }
 

@@ -7,6 +7,7 @@ use App\Department_types;
 use App\Departments;
 use App\LinkGroups;
 use App\Links;
+use App\Pbx_report_extension;
 use App\PrivilageRelation;
 use App\UserTypes;
 use Illuminate\Http\Request;
@@ -156,10 +157,12 @@ class AdminController extends Controller
     public function addDepartmentGet() {
         $department_types = Department_types::all();
         $departments = Departments::all();
+        $menagers = User::where('user_type_id', '=', '7')->where('status_work', '=', '1')->get();
 
         return view('admin.addDepartment')
             ->with('departments', $departments)
-            ->with('department_types', $department_types);
+            ->with('department_types', $department_types)
+            ->with('menagers', $menagers);
     }
 
     public function addDepartmentPost(Request $request) {
@@ -199,6 +202,7 @@ class AdminController extends Controller
         $department_info->working_hours_normal = ($request->work_hour > 0) ? $request->work_hour : 0 ;
         $department_info->working_hours_week = ($request->work_hour_weekend > 0) ? $request->work_hour_weekend : 0 ;
         $department_info->blocked = 0;
+        $department_info->menager_id = ($request->menager != 0) ? $request->menager : null ;
 
         $department_info->save();
 
@@ -212,9 +216,11 @@ class AdminController extends Controller
     //edycja oddziałów
     public function editDepartmentGet() {
         $department_info = Department_info::all();
+        $user = User::all();
 
         return view('admin.editDepartment')
-            ->with('department_info', $department_info);
+            ->with('department_info', $department_info)
+            ->with('user', $user);
     }
 
     //edycja oddziałów
@@ -222,6 +228,7 @@ class AdminController extends Controller
         //$request->type okkreśla czy oddział jest wybierany czy edytowany
         //1 - wybranie oddziału
         //2 - edycja oddziału
+        $menagers = User::where('user_type_id', '=', '7')->where('status_work', '=', '1')->get();
         $department_info = Department_info::all();
         $department_types = Department_types::all();
         $selected_department = Department_info::find($request->selected_department_info_id);
@@ -234,7 +241,8 @@ class AdminController extends Controller
           return view('admin.editDepartment')
               ->with('selected_department', $selected_department)
               ->with('department_types', $department_types)
-              ->with('department_info', $department_info);
+              ->with('department_info', $department_info)
+              ->with('menagers', $menagers);
         }
 
         if ($request->post_type == 2) {
@@ -273,6 +281,7 @@ class AdminController extends Controller
             $selected_department->pbx_id = ($request->pbx_id != null) ? $request->pbx_id : 0 ;
             $selected_department->working_hours_normal = ($request->work_hour > 0) ? $request->work_hour : 0 ;
             $selected_department->working_hours_week = ($request->work_hour_weekend > 0) ? $request->work_hour_weekend : 0 ;
+            $selected_department->menager_id = ($request->menager != 0) ? $request->menager : 0 ;
             $selected_department->save();
         }
 
@@ -544,32 +553,41 @@ class AdminController extends Controller
             return 1;
         }
     }
-    public function aMethod(Request $request) {
+    public function aMethod($id) {
         $table = [];
-        for ($i = 1; $i <= 30; $i++) {
-            $table[] = collect([
-                'username' => 'Paweł Gaweł' . $i,
-                'pole1' => $i,
-                'pole2' => $i,
-                'pole3' => $i,
-                'pole4' => $i,
-            ]);
-        }
-        $collection = collect($table);
-        foreach($collection as $item) {
-//            dd($item['username']);
-        }
+//        $pbx_report_extension = Pbx_report_extension::('pbx_id')->groupBy();
+//        $time = Pbx_report_extension::where('pbx_id', '=', '11')
+//        dd(Pbx_report_extension::where('report_date', 'LIKE', '2018-03-01')->get());
+          $givenUsers = Pbx_report_extension::where('report_date', 'like', '2018-03-19')->where('report_hour', 'like', '11:00:00')->get();
 
-        $parted_collection = $collection->chunk(8);
+          $table1 = [];
+          foreach($givenUsers as $item) {
+              if(is_object($item->user)) {
+                  if($item->user->department_info_id == $id) {
+                      array_push($table1, $item);
+                  }
+              }
+          }
 
-//        dd($parted_collection);
-        return view('screens.testPag')->with('dane', $collection);
+//        for ($i = 1; $i <= 30; $i++) {
+//            $table[] = collect([
+//                'username' => $pbx_report_extension->user->first_name . " " . $pbx_report_extension->user->last_name,
+//                'pole1' => $i,
+//                'pole2' => $i,
+//                'pole3' => $i,
+//                'pole4' => $i,
+//            ]);
+//        }
+        $collection = collect($table1);
+
+
+
+        return view('screens.testPag')->with('dane', $collection)->with('table23', $table1);
     }
 
     public function screenMethod(Request $request) {
-        $departments = Departments::select('id', 'name', 'desc')->get();
-//        dd($departments);
-        return view('screens.screen_table')->with('dane', $departments);
+        $department_info = Department_info::all();
+        return view('screens.screen_table')->with('dane', $department_info);
     }
 
 }

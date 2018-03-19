@@ -55,6 +55,17 @@
                   <option>Badania/Wysyłka</option>
                 </select>
             </div>
+
+            <div class="form-group">
+                <label for="menager">Wybierz kierownika oddziału</label>
+                <select class="form-control" name="menager" id="menager">
+                        <option value="0">Wybierz</option>
+                    @foreach($menagers as $m)
+                        <option value="{{$m->id}}">{{$m->first_name . ' ' . $m->last_name}}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="form-group">
                 <label for="pbx_id">Id z programu PBX:<span style="color:red;">*</span></label>
                 <input type="text" class="form-control" id="pbx_id" name="pbx_id" placeholder="PBX ID">
@@ -126,6 +137,7 @@ $('#add_department_submit').on('click', function() {
     var id_dep_type = $("#id_dep_type").val();
     var department = $('#department').val();
     var city = $('#city').val();
+    var menager = $('#menager').val();
 
     if (department == '-1' && city == '') {
         swal('Wybierz oddział lub dodaj nowy!')
@@ -134,6 +146,11 @@ $('#add_department_submit').on('click', function() {
 
     if (id_dep_type == 'Wybierz') {
         swal('Wybierz typ oddziału!')
+        return false;
+    }
+
+    if (menager == '0') {
+        swal('Wybierz kierownika oddziału')
         return false;
     }
 });
