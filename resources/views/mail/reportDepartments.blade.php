@@ -77,7 +77,7 @@
                 $day = ($i < 10) ? '0' . $i : $i;
                 $date = $year . '-' . $month . '-' . $day;
 
-                $report = $hour_reports->where('report_date', '=', $date)->first();
+                $report = $hour_reports->where('report_date', '=', $date)->where('success', '>', 0)->first();
 
                 $add_default_zero = ($report != null) ? false : true ;
 
