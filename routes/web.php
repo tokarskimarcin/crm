@@ -584,7 +584,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 });
 //////////////////////Testing ORM///////////////
 ///
-Route::get('/testPag','AdminController@aMethod');
+Route::get('/dept/{id}','AdminController@aMethod');
 Route::get('/screen_table','AdminController@screenMethod');
 
   Route::get('/testorm', 'TestORM@test');

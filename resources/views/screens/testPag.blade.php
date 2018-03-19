@@ -125,11 +125,14 @@
     tbody > tr:nth-of-type(2n) {
         background-color: #EDEDF4;
     }
+
 </style>
 
 <div class="wraper">
     <header>
-        <div class="first"><span id="first-span">Bieżące wyniki <script>
+
+        <div class="first"><span id="first-span">Bieżące wyniki
+                <script>
                          /***********Displaying actual date*********/
                          setInterval(function() {
                              var today = new Date();
@@ -183,7 +186,7 @@
                                  window.location.reload(1);
                              }
                          }, 1000);
-                    </script></span></div>
+                </script><span/></div>
         <div class="second">
             <div class="second-cont-inside">
                 <span id="second-span">
@@ -208,19 +211,44 @@
             </thead>
 
             <tbody class="table-body">
-            @foreach($dane as $user)
+            @foreach($table23 as $t)
             <tr class="one">
                 <td class="indx"></td>
-                <td>{{$user['username']}}</td>
-                <td>{{$user['pole1']}}</td>
-                <td>{{$user['pole2']}}</td>
-                <td>{{$user['pole3']}}</td>
-                <td>{{$user['pole4']}}</td>
+                <td>{{$t->user->first_name . ' ' . $t->user->last_name}}</td>
+                <td>{{$t->login_time}}</td>
+                <td>{{$t->success}}</td>
+                <td>{{$t->average}}</td>
+                <td class="pr">
+                    <script>
+                        var base = 10;
+                        var step = 0.5;
+                        var start = 2.5;
+                        var avg = {{$t->average}};
+                        var salary;
+                            if(avg > start) {
+                                var count;
+                                var difference;
+                                if (avg < start) {
+                                    difference = 0;
+                                }
+                                else {
+                                    difference = avg - start;
+                                }
+                                count = Math.ceil(difference / 0.5);
+                                salary = base + count*step;
+                            }
+                            else {
+                                salary = base;
+                            }
+                            $('.pr:last').text(salary);
+                    </script>
+                </td>
             </tr>
             @endforeach
 
             </tbody>
         </table>
+
         @else
         <div class="no-data">Brak danych!</div>
             <script>
