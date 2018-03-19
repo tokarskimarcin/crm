@@ -1614,28 +1614,209 @@ class StatisticsController extends Controller
         $month = $request->month_selected;
         $year = date('Y');
 
-        $dep_id = $request->selected_dep;
+        if (intval($request->selected_dep) < 100) {
+            $dep_id = $request->selected_dep;
 
-        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+            $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
-        $data = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep_id, $days_in_month);
+            $data = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep_id, $days_in_month);
 
-        return view('reportpage.ReportDepartments')
-            ->with([
-                'date_start'        => $data['date_start'],
-                'date_stop'         => $data['date_stop'],
-                'month'             => $data['month'],
-                'year'              => $data['year'],
-                'send_month'        => $month,
-                'total_days'        => intval($days_in_month),
-                'hour_reports'      => $data['hour_reports'],
-                'dep_info'          => $data['dep_info'],
-                'schedule_data'     => $data['schedule_data'],
-                'month_selected'    => $request->month_selected,
-                'departments'       => $departments,
-                'dep_id'            => $dep_id,
-                'months'            => $data['months']
-            ]);
+            return view('reportpage.ReportDepartments')
+                ->with([
+                    'date_start'        => $data['date_start'],
+                    'date_stop'         => $data['date_stop'],
+                    'month'             => $data['month'],
+                    'year'              => $data['year'],
+                    'send_month'        => $month,
+                    'total_days'        => intval($days_in_month),
+                    'hour_reports'      => $data['hour_reports'],
+                    'dep_info'          => $data['dep_info'],
+                    'schedule_data'     => $data['schedule_data'],
+                    'month_selected'    => $request->month_selected,
+                    'departments'       => $departments,
+                    'dep_id'            => $dep_id,
+                    'months'            => $data['months']
+                ]);
+        } else {
+//            $dep_id = $request->selected_dep;
+
+            $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+            $data = $this->getMultiDepartmentData($first_day, $last_day, $month, $year, [2,10,11,8], $days_in_month);
+
+            return view('reportpage.ReportDepartments')
+                ->with([
+                    'date_start'        => $data['date_start'],
+                    'date_stop'         => $data['date_stop'],
+                    'month'             => $data['month'],
+                    'year'              => $data['year'],
+                    'send_month'        => $month,
+                    'total_days'        => intval($days_in_month),
+                    'hour_reports'      => $data['hour_reports'],
+                    'dep_info'          => $data['dep_info'],
+                    'schedule_data'     => $data['schedule_data'],
+                    'month_selected'    => $request->month_selected,
+                    'departments'       => $departments,
+                    'dep_id'            => 101,
+                    'months'            => $data['months']
+                ]);
+        }
+    }
+
+    /**
+     * Pobranie danych dla zbiorczego raportu (sortowanie po dyrektorach)
+     */
+    private function getMultiDepartmentData($date_start, $date_stop, $month, $year, $deps, $days_in_month) {
+        /**
+         * Pobranie ostatnich ID z dnia
+         */
+        $reportIds = DB::table('hour_report')
+            ->select(DB::raw('
+                MAX(id) as id
+            '))
+            ->whereBetween('hour_report.report_date', [$date_start, $date_stop])
+            ->groupBy('report_date')
+            ->groupBy('department_info_id')
+            ->whereIn('department_info_id', $deps)
+            ->get();
+
+        /**
+         * Pobranie danych do raportu
+         */
+        $hourReports = DB::table('hour_report')
+            ->select(DB::raw('
+                hour_report.*
+            '))
+            ->whereBetween('hour_report.report_date', [$date_start, $date_stop])
+            ->whereIn('hour_report.id', $reportIds->pluck('id')->toArray())
+            ->get();
+
+        /**
+         * Pobranie danych z przepracowanych godzin
+         */
+        $acceptHours = DB::table('work_hours')
+            ->select(DB::raw('
+                SUM(TIME_TO_SEC(accept_stop) - TIME_TO_SEC(accept_start)) as time_sum,
+                date
+            '))
+            ->join('users', 'users.id', 'work_hours.id_user')
+            ->whereBetween('date', [$date_start, $date_stop])
+            ->whereIn('users.department_info_id', $deps)
+            ->whereIn('users.user_type_id', [1,2])
+            ->groupBy('date')
+            ->get();
+
+        /**
+         * Pobranie danych dotyczących janków
+         */
+        $jankyIds = DB::table('pbx_dkj_team')
+            ->select(DB::raw('
+                MAX(id) as id
+            '))
+            ->whereBetween('report_date', [$date_start, $date_stop])
+            ->groupBy('report_date')
+            ->groupBy('department_info_id')
+            ->whereIn('department_info_id', $deps)
+            ->get();
+
+        $yanky = DB::table('pbx_dkj_team')
+            ->select(DB::raw('
+                *
+            '))
+            ->whereBetween('report_date', [$date_start, $date_stop])
+            ->whereIn('id', $jankyIds->pluck('id')->toArray())
+            ->get();
+
+        /**
+         * Pobranie danych z grafiku
+         */
+        //Pobranie tygodni których dotyczy dany miesiąc
+        $schedule_weeks = [];
+        for ($i = 1; $i <= intval($days_in_month); $i = $i + 7) {
+            $cur_day = ($i < 10) ? '0' . $i : $i;
+            $schedule_weeks[] = intval(date('W',strtotime($year . '-'. $month . '-' . $cur_day)));
+        }
+        $schedule_data_raw = [];
+        foreach($schedule_weeks as $week) {
+            $schedule_data_raw[] = DB::table('schedule')
+                ->select(DB::raw('
+                    SUM(TIME_TO_SEC(monday_stop) - TIME_TO_SEC(monday_start)) / 3600 as day1,
+                    SUM(TIME_TO_SEC(tuesday_stop) - TIME_TO_SEC(tuesday_start)) / 3600 as day2,
+                    SUM(TIME_TO_SEC(wednesday_stop) - TIME_TO_SEC(wednesday_start)) / 3600 as day3,
+                    SUM(TIME_TO_SEC(thursday_stop) - TIME_TO_SEC(thursday_start)) / 3600 as day4,
+                    SUM(TIME_TO_SEC(friday_stop) - TIME_TO_SEC(friday_start)) / 3600 as day5,
+                    SUM(TIME_TO_SEC(saturday_stop) - TIME_TO_SEC(saturday_start)) / 3600 as day6,
+                    SUM(TIME_TO_SEC(sunday_stop) - TIME_TO_SEC(sunday_start)) / 3600 as day7,
+                    week_num
+                '))
+                ->join('users', 'users.id', 'schedule.id_user')
+                ->whereIn('users.department_info_id', $deps)
+                ->whereIn('users.user_type_id', [1,2])
+                ->where('week_num', $week)
+                ->get();
+        }
+
+        $schedule_data_raw = collect($schedule_data_raw);
+
+        $schedule_data = $schedule_data_raw->map(function($item) {
+            return $item->first();
+        });
+
+        /**
+         * Przypisanie danych do jednego obiektu
+         */
+        $newHourReports = $hourReports->map(function($item) use ($yanky, $acceptHours) {
+            //Pobranie danych z jankami
+            $toAdd = $yanky->where('report_date', '=', $item->report_date)->first();
+
+            $item->count_all_check = ($toAdd != null) ? $toAdd->count_all_check : 0;
+            $item->count_bad_check = ($toAdd != null) ? $toAdd->count_bad_check : 0;
+
+            //pobranie danych z przepracowanymi godzinami
+            $toAddHours = $acceptHours->where('date', '=', $item->report_date)->first();
+
+            $item->time_sum_real_RBH = ($toAddHours != null) ? $toAddHours->time_sum : 0;
+
+            return $item;
+        });
+        /**
+         *Tutaj raport w widoku bierze pierwszy wpis z daną datą, trzeba  posumować dane ze wszystkich oddziałów pogrupowane po datach
+         */
+        /**
+         * Pobranie danych departamentu
+         */
+        $dep_info = Department_info::find(2); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TUTAJ ZMIENIC na cos związanego z tym dla kogo generowany jest raport
+
+        /**
+         * Tabela z miesiącami
+         */
+        $months = [
+            '01' => 'Styczeń',
+            '02' => 'Luty',
+            '03' => 'Marzec',
+            '04' => 'Kwiecień',
+            '05' => 'Maj',
+            '06' => 'Czerwiec',
+            '07' => 'Lipiec',
+            '08' => 'Sierpień',
+            '09' => 'Wrzesień',
+            '10' => 'Październik',
+            '11' => 'Listopad',
+            '12' => 'Grudzień'
+        ];
+
+        $data = [
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'month' => $month,
+            'year' => $year,
+            'hour_reports' => $newHourReports,
+            'dep_info' =>$dep_info,
+            'schedule_data' => $schedule_data,
+            'months' => $months
+        ];
+
+        return $data;
     }
 
     /**
@@ -1874,7 +2055,9 @@ class StatisticsController extends Controller
                 $user_sum[$y]['success'] = 0;
                 $user_sum[$y]['proc_call_success'] = 0;
                 $user_sum[$y]['pause_time'] = 0;
+                $user_sum[$y]['received_calls'] = 0;
                 $user_sum[$y]['login_time'] = 0;
+                $user_sum[$y]['proc_received_calls'] = 0;
 
                 $user_sum[$y]['first_name'] = $consultant->first()->first_name;
                 $user_sum[$y]['last_name'] = $consultant->first()->last_name;
@@ -1906,6 +2089,7 @@ class StatisticsController extends Controller
                     $user_sum[$week_num]['success'] += $report->success;
                     $user_sum[$week_num]['login_time'] += $work_time;
                     $user_sum[$week_num]['pause_time'] += $report->time_pause;
+                    $user_sum[$week_num]['received_calls'] += $report->received_calls;
 
                     $week_yanky += ($report->success * ($report->dkj_proc / 100));
                 }
@@ -1933,6 +2117,7 @@ class StatisticsController extends Controller
 
                     $user_sum[$week_num]['janky_proc'] = ($user_sum[$week_num]['success'] > 0) ? round(($week_yanky / $user_sum[$week_num]['success']) * 100) : 0 ;
                     $user_sum[$week_num]['average'] = ($user_sum[$week_num]['login_time']) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['login_time']), 2) : 0 ;
+                    $user_sum[$week_num]['proc_received_calls'] = ($user_sum[$week_num]['received_calls'] > 0) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['received_calls']) * 100 , 2) : 0 ;
                     $week_num++;
                     $week_yanky = 0;
                     $add_week_sum = true;
@@ -1992,6 +2177,28 @@ class StatisticsController extends Controller
         $this->sendMailByVerona('summaryReportDepartment', $data, $title);
     }
 
+    /**
+     * Metoda wysyłająca dziennie raport do kierwników oddziałów
+     */
+    public function MailDayDepartmentsReport() {
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        foreach($departments as $department) {
+            $menager = User::where('id', '=', $department->menager_id)->get();
+
+            $date_start = date('Y-m-') . '01';
+            $date_stop = date('Y-m-t');
+            $month = date('m');
+            $year = date('Y');
+            $day_in_month = date('t', strtotime($month));
+
+            $data = $this->getDepartmentsData($date_start, $date_stop, $month, $year, $department->id, $day_in_month);
+            $data['total_days'] = $day_in_month;
+
+            $this->sendMailByVerona('reportDepartments', $data, 'Raport oddziały', $menager);
+        }
+    }
+
     /******** Główna funkcja do wysyłania emaili*************/
     /*
     * $mail_type - jaki mail ma być wysłany - typ to nazwa ścieżki z web.php
@@ -1999,38 +2206,38 @@ class StatisticsController extends Controller
     *
     */
 
-    private function sendMailByVerona($mail_type, $data, $mail_title) {
-        $email = [];
-        $mail_type_pom = $mail_type;
-        $mail_without_folder = explode(".",$mail_type);
-        // podfoldery
-        $mail_type = $mail_without_folder[count($mail_without_folder)-1];
-        $mail_type2 = ucfirst($mail_type);
-        $mail_type2 = 'page' . $mail_type2;
-        $accepted_users = DB::table('users')
-            ->select(DB::raw('
+    private function sendMailByVerona($mail_type, $data, $mail_title, $default_users = null) {
+        if ($default_users !== null) {
+            $accepted_users = $default_users;
+        } else {
+            $email = [];
+            $mail_type_pom = $mail_type;
+            $mail_without_folder = explode(".",$mail_type);
+            // podfoldery
+            $mail_type = $mail_without_folder[count($mail_without_folder)-1];
+            $mail_type2 = ucfirst($mail_type);
+            $mail_type2 = 'page' . $mail_type2;
+            $accepted_users = DB::table('users')
+                ->select(DB::raw('
             users.first_name,
             users.last_name,
             users.username,
             users.email_off
             '))
-            ->join('privilage_relation', 'privilage_relation.user_type_id', '=', 'users.user_type_id')
-            ->join('links', 'privilage_relation.link_id', '=', 'links.id')
-            ->where('links.link', '=', $mail_type2)
-            ->where('users.status_work', '=', 1)
-            ->where('users.id', '!=', 4592) // tutaj szczesna
-            ->get();
+                ->join('privilage_relation', 'privilage_relation.user_type_id', '=', 'users.user_type_id')
+                ->join('links', 'privilage_relation.link_id', '=', 'links.id')
+                ->where('links.link', '=', $mail_type2)
+                ->where('users.status_work', '=', 1)
+                ->where('users.id', '!=', 4592) // tutaj szczesna
+                ->get();
 
             $szczesny = new User();
             $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
             $szczesny->first_name = 'Bartosz';
             $szczesny->last_name = 'Szczęsny';
             $accepted_users->push($szczesny);
-
-
-
-
-
+        }
+dd($data);
 
 //    $accepted_users = [
 //        'cytawa.verona@gmail.com',

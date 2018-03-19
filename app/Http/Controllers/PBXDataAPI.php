@@ -203,8 +203,9 @@ class PBXDataAPI extends Controller
                             $data_to_insert[$temp_key]['login_time'] = $rowItem;
                         } else if ($key == 9) {
                             $data_to_insert[$temp_key]['dkj_proc'] = floatval($rowItem);
+                        } else if ($key == 10) {
+                            $data_to_insert[$temp_key]['received_calls'] = intval($rowItem);
 
-                            $data_to_insert[$temp_key]['received_calls'] = 0;
                             $data_to_insert[$temp_key]['report_date'] = date('Y-m-d');
                             $data_to_insert[$temp_key]['report_hour'] = date('H:') . '00:00';
 
@@ -234,7 +235,7 @@ class PBXDataAPI extends Controller
                 }
                 $row++;
             }
-
+            dd($data_to_insert);
             Pbx_report_extension::insert($data_to_insert);
             fclose($handle);
         }

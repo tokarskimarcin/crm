@@ -14,9 +14,15 @@
                 <div class="form-group">
                     <label>Oddział:</label>
                     <select class="form-control" name="selected_dep">
-                        @foreach($departments as $dep)
-                            <option value="{{$dep->id}}" @if($dep->id == $dep_id) selected @endif>{{$dep->departments->name . ' ' . $dep->department_type->name}}</option>
-                        @endforeach
+                        <optgroup label="Oddziały">
+                            @foreach($departments as $dep)
+                                <option value="{{$dep->id}}" @if($dep->id == $dep_id) selected @endif>{{$dep->departments->name . ' ' . $dep->department_type->name}}</option>
+                            @endforeach
+                        </optgroup>
+                        <optgroup label="Dyrektorzy">
+                            <option value="101">Daniel Abramowicz</option>
+                            <option value="102">Sylwia Kwiecień</option>
+                        </optgroup>
                     </select>
                 </div>
             </div>
