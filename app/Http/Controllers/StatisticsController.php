@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DisableAccountInfo;
 use App\HourReport;
 use App\Pbx_report_extension;
 use App\PBXDKJTeam;
@@ -1992,6 +1993,56 @@ class StatisticsController extends Controller
         $this->sendMailByVerona('summaryReportDepartment', $data, $title);
     }
 
+    /*
+     *  Strona z informacją o dezaktywowanych kontach
+     */
+
+    public function pageWeekReportUnuserdAccount(){
+
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = $this::UnuserdAccount(1);
+        return view('reportpage.accountReport.WeekReportUnuserdAccount')
+            ->with('department_info',$data['departments'])
+            ->with('users_warning',$data['users_warning'])
+            ->with('users_disable',$data['users_disable']);
+    }
+    public function MailWeekReportUnuserdAccount(){
+
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = $this::UnuserdAccount(1);
+        $title = 'Tygodniowy Raport Nieaktywnych Kont Konsultantów '.$date_start.' - '.$date_stop;
+
+        $this->sendMailByVerona('accountMail.weekReportUnuserdAccount', $data, $title);
+
+    }
+
+    public function UnuserdAccount($type){
+        $today = date("Y-m-d");
+        $date_warning = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_disable = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-14,date("Y")));
+
+
+        $users_warning = User::
+        wherebetween('last_login',[$date_disable,$date_warning])
+                    ->whereIn('users.user_type_id',[1,2])
+                    ->where('status_work','=',1)
+                    ->get();
+
+        $users_disable = DisableAccountInfo::
+                    wherebetween('disable_date',[$date_warning,$today])
+                        ->get();
+        $departmnets = Department_info::all();
+        $data = [
+            'users_warning'     => $users_warning,
+            'users_disable'     => $users_disable,
+            'departments'       => $departmnets
+        ];
+        return $data;
+
+    }
+
     /******** Główna funkcja do wysyłania emaili*************/
     /*
     * $mail_type - jaki mail ma być wysłany - typ to nazwa ścieżki z web.php
@@ -2048,7 +2099,7 @@ class StatisticsController extends Controller
 //        }
 //     });
 //
-
+        $mail_type = $mail_type_pom;
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
        {
