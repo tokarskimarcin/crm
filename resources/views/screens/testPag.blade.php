@@ -9,7 +9,7 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-family: "Trebuchet MS", "Tahoma", sans-serif;
+        font-family: Verdana, "Tahoma", sans-serif;
     }
 
     body {
@@ -98,12 +98,9 @@
         font-size: 2.2em;
     }
 
-    th:first-of-type {
+    .firstTh {
         width: 7%;
-    }
-
-    tr {
-        height: 8.8vh;
+        font-size: 1.1em;
     }
 
     td {
@@ -114,10 +111,6 @@
         text-align: center;
     }
 
-    td:first-of-type {
-        width: 7%;
-    }
-
     thead {
         background: linear-gradient(dimgray, white);
     }
@@ -126,11 +119,50 @@
         background-color: #EDEDF4;
     }
 
-</style>
+    .two {
+        background: lightcyan;
+    }
 
+    .secondTable {
+        font-size: 2.5em
+    }
+
+    /***********Last slide**************/
+    .active {
+        display: table;
+    }
+
+    .inactive {
+        display: none;
+    }
+
+    .indx {
+        width: 7%;
+    }
+
+    .secondTd {
+        width: 40%;
+        /*font-weight: bold;*/
+    }
+
+    .firstTr {
+        height: 9vh;
+        font-size: 1.1em;
+    }
+
+    .secondTr {
+        height: 6.55vh;
+        font-size: 0.87em;
+    }
+
+    .secondTh {
+        font-size: 0.85em;
+    }
+
+
+</style>
 <div class="wraper">
     <header>
-
         <div class="first"><span id="first-span">Bieżące wyniki
                 <script>
                          /***********Displaying actual date*********/
@@ -175,15 +207,21 @@
                              $('#first-span').append(actualDate);
                          },1000);
 
-                         /******Refreshing page every hour******/
+                         /******Refreshing page every hour and after 5 minutes within each hour******/
                          var today = new Date();
+                         var today2 = new Date();
                          setInterval(function(){
                              today = new Date();
-                         }, 1000);
-                         var actualHour = today.getHours();
-                         setInterval(function(){
-                             if(actualHour - today.getHours() != 0) {
+                             if(today.getMinutes() == '5' && (today.getSeconds() == '1' || today.getSeconds() == '2')){
                                  window.location.reload(1);
+                             }
+                         }, 1000);
+                         var actualHour = today2.getHours();
+                         setInterval(function(){
+                             today2 = new Date();
+                             if(actualHour - today2.getHours() != 0) {
+                                 window.location.reload(1);
+                                 actualHour = today2.getHours()
                              }
                          }, 1000);
                 </script></span></div>
@@ -197,11 +235,11 @@
     </header>
 
     <section>
-        @if(isset($dane))
-        <table class="table">
+        @if(sizeof($userTable) != 0 || sizeof($reportTable) != 0)
+        <table class="table inactive">
             <thead>
             <tr>
-                <th>L.P</th>
+                <th class="firstTh">L.P</th>
                 <th>Imie &amp; Nazwisko</th>
                 <th>Czas</th>
                 <th>L.zgód</th>
@@ -210,9 +248,9 @@
             </tr>
             </thead>
 
-            <tbody class="table-body">
-            @foreach($table23 as $t)
-            <tr class="one">
+            <tbody class="table-body table-body1">
+            @foreach($userTable as $t)
+            <tr class="one firstTr">
                 <td class="indx"></td>
                 <td>{{$t->user->first_name . ' ' . $t->user->last_name}}</td>
                 <td>{{$t->login_time}}</td>
@@ -240,7 +278,7 @@
                             else {
                                 salary = base;
                             }
-                            $('.pr:last').text(salary);
+                        $('.pr:last').text(salary);
                     </script>
                 </td>
             </tr>
@@ -248,7 +286,30 @@
 
             </tbody>
         </table>
+        <table class="table active secondTable">
+                <thead class="two secondTh">
+                <tr>
+                    <th>Oddział</th>
+                    <th>Godzina</th>
+                    <th>Średnia</th>
+                    <th>Liczba zaproszeń</th>
+                    <th>Proc. janków</th>
+                </tr>
+                </thead>
 
+                <tbody class="table-body">
+                @foreach($reportTable as $r)
+                    <tr class="one secondTr">
+                        <td class="secondTd">{{$r->department_info->departments->name . ' ' . $r->department_info->department_type->name}}</td>
+                        <td>{{$r->hour}}</td>
+                        <td>{{$r->average}}</td>
+                        <td>{{$r->success}}</td>
+                        <td>{{$r->janky_count}}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+        </table>
+        {{--*********CASE OF NO DATA***********--}}
         @else
         <div class="no-data">Brak danych!</div>
             <script>
@@ -257,6 +318,7 @@
                 }, 30000);
             </script>
         @endif
+        {{--************END CASE***************--}}
     </section>
 
 <script>
@@ -269,7 +331,7 @@
         });
         /*************End Filling*************/
 
-        var rekordy = $('tbody tr');
+        var rekordy = $('.table-body1 tr');
         rekordy.each(function() {
             var danyRekord = $(this);
             tablica.push(danyRekord);
@@ -287,18 +349,24 @@
 
         var delayInMilliseconds = 8000;
         var newTable = chunks(tablica,8);
-        var tableBody = $('.table-body');
+        var tableBody = $('.table-body1');
         tableBody.text(' ');
         tableBody.append(newTable[0]);
         var iteracja = 0;
 
         setInterval(function() {
-            tableBody.text(' ');
-            tableBody.append(newTable[iteracja]);
-            iteracja++;
-            if(iteracja == newTable.length) {
-                iteracja = 0;
-            }
+                if(iteracja == 0) {
+                    $('table:last').toggleClass('active');
+                    $('table:last').toggleClass('inactive');
+                    $('table:first').toggleClass('inactive');
+                    $('table:first').toggleClass('active');
+                }
+                tableBody.text(' ');
+                tableBody.append(newTable[iteracja]);
+                iteracja++;
+                if(iteracja == newTable.length) {
+                    iteracja = 0;
+                }
         },delayInMilliseconds);
     });
 </script>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Department_info;
 use App\Department_types;
 use App\Departments;
+use App\HourReport;
 use App\LinkGroups;
 use App\Links;
 use App\Pbx_report_extension;
@@ -554,35 +555,34 @@ class AdminController extends Controller
         }
     }
     public function aMethod($id) {
-        $table = [];
-//        $pbx_report_extension = Pbx_report_extension::('pbx_id')->groupBy();
-//        $time = Pbx_report_extension::where('pbx_id', '=', '11')
-//        dd(Pbx_report_extension::where('report_date', 'LIKE', '2018-03-01')->get());
-          $givenUsers = Pbx_report_extension::where('report_date', 'like', '2018-03-19')->where('report_hour', 'like', '11:00:00')->get();
+            $hour = date('H');
+            $hour = $hour . ":00:00";
+            $date = date("Y-m-d");
 
-          $table1 = [];
+          $givenUsers = Pbx_report_extension::where('report_date', '=', $date)->where('report_hour', '=', "13:00:00")->get();
+          $userTable = [];
+          $reportTable = [];
           foreach($givenUsers as $item) {
               if(is_object($item->user)) {
                   if($item->user->department_info_id == $id) {
-                      array_push($table1, $item);
+                      array_push($userTable, $item);
                   }
               }
           }
 
-//        for ($i = 1; $i <= 30; $i++) {
-//            $table[] = collect([
-//                'username' => $pbx_report_extension->user->first_name . " " . $pbx_report_extension->user->last_name,
-//                'pole1' => $i,
-//                'pole2' => $i,
-//                'pole3' => $i,
-//                'pole4' => $i,
-//            ]);
-//        }
-        $collection = collect($table1);
+          $dep = Department_info::find($id);
+          $report = HourReport::where('hour', '13:00:00')
+              ->where('report_date', $date)
+              ->get();
 
+          foreach($report as $r) {
+              if(is_object($r)) {
+                  array_push($reportTable, $r);
+              }
+          }
 
-
-        return view('screens.testPag')->with('dane', $collection)->with('table23', $table1);
+        return view('screens.testPag')->with('userTable', $userTable)
+            ->with('reportTable', $reportTable);
     }
 
     public function screenMethod(Request $request) {
