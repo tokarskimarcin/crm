@@ -18,7 +18,6 @@
         text-align: center;
     }
 </style>
-
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
@@ -63,10 +62,14 @@
                         <div class="col-md-4">
                             <label>Pracownik HR</label>
                             <select class="form-control" id="hr_user" onchange="myFunction()">
+                                        @if(Auth::user()->user_type_id == '5')
+                                            <option value="{{Auth::user()->id}}">{{Auth::user()->last_name . ' ' . Auth::user()->first_name}}</option>
+                                        @else
                                 <option value="0">Wszyscy</option>
                                 @foreach($hr as $item)
                                     <option value="{{$item->id}}">{{$item->last_name . ' ' . $item->first_name}}</option>
                                 @endforeach
+                                        @endif
                             </select>
                         </div>
                         <div class="col-md-4">
