@@ -63,6 +63,16 @@
                   <option @if($selected_department->type == 'Badania/Wysyłka') selected @endif>Badania/Wysyłka</option>
                 </select>
             </div>
+
+            <div class="form-group">
+                <label for="menager">Kierownik oddziału</label>
+                <select class="form-control" name="menager" id="menager">
+                    @foreach($menagers as $m)
+                        <option value="{{$m->id}}" @if(isset($selected_department->menager_id) && $selected_department->menager_id == $m->id) selected @endif>{{$m->first_name . ' ' . $m->last_name}}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="form-group">
                 <label for="pbx_id">Id z programu PBX:<span style="color:red;">*</span></label>
                 <input type="text" class="form-control" id="pbx_id" name="pbx_id" value="{{$selected_department->pbx_id}}" placeholder="PBX ID">
