@@ -47,4 +47,7 @@ class Department_info extends Model
         return $this->hasMany('App\MultipleDepartments', 'department_info_id');
     }
 
+    public function menager() {
+        return $this->belongsTo('App\User', 'menager_id');
+    }
 }

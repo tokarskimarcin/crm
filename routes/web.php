@@ -251,6 +251,9 @@ Route::get('/monthReportireCandidate', 'StatisticsController@MailmonthReportHire
 //Emaile dotyczące statystyk oddziałów
 Route::get('/monthReportSummaryDepartments', 'StatisticsController@MailMonthReportDepartments');
 
+Route::get('/dayReportDepartments', 'StatisticsController@MailDayDepartmentsReport');
+
+//Maila dotyczące wyłączonych kont
 //Raport Usunietych kont
 Route::get('/weekReportUnuserdAccount','StatisticsController@MailWeekReportUnuserdAccount');
 
@@ -598,7 +601,8 @@ Route::get('/testPag','AdminController@aMethod');
 
   Route::get('/testorm', 'TestORM@test');
 
-  Route::get('/testme', 'PBXDataAPI@PBXReportExtension');
+  //Pobieranie danych dla PBX_REPORT_EXTENSION
+  Route::get('/pbx_report_ext', 'PBXDataAPI@PBXReportExtension');
 
     //Dane DKJ dla oddziałów
     Route::get('/TeamDKJHourData', 'PBXDataAPI@TeamDKJHourData');
