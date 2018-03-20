@@ -1642,7 +1642,7 @@ class StatisticsController extends Controller
                 ]);
         } else {
 //            $dep_id = $request->selected_dep;
-
+return "Raport w przygotowaniu";
             $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
             $data = $this->getMultiDepartmentData($first_day, $last_day, $month, $year, [2,10,11,8], $days_in_month);
@@ -2361,13 +2361,13 @@ class StatisticsController extends Controller
                 ->where('users.id', '!=', 4592) // tutaj szczesna
                 ->get();
 
-//            $szczesny = new User();
-//            $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
-//            $szczesny->first_name = 'Bartosz';
-//            $szczesny->last_name = 'Szczęsny';
-//            $accepted_users->push($szczesny);
+            $szczesny = new User();
+            $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
+            $szczesny->first_name = 'Bartosz';
+            $szczesny->last_name = 'Szczęsny';
+            $accepted_users->push($szczesny);
         }
-dd($mail_type2);
+
 //    $accepted_users = [
 //        'cytawa.verona@gmail.com',
 //        'jarzyna.verona@gmail.com'
