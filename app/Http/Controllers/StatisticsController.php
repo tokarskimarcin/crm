@@ -1291,8 +1291,10 @@ class StatisticsController extends Controller
      * Wyswietlanie spływu rekrutacji Miesięczny
      */
     public function pageMonthReportRecruitmentFlow(){
-        $date_start = new DateTime("first day of last month");
-        $date_stop = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
         ];
@@ -1305,8 +1307,10 @@ class StatisticsController extends Controller
      */
 
     public function MailmonthReportRecruitmentFlow() {
-        $date_start = new DateTime("first day of last month");
-        $date_stop = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
 
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
@@ -1372,8 +1376,10 @@ class StatisticsController extends Controller
      * Wyświetlanie przeprowadzonych szkoleń Miesięczny
      */
     public function pageMonthReportTrainingGroup(){
-        $date_start = new DateTime("first day of last month");
-        $date_stop = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
         $data = [
             'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
         ];
@@ -1385,8 +1391,10 @@ class StatisticsController extends Controller
      * Mail przeprowadzonych szkoleń Miesięczny
      */
     public function MailmonthReportTrainingGroup() {
-        $date_start = new DateTime("first day of last month");
-        $date_stop = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
         $data = [
             'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
         ];
@@ -1454,8 +1462,10 @@ class StatisticsController extends Controller
      */
 
     public function pageMonthReportInterviews(){
-        $date_start = new DateTime("first day of last month");
-        $date_stop = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
         $data = [
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
@@ -1467,8 +1477,10 @@ class StatisticsController extends Controller
      *  Maila przeprowadzonych rozmów Miesięczny
      */
     public function MailmonthReportInterviews(){
-        $date_start = new DateTime("first day of last month");
-        $date_stop = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
         $data = [
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
@@ -1493,8 +1505,8 @@ class StatisticsController extends Controller
      *  Maila przeprowadzonych rozmów Dzienny
      */
     public function MaildayReportHireCandidate(){
-        $date_start = date('Y-m-d', time() - 24 * 3600);
-        $date_stop = date('Y-m-d', time() - 24 * 3600);
+        $date_start = date('Y-m-d', time() - 24 * 3600)
+        $date_stop = date('Y-m-d', time() - 24 * 3600)
         $data = [
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
@@ -1534,8 +1546,10 @@ class StatisticsController extends Controller
      * Raport zatrudnienie Miesięczny
      */
     public function pageMonthReportHireCandidate(){
-        $date_start = new DateTime("first day of last month");
-        $date_stop = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
         $data = [
             'data' => RecruitmentStory::getReportNewAccountData($date_start,$date_stop,0)
         ];
@@ -1547,8 +1561,10 @@ class StatisticsController extends Controller
      *  Maila przeprowadzonych rozmów Miesięczny
      */
     public function MailmonthReportHireCandidate(){
-        $date_start = new DateTime("first day of last month");
-        $date_stop = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of last month");
+        $month_end = new DateTime("last day of last month");
+        $date_start =  $month_ini->format('Y-m-d');
+        $date_stop  = $month_end->format('Y-m-d');
         $data = [
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
