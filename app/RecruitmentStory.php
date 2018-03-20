@@ -48,12 +48,15 @@ class RecruitmentStory extends Model
     public static function getReportFlowData($data_start,$data_stop){
         $result = DB::table('candidate')
             ->select(DB::Raw("users.first_name,users.last_name,count(candidate.id) as count_flow,
-                `departments`.`name`"))
+                `departments`.`name`,`department_type`.`name` as dep_type"))
             ->join('users','users.id','candidate.cadre_id')
             ->join('department_info','department_info.id','users.department_info_id')
             ->join('departments','departments.id','department_info.id_dep')
+            ->join('department_type','department_type.id','department_info.id_dep_type')
             ->wherebetween('candidate.created_at',[$data_start.' 00:00:00',$data_stop.' 23:00:00'])
+            ->where('users.user_type_id','=','5')
             ->groupBy('candidate.cadre_id')
+            ->orderBy('count_flow')
             ->get();
         return $result;
     }
