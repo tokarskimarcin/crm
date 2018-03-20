@@ -234,19 +234,19 @@ Route::get('/monthReportDatabaseUse', 'DatabaseURLController@MailMonthRaportData
 
 // maila dotyczące rekrutacji
 Route::get('/dayReportRecruitmentFlow', 'StatisticsController@MaildayReportRecruitmentFlow');
-Route::get('/dayReportTrainingGroup', 'StatisticsController@MaildayReportTrainingGroup');
+Route::get('/dayReportRecruitmentTrainingGroup', 'StatisticsController@MaildayReportTrainingGroup');
 Route::get('/dayReportInterviews', 'StatisticsController@MaildayReportInterviews');
-Route::get('/dayReportireCandidate', 'StatisticsController@MaildayReportHireCandidate');
+Route::get('/dayReportHireCandidate', 'StatisticsController@MaildayReportHireCandidate');
 
 Route::get('/weekReportRecruitmentFlow', 'StatisticsController@MailweekReportRecruitmentFlow');
 Route::get('/weekReportTrainingGroup', 'StatisticsController@MailweekReportTrainingGroup');
 Route::get('/weekReportInterviews', 'StatisticsController@MailweekReportInterviews');
-Route::get('/weekReportireCandidate', 'StatisticsController@MailweekReportHireCandidate');
+Route::get('/weekReportHireCandidate', 'StatisticsController@MailweekReportHireCandidate');
 
 Route::get('/monthReportRecruitmentFlow', 'StatisticsController@MailmonthReportRecruitmentFlow');
 Route::get('/monthReportTrainingGroup', 'StatisticsController@MailmonthReportTrainingGroup');
 Route::get('/monthReportInterviews', 'StatisticsController@MailmonthReportInterviews');
-Route::get('/monthReportireCandidate', 'StatisticsController@MailmonthReportHireCandidate');
+Route::get('/monthReportHireCandidate', 'StatisticsController@MailmonthReportHireCandidate');
 
 //Emaile dotyczące statystyk oddziałów
 Route::get('/monthReportSummaryDepartments', 'StatisticsController@MailMonthReportDepartments');
@@ -493,7 +493,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     //Dzienny
     Route::get('/pageDayReportRecruitmentFlow','StatisticsController@pageDayReportRecruitmentFlow');
-    Route::get('/pageDayReportTrainingGroup','StatisticsController@pageDayReportTrainingGroup');
+    Route::get('/pageDayReportRecruitmentTrainingGroup','StatisticsController@pageDayReportTrainingGroup');
     Route::get('/pageDayReportInterviews','StatisticsController@pageDayReportInterviews');
     Route::get('/pageDayReportHireCandidate','StatisticsController@pageDayReportHireCandidate');
     //Tygodniowy
