@@ -150,7 +150,7 @@ validationResult = false;
 return false;
 }
 
-if ($('#user_scan')[0].files[0].size > 2097152) {
+if ($('#user_scan')[0].files[0].size > 5242880) {
 swal('Rozmiar pliku przekracza 2 MB!');
 validationResult = false;
 return false;

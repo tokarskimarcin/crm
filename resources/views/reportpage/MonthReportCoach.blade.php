@@ -31,22 +31,33 @@
         </div>
     </div>
 
-    @isset($coachData)
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="panel panel-default">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div id="start_stop">
-                                <div class="panel-body">
-                                    @include('mail.monthReportCoach')
+    @if(isset($coachData))
+        @if($coachData->count() > 0)
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div id="start_stop">
+                                    <div class="panel-body">
+                                        @include('mail.monthReportCoach')
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        @else
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-danger">
+                        Brak statystyk dla danego trenera!
+                    </div>
+                </div>
+            </div>
+        @endif
+
     @endif
 
     </div>
