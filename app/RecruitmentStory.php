@@ -130,6 +130,7 @@ class RecruitmentStory extends Model
             ->where('user.user_type_id','=','5')
             ->groupby('users.id_manager')
             ->having('add_user','!=',0)
+            ->orderBy('add_user','desc')
             ->get();
         return $date;
     }
