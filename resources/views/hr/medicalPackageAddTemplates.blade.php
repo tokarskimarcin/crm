@@ -99,13 +99,13 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label>Numer domu:</label>
-                        <input type="number" class="form-control" placeholder="000" name="house_number[]">
+                        <input type="text" class="form-control" placeholder="000" name="house_number[]">
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
                         <label>Numer mieszkania:</label>
-                        <input type="number" class="form-control" placeholder="000" name="flat_number[]">
+                        <input type="text" class="form-control" placeholder="000" name="flat_number[]">
                     </div>
                 </div>
             </div>
@@ -189,13 +189,13 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Numer domu:</label>
-                            <input type="number" class="form-control" placeholder="000" name="house_number[]">
+                            <input type="text" class="form-control" placeholder="000" name="house_number[]">
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Numer mieszkania:</label>
-                            <input type="number" class="form-control" placeholder="000" name="flat_number[]">
+                            <input type="text" class="form-control" placeholder="000" name="flat_number[]">
                         </div>
                     </div>
                 </div>
