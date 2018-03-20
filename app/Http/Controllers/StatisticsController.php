@@ -2361,13 +2361,13 @@ class StatisticsController extends Controller
                 ->where('users.id', '!=', 4592) // tutaj szczesna
                 ->get();
 
-            $szczesny = new User();
-            $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
-            $szczesny->first_name = 'Bartosz';
-            $szczesny->last_name = 'Szczęsny';
-            $accepted_users->push($szczesny);
+//            $szczesny = new User();
+//            $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
+//            $szczesny->first_name = 'Bartosz';
+//            $szczesny->last_name = 'Szczęsny';
+//            $accepted_users->push($szczesny);
         }
-dd($accepted_users);
+dd($mail_type2);
 //    $accepted_users = [
 //        'cytawa.verona@gmail.com',
 //        'jarzyna.verona@gmail.com'
