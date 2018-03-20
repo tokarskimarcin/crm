@@ -101,6 +101,7 @@
                                 <tr>
                                     <td>Pracownik HR</td>
                                     <td>Kandydat</td>
+                                    <td>Nr telefonu</td>
                                     <td>Data</td>
                                     <td>Status</td>
                                     <td>Wynik Statusu</td>
@@ -144,6 +145,7 @@
             "autoWidth": false,
             "processing": true,
             "serverSide": true,
+            "searching": false,
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
             }, "ajax": {
@@ -162,12 +164,17 @@
                 {
                     "data": function (data, type, dataToSet) {
                         return data.cadre_last_name+' '+data.cadre_first_name;
-                    },"name":"cadre_last_name"
+                    },"name":"candidate_last_name"
                 },
                 {
                     "data": function (data, type, dataToSet) {
                         return data.candidate_last_name+' '+data.candidate_first_name;
                     },"name":"candidate_last_name"
+                },
+                {
+                    "data": function (data, type, dataToSet) {
+                        return data.candidate_phone;
+                    },"name":"candidate_phone"
                 },
                 {"data": "created_at"},
                 {"data": "attempt_status_name"},
