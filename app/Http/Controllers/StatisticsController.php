@@ -1511,7 +1511,7 @@ class StatisticsController extends Controller
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
         $title = 'Dzienny Raport Rozmów Rekrutacyjnych '. date('Y-m-d');
-        $this->sendMailByVerona('recruitmentMail.dayReportInterviews', $data, $title);
+        $this->sendMailByVerona('recruitmentMail.dayReportHireCandidate', $data, $title);
     }
 
 
@@ -1538,7 +1538,7 @@ class StatisticsController extends Controller
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
         $title = 'Tygodniowy Raport Rozmów Rekrutacyjnych '.$date_start.' - '.$date_stop;
-        $this->sendMailByVerona('recruitmentMail.weekReportInterviews', $data, $title);
+        $this->sendMailByVerona('recruitmentMail.weekReportHireCandidate', $data, $title);
     }
 
 
@@ -1569,7 +1569,7 @@ class StatisticsController extends Controller
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
         $title = 'Miesięczny Raport Rozmów Rekrutacyjnych '.$date_start.' - '.$date_stop;
-        $this->sendMailByVerona('recruitmentMail.monthReportInterviews', $data, $title);
+        $this->sendMailByVerona('recruitmentMail.monthReportHireCandidate', $data, $title);
     }
 
 
@@ -2372,7 +2372,7 @@ return "Raport w przygotowaniu";
 //        'cytawa.verona@gmail.com',
 //        'jarzyna.verona@gmail.com'
 //    ];
-//
+
 //        $mail_type = $mail_type_pom;
 //     Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
 //     {
