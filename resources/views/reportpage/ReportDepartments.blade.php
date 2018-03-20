@@ -20,8 +20,9 @@
                             @endforeach
                         </optgroup>
                         <optgroup label="Dyrektorzy">
-                            <option value="101">Daniel Abramowicz</option>
-                            <option value="102">Sylwia Kwiecień</option>
+                            @foreach($directors as $director)
+                                <option value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
+                            @endforeach
                         </optgroup>
                     </select>
                 </div>

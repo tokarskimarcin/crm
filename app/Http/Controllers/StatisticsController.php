@@ -1584,6 +1584,9 @@ class StatisticsController extends Controller
 
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+        $directors = User::whereIn('id', $directorsIds)->get();
+
         $dep_id = $departments->first()->id;
 
         $data = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep_id, $days_in_month);
@@ -1603,7 +1606,8 @@ class StatisticsController extends Controller
                 'departments'       => $departments,
                 'dep_id'            => $dep_id,
                 'months'            => $data['months'],
-                'wiev_type'         => 'department'
+                'wiev_type'         => 'department',
+                'directors'         => $directors
             ]);
     }
 
@@ -1613,6 +1617,8 @@ class StatisticsController extends Controller
         $last_day = date('Y-m-') . date('t', strtotime($request->month_selected));
         $month = $request->month_selected;
         $year = date('Y');
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+        $directors = User::whereIn('id', $directorsIds)->get();
 
         if (intval($request->selected_dep) < 100) {
             $dep_id = $request->selected_dep;
@@ -1636,16 +1642,19 @@ class StatisticsController extends Controller
                     'departments'       => $departments,
                     'dep_id'            => $dep_id,
                     'months'            => $data['months'],
-                    'wiev_type'         => 'department'
+                    'wiev_type'         => 'department',
+                    'directors'         => $directors
                 ]);
         } else {
             if (Auth::user()->id != 4796) {
                 return "Raport w przygotowaniu";
             }
+            $dirId = substr($request->selected_dep, 2);
+            $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
 
             $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
-            $data = $this->getMultiDepartmentData($first_day, $last_day, $month, $year, [2,10,11,8], $days_in_month);
+            $data = $this->getMultiDepartmentData($first_day, $last_day, $month, $year, $director_departments->pluck('id')->toArray(), $days_in_month);
 
             return view('reportpage.ReportDepartments')
                 ->with([
@@ -1662,7 +1671,8 @@ class StatisticsController extends Controller
                     'departments'       => $departments,
                     'dep_id'            => 101,
                     'months'            => $data['months'],
-                    'wiev_type'         => 'director'
+                    'wiev_type'         => 'director',
+                    'directors'         => $directors
                 ]);
         }
     }
@@ -1821,7 +1831,7 @@ class StatisticsController extends Controller
                 foreach ($reports as $item) {
                     $tempReport->success += $item->success;
 
-                    $login_time_array = explode(":", $item->login_time);
+                    $login_time_array = explode(":", $item->login_time); //Tutaj coś pierdoli ze nie ma login_time (sprawdzic czu isteniją te gowna chhodciaz powinny)
                     $tempReport->login_time += (($login_time_array[0] * 3600) + ($login_time_array[1] * 60) + $login_time_array[2]);
                     $tempReport->hour_time_use += floatval($item->hour_time_use);
 
