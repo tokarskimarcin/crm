@@ -19,7 +19,7 @@
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->first_name}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->last_name}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->name}}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->name.' '.$item->dep_type}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->add_user}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->add_candidate}}</td>
         </tr>
