@@ -56,7 +56,7 @@ class RecruitmentStory extends Model
             ->wherebetween('candidate.created_at',[$data_start.' 00:00:00',$data_stop.' 23:00:00'])
             ->where('users.user_type_id','=','5')
             ->groupBy('candidate.cadre_id')
-            ->orderBy('count_flow')
+            ->orderBy('count_flow','desc')
             ->get();
         return $result;
     }
@@ -94,7 +94,7 @@ class RecruitmentStory extends Model
                 ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
                 ->whereBetween('interview_date', [$date_start . ' 01:00:00', $date_stop . ' 23:00:00'])
                 ->groupBy('users.department_info_id')
-                ->orderBy('counted')
+                ->orderBy('counted','desc')
                 ->get();
         } else if ($select_type == 1) {
             $data = DB::table('recruitment_attempt')
@@ -106,7 +106,7 @@ class RecruitmentStory extends Model
                 ->join('users', 'users.id', 'recruitment_attempt.cadre_id')
                 ->whereBetween('interview_date', [$date_start . ' 01:00:00', $date_stop . ' 23:00:00'])
                 ->groupBy('users.id')
-                ->orderBy('counted')
+                ->orderBy('counted','desc')
                 ->get();
         }
         return $data;
