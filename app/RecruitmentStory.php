@@ -127,7 +127,7 @@ class RecruitmentStory extends Model
             ->leftjoin('candidate','candidate.id','users.candidate_id')
             ->join('department_info','department_info.id','users.department_info_id')
             ->join('departments','departments.id','department_info.id_dep')
-            ->where('users.user_type_id','=','5')
+            ->where('user.user_type_id','=','5')
             ->groupby('users.id_manager')
             ->having('add_user','!=',0)
             ->get();
