@@ -1572,8 +1572,6 @@ class StatisticsController extends Controller
         $this->sendMailByVerona('recruitmentMail.monthReportHireCandidate', $data, $title);
     }
 
-
-
     /**
      * Raport oddziały
      */
@@ -1641,8 +1639,10 @@ class StatisticsController extends Controller
                     'wiev_type'         => 'department'
                 ]);
         } else {
-//            $dep_id = $request->selected_dep;
-return "Raport w przygotowaniu";
+            if (Auth::user()->id != 4796) {
+                return "Raport w przygotowaniu";
+            }
+
             $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
             $data = $this->getMultiDepartmentData($first_day, $last_day, $month, $year, [2,10,11,8], $days_in_month);
