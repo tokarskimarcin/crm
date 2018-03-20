@@ -1291,8 +1291,8 @@ class StatisticsController extends Controller
      * Wyswietlanie spływu rekrutacji Miesięczny
      */
     public function pageMonthReportRecruitmentFlow(){
-        $month_ini = new DateTime("first day of last month");
-        $month_end = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of this month");
+        $month_end = new DateTime("last day of this month");
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
         $data = [
@@ -1376,8 +1376,8 @@ class StatisticsController extends Controller
      * Wyświetlanie przeprowadzonych szkoleń Miesięczny
      */
     public function pageMonthReportTrainingGroup(){
-        $month_ini = new DateTime("first day of last month");
-        $month_end = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of this month");
+        $month_end = new DateTime("last day of this month");
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
         $data = [
@@ -1462,8 +1462,8 @@ class StatisticsController extends Controller
      */
 
     public function pageMonthReportInterviews(){
-        $month_ini = new DateTime("first day of last month");
-        $month_end = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of this month");
+        $month_end = new DateTime("last day of this month");
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
         $data = [
@@ -1546,8 +1546,8 @@ class StatisticsController extends Controller
      * Raport zatrudnienie Miesięczny
      */
     public function pageMonthReportHireCandidate(){
-        $month_ini = new DateTime("first day of last month");
-        $month_end = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of this month");
+        $month_end = new DateTime("last day of this month");
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
         $data = [

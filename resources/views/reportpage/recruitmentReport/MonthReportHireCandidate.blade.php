@@ -6,7 +6,7 @@
         <div class="col-lg-12">
             <div class="page-header">
                 <div class="alert gray-nav">Miesięczny Raport Zatrudnionych Kandydatów</div>
-            </div>Miesięczny Raport Zatrudnionych Kandydatów</h1>
+            </div>
         </div>
     </div>
     <div class="row">
