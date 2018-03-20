@@ -2331,6 +2331,13 @@ class StatisticsController extends Controller
 
     private function sendMailByVerona($mail_type, $data, $mail_title, $default_users = null) {
         if ($default_users !== null) {
+            $email = [];
+            $mail_type_pom = $mail_type;
+            $mail_without_folder = explode(".",$mail_type);
+            // podfoldery
+            $mail_type = $mail_without_folder[count($mail_without_folder)-1];
+            $mail_type2 = ucfirst($mail_type);
+            $mail_type2 = 'page' . $mail_type2;
             $accepted_users = $default_users;
         } else {
             $email = [];
