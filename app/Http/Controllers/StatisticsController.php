@@ -1505,8 +1505,8 @@ class StatisticsController extends Controller
      *  Maila przeprowadzonych rozmów Dzienny
      */
     public function MaildayReportHireCandidate(){
-        $date_start = date('Y-m-d', time() - 24 * 3600)
-        $date_stop = date('Y-m-d', time() - 24 * 3600)
+        $date_start = date('Y-m-d', time() - 24 * 3600);
+        $date_stop = date('Y-m-d', time() - 24 * 3600);
         $data = [
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
