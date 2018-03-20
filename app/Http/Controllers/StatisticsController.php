@@ -1250,8 +1250,8 @@ class StatisticsController extends Controller
      */
 
     public function MaildayReportRecruitmentFlow() {
-        $date_start = date('Y-m-d');
-        $date_stop = date('Y-m-d');
+        $date_start = date('Y-m-d', time() - 24 * 3600);
+        $date_stop = date('Y-m-d', time() - 24 * 3600);
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
         ];
@@ -1337,8 +1337,8 @@ class StatisticsController extends Controller
      * Mail przeprowadzonych szkoleń
      */
     public function MaildayReportTrainingGroup() {
-        $date_start = date('Y-m-d');
-        $date_stop = date('Y-m-d');
+        $date_start = date('Y-m-d', time() - 24 * 3600);
+        $date_stop = date('Y-m-d', time() - 24 * 3600);
         $data = [
             'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
         ];
@@ -1420,8 +1420,8 @@ class StatisticsController extends Controller
      *  Maila przeprowadzonych rozmów Dzienny
      */
     public function MaildayReportInterviews(){
-        $date_start = date('Y-m-d');
-        $date_stop = date('Y-m-d');
+        $date_start = date('Y-m-d', time() - 24 * 3600);
+        $date_stop = date('Y-m-d', time() - 24 * 3600);
         $data = [
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
@@ -1492,7 +1492,7 @@ class StatisticsController extends Controller
      * Raport zatrudnienie
      */
     public function pageDayReportHireCandidate(){
-        $date_start = "2018-01-01";//date('Y-m-d');
+        $date_start = date('Y-m-d');
         $date_stop = date('Y-m-d');
         $data = [
             'data' => RecruitmentStory::getReportNewAccountData($date_start,$date_stop,0)
@@ -1505,8 +1505,8 @@ class StatisticsController extends Controller
      *  Maila przeprowadzonych rozmów Dzienny
      */
     public function MaildayReportHireCandidate(){
-        $date_start = date('Y-m-d');
-        $date_stop = date('Y-m-d');
+        $date_start = date('Y-m-d', time() - 24 * 3600);
+        $date_stop = date('Y-m-d', time() - 24 * 3600);
         $data = [
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
