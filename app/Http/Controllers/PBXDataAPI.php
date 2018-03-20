@@ -235,7 +235,6 @@ class PBXDataAPI extends Controller
                 }
                 $row++;
             }
-            dd($data_to_insert);
             Pbx_report_extension::insert($data_to_insert);
             fclose($handle);
         }

@@ -1603,7 +1603,8 @@ class StatisticsController extends Controller
                 'month_selected'    => date('m'),
                 'departments'       => $departments,
                 'dep_id'            => $dep_id,
-                'months'            => $data['months']
+                'months'            => $data['months'],
+                'wiev_type'         => 'department'
             ]);
     }
 
@@ -1635,7 +1636,8 @@ class StatisticsController extends Controller
                     'month_selected'    => $request->month_selected,
                     'departments'       => $departments,
                     'dep_id'            => $dep_id,
-                    'months'            => $data['months']
+                    'months'            => $data['months'],
+                    'wiev_type'         => 'department'
                 ]);
         } else {
 //            $dep_id = $request->selected_dep;
@@ -1658,7 +1660,8 @@ class StatisticsController extends Controller
                     'month_selected'    => $request->month_selected,
                     'departments'       => $departments,
                     'dep_id'            => 101,
-                    'months'            => $data['months']
+                    'months'            => $data['months'],
+                    'wiev_type'         => 'director'
                 ]);
         }
     }
@@ -1727,6 +1730,39 @@ class StatisticsController extends Controller
             ->whereIn('id', $jankyIds->pluck('id')->toArray())
             ->get();
 
+        $newYanky = [];
+        for ($i = 1; $i <= $days_in_month; $i++) {
+            $day = ($i < 10) ? '0' . $i : $i ;
+            $loop_date = $year . '-' . $month . '-' . $day;
+
+            if ($yanky->where('report_date', '=', $loop_date)->count() > 0) {
+               $tempYanek = new \stdClass();
+
+               $tempYanek->report_date = $loop_date;
+               $tempYanek->consultant_without_check = 0;
+               $tempYanek->online_consultant = 0;
+               $tempYanek->success = 0;
+               $tempYanek->count_all_check = 0;
+               $tempYanek->count_good_check = 0;
+               $tempYanek->count_bad_check = 0;
+               $tempYanek->all_jaky_disagreement = 0;
+               $tempYanek->good_jaky_disagreement = 0;
+
+               foreach($yanky->where('report_date', '=', $loop_date) as $item) {
+                   $tempYanek->consultant_without_check += $item->consultant_without_check;
+                   $tempYanek->online_consultant += $item->online_consultant;
+                   $tempYanek->success += $item->success;
+                   $tempYanek->count_all_check += $item->count_all_check;
+                   $tempYanek->count_good_check += $item->count_good_check;
+                   $tempYanek->count_bad_check += $item->count_bad_check;
+                   $tempYanek->all_jaky_disagreement += $item->all_jaky_disagreement;
+                   $tempYanek->good_jaky_disagreement += $item->good_jaky_disagreement;
+               }
+
+               $newYanky[] = $tempYanek;
+            }
+        }
+        //dd($yanky);
         /**
          * Pobranie danych z grafiku
          */
@@ -1762,6 +1798,41 @@ class StatisticsController extends Controller
             return $item->first();
         });
 
+        $reps = [];
+
+        for ($i = 1; $i <= $days_in_month; $i++) {
+            $day = ($i < 10) ? '0' . $i : $i ;
+            $loop_date = $year . '-' . $month . '-' . $day;
+
+            if ($hourReports->where('report_date', '=', $loop_date)->count() > 0) {
+                $reports = $hourReports->where('report_date', '=', $loop_date);
+
+                $tempReport = new \stdClass();
+                $tempReport->report_date = $loop_date;
+                $tempReport->average = 0;
+                $tempReport->success = 0;
+                $tempReport->janky_count = 0;
+                $tempReport->wear_base = 0;
+                $tempReport->call_time = 0;
+                $tempReport->login_time = 0;
+                $tempReport->hour_time_use = 0;
+
+                foreach ($reports as $item) {
+                    $tempReport->success += $item->success;
+
+                    $login_time_array = explode(":", $item->login_time);
+                    $tempReport->login_time += (($login_time_array[0] * 3600) + ($login_time_array[1] * 60) + $login_time_array[2]);
+                    $tempReport->hour_time_use += floatval($item->hour_time_use);
+
+                }
+                $tempReport->average = ($tempReport->hour_time_use > 0) ? round($tempReport->success / $tempReport->hour_time_use, 2) : 0 ;
+                $tempReport->login_time = sprintf('%02d:%02d:%02d', ($tempReport->login_time/3600),($tempReport->login_time/60%60), $tempReport->login_time%60);
+
+                $reps[] = $tempReport;
+            }
+        }
+        //dd($reps);
+        $hourReports = collect($reps);
         /**
          * Przypisanie danych do jednego obiektu
          */
@@ -1785,7 +1856,7 @@ class StatisticsController extends Controller
         /**
          * Pobranie danych departamentu
          */
-        $dep_info = Department_info::find(2); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TUTAJ ZMIENIC na cos związanego z tym dla kogo generowany jest raport
+        $dep_info = Department_info::whereIn('id',[2,10,11,8])->get(); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TUTAJ ZMIENIC na cos związanego z tym dla kogo generowany jest raport
 
         /**
          * Tabela z miesiącami
@@ -1811,7 +1882,7 @@ class StatisticsController extends Controller
             'month' => $month,
             'year' => $year,
             'hour_reports' => $newHourReports,
-            'dep_info' =>$dep_info,
+            'dep_info' => $dep_info,
             'schedule_data' => $schedule_data,
             'months' => $months
         ];
@@ -2184,7 +2255,8 @@ class StatisticsController extends Controller
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
         foreach($departments as $department) {
-            $menager = User::where('id', '=', $department->menager_id)->get();
+            //$menager = User::where('id', '=', $department->menager_id)->get();
+            $menager = User::where('id', '=', 4796)->get();
 
             $date_start = date('Y-m-') . '01';
             $date_stop = date('Y-m-t');
@@ -2237,7 +2309,7 @@ class StatisticsController extends Controller
             $szczesny->last_name = 'Szczęsny';
             $accepted_users->push($szczesny);
         }
-dd($data);
+
 
 //    $accepted_users = [
 //        'cytawa.verona@gmail.com',
