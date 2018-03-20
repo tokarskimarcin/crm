@@ -159,6 +159,7 @@
                                     <th>Komentarz</th>
                                     <th style="width: 15%">Data</th>
                                     <th style="width: 15%">Godzina</th>
+                                    <th style="width: 15%">Telefon</th>
                                     <th style="width: 15%">Szczegóły</th>
                                 </thead>
                                 <tbody id="my_interviews">
@@ -334,6 +335,7 @@ function myInterviews(start_search, stop_search) {
                         <td>Komentarz</td>
                         <td>${value.interview_date.substr(0, 10)}</td>
                         <td>${value.interview_date.substr(11, 20)}</td>
+                        <td>${value.user_phone}</td>
                         <td>
                             <a class="btn btn-info" href="{{ URL::to('/candidateProfile') }}/${value.candidate_id}">
                                 <span class="glyphicon glyphicon-ok"></span> Profil kandydata

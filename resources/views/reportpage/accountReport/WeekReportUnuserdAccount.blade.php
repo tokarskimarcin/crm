@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="page-header">
-                <div class="alert gray-nav">Miesięczny Raport Zatrudnionych Kandydatów</div>
+                <div class="alert gray-nav">Tygodniowy Raport Nieaktywnych Kont Konsultantów</div>
             </div>
         </div>
     </div>
@@ -16,7 +16,7 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <div class="panel-body">
-                                        @include('mail.recruitmentMail.monthReportHireCandidate')
+                                        @include('mail.accountMail.weekReportUnuserdAccount')
                                     </div>
                                 </div>
                             </div>

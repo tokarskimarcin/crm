@@ -243,12 +243,21 @@ Route::get('/weekReportTrainingGroup', 'StatisticsController@MailweekReportTrain
 Route::get('/weekReportInterviews', 'StatisticsController@MailweekReportInterviews');
 Route::get('/weekReportireCandidate', 'StatisticsController@MailweekReportHireCandidate');
 
+Route::get('/monthReportRecruitmentFlow', 'StatisticsController@MailmonthReportRecruitmentFlow');
+Route::get('/monthReportTrainingGroup', 'StatisticsController@MailmonthReportTrainingGroup');
+Route::get('/monthReportInterviews', 'StatisticsController@MailmonthReportInterviews');
+Route::get('/monthReportireCandidate', 'StatisticsController@MailmonthReportHireCandidate');
+
 //Emaile dotyczące statystyk oddziałów
 Route::get('/monthReportSummaryDepartments', 'StatisticsController@MailMonthReportDepartments');
 
 Route::get('/dayReportDepartments', 'StatisticsController@MailDayDepartmentsReport');
 
 //Maila dotyczące wyłączonych kont
+//Raport Usunietych kont
+Route::get('/weekReportUnuserdAccount','StatisticsController@MailWeekReportUnuserdAccount');
+
+//wyłączenie danych użytkowników którzy nie logowali się już 14 dni i więcej
 Route::GET('/disableUnusedAccount', 'UsersController@DisableUnusedAccount');
 
 
@@ -484,6 +493,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 
     //Raporty Rekrutacji
+
     //Dzienny
     Route::get('/pageDayReportRecruitmentFlow','StatisticsController@pageDayReportRecruitmentFlow');
     Route::get('/pageDayReportTrainingGroup','StatisticsController@pageDayReportTrainingGroup');
@@ -500,6 +510,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageMonthReportInterviews','StatisticsController@pageMonthReportInterviews');
     Route::get('/pageMonthReportHireCandidate','StatisticsController@pageMonthReportHireCandidate');
 
+
+    //Raport Usunietych kont
+    Route::get('/pageWeekReportUnuserdAccount','StatisticsController@pageWeekReportUnuserdAccount');
     //Report Page STOP
 
     //TESTS START //

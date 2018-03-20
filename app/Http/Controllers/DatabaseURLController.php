@@ -234,6 +234,14 @@ class DatabaseURLController extends Controller
             ->where('users.status_work', '=', 1)
             ->where('users.id', '!=', 4592) // tutaj szczesna
             ->get();
+
+
+        $user3 = new User();
+        $user3->username = 'kamil.kostecki@veronaconsulting.pl';
+        $user3->first_name = 'Kamil';
+        $user3->last_name = 'Kostecki';
+        $accepted_users->push($user3);
+
         $user = new User();
         $user->username = 'daniel.abramowicz@veronaconsulting.pl';
         $user->first_name = 'Daniel';
@@ -245,6 +253,8 @@ class DatabaseURLController extends Controller
         $user2->first_name = 'Sylwia';
         $user2->last_name = 'Kwiecień';
         $accepted_users->push($user2);
+
+
         /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
         Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
         {

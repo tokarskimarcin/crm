@@ -156,6 +156,7 @@ class RecruitmentAttemptController extends Controller
                     recruitment_attempt.*,
                     candidate.first_name as user_name,
                     candidate.last_name as user_surname,
+                    candidate.phone as user_phone,
                     candidate.id as candidate_id
                 '))
                 ->join('candidate', 'candidate.id', 'recruitment_attempt.candidate_id')

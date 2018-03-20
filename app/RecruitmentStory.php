@@ -48,12 +48,15 @@ class RecruitmentStory extends Model
     public static function getReportFlowData($data_start,$data_stop){
         $result = DB::table('candidate')
             ->select(DB::Raw("users.first_name,users.last_name,count(candidate.id) as count_flow,
-                `departments`.`name`"))
+                `departments`.`name`,`department_type`.`name` as dep_type"))
             ->join('users','users.id','candidate.cadre_id')
             ->join('department_info','department_info.id','users.department_info_id')
             ->join('departments','departments.id','department_info.id_dep')
+            ->join('department_type','department_type.id','department_info.id_dep_type')
             ->wherebetween('candidate.created_at',[$data_start.' 00:00:00',$data_stop.' 23:00:00'])
+            ->where('users.user_type_id','=','5')
             ->groupBy('candidate.cadre_id')
+            ->orderBy('count_flow','desc')
             ->get();
         return $result;
     }
@@ -91,6 +94,7 @@ class RecruitmentStory extends Model
                 ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
                 ->whereBetween('interview_date', [$date_start . ' 01:00:00', $date_stop . ' 23:00:00'])
                 ->groupBy('users.department_info_id')
+                ->orderBy('counted','desc')
                 ->get();
         } else if ($select_type == 1) {
             $data = DB::table('recruitment_attempt')
@@ -102,6 +106,7 @@ class RecruitmentStory extends Model
                 ->join('users', 'users.id', 'recruitment_attempt.cadre_id')
                 ->whereBetween('interview_date', [$date_start . ' 01:00:00', $date_stop . ' 23:00:00'])
                 ->groupBy('users.id')
+                ->orderBy('counted','desc')
                 ->get();
         }
         return $data;
@@ -117,13 +122,16 @@ class RecruitmentStory extends Model
          sum(Case when `users`.`candidate_id` is not null and `users`.`start_work` between "'.$date_start.'" and "'.$date_stop.'" 
           and `candidate`.`created_at` < `users`.`created_at`
          then 1 else 0 end ) as add_candidate
-         ,`user`.`first_name`,`user`.`last_name`,`departments`.`name`'))
+         ,`user`.`first_name`,`user`.`last_name`,`departments`.`name`,`department_type`.`name` as dep_type'))
             ->join('users as user','user.id','users.id_manager')
             ->leftjoin('candidate','candidate.id','users.candidate_id')
             ->join('department_info','department_info.id','users.department_info_id')
             ->join('departments','departments.id','department_info.id_dep')
+            ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
+            ->where('user.user_type_id','=','5')
             ->groupby('users.id_manager')
             ->having('add_user','!=',0)
+            ->orderBy('add_user','desc')
             ->get();
         return $date;
     }

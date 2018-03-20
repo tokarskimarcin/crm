@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DisableAccountInfo;
 use App\HourReport;
 use App\Pbx_report_extension;
 use App\PBXDKJTeam;
@@ -1249,8 +1250,8 @@ class StatisticsController extends Controller
      */
 
     public function MaildayReportRecruitmentFlow() {
-        $date_start = date('Y-m-d');
-        $date_stop = date('Y-m-d');
+        $date_start = date('Y-m-d', time() - 24 * 3600);
+        $date_stop = date('Y-m-d', time() - 24 * 3600);
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
         ];
@@ -1290,8 +1291,8 @@ class StatisticsController extends Controller
      * Wyswietlanie spływu rekrutacji Miesięczny
      */
     public function pageMonthReportRecruitmentFlow(){
-        $month_ini = new DateTime("first day of last month");
-        $month_end = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of this month");
+        $month_end = new DateTime("last day of this month");
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
         $data = [
@@ -1336,8 +1337,8 @@ class StatisticsController extends Controller
      * Mail przeprowadzonych szkoleń
      */
     public function MaildayReportTrainingGroup() {
-        $date_start = date('Y-m-d');
-        $date_stop = date('Y-m-d');
+        $date_start = date('Y-m-d', time() - 24 * 3600);
+        $date_stop = date('Y-m-d', time() - 24 * 3600);
         $data = [
             'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
         ];
@@ -1375,8 +1376,8 @@ class StatisticsController extends Controller
      * Wyświetlanie przeprowadzonych szkoleń Miesięczny
      */
     public function pageMonthReportTrainingGroup(){
-        $month_ini = new DateTime("first day of last month");
-        $month_end = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of this month");
+        $month_end = new DateTime("last day of this month");
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
         $data = [
@@ -1419,8 +1420,8 @@ class StatisticsController extends Controller
      *  Maila przeprowadzonych rozmów Dzienny
      */
     public function MaildayReportInterviews(){
-        $date_start = date('Y-m-d');
-        $date_stop = date('Y-m-d');
+        $date_start = date('Y-m-d', time() - 24 * 3600);
+        $date_stop = date('Y-m-d', time() - 24 * 3600);
         $data = [
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
@@ -1461,8 +1462,8 @@ class StatisticsController extends Controller
      */
 
     public function pageMonthReportInterviews(){
-        $month_ini = new DateTime("first day of last month");
-        $month_end = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of this month");
+        $month_end = new DateTime("last day of this month");
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
         $data = [
@@ -1491,7 +1492,7 @@ class StatisticsController extends Controller
      * Raport zatrudnienie
      */
     public function pageDayReportHireCandidate(){
-        $date_start = "2018-01-01";//date('Y-m-d');
+        $date_start = date('Y-m-d');
         $date_stop = date('Y-m-d');
         $data = [
             'data' => RecruitmentStory::getReportNewAccountData($date_start,$date_stop,0)
@@ -1504,8 +1505,8 @@ class StatisticsController extends Controller
      *  Maila przeprowadzonych rozmów Dzienny
      */
     public function MaildayReportHireCandidate(){
-        $date_start = date('Y-m-d');
-        $date_stop = date('Y-m-d');
+        $date_start = date('Y-m-d', time() - 24 * 3600);
+        $date_stop = date('Y-m-d', time() - 24 * 3600);
         $data = [
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
@@ -1545,8 +1546,8 @@ class StatisticsController extends Controller
      * Raport zatrudnienie Miesięczny
      */
     public function pageMonthReportHireCandidate(){
-        $month_ini = new DateTime("first day of last month");
-        $month_end = new DateTime("last day of last month");
+        $month_ini = new DateTime("first day of this month");
+        $month_end = new DateTime("last day of this month");
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
         $data = [
@@ -2248,6 +2249,56 @@ class StatisticsController extends Controller
         $this->sendMailByVerona('summaryReportDepartment', $data, $title);
     }
 
+    /*
+     *  Strona z informacją o dezaktywowanych kontach
+     */
+
+    public function pageWeekReportUnuserdAccount(){
+
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = $this::UnuserdAccount(1);
+        return view('reportpage.accountReport.WeekReportUnuserdAccount')
+            ->with('department_info',$data['departments'])
+            ->with('users_warning',$data['users_warning'])
+            ->with('users_disable',$data['users_disable']);
+    }
+    public function MailWeekReportUnuserdAccount(){
+
+        $date_start = date('Y-m-d');
+        $date_stop = date('Y-m-d');
+        $data = $this::UnuserdAccount(1);
+        $title = 'Tygodniowy Raport Nieaktywnych Kont Konsultantów '.$date_start.' - '.$date_stop;
+
+        $this->sendMailByVerona('accountMail.weekReportUnuserdAccount', $data, $title);
+
+    }
+
+    public function UnuserdAccount($type){
+        $today = date("Y-m-d");
+        $date_warning = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_disable = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-14,date("Y")));
+
+
+        $users_warning = User::
+        wherebetween('last_login',[$date_disable,$date_warning])
+                    ->whereIn('users.user_type_id',[1,2])
+                    ->where('status_work','=',1)
+                    ->get();
+
+        $users_disable = DisableAccountInfo::
+                    wherebetween('disable_date',[$date_warning,$today])
+                        ->get();
+        $departmnets = Department_info::all();
+        $data = [
+            'users_warning'     => $users_warning,
+            'users_disable'     => $users_disable,
+            'departments'       => $departmnets
+        ];
+        return $data;
+
+    }
+
     /**
      * Metoda wysyłająca dziennie raport do kierwników oddziałów
      */
@@ -2327,7 +2378,7 @@ class StatisticsController extends Controller
 //        }
 //     });
 //
-
+        $mail_type = $mail_type_pom;
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
        {
