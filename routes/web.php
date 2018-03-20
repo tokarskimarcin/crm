@@ -243,6 +243,11 @@ Route::get('/weekReportTrainingGroup', 'StatisticsController@MailweekReportTrain
 Route::get('/weekReportInterviews', 'StatisticsController@MailweekReportInterviews');
 Route::get('/weekReportireCandidate', 'StatisticsController@MailweekReportHireCandidate');
 
+Route::get('/monthReportRecruitmentFlow', 'StatisticsController@MailmonthReportRecruitmentFlow');
+Route::get('/monthReportTrainingGroup', 'StatisticsController@MailmonthReportTrainingGroup');
+Route::get('/monthReportInterviews', 'StatisticsController@MailmonthReportInterviews');
+Route::get('/monthReportireCandidate', 'StatisticsController@MailmonthReportHireCandidate');
+
 //Emaile dotyczące statystyk oddziałów
 Route::get('/monthReportSummaryDepartments', 'StatisticsController@MailMonthReportDepartments');
 
@@ -485,6 +490,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 
     //Raporty Rekrutacji
+
     //Dzienny
     Route::get('/pageDayReportRecruitmentFlow','StatisticsController@pageDayReportRecruitmentFlow');
     Route::get('/pageDayReportTrainingGroup','StatisticsController@pageDayReportTrainingGroup');
