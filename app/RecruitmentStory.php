@@ -122,11 +122,12 @@ class RecruitmentStory extends Model
          sum(Case when `users`.`candidate_id` is not null and `users`.`start_work` between "'.$date_start.'" and "'.$date_stop.'" 
           and `candidate`.`created_at` < `users`.`created_at`
          then 1 else 0 end ) as add_candidate
-         ,`user`.`first_name`,`user`.`last_name`,`departments`.`name`'))
+         ,`user`.`first_name`,`user`.`last_name`,`departments`.`name`,`department_type`.`name` as dep_type'))
             ->join('users as user','user.id','users.id_manager')
             ->leftjoin('candidate','candidate.id','users.candidate_id')
             ->join('department_info','department_info.id','users.department_info_id')
             ->join('departments','departments.id','department_info.id_dep')
+            ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
             ->where('user.user_type_id','=','5')
             ->groupby('users.id_manager')
             ->having('add_user','!=',0)
