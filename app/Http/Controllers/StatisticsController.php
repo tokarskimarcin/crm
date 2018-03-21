@@ -1255,7 +1255,7 @@ class StatisticsController extends Controller
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
         ];
-        $title = 'Raport Dzienny Spływu Rekrutacji ' . date('Y-m-d');
+        $title = 'Raport Dzienny Spływu Rekrutacji ' . $date_start;
         $this->sendMailByVerona('recruitmentMail.dayReportRecruitmentFlow', $data, $title);
     }
 
@@ -1342,7 +1342,7 @@ class StatisticsController extends Controller
         $data = [
             'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
         ];
-        $title = 'Raport Dzienny Szkoleń '. date('Y-m-d');
+        $title = 'Raport Dzienny Szkoleń '. $date_start;
         $this->sendMailByVerona('recruitmentMail.dayReportRecruitmentTrainingGroup', $data, $title);
     }
 
@@ -1425,7 +1425,7 @@ class StatisticsController extends Controller
         $data = [
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
-        $title = 'Dzienny Raport Rozmów Rekrutacyjnych '. date('Y-m-d');
+        $title = 'Dzienny Raport Rozmów Rekrutacyjnych '. $date_start;
         $this->sendMailByVerona('recruitmentMail.dayReportInterviews', $data, $title);
     }
 
@@ -1510,7 +1510,7 @@ class StatisticsController extends Controller
         $data = [
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
-        $title = 'Dzienny Raport Rozmów Rekrutacyjnych '. date('Y-m-d');
+        $title = 'Dzienny Raport Rozmów Rekrutacyjnych '. $date_start;
         $this->sendMailByVerona('recruitmentMail.dayReportHireCandidate', $data, $title);
     }
 
