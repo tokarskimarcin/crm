@@ -2309,8 +2309,7 @@ class StatisticsController extends Controller
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
         foreach($departments as $department) {
-            //$menager = User::where('id', '=', $department->menager_id)->get();
-            $menager = User::where('id', '=', 4796)->get();
+            $menager = User::whereIn('id', [$department->menager_id, 4796])->get();
 
             $date_start = date('Y-m-') . '01';
             $date_stop = date('Y-m-t');
