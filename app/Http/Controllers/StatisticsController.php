@@ -1669,7 +1669,7 @@ class StatisticsController extends Controller
                     'schedule_data'     => $data['schedule_data'],
                     'month_selected'    => $request->month_selected,
                     'departments'       => $departments,
-                    'dep_id'            => 101,
+                    'dep_id'            => $request->selected_dep,
                     'months'            => $data['months'],
                     'wiev_type'         => 'director',
                     'directors'         => $directors
@@ -1773,7 +1773,8 @@ class StatisticsController extends Controller
                $newYanky[] = $tempYanek;
             }
         }
-        //dd($yanky);
+        $newYanky = collect($newYanky);
+        //dd($newYanky);
         /**
          * Pobranie danych z grafiku
          */
@@ -1825,31 +1826,26 @@ class StatisticsController extends Controller
                 $tempReport->janky_count = 0;
                 $tempReport->wear_base = 0;
                 $tempReport->call_time = 0;
-                $tempReport->login_time = 0;
                 $tempReport->hour_time_use = 0;
 
                 foreach ($reports as $item) {
                     $tempReport->success += $item->success;
 
                     $login_time_array = explode(":", $item->login_time); //Tutaj coś pierdoli ze nie ma login_time (sprawdzic czu isteniją te gowna chhodciaz powinny)
-                    $tempReport->login_time += (($login_time_array[0] * 3600) + ($login_time_array[1] * 60) + $login_time_array[2]);
                     $tempReport->hour_time_use += floatval($item->hour_time_use);
-
                 }
                 $tempReport->average = ($tempReport->hour_time_use > 0) ? round($tempReport->success / $tempReport->hour_time_use, 2) : 0 ;
-                $tempReport->login_time = sprintf('%02d:%02d:%02d', ($tempReport->login_time/3600),($tempReport->login_time/60%60), $tempReport->login_time%60);
-
                 $reps[] = $tempReport;
             }
         }
-        //dd($reps);
+
         $hourReports = collect($reps);
         /**
          * Przypisanie danych do jednego obiektu
          */
-        $newHourReports = $hourReports->map(function($item) use ($yanky, $acceptHours) {
+        $newHourReports = $hourReports->map(function($item) use ($newYanky, $acceptHours) {
             //Pobranie danych z jankami
-            $toAdd = $yanky->where('report_date', '=', $item->report_date)->first();
+            $toAdd = $newYanky->where('report_date', '=', $item->report_date)->first();
 
             $item->count_all_check = ($toAdd != null) ? $toAdd->count_all_check : 0;
             $item->count_bad_check = ($toAdd != null) ? $toAdd->count_bad_check : 0;
