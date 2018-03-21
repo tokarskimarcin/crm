@@ -1020,7 +1020,7 @@
                             if (response.length != 0) {
                                 for (var i = 0; i < response.length; i++) {
                                     var html = '<a class="list-group-item nocheck" onclick = "onclickRowLeft(this)" id=' + response[i].id + '>' +
-                                        response[i].first_name + ' ' + response[i].last_name +
+                                        response[i].first_name + ' ' + response[i].last_name +' '+response[i].phone+
                                         '<input type="checkbox" class="pull-left" style="display: block">' +
                                         '</a>';
                                     if (response[i].attempt_status_id == 5 || response[i].attempt_status_id == 12) {
@@ -1066,39 +1066,39 @@
                                                             //ETAP 1
                                     if (response['candidate'][i].attempt_status_id == 5 && cancel_candidate == 0) {
                                         var html = '<a class="list-group-item nocheck" onclick = "onclickRowLeft(this)" id=' + response['candidate'][i].id + '>' +
-                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
+                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +' '+response['candidate'][i].phone+
                                             '<input type="checkbox" class="pull-left" style="display: block">' +
                                             '</a>';
                                         $('#list_candidate').append(html);
                                     } else if (response['candidate'][i].attempt_status_id == 6  && cancel_candidate == 0) {
                                         var html = '<a class="list-group-item nocheck" onclick = "onclickRowRight(this)" id=' + response['candidate'][i].id + '>' +
-                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
+                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +' '+response['candidate'][i].phone+
                                             '<input type="checkbox" class="pull-right" style="display: block">' +
                                             '</a>';
                                         $('#list_candidate_choice').append(html);
                                     }               //ETAP 2
                                     else if (response['candidate'][i].attempt_status_id == 12 && cancel_candidate == 0) {
                                         var html = '<a class="list-group-item nocheck" onclick = "onclickRowLeft(this)" id=' + response['candidate'][i].id + '>' +
-                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
+                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +' '+response['candidate'][i].phone+
                                             '<input type="checkbox" class="pull-left" style="display: block">' +
                                             '</a>';
                                         $('#list_candidate').append(html);
                                     } else if (response['candidate'][i].attempt_status_id == 13  && cancel_candidate == 0) {
                                         var html = '<a class="list-group-item nocheck" onclick = "onclickRowRight(this)" id=' + response['candidate'][i].id + '>' +
-                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
+                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +' '+response['candidate'][i].phone+
                                             '<input type="checkbox" class="pull-right" style="display: block">' +
                                             '</a>';
                                         $('#list_candidate_choice').append(html);
                                     }else if ((response['candidate'][i].attempt_status_id == 18 ||response['candidate'][i].attempt_status_id == 19 )  && cancel_candidate == 0) {
                                         var html = '<a class="list-group-item nocheck" onclick = "onclickRowRight(this)" id=' + response['candidate'][i].id + '>' +
-                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
+                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +' '+response['candidate'][i].phone+
                                             '<input type="checkbox" class="pull-right" style="display: block">' +
                                             '</a>';
                                         $('#list_candidate_choice_absent').append(html);
                                     }
                                     else if (cancel_candidate != 0) {
                                         var html = '<a class="list-group-item nocheck" id=' + response['candidate'][i].id + '>' +
-                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +
+                                            response['candidate'][i].first_name + ' ' + response['candidate'][i].last_name +' '+response['candidate'][i].phone+
                                             '</a>';
                                         if(cancel_candidate == 1)
                                             $('#list_candidate_choice_cancel').append(html);
