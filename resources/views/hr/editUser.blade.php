@@ -903,6 +903,14 @@ $(document).ready(function() {
         });
     });
 
+    /******* PBX input validation ******/
+    var pbx = $('#login_phone');
+    pbx.on('change', function() {
+        if(pbx.val() < 0) {
+            pbx.val(0);
+        }
+    });
+
 });
 
 </script>
