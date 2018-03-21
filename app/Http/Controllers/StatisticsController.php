@@ -2190,8 +2190,7 @@ class StatisticsController extends Controller
                 }
 
                 if (($week_day == 7 || $i == $days_in_month) &&  $add_week_sum == true && $miss_first_week == false) {
-
-                    $user_sum[$week_num]['first_week_day'] == null;
+                    $user_sum[$week_num]['last_week_day'] = $actual_loop_day;
 
                     $user_sum[$week_num]['janky_proc'] = ($user_sum[$week_num]['success'] > 0) ? round(($week_yanky / $user_sum[$week_num]['success']) * 100) : 0 ;
                     $user_sum[$week_num]['average'] = ($user_sum[$week_num]['login_time']) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['login_time']), 2) : 0 ;

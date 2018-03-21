@@ -2,7 +2,7 @@
     <thead style="color:#efd88f">
         <tr>
             <td colspan="6" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
-                <font size="5" face="Calibri">RAPORT TRENERZY - IMIE NAZWISKO {{$date_start . ' - ' . $date_stop}} </font></td>
+                <font size="5" face="Calibri">RAPORT TRENERZY - {{$leader->last_name . ' ' . $leader->first_name}} {{date('Y-m',strtotime($date_start)) . '-01 - ' . date('Y-m-t',strtotime($date_stop))}} </font></td>
             <td colspan="2" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20">
                 <img src="http://teambox.pl/image/logovc.png" class="CToWUd"></td>
         </tr>
@@ -71,7 +71,7 @@
                 $week_received_calls_proc = ($week_received_calls > 0) ? round(($week_success / $week_received_calls) * 100 , 2) : 0 ;
             @endphp
             <tr>
-                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $data['first_week_day'] }}</b></td>
+                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA {{ $data['first_week_day'] . '-' . $data['last_week_day']}}</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_average }}</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_janky_proc }} %</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_received_calls }}</b></td>
