@@ -1830,8 +1830,6 @@ class StatisticsController extends Controller
 
                 foreach ($reports as $item) {
                     $tempReport->success += $item->success;
-
-                    $login_time_array = explode(":", $item->login_time); //Tutaj coś pierdoli ze nie ma login_time (sprawdzic czu isteniją te gowna chhodciaz powinny)
                     $tempReport->hour_time_use += floatval($item->hour_time_use);
                 }
                 $tempReport->average = ($tempReport->hour_time_use > 0) ? round($tempReport->success / $tempReport->hour_time_use, 2) : 0 ;
