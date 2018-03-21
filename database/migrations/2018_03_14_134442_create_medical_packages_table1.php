@@ -23,8 +23,8 @@ class CreateMedicalPackagesTable1 extends Migration
             $table->string('postal_code', 191);
             $table->string('city', 191);
             $table->string('street', 191);
-            $table->integer('house_number');
-            $table->integer('flat_number');
+            $table->string('house_number', 100);
+            $table->string('flat_number', 100);
             $table->string('package_name', 191);
             $table->string('package_variable', 191);
             $table->string('package_scope', 191);

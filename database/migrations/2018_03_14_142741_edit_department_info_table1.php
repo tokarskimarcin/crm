@@ -18,6 +18,7 @@ class EditDepartmentInfoTable1 extends Migration
             $table->foreign('id_dep_type')->references('id')->on('department_type');
             $table->foreign('janky_system_id')->references('id')->on('janky_penatly_proc');
             $table->foreign('menager_id')->references('id')->on('users');
+            $table->foreign('director_id')->references('id')->on('users');
         });
     }
 
@@ -33,6 +34,7 @@ class EditDepartmentInfoTable1 extends Migration
             $table->dropForeign(['id_dep_type']);
             $table->dropForeign(['janky_system_id']);
             $table->dropForeign(['menager_id']);
+            $table->dropForeign(['director_id']);
         });
     }
 }
