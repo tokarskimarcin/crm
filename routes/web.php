@@ -490,6 +490,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/pageMonthReportCoach', 'StatisticsController@pageMonthReportCoachGet');
     Route::post('/pageMonthReportCoach', 'StatisticsController@pageMonthReportCoachPost');
+    Route::get('/pageDayReportCoaches', 'StatisticsController@pageDayReportCoachGet');
+    Route::post('/pageDayReportCoaches', 'StatisticsController@pageDayReportCoachPost');
 
 
     //Raporty Rekrutacji

@@ -13,3 +13,5 @@ ID: [1] DATE: [2017-12-06 11:44:22] ACTION: [item3 : id59, Zmiana uprawnień gru
 ID: [1] DATE: [2017-12-07 13:18:09] ACTION: [Zmiana hasła przez użytkownika, nowe hasło: c2VkZXMxMjM=]
 ID: [1] DATE: [2017-12-07 13:20:28] ACTION: [Zmiana hasła przez użytkownika, nowe hasło: bm9raWExMjM=]
 ID: [1] DATE: [2017-12-07 14:39:21] ACTION: [Zmiana hasła przez użytkownika, nowe hasło: c2VkZXMxMjM=]
+ID: [4796] DATE: [2018-03-21 13:55:37] ACTION: [item3 : id153, Zmiana uprawnień grup i użytkowników : , Link name : Raport dzienny trenerzy, Link adress : dayReportCoaches, Link group : , ]
+ID: [4796] DATE: [2018-03-21 13:56:26] ACTION: [item3 : id153, Zmiana uprawnień grup i użytkowników : , Link name : Raport dzienny trenerzy, Link adress : pageDayReportCoaches, Link group : , ]
