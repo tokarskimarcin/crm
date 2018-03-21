@@ -1,16 +1,62 @@
-<table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px">
-    <thead style="color:#efd88f">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+{{--<style>--}}
+    {{--.sticky {--}}
+        {{--position: fixed;--}}
+        {{--top: 0;--}}
+        {{--width: 100%--}}
+    {{--}--}}
+
+
+
+{{--</style>--}}
+
+{{--<input type="text" id="testInput"></input>--}}
+{{--<input type="text" id="testInput2"></input>--}}
+{{--<table id="tableHidden">--}}
+    {{--<thead>--}}
+    {{--<tr>--}}
+        {{--<th colspan="15" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">--}}
+            {{--<font size="6" face="Calibri">RAPORT ODDZIAŁY {{$date_start . ' - ' . $date_stop}} </font></th>--}}
+        {{--<th colspan="2" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20">--}}
+            {{--<img src="http://teambox.pl/image/logovc.png" class="CToWUd"></th>--}}
+    {{--</tr>--}}
+    {{--<tr>--}}
+        {{--<th style="border:1px solid #231f20;padding:3px;background:#231f20;">Data</th>--}}
+        {{--<th style="border:1px solid #231f20;padding:3px;background:#231f20;">RBH PLAN</th>--}}
+        {{--<th style="border:1px solid #231f20;padding:3px;background:#231f20;">RBH REAL</th>--}}
+        {{--<th style="border:1px solid #231f20;padding:3px;background:#231f20;">ZGODY</th>--}}
+        {{--<td style="border:1px solid #231f20;padding:3px;background:#231f20;">CZAS ROZMÓW</td>--}}
+        {{--<td style="border:1px solid #231f20;padding:3px;background:#231f20;">LICZBA ODSŁUCHANYCH</td>--}}
+        {{--<td style="border:1px solid #231f20;padding:3px;background:#231f20;">LICZBA JANKÓW</td>--}}
+        {{--<td style="border:1px solid #231f20;padding:3px;background:#231f20;">LICZBA STANOWISK</td>--}}
+        {{--<td style="border:1px solid #231f20;padding:3px;background:#231f20;">CEL ZGODY</td>--}}
+        {{--<td style="border:1px solid #231f20;padding:3px;background:#231f20;">CEL RBH</td>--}}
+        {{--<td style="border:1px solid #231f20;padding:3px;background:#231f20;">ŚREDNIA</td>--}}
+        {{--<td style="border:1px solid #231f20;padding:3px;background:#231f20;">% JANKÓW</td>--}}
+        {{--<td style="border:1px solid #231f20;padding:3px;background:#231f20;">% ROZMÓW</td>--}}
+        {{--<td style="border:1px solid #231f20;padding:3px;background:#231f20;">GRAFIK REAL</td>--}}
+        {{--<td style="border:1px solid #231f20;padding:3px;background:#231f20;">STRATA GODZ</td>--}}
+        {{--<td style="border:1px solid #231f20;padding:3px;background:#231f20;">% CELU</td>--}}
+        {{--<td style="border:1px solid #231f20;padding:3px;background:#231f20;">POZOSTAŁO CELU</td>--}}
+    {{--</tr>--}}
+    {{--</thead>--}}
+{{--</table>--}}
+
+<table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px" id="tableFull">
+    <thead style="color:#efd88f"  id="header">
     <tr>
-        <td colspan="15" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
-            <font size="6" face="Calibri">RAPORT ODDZIAŁY {{$date_start . ' - ' . $date_stop}} </font></td>
-        <td colspan="2" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20">
-            <img src="http://teambox.pl/image/logovc.png" class="CToWUd"></td>
+        <th colspan="15" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
+            <font size="6" face="Calibri">RAPORT ODDZIAŁY {{$date_start . ' - ' . $date_stop}} </font></th>
+        <th colspan="2" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20">
+            <img src="http://teambox.pl/image/logovc.png" class="CToWUd"></th>
     </tr>
         <tr>
-            <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Data</td>
-            <td style="border:1px solid #231f20;padding:3px;background:#231f20;">RBH PLAN</td>
-            <td style="border:1px solid #231f20;padding:3px;background:#231f20;">RBH REAL</td>
-            <td style="border:1px solid #231f20;padding:3px;background:#231f20;">ZGODY</td>
+            <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Data</th>
+            <th style="border:1px solid #231f20;padding:3px;background:#231f20;">RBH PLAN</th>
+            <th style="border:1px solid #231f20;padding:3px;background:#231f20;">RBH REAL</th>
+            <th style="border:1px solid #231f20;padding:3px;background:#231f20;">ZGODY</th>
             <td style="border:1px solid #231f20;padding:3px;background:#231f20;">CZAS ROZMÓW</td>
             <td style="border:1px solid #231f20;padding:3px;background:#231f20;">LICZBA ODSŁUCHANYCH</td>
             <td style="border:1px solid #231f20;padding:3px;background:#231f20;">LICZBA JANKÓW</td>
@@ -26,7 +72,7 @@
             <td style="border:1px solid #231f20;padding:3px;background:#231f20;">POZOSTAŁO CELU</td>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="tableBody">
 
         @php
             $total_week_success = 0;
@@ -310,3 +356,28 @@
 
     </tbody>
 </table>
+<script>
+    // $(document).ready(function() {
+       // window.onscroll = function() {myFunction()};
+       // var header = document.getElementById('header');
+       //
+       // var sticky = header.innerHeight;
+       // var sticky2 = $('#header').innerHeight();
+       // var wind = $('#header').offset().top;
+       //
+       // var testInput = document.getElementById('testInput');
+       // var testInput2 = document.getElementById('testInput2');
+       //
+       // testInput.value = sticky2;
+       // testInput2.value = $(window).offset().top;
+       // function myFunction() {
+       //     if($(window).innerHeight() <= wind) {
+       //         header.classList.add('sticky');
+       //     }
+       //     else {
+       //         header.classList.remove('sticky');
+       //     }
+       // }
+    // });
+
+</script>
