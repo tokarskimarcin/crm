@@ -1,9 +1,9 @@
 {{--@extends('layouts.tyleoile')--}}
 {{--@section('content')--}}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <style>
     * {
         margin: 0;
@@ -236,57 +236,57 @@
 
     <section>
         @if(sizeof($userTable) != 0 || sizeof($reportTable) != 0)
-        <table class="table inactive">
-            <thead>
-            <tr>
-                <th class="firstTh">L.P</th>
-                <th>Imie &amp; Nazwisko</th>
-                <th>Czas</th>
-                <th>L.zgód</th>
-                <th>Średnia</th>
-                <th>Pln/h</th>
-            </tr>
-            </thead>
+            <table class="table inactive">
+                <thead>
+                <tr>
+                    <th class="firstTh">L.P</th>
+                    <th>Imie &amp; Nazwisko</th>
+                    <th>Czas</th>
+                    <th>L.zgód</th>
+                    <th>Średnia</th>
+                    <th>Pln/h</th>
+                </tr>
+                </thead>
 
-            <tbody class="table-body table-body1">
-            @foreach($userTable as $t)
-            <tr class="one firstTr">
-                <td class="indx"></td>
-                <td>{{$t->user->first_name . ' ' . $t->user->last_name}}</td>
-                <td>{{$t->login_time}}</td>
-                <td>{{$t->success}}</td>
-                <td>{{$t->average}}</td>
-                <td class="pr">
-                    <script>
-                        var base = 10;
-                        var step = 0.5;
-                        var start = 2.5;
-                        var avg = {{$t->average}};
-                        var salary;
-                            if(avg > start) {
-                                var count;
-                                var difference;
-                                if (avg < start) {
-                                    difference = 0;
+                <tbody class="table-body table-body1">
+                @foreach($userTable as $t)
+                    <tr class="one firstTr">
+                        <td class="indx"></td>
+                        <td>{{$t->user->first_name . ' ' . $t->user->last_name}}</td>
+                        <td>{{$t->login_time}}</td>
+                        <td>{{$t->success}}</td>
+                        <td>{{$t->average}}</td>
+                        <td class="pr">
+                            <script>
+                                var base = 10;
+                                var step = 0.5;
+                                var start = 2.5;
+                                var avg = {{$t->average}};
+                                var salary;
+                                if(avg > start) {
+                                    var count;
+                                    var difference;
+                                    if (avg < start) {
+                                        difference = 0;
+                                    }
+                                    else {
+                                        difference = avg - start;
+                                    }
+                                    count = Math.ceil(difference / 0.5);
+                                    salary = base + count*step;
                                 }
                                 else {
-                                    difference = avg - start;
+                                    salary = base;
                                 }
-                                count = Math.ceil(difference / 0.5);
-                                salary = base + count*step;
-                            }
-                            else {
-                                salary = base;
-                            }
-                        $('.pr:last').text(salary);
-                    </script>
-                </td>
-            </tr>
-            @endforeach
+                                $('.pr:last').text(salary);
+                            </script>
+                        </td>
+                    </tr>
+                @endforeach
 
-            </tbody>
-        </table>
-        <table class="table active secondTable">
+                </tbody>
+            </table>
+            <table class="table active secondTable">
                 <thead class="two secondTh">
                 <tr>
                     <th>Oddział</th>
@@ -308,53 +308,53 @@
                     </tr>
                 @endforeach
                 </tbody>
-        </table>
-        {{--*********CASE OF NO DATA***********--}}
+            </table>
+            {{--*********CASE OF NO DATA***********--}}
         @else
-        <div class="no-data">Brak danych!</div>
+            <div class="no-data">Brak danych!</div>
             <script>
                 setInterval(function(){
-                        window.location.reload(1);
+                    window.location.reload(1);
                 }, 30000);
             </script>
         @endif
-        {{--************END CASE***************--}}
+            {{--************END CASE***************--}}
     </section>
 
-<script>
-    $(document).ready(function() {
-        var tablica = [];
-        /***********Filling L.P column*********/
-        var indx = $('.indx');
-        indx.each(function(index) {
-            $(this).prepend(index+1);
-        });
-        /*************End Filling*************/
+    <script>
+        $(document).ready(function() {
+            var tablica = [];
+            /***********Filling L.P column*********/
+            var indx = $('.indx');
+            indx.each(function(index) {
+                $(this).prepend(index+1);
+            });
+            /*************End Filling*************/
 
-        var rekordy = $('.table-body1 tr');
-        rekordy.each(function() {
-            var danyRekord = $(this);
-            tablica.push(danyRekord);
-        });
+            var rekordy = $('.table-body1 tr');
+            rekordy.each(function() {
+                var danyRekord = $(this);
+                tablica.push(danyRekord);
+            });
 
-        /*****Function that splits data rows into array of objects*****/
-        var chunks = function(array, size) {
-            var results = [];
-            while (array.length) {
-                results.push(array.splice(0, size));
-            }
-            return results;
-        };
-        /***********End of function*********/
+            /*****Function that splits data rows into array of objects*****/
+            var chunks = function(array, size) {
+                var results = [];
+                while (array.length) {
+                    results.push(array.splice(0, size));
+                }
+                return results;
+            };
+            /***********End of function*********/
 
-        var delayInMilliseconds = 8000;
-        var newTable = chunks(tablica,8);
-        var tableBody = $('.table-body1');
-        tableBody.text(' ');
-        tableBody.append(newTable[0]);
-        var iteracja = 0;
+            var delayInMilliseconds = 8000;
+            var newTable = chunks(tablica,8);
+            var tableBody = $('.table-body1');
+            tableBody.text(' ');
+            tableBody.append(newTable[0]);
+            var iteracja = 0;
 
-        setInterval(function() {
+            setInterval(function() {
                 if(iteracja == 0) {
                     $('table:last').toggleClass('active');
                     $('table:last').toggleClass('inactive');
@@ -367,9 +367,9 @@
                 if(iteracja == newTable.length) {
                     iteracja = 0;
                 }
-        },delayInMilliseconds);
-    });
-</script>
+            },delayInMilliseconds);
+        });
+    </script>
 </div>
 {{--@endsection--}}
 

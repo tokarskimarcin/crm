@@ -554,7 +554,7 @@ class AdminController extends Controller
             return 1;
         }
     }
-    public function aMethod($id) {
+    public function monitorMethod($id) {
             $hour = date('H');
             $hour = $hour . ":00:00";
             $date = date("Y-m-d");
@@ -581,7 +581,7 @@ class AdminController extends Controller
               }
           }
 
-        return view('screens.testPag')->with('userTable', $userTable)
+        return view('screens.monitors')->with('userTable', $userTable)
             ->with('reportTable', $reportTable);
     }
 
