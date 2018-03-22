@@ -237,7 +237,7 @@
                         @if($type == 1)
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="myLabel">Numer PBX:</label>
+                                    <label for="login_phone" class="myLabel">Numer PBX:</label>
                                     <input type="number" class="form-control" placeholder="000" id="login_phone" name="login_phone" value="">
                                 </div>
                             </div>
@@ -510,9 +510,13 @@ $(document).ready(function() {
         pickTime: false,
     });
 
-    ///Event listeners responsible for salary and additional_salary inputs validation
+    ///Event listeners responsible for salary, additional_salary and pbx inputs validation
     var salary = $('#salary');
     var additional_salary = $('#additional_salary');
+    var pbx = $('#login_phone');
+
+
+
     salary.on('change', function() {
         if(salary.val() < 0) {
             salary.val(0);
@@ -523,6 +527,12 @@ $(document).ready(function() {
         if(additional_salary.val() < 0) {
             additional_salary.val(0);
         }
+    });
+
+    pbx.on('change', function() {
+       if(pbx.val() < 0) {
+           pbx.val(0);
+       }
     });
     //********END salary and additional salary inputs validation *****
 });

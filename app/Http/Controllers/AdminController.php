@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Department_info;
 use App\Department_types;
 use App\Departments;
+use App\HourReport;
 use App\LinkGroups;
 use App\Links;
 use App\Pbx_report_extension;
@@ -202,7 +203,8 @@ class AdminController extends Controller
         $department_info->working_hours_normal = ($request->work_hour > 0) ? $request->work_hour : 0 ;
         $department_info->working_hours_week = ($request->work_hour_weekend > 0) ? $request->work_hour_weekend : 0 ;
         $department_info->blocked = 0;
-        $department_info->menager_id = ($request->menager != 0) ? $request->menager : null ;
+        $department_info->menager_id = ($request->menager != 0) ? $request->menager : 0 ;
+        $department_info->director_id = ($request->director != 0) ? $request->director : 0 ;
 
         $department_info->save();
 
@@ -282,6 +284,7 @@ class AdminController extends Controller
             $selected_department->working_hours_normal = ($request->work_hour > 0) ? $request->work_hour : 0 ;
             $selected_department->working_hours_week = ($request->work_hour_weekend > 0) ? $request->work_hour_weekend : 0 ;
             $selected_department->menager_id = ($request->menager != 0) ? $request->menager : 0 ;
+            $selected_department->director_id = ($request->director != 0) ? $request->director : 0 ;
             $selected_department->save();
         }
 
@@ -553,36 +556,34 @@ class AdminController extends Controller
             return 1;
         }
     }
-    public function aMethod($id) {
-        $table = [];
-//        $pbx_report_extension = Pbx_report_extension::('pbx_id')->groupBy();
-//        $time = Pbx_report_extension::where('pbx_id', '=', '11')
-//        dd(Pbx_report_extension::where('report_date', 'LIKE', '2018-03-01')->get());
-          $givenUsers = Pbx_report_extension::where('report_date', 'like', '2018-03-19')->where('report_hour', 'like', '11:00:00')->get();
+    public function monitorMethod($id) {
+            $hour = date('H');
+            $hour = $hour . ":00:00";
+            $date = date("Y-m-d");
 
-          $table1 = [];
+          $givenUsers = Pbx_report_extension::where('report_date', '=', $date)->where('report_hour', '=', $hour)->get();
+          $userTable = [];
+          $reportTable = [];
           foreach($givenUsers as $item) {
               if(is_object($item->user)) {
                   if($item->user->department_info_id == $id) {
-                      array_push($table1, $item);
+                      array_push($userTable, $item);
                   }
               }
           }
+          $dep = Department_info::find($id);
+          $report = HourReport::where('hour', $hour)
+              ->where('report_date', $date)
+              ->get();
 
-//        for ($i = 1; $i <= 30; $i++) {
-//            $table[] = collect([
-//                'username' => $pbx_report_extension->user->first_name . " " . $pbx_report_extension->user->last_name,
-//                'pole1' => $i,
-//                'pole2' => $i,
-//                'pole3' => $i,
-//                'pole4' => $i,
-//            ]);
-//        }
-        $collection = collect($table1);
+          foreach($report as $r) {
+              if(is_object($r)) {
+                  array_push($reportTable, $r);
+              }
+          }
 
-
-
-        return view('screens.testPag')->with('dane', $collection)->with('table23', $table1);
+        return view('screens.monitors')->with('userTable', $userTable)
+            ->with('reportTable', $reportTable);
     }
 
     public function screenMethod(Request $request) {
