@@ -26,7 +26,7 @@
             <td style="border:1px solid #231f20;padding:3px;background:#231f20;">POZOSTAŁO CELU</td>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="tableBody">
 
         @php
             $total_week_success = 0;
@@ -310,3 +310,28 @@
 
     </tbody>
 </table>
+<script>
+    // $(document).ready(function() {
+       // window.onscroll = function() {myFunction()};
+       // var header = document.getElementById('header');
+       //
+       // var sticky = header.innerHeight;
+       // var sticky2 = $('#header').innerHeight();
+       // var wind = $('#header').offset().top;
+       //
+       // var testInput = document.getElementById('testInput');
+       // var testInput2 = document.getElementById('testInput2');
+       //
+       // testInput.value = sticky2;
+       // testInput2.value = $(window).offset().top;
+       // function myFunction() {
+       //     if($(window).innerHeight() <= wind) {
+       //         header.classList.add('sticky');
+       //     }
+       //     else {
+       //         header.classList.remove('sticky');
+       //     }
+       // }
+    // });
+
+</script>

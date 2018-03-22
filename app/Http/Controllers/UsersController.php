@@ -7,6 +7,7 @@ use App\Department_info;
 use App\Departments;
 use App\DisableAccountInfo;
 use App\User;
+use App\UserEmploymentStatus;
 use App\UserTypes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -87,6 +88,10 @@ class UsersController extends Controller
         $send_type = $send_type->type;
         $agencies = Agencies::all();
         $user = new User;
+        $userEmployment = new UserEmploymentStatus;
+
+
+
         $user->username = $request->username;
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
@@ -152,6 +157,13 @@ class UsersController extends Controller
         $user->id_manager = Auth::id();
         $user->documents = $request->documents;
         $user->save();
+
+        $userEmployment->pbx_id = $request->login_phone;
+        $userEmployment->pbx_id_add_date = $request->start_date;
+        $userEmployment->pbx_id_remove_date = 0;
+        $userEmployment->user_id = $user->id;
+        $userEmployment->save();
+
         $user_data = array(
             'first_name' => $user->first_name,
             'last_name' => $user->last_name
@@ -289,6 +301,38 @@ class UsersController extends Controller
         }
 
         $user = User::find($id);
+        $userEmployment = UserEmploymentStatus::
+        where('pbx_id', '=', $user->login_phone)
+            -> where('user_id', '=', $user->id)
+            ->first();
+        $date = date("Y-m-d");
+
+//       dd($userEmployment);
+
+//        if($request->status_work == "0") {
+//            $userEmployment->pbx_id_remove_date = $request->stop_date;
+//            $userEmployment->pbx_id = 0;
+//        }
+
+        if ($request->status_work == "1") {
+            if($user->login_phone != $request->login_phone) {
+                    if($userEmployment) {
+                        $userEmployment->pbx_id_remove_date = $date;
+                        $user->login_phone = $request->login_phone;
+                        $userEmployment1 = new UserEmploymentStatus();
+                        $userEmployment1->pbx_id = $request->login_phone;
+                        $userEmployment1->pbx_id_add_date = $request->start_date;
+                        $userEmployment1->pbx_id_remove_date = 0;
+                        $userEmployment1->user_id = $user->$id;
+                        $userEmployment->save();
+                        $userEmployment1->save();
+                    }
+            }
+            else {
+                dd('nie zmienimay pbx');
+            }
+            $user->end_work = null;
+        }
 
         if ($user == null) {
             return view('errors.404');
@@ -366,7 +410,7 @@ class UsersController extends Controller
                 $user->user_type_id = $request->user_type;
             }
         }
-        if ($request->status_work == 1) {
+        if ($request->status_work == "1") {
             $user->end_work = null;
         } else {
             $user->end_work = $request->stop_date;
@@ -380,6 +424,9 @@ class UsersController extends Controller
          * automatyczne rozwiązanie pakietu medycznego w przypadku zakończenia pracy
          */
         if ($request->status_work == 0) {
+            if($user->status_work == 1) {
+                dd('zwolniony');
+            }
             $month_to_end = date('Y-m-t', strtotime($request->stop_date));
             MedicalPackage::where('user_id', '=', $user->id)
                 ->where('deleted', '=', 0)
@@ -387,6 +434,7 @@ class UsersController extends Controller
                 ->update(['deleted' => 1, 'month_stop' => $month_to_end]);
         }
         $user->save();
+//        $userEmployment->save();//added
 
         $data = [
             'Edycja użytkownika:' => ' ',
