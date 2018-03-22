@@ -202,7 +202,7 @@
                              }
                              /****END***/
 
-                             var actualDate = dzien + '.' + miesiac + '.' + today.getFullYear() + 'r. ' + godzina + ':' + minuty + ':' + sekundy;
+                             var actualDate = dzien + '.' + miesiac + '.' + today.getFullYear() + 'r. ' + godzina + ':' + minuty;
                              $('#first-span').text('Bieżące wyniki ');
                              $('#first-span').append(actualDate);
                          },1000);
@@ -253,7 +253,7 @@
                     <tr class="one firstTr">
                         <td class="indx"></td>
                         <td>{{$t->user->first_name . ' ' . $t->user->last_name}}</td>
-                        <td>{{$t->login_time}}</td>
+                        <td>{{substr($t->login_time, 0, 5)}} </td>
                         <td>{{$t->success}}</td>
                         <td>{{$t->average}}</td>
                         <td class="pr">
@@ -320,7 +320,7 @@
                 @foreach($reportTable as $r)
                     <tr class="one secondTr">
                         <td class="secondTd">{{$r->department_info->departments->name . ' ' . $r->department_info->department_type->name}}</td>
-                        <td>{{$r->hour}}</td>
+                        <td>{{substr($r->hour, 0, 5)}}</td>
                         <td>{{$r->average}}</td>
                         <td>{{$r->success}}</td>
                         <td>{{$r->janky_count}}</td>
@@ -366,7 +366,7 @@
             };
             /***********End of function*********/
 
-            var delayInMilliseconds = 10000;
+            var delayInMilliseconds = 15000;
             var newTable = chunks(tablica,8);
             var tableBody = $('.table-body1');
             tableBody.text(' ');
@@ -374,18 +374,29 @@
             var iteracja = 0;
 
             setInterval(function() {
-                if(iteracja == 0) {
+                if(iteracja == -1) {
                     $('table:last').toggleClass('active');
                     $('table:last').toggleClass('inactive');
                     $('table:first').toggleClass('inactive');
                     $('table:first').toggleClass('active');
+                    iteracja++;
+                    tableBody.text(' ');
                 }
-                tableBody.text(' ');
-                tableBody.append(newTable[iteracja]);
-                iteracja++;
-                if(iteracja == newTable.length) {
-                    iteracja = 0;
+                else {
+                    if(iteracja == 0) {
+                        $('table:last').toggleClass('active');
+                        $('table:last').toggleClass('inactive');
+                        $('table:first').toggleClass('inactive');
+                        $('table:first').toggleClass('active');
+                    }
+                    tableBody.text(' ');
+                    tableBody.append(newTable[iteracja]);
+                    iteracja++;
+                    if(iteracja == newTable.length) {
+                        iteracja = -1;
+                    }
                 }
+
             },delayInMilliseconds);
         });
     </script>
