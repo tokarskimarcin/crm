@@ -2,7 +2,7 @@
     <thead style="color:#efd88f">
     <tr>
         <td colspan="6" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
-            <font size="6" face="Calibri">RAPORT DZIENNY TRENERZY </font></td>
+            <font size="6" face="Calibri">RAPORT DZIENNY TRENERZY {{$coach->last_name . ' ' . $coach->first_name . ' ' . $date_selected . ' ' . $hour_selected}} </font></td>
         <td colspan="2" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20">
             <img src="http://teambox.pl/image/logovc.png" class="CToWUd"></td>
     </tr>
@@ -24,12 +24,13 @@
             $total_success = 0;
             $total_pause_time = 0;
             $total_login_time = 0;
+            $total_janky_count = 0;
         @endphp
 
         @foreach($data as $item)
             <tr>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->user_last_name . ' ' . $item->user_first_name }}</td>
-                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->average }}</td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->average }} %</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->dkj_proc }} %</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->received_calls }}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->success }}</td>
@@ -44,13 +45,20 @@
                 $total_pause_time += $item->time_pause;
                 $hours_array = explode(':', $item->login_time);
                 $total_login_time += (($hours_array[0] * 3600) + ($hours_array[1] * 60) + $hours_array[2]);
+                $total_janky_count += round($item->success * $item->dkj_proc);
             @endphp
         @endforeach
 
+        @php
+            $total_time = $total_login_time / 3600;
+            $total_avg = ($total_time > 0) ? round(($total_success / $total_time), 2) : 0 ;
+            $total_janky_proc = ($total_success > 0) ? round(($total_janky_count / $total_success), 2) : 0 ;
+        @endphp
+
         <tr>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA</b></td>
-            <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA</b></td>
-            <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA</b></td>
+            <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_avg }} %</b></td>
+            <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_janky_proc }} %</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_received_calls }}</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_success }}</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ ($total_received_calls > 0) ? round(($total_success / $total_received_calls) * 100, 2) : 0 }} %</b></td>

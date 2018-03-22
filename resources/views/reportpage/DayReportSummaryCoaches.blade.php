@@ -1,27 +1,25 @@
 @extends('layouts.main')
 @section('content')
-
-    {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Raport Dzienny Trenerzy</h1>
+            <h1 class="page-header">Raport Dzienny Trenerzy (Zbiorczy)</h1>
         </div>
     </div>
-    <form method="POST" action="{{ URL::to('/pageDayReportCoaches') }}" id="my_coach_form">
+    <form method="POST" action="{{ URL::to('/pageSummaryDayReportCoaches') }}" id="my_dep_form">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="form-group">
-                    <label>Trener:</label>
-                    <select class="form-control" name="coach_id" id="coach_id">
+                    <label>Oddział:</label>
+                    <select class="form-control" name="dep_id" id="dep_id">
                         <option value="0">Wybierz</option>
-                        @foreach($coaches as $item)
-                            <option @if($coach_id == $item->id) selected @endif value="{{ $item->id }}">{{ $item->last_name . ' ' . $item->first_name }}</option>
+                        @foreach($department_info as $item)
+                            <option @if($dep_id == $item->id) selected @endif value="{{ $item->id }}">{{ $item->departments->name . ' ' . $item->department_type->name }}</option>
                         @endforeach
                     </select>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="form-group">
                     <label>Wybierz dzień:</label>
                     <select class="form-control" name="day_select">
@@ -35,23 +33,9 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="form-group">
-                    <label>Wybierz godzinę:</label>
-                    <select class="form-control" name="hour_select">
-                        @for($i = 9; $i <= 20; $i++)
-                            @php
-                                $hour = ($i < 10) ? '0' . $i : $i ;
-                                $loop_hour = $hour . ':00:00';
-                            @endphp
-                            <option @if($loop_hour == $hour_selected) selected @endif>{{ $loop_hour }}</option>
-                        @endfor
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="form-group">
-                    <input id="get_coach" style="margin-top: 25px; width: 100%" type="submit" class="btn btn-info" value="Generuj raport">
+                    <input id="get_dep" style="margin-top: 25px; width: 100%" type="submit" class="btn btn-info" value="Generuj raport">
                 </div>
             </div>
         </div>
@@ -64,7 +48,7 @@
                         <div id="start_stop">
                             <div class="panel-body">
                                 @isset($data)
-                                    @include('mail.dayReportCoach')
+                                    @include('mail.hourReportCoach')
                                 @endisset
                             </div>
                         </div>
@@ -81,15 +65,15 @@
     <script>
 
         $(document).ready(function () {
-            $('#get_coach').click((e) => {
+            $('#get_dep').click((e) => {
                 e.preventDefault();
-                if ($('#coach_id').val() == 0) {
-                    swal('Wybierz trenera!');
-                    return false;
-                } else {
-                    $('#my_coach_form').submit();
-                }
-            });
+            if ($('#dep_id').val() == 0) {
+                swal('Wybierz oddział!');
+                return false;
+            } else {
+                $('#my_dep_form').submit();
+            }
+        });
         });
 
     </script>
