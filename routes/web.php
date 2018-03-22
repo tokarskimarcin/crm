@@ -599,6 +599,12 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 
     /**REKRUTACJA STOP */
+
+
+    /** Tabela Postępów Coaching */
+
+    Route::get('/progress_table', 'CoachingController@progress_tableGET');
+
 });
 //////////////////////Testing ORM///////////////
 ///
