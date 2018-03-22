@@ -2080,7 +2080,10 @@ class StatisticsController extends Controller
      * Wyśwetlanie raportu miesięczengo trenerzy
      */
     public function pageMonthReportCoachGet () {
-        $coaches = User::whereIn('user_type_id', [4,12])->where('status_work', '=', 1)->get();
+        $coaches = User::whereIn('user_type_id', [4,12])
+            ->where('status_work', '=', 1)
+            ->orderBy('last_name')
+            ->get();
 
         return view('reportpage.MonthReportCoach')
             ->with([
@@ -2322,6 +2325,193 @@ class StatisticsController extends Controller
 
             $this->sendMailByVerona('reportDepartments', $data, 'Raport oddziały', $menager);
         }
+    }
+
+    /**
+     * Raport dzienny trenerzy
+     */
+    public function pageDayReportCoachGet() {
+        $coaches = User::whereIn('user_type_id', [4, 12])
+            ->orderBy('last_name')
+            ->where('status_work', '=', 1)
+            ->get();
+        $year = date('Y');
+        $month = date('m');
+        $days_in_month = date('t', strtotime($month));
+
+        return view('reportpage.dayReportCoaches')
+            ->with([
+                'coaches'   => $coaches,
+                'year'      => $year,
+                'month'     => $month,
+                'days'      => $days_in_month,
+                'coach_id'  => 0,
+                'date_selected' => date('Y-m-d'),
+                'hour_selected' => '09:00:00'
+            ]);
+    }
+
+    /**
+     * Raport dzienny trenerzy (po wyborze)
+     */
+    public function pageDayReportCoachPost(Request $request) {
+        $coaches = User::whereIn('user_type_id', [4, 12])
+            ->orderBy('last_name')
+            ->where('status_work', '=', 1)
+            ->get();
+        $year = date('Y');
+        $month = date('m');
+        $days_in_month = date('t', strtotime($month));
+
+        /*
+         * !!!!!!!!!!!!!!!!!!!!! ZOSTAWIC DO WYSYłania maili
+         */
+//        $ids = DB::table('pbx_report_extension')
+//            ->select(DB::raw('
+//                MAX(pbx_report_extension.id) as id
+//            '))
+//            ->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id')
+//            ->where('users.coach_id', '=', $request->coach_id)
+//            ->groupBy('users.id')
+//            ->where('report_date', '=', $request->day_select)
+//            ->get();
+
+        $data = DB::table('pbx_report_extension')
+            ->select(DB::raw('
+                pbx_report_extension.*,
+                users.last_name as user_last_name,
+                users.first_name as user_first_name
+            '))
+            ->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id')
+            ->where('users.coach_id', '=', $request->coach_id)
+            //->whereIn('pbx_report_extension.id', $ids->pluck('id')->toArray())
+            ->where('report_date', '=', $request->day_select)
+            ->where('report_hour', '=', $request->hour_select)
+            ->get();
+
+        $coach = User::find($request->coach_id);
+
+        return view('reportpage.dayReportCoaches')
+            ->with([
+                'coaches'   => $coaches,
+                'coach'     => $coach,
+                'year'      => $year,
+                'month'     => $month,
+                'days'      => $days_in_month,
+                'data'      => $data,
+                'coach_id'  => $request->coach_id,
+                'date_selected' => $request->day_select,
+                'hour_selected' => $request->hour_select
+            ]);
+    }
+
+    /**
+     * Strona wyświetająca zborczy raport trenerrow (po ddziałach)
+     */
+    public function pageSummaryDayReportCoachesGet() {
+        $department_info = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $month = date('m');
+        $year = date('Y');
+        $days_in_month = date('t', strtotime($month));
+
+        return view('reportpage.DayReportSummaryCoaches')
+            ->with([
+                'department_info' => $department_info,
+                'dep_id' => 2,
+                'days' => $days_in_month,
+                'month' => $month,
+                'year' => $year,
+                'date_selected' => date('Y-m-d')
+            ]);
+    }
+
+    /**
+     * Raport dzienny zbiorczy trenerzy (po oddziałach)
+     */
+    public function pageSummaryDayReportCoachesPost(Request $request) {
+        $department_info = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $month = date('m');
+        $year = date('Y');
+        $days_in_month = date('t', strtotime($month));
+
+        $department = Department_info::find($request->dep_id);
+
+        $data = $this->getDayCoachStatistics($request->dep_id, $request->day_select);
+
+        return view('reportpage.DayReportSummaryCoaches')
+            ->with([
+                'department_info'   => $department_info,
+                'department'        => $department,
+                'dep_id'            => 2,
+                'days'              => $days_in_month,
+                'month'             => $month,
+                'year'              => $year,
+                'date_selected'     => date('Y-m-d'),
+                'coaches'           => $data['coaches'],
+                'data'              => $data['data'],
+                'report_date'       => $data['report_date']
+            ]);
+    }
+
+    private function getDayCoachStatistics($dep_id, $report_date) {
+        $department_info = Department_info::find($dep_id);
+        $coaches = User::whereIn('user_type_id', [4,12])
+            ->where('status_work', '=', 1)
+            ->where('department_info_id', '=', $department_info->id)
+            ->get();
+
+
+        $data = [];
+
+        foreach ($coaches as $coach) {
+            $ids = DB::table('pbx_report_extension')
+                ->select(DB::raw('
+                    MAX(pbx_report_extension.id) as id
+                '))
+                ->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id')
+                ->where('users.coach_id', '=', $coach->id)
+                ->groupBy('users.id')
+                ->where('report_date', '=', $report_date)
+                ->get();
+
+            $coach_data = DB::table('pbx_report_extension')
+                ->select(DB::raw('
+                    pbx_report_extension.*,
+                    users.last_name as user_last_name,
+                    users.first_name as user_first_name
+                '))
+                ->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id')
+                ->where('users.coach_id', '=', $coach->id)
+                ->whereIn('pbx_report_extension.id', $ids->pluck('id')->toArray())
+                ->where('report_date', '=', $report_date)
+                ->get();
+
+            $data[] = $coach_data->merge($coach);
+        }
+        $total_data = [
+            'coaches' => $coaches,
+            'report_date' => $report_date,
+            'data' => $data
+        ];
+        return $total_data;
+    }
+
+    /**
+     * Wysyłanie maila dziennego (trenerzy) dla kierownikow
+     */
+    public function MailDayReportCoaches() {
+        $data = $this->getDayCoachStatistics(2, date('Y-m-d'));
+
+        $department = Department_info::find(2);
+        return view('mail.hourReportCoach')
+            ->with([
+                'department'   => $department,
+                'coaches'   => $data['coaches'],
+                'data'      => $data['data'],
+                'report_date' => $data['report_date']
+            ]);
     }
 
     /******** Główna funkcja do wysyłania emaili*************/

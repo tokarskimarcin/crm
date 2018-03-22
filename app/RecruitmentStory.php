@@ -82,21 +82,38 @@ class RecruitmentStory extends Model
      */
     public static function getReportInterviewsData($date_start, $date_stop, $select_type) {
         if ($select_type == 0) {
-            $data = DB::table('recruitment_story')
+            $dataCount = DB::table('recruitment_story')
                 ->select(DB::raw('
+                    departments.id as dep_id,
                     departments.name as dep_name,
                     department_type.name as dep_name_type,
                     count(recruitment_story.id) as counted
                 '))
-                ->join('users', 'users.id', 'recruitment_story.cadre_id')
-                ->join('department_info', 'users.department_info_id', 'department_info.id')
+                ->join('candidate', 'candidate.id', 'recruitment_story.candidate_id')
+                ->join('department_info', 'candidate.department_info_id', 'department_info.id')
                 ->join('departments', 'departments.id', 'department_info.id_dep')
                 ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
                 ->whereBetween('recruitment_story.created_at', [$date_start . ' 01:00:00', $date_stop . ' 23:00:00'])
                 ->where('recruitment_story.attempt_status_id','=',17)
-                ->groupBy('users.department_info_id')
+                ->groupBy('candidate.department_info_id')
                 ->orderBy('counted','desc')
                 ->get();
+
+            $deps = Department_info::all();
+
+            $data = [];
+            foreach ($deps as $dep) {
+                $dep_data = new \stdClass();
+                $dep_data->dep_name = $dep->departments->name;
+                $dep_data->dep_name_type = $dep->department_type->name;
+                $dep_data->counted = 0;
+                foreach($dataCount as $item) {
+                    if ($item->dep_id == $dep->id) {
+                        $dep_data->counted = $item->counted;
+                    }
+                }
+                $data[] = $dep_data;
+            }
         } else if ($select_type == 1) {
             $data = DB::table('recruitment_story')
                 ->select(DB::raw('
