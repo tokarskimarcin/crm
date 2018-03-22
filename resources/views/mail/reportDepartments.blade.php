@@ -7,10 +7,10 @@
             <img src="http://teambox.pl/image/logovc.png" class="CToWUd"></td>
     </tr>
         <tr>
-            <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Data</th>
-            <th style="border:1px solid #231f20;padding:3px;background:#231f20;">RBH PLAN</th>
-            <th style="border:1px solid #231f20;padding:3px;background:#231f20;">RBH REAL</th>
-            <th style="border:1px solid #231f20;padding:3px;background:#231f20;">ZGODY</th>
+            <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Data</td>
+            <td style="border:1px solid #231f20;padding:3px;background:#231f20;">RBH PLAN</td>
+            <td style="border:1px solid #231f20;padding:3px;background:#231f20;">RBH REAL</td>
+            <td style="border:1px solid #231f20;padding:3px;background:#231f20;">ZGODY</td>
             <td style="border:1px solid #231f20;padding:3px;background:#231f20;">CZAS ROZMÓW</td>
             <td style="border:1px solid #231f20;padding:3px;background:#231f20;">LICZBA ODSŁUCHANYCH</td>
             <td style="border:1px solid #231f20;padding:3px;background:#231f20;">LICZBA JANKÓW</td>
