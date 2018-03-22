@@ -88,7 +88,7 @@ class UsersController extends Controller
         $send_type = $send_type->type;
         $agencies = Agencies::all();
         $user = new User;
-        $userEmployment = new UserEmploymentStatus;
+//        $userEmployment = new UserEmploymentStatus;
 
 
 
@@ -158,11 +158,11 @@ class UsersController extends Controller
         $user->documents = $request->documents;
         $user->save();
 
-        $userEmployment->pbx_id = $request->login_phone;
-        $userEmployment->pbx_id_add_date = $request->start_date;
-        $userEmployment->pbx_id_remove_date = 0;
-        $userEmployment->user_id = $user->id;
-        $userEmployment->save();
+//        $userEmployment->pbx_id = $request->login_phone;
+//        $userEmployment->pbx_id_add_date = $request->start_date;
+//        $userEmployment->pbx_id_remove_date = 0;
+//        $userEmployment->user_id = $user->id;
+//        $userEmployment->save();
 
         $user_data = array(
             'first_name' => $user->first_name,
@@ -301,10 +301,12 @@ class UsersController extends Controller
         }
 
         $user = User::find($id);
-        $userEmployment = UserEmploymentStatus::
-        where('pbx_id', '=', $user->login_phone)
-            -> where('user_id', '=', $user->id)
-            ->first();
+
+//        $userEmployment = UserEmploymentStatus::
+//        where('pbx_id', '=', $user->login_phone)
+//            -> where('user_id', '=', $user->id)
+//            ->first();
+
         $date = date("Y-m-d");
 
 //       dd($userEmployment);
@@ -314,25 +316,25 @@ class UsersController extends Controller
 //            $userEmployment->pbx_id = 0;
 //        }
 
-        if ($request->status_work == "1") {
-            if($user->login_phone != $request->login_phone) {
-                    if($userEmployment) {
-                        $userEmployment->pbx_id_remove_date = $date;
-                        $user->login_phone = $request->login_phone;
-                        $userEmployment1 = new UserEmploymentStatus();
-                        $userEmployment1->pbx_id = $request->login_phone;
-                        $userEmployment1->pbx_id_add_date = $request->start_date;
-                        $userEmployment1->pbx_id_remove_date = 0;
-                        $userEmployment1->user_id = $user->$id;
-                        $userEmployment->save();
-                        $userEmployment1->save();
-                    }
-            }
-            else {
-                dd('nie zmienimay pbx');
-            }
-            $user->end_work = null;
-        }
+//        if ($request->status_work == "1") {
+//            if($user->login_phone != $request->login_phone) {
+//                    if($userEmployment) {
+//                        $userEmployment->pbx_id_remove_date = $date;
+//                        $user->login_phone = $request->login_phone;
+//                        $userEmployment1 = new UserEmploymentStatus();
+//                        $userEmployment1->pbx_id = $request->login_phone;
+//                        $userEmployment1->pbx_id_add_date = $request->start_date;
+//                        $userEmployment1->pbx_id_remove_date = 0;
+//                        $userEmployment1->user_id = $user->$id;
+//                        $userEmployment->save();
+//                        $userEmployment1->save();
+//                    }
+//            }
+//            else {
+//                dd('nie zmienimay pbx');
+//            }
+//            $user->end_work = null;
+//        }
 
         if ($user == null) {
             return view('errors.404');
@@ -424,9 +426,9 @@ class UsersController extends Controller
          * automatyczne rozwiązanie pakietu medycznego w przypadku zakończenia pracy
          */
         if ($request->status_work == 0) {
-            if($user->status_work == 1) {
-                dd('zwolniony');
-            }
+//            if($user->status_work == 1) {
+//                dd('zwolniony');
+//            }
             $month_to_end = date('Y-m-t', strtotime($request->stop_date));
             MedicalPackage::where('user_id', '=', $user->id)
                 ->where('deleted', '=', 0)
