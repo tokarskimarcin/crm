@@ -26,7 +26,7 @@
                         <div class="form-group">
                             <label class="myLabel">Zakres od:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                <input class="form-control" id="date_start" name="date_start_in_progress" type="text" value="" >
+                                <input class="form-control" id="date_start" name="date_start_in_progress" type="text" value="{{date('Y-m-d')}}" >
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                             </div>
                         </div>
@@ -35,7 +35,7 @@
                         <div class="form-group">
                             <label class="myLabel">Zakres do:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                <input class="form-control" id="date_stop" name="date_stop_in_progress" type="text" value="" >
+                                <input class="form-control" id="date_stop" name="date_stop_in_progress" type="text" value="{{date('Y-m-d')}}" >
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                             </div>
                         </div>
@@ -81,7 +81,7 @@
                         <div class="form-group">
                             <label class="myLabel">Zakres od:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                <input class="form-control" id="date_start" name="date_start_unsettled" type="text" value="" >
+                                <input class="form-control" id="date_start" name="date_start_unsettled" type="text" value="{{date('Y-m-d')}}" >
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                             </div>
                         </div>
@@ -90,7 +90,7 @@
                         <div class="form-group">
                             <label class="myLabel">Zakres do:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                <input class="form-control" id="date_stop" name="date_stop_unsettled" type="text" value="" >
+                                <input class="form-control" id="date_stop" name="date_stop_unsettled" type="text" value="{{date('Y-m-d')}}" >
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                             </div>
                         </div>
@@ -135,7 +135,7 @@
                         <div class="form-group">
                             <label class="myLabel">Zakres od:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                <input class="form-control" id="date_start" name="date_start_settled" type="text" value="" >
+                                <input class="form-control" id="date_start" name="date_start_settled" type="text" value="{{date('Y-m-d')}}" >
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                             </div>
                         </div>
@@ -144,7 +144,7 @@
                         <div class="form-group">
                             <label class="myLabel">Zakres do:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                <input class="form-control" id="date_stop" name="date_stop_settled" type="text" value="" >
+                                <input class="form-control" id="date_stop" name="date_stop_settled" type="text" value="{{date('Y-m-d')}}" >
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                             </div>
                         </div>
@@ -193,7 +193,7 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label class="myLabel">Konsultant</label>
-                                        <select class="form-control">
+                                        <select class="form-control" id="couaching_user_id">
                                             <option>1</option>
                                             <option>2</option>
                                             <option>3</option>
@@ -206,7 +206,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="myLabel">Temat</label>
-                                        <textarea class="form-control"></textarea>
+                                        <input type="text" class="form-control" id="coaching_subject"/>
                                     </div>
                                 </div>
 
@@ -214,7 +214,7 @@
                                     <div class="form-group">
                                         <label class="myLabel">Data Coaching'u:</label>
                                         <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                            <input class="form-control" id="date_start" name="date_start_new_coaching" type="text" value="" >
+                                            <input class="form-control" id="date_start" name="date_start_new_coaching" type="text" value="{{date('Y-m-d')}}" >
                                             <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-th"></span>
                                         </span>
@@ -227,24 +227,14 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="myLabel">Cel od</label>
-                                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                            <input class="form-control" id="date_start" name="date_start_new_coaching" type="text" value="" >
-                                            <span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-th"></span>
-                                        </span>
-                                        </div>
+                                        <input type="number" class="form-control" id="coaching_goal_min"/>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="myLabel">Cel do</label>
-                                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                            <input class="form-control" id="date_start" name="date_start_new_coaching" type="text" value="" >
-                                            <span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-th"></span>
-                                        </span>
-                                        </div>
+                                        <input type="number" class="form-control" id="coaching_goal_max"/>
                                     </div>
                                 </div>
 
