@@ -22,7 +22,7 @@
             @foreach($dane as $d)
             <tr>
                 <td>{{$d->departments->name . " " . $d->department_type->name}}</td>
-                <td><a href="http://127.0.0.1:8000/dept/{{$d->id}}">Link </a></td>
+                <td><a href="{{URL::to("dept")}}/{{$d->id}}">Link </a></td>
             </tr>
             @endforeach
 
