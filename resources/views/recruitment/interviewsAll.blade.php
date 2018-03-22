@@ -223,6 +223,7 @@
                         <thead>
                             <tr>
                                 <th>Imie i nazwisko</th>
+                                <th>Telefon</th>
                                 <th>Data dodania</th>
                                 <th>Status</th>
                                 <th style="width: 15%">Szczegóły</th>
@@ -430,6 +431,7 @@ table = $('#candidates').DataTable({
             var myName = data.first_name + " " + data.last_name;
             return myName;
         },"orderable": true, "searchable": true, "name": "last_name"},
+        {"data": "phone"},
         {"data": "created_at"},
         {"data": "attempt_name"},
         {"data": function (data, type, dataToSet) {
