@@ -582,7 +582,9 @@ class AdminController extends Controller
 
           foreach($report as $r) {
               if(is_object($r)) {
+                  if($r->department_info->id_dep_type == 2) {
                   array_push($reportTable, $r);
+                  }
               }
           }
 
