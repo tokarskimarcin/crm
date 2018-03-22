@@ -561,7 +561,7 @@ class AdminController extends Controller
             $hour = $hour . ":00:00";
             $date = date("Y-m-d");
 
-          $givenUsers = Pbx_report_extension::where('report_date', '=', $date)->where('report_hour', '=', "13:00:00")->get();
+          $givenUsers = Pbx_report_extension::where('report_date', '=', $date)->where('report_hour', '=', $hour)->get();
           $userTable = [];
           $reportTable = [];
           foreach($givenUsers as $item) {
@@ -571,9 +571,8 @@ class AdminController extends Controller
                   }
               }
           }
-
           $dep = Department_info::find($id);
-          $report = HourReport::where('hour', '13:00:00')
+          $report = HourReport::where('hour', $hour)
               ->where('report_date', $date)
               ->get();
 

@@ -258,25 +258,44 @@
                         <td>{{$t->average}}</td>
                         <td class="pr">
                             <script>
-                                var base = 10;
-                                var step = 0.5;
-                                var start = 2.5;
+                                var base = {{$t->user->department_info->commission_start_money}};
+                                var step = {{$t->user->department_info->commission_step}};
+                                var start = {{$t->user->department_info->commission_avg}};
                                 var avg = {{$t->average}};
                                 var salary;
-                                if(avg > start) {
+
+                                if(start == 2.5) { //start od 2.5
                                     var count;
                                     var difference;
-                                    if (avg < start) {
-                                        difference = 0;
+                                    if(avg >= start && avg < (start + 0.25)) { // avg in <2.5 ; 2.75)
+                                        salary = base + step;
                                     }
-                                    else {
+                                    else if (avg >= start + 0.25) { // avg in <2.75 ; infty)
                                         difference = avg - start;
+                                        if(difference % 0.25 == 0) { //Gdy roznica jest wielokrotnoscia 0.25
+                                            difference += 0.01; // dodajemy, aby wskoczyło w próg o jeden wyżej
+                                        }
+                                        count = Math.ceil(difference / 0.25);
+                                        salary = base + (count * step);
                                     }
-                                    count = Math.ceil(difference / 0.5);
-                                    salary = base + count*step;
+                                    else { // avg in <0 ; 2.5)
+                                        salary = base;
+                                    }
                                 }
-                                else {
-                                    salary = base;
+                                else { //start od 3.0
+                                    var count;
+                                    var difference;
+                                    if (avg >= start && avg <= start + 0.25) { // avg in <3 ; 3.25>
+                                        salary = base + step;
+                                    }
+                                    else if (avg > start + 0.25) { // avg in (3.25 ; infty)
+                                        difference = avg - start;
+                                        count = Math.ceil(difference / 0.25);
+                                        salary = base + (count * step);
+                                    }
+                                    else { //avg in <0 ; 3)
+                                        salary = base;
+                                    }
                                 }
                                 $('.pr:last').text(salary);
                             </script>
@@ -347,7 +366,7 @@
             };
             /***********End of function*********/
 
-            var delayInMilliseconds = 8000;
+            var delayInMilliseconds = 10000;
             var newTable = chunks(tablica,8);
             var tableBody = $('.table-body1');
             tableBody.text(' ');
