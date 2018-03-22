@@ -2442,16 +2442,16 @@ class StatisticsController extends Controller
 
         return view('reportpage.DayReportSummaryCoaches')
             ->with([
-                'department_info' => $department_info,
-                'department' => $department,
-                'dep_id' => 2,
-                'days' => $days_in_month,
-                'month' => $month,
-                'year' => $year,
-                'date_selected' => date('Y-m-d'),
-                'coaches'   => $data['coaches'],
-                'data'      => $data['data'],
-                'report_date' => $data['report_date']
+                'department_info'   => $department_info,
+                'department'        => $department,
+                'dep_id'            => 2,
+                'days'              => $days_in_month,
+                'month'             => $month,
+                'year'              => $year,
+                'date_selected'     => date('Y-m-d'),
+                'coaches'           => $data['coaches'],
+                'data'              => $data['data'],
+                'report_date'       => $data['report_date']
             ]);
     }
 
@@ -2504,8 +2504,10 @@ class StatisticsController extends Controller
     public function MailDayReportCoaches() {
         $data = $this->getDayCoachStatistics(2, date('Y-m-d'));
 
+        $department = Department_info::find(2);
         return view('mail.hourReportCoach')
             ->with([
+                'department'   => $department,
                 'coaches'   => $data['coaches'],
                 'data'      => $data['data'],
                 'report_date' => $data['report_date']
