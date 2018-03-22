@@ -74,6 +74,15 @@
             </div>
 
             <div class="form-group">
+                <label for="director">Dyrektor oddziału</label>
+                <select class="form-control" name="director" id="director">
+                    @foreach($menagers as $d)
+                        <option value="{{$d->id}}" @if(isset($selected_department->director_id) && $selected_department->director_id == $d->id) selected @endif>{{$d->first_name . ' ' . $d->last_name}}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label for="pbx_id">Id z programu PBX:<span style="color:red;">*</span></label>
                 <input type="text" class="form-control" id="pbx_id" name="pbx_id" value="{{$selected_department->pbx_id}}" placeholder="PBX ID">
             </div>

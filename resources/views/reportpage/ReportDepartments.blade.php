@@ -1,7 +1,30 @@
 @extends('layouts.main')
 @section('content')
 
-    {{--Header page --}}
+
+    {{--<style>--}}
+
+        {{--.sticky {--}}
+    {{--position: fixed;--}}
+    {{--top: 0;--}}
+    {{--display: block;--}}
+            {{--width: 80%;--}}
+    {{--}--}}
+        {{--.sticky-help {--}}
+            {{--width: 900px;--}}
+        {{--}--}}
+        {{--.hidden {--}}
+            {{--display:none;--}}
+        {{--}--}}
+        {{--.display {--}}
+            {{--display:table;--}}
+        {{--}--}}
+
+
+
+    {{--</style>--}}
+
+
     <div class="row">
         <div class="col-lg-12">
             <h1 class="page-header">Raport Miesięczny Oddziały</h1>
@@ -16,12 +39,15 @@
                     <select class="form-control" name="selected_dep">
                         <optgroup label="Oddziały">
                             @foreach($departments as $dep)
-                                <option value="{{$dep->id}}" @if($dep->id == $dep_id) selected @endif>{{$dep->departments->name . ' ' . $dep->department_type->name}}</option>
+                                <option value="{{$dep->id}}" @if(($wiev_type == 'department') && $dep->id == $dep_id) selected @endif>{{$dep->departments->name . ' ' . $dep->department_type->name}}</option>
                             @endforeach
                         </optgroup>
                         <optgroup label="Dyrektorzy">
-                            <option value="101">Daniel Abramowicz</option>
-                            <option value="102">Sylwia Kwiecień</option>
+                            @foreach($directors as $director)
+                                <option
+                                    @if($wiev_type == 'director' && ('10' . $director->id == $dep_id)) selected @endif
+                                value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
+                            @endforeach
                         </optgroup>
                     </select>
                 </div>
@@ -73,5 +99,53 @@
 @section('script')
 
     <script>
+        // $(document).ready(function() {
+            // window.onscroll = function() {myFunction()};
+            // var header = document.getElementById('header');
+            // var wind = $(window);
+            // // var doc = $(document);
+            //
+            // var sticky = $('#header').offset().top;
+            // var sticky2 = $('#header').innerHeight();
+            //
+            // var testInput = document.getElementById('testInput');
+            // var testInput2 = document.getElementById('testInput2');
+            //
+            // // testInput.value = $(document).offset().top;
+            // // testInput2.value = wind;
+            // function myFunction() {
+            //     if(window.pageYOffset >= sticky) {
+            //         $('#header').toggleClass('sticky');
+            //     }
+            //     else {
+            //         $('#header').toggleClass('sticky');
+            //     }
+            // }
+        //
+        //     wind.on('scroll', function() {
+        //         console.log('typeofPageYoffset: ' + typeof(window.pageYOffset));
+        //         console.log('PageYoffset: ' + window.pageYOffset);
+        //         console.log('sticky: ' + sticky);
+        //         console.log('sticky typeof: ' + typeof(sticky));
+        //         console.log('difference: ' + (sticky - window.pageYOffset));
+        //         console.log('typeofdifference: ' + typeof(sticky - window.pageYOffset));
+        //
+        //         if(window.pageYOffset >= sticky) {
+        //             $('#header').addClass('sticky');
+        //             $('#tableHidden').addClass('display');
+        //             $('#tableHidden').removeClass('hidden');
+        //
+        //         }
+        //         else {
+        //             $('#header').removeClass('sticky');
+        //             $('#tableHidden').addClass('hidden');
+        //             $('#tableHidden').removeClass('display');
+        //
+        //         }
+        //        console.log(window.pageYOffset);
+        //        console.log('sticky: ' + sticky);
+        //     });
+        // });
+
     </script>
 @endsection

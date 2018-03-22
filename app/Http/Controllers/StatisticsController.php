@@ -1584,6 +1584,9 @@ class StatisticsController extends Controller
 
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+        $directors = User::whereIn('id', $directorsIds)->get();
+
         $dep_id = $departments->first()->id;
 
         $data = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep_id, $days_in_month);
@@ -1603,7 +1606,8 @@ class StatisticsController extends Controller
                 'departments'       => $departments,
                 'dep_id'            => $dep_id,
                 'months'            => $data['months'],
-                'wiev_type'         => 'department'
+                'wiev_type'         => 'department',
+                'directors'         => $directors
             ]);
     }
 
@@ -1613,6 +1617,8 @@ class StatisticsController extends Controller
         $last_day = date('Y-m-') . date('t', strtotime($request->month_selected));
         $month = $request->month_selected;
         $year = date('Y');
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+        $directors = User::whereIn('id', $directorsIds)->get();
 
         if (intval($request->selected_dep) < 100) {
             $dep_id = $request->selected_dep;
@@ -1636,16 +1642,19 @@ class StatisticsController extends Controller
                     'departments'       => $departments,
                     'dep_id'            => $dep_id,
                     'months'            => $data['months'],
-                    'wiev_type'         => 'department'
+                    'wiev_type'         => 'department',
+                    'directors'         => $directors
                 ]);
         } else {
             if (Auth::user()->id != 4796) {
                 return "Raport w przygotowaniu";
             }
+            $dirId = substr($request->selected_dep, 2);
+            $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
 
             $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
-            $data = $this->getMultiDepartmentData($first_day, $last_day, $month, $year, [2,10,11,8], $days_in_month);
+            $data = $this->getMultiDepartmentData($first_day, $last_day, $month, $year, $director_departments->pluck('id')->toArray(), $days_in_month);
 
             return view('reportpage.ReportDepartments')
                 ->with([
@@ -1660,9 +1669,10 @@ class StatisticsController extends Controller
                     'schedule_data'     => $data['schedule_data'],
                     'month_selected'    => $request->month_selected,
                     'departments'       => $departments,
-                    'dep_id'            => 101,
+                    'dep_id'            => $request->selected_dep,
                     'months'            => $data['months'],
-                    'wiev_type'         => 'director'
+                    'wiev_type'         => 'director',
+                    'directors'         => $directors
                 ]);
         }
     }
@@ -1763,7 +1773,8 @@ class StatisticsController extends Controller
                $newYanky[] = $tempYanek;
             }
         }
-        //dd($yanky);
+        $newYanky = collect($newYanky);
+        //dd($newYanky);
         /**
          * Pobranie danych z grafiku
          */
@@ -1815,31 +1826,24 @@ class StatisticsController extends Controller
                 $tempReport->janky_count = 0;
                 $tempReport->wear_base = 0;
                 $tempReport->call_time = 0;
-                $tempReport->login_time = 0;
                 $tempReport->hour_time_use = 0;
 
                 foreach ($reports as $item) {
                     $tempReport->success += $item->success;
-
-                    $login_time_array = explode(":", $item->login_time);
-                    $tempReport->login_time += (($login_time_array[0] * 3600) + ($login_time_array[1] * 60) + $login_time_array[2]);
                     $tempReport->hour_time_use += floatval($item->hour_time_use);
-
                 }
                 $tempReport->average = ($tempReport->hour_time_use > 0) ? round($tempReport->success / $tempReport->hour_time_use, 2) : 0 ;
-                $tempReport->login_time = sprintf('%02d:%02d:%02d', ($tempReport->login_time/3600),($tempReport->login_time/60%60), $tempReport->login_time%60);
-
                 $reps[] = $tempReport;
             }
         }
-        //dd($reps);
+
         $hourReports = collect($reps);
         /**
          * Przypisanie danych do jednego obiektu
          */
-        $newHourReports = $hourReports->map(function($item) use ($yanky, $acceptHours) {
+        $newHourReports = $hourReports->map(function($item) use ($newYanky, $acceptHours) {
             //Pobranie danych z jankami
-            $toAdd = $yanky->where('report_date', '=', $item->report_date)->first();
+            $toAdd = $newYanky->where('report_date', '=', $item->report_date)->first();
 
             $item->count_all_check = ($toAdd != null) ? $toAdd->count_all_check : 0;
             $item->count_bad_check = ($toAdd != null) ? $toAdd->count_bad_check : 0;
@@ -2184,8 +2188,7 @@ class StatisticsController extends Controller
                 }
 
                 if (($week_day == 7 || $i == $days_in_month) &&  $add_week_sum == true && $miss_first_week == false) {
-
-                    $user_sum[$week_num]['first_week_day'] == null;
+                    $user_sum[$week_num]['last_week_day'] = $actual_loop_day;
 
                     $user_sum[$week_num]['janky_proc'] = ($user_sum[$week_num]['success'] > 0) ? round(($week_yanky / $user_sum[$week_num]['success']) * 100) : 0 ;
                     $user_sum[$week_num]['average'] = ($user_sum[$week_num]['login_time']) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['login_time']), 2) : 0 ;
@@ -2306,8 +2309,7 @@ class StatisticsController extends Controller
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
         foreach($departments as $department) {
-            //$menager = User::where('id', '=', $department->menager_id)->get();
-            $menager = User::where('id', '=', 4796)->get();
+            $menager = User::whereIn('id', [$department->menager_id, 4796])->get();
 
             $date_start = date('Y-m-') . '01';
             $date_stop = date('Y-m-t');

@@ -2,7 +2,7 @@
     <thead style="color:#efd88f">
     <tr>
         <td colspan="15" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
-            <font size="6" face="Calibri">RAPORT ODDZIAŁY {{$date_start . ' - ' . $date_stop}} </font></td>
+            <font size="6" face="Calibri">RAPORT ODDZIAŁY {{$dep_info->departments->name . ' ' . $dep_info->department_type->name . ' ' .$date_start . ' - ' . $date_stop}} </font></td>
         <td colspan="2" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20">
             <img src="http://teambox.pl/image/logovc.png" class="CToWUd"></td>
     </tr>
@@ -26,7 +26,7 @@
             <td style="border:1px solid #231f20;padding:3px;background:#231f20;">POZOSTAŁO CELU</td>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="tableBody">
 
         @php
             $total_week_success = 0;
@@ -310,3 +310,28 @@
 
     </tbody>
 </table>
+<script>
+    // $(document).ready(function() {
+       // window.onscroll = function() {myFunction()};
+       // var header = document.getElementById('header');
+       //
+       // var sticky = header.innerHeight;
+       // var sticky2 = $('#header').innerHeight();
+       // var wind = $('#header').offset().top;
+       //
+       // var testInput = document.getElementById('testInput');
+       // var testInput2 = document.getElementById('testInput2');
+       //
+       // testInput.value = sticky2;
+       // testInput2.value = $(window).offset().top;
+       // function myFunction() {
+       //     if($(window).innerHeight() <= wind) {
+       //         header.classList.add('sticky');
+       //     }
+       //     else {
+       //         header.classList.remove('sticky');
+       //     }
+       // }
+    // });
+
+</script>

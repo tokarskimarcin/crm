@@ -91,10 +91,11 @@
             $size = 0;
             foreach ($dep_info as $dep) {
                 $goal += ($day_number < 6) ? $dep->dep_aim : $dep->dep_aim_week;
-                $working_hours += ($day_number < 6) ? $dep->working_hours_normal : $dep->working_hours_week;
+                $department_hours = ($day_number < 6) ? $dep->working_hours_normal : $dep->working_hours_week;
+                $working_hours += $department_hours * $dep->size;
                 $size += $dep->size;
             }
-            $working_hours_goal = $size * $working_hours;
+            $working_hours_goal = $working_hours;
             //Obliczenie % celu
             $proc_goal = round(($report->success / $goal) * 100, 2);
             //Obliczenie reszty celu
@@ -103,7 +104,13 @@
             $real_RBH = round(($report->time_sum_real_RBH / 3600) ,2);
 
             //Oblicznenie czasu rozmów
-            $phone_time = ($report->call_time > 0) ? round(($real_RBH * $report->call_time) / 100, 2) : 0 ;
+            $hour_time_use = $report->hour_time_use;
+
+            //tutaj dodac %
+            $call_time = ($real_RBH > 0) ? round(($hour_time_use / $real_RBH) * 100, 2) : 0 ;
+
+            //obliczenie procentu
+            $janky_count = ($report->success) ? round(($report->count_bad_check / $report->success) * 100, 2) : 0 ;
 
             //Pobranie godzin z grafiku
             //pobranie numeru tygodnia
@@ -147,7 +154,7 @@
             $total_week_success += $report->success;
             $week_schedule_goal += $schedule_goal;
             $real_week_RBH += $real_RBH;
-            $real_week_phone_time += $phone_time;
+            $real_week_phone_time += $hour_time_use;
             $total_week_checked += $report->count_all_check;
             $total_week_bad += $report->count_bad_check;
             $total_week_goal += $goal;
@@ -158,7 +165,7 @@
             $total_success += $report->success;
             $total_schedule_goal += $schedule_goal;
             $total_real_RBH += $real_RBH;
-            $total_phone_time += $phone_time;
+            $total_phone_time += $hour_time_use;
             $total_checked += $report->count_all_check;
             $total_bad += $report->count_bad_check;
             $total_goal += $goal;
@@ -168,9 +175,8 @@
 
             $report_sum_call_time = ($report->call_time > 0 && $report->call_time != null) ? (($report->hour_time_use * 100) / $report->call_time) : 0 ;
 
-            $total_week_sum_call_time += $report_sum_call_time;
-            $total_sum_call_time += $report_sum_call_time;
-
+            $total_week_sum_call_time += $call_time;
+            $total_sum_call_time += $call_time;
         }
 
         /**
@@ -202,15 +208,15 @@
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($schedule_goal)}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$real_RBH}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->success}}</td>
-                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$phone_time}}</td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$hour_time_use}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->count_all_check}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->count_bad_check}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$size}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$goal}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$working_hours_goal}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->average}}</td>
-                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->janky_count}} %</td>
-                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->call_time}} %</td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$janky_count}} %</td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$call_time}} %</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$real_schedule}} %</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{($lost_schedule < 0) ? $lost_schedule : 0 }}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$proc_goal}} %</td>
