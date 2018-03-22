@@ -317,7 +317,7 @@ class UsersController extends Controller
         if ($request->status_work == "1") {
             if($user->login_phone != $request->login_phone) {
                     if($userEmployment) {
-                        $userEmployment->pbx_id_remove_date = $request->$date;
+                        $userEmployment->pbx_id_remove_date = $date;
                         $user->login_phone = $request->login_phone;
                         $userEmployment1 = new UserEmploymentStatus();
                         $userEmployment1->pbx_id = $request->login_phone;

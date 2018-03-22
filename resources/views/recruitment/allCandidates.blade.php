@@ -22,6 +22,7 @@
               <thead>
                 <tr>
                     <td>Imie i nazwisko</td>
+                    <td>Telefon</td>
                     <td>Data dodania</td>
                     <td>Dodany przez</td>
                     <td>Status</td>
@@ -63,6 +64,7 @@ table = $('#candidates').DataTable({
             var myName = data.first_name + " " + data.last_name;
             return myName;
         },"orderable": true, "searchable": true, "name": "last_name"},
+        {"data": "phone"},
         {"data": "created_at"},
         {"data": function (data, type, dataToSet) {
             var myName = data.cadre_name + " " + data.cadre_surname;

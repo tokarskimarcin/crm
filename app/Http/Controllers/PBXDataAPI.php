@@ -179,6 +179,7 @@ class PBXDataAPI extends Controller
                     foreach ($rowData as $key => $rowItem) {
                         $removeData = false;
                         if ($key == 0) {
+                            $temp_key = $key;
                             $pbx_number_array = explode(' ', $rowItem);
                             if (count($pbx_number_array) > 1) {
                                 $pbx_number = $pbx_number_array[count($pbx_number_array) - 1];
@@ -205,7 +206,8 @@ class PBXDataAPI extends Controller
                             $data_to_insert[$temp_key]['dkj_proc'] = floatval($rowItem);
                         } else if ($key == 10) {
                             $data_to_insert[$temp_key]['received_calls'] = intval($rowItem);
-
+                        } else if ($key == 11) {
+                            $data_to_insert[$temp_key]['pbx_id'] = $rowItem;
                             $data_to_insert[$temp_key]['report_date'] = date('Y-m-d');
                             $data_to_insert[$temp_key]['report_hour'] = date('H:') . '00:00';
 
@@ -224,6 +226,9 @@ class PBXDataAPI extends Controller
                                 $removeData = true;
                             }
                             if (!isset($data_to_insert[$temp_key]['pbx_id'])) {
+                                $removeData = true;
+                            }
+                            if ($data_to_insert[$temp_key]['pbx_id'] == 0) {
                                 $removeData = true;
                             }
                         }
