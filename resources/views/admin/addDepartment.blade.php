@@ -77,6 +77,16 @@
             </div>
 
             <div class="form-group">
+                <label for="hrEmployee">Wybierz pracownika HR</label>
+                <select class="form-control" name="hrEmployee" id="hrEmployee">
+                    <option value="0">Wybierz</option>
+                    @foreach($hrEmployee as $h)
+                        <option value="{{$h->id}}">{{$h->first_name . ' ' . $h->last_name}}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label for="pbx_id">Id z programu PBX:<span style="color:red;">*</span></label>
                 <input type="text" class="form-control" id="pbx_id" name="pbx_id" placeholder="PBX ID">
             </div>

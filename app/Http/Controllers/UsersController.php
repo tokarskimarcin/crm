@@ -309,39 +309,41 @@ class UsersController extends Controller
             ->first();
         $date = date("Y-m-d"); // actual date
 
-//       dd($userEmployment);
-
-//        if($request->status_work == "0") {
-//            $userEmployment->pbx_id_remove_date = $request->stop_date;
-//            $userEmployment->pbx_id = 0;
-//        }
-
-        if ($request->status_work == "1") { //editing working employee
-            if($user->status_work == "1") {
-                if($user->login_phone != $request->login_phone) { //user changes pbx_id
+        if($user->user_type_id == 1 || $user->user_type_id == 2) { //users are only consultants
+            if ($request->status_work == "1") { //editing working employee
+                if($user->status_work == "1") {
+                    if($user->login_phone != $request->login_phone) { //user changes pbx_id
                         if($userEmployment) { //user has history in user_employment_status
-                            $userEmployment->pbx_id_remove_date = $date; //remove date set to actual date
+                            $userEmployment->pbx_id_remove_date = $date;
                             $user->login_phone = $request->login_phone;
                             $userEmployment1 = new UserEmploymentStatus();
                             $userEmployment1->pbx_id = $request->login_phone;
-                            $userEmployment1->pbx_id_add_date = $date; //add date set to actual date
+                            $userEmployment1->pbx_id_add_date = $date;
                             $userEmployment1->pbx_id_remove_date = 0;
                             $userEmployment1->user_id = $user->id;
                             $userEmployment->save();
                             $userEmployment1->save();
                         }
                         else { //user has no history in user_employment_status and we add new insertion
-                            $userEmployment1 = new UserEmploymentStatus();
+                            $userEmployment4 = new UserEmploymentStatus(); //insertion with old pbx_id
+                            $userEmployment4->pbx_id = $user->login_phone;
+                            $userEmployment4->user_id = $user->id;
+                            $userEmployment4->pbx_id_add_date = $date;
+                            $userEmployment4->pbx_id_remove_date = $date;
+                            $userEmployment4->save();
+                            $userEmployment1 = new UserEmploymentStatus(); //insertion with new pbx_id
                             $userEmployment1->pbx_id = $request->login_phone;
                             $userEmployment1->user_id = $user->id;
                             $userEmployment1->pbx_id_add_date = $date;
                             $userEmployment1->pbx_id_remove_date = 0;
                             $userEmployment1->save();
                         }
+                    }
+                    $user->end_work = null;
                 }
-                $user->end_work = null;
             }
         }
+
 
 
 
@@ -387,33 +389,36 @@ class UsersController extends Controller
         $user->agency_id = $request->agency_id;
         $user->login_phone = ($request->login_phone != null) ? $request->login_phone : 0 ;
 
-        if($request->status_work == 0) { //hiring employee
-            if($user->status_work == 1) {
-                if($userEmployment) { //user has history in user_employment_status
-                    $userEmployment->pbx_id_remove_date = $request->stop_date;
-                    $user->login_phone = null;
-                    $userEmployment->save();
-                }
-                else { // user has no history in user_employment_status
-                    $user->login_phone = null;
-                    $userEmployment2 = new UserEmploymentStatus();
-                    $userEmployment2->pbx_id = $request->login_phone;
-                    $userEmployment2->user_id = $user->id;
-                    $userEmployment2->pbx_id_add_date = $request->stop_date;
-                    $userEmployment2->pbx_id_remove_date = $request->stop_date;
-                    $userEmployment2->save();
+        if($user->user_type_id == 1 || $user->user_type_id == 2) {
+            if ($request->status_work == 0) { //firing employee
+                if ($user->status_work == 1) {
+                    if ($userEmployment) { //user has history in user_employment_status
+                        $userEmployment->pbx_id_remove_date = $request->stop_date;
+                        $user->login_phone = null;
+                        $userEmployment->save();
+                    } else { // user has no history in user_employment_status
+                        $user->login_phone = null;
+                        $userEmployment2 = new UserEmploymentStatus();
+                        $userEmployment2->pbx_id = $request->login_phone;
+                        $userEmployment2->user_id = $user->id;
+                        $userEmployment2->pbx_id_add_date = $request->stop_date;
+                        $userEmployment2->pbx_id_remove_date = $request->stop_date;
+                        $userEmployment2->save();
+                    }
                 }
             }
         }
 
-        if($request->status_work == 1) {
-            if($user->status_work == 0) {
-                    $userEmployment3 = new UserEmploymentStatus();
+        if($user->user_type_id == 1 || $user->user_type_id == 2) {
+            if ($request->status_work == 1) { //re-hiring employee
+                if ($user->status_work == 0) {
+                    $userEmployment3 = new UserEmploymentStatus(); //adding new insertion
                     $userEmployment3->pbx_id = $request->login_phone;
                     $userEmployment3->user_id = $user->id;
                     $userEmployment3->pbx_id_add_date = $request->start_date;
                     $userEmployment3->pbx_id_remove_date = null;
                     $userEmployment3->save();
+                }
             }
         }
 
@@ -473,7 +478,6 @@ class UsersController extends Controller
                 ->update(['deleted' => 1, 'month_stop' => $month_to_end]);
         }
         $user->save();
-//        $userEmployment->save();//added
 
         $data = [
             'Edycja użytkownika:' => ' ',
