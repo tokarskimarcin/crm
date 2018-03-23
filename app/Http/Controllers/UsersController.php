@@ -444,6 +444,20 @@ class UsersController extends Controller
         if ($request->user_type != null && $request->user_type != 0) {
             if($user->user_type_id == 1 || $user->user_type_id == 2){
                 if($request->user_type > 2){ // AWANS
+                    if($userEmployment) { //gdy mamy historie w bazie danych
+                        $user->login_phone = null;
+                        $userEmployment->pbx_id_remove_date = $date;
+                        $userEmployment->save();
+                    }
+                    else { //gdy nie mamy historii w bazie danych
+                        $userEmployment5 = new UserEmploymentStatus();
+                        $userEmployment5->user_id = $user->id;
+                        $userEmployment5->pbx_id = $user->login_phone;
+                        $user->login_phone = null;
+                        $userEmployment5->pbx_id_add_date = $date;
+                        $userEmployment5->pbx_id_remove_date = $date;
+                        $userEmployment5->save();
+                    }
                     $user->promotion_date = date('Y-m-d');
                     $type_redirect = 2;
                 }
@@ -451,6 +465,7 @@ class UsersController extends Controller
             }else if($user->user_type_id > 2){
                     if($request->user_type < 3){
                         //Degradacja
+                        $user->login_phone = null;
                         $user->degradation_date = date('Y-m-d');
                         $type_redirect = 1;
                     }
