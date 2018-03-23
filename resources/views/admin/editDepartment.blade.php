@@ -83,6 +83,15 @@
             </div>
 
             <div class="form-group">
+                <label for="hrEmployee">Pracownik HR</label>
+                <select class="form-control" name="hrEmployee" id="hrEmployee">
+                    @foreach($hrEmployee as $h)
+                        <option value="{{$h->id}}" @if(isset($selected_department->hr_id) && $selected_department->hr_id == $h->id) selected @endif>{{$h->first_name . ' ' . $h->last_name}}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label for="pbx_id">Id z programu PBX:<span style="color:red;">*</span></label>
                 <input type="text" class="form-control" id="pbx_id" name="pbx_id" value="{{$selected_department->pbx_id}}" placeholder="PBX ID">
             </div>

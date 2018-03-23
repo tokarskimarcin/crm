@@ -159,11 +159,13 @@ class AdminController extends Controller
         $department_types = Department_types::all();
         $departments = Departments::all();
         $menagers = User::where('user_type_id', '=', '7')->where('status_work', '=', '1')->get();
+        $hr = User::where('user_type_id', '=', '5')->where('status_work', '=', '1')->get();
 
         return view('admin.addDepartment')
             ->with('departments', $departments)
             ->with('department_types', $department_types)
-            ->with('menagers', $menagers);
+            ->with('menagers', $menagers)
+            ->with('hrEmployee', $hr);
     }
 
     public function addDepartmentPost(Request $request) {
@@ -205,6 +207,7 @@ class AdminController extends Controller
         $department_info->blocked = 0;
         $department_info->menager_id = ($request->menager != 0) ? $request->menager : 0 ;
         $department_info->director_id = ($request->director != 0) ? $request->director : 0 ;
+        $department_info->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : 0 ;
 
         $department_info->save();
 
@@ -231,6 +234,7 @@ class AdminController extends Controller
         //1 - wybranie oddziału
         //2 - edycja oddziału
         $menagers = User::where('user_type_id', '=', '7')->where('status_work', '=', '1')->get();
+        $hrEmployee = User::where('user_type_id', '=', '5')->where('status_work', '=', '1')->get();
         $department_info = Department_info::all();
         $department_types = Department_types::all();
         $selected_department = Department_info::find($request->selected_department_info_id);
@@ -244,6 +248,7 @@ class AdminController extends Controller
               ->with('selected_department', $selected_department)
               ->with('department_types', $department_types)
               ->with('department_info', $department_info)
+              ->with('hrEmployee', $hrEmployee)
               ->with('menagers', $menagers);
         }
 
@@ -285,6 +290,7 @@ class AdminController extends Controller
             $selected_department->working_hours_week = ($request->work_hour_weekend > 0) ? $request->work_hour_weekend : 0 ;
             $selected_department->menager_id = ($request->menager != 0) ? $request->menager : 0 ;
             $selected_department->director_id = ($request->director != 0) ? $request->director : 0 ;
+            $selected_department->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : 0 ;
             $selected_department->save();
         }
 
@@ -555,46 +561,6 @@ class AdminController extends Controller
 
             return 1;
         }
-    }
-    public function monitorMethod($id) {
-            $hour = date('H');
-            $hour = $hour . ":00:00";
-            $date = date("Y-m-d");
-
-          $givenUsers = Pbx_report_extension::where('report_date', '=', $date)
-              ->where('report_hour', '=', $hour)
-              ->orderBy('average', 'DESC')
-              ->get();
-          $userTable = [];
-          $reportTable = [];
-          foreach($givenUsers as $item) {
-              if(is_object($item->user)) {
-                  if($item->user->department_info_id == $id) {
-                      array_push($userTable, $item);
-                  }
-              }
-          }
-          $dep = Department_info::find($id);
-          $report = HourReport::where('hour', $hour)
-              ->where('report_date', $date)
-              ->orderBy('average', 'DESC')
-              ->get();
-
-          foreach($report as $r) {
-              if(is_object($r)) {
-                  if($r->department_info->id_dep_type == 2) {
-                  array_push($reportTable, $r);
-                  }
-              }
-          }
-
-        return view('screens.monitors')->with('userTable', $userTable)
-            ->with('reportTable', $reportTable);
-    }
-
-    public function screenMethod(Request $request) {
-        $department_info = Department_info::all();
-        return view('screens.screen_table')->with('dane', $department_info);
     }
 
 }

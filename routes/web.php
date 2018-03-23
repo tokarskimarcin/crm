@@ -608,8 +608,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 });
 //////////////////////Testing ORM///////////////
 ///
-Route::get('/dept/{id}','AdminController@monitorMethod');
-Route::get('/screen_table','AdminController@screenMethod');
+Route::get('/dept/{id}','ScreensController@monitorMethod');
+Route::get('/screen_table','ScreensController@screenMethod');
 //pobieranie danych po oddziałach godzinny
   Route::get('/testorm', 'TestORM@test');
 

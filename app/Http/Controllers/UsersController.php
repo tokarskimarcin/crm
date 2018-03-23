@@ -88,7 +88,7 @@ class UsersController extends Controller
         $send_type = $send_type->type;
         $agencies = Agencies::all();
         $user = new User;
-//        $userEmployment = new UserEmploymentStatus;
+        $userEmployment = new UserEmploymentStatus;
 
 
 
@@ -158,11 +158,11 @@ class UsersController extends Controller
         $user->documents = $request->documents;
         $user->save();
 
-//        $userEmployment->pbx_id = $request->login_phone;
-//        $userEmployment->pbx_id_add_date = $request->start_date;
-//        $userEmployment->pbx_id_remove_date = 0;
-//        $userEmployment->user_id = $user->id;
-//        $userEmployment->save();
+        $userEmployment->pbx_id = $request->login_phone;
+        $userEmployment->pbx_id_add_date = $request->start_date;
+        $userEmployment->pbx_id_remove_date = 0;
+        $userEmployment->user_id = $user->id;
+        $userEmployment->save();
 
         $user_data = array(
             'first_name' => $user->first_name,
@@ -302,39 +302,50 @@ class UsersController extends Controller
 
         $user = User::find($id);
 
-//        $userEmployment = UserEmploymentStatus::
-//        where('pbx_id', '=', $user->login_phone)
-//            -> where('user_id', '=', $user->id)
-//            ->first();
 
-        $date = date("Y-m-d");
+        $userEmployment = UserEmploymentStatus::
+        where('pbx_id', '=', $user->login_phone)
+            -> where('user_id', '=', $user->id)
+            ->first();
+        $date = date("Y-m-d"); // actual date
 
-//       dd($userEmployment);
+        if($user->user_type_id == 1 || $user->user_type_id == 2) { //users are only consultants
+            if ($request->status_work == "1") { //editing working employee
+                if($user->status_work == "1") {
+                    if($user->login_phone != $request->login_phone) { //user changes pbx_id
+                        if($userEmployment) { //user has history in user_employment_status
+                            $userEmployment->pbx_id_remove_date = $date;
+                            $user->login_phone = $request->login_phone;
+                            $userEmployment1 = new UserEmploymentStatus();
+                            $userEmployment1->pbx_id = $request->login_phone;
+                            $userEmployment1->pbx_id_add_date = $date;
+                            $userEmployment1->pbx_id_remove_date = 0;
+                            $userEmployment1->user_id = $user->id;
+                            $userEmployment->save();
+                            $userEmployment1->save();
+                        }
+                        else { //user has no history in user_employment_status and we add new insertion
+                            $userEmployment4 = new UserEmploymentStatus(); //insertion with old pbx_id
+                            $userEmployment4->pbx_id = $user->login_phone;
+                            $userEmployment4->user_id = $user->id;
+                            $userEmployment4->pbx_id_add_date = $date;
+                            $userEmployment4->pbx_id_remove_date = $date;
+                            $userEmployment4->save();
+                            $userEmployment1 = new UserEmploymentStatus(); //insertion with new pbx_id
+                            $userEmployment1->pbx_id = $request->login_phone;
+                            $userEmployment1->user_id = $user->id;
+                            $userEmployment1->pbx_id_add_date = $date;
+                            $userEmployment1->pbx_id_remove_date = 0;
+                            $userEmployment1->save();
+                        }
+                    }
+                    $user->end_work = null;
+                }
+            }
+        }
 
-//        if($request->status_work == "0") {
-//            $userEmployment->pbx_id_remove_date = $request->stop_date;
-//            $userEmployment->pbx_id = 0;
-//        }
 
-//        if ($request->status_work == "1") {
-//            if($user->login_phone != $request->login_phone) {
-//                    if($userEmployment) {
-//                        $userEmployment->pbx_id_remove_date = $date;
-//                        $user->login_phone = $request->login_phone;
-//                        $userEmployment1 = new UserEmploymentStatus();
-//                        $userEmployment1->pbx_id = $request->login_phone;
-//                        $userEmployment1->pbx_id_add_date = $request->start_date;
-//                        $userEmployment1->pbx_id_remove_date = 0;
-//                        $userEmployment1->user_id = $user->$id;
-//                        $userEmployment->save();
-//                        $userEmployment1->save();
-//                    }
-//            }
-//            else {
-//                dd('nie zmienimay pbx');
-//            }
-//            $user->end_work = null;
-//        }
+
 
         if ($user == null) {
             return view('errors.404');
@@ -377,6 +388,40 @@ class UsersController extends Controller
         $user->salary_to_account = $request->salary_to_account;
         $user->agency_id = $request->agency_id;
         $user->login_phone = ($request->login_phone != null) ? $request->login_phone : 0 ;
+
+        if($user->user_type_id == 1 || $user->user_type_id == 2) {
+            if ($request->status_work == 0) { //firing employee
+                if ($user->status_work == 1) {
+                    if ($userEmployment) { //user has history in user_employment_status
+                        $userEmployment->pbx_id_remove_date = $request->stop_date;
+                        $user->login_phone = null;
+                        $userEmployment->save();
+                    } else { // user has no history in user_employment_status
+                        $user->login_phone = null;
+                        $userEmployment2 = new UserEmploymentStatus();
+                        $userEmployment2->pbx_id = $request->login_phone;
+                        $userEmployment2->user_id = $user->id;
+                        $userEmployment2->pbx_id_add_date = $request->stop_date;
+                        $userEmployment2->pbx_id_remove_date = $request->stop_date;
+                        $userEmployment2->save();
+                    }
+                }
+            }
+        }
+
+        if($user->user_type_id == 1 || $user->user_type_id == 2) {
+            if ($request->status_work == 1) { //re-hiring employee
+                if ($user->status_work == 0) {
+                    $userEmployment3 = new UserEmploymentStatus(); //adding new insertion
+                    $userEmployment3->pbx_id = $request->login_phone;
+                    $userEmployment3->user_id = $user->id;
+                    $userEmployment3->pbx_id_add_date = $request->start_date;
+                    $userEmployment3->pbx_id_remove_date = null;
+                    $userEmployment3->save();
+                }
+            }
+        }
+
         $user->rate = $request->rate;
         $user->salary = $request->salary;
         $user->documents = $request->documents;
@@ -399,6 +444,20 @@ class UsersController extends Controller
         if ($request->user_type != null && $request->user_type != 0) {
             if($user->user_type_id == 1 || $user->user_type_id == 2){
                 if($request->user_type > 2){ // AWANS
+                    if($userEmployment) { //gdy mamy historie w bazie danych
+                        $user->login_phone = null;
+                        $userEmployment->pbx_id_remove_date = $date;
+                        $userEmployment->save();
+                    }
+                    else { //gdy nie mamy historii w bazie danych
+                        $userEmployment5 = new UserEmploymentStatus();
+                        $userEmployment5->user_id = $user->id;
+                        $userEmployment5->pbx_id = $user->login_phone;
+                        $user->login_phone = null;
+                        $userEmployment5->pbx_id_add_date = $date;
+                        $userEmployment5->pbx_id_remove_date = $date;
+                        $userEmployment5->save();
+                    }
                     $user->promotion_date = date('Y-m-d');
                     $type_redirect = 2;
                 }
@@ -406,6 +465,7 @@ class UsersController extends Controller
             }else if($user->user_type_id > 2){
                     if($request->user_type < 3){
                         //Degradacja
+                        $user->login_phone = null;
                         $user->degradation_date = date('Y-m-d');
                         $type_redirect = 1;
                     }
@@ -426,9 +486,6 @@ class UsersController extends Controller
          * automatyczne rozwiązanie pakietu medycznego w przypadku zakończenia pracy
          */
         if ($request->status_work == 0) {
-//            if($user->status_work == 1) {
-//                dd('zwolniony');
-//            }
             $month_to_end = date('Y-m-t', strtotime($request->stop_date));
             MedicalPackage::where('user_id', '=', $user->id)
                 ->where('deleted', '=', 0)
@@ -436,7 +493,6 @@ class UsersController extends Controller
                 ->update(['deleted' => 1, 'month_stop' => $month_to_end]);
         }
         $user->save();
-//        $userEmployment->save();//added
 
         $data = [
             'Edycja użytkownika:' => ' ',
