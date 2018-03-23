@@ -2504,16 +2504,23 @@ class StatisticsController extends Controller
      * Wysyłanie maila dziennego (trenerzy) dla kierownikow
      */
     public function MailDayReportCoaches() {
-        $data = $this->getDayCoachStatistics(2, date('Y-m-d'));
+        $departments = Department_info::where('id_dep_type', '=', 2)
+            ->get();
 
-        $department = Department_info::find(2);
-        return view('mail.hourReportCoach')
-            ->with([
+        foreach ($departments as $department){
+            $data_raw = $this->getDayCoachStatistics($department->id, date('Y-m-d'));
+
+            $data = [
                 'department'   => $department,
-                'coaches'   => $data['coaches'],
-                'data'      => $data['data'],
-                'report_date' => $data['report_date']
-            ]);
+                'coaches'   => $data_raw['coaches'],
+                'data'      => $data_raw['data'],
+                'report_date' => $data_raw['report_date']
+            ];
+
+            $menager = User::whereIn('id', [$department->menager_id, 4796, 1364])->get();
+
+            $this->sendMailByVerona('hourReportCoach', $data, 'Raport trenerzy', $menager);
+        }
     }
 
     /******** Główna funkcja do wysyłania emaili*************/
