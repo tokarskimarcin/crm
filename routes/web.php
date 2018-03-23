@@ -252,6 +252,7 @@ Route::get('/monthReportHireCandidate', 'StatisticsController@MailmonthReportHir
 Route::get('/monthReportSummaryDepartments', 'StatisticsController@MailMonthReportDepartments');
 
 Route::get('/dayReportDepartments', 'StatisticsController@MailDayDepartmentsReport');
+Route::get('/dayReportCoaches', 'StatisticsController@MailDayReportCoaches');
 
 //Maila dotyczące wyłączonych kont
 //Raport Usunietych kont
@@ -490,6 +491,10 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/pageMonthReportCoach', 'StatisticsController@pageMonthReportCoachGet');
     Route::post('/pageMonthReportCoach', 'StatisticsController@pageMonthReportCoachPost');
+    Route::get('/pageDayReportCoaches', 'StatisticsController@pageDayReportCoachGet');
+    Route::post('/pageDayReportCoaches', 'StatisticsController@pageDayReportCoachPost');
+    Route::get('/pageSummaryDayReportCoaches', 'StatisticsController@pageSummaryDayReportCoachesGet');
+    Route::post('/pageSummaryDayReportCoaches', 'StatisticsController@pageSummaryDayReportCoachesPost');
 
 
     //Raporty Rekrutacji
@@ -594,6 +599,12 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 
     /**REKRUTACJA STOP */
+
+
+    /** Tabela Postępów Coaching */
+
+    Route::get('/progress_table', 'CoachingController@progress_tableGET');
+
 });
 //////////////////////Testing ORM///////////////
 ///

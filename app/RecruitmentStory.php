@@ -46,18 +46,38 @@ class RecruitmentStory extends Model
 
 
     public static function getReportFlowData($data_start,$data_stop){
-        $result = DB::table('candidate')
-            ->select(DB::Raw("users.first_name,users.last_name,count(candidate.id) as count_flow,
-                `departments`.`name`,`department_type`.`name` as dep_type"))
-            ->join('users','users.id','candidate.cadre_id')
-            ->join('department_info','department_info.id','users.department_info_id')
+        $data_start = $data_start . ' 00:00:00';
+        $data_stop = $data_stop . ' 23:00:00';
+
+        $result = DB::table('department_info')
+            ->select(DB::raw('
+                users.last_name,
+                users.first_name,
+                departments.name, 
+                department_type.name as dep_type, 
+                SUM(CASE WHEN `candidate`.`created_at` between "' . $data_start . '" and "' . $data_stop . '" THEN 1 ELSE 0 END) as count_flow
+            '))
             ->join('departments','departments.id','department_info.id_dep')
             ->join('department_type','department_type.id','department_info.id_dep_type')
-            ->wherebetween('candidate.created_at',[$data_start.' 00:00:00',$data_stop.' 23:00:00'])
-            ->where('users.user_type_id','=','5')
-            ->groupBy('candidate.cadre_id')
-            ->orderBy('count_flow','desc')
+            ->leftjoin('candidate', 'candidate.department_info_id', 'department_info.id')
+            ->leftjoin('users', 'users.id', 'department_info.hr_id')
+            ->groupBy('department_info.id')
+            ->orderBy('count_flow', 'desc')
+            ->where('commission_janky', '!=', 0)
             ->get();
+//        $result = DB::table('candidate')
+//            ->select(DB::Raw("department_info.id as depid, users.id as uid, users.first_name,users.last_name,count(candidate.id) as count_flow,
+//                `departments`.`name`,`department_type`.`name` as dep_type"))
+//            ->join('users','users.id','candidate.cadre_id')
+//            ->join('department_info','department_info.id','users.department_info_id')
+//            ->join('departments','departments.id','department_info.id_dep')
+//            ->join('department_type','department_type.id','department_info.id_dep_type')
+//            ->wherebetween('candidate.created_at',[$data_start.' 00:00:00',$data_stop.' 23:00:00'])
+//            ->where('users.user_type_id','=','5')
+//            ->groupBy('candidate.cadre_id')
+//            ->orderBy('count_flow','desc')
+//            ->get();
+        //dd($result);
         return $result;
     }
 
@@ -82,21 +102,38 @@ class RecruitmentStory extends Model
      */
     public static function getReportInterviewsData($date_start, $date_stop, $select_type) {
         if ($select_type == 0) {
-            $data = DB::table('recruitment_story')
+            $dataCount = DB::table('recruitment_story')
                 ->select(DB::raw('
+                    departments.id as dep_id,
                     departments.name as dep_name,
                     department_type.name as dep_name_type,
                     count(recruitment_story.id) as counted
                 '))
-                ->join('users', 'users.id', 'recruitment_story.cadre_id')
-                ->join('department_info', 'users.department_info_id', 'department_info.id')
+                ->join('candidate', 'candidate.id', 'recruitment_story.candidate_id')
+                ->join('department_info', 'candidate.department_info_id', 'department_info.id')
                 ->join('departments', 'departments.id', 'department_info.id_dep')
                 ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
                 ->whereBetween('recruitment_story.created_at', [$date_start . ' 01:00:00', $date_stop . ' 23:00:00'])
                 ->where('recruitment_story.attempt_status_id','=',17)
-                ->groupBy('users.department_info_id')
+                ->groupBy('candidate.department_info_id')
                 ->orderBy('counted','desc')
                 ->get();
+
+            $deps = Department_info::all();
+
+            $data = [];
+            foreach ($deps as $dep) {
+                $dep_data = new \stdClass();
+                $dep_data->dep_name = $dep->departments->name;
+                $dep_data->dep_name_type = $dep->department_type->name;
+                $dep_data->counted = 0;
+                foreach($dataCount as $item) {
+                    if ($item->dep_id == $dep->id) {
+                        $dep_data->counted = $item->counted;
+                    }
+                }
+                $data[] = $dep_data;
+            }
         } else if ($select_type == 1) {
             $data = DB::table('recruitment_story')
                 ->select(DB::raw('
