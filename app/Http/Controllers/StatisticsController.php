@@ -1827,10 +1827,12 @@ class StatisticsController extends Controller
                 $tempReport->wear_base = 0;
                 $tempReport->call_time = 0;
                 $tempReport->hour_time_use = 0;
+                $tempReport->total_time = 0;
 
                 foreach ($reports as $item) {
                     $tempReport->success += $item->success;
                     $tempReport->hour_time_use += floatval($item->hour_time_use);
+                    $tempReport->total_time += ($item->call_time > 0) ? ((100 * $item->hour_time_use) / $item->call_time) : 0 ;
                 }
                 $tempReport->average = ($tempReport->hour_time_use > 0) ? round($tempReport->success / $tempReport->hour_time_use, 2) : 0 ;
                 $reps[] = $tempReport;
@@ -2444,11 +2446,11 @@ class StatisticsController extends Controller
             ->with([
                 'department_info'   => $department_info,
                 'department'        => $department,
-                'dep_id'            => 2,
+                'dep_id'            => $request->dep_id,
                 'days'              => $days_in_month,
                 'month'             => $month,
                 'year'              => $year,
-                'date_selected'     => date('Y-m-d'),
+                'date_selected'     => $request->day_select,
                 'coaches'           => $data['coaches'],
                 'data'              => $data['data'],
                 'report_date'       => $data['report_date']
