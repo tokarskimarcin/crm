@@ -395,11 +395,17 @@
                     tableBody.text(' ');
                     tableBody.append(newTable[iteracja]);
                     iteracja++;
-                    if(iteracja == newTable.length) {
-                        iteracja = -1;
+                    if(newTable.length <= 3) {
+                        if(iteracja == newTable.length) {
+                            iteracja = -1;
+                        }
+                    }
+                    else {
+                        if(iteracja == 3) {
+                            iteracja = -1;
+                        }
                     }
                 }
-
             },delayInMilliseconds);
         });
     </script>
