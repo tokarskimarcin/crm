@@ -505,6 +505,7 @@ $(document).ready(function() {
         var salary_to_account = $('#salary_to_account').val();
         var start_date = $('#start_date').val();
         var stop_date = $('#stop_date').val();
+        var status_work = $('#status_work').val();
         var email = $('#email').val();
         var phone = $('#phone').val();
         var user_type = $('#user_type').val();
@@ -537,9 +538,11 @@ $(document).ready(function() {
             return false;
         }
 
-        if (trainer == "0") {
-            swal('Wybierz prowadzącego');
-            return false;
+        if(status_work == 1) {
+            if (trainer == "0") {
+                swal('Wybierz prowadzącego');
+                return false;
+            }
         }
 
         if (documents == 'Wybierz') {
@@ -562,9 +565,11 @@ $(document).ready(function() {
             return false;
         }
 
-        if (login_phone != null && login_phone.trim().length == 0) {
-            swal('Podaj numer kolejki PBX!');
-            return false;
+        if (status_work == 1) {
+            if (login_phone != null && login_phone.trim().length == 0) {
+                swal('Podaj numer kolejki PBX!');
+                return false;
+            }
         }
 
         if (description.trim().length == 0) {

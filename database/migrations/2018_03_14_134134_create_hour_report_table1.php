@@ -26,7 +26,6 @@ class CreateHourReportTable1 extends Migration
             $table->decimal('janky_count', 10,2);
             $table->decimal('wear_base', 10,2);
             $table->decimal('call_time', 10,2);
-            $table->time('login_time');
             $table->decimal('hour_time_use', 10,2);
             $table->timestamps();
         });
