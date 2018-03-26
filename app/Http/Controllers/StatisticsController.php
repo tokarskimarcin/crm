@@ -1827,10 +1827,12 @@ class StatisticsController extends Controller
                 $tempReport->wear_base = 0;
                 $tempReport->call_time = 0;
                 $tempReport->hour_time_use = 0;
+                $tempReport->total_time = 0;
 
                 foreach ($reports as $item) {
                     $tempReport->success += $item->success;
                     $tempReport->hour_time_use += floatval($item->hour_time_use);
+                    $tempReport->total_time += ($item->call_time > 0) ? ((100 * $item->hour_time_use) / $item->call_time) : 0 ;
                 }
                 $tempReport->average = ($tempReport->hour_time_use > 0) ? round($tempReport->success / $tempReport->hour_time_use, 2) : 0 ;
                 $reps[] = $tempReport;
@@ -2095,8 +2097,8 @@ class StatisticsController extends Controller
      * Wyświetlanie raportu miesięcznego trenerzy
      */
     public function pageMonthReportCoachPost(Request $request) {
-        $date_start = date('Y-m-d');
-        $date_stop = date('Y-m-d');
+        $date_start = date('Y-m-') . '01';
+        $date_stop = date('Y-m-t');
 
         $leader = User::find($request->coach_id);
 
@@ -2141,6 +2143,7 @@ class StatisticsController extends Controller
                 $user_sum[$y]['first_name'] = $consultant->first()->first_name;
                 $user_sum[$y]['last_name'] = $consultant->first()->last_name;
                 $user_sum[$y]['week_num'] = $y;
+                $user_sum[$y]['total_week_yanky'] = 0;
                 $user_sum[$y]['first_week_day'] = null;
                 $user_sum[$y]['last_week_day'] = null;
             }
@@ -2193,7 +2196,8 @@ class StatisticsController extends Controller
                 if (($week_day == 7 || $i == $days_in_month) &&  $add_week_sum == true && $miss_first_week == false) {
                     $user_sum[$week_num]['last_week_day'] = $actual_loop_day;
 
-                    $user_sum[$week_num]['janky_proc'] = ($user_sum[$week_num]['success'] > 0) ? round(($week_yanky / $user_sum[$week_num]['success']) * 100) : 0 ;
+                    $user_sum[$week_num]['total_week_yanky'] = $week_yanky;
+                    $user_sum[$week_num]['janky_proc'] = ($user_sum[$week_num]['success'] > 0) ? round(($week_yanky / $user_sum[$week_num]['success']) * 100, 2) : 0 ;
                     $user_sum[$week_num]['average'] = ($user_sum[$week_num]['login_time']) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['login_time']), 2) : 0 ;
                     $user_sum[$week_num]['proc_received_calls'] = ($user_sum[$week_num]['received_calls'] > 0) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['received_calls']) * 100 , 2) : 0 ;
                     $week_num++;
@@ -2444,11 +2448,11 @@ class StatisticsController extends Controller
             ->with([
                 'department_info'   => $department_info,
                 'department'        => $department,
-                'dep_id'            => 2,
+                'dep_id'            => $request->dep_id,
                 'days'              => $days_in_month,
                 'month'             => $month,
                 'year'              => $year,
-                'date_selected'     => date('Y-m-d'),
+                'date_selected'     => $request->day_select,
                 'coaches'           => $data['coaches'],
                 'data'              => $data['data'],
                 'report_date'       => $data['report_date']
@@ -2502,16 +2506,23 @@ class StatisticsController extends Controller
      * Wysyłanie maila dziennego (trenerzy) dla kierownikow
      */
     public function MailDayReportCoaches() {
-        $data = $this->getDayCoachStatistics(2, date('Y-m-d'));
+        $departments = Department_info::where('id_dep_type', '=', 2)
+            ->get();
 
-        $department = Department_info::find(2);
-        return view('mail.hourReportCoach')
-            ->with([
+        foreach ($departments as $department){
+            $data_raw = $this->getDayCoachStatistics($department->id, date('Y-m-d'));
+
+            $data = [
                 'department'   => $department,
-                'coaches'   => $data['coaches'],
-                'data'      => $data['data'],
-                'report_date' => $data['report_date']
-            ]);
+                'coaches'   => $data_raw['coaches'],
+                'data'      => $data_raw['data'],
+                'report_date' => $data_raw['report_date']
+            ];
+
+            $menager = User::whereIn('id', [$department->menager_id, 4796, 1364])->get();
+
+            $this->sendMailByVerona('hourReportCoach', $data, 'Raport trenerzy', $menager);
+        }
     }
 
     /******** Główna funkcja do wysyłania emaili*************/

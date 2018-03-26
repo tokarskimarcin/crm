@@ -65,19 +65,7 @@ class RecruitmentStory extends Model
             ->orderBy('count_flow', 'desc')
             ->where('commission_janky', '!=', 0)
             ->get();
-//        $result = DB::table('candidate')
-//            ->select(DB::Raw("department_info.id as depid, users.id as uid, users.first_name,users.last_name,count(candidate.id) as count_flow,
-//                `departments`.`name`,`department_type`.`name` as dep_type"))
-//            ->join('users','users.id','candidate.cadre_id')
-//            ->join('department_info','department_info.id','users.department_info_id')
-//            ->join('departments','departments.id','department_info.id_dep')
-//            ->join('department_type','department_type.id','department_info.id_dep_type')
-//            ->wherebetween('candidate.created_at',[$data_start.' 00:00:00',$data_stop.' 23:00:00'])
-//            ->where('users.user_type_id','=','5')
-//            ->groupBy('candidate.cadre_id')
-//            ->orderBy('count_flow','desc')
-//            ->get();
-        //dd($result);
+
         return $result;
     }
 
