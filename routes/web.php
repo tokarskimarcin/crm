@@ -129,6 +129,8 @@ Route::POST('/datatableAllTests','AdminController@datatableAllTests')->name('api
 
 Route::POST('/paymentStory','FinancesController@paymentStory')->name('api.paymentStory');
 
+Route::POST('/saveCoaching','CoachingController@saveCoaching')->name('api.saveCoaching');
+
 /* TEST AJAX ROUTES STOP */
 
 //** RECRUITMENT AJAX */
@@ -185,6 +187,11 @@ Route::POST('/getMedicalPackagesAdminData', 'AdminController@getMedicalPackagesA
 Route::POST('/getMedicalPackageData', 'AdminController@getMedicalPackageData')->name('api.getMedicalPackageData');
 Route::POST('/saveMedicalPackageData', 'AdminController@saveMedicalPackageData')->name('api.saveMedicalPackageData');
 
+
+
+
+
+Route::POST('/datatableCoachingTable','CoachingController@datatableCoachingTable')->name('api.datatableCoachingTable');
 
 //Bootstrap notifications //
 
