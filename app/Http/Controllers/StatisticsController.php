@@ -759,27 +759,33 @@ class StatisticsController extends Controller
         $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
         $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
 
-        $dkj = DB::table('dkj')
-            ->select(DB::raw('
-                dkj.department_info_id,
-                departments.name as dep_name,
-                department_type.name as dep_name_type,
-                department_info.type,
-                count(dkj.id) as liczba_odsluchanych,
-                sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as wysylka,
-                sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as badania,
-                SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 1 THEN 1 ELSE 0 END) as bad_wysylka,
-                SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 0 THEN 1 ELSE 0 END) as bad_badania
-            '))
-            ->join('users', 'users.id', '=', 'dkj.id_user')
-            ->join('department_info', 'department_info.id', '=', 'dkj.department_info_id')
+
+        $dkj = DB::table('pbx_dkj_team')
+            ->select(DB::raw(
+                'SUM(count_all_check) as sum_all_talks,
+                SUM(count_good_check) as sum_correct_talks,
+                SUM(count_bad_check) as sum_janky,
+                departments.name as dep, 
+                department_type.name as depname,
+                count(departments.name)
+                   '))
+            ->join('department_info', 'department_info.id', '=', 'pbx_dkj_team.department_info_id')
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-            ->whereBetween('add_date', [$date_start, $date_stop])
-            ->groupBy('users.department_info_id')
-            ->groupBy('department_info.type')
+            ->where('department_info.dep_aim','!=',0)
+            ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop){
+                $query->select(DB::raw(
+                    'MAX(pbx_dkj_team.id)'
+                ))
+                    ->from('pbx_dkj_team')
+                    ->whereBetween('report_date', [$date_start, $date_stop])
+                    ->groupBy('department_info_id','report_date');
+            })
+            ->where('department_info.id_dep_type', '=', 2)
+            ->groupBy('pbx_dkj_team.department_info_id')
             ->get();
 
+//            dd($dkj);
         $data = [
             'date_start' => $date_start,
             'date_stop' => $date_stop,
@@ -874,21 +880,29 @@ class StatisticsController extends Controller
         }
         $selected_date = $year . '-' . $month . '%';
 
-        $dkj = DB::table('users')
-            ->select(DB::raw('
-                users.id,
-                users.first_name,
-                users.last_name,
-                users.dating_type,
-                count(*) as user_sum,
-                sum(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as user_janek,
-                sum(CASE WHEN dkj.dkj_status = 0 THEN 1 ELSE 0 END) as user_not_janek
-            '))
-            ->join('dkj', 'users.id', '=', 'dkj.id_dkj')
-            ->where('dkj.add_date', 'like', $selected_date)
-            ->groupBy('dkj.id_dkj')
-            ->get();
+        $month_ini = new DateTime("first day of this month");
+        $date_start = $month_ini->format('Y-m-d');
+        $month_end = new DateTime("last day of this month");
+        $date_stop = $month_end->format('Y-m-d');
 
+//        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+//        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+
+//        $dkj = DB::table('users')
+//            ->select(DB::raw('
+//                users.id,
+//                users.first_name,
+//                users.last_name,
+//                users.dating_type,
+//                count(*) as user_sum,
+//                sum(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as user_janek,
+//                sum(CASE WHEN dkj.dkj_status = 0 THEN 1 ELSE 0 END) as user_not_janek
+//            '))
+//            ->join('dkj', 'users.id', '=', 'dkj.id_dkj')
+//            ->where('dkj.add_date', 'like', $selected_date)
+//            ->groupBy('dkj.id_dkj')
+//            ->get();
+//
         $work_hours = DB::table('users')
             ->select(DB::raw('
                 users.id,
@@ -900,12 +914,44 @@ class StatisticsController extends Controller
             ->where('users.user_type_id', '=', 2)
             ->get();
 
+        $dkj = DB::table('pbx_dkj_team')
+            ->select(DB::raw(
+                'SUM(count_all_check) as sum_all_talks,
+                SUM(count_good_check) as sum_correct_talks,
+                SUM(count_bad_check) as sum_janky,
+                departments.name as dep, 
+                department_type.name as depname,
+                count(departments.name)
+                   '))
+            ->join('department_info', 'department_info.id', '=', 'pbx_dkj_team.department_info_id')
+            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+            ->where('department_info.dep_aim','!=',0)
+            ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop){
+                $query->select(DB::raw(
+                    'MAX(pbx_dkj_team.id)'
+                ))
+                    ->from('pbx_dkj_team')
+                    ->whereBetween('report_date', [$date_start, $date_stop])
+                    ->groupBy('department_info_id','report_date');
+            })
+            ->where('department_info.id_dep_type', '=', 2)
+            ->groupBy('pbx_dkj_team.department_info_id')
+            ->get();
 
         $data = [
             'month_name' => $this->monthReverseName($month),
-            'dkj' => $dkj,
-            'work_hours' => $work_hours
+            'work_hours' => $work_hours,
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'dkj' => $dkj
         ];
+//        dd($data);
+//        $data = [
+//            'month_name' => $this->monthReverseName($month),
+//            'dkj' => $dkj,
+//            'work_hours' => $work_hours
+//        ];
       
         return $data;
     }
