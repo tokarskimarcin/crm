@@ -863,9 +863,9 @@ class StatisticsController extends Controller
     //wysyłanie email (raport tygodniowy dkj)
     public function MailWeekReportDkj() {
       $data = $this->weekReportDkjData();
-
+        $users = User::whereIn('id', [4796, 1364, 6009])->get();
       $title = 'Raport tygodniowy DKJ ' . $data['date_start'] . ' - ' . $data['date_stop'];
-      $this->sendMailByVerona('weekReportDkj', $data, $title);
+      $this->sendMailByVerona('weekReportDkj', $data, $title, $users);
     }
 
     //przygotowanie danych do raportu miesięcznego dkj
@@ -959,7 +959,7 @@ class StatisticsController extends Controller
     //wysyłanie raportu miesięcznego pracownicy dkj
     public function monthReportDkj() {
       $data = $this->MonthReportDkjData();
-        $users = User::whereIn('id', [4796, 1364, 6009]);
+        $users = User::whereIn('id', [4796, 1364, 6009])->get();
       $title = 'Raport miesięczny DKJ';
       $this->sendMailByVerona('monthReportDkj', $data, $title, $users);
     }
@@ -2616,7 +2616,6 @@ class StatisticsController extends Controller
             $szczesny->last_name = 'Szczęsny';
             $accepted_users->push($szczesny);
         }
-
 //    $accepted_users = [
 //        'cytawa.verona@gmail.com',
 //        'jarzyna.verona@gmail.com'
