@@ -2097,8 +2097,8 @@ class StatisticsController extends Controller
      * Wyświetlanie raportu miesięcznego trenerzy
      */
     public function pageMonthReportCoachPost(Request $request) {
-        $date_start = date('Y-m-d');
-        $date_stop = date('Y-m-d');
+        $date_start = date('Y-m-') . '01';
+        $date_stop = date('Y-m-t');
 
         $leader = User::find($request->coach_id);
 
@@ -2143,6 +2143,7 @@ class StatisticsController extends Controller
                 $user_sum[$y]['first_name'] = $consultant->first()->first_name;
                 $user_sum[$y]['last_name'] = $consultant->first()->last_name;
                 $user_sum[$y]['week_num'] = $y;
+                $user_sum[$y]['total_week_yanky'] = 0;
                 $user_sum[$y]['first_week_day'] = null;
                 $user_sum[$y]['last_week_day'] = null;
             }
@@ -2195,7 +2196,8 @@ class StatisticsController extends Controller
                 if (($week_day == 7 || $i == $days_in_month) &&  $add_week_sum == true && $miss_first_week == false) {
                     $user_sum[$week_num]['last_week_day'] = $actual_loop_day;
 
-                    $user_sum[$week_num]['janky_proc'] = ($user_sum[$week_num]['success'] > 0) ? round(($week_yanky / $user_sum[$week_num]['success']) * 100) : 0 ;
+                    $user_sum[$week_num]['total_week_yanky'] = $week_yanky;
+                    $user_sum[$week_num]['janky_proc'] = ($user_sum[$week_num]['success'] > 0) ? round(($week_yanky / $user_sum[$week_num]['success']) * 100, 2) : 0 ;
                     $user_sum[$week_num]['average'] = ($user_sum[$week_num]['login_time']) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['login_time']), 2) : 0 ;
                     $user_sum[$week_num]['proc_received_calls'] = ($user_sum[$week_num]['received_calls'] > 0) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['received_calls']) * 100 , 2) : 0 ;
                     $week_num++;

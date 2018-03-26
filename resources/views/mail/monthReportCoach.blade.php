@@ -28,6 +28,7 @@
             $week_login_time = 0;
             $week_received_calls = 0;
             $week_received_calls_proc = 0;
+            $week_janky_count = 0;
 
             $total_average = 0;
             $total_janky_proc = 0;
@@ -36,6 +37,7 @@
             $total_login_time = 0;
             $total_received_calls = 0;
             $total_received_calls_proc = 0;
+            $total_janky_count = 0;
         @endphp
 
         @for($i = 1; $i <= 4; $i++)
@@ -48,11 +50,13 @@
                     $week_pause_time += $data['pause_time'];
                     $week_login_time += $data['login_time'];
                     $week_received_calls += $data['received_calls'];
+                    $week_janky_count += $data['total_week_yanky'];
 
                     $total_success += $data['success'];
                     $total_pause_time += $data['pause_time'];
                     $total_login_time += $data['login_time'];
                     $total_received_calls += $data['received_calls'];
+                    $total_janky_count += $data['total_week_yanky'];
                 @endphp
                 <tr>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $data['last_name'] . ' ' . $data['first_name'] }}</b></td>
@@ -69,11 +73,13 @@
             @php
                 $week_average = ($week_success > 0) ? round(($week_success / $week_login_time), 2) : 0 ;
                 $week_received_calls_proc = ($week_received_calls > 0) ? round(($week_success / $week_received_calls) * 100 , 2) : 0 ;
+                $week_janky_proc = ($week_success > 0) ? round(($week_janky_count / $week_success) * 100, 2) : 0 ;
+                $week_janky_count = 0;
             @endphp
             <tr>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA {{ $data['first_week_day'] . '-' . $data['last_week_day']}}</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_average }}</b></td>
-                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_janky_proc }} %</b></td>
+                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_janky_proc}} %</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_received_calls }}</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_success }}</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_received_calls_proc }} %</b></td>
@@ -96,12 +102,13 @@
         @php
             $total_average = ($total_success > 0) ? round(($total_success / $total_login_time), 2) : 0 ;
             $total_received_calls_proc = ($total_received_calls > 0) ? round(($total_success / $total_received_calls) * 100, 2) : 0 ;
+            $total_janky_proc = ($total_success > 0) ? round(($total_janky_count / $total_success) * 100, 2) : 0 ;
         @endphp
 
         <tr>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_average }}</b></td>
-            <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_janky_proc }}</b></td>
+            <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_janky_proc }} %</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_received_calls }}</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_success }}</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_received_calls_proc }} %</b></td>
