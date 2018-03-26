@@ -865,7 +865,6 @@ class StatisticsController extends Controller
       $data = $this->weekReportDkjData();
         $users = User::whereIn('id', [4796, 1364, 6009])->get();
       $title = 'Raport tygodniowy DKJ ' . $data['date_start'] . ' - ' . $data['date_stop'];
-      dd($data);
       $this->sendMailByVerona('weekReportDkj', $data, $title, $users);
     }
 
