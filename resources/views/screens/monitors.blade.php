@@ -172,6 +172,8 @@
                          setInterval(function() {
                              var today = new Date();
                              $('#first-span').text('Bieżące wyniki ');
+                             var month = today.getMonth();
+                             month += 1;
 
                              /*****Adding 0 to numbers less than 10*****/
                              if(today.getMinutes() < 10) {
@@ -186,10 +188,10 @@
                                  var godzina = today.getHours();
                              }
 
-                             if(today.getMonth() < 10) {
-                                 var miesiac = '0' + today.getMonth();
+                             if(month < 10) {
+                                 var miesiac = '0' + month;
                              } else {
-                                 var miesiac = today.getMonth();
+                                 var miesiac = month;
                              }
 
                              if(today.getDate() < 10) {
