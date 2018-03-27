@@ -2591,21 +2591,77 @@ class StatisticsController extends Controller
      * Raport podsumowanie oddziałow - po wybrze
      */
     public function pageMonthReportDepartmentsSummaryPost(Request $request) {
-        return 1;
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $weeks = $this->monthPerWeekDivision($request->month_selected, date('Y'));
+
+        $data = [];
+
+        foreach ($departments as $department) {
+            foreach ($weeks as $key => $week) {
+                $data[$department->id][] = self::dataWeekReportDepartmentsSummary($weeks[$key]['start_day'], $weeks[$key]['stop_day'], $department->id);
+            }
+            $data[$department->id]['department_info'] = $department;
+        }
+
+        return view('reportpage.monthReportDepartmentsSummary')
+            ->with([
+                'departments'   => $departments,
+                'dep_id'        => 2,
+                'months'        => self::getMonthsNames(),
+                'month'         => date('m'),
+                'data'          => $data
+            ]);
     }
 
     /*
      * Raport tygodniowy podsumowanie oddziałów - tylko do wglądu
      */
     public function pageWeekReportDepartmentsSummaryGet() {
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
+        $weeks = $this->monthPerWeekDivision(date('m'), date('Y'));
+
+        $data = [];
+
+        foreach ($weeks as $key => $week) {
+            foreach ($departments as $department) {
+               $data[$key][] = self::dataWeekReportDepartmentsSummary($weeks[$key]['start_day'], $weeks[$key]['stop_day'], $department->id);
+            }
+        }
+dd($data);
+        return view('reportpage.weekReportDepartmentSummary')
+            ->with([
+                'departments'   => $departments,
+                'dep_id'        => 2,
+                'months'        => self::getMonthsNames(),
+                'month'         => date('m')
+            ]);
     }
 
     /**
      * Raport tygodniowy podsomowanie oddziałow - po wyborze
      */
     public function pageWeekReportDepartmentsSummaryPost(Request $request) {
-        return 2;
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $weeks = $this->monthPerWeekDivision($request->month_selected, date('Y'));
+
+        $data = [];
+
+        foreach ($weeks as $key => $week) {
+            foreach ($departments as $department) {
+                $data[$key][] = self::dataWeekReportDepartmentsSummary($weeks[$key]['start_day'], $weeks[$key]['stop_day'], $department->id);
+            }
+        }
+
+        return view('reportpage.weekReportDepartmentSummary')
+            ->with([
+                'departments'   => $departments,
+                'dep_id'        => 2,
+                'months'        => self::getMonthsNames(),
+                'month'         => date('m')
+            ]);
     }
 
     private function monthPerWeekDivision($month, $year) {
