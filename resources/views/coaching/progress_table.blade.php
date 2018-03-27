@@ -160,7 +160,7 @@
                                     <th>Konsultant</th>
                                     <th>Data</th>
                                     <th>Temat</th>
-                                    <th>Wynik</th>
+                                    <th>Wynik aktualny</th>
                                     <th>Cel</th>
                                     <th>Komentarz</th>
                                 </tr>
@@ -228,7 +228,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="myLabel">Aktualna średnia</label>
-                                        <input type="number" lang="en" class="form-control" id="coaching_actual_avg" placeholder="Wprawoadź aktualną średnią"/>
+                                        <input type="number" lang="en" class="form-control" name="coaching_actual_avg" id="coaching_actual_avg" placeholder="Wprawoadź aktualną średnią"/>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -300,9 +300,12 @@
             }else if(coaching_goal_min.trim('').length == 0 || isNaN(coaching_goal_min) ){
                 validation = false;
                 swal('Błędna minimalna średnia')
-            }else if(coaching_goal_min.trim('').length == 0 || isNaN(coaching_goal_min) ){
+            }else if(coaching_goal_max.trim('').length == 0 || isNaN(coaching_goal_max) ){
                 validation = false;
                 swal('Błędna maksymalna średnia')
+            }else if(coaching_goal_min > coaching_goal_max) {
+                validation = false;
+                swal('Błędny przedział')
             }
 
             if(validation){
@@ -328,6 +331,17 @@
             }
         }
         $(document).ready(function(){
+            var consultant = JSON.parse('{!!$consultant!!}');
+            $('#couaching_user_id').on('change',function () {
+                for(var i =0;i<consultant.length;i++){
+                    if(consultant[i].id == $(this).val()){
+                        $('input[name="coaching_actual_avg"]').val(consultant[i].avg_consultant);
+                        break;
+                    }else{
+                        $('#coaching_actual_avg').val('');
+                    }
+                }
+            });
 
             var in_progress_table = $('#table_in_progress').DataTable({
                 "autoWidth": false,
@@ -344,7 +358,12 @@
                         d.date_stop     = $('#date_stop_in_progress').val();
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
-                },"columns":[
+                },"rowCallback": function( row, data, index ) {
+                    if (data["couching_rbh"] > 648000) {
+                        $(row).hide();
+                    }
+                },
+                "columns":[
                         {"data":function (data, type, dataToSet) {
                                 return data.manager_first_name + " " + data.manager_last_name;
                             },"name": "manager.last_name"
@@ -355,9 +374,19 @@
                         },
                         {"data":"coaching_date"},
                         {"data": "subject"},
-                        {"data": "subject"},
-                        {"data": "subject"}
-                    ]
+                        {"data": "avg_consultant"},
+                        {"data":function (data, type, dataToSet) {
+                                return data.average_goal_min + " - " + data.average_goal_max;
+                            },"name": "consultant.last_name"
+                        },
+                        {"data":null,"targets": -1,"orderable": false, "searchable": false },
+                    ],
+                    "columnDefs": [{
+                        "targets": -1,
+                        "data": "id",
+                        "defaultContent": "<button class='button-edit btn btn-warning'>Edycja</button>" +
+                        "<button class='button-delete btn btn-danger'>Usuń</button>"
+                    }],
             });
 
             $('#date_start_in_progress, #date_stop_in_progress').on('change',function (e) {
@@ -374,12 +403,17 @@
                     'url': "{{ route('api.datatableCoachingTable') }}",
                     'type': 'POST',
                     'data': function (d) {
-                        d.report_status = 1;
+                        d.report_status = 0;
                         d.date_start = $('#date_start_unsettled').val();
                         d.date_stop =  $('#date_stop_unsettled').val();
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
-                },"columns":[
+                },"rowCallback": function( row, data, index ) {
+                    if (data["couching_rbh"] < 648000) {
+                        $(row).hide();
+                    }
+                }
+                ,"columns":[
                     {"data":function (data, type, dataToSet) {
                             return data.manager_first_name + " " + data.manager_last_name;
                         },"name": "manager.last_name"
@@ -390,9 +424,19 @@
                     },
                     {"data":"coaching_date"},
                     {"data": "subject"},
-                    {"data": "subject"},
-                    {"data": "subject"}
-                ]
+                    {"data": "avg_consultant"},
+                    {"data":function (data, type, dataToSet) {
+                            return data.average_goal_min + " - " + data.average_goal_max;
+                        },"name": "consultant.last_name"
+                    },
+                    {"data":"comment"},
+                    {"data":null,"targets": -1,"orderable": false, "searchable": false },
+                ],
+                "columnDefs": [{
+                    "targets": -1,
+                    "data": "id",
+                    "defaultContent": "<button class='button-edit btn btn-success'>Akceptuj</button>"
+                }],
             });
 
             $('#date_start_unsettled, #date_stop_unsettled').on('change',function (e) {
@@ -409,7 +453,7 @@
                     'url': "{{ route('api.datatableCoachingTable') }}",
                     'type': 'POST',
                     'data': function (d) {
-                        d.report_status = 2;
+                        d.report_status = 1;
                         d.date_start = $('#date_start_settled').val();
                         d.date_stop =  $('#date_stop_settled').val();
                     },
@@ -425,9 +469,20 @@
                     },
                     {"data":"coaching_date"},
                     {"data": "subject"},
-                    {"data": "subject"},
-                    {"data": "subject"}
-                ]
+                    {"data": "avg_consultant"},
+                    {"data":function (data, type, dataToSet) {
+                            return data.average_goal_min + " - " + data.average_goal_max;
+                        },"name": "consultant.last_name"
+                    },
+                    {"data":"comment"},
+                    {"data":null,"targets": -1,"orderable": false, "searchable": false },
+                ],
+                "columnDefs": [{
+                    "targets": -1,
+                    "data": "id",
+                    "defaultContent": "<button class='button-edit btn btn-warning'>Edycja</button>" +
+                    "<button class='button-delete btn btn-danger'>Usuń</button>"
+                }],
             });
 
             $('#date_start_settled, #date_stop_settled').on('change',function (e) {
