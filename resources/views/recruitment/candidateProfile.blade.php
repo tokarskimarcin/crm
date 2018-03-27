@@ -270,8 +270,17 @@
                             <div class="col-md-7">
                                 <div class="alert alert-danger" style="color: #616366; font-size: 15px;">
                                     Data szkolenia:
+                                    @php
+                                        $actualDate = $candidate->recruitment_attempt->where('status', '=', 0)->first()->training_date;
+                                        $my_date = date('Y-m-d', strtotime($actualDate));
+                                        $dateFormatPrev = new DateTime($my_date);
+                                        $dateFormatNext = new DateTime($my_date);
+                                        $prev = $dateFormatPrev->modify('-3 days');
+                                        $next = $dateFormatNext->modify('+3 days');
+                                    @endphp
                                     <div id="training_date_input" style="display: initial;">
                                         <b id="training_date_edit_old_date">{{$candidate->recruitment_attempt->where('status', '=', 0)->first()->training_date}}</b>
+                                        <p id="adnotation" style="font-size:0.84em;font-weight:bolder;">Uwaga data szkolenia jest wiążąca, kandydat będzie dostępny pomiędzy {{$prev->format('Y-m-d')}} a {{$next->format('Y-m-d')}}</p>
                                         <div id="training_date_edit_new_date" class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width: 100%; display: none;">
                                             <input class="form-control" id="training_date_edit" name="training_date_edit" type="text" value="{{$candidate->recruitment_attempt->where('status', '=', 0)->first()->training_date}}" disabled>
                                             <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
@@ -850,6 +859,8 @@ $(document).ready(() => {
                     $('#training_date_edit_old_date').show();
                     $('#training_date_edit_new_date').hide();
                     $('#edit_training_date_button').html('<span class="glyphicon glyphicon-edit"></span> Edycja');
+                    $('#adnotation').text(' ');
+                    window.location.reload();
                     click--;
                 }
             });
