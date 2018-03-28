@@ -2385,6 +2385,11 @@ class StatisticsController extends Controller
             ->orderBy('last_name')
             ->where('status_work', '=', 1)
             ->get();
+
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
+
+
         $year = date('Y');
         $month = date('m');
         $days_in_month = date('t', strtotime($month));
@@ -2409,6 +2414,10 @@ class StatisticsController extends Controller
             ->orderBy('last_name')
             ->where('status_work', '=', 1)
             ->get();
+
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
+
         $year = date('Y');
         $month = date('m');
         $days_in_month = date('t', strtotime($month));
@@ -2449,6 +2458,9 @@ class StatisticsController extends Controller
     public function pageSummaryDayReportCoachesGet() {
         $department_info = Department_info::where('id_dep_type', '=', 2)->get();
 
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $department_info = $department_info->where('id', '=', Auth::user()->department_info_id);
+
         $month = date('m');
         $year = date('Y');
         $days_in_month = date('t', strtotime($month));
@@ -2469,6 +2481,9 @@ class StatisticsController extends Controller
      */
     public function pageSummaryDayReportCoachesPost(Request $request) {
         $department_info = Department_info::where('id_dep_type', '=', 2)->get();
+
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $department_info = $department_info->where('id', '=', Auth::user()->department_info_id);
 
         $month = date('m');
         $year = date('Y');
@@ -2609,7 +2624,7 @@ class StatisticsController extends Controller
                 'departments'   => $departments,
                 'dep_id'        => 2,
                 'months'        => self::getMonthsNames(),
-                'month'         => date('m'),
+                'month'         => $request->month_selected,
                 'data'          => $data
             ]);
     }
@@ -2629,13 +2644,14 @@ class StatisticsController extends Controller
                $data[$key][] = self::dataWeekReportDepartmentsSummary($weeks[$key]['start_day'], $weeks[$key]['stop_day'], $department->id);
             }
         }
-dd($data);
+
         return view('reportpage.weekReportDepartmentSummary')
             ->with([
                 'departments'   => $departments,
                 'dep_id'        => 2,
                 'months'        => self::getMonthsNames(),
-                'month'         => date('m')
+                'month'         => date('m'),
+                'data'          => $data
             ]);
     }
 
@@ -2660,7 +2676,8 @@ dd($data);
                 'departments'   => $departments,
                 'dep_id'        => 2,
                 'months'        => self::getMonthsNames(),
-                'month'         => date('m')
+                'month'         => $request->month_selected,
+                'data'          => $data
             ]);
     }
 

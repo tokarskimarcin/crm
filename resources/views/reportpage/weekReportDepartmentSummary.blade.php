@@ -2,7 +2,9 @@
 @section('content')
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Podsumowanie oddziałów - raport tygodniowy</h1>
+            <div class="page-header">
+                <div class="alert gray-nav">Podsumowanie oddziałów - Raport Dzienny</div>
+            </div>
         </div>
     </div>
     <form method="POST" action="{{ URL::to('/pageWeekReportDepartmentsSummary') }}">
