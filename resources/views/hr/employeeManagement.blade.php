@@ -26,7 +26,16 @@
             </div>
         </div>
     </div>
-
+    @if(Session::has('adnotation'))
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-success">{{Session::get('adnotation') }}</div>
+            </div>
+        </div>
+        @php
+            Session::forget('adnotation');
+        @endphp
+    @endif
     @if(isset($saved))
         <div class="alert alert-success">
             <strong>Sukces!</strong> Konto użytkownika: {{$saved['first_name'] . ' ' . $saved['last_name']}} zostało zmodyfikowane!
