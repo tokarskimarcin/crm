@@ -70,10 +70,11 @@ class RecruitmentStory extends Model
     }
 
     public static function getReportTrainingData($data_start,$data_stop){
-        return DB::table('group_training')
+         $records = DB::table('group_training')
             ->select(DB::raw('
                 sum(candidate_choise_count) as sum_choise,
                 sum(candidate_absent_count) as sum_absent,
+                departments.id as dep_id,
                 departments.name as dep_name,
                 department_type.name as dep_name_type
             '))
@@ -83,6 +84,25 @@ class RecruitmentStory extends Model
             ->whereBetween('training_date', [$data_start, $data_stop])
             ->groupBy('department_info.id')
             ->get();
+
+        $deps = Department_info::all();
+        $data=[];
+        foreach ($deps as $dep) {
+            $dep_data = new \stdClass();
+            $dep_data->dep_name = $dep->departments->name;
+            $dep_data->dep_name_type = $dep->department_type->name;
+            $dep_data->sum_choise = 0;
+            $dep_data->sum_absent = 0;
+            foreach($records as $item) {
+                if ($item->dep_id == $dep->id) {
+                    $dep_data->sum_choise = $item->sum_choise;
+                    $dep_data->sum_absent = $item->sum_absent;
+                }
+            }
+            $data[] = $dep_data;
+        }
+
+        return collect($data)->sortByDesc('sum_choise');
     }
 
     /**
