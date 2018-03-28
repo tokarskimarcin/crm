@@ -249,7 +249,7 @@
                     <th>Czas</th>
                     <th>L.zgód</th>
                     <th>Średnia</th>
-                    <th>Pln/h</th>
+                    {{--<th>Pln/h</th>--}}
                 </tr>
                 </thead>
 
@@ -261,50 +261,50 @@
                         <td>{{substr($t->login_time, 0, 5)}} </td>
                         <td>{{$t->success}}</td>
                         <td>{{$t->average}}</td>
-                        <td class="pr">
-                            <script>
-                                var base = {{$t->user->department_info->commission_start_money}};
-                                var step = {{$t->user->department_info->commission_step}};
-                                var start = {{$t->user->department_info->commission_avg}};
-                                var avg = {{$t->average}};
-                                var salary;
+                        {{--<td class="pr">--}}
+                            {{--<script>--}}
+                                {{--var base = {{$t->user->department_info->commission_start_money}};--}}
+                                {{--var step = {{$t->user->department_info->commission_step}};--}}
+                                {{--var start = {{$t->user->department_info->commission_avg}};--}}
+                                {{--var avg = {{$t->average}};--}}
+                                {{--var salary;--}}
 
-                                if(start == 2.5) { //start od 2.5
-                                    var count;
-                                    var difference;
-                                    if(avg >= start && avg < (start + 0.25)) { // avg in <2.5 ; 2.75)
-                                        salary = base + step;
-                                    }
-                                    else if (avg >= start + 0.25) { // avg in <2.75 ; infty)
-                                        difference = avg - start;
-                                        if(difference % 0.25 == 0) { //Gdy roznica jest wielokrotnoscia 0.25
-                                            difference += 0.01; // dodajemy, aby wskoczyło w próg o jeden wyżej
-                                        }
-                                        count = Math.ceil(difference / 0.25);
-                                        salary = base + (count * step);
-                                    }
-                                    else { // avg in <0 ; 2.5)
-                                        salary = base;
-                                    }
-                                }
-                                else { //start od 3.0
-                                    var count;
-                                    var difference;
-                                    if (avg >= start && avg <= start + 0.25) { // avg in <3 ; 3.25>
-                                        salary = base + step;
-                                    }
-                                    else if (avg > start + 0.25) { // avg in (3.25 ; infty)
-                                        difference = avg - start;
-                                        count = Math.ceil(difference / 0.25);
-                                        salary = base + (count * step);
-                                    }
-                                    else { //avg in <0 ; 3)
-                                        salary = base;
-                                    }
-                                }
-                                $('.pr:last').text(salary);
-                            </script>
-                        </td>
+                                {{--if(start == 2.5) { //start od 2.5--}}
+                                    {{--var count;--}}
+                                    {{--var difference;--}}
+                                    {{--if(avg >= start && avg < (start + 0.25)) { // avg in <2.5 ; 2.75)--}}
+                                        {{--salary = base + step;--}}
+                                    {{--}--}}
+                                    {{--else if (avg >= start + 0.25) { // avg in <2.75 ; infty)--}}
+                                        {{--difference = avg - start;--}}
+                                        {{--if(difference % 0.25 == 0) { //Gdy roznica jest wielokrotnoscia 0.25--}}
+                                            {{--difference += 0.01; // dodajemy, aby wskoczyło w próg o jeden wyżej--}}
+                                        {{--}--}}
+                                        {{--count = Math.ceil(difference / 0.25);--}}
+                                        {{--salary = base + (count * step);--}}
+                                    {{--}--}}
+                                    {{--else { // avg in <0 ; 2.5)--}}
+                                        {{--salary = base;--}}
+                                    {{--}--}}
+                                {{--}--}}
+                                {{--else { //start od 3.0--}}
+                                    {{--var count;--}}
+                                    {{--var difference;--}}
+                                    {{--if (avg >= start && avg <= start + 0.25) { // avg in <3 ; 3.25>--}}
+                                        {{--salary = base + step;--}}
+                                    {{--}--}}
+                                    {{--else if (avg > start + 0.25) { // avg in (3.25 ; infty)--}}
+                                        {{--difference = avg - start;--}}
+                                        {{--count = Math.ceil(difference / 0.25);--}}
+                                        {{--salary = base + (count * step);--}}
+                                    {{--}--}}
+                                    {{--else { //avg in <0 ; 3)--}}
+                                        {{--salary = base;--}}
+                                    {{--}--}}
+                                {{--}--}}
+                                {{--$('.pr:last').text(salary);--}}
+                            {{--</script>--}}
+                        {{--</td>--}}
                     </tr>
                 @endforeach
 
