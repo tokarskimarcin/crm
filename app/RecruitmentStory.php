@@ -92,10 +92,10 @@ class RecruitmentStory extends Model
         if ($select_type == 0) {
             $dataCount = DB::table('recruitment_story')
                 ->select(DB::raw('
+                count(recruitment_story.id) as counted,
                     departments.id as dep_id,
                     departments.name as dep_name,
-                    department_type.name as dep_name_type,
-                    count(recruitment_story.id) as counted
+                    department_type.name as dep_name_type
                 '))
                 ->join('candidate', 'candidate.id', 'recruitment_story.candidate_id')
                 ->join('department_info', 'candidate.department_info_id', 'department_info.id')
@@ -136,7 +136,9 @@ class RecruitmentStory extends Model
                 ->orderBy('counted','desc')
                 ->get();
         }
-        return $data;
+
+
+        return collect($data)->sortByDesc('counted');
     }
 
     /**
