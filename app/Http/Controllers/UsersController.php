@@ -6,6 +6,7 @@ use App\Agencies;
 use App\Department_info;
 use App\Departments;
 use App\DisableAccountInfo;
+use App\PrivilageRelation;
 use App\User;
 use App\UserEmploymentStatus;
 use App\UserTypes;
@@ -235,11 +236,14 @@ class UsersController extends Controller
 
     }
 
-    public function edit_cadreGet($id) {
+    public function edit_cadreGet($id, Request $request) {
+        $flag = $request->session()->get('flag');
+        $request->session()->forget('flag');
+        $user = User::find($id);
 
         if(Auth::user()->user_type->all_departments == 1) {
-            $user = User::find($id);
 
+            $user = User::find($id);
             $agencies = Agencies::all();
             $department_info = Department_info::all();
             $month = date('m');
@@ -287,12 +291,17 @@ class UsersController extends Controller
                 ->with('month', $months)
                 ->with('department_info', $department_info)
                 ->with('type', 2);
-        }else{
+        }
+        else if($flag == "true") {
+            return Redirect::to('edit_cadre/'.$user->id);
+        }
+        else{
             return Redirect::back();
         }
     }
 
     public function edit_cadrePOST($id, Request $request) {
+
         $manager_id = Auth::user()->id;
         $url_array = explode('/',URL::previous());
         $urlValidation = end($url_array);
@@ -301,8 +310,7 @@ class UsersController extends Controller
         }
 
         $user = User::find($id);
-
-
+        $loggedUser = Auth::user();
         $userEmployment = UserEmploymentStatus::
         where('pbx_id', '=', $user->login_phone)
             -> where('user_id', '=', $user->id)
@@ -522,14 +530,26 @@ class UsersController extends Controller
          * Ewentualna zmiana pakietów medycznych
          */
 
-
+        $redirectFlag = false; //false = brak uprawnien, true = posiada uprawnienia
+        $userPrivilage = Auth::user()->user_type->all_departments;
+        if($userPrivilage == 1){
+            $redirectFlag = true;
+        }
         Session::flash('message_edit', "Dane zostały zaktualizowane!");
 
-        if($type_redirect == 0 ){
+        if($redirectFlag) {
+            $request->session()->put('flag', 'true');
+        }
+        Session::flash('adnotation', "Pracownik został edytowany! Brak możliwości dalszej edycji pracownika (brak uprawnień)."); //sesja wykorzystywana w /employee_management
+
+        if($type_redirect == 0){
             return Redirect::back();
         }else if($type_redirect == 1){
             return Redirect::to('edit_consultant/'.$user->id);
-        }else{
+        }else if($redirectFlag == false){
+            return Redirect::to('/employee_management');
+        }
+        else{
             return Redirect::to('edit_cadre/'.$user->id);
         }
     }
