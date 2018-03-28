@@ -50,9 +50,7 @@ class RecruitmentStory extends Model
         $data_stop = $data_stop . ' 23:00:00';
 
         $result = DB::table('department_info')
-            ->select(DB::raw('
-                users.last_name,
-                users.first_name,
+            ->select(DB::raw('               
                 departments.name, 
                 department_type.name as dep_type, 
                 SUM(CASE WHEN `candidate`.`created_at` between "' . $data_start . '" and "' . $data_stop . '" THEN 1 ELSE 0 END) as count_flow
