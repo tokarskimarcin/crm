@@ -123,7 +123,7 @@
                     <p>Nazwa drugiego panelu</p>
                 </div>
                 <div class="panel-body">
-                    <form action="">
+                    <form action="" id="auditForm">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <div class="table-responsive">
                             <table class="table">
@@ -1525,6 +1525,16 @@
             inputDepartment.addEventListener('change', handleChange1);
             inputTrainer.addEventListener('change', handleChange2);
             firstButton.addEventListener('click', handleFirstButtonClick);
+
+            /***********Submit part*************/
+            var submitButton = document.getElementById('secondButton');
+            submitButton.addEventListener('click', submitHandler);
+
+            function submitHandler(e) {
+                e.preventDefault();
+                var everythingIsOk = true;
+                //zaznaczyc wszystkie tak/nie po przez klase. Foreachem na nodelist sprawdzic czy ktorys jest nie wybrany, jeśli tak to ustawic flage na false.
+            }
 
         });
     </script>
