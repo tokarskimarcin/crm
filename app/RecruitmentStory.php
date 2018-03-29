@@ -72,7 +72,7 @@ class RecruitmentStory extends Model
             ->select(DB::raw('
                 sum(candidate_choise_count) as sum_choise,
                 sum(candidate_absent_count) as sum_absent,
-                departments.id as dep_id,
+                department_info.id as dep_id,
                 departments.name as dep_name,
                 department_type.name as dep_name_type
             '))
@@ -111,7 +111,7 @@ class RecruitmentStory extends Model
             $dataCount = DB::table('recruitment_story')
                 ->select(DB::raw('
                 count(recruitment_story.id) as counted,
-                    departments.id as dep_id,
+                    department_info.id as dep_id,
                     departments.name as dep_name,
                     department_type.name as dep_name_type
                 '))

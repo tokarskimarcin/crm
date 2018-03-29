@@ -2385,6 +2385,11 @@ class StatisticsController extends Controller
             ->orderBy('last_name')
             ->where('status_work', '=', 1)
             ->get();
+
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
+
+
         $year = date('Y');
         $month = date('m');
         $days_in_month = date('t', strtotime($month));
@@ -2409,6 +2414,10 @@ class StatisticsController extends Controller
             ->orderBy('last_name')
             ->where('status_work', '=', 1)
             ->get();
+
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
+
         $year = date('Y');
         $month = date('m');
         $days_in_month = date('t', strtotime($month));
@@ -2449,6 +2458,9 @@ class StatisticsController extends Controller
     public function pageSummaryDayReportCoachesGet() {
         $department_info = Department_info::where('id_dep_type', '=', 2)->get();
 
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $department_info = $department_info->where('id', '=', Auth::user()->department_info_id);
+
         $month = date('m');
         $year = date('Y');
         $days_in_month = date('t', strtotime($month));
@@ -2469,6 +2481,9 @@ class StatisticsController extends Controller
      */
     public function pageSummaryDayReportCoachesPost(Request $request) {
         $department_info = Department_info::where('id_dep_type', '=', 2)->get();
+
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $department_info = $department_info->where('id', '=', Auth::user()->department_info_id);
 
         $month = date('m');
         $year = date('Y');
@@ -2591,21 +2606,79 @@ class StatisticsController extends Controller
      * Raport podsumowanie oddziałow - po wybrze
      */
     public function pageMonthReportDepartmentsSummaryPost(Request $request) {
-        return 1;
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $weeks = $this->monthPerWeekDivision($request->month_selected, date('Y'));
+
+        $data = [];
+
+        foreach ($departments as $department) {
+            foreach ($weeks as $key => $week) {
+                $data[$department->id][] = self::dataWeekReportDepartmentsSummary($weeks[$key]['start_day'], $weeks[$key]['stop_day'], $department->id);
+            }
+            $data[$department->id]['department_info'] = $department;
+        }
+
+        return view('reportpage.monthReportDepartmentsSummary')
+            ->with([
+                'departments'   => $departments,
+                'dep_id'        => 2,
+                'months'        => self::getMonthsNames(),
+                'month'         => $request->month_selected,
+                'data'          => $data
+            ]);
     }
 
     /*
      * Raport tygodniowy podsumowanie oddziałów - tylko do wglądu
      */
     public function pageWeekReportDepartmentsSummaryGet() {
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
+        $weeks = $this->monthPerWeekDivision(date('m'), date('Y'));
+
+        $data = [];
+
+        foreach ($weeks as $key => $week) {
+            foreach ($departments as $department) {
+               $data[$key][] = self::dataWeekReportDepartmentsSummary($weeks[$key]['start_day'], $weeks[$key]['stop_day'], $department->id);
+            }
+        }
+
+        return view('reportpage.weekReportDepartmentSummary')
+            ->with([
+                'departments'   => $departments,
+                'dep_id'        => 2,
+                'months'        => self::getMonthsNames(),
+                'month'         => date('m'),
+                'data'          => $data
+            ]);
     }
 
     /**
      * Raport tygodniowy podsomowanie oddziałow - po wyborze
      */
     public function pageWeekReportDepartmentsSummaryPost(Request $request) {
-        return 2;
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $weeks = $this->monthPerWeekDivision($request->month_selected, date('Y'));
+
+        $data = [];
+
+        foreach ($weeks as $key => $week) {
+            foreach ($departments as $department) {
+                $data[$key][] = self::dataWeekReportDepartmentsSummary($weeks[$key]['start_day'], $weeks[$key]['stop_day'], $department->id);
+            }
+        }
+
+        return view('reportpage.weekReportDepartmentSummary')
+            ->with([
+                'departments'   => $departments,
+                'dep_id'        => 2,
+                'months'        => self::getMonthsNames(),
+                'month'         => $request->month_selected,
+                'data'          => $data
+            ]);
     }
 
     private function monthPerWeekDivision($month, $year) {
