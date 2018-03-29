@@ -622,8 +622,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 //////////////////////Testing ORM///////////////
 ///
 ///
-Route::get('/testPag', 'AdminController@testMethodGet');
-Route::post('/testPag', 'AdminController@ajax')->name('api.ajax');
+Route::get('/addAudit', 'AuditController@auditMethodGet');
+Route::post('/addAudit', 'AuditController@ajax')->name('api.ajax');
 
 Route::get('/dept/{id}','ScreensController@monitorMethod');
 Route::get('/screen_table','ScreensController@screenMethod');
