@@ -2,10 +2,12 @@
 @section('content')
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Podsumowanie oddziałów - Raport Tygodniowy</h1>
+            <div class="page-header">
+                <div class="alert gray-nav">Podsumowanie oddziałów - Raport Dzienny</div>
+            </div>
         </div>
     </div>
-    <form method="POST" action="{{ URL::to('/pageMonthReportDepartmentsSummary') }}">
+    <form method="POST" action="{{ URL::to('/pageWeekReportDepartmentsSummary') }}">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <div class="row">
             <div class="col-md-6">
@@ -32,7 +34,7 @@
                     <div class="col-lg-12">
                         <div id="start_stop">
                             <div class="panel-body">
-                                @include('mail.monthReportDepartmentsSummary')
+                                @include('mail.weekReportDepartmentsSummary')
                             </div>
                         </div>
                     </div>

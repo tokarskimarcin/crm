@@ -105,11 +105,11 @@
         <tr>
             <td rowspan="5" style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $department['department_info']->departments->name . ' ' . $department['department_info']->department_type->name }}</b></td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>ŚREDNIA</b></td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_one_avg }} %</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_two_avg }} %</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_three_avg }} %</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_four_avg }} %</td>
-            <td style="background-color: #5eff80;border:1px solid #231f20;text-align:center;padding:3px">{{ $month_avg }} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_one_avg }}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_two_avg }}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_three_avg }}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_four_avg }}</td>
+            <td style="background-color: #5eff80;border:1px solid #231f20;text-align:center;padding:3px">{{ $month_avg }}</td>
         </tr>
 
         <tr>

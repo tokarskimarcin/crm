@@ -30,7 +30,7 @@
         @foreach($data as $item)
             <tr>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->user_last_name . ' ' . $item->user_first_name }}</td>
-                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->average }} %</td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->average }}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->dkj_proc }} %</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->received_calls }}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->success }}</td>
@@ -57,7 +57,7 @@
 
         <tr>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA</b></td>
-            <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_avg }} %</b></td>
+            <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_avg }}</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_janky_proc }} %</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_received_calls }}</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_success }}</b></td>
