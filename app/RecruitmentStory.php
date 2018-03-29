@@ -50,9 +50,7 @@ class RecruitmentStory extends Model
         $data_stop = $data_stop . ' 23:00:00';
 
         $result = DB::table('department_info')
-            ->select(DB::raw('
-                users.last_name,
-                users.first_name,
+            ->select(DB::raw('               
                 departments.name, 
                 department_type.name as dep_type, 
                 SUM(CASE WHEN `candidate`.`created_at` between "' . $data_start . '" and "' . $data_stop . '" THEN 1 ELSE 0 END) as count_flow
@@ -70,10 +68,11 @@ class RecruitmentStory extends Model
     }
 
     public static function getReportTrainingData($data_start,$data_stop){
-        return DB::table('group_training')
+         $records = DB::table('group_training')
             ->select(DB::raw('
                 sum(candidate_choise_count) as sum_choise,
                 sum(candidate_absent_count) as sum_absent,
+                departments.id as dep_id,
                 departments.name as dep_name,
                 department_type.name as dep_name_type
             '))
@@ -83,6 +82,25 @@ class RecruitmentStory extends Model
             ->whereBetween('training_date', [$data_start, $data_stop])
             ->groupBy('department_info.id')
             ->get();
+
+        $deps = Department_info::all();
+        $data=[];
+        foreach ($deps as $dep) {
+            $dep_data = new \stdClass();
+            $dep_data->dep_name = $dep->departments->name;
+            $dep_data->dep_name_type = $dep->department_type->name;
+            $dep_data->sum_choise = 0;
+            $dep_data->sum_absent = 0;
+            foreach($records as $item) {
+                if ($item->dep_id == $dep->id) {
+                    $dep_data->sum_choise = $item->sum_choise;
+                    $dep_data->sum_absent = $item->sum_absent;
+                }
+            }
+            $data[] = $dep_data;
+        }
+
+        return collect($data)->sortByDesc('sum_choise');
     }
 
     /**
@@ -92,10 +110,10 @@ class RecruitmentStory extends Model
         if ($select_type == 0) {
             $dataCount = DB::table('recruitment_story')
                 ->select(DB::raw('
+                count(recruitment_story.id) as counted,
                     departments.id as dep_id,
                     departments.name as dep_name,
-                    department_type.name as dep_name_type,
-                    count(recruitment_story.id) as counted
+                    department_type.name as dep_name_type
                 '))
                 ->join('candidate', 'candidate.id', 'recruitment_story.candidate_id')
                 ->join('department_info', 'candidate.department_info_id', 'department_info.id')
@@ -136,7 +154,9 @@ class RecruitmentStory extends Model
                 ->orderBy('counted','desc')
                 ->get();
         }
-        return $data;
+
+
+        return collect($data)->sortByDesc('counted');
     }
 
     /**

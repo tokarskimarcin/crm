@@ -192,7 +192,7 @@ Route::POST('/saveMedicalPackageData', 'AdminController@saveMedicalPackageData')
 
 
 Route::POST('/datatableCoachingTable','CoachingController@datatableCoachingTable')->name('api.datatableCoachingTable');
-
+Route::POST('/acceptCoaching', 'CoachingController@acceptCoaching')->name('api.acceptCoaching');;
 //Bootstrap notifications //
 
 Route::post('getBootstrapNotifications', 'HomeController@getBootstrapNotifications')->name('getBootstrapNotifications');
@@ -617,6 +617,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     /** Tabela Postępów Coaching */
 
     Route::get('/progress_table', 'CoachingController@progress_tableGET');
+
+
 
 });
 //////////////////////Testing ORM///////////////
