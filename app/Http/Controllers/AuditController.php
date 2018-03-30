@@ -12,6 +12,7 @@ use App\Audit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 
 use Session;
 
@@ -66,10 +67,12 @@ class AuditController extends Controller
                 $newCrit->comment = $request->$nameComment;
                 $newCrit->save();
         }
+        return Redirect::to('audit/'.$newForm->id);
     }
 
     public function showAuditsGet(Request $request) {
-        return view('audit.showAudits');
+            $audit = Audit::all();
+        return view('audit.showAudits')->with('audit', $audit);
     }
 
     public function showAuditsPost(Request $request) {
@@ -84,10 +87,15 @@ class AuditController extends Controller
                 CONCAT(users.first_name, " ", users.last_name) as user_name,
                 CONCAT(departments.name, " ", department_type.name) as department,
                 date_audit,
-                trainer.first_name as trainer_first_name,
-                trainer.last_name as trainer_last_name            
+                CONCAT(trainer.first_name, " ", trainer.last_name) as trainer,
+                audit.id as audit_id
                 '));
-
             return datatables($audit)->make(true);
     }
+
+    public function auditGet($id) {
+        return $id;
+    }
+
+
 }

@@ -16,12 +16,11 @@
                                     <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
                                         <thead>
                                         <tr>
-                                            <th>Imię Wypełniającego</th>
-                                            <th>Nazwisko Wypełniającego</th>
+                                            <th>Wypełniającey</th>
+                                            <th>Trener</th>
                                             <th>Department</th>
                                             <th>Data</th>
-                                            <th>Imię trenera</th>
-                                            <th>Nazwisko trenera</th>
+                                            <th>Podgląd</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -58,12 +57,14 @@
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },"columns":[
-                    {"data": "first_name"},
-                    {"data": "last_name"},
+                    {"data": "user_name"},
+                    {"data": "trainer"},
                     {"data": "department"},
                     {"data": "date_audit"},
-                    {"data": "trainer_first_name"},
-                    {"data": "trainer_last_name"}
+                    {"data":function (data, type, dataToSet) {
+                            return '<a href="{{URL::to("audit")}}/' + data.audit_id + '}">Link</a>';
+                        },"orderable": false, "searchable": false
+                    }
                 ]
             });
 
