@@ -15,6 +15,7 @@ class CoachingController extends Controller
         $consultant = $this::getCoachConsultant();
 
 
+
         $inprogres = DB::table('coaching')
             ->select(DB::raw('coaching.*,
                         ROUND(sum(work_hours.id)/ sum(time_to_sec(`accept_stop`-`accept_start`)),2) as avg_consultant,
@@ -48,15 +49,19 @@ class CoachingController extends Controller
      */
     public function saveCoaching(Request $request){
         if($request->ajax()){
-            $new_coaching = new Coaching();
+            if($request->status == 0)
+                $new_coaching =  new Coaching();
+            else
+                $new_coaching = Coaching::find($request->status);
+
             $new_coaching->consultant_id = $request->consultant_id;
             $new_coaching->manager_id = Auth::user()->id;
             $new_coaching->coaching_date = $request->coaching_date;
             $new_coaching->subject = $request->subject;
             $new_coaching->comment = $request->coaching_comment;
-            $new_coaching->average_goal_min = $request->coaching_actual_avg;
-            $new_coaching->average_goal_min = $request->coaching_goal_min;
-            $new_coaching->average_goal_max = $request->coaching_goal_max;
+            $new_coaching->coaching_actual_avg = $request->coaching_actual_avg;
+            //$new_coaching->average_goal_min = $request->coaching_goal_min;
+            $new_coaching->average_goal = $request->coaching_goal;
 
             if($new_coaching->save()){
                 return 1;
@@ -111,5 +116,45 @@ class CoachingController extends Controller
             ->where('users.status_work','=',1)
             ->groupby('users.id')
             ->get();
+    }
+
+
+    /**
+     * Akceptacja Coaching'u
+     * @param Request $request
+     * @return int
+     */
+    public function acceptCoaching(Request $request){
+        if($request->ajax()){
+            $coaching = Coaching::find($request->coaching_id);
+            $coaching->comment = $request->coaching__comment;
+            $coaching->status = 1;
+            $coaching->save();
+            return 1;
+        }else
+            return 0;
+    }
+
+    /**
+     * Usunięcie Coaching'u
+     * @param Request $request
+     * @return int
+     */
+    public function deleteCoaching(Request $request){
+        if($request->ajax()){
+            $coaching = Coaching::find($request->coaching_id);
+            $coaching->status = 3;
+            $coaching->save();
+            return 1;
+        }else
+            return 0;
+    }
+
+    public function getCoaching(Request $request){
+        if($request->ajax()){
+            $coaching = Coaching::find($request->coaching_id);
+            return $coaching;
+        }else
+            return 0;
     }
 }

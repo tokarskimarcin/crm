@@ -59,7 +59,7 @@
                                         <tr>
                                             <th>Imię</th>
                                             <th>Nazwisko</th>
-                                            <th>Login</th>
+                                            <th>Lider</th>
                                             <th>Data rozp.</th>
                                             <th>Data zak.</th>
                                             <th>Nr. Tel.</th>
@@ -127,11 +127,18 @@
             },"columns":[
                 {"data": "first_name"},
                 {"data": "last_name"},
-                {"data": "username"},
+                {"data": function (data, type, dataToSet) {
+                        if(data.coach_first_name == null || data.coach_last_name == null){
+                            return '';
+                        }else
+                            return data.coach_first_name+' '+data.coach_last_name;
+                    },"name": "coach.last_name"
+                },
                 {"data": "start_work"},
                 {"data": "end_work"},
                 {"data": "private_phone"},
                 {"data": function (data, type, dataToSet) {
+                    console.log(data);
                     if(data.documents == 1)
                         data.documents = "Posiada";
                     else if(data.documents == 0)

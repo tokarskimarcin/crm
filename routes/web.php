@@ -130,7 +130,8 @@ Route::POST('/datatableAllTests','AdminController@datatableAllTests')->name('api
 Route::POST('/paymentStory','FinancesController@paymentStory')->name('api.paymentStory');
 
 Route::POST('/saveCoaching','CoachingController@saveCoaching')->name('api.saveCoaching');
-
+Route::POST('/deleteCoaching','CoachingController@deleteCoaching')->name('api.deleteCoaching');
+Route::POST('/getCoaching','CoachingController@getCoaching')->name('api.getCoaching');
 /* TEST AJAX ROUTES STOP */
 
 //** RECRUITMENT AJAX */
