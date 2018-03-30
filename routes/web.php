@@ -624,6 +624,10 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 ///
 Route::get('/addAudit', 'AuditController@auditMethodGet');
 Route::post('/addAudit', 'AuditController@ajax')->name('api.ajax');
+Route::post('/handleForm', 'AuditController@handleFormPost');
+
+Route::get('/showAudits', 'AuditController@showAuditsGet');
+Route::post('/showAudits', 'AuditController@showAuditsPost')->name('api.auditTable');
 
 Route::get('/dept/{id}','ScreensController@monitorMethod');
 Route::get('/screen_table','ScreensController@screenMethod');
