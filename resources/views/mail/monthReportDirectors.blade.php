@@ -81,6 +81,8 @@
 
             $add_default_zero = ($report != null) ? false : true ;
 
+            $size = 0;
+
         if ($add_default_zero == false) {
             //Sprawdzenie czy dzien jest normalny czy weekendowy
             $day_number = date('N', strtotime($report->report_date));
@@ -92,10 +94,11 @@
             foreach ($dep_info as $dep) {
                 $goal += ($day_number < 6) ? $dep->dep_aim : $dep->dep_aim_week;
                 $department_hours = ($day_number < 6) ? $dep->working_hours_normal : $dep->working_hours_week;
-                $working_hours += $department_hours * $dep->size;
+                $day_goal = ($day_number < 6) ? $dep->dep_aim : $dep->dep_aim_week;
+                $working_hours += ($dep->commission_avg) ? $day_goal / $dep->commission_avg : 0 ;
                 $size += $dep->size;
             }
-            $working_hours_goal = $working_hours;
+            $working_hours_goal = round($working_hours);
             //Obliczenie % celu
             $proc_goal = round(($report->success / $goal) * 100, 2);
             //Obliczenie reszty celu

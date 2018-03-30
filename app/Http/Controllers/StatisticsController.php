@@ -1692,9 +1692,6 @@ class StatisticsController extends Controller
                     'directors'         => $directors
                 ]);
         } else {
-            if (Auth::user()->id != 4796) {
-                return "Raport w przygotowaniu";
-            }
             $dirId = substr($request->selected_dep, 2);
             $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
 
@@ -1820,7 +1817,6 @@ class StatisticsController extends Controller
             }
         }
         $newYanky = collect($newYanky);
-        //dd($newYanky);
         /**
          * Pobranie danych z grafiku
          */
@@ -1909,7 +1905,7 @@ class StatisticsController extends Controller
         /**
          * Pobranie danych departamentu
          */
-        $dep_info = Department_info::whereIn('id',[2,10,11,8])->get(); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TUTAJ ZMIENIC na cos związanego z tym dla kogo generowany jest raport
+        $dep_info = Department_info::whereIn('id', $deps)->get();
 
         /**
          * Tabela z miesiącami
@@ -2274,7 +2270,129 @@ class StatisticsController extends Controller
     }
 
     /**
-     *  funkcja wysyłająca email miesięczny raport oddziały
+     * Metoda pobierająca dane na temat wynikow tydogniowych- miesięcznych dla danego trenera
+     */
+    private function getWeekMonthCoachData($date_start, $date_stop, $coach_id) {
+        $leader = User::find($coach_id);
+
+        $ids = $leader->trainerConsultants->pluck('login_phone')->toArray();
+
+        $max_from_day = DB::table('pbx_report_extension')
+            ->select(DB::raw('
+                MAX(id) as id
+            '))
+            ->whereBetween('report_date', [$date_start, $date_stop])
+            ->whereIn('pbx_id', $ids)
+            ->groupBy('report_date')
+            ->groupBy('pbx_id')
+            ->get();
+
+        $pbx_data = Pbx_report_extension::whereBetween('report_date', [$date_start, $date_stop])
+            ->whereIn('pbx_id', $ids)
+            ->whereIn('id', $max_from_day->pluck('id')->toArray())
+            ->get();
+
+        $total_data = $pbx_data->groupBy('pbx_id');
+
+        $days_in_month = intval(date('t', strtotime($date_start)));
+
+        $terefere = $total_data->map(function($item, $key) use ($days_in_month, $date_start) {
+            $user_sum = [];
+
+            $consultant = User::where('login_phone', '=', $item->first()->pbx_id)
+                ->get();
+
+            for ($y = 1; $y <= 4; $y++) {
+                $user_sum[$y]['average'] = 0;
+                $user_sum[$y]['janky_proc'] = 0;
+                $user_sum[$y]['count_calls'] = 0;
+                $user_sum[$y]['success'] = 0;
+                $user_sum[$y]['proc_call_success'] = 0;
+                $user_sum[$y]['pause_time'] = 0;
+                $user_sum[$y]['received_calls'] = 0;
+                $user_sum[$y]['login_time'] = 0;
+                $user_sum[$y]['proc_received_calls'] = 0;
+
+                $user_sum[$y]['first_name'] = $consultant->first()->first_name;
+                $user_sum[$y]['last_name'] = $consultant->first()->last_name;
+                $user_sum[$y]['week_num'] = $y;
+                $user_sum[$y]['total_week_yanky'] = 0;
+                $user_sum[$y]['first_week_day'] = null;
+                $user_sum[$y]['last_week_day'] = null;
+            }
+            $week_num = 1;
+            $week_yanky = 0;
+            $add_week_sum = true;
+            $start_day = true;
+            $miss_first_week = false;
+
+            for ($i = 1; $i <= $days_in_month; $i++) {
+                $i_fixed = ($i < 10) ? '0' . $i : $i ;
+                $actual_loop_day = date('Y-m-', strtotime($date_start)) . $i_fixed;
+                $week_day = date('N', strtotime($actual_loop_day));
+
+                if ($user_sum[$week_num]['first_week_day'] == null) {
+                    $user_sum[$week_num]['first_week_day'] = $actual_loop_day;
+                }
+
+                if ($item->where('report_date', '=', $actual_loop_day)->count() > 0) {
+                    $report = $item->where('report_date', '=', $actual_loop_day)->first();
+
+                    $work_time_array = explode(":", $report->login_time);
+                    $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]) / 3600, 2);
+
+                    $user_sum[$week_num]['success'] += $report->success;
+                    $user_sum[$week_num]['login_time'] += $work_time;
+                    $user_sum[$week_num]['pause_time'] += $report->time_pause;
+                    $user_sum[$week_num]['received_calls'] += $report->received_calls;
+
+                    $week_yanky += ($report->success * ($report->dkj_proc / 100));
+                }
+
+                if ($week_day == 7 && $start_day == false && $miss_first_week == false) {
+                    $add_week_sum = true;
+                }
+
+                if ($start_day == true && $week_day == 1) {
+                    $add_week_sum = true;
+                    $start_day = false;
+                } else if ($start_day == true && $week_day != 1) {
+                    $add_week_sum = false;
+                    $miss_first_week = true;
+                    $start_day = false;
+                }
+
+                if ($week_num == 4 && $week_day == 7 && $i < $days_in_month) {
+                    $add_week_sum = false;
+                }
+
+                if (($week_day == 7 || $i == $days_in_month) &&  $add_week_sum == true && $miss_first_week == false) {
+                    $user_sum[$week_num]['last_week_day'] = $actual_loop_day;
+
+                    $user_sum[$week_num]['total_week_yanky'] = $week_yanky;
+                    $user_sum[$week_num]['janky_proc'] = ($user_sum[$week_num]['success'] > 0) ? round(($week_yanky / $user_sum[$week_num]['success']) * 100, 2) : 0 ;
+                    $user_sum[$week_num]['average'] = ($user_sum[$week_num]['login_time']) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['login_time']), 2) : 0 ;
+                    $user_sum[$week_num]['proc_received_calls'] = ($user_sum[$week_num]['received_calls'] > 0) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['received_calls']) * 100 , 2) : 0 ;
+                    $week_num++;
+                    $week_yanky = 0;
+                    $add_week_sum = true;
+                }
+
+                if  ($miss_first_week == true && $week_day == 7) {
+                    $miss_first_week = false;
+                }
+                if ($week_num == 4 && $week_day == 7 && $i < $days_in_month) {
+                    $add_week_sum = true;
+                }
+
+            }
+            return $user_sum;
+        });
+        return $terefere;
+    }
+
+    /**
+     * funkcja wysyłająca email miesięczny raport oddziały
      */
     public function MailMonthReportDepartments() {
         $data = [];
@@ -2303,6 +2421,66 @@ class StatisticsController extends Controller
 
         $title = 'Miesięczny Raport Oddziały';
         $this->sendMailByVerona('summaryReportDepartment', $data, $title);
+    }
+
+    /**
+     * Wyświetlanie raportu miesięczenego zbiorczego trenerów
+     */
+    public function pageMonthReportCoachSummaryGet() {
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $coaches = User::where('department_info_id', '=', $departments->first()->id)
+            ->whereIn('user_type_id', [4, 12])
+            ->where('status_work', '=', 1)
+            ->get();
+
+        $data = [];
+
+        foreach ($coaches as $coach) {
+            $data[$coach->id]['trainer_data'] = self::getWeekMonthCoachData(date('Y-m-d'), date('Y-m-t'), 6052);
+            $data[$coach->id]['trainer'] = $coach;
+            $data[$coach->id]['date'] = [date('Y-m-d'), date('Y-m-t')];
+        }
+
+        return view('reportpage.monthReportCoachSummary')
+            ->with([
+                'months'        => self::getMonthsNames(),
+                'month'         => date('m'),
+                'departments'   => $departments,
+                'dep_id'        => $departments->first()->id,
+                'data'          => $data
+            ]);
+    }
+
+    /**
+     * Wyświetlanie raportu miesięcznego zbiorczego trenerów po wyborze
+     */
+    public function pageMonthReportCoachSummaryPost(Request $request) {
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $coaches = User::where('department_info_id', '=', $request->dep_selected)
+            ->whereIn('user_type_id', [4, 12])
+            ->where('status_work', '=', 1)
+            ->get();
+        $data = [];
+
+        $data_start = date('Y-') . $request->month_selected . '-01';
+        $data_stop = date('Y-') . $request->month_selected . date('-t', strtotime(date('Y-') . $request->month_selected));
+
+        foreach ($coaches as $coach) {
+            $data[$coach->id]['trainer_data'] = self::getWeekMonthCoachData($data_start, $data_stop, $coach->id);
+            $data[$coach->id]['trainer'] = $coach;
+            $data[$coach->id]['date'] = [$data_start, $data_stop];
+        }
+
+        return view('reportpage.monthReportCoachSummary')
+            ->with([
+                'months'        => self::getMonthsNames(),
+                'month'         => date('m'),
+                'departments'   => $departments,
+                'dep_id'        => $request->dep_selected,
+                'data'          => $data
+            ]);
     }
 
     /*
@@ -2362,7 +2540,7 @@ class StatisticsController extends Controller
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
         foreach($departments as $department) {
-            $menager = User::whereIn('id', [$department->menager_id, 4796])->get();
+            $menager = User::whereIn('id', [$department->menager_id, 4796, 11, 1364])->get();
 
             $date_start = date('Y-m-') . '01';
             $date_stop = date('Y-m-t');
@@ -2569,9 +2747,50 @@ class StatisticsController extends Controller
                 'report_date' => $data_raw['report_date']
             ];
 
-            $menager = User::whereIn('id', [$department->menager_id, $department->director_id, 4796, 1364])->get();
+            /**
+             * Maile wysyłane są do dyrektorow, kierownikow, trenerów + paweł
+             */
+            $coaches = User::whereIn('user_type_id', [4, 12])
+                ->where('status_work', '=', 1)
+                ->where('department_info_id', '=', $department->id)
+                ->get();
 
-            $this->sendMailByVerona('hourReportCoach', $data, 'Raport trenerzy', $menager);
+            $menager = $coaches->pluck('id')->merge(collect([$department->menager_id, $department->director_id, 4796, 1364, 11]))->toArray();
+
+            $this->sendMailByVerona('hourReportCoach', $data, 'Raport trenerzy', User::whereIn('id', $menager)->get());
+        }
+    }
+
+    /**
+     * Wysłanie maili godzinnych raport trenerzy
+     */
+    public function MailHourReportCoaches() {
+        $departments = Department_info::where('id_dep_type', '=', 2)
+            ->get();
+
+        foreach ($departments as $department){
+            $report_hour = date('H') . ':00:00';
+            $data_raw = $this->getDayCoachStatistics($department->id, date('Y-m-d'));
+
+            $data = [
+                'department'   => $department,
+                'coaches'   => $data_raw['coaches'],
+                'data'      => $data_raw['data'],
+                'report_date' => $data_raw['report_date'],
+                'report_hour' => $report_hour
+            ];
+
+            /**
+             * Maile wysyłane są do dyrektorow, kierownikow, trenerów + paweł
+             */
+            $coaches = User::whereIn('user_type_id', [4, 12])
+                ->where('status_work', '=', 1)
+                ->where('department_info_id', '=', $department->id)
+                ->get();
+
+            $menager = $coaches->pluck('id')->merge(collect([$department->menager_id, $department->director_id, 4796, 1364, 11]))->toArray();
+
+            $this->sendMailByVerona('hourReportCoach', $data, 'Raport trenerzy', User::whereIn('id', $menager)->get());
         }
     }
 

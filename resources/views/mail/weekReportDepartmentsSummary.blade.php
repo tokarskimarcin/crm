@@ -63,7 +63,7 @@
                     <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>ŚREDNIA</b></td>
                     @foreach($headers as $report_date)
                         @php
-                            $repo = $department_repo['data']->where('report_date', '=', $report_date)->first() ?? null;
+                            $repo = (is_object($department_repo['data']->where('report_date', '=', $report_date)->first())) ? $department_repo['data']->where('report_date', '=', $report_date)->first() : null;
                         @endphp
                         <td style="border:1px solid #231f20;text-align:center;padding:3px">@if($repo !== null) {{$repo->average}} @else 0 @endif</td>
                     @endforeach
@@ -74,7 +74,7 @@
                     <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>RBH</b></td>
                     @foreach($headers as $report_date)
                         @php
-                            $repo = $department_repo['data']->where('report_date', '=', $report_date)->first() ?? null;
+                            $repo = (is_object($department_repo['data']->where('report_date', '=', $report_date)->first())) ? $department_repo['data']->where('report_date', '=', $report_date)->first() : null;
                         @endphp
                         <td style="border:1px solid #231f20;text-align:center;padding:3px">@if($repo !== null) {{ round($repo->day_time_sum, 2) }} @else 0 @endif</td>
                     @endforeach
@@ -85,7 +85,7 @@
                     <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>% CELU</b></td>
                     @foreach($headers as $report_date)
                         @php
-                            $repo = $department_repo['data']->where('report_date', '=', $report_date)->first() ?? null;
+                            $repo = (is_object($department_repo['data']->where('report_date', '=', $report_date)->first())) ? $department_repo['data']->where('report_date', '=', $report_date)->first() : null;
                             if ($repo)
                                 $day_goal = (date('N', strtotime($repo->report_date)) < 6) ? $dep->dep_aim : $dep->dep_aim_week ;
                             else
@@ -100,7 +100,7 @@
                     <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>JAKOŚĆ</b></td>
                     @foreach($headers as $report_date)
                         @php
-                            $repo = $department_repo['data']->where('report_date', '=', $report_date)->first() ?? null;
+                            $repo = (is_object($department_repo['data']->where('report_date', '=', $report_date)->first())) ? $department_repo['data']->where('report_date', '=', $report_date)->first() : null;
                         @endphp
                         <td style="border:1px solid #231f20;text-align:center;padding:3px">@if($repo !== null) {{ $repo->janky_count }} @else 0 @endif %</td>
                     @endforeach
@@ -111,7 +111,7 @@
                     <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>CZAS ROZMÓW</b></td>
                     @foreach($headers as $report_date)
                         @php
-                            $repo = $department_repo['data']->where('report_date', '=', $report_date)->first() ?? null;
+                            $repo = (is_object($department_repo['data']->where('report_date', '=', $report_date)->first())) ? $department_repo['data']->where('report_date', '=', $report_date)->first() : null;
                         @endphp
                         <td style="border:1px solid #231f20;text-align:center;padding:3px">@if($repo !== null) {{ $repo->call_time }} @else 0 @endif %</td>
                     @endforeach
