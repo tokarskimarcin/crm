@@ -261,6 +261,7 @@ Route::get('/monthReportSummaryDepartments', 'StatisticsController@MailMonthRepo
 
 Route::get('/dayReportDepartments', 'StatisticsController@MailDayDepartmentsReport');
 Route::get('/dayReportCoaches', 'StatisticsController@MailDayReportCoaches');
+Route::get('/hourReportCoaches', 'StatisticsController@MailHourReportCoaches');
 
 //Maila dotyczące wyłączonych kont
 //Raport Usunietych kont
@@ -510,6 +511,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageWeekReportDepartmentsSummary', 'StatisticsController@pageWeekReportDepartmentsSummaryGet');
     Route::post('/pageWeekReportDepartmentsSummary', 'StatisticsController@pageWeekReportDepartmentsSummaryPost');
 
+    Route::get('/pageMonthReportCoachSummary', 'StatisticsController@pageMonthReportCoachSummaryGet');
+    Route::post('/pageMonthReportCoachSummary', 'StatisticsController@pageMonthReportCoachSummaryPost');
 
     //Raporty Rekrutacji
 
