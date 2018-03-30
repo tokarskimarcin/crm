@@ -58,8 +58,6 @@
                             <table id="table_interview_count" class="table table-striped thead-inverse">
                                 <thead>
                                     <tr>
-                                        <th>Imie</th>
-                                        <th>Nazwisko</th>
                                         <th>Oddział</th>
                                         <th>Spływ</th>
                                     </tr>
@@ -67,9 +65,7 @@
                                 <tbody>
                                     @foreach($flow_count as  $item)
                                         <tr>
-                                            <td>{{$item->first_name}}</td>
-                                            <td>{{$item->last_name}}</td>
-                                            <td>{{$item->name}}</td>
+                                            <td>{{$item->name.' '.$item->dep_type}}</td>
                                             <td>{{$item->count_flow}}</td>
                                         </tr>
                                     @endforeach
