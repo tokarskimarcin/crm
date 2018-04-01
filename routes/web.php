@@ -619,6 +619,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/progress_table', 'CoachingController@progress_tableGET');
 
+    Route::get('/pageReportCoaching', 'StatisticsController@pageReportCoachingGet');
+    Route::post('/pageReportCoaching', 'StatisticsController@pageReportCoachingPost');
+
 
 
 });
