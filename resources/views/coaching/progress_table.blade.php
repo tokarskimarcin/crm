@@ -467,7 +467,15 @@
                         },
                         {"data":"coaching_date"},
                         {"data": "subject"},
-                        {"data": "avg_consultant","searchable": false},
+                        {"data":function (data, type, dataToSet) {
+                                let color = 'green';
+                                if(data.avg_consultant < data.average_goal)
+                                    color = 'red';
+                                if(data.avg_consultant == null)
+                                    return 'Brak';
+                                 return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
+                            },"name": "avg_consultant","searchable": false
+                        },
                         {"data":function (data, type, dataToSet) {
                                 return Math.round(data.couching_rbh/3600,2);
                             },"name": "couching_rbh","searchable": false
@@ -552,7 +560,14 @@
                     },
                     {"data":"coaching_date"},
                     {"data": "subject"},
-                    {"data": "avg_consultant","searchable": false},
+
+                    {"data":function (data, type, dataToSet) {
+                            let color = 'green';
+                            if(data.avg_consultant < data.average_goal)
+                                color = 'red';
+                            return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
+                        },"name": "avg_consultant","searchable": false
+                    },
                     {"data": "average_goal"},
                     {"data":function (data, type, dataToSet) {
                             return Math.round(data.couching_rbh/3600,2);
@@ -604,7 +619,13 @@
                     },
                     {"data":"coaching_date"},
                     {"data": "subject"},
-                    {"data": "avg_consultant","searchable": false},
+                    {"data":function (data, type, dataToSet) {
+                            let color = 'green';
+                            if(data.avg_consultant < data.average_goal)
+                                color = 'red';
+                            return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
+                        },"name": "avg_consultant","searchable": false
+                    },
                     {"data":function (data, type, dataToSet) {
                             return Math.round(data.couching_rbh/3600,2);
                         },"name": "couching_rbh","searchable": false
