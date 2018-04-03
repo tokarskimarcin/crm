@@ -2139,8 +2139,8 @@ class StatisticsController extends Controller
      * Wyświetlanie raportu miesięcznego trenerzy
      */
     public function pageMonthReportCoachPost(Request $request) {
-        $date_start = date('Y-m-') . '01';
-        $date_stop = date('Y-m-t');
+        $date_start = '2018-03-01';//date('Y-m-') . '01';
+        $date_stop = '2018-03-31';//date('Y-m-t');
 
         $leader = User::find($request->coach_id);
 
@@ -2476,7 +2476,7 @@ class StatisticsController extends Controller
         return view('reportpage.monthReportCoachSummary')
             ->with([
                 'months'        => self::getMonthsNames(),
-                'month'         => date('m'),
+                'month'         => $request->month_selected,
                 'departments'   => $departments,
                 'dep_id'        => $request->dep_selected,
                 'data'          => $data
@@ -2569,7 +2569,7 @@ class StatisticsController extends Controller
 
 
         $year = date('Y');
-        $month = date('m');
+        $month = '03';//date('m');
         $days_in_month = date('t', strtotime($month));
 
         return view('reportpage.dayReportCoaches')
@@ -2597,7 +2597,7 @@ class StatisticsController extends Controller
             $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
 
         $year = date('Y');
-        $month = date('m');
+        $month = '03';//date('m');
         $days_in_month = date('t', strtotime($month));
 
 
@@ -2639,7 +2639,7 @@ class StatisticsController extends Controller
         if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
             $department_info = $department_info->where('id', '=', Auth::user()->department_info_id);
 
-        $month = date('m');
+        $month = '03';//date('m');
         $year = date('Y');
         $days_in_month = date('t', strtotime($month));
 
@@ -2663,7 +2663,7 @@ class StatisticsController extends Controller
         if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
             $department_info = $department_info->where('id', '=', Auth::user()->department_info_id);
 
-        $month = date('m');
+        $month = '03';//date('m');
         $year = date('Y');
         $days_in_month = date('t', strtotime($month));
 
