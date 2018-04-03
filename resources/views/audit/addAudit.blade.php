@@ -305,7 +305,7 @@
                 }
 
 
-                 // check if every quality input is selected
+                 // check if every quality input is selected g
                 if(everythingIsOk == true) {
                     for(var j = 0; j < secondInp.length; j++) {
                         if(secondInp[j].value == 0) {
