@@ -2288,7 +2288,9 @@ class StatisticsController extends Controller
 
         return view('reportpage.MonthReportCoach')
             ->with([
-                'coaches' => $coaches
+                'coaches'   => $coaches,
+                'months'    => self::getMonthsNames(),
+                'month_selected' => date('m')
             ]);
     }
 
@@ -2296,8 +2298,8 @@ class StatisticsController extends Controller
      * Wyświetlanie raportu miesięcznego trenerzy
      */
     public function pageMonthReportCoachPost(Request $request) {
-        $date_start = date('Y-m-') . '01';
-        $date_stop = date('Y-m-t');
+        $date_start = date('Y-') . $request->month_selected . '-01';
+        $date_stop = date('Y-') . $request->month_selected . date('-t', strtotime(date('Y-') . $request->month_selected));
 
         $leader = User::find($request->coach_id);
 
@@ -2422,7 +2424,9 @@ class StatisticsController extends Controller
                 'date_start' => $date_start,
                 'date_stop' => $date_stop,
                 'coachData' => $terefere,
-                'leader' => $leader
+                'leader' => $leader,
+                'months'    => self::getMonthsNames(),
+                'month_selected' => $request->month_selected
             ]);
     }
 
@@ -2633,7 +2637,7 @@ class StatisticsController extends Controller
         return view('reportpage.monthReportCoachSummary')
             ->with([
                 'months'        => self::getMonthsNames(),
-                'month'         => date('m'),
+                'month'         => $request->month_selected,
                 'departments'   => $departments,
                 'dep_id'        => $request->dep_selected,
                 'data'          => $data
@@ -2726,7 +2730,7 @@ class StatisticsController extends Controller
 
 
         $year = date('Y');
-        $month = date('m');
+        $month = '03';//date('m');
         $days_in_month = date('t', strtotime($month));
 
         return view('reportpage.dayReportCoaches')
@@ -2737,7 +2741,8 @@ class StatisticsController extends Controller
                 'days'      => $days_in_month,
                 'coach_id'  => 0,
                 'date_selected' => date('Y-m-d'),
-                'hour_selected' => '09:00:00'
+                'hour_selected' => '09:00:00',
+                'months'    => self::getMonthsNames()
             ]);
     }
 
@@ -2754,7 +2759,7 @@ class StatisticsController extends Controller
             $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
 
         $year = date('Y');
-        $month = date('m');
+        $month = '03';//date('m');
         $days_in_month = date('t', strtotime($month));
 
 
@@ -2802,12 +2807,13 @@ class StatisticsController extends Controller
 
         return view('reportpage.DayReportSummaryCoaches')
             ->with([
-                'department_info' => $department_info,
-                'dep_id' => 2,
-                'days' => $days_in_month,
-                'month' => $month,
-                'year' => $year,
-                'date_selected' => date('Y-m-d')
+                'department_info'   => $department_info,
+                'dep_id'            => 2,
+                'days'              => $days_in_month,
+                'month'             => $month,
+                'year'              => $year,
+                'date_selected'     => date('Y-m-d'),
+                'months'            => self::getMonthsNames()
             ]);
     }
 
@@ -2820,7 +2826,7 @@ class StatisticsController extends Controller
         if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
             $department_info = $department_info->where('id', '=', Auth::user()->department_info_id);
 
-        $month = date('m');
+        $month = $request->month_selected;
         $year = date('Y');
         $days_in_month = date('t', strtotime($month));
 
@@ -2834,12 +2840,13 @@ class StatisticsController extends Controller
                 'department'        => $department,
                 'dep_id'            => $request->dep_id,
                 'days'              => $days_in_month,
-                'month'             => $month,
+                'month'             => $request->month_selected,
                 'year'              => $year,
                 'date_selected'     => $request->day_select,
                 'coaches'           => $data['coaches'],
                 'data'              => $data['data'],
-                'report_date'       => $data['report_date']
+                'report_date'       => $data['report_date'],
+                'months'            => self::getMonthsNames()
             ]);
     }
 
@@ -3176,6 +3183,23 @@ class StatisticsController extends Controller
             '12' => 'Grudzień'
         ];
         return $months;
+    }
+
+    /**
+     * Pobranie ilości dni w miesiacu
+     */
+    public function getDaysInMonth(Request $request) {
+        $month = date('Y-') . $request->month_selected;
+        $days_in_month = date('t', strtotime('Y-' . $request->month_selected));
+        $data = [];
+        for ($i = 1; $i <= $days_in_month; $i++) {
+            $day = ($i < 10) ? '0' . $i : $i ;
+            $data[] = $month . '-' . $day;
+        }
+        return [
+            'month' => $month,
+            'data' => $data
+        ];
     }
 
     /******** Główna funkcja do wysyłania emaili*************/

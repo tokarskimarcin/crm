@@ -13,7 +13,7 @@
                     <label>Oddział:</label>
                     <select class="form-control" name="dep_selected">
                         @foreach($departments as $key => $value)
-                            <option @if($dep_id == $value->id) selected @endif value="{{$value->id}}">{{ $value->departments->name }}</option>
+                            <option @if($dep_id == $value->id) selected @endif value="{{$value->id}}">{{ $value->departments->name . ' ' . $value->department_type->name }}</option>
                         @endforeach
                     </select>
                 </div>
