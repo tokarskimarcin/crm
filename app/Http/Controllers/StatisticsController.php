@@ -868,7 +868,8 @@ class StatisticsController extends Controller
     }
 
     //przygotowanie danych do raportu miesięcznego dkj
-    private function MonthReportDkjData() {
+    //type - 0 bierzący miesiac, 1 poprzedni
+    private function MonthReportDkjData($type) {
         $month = $this->monthReverse(date('m'));
         $year = date('Y');
         if ($month < 10) {
@@ -878,11 +879,19 @@ class StatisticsController extends Controller
             $year -= 1;
         }
         $selected_date = $year . '-' . $month . '%';
+        if($type == 0)
+        {
+            $month_ini = new DateTime("first day of this month");
+            $date_start = $month_ini->format('Y-m-d');
+            $month_end = new DateTime("last day of this month");
+            $date_stop = $month_end->format('Y-m-d');
+        }else{
+            $month_ini = new DateTime("first day of last month");
+            $date_start = $month_ini->format('Y-m-d');
+            $month_end = new DateTime("last day of last month");
+            $date_stop = $month_end->format('Y-m-d');
+        }
 
-        $month_ini = new DateTime("first day of this month");
-        $date_start = $month_ini->format('Y-m-d');
-        $month_end = new DateTime("last day of this month");
-        $date_stop = $month_end->format('Y-m-d');
 
 //        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
 //        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
@@ -957,7 +966,7 @@ class StatisticsController extends Controller
 
     //wysyłanie raportu miesięcznego pracownicy dkj
     public function monthReportDkj() {
-      $data = $this->MonthReportDkjData();
+      $data = $this->MonthReportDkjData(1);
         $users = User::whereIn('id', [4796, 1364, 6009])->get();
       $title = 'Raport miesięczny DKJ';
       $this->sendMailByVerona('monthReportDkj', $data, $title, $users);
@@ -965,7 +974,7 @@ class StatisticsController extends Controller
 
     //wyswietlanie raoprtu miesiecznego pracownicy dkj
     public function pageMonthReportDKJ(){
-        $data = $this->MonthReportDkjData();
+        $data = $this->MonthReportDkjData(0);
 
         return view('reportpage.MonthReportDkj')
             ->with('month_name', $data['month_name'])
