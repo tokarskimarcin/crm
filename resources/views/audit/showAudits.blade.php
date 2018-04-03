@@ -16,11 +16,11 @@
                                     <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
                                         <thead>
                                         <tr>
-                                            <th>Wypełniającey</th>
+                                            <th class="search-input-text" data-column="1">Wypełniającey</th>
                                             <th>Trener</th>
                                             <th>Department</th>
                                             <th>Data</th>
-                                            <th>Podgląd</th>
+                                            <th>Podgląd/Edycja</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -47,6 +47,7 @@
                 "autoWidth": true,
                 "processing": true,
                 "serverSide": true,
+                "searching": false,
                 "drawCallback": function( settings ) {
                 },
                 "ajax": {
@@ -62,17 +63,17 @@
                     {"data": "department"},
                     {"data": "date_audit"},
                     {"data":function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("audit")}}/' + data.audit_id + '}">Link</a>';
+                            return '<a href="{{URL::to("audit")}}/' + data.audit_id + '">Link</a>';
                         },"orderable": false, "searchable": false
                     }
                 ]
             });
 
-            // $('.search-input-text').on( 'change', function () {   // for text boxes
-            //     var i =$(this).attr('data-column');  // getting column index
-            //     var v = $(this).find("option:selected").text()  // getting search input value
-            //     table.columns(i).search(v).draw();
-            // } );
+            $('.search-input-text').on( 'change', function () {   // for text boxes
+                var i =$(this).attr('data-column');  // getting column index
+                var v = $(this).text()  // getting search input value
+                table.columns(i).search(v).draw();
+            } );
         });
     </script>
 

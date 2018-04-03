@@ -286,8 +286,47 @@
                 title.textContent = 'Audyt dla departamentu: ' + inputDepartment.options[inputDepartment.selectedIndex].text + ' wypełniony przez ' + inputTrainer.options[inputTrainer.selectedIndex].text + ' ' + inputDate.value;
                 firstPanel.classList.add('inactivePanel');
             }
-            /************ End of event listeners functions ************/
 
+            /**
+             * Function check whether all inputs are filled by user(validation), if positive, send form.
+             */
+            function submitHandler(e) {
+                e.preventDefault();
+                var everythingIsOk = true; //true = form submits, false = form doesn's submit
+                var firstInp = document.getElementsByClassName('firstInp');
+                var secondInp = document.getElementsByClassName('secondInp');
+
+                 //Check if every amount input is selected
+                for(var i = 0; i < firstInp.length; i++) {
+                    if(firstInp[i].value == 0) {
+                        everythingIsOk = false;
+                        break;
+                    }
+                }
+
+
+                 // check if every quality input is selected
+                if(everythingIsOk == true) {
+                    for(var j = 0; j < secondInp.length; j++) {
+                        if(secondInp[j].value == 0) {
+                            everythingIsOk = false;
+                            break;
+                        }
+                    }
+                }
+
+                //Validation of required inputs
+                if(everythingIsOk != true) {
+                    swal('Wypełnij wszystkie pola w kolumnach "Ilość" i "Jakość"');
+                }
+
+                if(everythingIsOk == true) {
+                    document.getElementById('auditForm').submit();
+                }
+
+            }
+
+            /************ End of event listeners functions ************/
 
             //select every div that should disappear/appear at some point of user experience
            var firstPanel = document.getElementsByClassName('first-panel')[0];
@@ -318,40 +357,6 @@
             /***********Submit part*************/
             var submitButton = document.getElementById('secondButton');
             submitButton.addEventListener('click', submitHandler);
-
-            function submitHandler(e) {
-                e.preventDefault();
-                var everythingIsOk = true; //true = form submits, false = form doesn's submit
-                var firstInp = document.getElementsByClassName('firstInp');
-                var secondInp = document.getElementsByClassName('secondInp');
-
-                /**
-                 * Check if every amount input is selected
-                 */
-                for(var i = 0; i < firstInp.length; i++) {
-                    if(firstInp[i].value == 0) {
-                        everythingIsOk = false;
-                        break;
-                    }
-                }
-
-                /**
-                 * check if every quality input is selected
-                 */
-                if(everythingIsOk == true) {
-                    for(var j = 0; j < secondInp.length; j++) {
-                        if(secondInp[j].value == 0) {
-                            everythingIsOk = false;
-                            break;
-                        }
-                    }
-                }
-                everythingIsOk = true;
-                if(everythingIsOk == true) {
-                    document.getElementById('auditForm').submit();
-                }
-
-            }
 
         });
     </script>

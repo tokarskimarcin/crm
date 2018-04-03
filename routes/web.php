@@ -628,7 +628,10 @@ Route::post('/handleForm', 'AuditController@handleFormPost');
 
 Route::get('/showAudits', 'AuditController@showAuditsGet');
 Route::post('/showAudits', 'AuditController@showAuditsPost')->name('api.auditTable');
-Route::get('/audit/{id}', 'AuditController@auditGet');
+
+Route::get('/audit/{id}', 'AuditController@editAuditGet');
+Route::post('/handleEdit', 'AuditController@editAuditPost');
+
 
 Route::get('/dept/{id}','ScreensController@monitorMethod');
 Route::get('/screen_table','ScreensController@screenMethod');
