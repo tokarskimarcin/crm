@@ -1619,6 +1619,111 @@ class StatisticsController extends Controller
     }
 
     /**
+     * Raporty Coaching'ow Podział na tygodnie
+     */
+
+    public function pageReportCoachingGet(){
+        $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+        $directors = User::whereIn('id', $directorsIds)->get();
+        $dep_id = Auth::user()->department_info_id;
+        $month = date('m');
+        $year = date('Y');
+        $data = $this->getCoachingData( $month, $year, $dep_id);
+
+
+        return view('reportpage.ReportCoachingWeek')
+            ->with([
+                'departments'       => $departments,
+                'directors'         => $directors,
+                'wiev_type'         => 'department',
+                'dep_id'            => $dep_id,
+                'months'            => $this->getMonthsNames(),
+                'month'             => $month,
+                'all_coaching'      => $data['all_coaching']
+                ]);
+    }
+
+    public function pageReportCoachingPost(Request $request){
+        return 0;
+    }
+
+    public function getCoachingData($month, $year, $dep_id){
+        /**
+         * pobranie informacji i ilości coachingów w tygodniu, podział na 4 tygodnie
+         */
+        $split_month = $this->monthPerWeekDivision($month,$year);
+
+        $all_coaching_statisctics = collect();
+        $coach_from_department = User::whereIn('department_info_id',[$dep_id])
+            ->where('status_work','=',1)
+            ->whereIn('user_type_id',[4])
+            ->get();
+        foreach ($split_month as $item){
+
+            // pobranie informacji o odbytych coachingach
+            $coach_week = DB::table('coaching')
+                ->select(DB::raw('
+            users.id as user_id,
+            count(manager_id) sum_all_coaching,
+            sum(case when coaching.status = 0 then 1 else 0 end) as in_progress,
+            sum(case when coaching.status = 1 then 1 else 0 end) as end_possitive,
+            sum(case when coaching.status = 2 then 1 else 0 end) as end_negative,
+            users.first_name,
+            users.last_name'))
+                ->join('users','users.id','manager_id')
+                ->where('users.department_info_id','=',$dep_id)
+                ->wherebetween('coaching_date',[$item['start_day'].' 00:00:00',$item['stop_day'].' 23:00:00'])
+                ->groupBy('manager_id')
+                ->get();
+            $empty_coach_list = new \stdClass();
+            $ready_data = [];
+            //Dodanie trenerów którzy nie znajdują się na liście
+            foreach ($coach_from_department as $coach_from_department_list){
+                $empty_coach_list = new \stdClass();
+                $coach = $coach_week->where('user_id','=',$coach_from_department_list->id);
+                if((!$coach->isempty())){
+                    $empty_coach_list->user_id = $coach->user_id;
+                    $empty_coach_list->first_name = $coach->first_name;
+                    $empty_coach_list->last_name =$coach->last_name;
+                    $empty_coach_list->end_possitive = $coach->end_possitive;
+                    $empty_coach_list->end_negative = $coach->end_negative;
+                    $empty_coach_list->in_progress = $coach->in_progress;
+                    $empty_coach_list->sum_all_coaching = $coach->sum_all_coaching;
+
+                }else{
+                    $empty_coach_list->first_name = $coach_from_department_list->first_name;
+                    $empty_coach_list->last_name = $coach_from_department_list->last_name;
+                    $empty_coach_list->user_id = $coach_from_department_list->id;
+                    $empty_coach_list->end_possitive = 0;
+                    $empty_coach_list->end_negative = 0;
+                    $empty_coach_list->in_progress = 0;
+                    $empty_coach_list->sum_all_coaching = 0;
+
+                }
+                $ready_data[] = $empty_coach_list;
+            }
+            $ready_data_collection = collect($ready_data);
+
+            foreach ($coach_week as $coach_week_list){
+                if($ready_data_collection->where('user_id','=',$coach_week_list->user_id)->isEmpty()){
+                    $ready_data_collection->push($coach_week_list);
+                }
+            }
+            $all_coaching_statisctics->push($ready_data_collection);
+
+        }
+        $data = [
+            'month'  => $month,
+            'all_coaching' => $all_coaching_statisctics
+            ];
+        return $data;
+    }
+
+
+
+
+    /**
      * Raport oddziały
      */
     public function pageReportDepartmentsGet() {
