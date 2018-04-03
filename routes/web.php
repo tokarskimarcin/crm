@@ -132,6 +132,8 @@ Route::POST('/paymentStory','FinancesController@paymentStory')->name('api.paymen
 Route::POST('/saveCoaching','CoachingController@saveCoaching')->name('api.saveCoaching');
 Route::POST('/deleteCoaching','CoachingController@deleteCoaching')->name('api.deleteCoaching');
 Route::POST('/getCoaching','CoachingController@getCoaching')->name('api.getCoaching');
+Route::POST('/getcoach_list','CoachingController@getcoach_list')->name('api.getcoach_list');
+
 /* TEST AJAX ROUTES STOP */
 
 //** RECRUITMENT AJAX */
@@ -625,7 +627,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageReportCoaching', 'StatisticsController@pageReportCoachingGet');
     Route::post('/pageReportCoaching', 'StatisticsController@pageReportCoachingPost');
 
-
+    Route::get('/progress_table_manager', 'CoachingController@progress_table_managerGET');
 
 });
 //////////////////////Testing ORM///////////////

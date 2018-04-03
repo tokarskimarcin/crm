@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Coaching;
+use App\Department_info;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +11,46 @@ use Illuminate\Support\Facades\DB;
 
 class CoachingController extends Controller
 {
+
+
+
+    public function progress_table_managerGET(){
+        $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+        $directors = User::whereIn('id', $directorsIds)->get();
+        $dep_id = Auth::user()->department_info_id;
+        $coach = User::where('status_work','=','1')
+                        ->where('department_info_id','=',$dep_id)
+                        ->whereIn('user_type_id',[4,12])
+                        ->get();
+        return view('coaching.progress_manager_table')->with([
+            'departments'   => $departments,
+            'directorsIds'  => $directorsIds,
+            'wiev_type'     => 'department',
+            'directors'     => $directors,
+            'dep_id'        => $dep_id,
+            'coach'        => $coach,
+        ]);
+    }
+
+    public function getcoach_list(Request $request){
+        if($request->ajax()){
+            if($request->department_info_id < 100){
+                $coach = User::where('status_work','=','1')
+                    ->where('department_info_id','=',$request->department_info_id)
+                    ->whereIn('user_type_id',[4,12])
+                    ->get();
+            }else{
+                $dirId = substr($request->department_info_id, 2);
+                $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
+                $coach = User::where('status_work','=','1')
+                    ->whereIn('department_info_id',$director_departments->pluck('id')->toArray())
+                    ->whereIn('user_type_id',[4,12])
+                    ->get();
+            }
+            return json_decode($coach);
+        }else return 0;
+    }
     /**
      * @return $this
      * Wyświetlenie strony 'progress_table'
@@ -62,10 +103,34 @@ class CoachingController extends Controller
                         manager.last_name as manager_last_name'))
             ->join('users as consultant','consultant.id','coaching.consultant_id')
             ->join('work_hours','work_hours.id_user','coaching.consultant_id')
-            ->join('users as manager','manager.id','coaching.manager_id')
-            ->whereBetween('coaching_date',[$request->date_start .' 00:00:00',$request->date_stop.' 23:00:00'])
-            ->where('coaching.status','=',$request->report_status)
-            ->groupby('coaching.id');
+            ->join('users as manager','manager.id','coaching.manager_id');
+        if($request->type == 'manager'){
+            if($request->department_info < 100){
+                $inprogres = $inprogres->whereBetween('coaching_date',[$request->date_start .' 00:00:00',$request->date_stop.' 23:00:00'])
+                    ->where('coaching.status','=',$request->report_status)
+                    // wybrany oddział do filtracji
+                    ->where('manager.department_info_id','=',$request->department_info);
+            }else{ // opcja z dyrektorem
+                $dirId = substr($request->department_info_id, 2);
+                $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
+                $inprogres = $inprogres->whereBetween('coaching_date',[$request->date_start .' 00:00:00',$request->date_stop.' 23:00:00'])
+                    ->where('coaching.status','=',$request->report_status)
+                    // wybrany oddział do filtracji
+                    ->whereIn('manager.department_info_id',$director_departments->pluck('id')->toArray());
+
+            }
+            // wybrany trener do filtracji
+            if($request->coach_id != 'Wszyscy'){
+                $inprogres = $inprogres->where('manager.id','=',$request->coach_id);
+            }
+            $inprogres = $inprogres->groupby('coaching.id');
+        }else{
+            $inprogres->whereBetween('coaching_date',[$request->date_start .' 00:00:00',$request->date_stop.' 23:00:00'])
+                ->where('coaching.status','=',$request->report_status)
+                ->groupby('coaching.id');
+        }
+
+
             return datatables($inprogres)->make(true);
     }
 
