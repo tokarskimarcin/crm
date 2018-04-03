@@ -6,7 +6,7 @@
             <h1 class="page-header">Raport Tygodniowy Coaching</h1>
         </div>
     </div>
-    <form method="POST" action="{{ URL::to('/pageReportDepartments') }}">
+    <form method="POST" action="{{ URL::to('/pageReportCoaching') }}">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <div class="row">
             <div class="col-md-4">
@@ -52,15 +52,7 @@
                     <div class="col-lg-12">
                         <div id="start_stop">
                             <div class="panel-body">
-                                @if($wiev_type == 'director')
-                                    @if(Auth::user()->id == 4796)
-                                        @include('mail.monthReportDirectors')
-                                    @else
-                                        Raport w przygotowaniu
-                                    @endif
-                                @else
                                     @include('mail.reportCoachingWeek')
-                                @endif
                             </div>
                         </div>
                     </div>
