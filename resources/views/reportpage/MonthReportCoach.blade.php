@@ -13,7 +13,7 @@
         <div class="col-md-12">
             <form method="POST" action="{{ URL::to('/pageMonthReportCoach') }}" id="checkCoach">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label>Trener:</label>
                         <select class="form-control" name="coach_id" id="coach_id">
@@ -24,7 +24,17 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Miesiąc:</label>
+                        <select class="form-control" name="month_selected" id="month_selected">
+                            @foreach($months as $key => $month)
+                                <option @if($month_selected == $key) selected @endif value="{{ $key }}">{{ $month }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
                     <input type="submit" class="btn btn-info" value="Pokaż statystyki" style="width: 100%; margin-top: 25px" id="select_coach">
                 </div>
             </form>
