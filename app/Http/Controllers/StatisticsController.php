@@ -2738,7 +2738,7 @@ class StatisticsController extends Controller
 
 
         $year = date('Y');
-        $month = '03';//date('m');
+        $month = date('m');
         $days_in_month = date('t', strtotime($month));
 
         return view('reportpage.dayReportCoaches')
@@ -2767,7 +2767,7 @@ class StatisticsController extends Controller
             $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
 
         $year = date('Y');
-        $month = '03';//date('m');
+        $month = $request->month_selected;
         $days_in_month = date('t', strtotime($month));
 
 
@@ -2788,15 +2788,16 @@ class StatisticsController extends Controller
 
         return view('reportpage.dayReportCoaches')
             ->with([
-                'coaches'   => $coaches,
-                'coach'     => $coach,
-                'year'      => $year,
-                'month'     => $month,
-                'days'      => $days_in_month,
-                'data'      => $data,
-                'coach_id'  => $request->coach_id,
+                'coaches'       => $coaches,
+                'coach'         => $coach,
+                'year'          => $year,
+                'month'         => $month,
+                'days'          => $days_in_month,
+                'data'          => $data,
+                'coach_id'      => $request->coach_id,
                 'date_selected' => $request->day_select,
-                'hour_selected' => $request->hour_select
+                'hour_selected' => $request->hour_select,
+                'months'        => self::getMonthsNames()
             ]);
     }
 

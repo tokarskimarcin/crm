@@ -10,7 +10,7 @@
     <form method="POST" action="{{ URL::to('/pageDayReportCoaches') }}" id="my_coach_form">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="form-group">
                     <label>Trener:</label>
                     <select class="form-control" name="coach_id" id="coach_id">
@@ -21,10 +21,20 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Wybierz miesiąc:</label>
+                    <select class="form-control" id="month_selected" name="month_selected">
+                        @foreach($months as $key => $value)
+                            <option @if($key == $month) selected @endif value="{{ $key }}">{{ $value }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
                 <div class="form-group">
                     <label>Wybierz dzień:</label>
-                    <select class="form-control" name="day_select">
+                    <select class="form-control" id="day_select" name="day_select">
                         @for($i = 1; $i <= $days; $i++)
                             @php
                                 $day = ($i < 10) ? '0' . $i : $i ;
@@ -35,7 +45,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <div class="form-group">
                     <label>Wybierz godzinę:</label>
                     <select class="form-control" name="hour_select">
@@ -49,7 +59,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <div class="form-group">
                     <input id="get_coach" style="margin-top: 25px; width: 100%" type="submit" class="btn btn-info" value="Generuj raport">
                 </div>
@@ -81,6 +91,33 @@
     <script>
 
         $(document).ready(function () {
+            $('#month_selected').change(() => {
+                var month_selected = $('#month_selected').val();
+            $.ajax({
+                type: "POST",
+                url: '{{ route('api.getDaysInMonth') }}',
+                data: {
+                    "month_selected":month_selected,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    $('#day_select option').remove();
+
+                    var content = '';
+                    $.each(response.data, function(key, value) {
+                        content += `
+                                <option>
+                                    ${value}
+                                </option>
+                            `;
+                    });
+                    $('#day_select').append(content);
+                }
+            });
+        });
+
             $('#get_coach').click((e) => {
                 e.preventDefault();
                 if ($('#coach_id').val() == 0) {
