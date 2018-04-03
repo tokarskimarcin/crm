@@ -2755,12 +2755,13 @@ class StatisticsController extends Controller
 
         return view('reportpage.DayReportSummaryCoaches')
             ->with([
-                'department_info' => $department_info,
-                'dep_id' => 2,
-                'days' => $days_in_month,
-                'month' => $month,
-                'year' => $year,
-                'date_selected' => date('Y-m-d')
+                'department_info'   => $department_info,
+                'dep_id'            => 2,
+                'days'              => $days_in_month,
+                'month'             => $month,
+                'year'              => $year,
+                'date_selected'     => date('Y-m-d'),
+                'months'            => self::getMonthsNames()
             ]);
     }
 
@@ -2773,7 +2774,7 @@ class StatisticsController extends Controller
         if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
             $department_info = $department_info->where('id', '=', Auth::user()->department_info_id);
 
-        $month = date('m');
+        $month = $request->month_selected;
         $year = date('Y');
         $days_in_month = date('t', strtotime($month));
 
@@ -2787,12 +2788,13 @@ class StatisticsController extends Controller
                 'department'        => $department,
                 'dep_id'            => $request->dep_id,
                 'days'              => $days_in_month,
-                'month'             => $month,
+                'month'             => $request->month_selected,
                 'year'              => $year,
                 'date_selected'     => $request->day_select,
                 'coaches'           => $data['coaches'],
                 'data'              => $data['data'],
-                'report_date'       => $data['report_date']
+                'report_date'       => $data['report_date'],
+                'months'            => self::getMonthsNames()
             ]);
     }
 
@@ -3129,6 +3131,23 @@ class StatisticsController extends Controller
             '12' => 'Grudzień'
         ];
         return $months;
+    }
+
+    /**
+     * Pobranie ilości dni w miesiacu
+     */
+    public function getDaysInMonth(Request $request) {
+        $month = date('Y-') . $request->month_selected;
+        $days_in_month = date('t', strtotime('Y-' . $request->month_selected));
+        $data = [];
+        for ($i = 1; $i <= $days_in_month; $i++) {
+            $day = ($i < 10) ? '0' . $i : $i ;
+            $data[] = $month . '-' . $day;
+        }
+        return [
+            'month' => $month,
+            'data' => $data
+        ];
     }
 
     /******** Główna funkcja do wysyłania emaili*************/
