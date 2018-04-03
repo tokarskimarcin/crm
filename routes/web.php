@@ -189,7 +189,7 @@ Route::POST('/getMedicalPackageData', 'AdminController@getMedicalPackageData')->
 Route::POST('/saveMedicalPackageData', 'AdminController@saveMedicalPackageData')->name('api.saveMedicalPackageData');
 
 
-
+Route::POST('/getDaysInMonth', 'StatisticsController@getDaysInMonth')->name('api.getDaysInMonth');
 
 
 Route::POST('/datatableCoachingTable','CoachingController@datatableCoachingTable')->name('api.datatableCoachingTable');
