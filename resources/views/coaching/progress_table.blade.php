@@ -108,8 +108,8 @@
                                     <th>Data</th>
                                     <th>Temat</th>
                                     <th>Wynik</th>
-                                    <th>Cel</th>
                                     <th>Aktualne RBH</th>
+                                    <th>Cel</th>
                                     <th>Komentarz</th>
                                     <th>Akcja</th>
                                 </tr>
@@ -519,8 +519,11 @@
                 ,"fnDrawCallback": function(settings){
 
                     $('.btn-accept_coaching').on('click',function () {
-                        coaching_id = $(this).data('id');
-                        coaching_comment = $('#text_'+coaching_id).val();
+                        let coaching_id = $(this).data('id');
+                        let coaching_comment = $('#text_'+coaching_id).val();
+                        let row = $(this).closest('tr');
+                        let avrage_end =  row.find('td:nth-child(5)').text();
+                        let rhb_end = row.find('td:nth-child(6)').text();
                         swal({
                             title: 'Jesteś pewien?',
                             text: "Nie będziesz w stanie cofnąć zmian!",
@@ -539,7 +542,10 @@
                                 },
                                 data: {
                                     'coaching_id'           : coaching_id,
-                                    'coaching__comment'      : coaching_comment,
+                                    'coaching__comment'     : coaching_comment,
+                                    'avrage_end'            : avrage_end,
+                                    'rhb_end'               : rhb_end,
+                                    'status'                : 1
                                 },
                                 success: function (response) {
                                     table_unsettled.ajax.reload();
@@ -568,11 +574,11 @@
                             return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
                         },"name": "avg_consultant","searchable": false
                     },
-                    {"data": "average_goal"},
                     {"data":function (data, type, dataToSet) {
                             return Math.round(data.couching_rbh/3600,2);
                         },"name": "couching_rbh","searchable": false
                     },
+                    {"data": "average_goal"},
                     {"data":function (data, type, dataToSet) {
                             let comment = 'Brak';
                             if(data.comment != null){

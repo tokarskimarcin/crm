@@ -31,10 +31,8 @@ class CoachingController extends Controller
                 $new_coaching =  new Coaching();
             else{
                 $new_coaching = Coaching::find($request->status);
-                $new_coaching->coaching_date_accept = date('Y-m-d');
-            }
 
-
+                }
             $new_coaching->consultant_id        = $request->consultant_id;
             $new_coaching->manager_id           = Auth::user()->id;
             $new_coaching->coaching_date        = $request->coaching_date;
@@ -132,7 +130,14 @@ class CoachingController extends Controller
         if($request->ajax()){
             $coaching               = Coaching::find($request->coaching_id);
             $coaching->comment      = $request->coaching__comment;
-            $coaching->status       = 1;
+
+            if($coaching->avrage_goal > $coaching->avrage_end) // Coaching niezaliczony
+                $coaching->status       = 2;
+            else
+                $coaching->status       = 1;    // Coaching zaliczony
+            $coaching->coaching_date_accept = date('Y-m-d');
+            $coaching->avrage_end = $request->avrage_end;
+            $coaching->rhb_end = $request->rhb_end;
             $coaching->save();
             return 1;
         }else
@@ -161,4 +166,9 @@ class CoachingController extends Controller
         }else
             return 0;
     }
+
+
+
+
+
 }
