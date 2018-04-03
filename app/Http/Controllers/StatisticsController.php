@@ -967,9 +967,8 @@ class StatisticsController extends Controller
     //wysyłanie raportu miesięcznego pracownicy dkj
     public function monthReportDkj() {
       $data = $this->MonthReportDkjData(1);
-        $users = User::whereIn('id', [4796, 1364, 6009])->get();
       $title = 'Raport miesięczny DKJ';
-      $this->sendMailByVerona('monthReportDkj', $data, $title, $users);
+      $this->sendMailByVerona('monthReportDkj', $data, $title);
     }
 
     //wyswietlanie raoprtu miesiecznego pracownicy dkj
