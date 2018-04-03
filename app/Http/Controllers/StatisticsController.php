@@ -2236,7 +2236,9 @@ class StatisticsController extends Controller
 
         return view('reportpage.MonthReportCoach')
             ->with([
-                'coaches' => $coaches
+                'coaches'   => $coaches,
+                'months'    => self::getMonthsNames(),
+                'month_selected' => date('m')
             ]);
     }
 
@@ -2244,8 +2246,8 @@ class StatisticsController extends Controller
      * Wyświetlanie raportu miesięcznego trenerzy
      */
     public function pageMonthReportCoachPost(Request $request) {
-        $date_start = '2018-03-01';//date('Y-m-') . '01';
-        $date_stop = '2018-03-31';//date('Y-m-t');
+        $date_start = date('Y-') . $request->month_selected . '-01';
+        $date_stop = date('Y-') . $request->month_selected . date('-t', strtotime(date('Y-') . $request->month_selected));
 
         $leader = User::find($request->coach_id);
 
@@ -2370,7 +2372,9 @@ class StatisticsController extends Controller
                 'date_start' => $date_start,
                 'date_stop' => $date_stop,
                 'coachData' => $terefere,
-                'leader' => $leader
+                'leader' => $leader,
+                'months'    => self::getMonthsNames(),
+                'month_selected' => $request->month_selected
             ]);
     }
 
@@ -2685,7 +2689,8 @@ class StatisticsController extends Controller
                 'days'      => $days_in_month,
                 'coach_id'  => 0,
                 'date_selected' => date('Y-m-d'),
-                'hour_selected' => '09:00:00'
+                'hour_selected' => '09:00:00',
+                'months'    => self::getMonthsNames()
             ]);
     }
 
@@ -2744,7 +2749,7 @@ class StatisticsController extends Controller
         if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
             $department_info = $department_info->where('id', '=', Auth::user()->department_info_id);
 
-        $month = '03';//date('m');
+        $month = date('m');
         $year = date('Y');
         $days_in_month = date('t', strtotime($month));
 
@@ -2768,7 +2773,7 @@ class StatisticsController extends Controller
         if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
             $department_info = $department_info->where('id', '=', Auth::user()->department_info_id);
 
-        $month = '03';//date('m');
+        $month = date('m');
         $year = date('Y');
         $days_in_month = date('t', strtotime($month));
 
