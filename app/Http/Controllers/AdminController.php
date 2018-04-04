@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\AuditCriterions;
+use App\AuditHeaders;
 use App\Department_info;
 use App\Department_types;
 use App\Departments;
@@ -561,6 +563,26 @@ class AdminController extends Controller
 
             return 1;
         }
+    }
+
+    public function editAuditGet() {
+        $headers = AuditHeaders::all();
+        return view('admin.editAudit')->with('headers', $headers);
+    }
+
+    public function editAuditPost(Request $request) {
+        $criterions = AuditCriterions::where('audit_header_id', '=', $request->header_id)->get();
+        return $criterions;
+    }
+
+    public function editDatabasePost(Request $request) {
+        $headers = AuditHeaders::all();
+        $crits = AuditCriterions::where('id', '=', $request->critSelect)->first();
+        $critAdd = $request->addingHeader;
+        if($critAdd == false) {
+            $crits->status = 0;
+        }
+
     }
 
 
