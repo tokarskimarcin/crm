@@ -218,9 +218,16 @@
                                 <div class="form-group">
                                     <label class="myLabel">Uprawnienia:</label>
                                     <select class="form-control" style="font-size:18px;" id="user_type" name="user_type">
-                                        @foreach($userTypes->whereNotIn('id',[3]) as $user_type)
-                                            <option value="{{$user_type->id}}" @if($user_type->id == $user->user_type_id) selected @endif>{{$user_type->name}}</option>
-                                        @endforeach
+                                        @if($user->user_type_id == 3)
+                                            @foreach($userTypes as $user_type)
+                                                <option value="{{$user_type->id}}" @if($user_type->id == $user->user_type_id) selected @endif>{{$user_type->name}}</option>
+                                            @endforeach
+                                        @else
+                                            @foreach($userTypes->whereNotIn('id',[3]) as $user_type)
+                                                <option value="{{$user_type->id}}" @if($user_type->id == $user->user_type_id) selected @endif>{{$user_type->name}}</option>
+                                            @endforeach
+                                        @endif
+
                                     </select>
                                 </div>
                             </div>
