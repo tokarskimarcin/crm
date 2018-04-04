@@ -3211,6 +3211,109 @@ class StatisticsController extends Controller
         ];
     }
 
+    /**
+     * Raport miesięczny konsultanci (grupowany po trenerach)
+     */
+    public function monthReportConsultantGet() {
+        $coaches = User::where('status_work', '=', 1)
+            ->orderBy('last_name')
+            ->whereIn('user_type_id', [4, 12])
+            ->get();
+
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
+
+        return view('reportpage.monthReportConsultant')
+            ->with([
+                'coaches'   => $coaches,
+                'months'    => self::getMonthsNames(),
+                'month'     => date('m'),
+                'coach_selected' => 0
+            ]);
+    }
+
+    /**
+     * Raport miesięczny konsultanci (grupowany po trenerach) - po wyborze
+     */
+    public function monthReportConsultantPost(Request $request) {
+        $coaches = User::where('status_work', '=', 1)
+            ->orderBy('last_name')
+            ->whereIn('user_type_id', [4, 12])
+            ->get();
+
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
+
+        $date_start = date('Y-') . $request->month_selected . '-01';
+        $date_stop = date('Y-') . $request->month_selected . date('-t', strtotime(date('Y-') . $request->month_selected)) ;
+
+        $data = self::monthReportConsultantsData($request->coach_id, $date_start, $date_stop);
+
+        return view('reportpage.monthReportConsultant')
+            ->with([
+                'coaches'   => $coaches,
+                'months'    => self::getMonthsNames(),
+                'month'     => $request->month_selected,
+                'coach_selected' => $request->coach_id,
+                'data'      => $data
+            ]);
+    }
+
+    /**
+     * Pobranie danych dla raportu miesięcznego konsultanci
+     */
+    private function monthReportConsultantsData($coach_id, $date_start, $date_stop) {
+        $reports = [];
+        $consultants = User::where('coach_id', '=', $coach_id)
+            ->get();
+
+        foreach ($consultants as $consultant) {
+            if ($consultant->login_phone > 0) {
+                $max_ids = DB::table('pbx_report_extension')
+                    ->select(DB::raw('
+                        MAX(id) as id
+                    '))
+                    ->where('pbx_id', '=', $consultant->login_phone)
+                    ->whereBetween('report_date', [$date_start, $date_stop])
+                    ->groupBy('report_date')
+                    ->get();
+
+                $repos = Pbx_report_extension::where('pbx_id', '=',  $consultant->login_phone)
+                    ->whereIn('id', $max_ids->pluck('id')->toArray())
+                    ->get();
+
+                $consultant_data = [];
+
+                $consultant_data['login_time'] = 0;
+                $consultant_data['pause_time'] = 0;
+                $consultant_data['call_success_proc'] = 0;
+                $consultant_data['success'] = 0;
+                $consultant_data['received_calls'] = 0;
+                $consultant_data['janky_count'] = 0;
+                $consultant_data['janky_proc'] = 0;
+                $consultant_data['average'] = 0;
+                $consultant_data['consultant'] = $consultant;
+
+                foreach ($repos as $repo) {
+                    $consultant_data['success'] += $repo->success;
+                    $consultant_data['pause_time'] += $repo->time_pause;
+                    $consultant_data['received_calls'] += $repo->received_calls;
+                    $login_time_array = explode(':', $repo->login_time);
+                    $consultant_data['login_time'] += (($login_time_array[0] * 3600) + ($login_time_array[1] * 60) + $login_time_array[2]);
+                    $consultant_data['janky_count'] += $repo->success * $repo->dkj_proc / 100;
+                }
+                $consultant_data['call_success_proc'] = ($consultant_data['received_calls'] > 0) ? round(($consultant_data['success'] / $consultant_data['received_calls'] * 100), 2) : 0 ;
+                $consultant_data['average'] = ($consultant_data['login_time'] > 0) ? round($consultant_data['success'] / ($consultant_data['login_time'] / 3600), 2) : 0 ;
+                $consultant_data['janky_proc'] = ($consultant_data['success'] > 0) ? ($consultant_data['janky_count'] / $consultant_data['success']) : 0 ;
+
+                if ($consultant_data['login_time'] > 0 && $consultant_data['success'] > 0)
+                    $reports[] = $consultant_data;
+            }
+        }
+
+        return collect($reports)->sortByDesc('average');
+    }
+
     /******** Główna funkcja do wysyłania emaili*************/
     /*
     * $mail_type - jaki mail ma być wysłany - typ to nazwa ścieżki z web.php
