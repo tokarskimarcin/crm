@@ -516,6 +516,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageMonthReportCoachSummary', 'StatisticsController@pageMonthReportCoachSummaryGet');
     Route::post('/pageMonthReportCoachSummary', 'StatisticsController@pageMonthReportCoachSummaryPost');
 
+    Route::get('/monthReportConsultant', 'StatisticsController@monthReportConsultantGet');
+    Route::post('/monthReportConsultant', 'StatisticsController@monthReportConsultantPost');
+
     //Raporty Rekrutacji
 
     //Dzienny
