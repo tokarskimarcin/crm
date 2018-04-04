@@ -8,6 +8,8 @@ use App\AuditHeaders;
 use App\AuditInfo;
 use App\Department_info;
 use App\User;
+use App\AuditFiles;
+use Illuminate\Support\Facades\Storage;
 use Session;
 use App\Audit;
 use Illuminate\Http\Request;
@@ -53,6 +55,9 @@ class AuditController extends Controller
         $newForm->date_audit = $request->date;
         $newForm->save();
 
+        $fileCatalog = "auditFiles";
+        $suffix = '';
+
         /*fill "audit_info" table*/
         $criterions = AuditCriterions::all();
         foreach($criterions as $c) {
@@ -61,28 +66,44 @@ class AuditController extends Controller
             $nameComment = $c->name . "_comment";
             $arrFilename = $c->name . "_files";
 
-                $newCrit = new AuditInfo();
-                $newCrit->status = 1;
-                $newCrit->audit_criterion_id = $c->id;
-                $newCrit->audit_id = $newForm->id;
-                $newCrit->amount = $request->$nameAmount;
-                $newCrit->quality = $request->$nameQuality;
-                $newCrit->comment = $request->$nameComment;
-                $newCrit->save();
+            $newCrit = new AuditInfo();
+            $newCrit->status = 1;
+            $newCrit->audit_criterion_id = $c->id;
+            $newCrit->audit_id = $newForm->id;
+            $newCrit->amount = $request->$nameAmount;
+            $newCrit->quality = $request->$nameQuality;
+            $newCrit->comment = $request->$nameComment;
 
 
+            //part responsible for saving files from user
+            $files = $request->file($arrFilename);
 
+            if($request->hasFile($arrFilename))
+            {
 
-//            $files = $request->file($arrFilename);
-//
-//            if($request->hasFile($arrFilename))
-//            {
-//                foreach ($files as $file) {
-//                    $file->store('users/' . $this->user->id . '/messages');
-//                }
-//            }
+                foreach ($files as $file) {
+                    $newArray = $request->files->all();
+
+                    for($j = 0; $j< count($newArray[$arrFilename]); $j++) {
+                        $fileName = $newArray[$arrFilename][$j]->getClientOriginalName();
+                        $dotIndex = strripos($fileName, '.'); //last occurence of .
+                        $suffix = substr($fileName, $dotIndex); //rest of string after $dotIndex
+
+                        if($suffix == '.jpeg' || $suffix == '.jpg' || $suffix == '.png' || $suffix == '.pdf') {
+                            $audit_files = new AuditFiles();
+                            $audit_files->audit_id = $newForm->id;
+                            $audit_files->criterion_id = $c->id;
+                            $audit_files->save();
+                            $nameOfFile = $newForm->id . '-' . $c->name . '-' . $audit_files->id . $suffix;
+                            $audit_files->name = $nameOfFile;
+                            $audit_files->save();
+                            $file->storeAs($fileCatalog, $newForm->id . '-' . $c->name . '-' . $audit_files->id . $suffix);
+                        }
+                    }
+                }
+            }
+            $newCrit->save();
         }
-
         return Redirect::to('audit/'.$newForm->id);
     }
 
@@ -139,6 +160,7 @@ class AuditController extends Controller
         $headers = AuditHeaders::where('status', '=', '1')->get();
         $criterion = AuditCriterions::where('status', '=', '1')->get();
         $audit_info = AuditInfo::where('audit_id', '=', $id)->get();
+        $audit_files = AuditFiles::where('audit_id', '=', $id)->get();
         $audit = Audit::find($id);
 
         return view('audit.reviewAudit')
@@ -147,6 +169,7 @@ class AuditController extends Controller
             ->with('audit_info', $audit_info)
             ->with('audit', $audit)
             ->with('givenId', $id)
+            ->with('audit_files', $audit_files)
             ->with('infoAboutAudit', $infoAboutAudit);
     }
 
@@ -159,37 +182,49 @@ class AuditController extends Controller
         $audit = Audit::find($id);
         $audit->edit_user_id = $loggedUser->id;
 
+        //editing audit_info table
         $criterions = AuditCriterions::all();
         foreach($criterions as $c) {
             $nameAmount = $c->name . "_amount";
             $nameQuality = $c->name . "_quality";
             $nameComment = $c->name . "_comment";
             $arrFilename = $c->name . "_files";
-            $fileCatalog = $id;
+            $fileCatalog = "auditFiles";
+            $suffix = '';
 
             $crit = AuditInfo::where('audit_criterion_id','=', $c->id)->where('audit_id', '=', $id)->first(); //tylko 1 audit powinien byc
             $crit->amount = $request->$nameAmount;
             $crit->quality = $request->$nameQuality;
             $crit->comment = $request->$nameComment;
-            $crit->save();
 
-            $i = 0;
+            //part responsible for uploading files from user
             $files = $request->file($arrFilename);
 
-            //saving files to server
             if($request->hasFile($arrFilename))
             {
+
                 foreach ($files as $file) {
                     $newArray = $request->files->all();
-                    $fileName = $newArray[$arrFilename][0]->getClientOriginalName();
-                    $dotIndex = strripos($fileName, '.'); //last occurence of .
-                    $suffix = substr($fileName, $dotIndex); //rest of string after $dotIndex
 
-                    $file->storeAs($fileCatalog, $c->name . '-' . $i . $suffix);
-                    $i++;
+                    for($j = 0; $j< count($newArray[$arrFilename]); $j++) {
+                        $fileName = $newArray[$arrFilename][$j]->getClientOriginalName();
+                        $dotIndex = strripos($fileName, '.'); //last occurence of .
+                        $suffix = substr($fileName, $dotIndex); //rest of string after $dotIndex
+
+                        if ($suffix == '.jpeg' || $suffix == '.jpg' || $suffix == '.png' || $suffix == '.pdf') {
+                            $audit_files = new AuditFiles();
+                            $audit_files->audit_id = $audit->id;
+                            $audit_files->criterion_id = $c->id;
+                            $audit_files->save();
+                            $nameOfFile = $id . '-' . $c->name . '-' . $audit_files->id . $suffix;
+                            $audit_files->name = $nameOfFile;
+                            $audit_files->save();
+                            $file->storeAs($fileCatalog, $id . '-' . $c->name . '-' . $audit_files->id . $suffix);
+                        }
+                    }
                 }
             }
-
+            $crit->save();
         }
         return Redirect::to('audit/'.$id);
     }

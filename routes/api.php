@@ -29,3 +29,9 @@ Route::get('getMedicalScan/{name}', function($name){
     $path = storage_path('app/medicalscan/' . $name);
     return response()->download($path);
 });
+
+Route::get('getAuditScan/{name}', function($name){
+    //return 1;
+    $path = storage_path('app/auditFiles/' . $name);
+    return response()->download($path);
+});

@@ -43,6 +43,7 @@
                                 <th>Jakość</th>
                                 <th>Komentarz</th>
                                 <th>Zdjęcia</th>
+                                <th>Załączniki</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -95,6 +96,22 @@
                                                 <input name="{{$c->name . "_files[]"}}" id="{{$c->name . "_files[]"}}" type="file" multiple="" />
                                             </div>
                                         </td>
+                                        <?php
+                                            $i = 1;
+                                        ?>
+                                        <td>
+                                            <div class="form-group">
+                                                @foreach($audit_files as $f)
+                                                    @if($c->id == $f->criterion_id)
+                                                <a href="/api/getAuditScan/{{$f->name}}" download>Załącznik{{$i}}</a>
+                                                        <?php
+                                                            $i++;
+                                                        ?>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                        </td>
+
                                     </tr>
                                 @endif
                             @endforeach
