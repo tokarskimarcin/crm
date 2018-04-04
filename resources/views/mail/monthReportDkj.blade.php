@@ -194,10 +194,12 @@
     <tr>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Lp.</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Oddział</th>
+        <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba Zaproszeń</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba odsłuchanych rozmów</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba poprawnych rozmów</th>
-        <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Jany</th>
+        <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba błędnych rozmów</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20;">% błędnych</th>
+        <th style="border:1px solid #231f20;padding:3px;background:#231f20;">% Odsłuchanych</th>
     </tr>
     </thead>
     <tbody>
