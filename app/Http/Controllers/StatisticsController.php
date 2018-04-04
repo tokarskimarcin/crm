@@ -2063,8 +2063,8 @@ class StatisticsController extends Controller
 
                 foreach ($reports as $item) {
                     $tempReport->success += $item->success;
-                    $tempReport->hour_time_use += floatval($item->hour_time_use);
-                    $tempReport->total_time += ($item->call_time > 0) ? ((100 * $item->hour_time_use) / $item->call_time) : 0 ;
+                    $tempReport->hour_time_use += round($item->call_time * $item->hour_time_use / 100, 2);//floatval($item->hour_time_use);
+                    $tempReport->total_time += floatval($item->hour_time_use);//($item->call_time > 0) ? ((100 * $item->hour_time_use) / $item->call_time) : 0 ;
                 }
                 $tempReport->average = ($tempReport->hour_time_use > 0) ? round($tempReport->success / $tempReport->hour_time_use, 2) : 0 ;
                 $reps[] = $tempReport;
