@@ -15,12 +15,12 @@ class CreateAuditInfoTable1 extends Migration
     {
         Schema::create('audit_info', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('audit_criterion_id')->unsigned();
-            $table->integer('audit_id')->unsigned();
-            $table->boolean('status');
-            $table->boolean('amount');
-            $table->boolean('quality');
-            $table->string('comment');
+            $table->integer('audit_criterion_id');
+            $table->integer('audit_id');
+            $table->tinyInteger('status');
+            $table->tinyInteger('amount');
+            $table->tinyInteger('quality');
+            $table->string('comment', '255');
         });
     }
 

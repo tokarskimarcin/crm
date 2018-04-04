@@ -15,9 +15,9 @@ class CreateAuditCriterionTable1 extends Migration
     {
         Schema::create('audit_criterion', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('audit_header_id')->unsigned();
+            $table->integer('audit_header_id');
             $table->string('name', '255');
-            $table->boolean('status');
+            $table->tinyInteger('status');
         });
     }
 

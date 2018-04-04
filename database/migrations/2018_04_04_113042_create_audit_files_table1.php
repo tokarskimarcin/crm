@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAuditHeadersTable1 extends Migration
+class CreateAuditFilesTable1 extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,11 @@ class CreateAuditHeadersTable1 extends Migration
      */
     public function up()
     {
-        Schema::create('audit_headers', function (Blueprint $table) {
+        Schema::create('audit_files', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name', '255');
-            $table->boolean('status');
+            $table->integer('audit_id');
+            $table->integer('criterion_id');
+            $table->string('name','255');
         });
     }
 
@@ -27,6 +28,6 @@ class CreateAuditHeadersTable1 extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('audit_headers');
+        Schema::dropIfExists('audit_files');
     }
 }
