@@ -207,31 +207,41 @@
         $sum_all_good = 0;
         $sum_all_bad = 0;
         $sum_proc = 0;
+        $sum_succes = 0;
+        $sum_proc_check = 0;
     @endphp
     @foreach($dkj as $item)
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dep}} {{$item->depname}}</td>
+            <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->success}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_all_talks}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_correct_talks}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_janky}}</td>
             @php
                 $bad_proc = (100*$item->sum_janky) / $item->sum_all_talks;
+                $check_proc = (100*$item->sum_all_talks) / $item->success;
                 $i++;
                 $sum_all_talks += $item->sum_all_talks;
                 $sum_all_good += $item->sum_correct_talks;
                 $sum_all_bad += $item->sum_janky;
+                $sum_succes += $item->success;
                 $sum_proc = (100*$sum_all_bad) / $sum_all_talks;
+                $sum_proc_check = (100*$sum_all_talks) / $sum_succes;
+
             @endphp
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($bad_proc,2)}} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($check_proc,2)}} %</td>
         </tr>
     @endforeach
     <tr>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;" colspan="2">Total</td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{$sum_succes}}</td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{$sum_all_talks}}</td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{$sum_all_good}} </td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{$sum_all_bad}}</td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{round($sum_proc,2)}} %</td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{round($sum_proc_check,2)}} %</td>
     </tr>
     <tbody>
 </table>
