@@ -214,7 +214,7 @@
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dep}} {{$item->depname}}</td>
-            <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->success}}</td>
+            <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$item->success}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_all_talks}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_correct_talks}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_janky}}</td>
