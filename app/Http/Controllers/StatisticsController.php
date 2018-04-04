@@ -765,6 +765,7 @@ class StatisticsController extends Controller
                 'SUM(count_all_check) as sum_all_talks,
                 SUM(count_good_check) as sum_correct_talks,
                 SUM(count_bad_check) as sum_janky,
+                SUM(success) as success,
                 departments.name as dep, 
                 department_type.name as depname,
                 count(departments.name)
@@ -927,6 +928,7 @@ class StatisticsController extends Controller
                 'SUM(count_all_check) as sum_all_talks,
                 SUM(count_good_check) as sum_correct_talks,
                 SUM(count_bad_check) as sum_janky,
+                 SUM(success) as success,
                 departments.name as dep, 
                 department_type.name as depname,
                 count(departments.name)

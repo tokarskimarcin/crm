@@ -307,6 +307,7 @@ class AdminController extends Controller
 
     public function multipleDepartmentGet() {
         $users = User::where('status_work', '=', 1)
+            ->whereNotIn('user_type_id',[1,2])
             ->orderBy('last_name')
             ->get();
 
@@ -317,6 +318,7 @@ class AdminController extends Controller
     public function multipleDepartmentPost(Request $request) {
         if($request->request_type == 'select_user'){
           $users = User::where('status_work', '=', 1)
+              ->whereNotIn('user_type_id',[1,2])
               ->orderBy('last_name')
               ->get();
 
