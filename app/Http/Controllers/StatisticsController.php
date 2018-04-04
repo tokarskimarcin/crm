@@ -863,13 +863,13 @@ class StatisticsController extends Controller
     //wysyłanie email (raport tygodniowy dkj)
     public function MailWeekReportDkj() {
       $data = $this->weekReportDkjData();
-        $users = User::whereIn('id', [4796, 1364, 6009])->get();
       $title = 'Raport tygodniowy DKJ ' . $data['date_start'] . ' - ' . $data['date_stop'];
-      $this->sendMailByVerona('weekReportDkj', $data, $title, $users);
+      $this->sendMailByVerona('weekReportDkj', $data, $title);
     }
 
     //przygotowanie danych do raportu miesięcznego dkj
-    private function MonthReportDkjData() {
+    //type - 0 bierzący miesiac, 1 poprzedni
+    private function MonthReportDkjData($type) {
         $month = $this->monthReverse(date('m'));
         $year = date('Y');
         if ($month < 10) {
@@ -879,11 +879,19 @@ class StatisticsController extends Controller
             $year -= 1;
         }
         $selected_date = $year . '-' . $month . '%';
+        if($type == 0)
+        {
+            $month_ini = new DateTime("first day of this month");
+            $date_start = $month_ini->format('Y-m-d');
+            $month_end = new DateTime("last day of this month");
+            $date_stop = $month_end->format('Y-m-d');
+        }else{
+            $month_ini = new DateTime("first day of last month");
+            $date_start = $month_ini->format('Y-m-d');
+            $month_end = new DateTime("last day of last month");
+            $date_stop = $month_end->format('Y-m-d');
+        }
 
-        $month_ini = new DateTime("first day of this month");
-        $date_start = $month_ini->format('Y-m-d');
-        $month_end = new DateTime("last day of this month");
-        $date_stop = $month_end->format('Y-m-d');
 
 //        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
 //        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
@@ -958,15 +966,14 @@ class StatisticsController extends Controller
 
     //wysyłanie raportu miesięcznego pracownicy dkj
     public function monthReportDkj() {
-      $data = $this->MonthReportDkjData();
-        $users = User::whereIn('id', [4796, 1364, 6009])->get();
+      $data = $this->MonthReportDkjData(1);
       $title = 'Raport miesięczny DKJ';
-      $this->sendMailByVerona('monthReportDkj', $data, $title, $users);
+      $this->sendMailByVerona('monthReportDkj', $data, $title);
     }
 
     //wyswietlanie raoprtu miesiecznego pracownicy dkj
     public function pageMonthReportDKJ(){
-        $data = $this->MonthReportDkjData();
+        $data = $this->MonthReportDkjData(0);
 
         return view('reportpage.MonthReportDkj')
             ->with('month_name', $data['month_name'])
@@ -1619,6 +1626,164 @@ class StatisticsController extends Controller
     }
 
     /**
+     * Raporty Coaching'ow Podział na tygodnie
+     */
+
+    public function pageReportCoachingGet(){
+
+        $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+        $directors = User::whereIn('id', $directorsIds)->get();
+        $dep_id = Auth::user()->department_info_id;
+        $month = date('m');
+        $year = date('Y');
+        $data = $this->getCoachingData( $month, $year, (array)$dep_id);
+
+
+        return view('reportpage.ReportCoachingWeek')
+            ->with([
+                'departments'       => $departments,
+                'directors'         => $directors,
+                'wiev_type'         => 'department',
+                'dep_id'            => $dep_id,
+                'months'            => $this->getMonthsNames(),
+                'month'             => $month,
+                'all_coaching'      => $data['all_coaching']
+                ]);
+    }
+
+    public function pageReportCoachingPost(Request $request){
+
+        $month = $request->month_selected;
+        $year = date('Y');
+
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+        $directors = User::whereIn('id', $directorsIds)->get();
+
+        if (intval($request->selected_dep) < 100) {
+            $dep_id = $request->selected_dep;
+            $departments = Department_info::whereIn('id_dep_type', [1, 2])->get();
+            $data = $this->getCoachingData($month, $year, (array)$dep_id);
+
+            return view('reportpage.ReportCoachingWeek')
+                ->with([
+                    'departments' => $departments,
+                    'directors' => $directors,
+                    'wiev_type' => 'department',
+                    'dep_id' => $dep_id,
+                    'months' => $this->getMonthsNames(),
+                    'month' => $month,
+                    'all_coaching' => $data['all_coaching']
+                ]);
+        }else{
+            // usunięcie 10 przed id dyrektora
+            $dirId = substr($request->selected_dep, 2);
+            $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
+            $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+            $data = $this->getCoachingData($month, $year, $director_departments->pluck('id')->toArray());
+
+            return view('reportpage.ReportCoachingWeek')
+                ->with([
+                    'departments' => $departments,
+                    'directors' => $directors,
+                    'wiev_type' => 'director',
+                    'dep_id' => $request->selected_dep,
+                    'months' => $this->getMonthsNames(),
+                    'month' => $month,
+                    'all_coaching' => $data['all_coaching']
+                ]);
+        }
+    }
+
+    /**
+     * @param $month
+     * @param $year
+     * @param $dep_id
+     * @return array
+     * Pobranie informacji o choaching'a z danego oddziału
+     */
+    public function getCoachingData($month, $year, $dep_id){
+        /**
+         * pobranie informacji i ilości coachingów w tygodniu, podział na 4 tygodnie
+         */
+
+        $split_month = $this->monthPerWeekDivision($month,$year);
+
+        $all_coaching_statisctics = collect();
+        $coach_from_department = User::whereIn('department_info_id',$dep_id)
+            ->where('status_work','=',1)
+            ->whereIn('user_type_id',[4])
+            ->get();
+        foreach ($split_month as $item){
+
+            // pobranie informacji o odbytych coachingach
+            $coach_week = DB::table('coaching')
+                ->select(DB::raw('
+            users.id as user_id,
+            count(manager_id) sum_all_coaching,
+            sum(case when coaching.status = 0 then 1 else 0 end) as in_progress,
+            sum(case when coaching.status = 1 then 1 else 0 end) as end_possitive,
+            sum(case when coaching.status = 2 then 1 else 0 end) as end_negative,
+            sum(case when coaching.status  in (1,2) then
+             coaching.avrage_end - coaching.average_goal else 0 end) as coaching_sum,
+            users.first_name,
+            users.last_name'))
+                ->join('users','users.id','manager_id')
+                ->whereIn('users.department_info_id',$dep_id)
+                ->wherebetween('coaching_date',[$item['start_day'].' 00:00:00',$item['stop_day'].' 23:00:00'])
+                ->groupBy('manager_id')
+                ->get();
+            $empty_coach_list = new \stdClass();
+            $ready_data = [];
+            //Dodanie trenerów którzy nie znajdują się na liście
+            foreach ($coach_from_department as $coach_from_department_list){
+                $empty_coach_list = new \stdClass();
+                $coach = $coach_week->where('user_id','=',$coach_from_department_list->id);
+                if((!$coach->isempty())){
+                    $empty_coach_list->user_id = $coach->user_id;
+                    $empty_coach_list->first_name = $coach->first_name;
+                    $empty_coach_list->last_name =$coach->last_name;
+                    $empty_coach_list->end_possitive = $coach->end_possitive;
+                    $empty_coach_list->end_negative = $coach->end_negative;
+                    $empty_coach_list->in_progress = $coach->in_progress;
+                    $empty_coach_list->sum_all_coaching = $coach->sum_all_coaching;
+                    $empty_coach_list->coaching_sum = $coach->coaching_sum;
+
+                }else{
+                    $empty_coach_list->first_name = $coach_from_department_list->first_name;
+                    $empty_coach_list->last_name = $coach_from_department_list->last_name;
+                    $empty_coach_list->user_id = $coach_from_department_list->id;
+                    $empty_coach_list->end_possitive = 0;
+                    $empty_coach_list->end_negative = 0;
+                    $empty_coach_list->in_progress = 0;
+                    $empty_coach_list->sum_all_coaching = 0;
+                    $empty_coach_list->coaching_sum = 0;
+
+                }
+                $ready_data[] = $empty_coach_list;
+            }
+            $ready_data_collection = collect($ready_data);
+
+            foreach ($coach_week as $coach_week_list){
+                if($ready_data_collection->where('user_id','=',$coach_week_list->user_id)->isEmpty()){
+                    $ready_data_collection->push($coach_week_list);
+                }
+            }
+            $all_coaching_statisctics->push($ready_data_collection);
+        }
+        $data = [
+            'month'  => $month,
+            'all_coaching' => $all_coaching_statisctics
+            ];
+        return $data;
+    }
+
+
+
+
+
+    /**
      * Raport oddziały
      */
     public function pageReportDepartmentsGet() {
@@ -1692,9 +1857,6 @@ class StatisticsController extends Controller
                     'directors'         => $directors
                 ]);
         } else {
-            if (Auth::user()->id != 4796) {
-                return "Raport w przygotowaniu";
-            }
             $dirId = substr($request->selected_dep, 2);
             $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
 
@@ -1820,7 +1982,6 @@ class StatisticsController extends Controller
             }
         }
         $newYanky = collect($newYanky);
-        //dd($newYanky);
         /**
          * Pobranie danych z grafiku
          */
@@ -1909,7 +2070,7 @@ class StatisticsController extends Controller
         /**
          * Pobranie danych departamentu
          */
-        $dep_info = Department_info::whereIn('id',[2,10,11,8])->get(); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TUTAJ ZMIENIC na cos związanego z tym dla kogo generowany jest raport
+        $dep_info = Department_info::whereIn('id', $deps)->get();
 
         /**
          * Tabela z miesiącami
@@ -2135,7 +2296,9 @@ class StatisticsController extends Controller
 
         return view('reportpage.MonthReportCoach')
             ->with([
-                'coaches' => $coaches
+                'coaches'   => $coaches,
+                'months'    => self::getMonthsNames(),
+                'month_selected' => date('m')
             ]);
     }
 
@@ -2143,8 +2306,8 @@ class StatisticsController extends Controller
      * Wyświetlanie raportu miesięcznego trenerzy
      */
     public function pageMonthReportCoachPost(Request $request) {
-        $date_start = date('Y-m-') . '01';
-        $date_stop = date('Y-m-t');
+        $date_start = date('Y-') . $request->month_selected . '-01';
+        $date_stop = date('Y-') . $request->month_selected . date('-t', strtotime(date('Y-') . $request->month_selected));
 
         $leader = User::find($request->coach_id);
 
@@ -2269,12 +2432,136 @@ class StatisticsController extends Controller
                 'date_start' => $date_start,
                 'date_stop' => $date_stop,
                 'coachData' => $terefere,
-                'leader' => $leader
+                'leader' => $leader,
+                'months'    => self::getMonthsNames(),
+                'month_selected' => $request->month_selected
             ]);
     }
 
     /**
-     *  funkcja wysyłająca email miesięczny raport oddziały
+     * Metoda pobierająca dane na temat wynikow tydogniowych- miesięcznych dla danego trenera
+     */
+    private function getWeekMonthCoachData($date_start, $date_stop, $coach_id) {
+        $leader = User::find($coach_id);
+
+        $ids = $leader->trainerConsultants->pluck('login_phone')->toArray();
+
+        $max_from_day = DB::table('pbx_report_extension')
+            ->select(DB::raw('
+                MAX(id) as id
+            '))
+            ->whereBetween('report_date', [$date_start, $date_stop])
+            ->whereIn('pbx_id', $ids)
+            ->groupBy('report_date')
+            ->groupBy('pbx_id')
+            ->get();
+
+        $pbx_data = Pbx_report_extension::whereBetween('report_date', [$date_start, $date_stop])
+            ->whereIn('pbx_id', $ids)
+            ->whereIn('id', $max_from_day->pluck('id')->toArray())
+            ->get();
+
+        $total_data = $pbx_data->groupBy('pbx_id');
+
+        $days_in_month = intval(date('t', strtotime($date_start)));
+
+        $terefere = $total_data->map(function($item, $key) use ($days_in_month, $date_start) {
+            $user_sum = [];
+
+            $consultant = User::where('login_phone', '=', $item->first()->pbx_id)
+                ->get();
+
+            for ($y = 1; $y <= 4; $y++) {
+                $user_sum[$y]['average'] = 0;
+                $user_sum[$y]['janky_proc'] = 0;
+                $user_sum[$y]['count_calls'] = 0;
+                $user_sum[$y]['success'] = 0;
+                $user_sum[$y]['proc_call_success'] = 0;
+                $user_sum[$y]['pause_time'] = 0;
+                $user_sum[$y]['received_calls'] = 0;
+                $user_sum[$y]['login_time'] = 0;
+                $user_sum[$y]['proc_received_calls'] = 0;
+
+                $user_sum[$y]['first_name'] = $consultant->first()->first_name;
+                $user_sum[$y]['last_name'] = $consultant->first()->last_name;
+                $user_sum[$y]['week_num'] = $y;
+                $user_sum[$y]['total_week_yanky'] = 0;
+                $user_sum[$y]['first_week_day'] = null;
+                $user_sum[$y]['last_week_day'] = null;
+            }
+            $week_num = 1;
+            $week_yanky = 0;
+            $add_week_sum = true;
+            $start_day = true;
+            $miss_first_week = false;
+
+            for ($i = 1; $i <= $days_in_month; $i++) {
+                $i_fixed = ($i < 10) ? '0' . $i : $i ;
+                $actual_loop_day = date('Y-m-', strtotime($date_start)) . $i_fixed;
+                $week_day = date('N', strtotime($actual_loop_day));
+
+                if ($user_sum[$week_num]['first_week_day'] == null) {
+                    $user_sum[$week_num]['first_week_day'] = $actual_loop_day;
+                }
+
+                if ($item->where('report_date', '=', $actual_loop_day)->count() > 0) {
+                    $report = $item->where('report_date', '=', $actual_loop_day)->first();
+
+                    $work_time_array = explode(":", $report->login_time);
+                    $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]) / 3600, 2);
+
+                    $user_sum[$week_num]['success'] += $report->success;
+                    $user_sum[$week_num]['login_time'] += $work_time;
+                    $user_sum[$week_num]['pause_time'] += $report->time_pause;
+                    $user_sum[$week_num]['received_calls'] += $report->received_calls;
+
+                    $week_yanky += ($report->success * ($report->dkj_proc / 100));
+                }
+
+                if ($week_day == 7 && $start_day == false && $miss_first_week == false) {
+                    $add_week_sum = true;
+                }
+
+                if ($start_day == true && $week_day == 1) {
+                    $add_week_sum = true;
+                    $start_day = false;
+                } else if ($start_day == true && $week_day != 1) {
+                    $add_week_sum = false;
+                    $miss_first_week = true;
+                    $start_day = false;
+                }
+
+                if ($week_num == 4 && $week_day == 7 && $i < $days_in_month) {
+                    $add_week_sum = false;
+                }
+
+                if (($week_day == 7 || $i == $days_in_month) &&  $add_week_sum == true && $miss_first_week == false) {
+                    $user_sum[$week_num]['last_week_day'] = $actual_loop_day;
+
+                    $user_sum[$week_num]['total_week_yanky'] = $week_yanky;
+                    $user_sum[$week_num]['janky_proc'] = ($user_sum[$week_num]['success'] > 0) ? round(($week_yanky / $user_sum[$week_num]['success']) * 100, 2) : 0 ;
+                    $user_sum[$week_num]['average'] = ($user_sum[$week_num]['login_time']) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['login_time']), 2) : 0 ;
+                    $user_sum[$week_num]['proc_received_calls'] = ($user_sum[$week_num]['received_calls'] > 0) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['received_calls']) * 100 , 2) : 0 ;
+                    $week_num++;
+                    $week_yanky = 0;
+                    $add_week_sum = true;
+                }
+
+                if  ($miss_first_week == true && $week_day == 7) {
+                    $miss_first_week = false;
+                }
+                if ($week_num == 4 && $week_day == 7 && $i < $days_in_month) {
+                    $add_week_sum = true;
+                }
+
+            }
+            return $user_sum;
+        });
+        return $terefere;
+    }
+
+    /**
+     * funkcja wysyłająca email miesięczny raport oddziały
      */
     public function MailMonthReportDepartments() {
         $data = [];
@@ -2303,6 +2590,66 @@ class StatisticsController extends Controller
 
         $title = 'Miesięczny Raport Oddziały';
         $this->sendMailByVerona('summaryReportDepartment', $data, $title);
+    }
+
+    /**
+     * Wyświetlanie raportu miesięczenego zbiorczego trenerów
+     */
+    public function pageMonthReportCoachSummaryGet() {
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $coaches = User::where('department_info_id', '=', $departments->first()->id)
+            ->whereIn('user_type_id', [4, 12])
+            ->where('status_work', '=', 1)
+            ->get();
+
+        $data = [];
+
+        foreach ($coaches as $coach) {
+            $data[$coach->id]['trainer_data'] = self::getWeekMonthCoachData(date('Y-m-d'), date('Y-m-t'), 6052);
+            $data[$coach->id]['trainer'] = $coach;
+            $data[$coach->id]['date'] = [date('Y-m-d'), date('Y-m-t')];
+        }
+
+        return view('reportpage.monthReportCoachSummary')
+            ->with([
+                'months'        => self::getMonthsNames(),
+                'month'         => date('m'),
+                'departments'   => $departments,
+                'dep_id'        => $departments->first()->id,
+                'data'          => $data
+            ]);
+    }
+
+    /**
+     * Wyświetlanie raportu miesięcznego zbiorczego trenerów po wyborze
+     */
+    public function pageMonthReportCoachSummaryPost(Request $request) {
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $coaches = User::where('department_info_id', '=', $request->dep_selected)
+            ->whereIn('user_type_id', [4, 12])
+            ->where('status_work', '=', 1)
+            ->get();
+        $data = [];
+
+        $data_start = date('Y-') . $request->month_selected . '-01';
+        $data_stop = date('Y-') . $request->month_selected . date('-t', strtotime(date('Y-') . $request->month_selected));
+
+        foreach ($coaches as $coach) {
+            $data[$coach->id]['trainer_data'] = self::getWeekMonthCoachData($data_start, $data_stop, $coach->id);
+            $data[$coach->id]['trainer'] = $coach;
+            $data[$coach->id]['date'] = [$data_start, $data_stop];
+        }
+
+        return view('reportpage.monthReportCoachSummary')
+            ->with([
+                'months'        => self::getMonthsNames(),
+                'month'         => $request->month_selected,
+                'departments'   => $departments,
+                'dep_id'        => $request->dep_selected,
+                'data'          => $data
+            ]);
     }
 
     /*
@@ -2362,7 +2709,7 @@ class StatisticsController extends Controller
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
         foreach($departments as $department) {
-            $menager = User::whereIn('id', [$department->menager_id, 4796])->get();
+            $menager = User::whereIn('id', [$department->menager_id, 4796, 11, 1364])->get();
 
             $date_start = date('Y-m-') . '01';
             $date_stop = date('Y-m-t');
@@ -2385,6 +2732,11 @@ class StatisticsController extends Controller
             ->orderBy('last_name')
             ->where('status_work', '=', 1)
             ->get();
+
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
+
+
         $year = date('Y');
         $month = date('m');
         $days_in_month = date('t', strtotime($month));
@@ -2397,7 +2749,8 @@ class StatisticsController extends Controller
                 'days'      => $days_in_month,
                 'coach_id'  => 0,
                 'date_selected' => date('Y-m-d'),
-                'hour_selected' => '09:00:00'
+                'hour_selected' => '09:00:00',
+                'months'    => self::getMonthsNames()
             ]);
     }
 
@@ -2409,8 +2762,12 @@ class StatisticsController extends Controller
             ->orderBy('last_name')
             ->where('status_work', '=', 1)
             ->get();
+
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
+
         $year = date('Y');
-        $month = date('m');
+        $month = $request->month_selected;
         $days_in_month = date('t', strtotime($month));
 
 
@@ -2431,15 +2788,16 @@ class StatisticsController extends Controller
 
         return view('reportpage.dayReportCoaches')
             ->with([
-                'coaches'   => $coaches,
-                'coach'     => $coach,
-                'year'      => $year,
-                'month'     => $month,
-                'days'      => $days_in_month,
-                'data'      => $data,
-                'coach_id'  => $request->coach_id,
+                'coaches'       => $coaches,
+                'coach'         => $coach,
+                'year'          => $year,
+                'month'         => $month,
+                'days'          => $days_in_month,
+                'data'          => $data,
+                'coach_id'      => $request->coach_id,
                 'date_selected' => $request->day_select,
-                'hour_selected' => $request->hour_select
+                'hour_selected' => $request->hour_select,
+                'months'        => self::getMonthsNames()
             ]);
     }
 
@@ -2449,18 +2807,22 @@ class StatisticsController extends Controller
     public function pageSummaryDayReportCoachesGet() {
         $department_info = Department_info::where('id_dep_type', '=', 2)->get();
 
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $department_info = $department_info->where('id', '=', Auth::user()->department_info_id);
+
         $month = date('m');
         $year = date('Y');
         $days_in_month = date('t', strtotime($month));
 
         return view('reportpage.DayReportSummaryCoaches')
             ->with([
-                'department_info' => $department_info,
-                'dep_id' => 2,
-                'days' => $days_in_month,
-                'month' => $month,
-                'year' => $year,
-                'date_selected' => date('Y-m-d')
+                'department_info'   => $department_info,
+                'dep_id'            => 2,
+                'days'              => $days_in_month,
+                'month'             => $month,
+                'year'              => $year,
+                'date_selected'     => date('Y-m-d'),
+                'months'            => self::getMonthsNames()
             ]);
     }
 
@@ -2470,7 +2832,10 @@ class StatisticsController extends Controller
     public function pageSummaryDayReportCoachesPost(Request $request) {
         $department_info = Department_info::where('id_dep_type', '=', 2)->get();
 
-        $month = date('m');
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $department_info = $department_info->where('id', '=', Auth::user()->department_info_id);
+
+        $month = $request->month_selected;
         $year = date('Y');
         $days_in_month = date('t', strtotime($month));
 
@@ -2484,12 +2849,13 @@ class StatisticsController extends Controller
                 'department'        => $department,
                 'dep_id'            => $request->dep_id,
                 'days'              => $days_in_month,
-                'month'             => $month,
+                'month'             => $request->month_selected,
                 'year'              => $year,
                 'date_selected'     => $request->day_select,
                 'coaches'           => $data['coaches'],
                 'data'              => $data['data'],
-                'report_date'       => $data['report_date']
+                'report_date'       => $data['report_date'],
+                'months'            => self::getMonthsNames()
             ]);
     }
 
@@ -2554,9 +2920,50 @@ class StatisticsController extends Controller
                 'report_date' => $data_raw['report_date']
             ];
 
-            $menager = User::whereIn('id', [$department->menager_id, $department->director_id, 4796, 1364])->get();
+            /**
+             * Maile wysyłane są do dyrektorow, kierownikow, trenerów + paweł
+             */
+            $coaches = User::whereIn('user_type_id', [4, 12])
+                ->where('status_work', '=', 1)
+                ->where('department_info_id', '=', $department->id)
+                ->get();
 
-            $this->sendMailByVerona('hourReportCoach', $data, 'Raport trenerzy', $menager);
+            $menager = $coaches->pluck('id')->merge(collect([$department->menager_id, $department->director_id, 4796, 1364, 11]))->toArray();
+
+            $this->sendMailByVerona('hourReportCoach', $data, 'Raport trenerzy', User::whereIn('id', $menager)->get());
+        }
+    }
+
+    /**
+     * Wysłanie maili godzinnych raport trenerzy
+     */
+    public function MailHourReportCoaches() {
+        $departments = Department_info::where('id_dep_type', '=', 2)
+            ->get();
+
+        foreach ($departments as $department){
+            $report_hour = date('H') . ':00:00';
+            $data_raw = $this->getDayCoachStatistics($department->id, date('Y-m-d'));
+
+            $data = [
+                'department'   => $department,
+                'coaches'   => $data_raw['coaches'],
+                'data'      => $data_raw['data'],
+                'report_date' => $data_raw['report_date'],
+                'report_hour' => $report_hour
+            ];
+
+            /**
+             * Maile wysyłane są do dyrektorow, kierownikow, trenerów + paweł
+             */
+            $coaches = User::whereIn('user_type_id', [4, 12])
+                ->where('status_work', '=', 1)
+                ->where('department_info_id', '=', $department->id)
+                ->get();
+
+            $menager = $coaches->pluck('id')->merge(collect([$department->menager_id, $department->director_id, 4796, 1364, 11]))->toArray();
+
+            $this->sendMailByVerona('hourReportCoach', $data, 'Raport trenerzy', User::whereIn('id', $menager)->get());
         }
     }
 
@@ -2591,21 +2998,79 @@ class StatisticsController extends Controller
      * Raport podsumowanie oddziałow - po wybrze
      */
     public function pageMonthReportDepartmentsSummaryPost(Request $request) {
-        return 1;
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $weeks = $this->monthPerWeekDivision($request->month_selected, date('Y'));
+
+        $data = [];
+
+        foreach ($departments as $department) {
+            foreach ($weeks as $key => $week) {
+                $data[$department->id][] = self::dataWeekReportDepartmentsSummary($weeks[$key]['start_day'], $weeks[$key]['stop_day'], $department->id);
+            }
+            $data[$department->id]['department_info'] = $department;
+        }
+
+        return view('reportpage.monthReportDepartmentsSummary')
+            ->with([
+                'departments'   => $departments,
+                'dep_id'        => 2,
+                'months'        => self::getMonthsNames(),
+                'month'         => $request->month_selected,
+                'data'          => $data
+            ]);
     }
 
     /*
      * Raport tygodniowy podsumowanie oddziałów - tylko do wglądu
      */
     public function pageWeekReportDepartmentsSummaryGet() {
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
+        $weeks = $this->monthPerWeekDivision(date('m'), date('Y'));
+
+        $data = [];
+
+        foreach ($weeks as $key => $week) {
+            foreach ($departments as $department) {
+               $data[$key][] = self::dataWeekReportDepartmentsSummary($weeks[$key]['start_day'], $weeks[$key]['stop_day'], $department->id);
+            }
+        }
+
+        return view('reportpage.weekReportDepartmentSummary')
+            ->with([
+                'departments'   => $departments,
+                'dep_id'        => 2,
+                'months'        => self::getMonthsNames(),
+                'month'         => date('m'),
+                'data'          => $data
+            ]);
     }
 
     /**
      * Raport tygodniowy podsomowanie oddziałow - po wyborze
      */
     public function pageWeekReportDepartmentsSummaryPost(Request $request) {
-        return 2;
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $weeks = $this->monthPerWeekDivision($request->month_selected, date('Y'));
+
+        $data = [];
+
+        foreach ($weeks as $key => $week) {
+            foreach ($departments as $department) {
+                $data[$key][] = self::dataWeekReportDepartmentsSummary($weeks[$key]['start_day'], $weeks[$key]['stop_day'], $department->id);
+            }
+        }
+
+        return view('reportpage.weekReportDepartmentSummary')
+            ->with([
+                'departments'   => $departments,
+                'dep_id'        => 2,
+                'months'        => self::getMonthsNames(),
+                'month'         => $request->month_selected,
+                'data'          => $data
+            ]);
     }
 
     private function monthPerWeekDivision($month, $year) {
@@ -2727,6 +3192,126 @@ class StatisticsController extends Controller
             '12' => 'Grudzień'
         ];
         return $months;
+    }
+
+    /**
+     * Pobranie ilości dni w miesiacu
+     */
+    public function getDaysInMonth(Request $request) {
+        $month = date('Y-') . $request->month_selected;
+        $days_in_month = date('t', strtotime('Y-' . $request->month_selected));
+        $data = [];
+        for ($i = 1; $i <= $days_in_month; $i++) {
+            $day = ($i < 10) ? '0' . $i : $i ;
+            $data[] = $month . '-' . $day;
+        }
+        return [
+            'month' => $month,
+            'data' => $data
+        ];
+    }
+
+    /**
+     * Raport miesięczny konsultanci (grupowany po trenerach)
+     */
+    public function monthReportConsultantGet() {
+        $coaches = User::where('status_work', '=', 1)
+            ->orderBy('last_name')
+            ->whereIn('user_type_id', [4, 12])
+            ->get();
+
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
+
+        return view('reportpage.monthReportConsultant')
+            ->with([
+                'coaches'   => $coaches,
+                'months'    => self::getMonthsNames(),
+                'month'     => date('m'),
+                'coach_selected' => 0
+            ]);
+    }
+
+    /**
+     * Raport miesięczny konsultanci (grupowany po trenerach) - po wyborze
+     */
+    public function monthReportConsultantPost(Request $request) {
+        $coaches = User::where('status_work', '=', 1)
+            ->orderBy('last_name')
+            ->whereIn('user_type_id', [4, 12])
+            ->get();
+
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
+
+        $date_start = date('Y-') . $request->month_selected . '-01';
+        $date_stop = date('Y-') . $request->month_selected . date('-t', strtotime(date('Y-') . $request->month_selected)) ;
+
+        $data = self::monthReportConsultantsData($request->coach_id, $date_start, $date_stop);
+
+        return view('reportpage.monthReportConsultant')
+            ->with([
+                'coaches'   => $coaches,
+                'months'    => self::getMonthsNames(),
+                'month'     => $request->month_selected,
+                'coach_selected' => $request->coach_id,
+                'data'      => $data
+            ]);
+    }
+
+    /**
+     * Pobranie danych dla raportu miesięcznego konsultanci
+     */
+    private function monthReportConsultantsData($coach_id, $date_start, $date_stop) {
+        $reports = [];
+        $consultants = User::where('coach_id', '=', $coach_id)
+            ->get();
+
+        foreach ($consultants as $consultant) {
+            if ($consultant->login_phone > 0) {
+                $max_ids = DB::table('pbx_report_extension')
+                    ->select(DB::raw('
+                        MAX(id) as id
+                    '))
+                    ->where('pbx_id', '=', $consultant->login_phone)
+                    ->whereBetween('report_date', [$date_start, $date_stop])
+                    ->groupBy('report_date')
+                    ->get();
+
+                $repos = Pbx_report_extension::where('pbx_id', '=',  $consultant->login_phone)
+                    ->whereIn('id', $max_ids->pluck('id')->toArray())
+                    ->get();
+
+                $consultant_data = [];
+
+                $consultant_data['login_time'] = 0;
+                $consultant_data['pause_time'] = 0;
+                $consultant_data['call_success_proc'] = 0;
+                $consultant_data['success'] = 0;
+                $consultant_data['received_calls'] = 0;
+                $consultant_data['janky_count'] = 0;
+                $consultant_data['janky_proc'] = 0;
+                $consultant_data['average'] = 0;
+                $consultant_data['consultant'] = $consultant;
+
+                foreach ($repos as $repo) {
+                    $consultant_data['success'] += $repo->success;
+                    $consultant_data['pause_time'] += $repo->time_pause;
+                    $consultant_data['received_calls'] += $repo->received_calls;
+                    $login_time_array = explode(':', $repo->login_time);
+                    $consultant_data['login_time'] += (($login_time_array[0] * 3600) + ($login_time_array[1] * 60) + $login_time_array[2]);
+                    $consultant_data['janky_count'] += $repo->success * $repo->dkj_proc / 100;
+                }
+                $consultant_data['call_success_proc'] = ($consultant_data['received_calls'] > 0) ? round(($consultant_data['success'] / $consultant_data['received_calls'] * 100), 2) : 0 ;
+                $consultant_data['average'] = ($consultant_data['login_time'] > 0) ? round($consultant_data['success'] / ($consultant_data['login_time'] / 3600), 2) : 0 ;
+                $consultant_data['janky_proc'] = ($consultant_data['success'] > 0) ? ($consultant_data['janky_count'] / $consultant_data['success']) : 0 ;
+
+                if ($consultant_data['login_time'] > 0 && $consultant_data['success'] > 0)
+                    $reports[] = $consultant_data;
+            }
+        }
+
+        return collect($reports)->sortByDesc('average');
     }
 
     /******** Główna funkcja do wysyłania emaili*************/

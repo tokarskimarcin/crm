@@ -81,6 +81,8 @@
 
             $add_default_zero = ($report != null) ? false : true ;
 
+            $size = 0;
+
         if ($add_default_zero == false) {
             //Sprawdzenie czy dzien jest normalny czy weekendowy
             $day_number = date('N', strtotime($report->report_date));
@@ -92,10 +94,11 @@
             foreach ($dep_info as $dep) {
                 $goal += ($day_number < 6) ? $dep->dep_aim : $dep->dep_aim_week;
                 $department_hours = ($day_number < 6) ? $dep->working_hours_normal : $dep->working_hours_week;
-                $working_hours += $department_hours * $dep->size;
+                $day_goal = ($day_number < 6) ? $dep->dep_aim : $dep->dep_aim_week;
+                $working_hours += ($dep->commission_avg) ? $day_goal / $dep->commission_avg : 0 ;
                 $size += $dep->size;
             }
-            $working_hours_goal = $working_hours;
+            $working_hours_goal = round($working_hours);
             //Obliczenie % celu
             $proc_goal = round(($report->success / $goal) * 100, 2);
             //Obliczenie reszty celu
@@ -213,7 +216,7 @@
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->count_bad_check}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$size}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$goal}}</td>
-                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$working_hours_goal}}</td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($working_hours_goal)}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->average}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$janky_count}} %</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$call_time}} %</td>
@@ -264,12 +267,12 @@
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_week_bad}}</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$size}}</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_week_goal}}</b></td>
-                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_week_goal_RBH}}</b></td>
+                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{round($total_week_goal_RBH)}}</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_week_avg}}</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_week_proc_janky}} %</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_week_sum_call_proc}} %</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_week_real_schedule}} %</b></td>
-                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_week_schedule_lost}}</b></td>
+                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{round($total_week_schedule_lost, 2)}}</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_week_goal_proc}} %</b></td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_week_rest_goal}}</b></td>
             </tr>
@@ -310,12 +313,12 @@
         <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_bad}}</b></td>
         <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$size}}</b></td>
         <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_goal}}</b></td>
-        <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_goal_RBH}}</b></td>
+        <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{round($total_goal_RBH)}}</b></td>
         <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_week_avg}}</b></td>
         <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_proc_janky}} %</b></td>
         <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_sum_call_proc}}</b></td>
         <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_real_schedule}} %</b></td>
-        <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_schedule_lost}}</b></td>
+        <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{round($total_schedule_lost, 2)}}</b></td>
         <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_goal_proc}} %</b></td>
         <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_rest_goal}}</b></td>
     </tr>

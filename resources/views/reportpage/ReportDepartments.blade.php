@@ -77,11 +77,7 @@
                         <div id="start_stop">
                             <div class="panel-body">
                                 @if($wiev_type == 'director')
-                                    @if(Auth::user()->id == 4796)
-                                        @include('mail.monthReportDirectors')
-                                    @else
-                                        Raport w przygotowaniu
-                                    @endif
+                                    @include('mail.monthReportDirectors')
                                 @else
                                     @include('mail.reportDepartments')
                                 @endif

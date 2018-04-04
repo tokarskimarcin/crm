@@ -130,6 +130,9 @@ Route::POST('/datatableAllTests','AdminController@datatableAllTests')->name('api
 Route::POST('/paymentStory','FinancesController@paymentStory')->name('api.paymentStory');
 
 Route::POST('/saveCoaching','CoachingController@saveCoaching')->name('api.saveCoaching');
+Route::POST('/deleteCoaching','CoachingController@deleteCoaching')->name('api.deleteCoaching');
+Route::POST('/getCoaching','CoachingController@getCoaching')->name('api.getCoaching');
+Route::POST('/getcoach_list','CoachingController@getcoach_list')->name('api.getcoach_list');
 
 /* TEST AJAX ROUTES STOP */
 
@@ -188,11 +191,11 @@ Route::POST('/getMedicalPackageData', 'AdminController@getMedicalPackageData')->
 Route::POST('/saveMedicalPackageData', 'AdminController@saveMedicalPackageData')->name('api.saveMedicalPackageData');
 
 
-
+Route::POST('/getDaysInMonth', 'StatisticsController@getDaysInMonth')->name('api.getDaysInMonth');
 
 
 Route::POST('/datatableCoachingTable','CoachingController@datatableCoachingTable')->name('api.datatableCoachingTable');
-
+Route::POST('/acceptCoaching', 'CoachingController@acceptCoaching')->name('api.acceptCoaching');;
 //Bootstrap notifications //
 
 Route::post('getBootstrapNotifications', 'HomeController@getBootstrapNotifications')->name('getBootstrapNotifications');
@@ -260,6 +263,7 @@ Route::get('/monthReportSummaryDepartments', 'StatisticsController@MailMonthRepo
 
 Route::get('/dayReportDepartments', 'StatisticsController@MailDayDepartmentsReport');
 Route::get('/dayReportCoaches', 'StatisticsController@MailDayReportCoaches');
+Route::get('/hourReportCoaches', 'StatisticsController@MailHourReportCoaches');
 
 //Maila dotyczące wyłączonych kont
 //Raport Usunietych kont
@@ -509,6 +513,11 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageWeekReportDepartmentsSummary', 'StatisticsController@pageWeekReportDepartmentsSummaryGet');
     Route::post('/pageWeekReportDepartmentsSummary', 'StatisticsController@pageWeekReportDepartmentsSummaryPost');
 
+    Route::get('/pageMonthReportCoachSummary', 'StatisticsController@pageMonthReportCoachSummaryGet');
+    Route::post('/pageMonthReportCoachSummary', 'StatisticsController@pageMonthReportCoachSummaryPost');
+
+    Route::get('/monthReportConsultant', 'StatisticsController@monthReportConsultantGet');
+    Route::post('/monthReportConsultant', 'StatisticsController@monthReportConsultantPost');
 
     //Raporty Rekrutacji
 
@@ -617,6 +626,11 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     /** Tabela Postępów Coaching */
 
     Route::get('/progress_table', 'CoachingController@progress_tableGET');
+
+    Route::get('/pageReportCoaching', 'StatisticsController@pageReportCoachingGet');
+    Route::post('/pageReportCoaching', 'StatisticsController@pageReportCoachingPost');
+
+    Route::get('/progress_table_manager', 'CoachingController@progress_table_managerGET');
 
 });
 //////////////////////Testing ORM///////////////

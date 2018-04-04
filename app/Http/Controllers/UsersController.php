@@ -557,29 +557,30 @@ class UsersController extends Controller
     public function datatableEmployeeManagement(Request $request)
     {
         if($request->ajax()) {
-            $query = User::select('id', 'first_name','last_name',
-                'username', 'start_work',
-                'end_work', 'private_phone',
-                'documents', 'student',
-                'status_work','last_login')
-                ->whereIn('user_type_id', [1,2])
-                ->where('department_info_id', Auth::user()->department_info_id);
+            $query = DB::table('users')
+                ->select(DB::raw('
+                users.*,
+                (CASE WHEN users.coach_id is null THEN null else coach.first_name end) as coach_first_name,
+                (CASE WHEN users.coach_id is null THEN null else coach.last_name end) as coach_last_name'))
+                ->leftjoin('users as coach','coach.id','users.coach_id')
+                ->whereIn('users.user_type_id', [1,2])
+                ->where('users.department_info_id', Auth::user()->department_info_id);
         }
         return datatables($query)
             ->filterColumn('student', function($query, $keyword) {
-                $sql = "student = ?";
+                $sql = "users.student = ?";
                 if(strtolower($keyword) == 'tak')
                     $query->whereRaw($sql, ["1"]);
                 else if(strtolower($keyword) == 'nie')
                     $query->whereRaw($sql, ["0"]);
             })->filterColumn('status_work', function($query, $keyword) {
-                $sql = "status_work = ?";
+                $sql = "users.status_work = ?";
                 if(mb_strtolower($keyword) == 'pracujący')
                     $query->whereRaw($sql, ["1"]);
                 else if(mb_strtolower($keyword) == "niepracujący")
                     $query->whereRaw($sql, ["0"]);
             })->filterColumn('documents', function($query, $keyword) {
-                $sql = "documents = ?";
+                $sql = "users.documents = ?";
                 if(mb_strtolower($keyword) == 'posiada')
                     $query->whereRaw($sql, ["1"]);
                 else if(mb_strtolower($keyword) == "brak")

@@ -2,7 +2,7 @@
     <thead style="color:#efd88f">
     <tr>
         <td colspan="6" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
-            <font size="6" face="Calibri">RAPORT DZIENNY TRENERZY {{$department->departments->name . ' ' . $department->department_type->name}} {{ $report_date }} </font></td>
+            <font size="6" face="Calibri">RAPORT TRENERZY {{$department->departments->name . ' ' . $department->department_type->name}} {{ $report_date }} {{ (isset($report_hour)) ? $report_hour : '' }} </font></td>
         <td colspan="2" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20">
             <img src="http://teambox.pl/image/logovc.png" class="CToWUd"></td>
     </tr>
@@ -42,7 +42,7 @@
                 @if(is_object($item))
                     <tr>
                         <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->user_last_name . ' ' . $item->user_first_name }}</td>
-                        <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->average }} %</td>
+                        <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->average }}</td>
                         <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->dkj_proc }} %</td>
                         <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->received_calls }}</td>
                         <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->success }}</td>
@@ -92,7 +92,7 @@
         @endphp
         <tr>
             <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">SUMA</td>
-            <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{ $day_total_avg }} %</td>
+            <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{ $day_total_avg }}</td>
             <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{ $day_total_janky_proc }} %</td>
             <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{ $day_total_received_calls }}</td>
             <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{ $day_total_success }}</td>

@@ -2,13 +2,23 @@
 @section('content')
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Podsumowanie oddziałów - Raport Tygodniowy</h1>
+            <h1 class="page-header">Podsumowanie Trenerów - Raport Miesięczny/Tygodniowy</h1>
         </div>
     </div>
-    <form method="POST" action="{{ URL::to('/pageMonthReportDepartmentsSummary') }}">
+    <form method="POST" action="{{ URL::to('/pageMonthReportCoachSummary') }}">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Oddział:</label>
+                    <select class="form-control" name="dep_selected">
+                        @foreach($departments as $key => $value)
+                            <option @if($dep_id == $value->id) selected @endif value="{{$value->id}}">{{ $value->departments->name . ' ' . $value->department_type->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
                 <div class="form-group">
                     <label>Miesiąc:</label>
                     <select class="form-control" name="month_selected">
@@ -18,7 +28,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-group">
                     <input style="margin-top: 25px; width: 100%" type="submit" class="btn btn-info" value="Generuj raport">
                 </div>
@@ -32,7 +42,7 @@
                     <div class="col-lg-12">
                         <div id="start_stop">
                             <div class="panel-body">
-                                @include('mail.monthReportDepartmentsSummary')
+                                @include('mail.monthReportCoachSummary')
                             </div>
                         </div>
                     </div>
@@ -45,9 +55,7 @@
 @endsection
 
 @section('script')
-
     <script>
-
 
     </script>
 @endsection

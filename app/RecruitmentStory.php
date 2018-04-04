@@ -50,9 +50,7 @@ class RecruitmentStory extends Model
         $data_stop = $data_stop . ' 23:00:00';
 
         $result = DB::table('department_info')
-            ->select(DB::raw('
-                users.last_name,
-                users.first_name,
+            ->select(DB::raw('               
                 departments.name, 
                 department_type.name as dep_type, 
                 SUM(CASE WHEN `candidate`.`created_at` between "' . $data_start . '" and "' . $data_stop . '" THEN 1 ELSE 0 END) as count_flow
@@ -74,7 +72,7 @@ class RecruitmentStory extends Model
             ->select(DB::raw('
                 sum(candidate_choise_count) as sum_choise,
                 sum(candidate_absent_count) as sum_absent,
-                departments.id as dep_id,
+                department_info.id as dep_id,
                 departments.name as dep_name,
                 department_type.name as dep_name_type
             '))
@@ -113,7 +111,7 @@ class RecruitmentStory extends Model
             $dataCount = DB::table('recruitment_story')
                 ->select(DB::raw('
                 count(recruitment_story.id) as counted,
-                    departments.id as dep_id,
+                    department_info.id as dep_id,
                     departments.name as dep_name,
                     department_type.name as dep_name_type
                 '))
