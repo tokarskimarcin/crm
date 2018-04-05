@@ -644,39 +644,42 @@ class StatisticsController extends Controller
     }
 
     private function dayReportDkjData($type) {
-      if ($type == 'today') {
-          $today = date('Y-m-d') . "%";
-          $data_help = date('Y-m-d');
-      } else if ($type == 'yesterday') {
-          $today = date('Y-m-d', time() - 24 * 3600) . "%";
-          $data_help = date('Y-m-d', time() - 24 * 3600);
-      }
+        if ($type == 'today') {
+            $date = date('Y-m-d');
+        } else if ($type == 'yesterday') {
+            $date = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+        }
 
+        $dkj = DB::table('pbx_dkj_team')
+            ->select(DB::raw(
+                '
+                  SUM(success) as success,
+                  sum(count_all_check) as sum_all_talks,
+                  sum(count_good_check) as sum_correct_talks,
+                  sum(count_bad_check) as sum_janky,
+                  department_type.name as dep,
+                  departments.name as depname
+                   '))
+            ->join('department_info', 'department_info.id', '=', 'pbx_dkj_team.department_info_id')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->where('department_info.dep_aim','!=',0)
+            ->whereIn('pbx_dkj_team.id', function($query) use($date){
+                $query->select(DB::raw(
+                    'MAX(pbx_dkj_team.id)'
+                ))
+                    ->from('pbx_dkj_team')
+                    ->where('report_date', '=',$date)
+                    ->groupBy('department_info_id');
+            })
+            ->whereIn('department_info.id_dep_type', [1,2])
+            ->groupBy('pbx_dkj_team.department_info_id')
+            ->get();
 
-      $dkj = DB::table('dkj')
-          ->select(DB::raw('
-              dkj.department_info_id,
-              departments.name as dep_name,
-              department_type.name as dep_name_type,
-              department_info.type,
-              count(dkj.id) as liczba_odsluchanych,
-              sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as wysylka,
-              sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as badania,
-              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 1 THEN 1 ELSE 0 END) as bad_wysylka,
-              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 0 THEN 1 ELSE 0 END) as bad_badania
-          '))
-          ->join('users', 'users.id', '=', 'dkj.id_user')
-          ->join('department_info', 'department_info.id', '=', 'dkj.department_info_id')
-          ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-          ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-          ->where('add_date', 'like', $today)
-          ->groupBy('users.department_info_id')
-          ->groupBy('department_info.type')
-          ->get();
 
         $data = [
             'dkj' => $dkj,
-            'today' => $data_help
+            'today' => $date
         ];
         return $data;
     }
@@ -1723,7 +1726,6 @@ class StatisticsController extends Controller
             $coach_week = DB::table('coaching')
                 ->select(DB::raw('
             users.id as user_id,
-            count(manager_id) sum_all_coaching,
             sum(case when coaching.status = 0 then 1 else 0 end) as in_progress,
             sum(case when coaching.status = 1 then 1 else 0 end) as end_possitive,
             sum(case when coaching.status = 2 then 1 else 0 end) as end_negative,
@@ -1739,17 +1741,20 @@ class StatisticsController extends Controller
             $empty_coach_list = new \stdClass();
             $ready_data = [];
             //Dodanie trenerów którzy nie znajdują się na liście
+            $lp = 0;
             foreach ($coach_from_department as $coach_from_department_list){
+                $lp++;
                 $empty_coach_list = new \stdClass();
                 $coach = $coach_week->where('user_id','=',$coach_from_department_list->id);
+
                 if((!$coach->isempty())){
+                    $coach = $coach->first();
                     $empty_coach_list->user_id = $coach->user_id;
                     $empty_coach_list->first_name = $coach->first_name;
                     $empty_coach_list->last_name =$coach->last_name;
                     $empty_coach_list->end_possitive = $coach->end_possitive;
                     $empty_coach_list->end_negative = $coach->end_negative;
                     $empty_coach_list->in_progress = $coach->in_progress;
-                    $empty_coach_list->sum_all_coaching = $coach->sum_all_coaching;
                     $empty_coach_list->coaching_sum = $coach->coaching_sum;
 
                 }else{
@@ -1759,7 +1764,6 @@ class StatisticsController extends Controller
                     $empty_coach_list->end_possitive = 0;
                     $empty_coach_list->end_negative = 0;
                     $empty_coach_list->in_progress = 0;
-                    $empty_coach_list->sum_all_coaching = 0;
                     $empty_coach_list->coaching_sum = 0;
 
                 }
