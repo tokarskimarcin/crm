@@ -644,39 +644,42 @@ class StatisticsController extends Controller
     }
 
     private function dayReportDkjData($type) {
-      if ($type == 'today') {
-          $today = date('Y-m-d') . "%";
-          $data_help = date('Y-m-d');
-      } else if ($type == 'yesterday') {
-          $today = date('Y-m-d', time() - 24 * 3600) . "%";
-          $data_help = date('Y-m-d', time() - 24 * 3600);
-      }
+        if ($type == 'today') {
+            $date = date('Y-m-d');
+        } else if ($type == 'yesterday') {
+            $date = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+        }
 
+        $dkj = DB::table('pbx_dkj_team')
+            ->select(DB::raw(
+                '
+                  SUM(success) as success,
+                  sum(count_all_check) as sum_all_talks,
+                  sum(count_good_check) as sum_correct_talks,
+                  sum(count_bad_check) as sum_janky,
+                  department_type.name as dep,
+                  departments.name as depname
+                   '))
+            ->join('department_info', 'department_info.id', '=', 'pbx_dkj_team.department_info_id')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->where('department_info.dep_aim','!=',0)
+            ->whereIn('pbx_dkj_team.id', function($query) use($date){
+                $query->select(DB::raw(
+                    'MAX(pbx_dkj_team.id)'
+                ))
+                    ->from('pbx_dkj_team')
+                    ->where('report_date', '=',$date)
+                    ->groupBy('department_info_id');
+            })
+            ->whereIn('department_info.id_dep_type', [1,2])
+            ->groupBy('pbx_dkj_team.department_info_id')
+            ->get();
 
-      $dkj = DB::table('dkj')
-          ->select(DB::raw('
-              dkj.department_info_id,
-              departments.name as dep_name,
-              department_type.name as dep_name_type,
-              department_info.type,
-              count(dkj.id) as liczba_odsluchanych,
-              sum(CASE WHEN users.dating_type = 1 THEN 1 ELSE 0 END) as wysylka,
-              sum(CASE WHEN users.dating_type = 0 THEN 1 ELSE 0 END) as badania,
-              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 1 THEN 1 ELSE 0 END) as bad_wysylka,
-              SUM(CASE WHEN dkj.dkj_status = 1 AND users.dating_type = 0 THEN 1 ELSE 0 END) as bad_badania
-          '))
-          ->join('users', 'users.id', '=', 'dkj.id_user')
-          ->join('department_info', 'department_info.id', '=', 'dkj.department_info_id')
-          ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-          ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-          ->where('add_date', 'like', $today)
-          ->groupBy('users.department_info_id')
-          ->groupBy('department_info.type')
-          ->get();
 
         $data = [
             'dkj' => $dkj,
-            'today' => $data_help
+            'today' => $date
         ];
         return $data;
     }
