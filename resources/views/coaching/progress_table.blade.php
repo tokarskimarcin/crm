@@ -523,7 +523,7 @@
                         let coaching_comment = $('#text_'+coaching_id).val();
                         let row = $(this).closest('tr');
                         let avrage_end =  row.find('td:nth-child(5)').text();
-                        let rhb_end = row.find('td:nth-child(6)').text();
+                        let rbh_end = row.find('td:nth-child(6)').text();
                         swal({
                             title: 'Jesteś pewien?',
                             text: "Nie będziesz w stanie cofnąć zmian!",
@@ -544,7 +544,7 @@
                                     'coaching_id'           : coaching_id,
                                     'coaching__comment'     : coaching_comment,
                                     'avrage_end'            : avrage_end,
-                                    'rhb_end'               : rhb_end,
+                                    'rbh_end'               : rbh_end,
                                     'status'                : 1
                                 },
                                 success: function (response) {
@@ -627,14 +627,14 @@
                     {"data": "subject"},
                     {"data":function (data, type, dataToSet) {
                             let color = 'green';
-                            if(data.avg_consultant < data.average_goal)
+                            if(data.avrage_end < data.average_goal)
                                 color = 'red';
-                            return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
-                        },"name": "avg_consultant","searchable": false
+                            return '<span style="color:' + color + '">' + data.avrage_end + '</span>';
+                        },"name": "avrage_end","searchable": false
                     },
                     {"data":function (data, type, dataToSet) {
-                            return Math.round(data.couching_rbh/3600,2);
-                        },"name": "couching_rbh","searchable": false
+                            return Math.round(data.rbh_end,2);
+                        },"name": "rbh_end","searchable": false
                     },
                     {"data": "average_goal"},
                     {"data":"comment"},
