@@ -3,7 +3,9 @@
 
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Raport Tygodniowy Coaching</h1>
+            <div class="page-header">
+                <div class="alert gray-nav">Raport Tygodniowy Coaching</div>
+            </div>
         </div>
     </div>
     <form method="POST" action="{{ URL::to('/pageReportCoaching') }}">
