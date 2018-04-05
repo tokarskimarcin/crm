@@ -4,7 +4,9 @@
     {{--Header page --}}
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Raport Dzienny Trenerzy</h1>
+            <div class="page-header">
+                <div class="alert gray-nav">Raport Dzienny Trenerzy</div>
+            </div>
         </div>
     </div>
     <form method="POST" action="{{ URL::to('/pageDayReportCoaches') }}" id="my_coach_form">
