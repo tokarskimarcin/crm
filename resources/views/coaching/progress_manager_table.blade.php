@@ -42,7 +42,27 @@
                 </select>
             </div>
         </div>
+    </div>
 
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="myLabel">Zakres od:</label>
+                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                    <input class="form-control" id="date_start_in_progress" name="date_start_in_progress" type="text" value="{{date('Y-m-d')}}" >
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="myLabel">Zakres do:</label>
+                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                    <input class="form-control" id="date_stop_in_progress" name="date_stop_in_progress" type="text" value="{{date('Y-m-d')}}" >
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{--Tabela z coaching w toku--}}
@@ -52,26 +72,6 @@
                 W toku
             </div>
             <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="myLabel">Zakres od:</label>
-                            <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                <input class="form-control" id="date_start_in_progress" name="date_start_in_progress" type="text" value="{{date('Y-m-d')}}" >
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="myLabel">Zakres do:</label>
-                            <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                <input class="form-control" id="date_stop_in_progress" name="date_stop_in_progress" type="text" value="{{date('Y-m-d')}}" >
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="table-responsive">
@@ -108,26 +108,6 @@
             </div>
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="myLabel">Zakres od:</label>
-                            <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                <input class="form-control" id="date_start_unsettled" name="date_start_unsettled" type="text" value="{{date('Y-m-d')}}" >
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="myLabel">Zakres do:</label>
-                            <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                <input class="form-control" id="date_stop_unsettled" name="date_stop_unsettled" type="text" value="{{date('Y-m-d')}}" >
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="col-md-12">
                         <div class="table-responsive">
                             <table id="table_unsettled" class="table table-striped thead-inverse">
@@ -161,26 +141,6 @@
                 Rozliczone
             </div>
             <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="myLabel">Zakres od:</label>
-                            <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                <input class="form-control" id="date_start_settled" name="date_start_settled" type="text" value="{{date('Y-m-d')}}" >
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="myLabel">Zakres do:</label>
-                            <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                <input class="form-control" id="date_stop_settled" name="date_stop_settled" type="text" value="{{date('Y-m-d')}}" >
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="table-responsive">
@@ -299,6 +259,8 @@
 
             $('#date_start_in_progress, #date_stop_in_progress,#selected_dep,#coach_dep').on('change',function (e) {
                 in_progress_table.ajax.reload();
+                table_unsettled.ajax.reload();
+                table_settled.ajax.reload();
             });
 
             var table_unsettled = $('#table_unsettled').DataTable({
@@ -312,8 +274,8 @@
                     'type': 'POST',
                     'data': function (d) {
                         d.report_status = 0;
-                        d.date_start = $('#date_start_unsettled').val();
-                        d.date_stop =  $('#date_stop_unsettled').val();
+                        d.date_start        = $('#date_start_in_progress').val();
+                        d.date_stop         = $('#date_stop_in_progress').val();
                         d.department_info   = $('#selected_dep').val();
                         d.coach_id          = $('#coach_dep').val();
                         d.type              = 'manager';
@@ -359,10 +321,6 @@
 
             });
 
-            $('#date_start_unsettled, #date_stop_unsettled,#selected_dep,#coach_dep').on('change',function (e) {
-                table_unsettled.ajax.reload();
-            });
-
             var table_settled = $('#table_settled').DataTable({
                 "autoWidth": false,
                 "processing": true,
@@ -374,8 +332,8 @@
                     'type': 'POST',
                     'data': function (d) {
                         d.report_status = 1;
-                        d.date_start = $('#date_start_settled').val();
-                        d.date_stop =  $('#date_stop_settled').val();
+                        d.date_start        = $('#date_start_in_progress').val();
+                        d.date_stop         = $('#date_stop_in_progress').val();
                         d.department_info   = $('#selected_dep').val();
                         d.coach_id          = $('#coach_dep').val();
                         d.type              = 'manager';
@@ -406,9 +364,6 @@
                     {"data": "average_goal"},
                     {"data":"comment"},
                 ]
-            });
-            $('#date_start_settled, #date_stop_settled,#selected_dep,#coach_dep').on('change',function (e) {
-                table_settled.ajax.reload();
             });
 
 
