@@ -765,6 +765,7 @@ class StatisticsController extends Controller
                 'SUM(count_all_check) as sum_all_talks,
                 SUM(count_good_check) as sum_correct_talks,
                 SUM(count_bad_check) as sum_janky,
+                SUM(success) as success,
                 departments.name as dep, 
                 department_type.name as depname,
                 count(departments.name)
@@ -927,6 +928,7 @@ class StatisticsController extends Controller
                 'SUM(count_all_check) as sum_all_talks,
                 SUM(count_good_check) as sum_correct_talks,
                 SUM(count_bad_check) as sum_janky,
+                 SUM(success) as success,
                 departments.name as dep, 
                 department_type.name as depname,
                 count(departments.name)
@@ -1831,7 +1833,7 @@ class StatisticsController extends Controller
         $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
         $directors = User::whereIn('id', $directorsIds)->get();
 
-        if (intval($request->selected_dep) < 100) {
+        if ($request->selected_dep < 100) {
             $dep_id = $request->selected_dep;
 
             $departments = Department_info::where('id_dep_type', '=', 2)->get();
@@ -1854,6 +1856,29 @@ class StatisticsController extends Controller
                     'dep_id'            => $dep_id,
                     'months'            => $data['months'],
                     'wiev_type'         => 'department',
+                    'directors'         => $directors
+                ]);
+        } else if ($request->selected_dep > 100000) {
+            $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+            $data = $this->getMultiDepartmentData($first_day, $last_day, $month, $year, $departments->pluck('id')->toArray(), $days_in_month);
+
+            return view('reportpage.ReportDepartments')
+                ->with([
+                    'date_start'        => $data['date_start'],
+                    'date_stop'         => $data['date_stop'],
+                    'month'             => $data['month'],
+                    'year'              => $data['year'],
+                    'send_month'        => $month,
+                    'total_days'        => intval($days_in_month),
+                    'hour_reports'      => $data['hour_reports'],
+                    'dep_info'          => $data['dep_info'],
+                    'schedule_data'     => $data['schedule_data'],
+                    'month_selected'    => $request->month_selected,
+                    'departments'       => $departments,
+                    'dep_id'            => $request->selected_dep,
+                    'months'            => $data['months'],
+                    'wiev_type'         => 'director',
                     'directors'         => $directors
                 ]);
         } else {
@@ -2038,8 +2063,8 @@ class StatisticsController extends Controller
 
                 foreach ($reports as $item) {
                     $tempReport->success += $item->success;
-                    $tempReport->hour_time_use += floatval($item->hour_time_use);
-                    $tempReport->total_time += ($item->call_time > 0) ? ((100 * $item->hour_time_use) / $item->call_time) : 0 ;
+                    $tempReport->hour_time_use += round($item->call_time * $item->hour_time_use / 100, 2);//floatval($item->hour_time_use);
+                    $tempReport->total_time += floatval($item->hour_time_use);//($item->call_time > 0) ? ((100 * $item->hour_time_use) / $item->call_time) : 0 ;
                 }
                 $tempReport->average = ($tempReport->hour_time_use > 0) ? round($tempReport->success / $tempReport->hour_time_use, 2) : 0 ;
                 $reps[] = $tempReport;

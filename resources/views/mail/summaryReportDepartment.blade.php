@@ -100,8 +100,7 @@
                 //Pobranie celu dla danego dnia
                 $goal = ($day_number < 6) ? $dep_info->dep_aim : $dep_info->dep_aim_week;
                 //Pobranie celu RBH
-                $working_hours = ($day_number < 6) ? $dep_info->working_hours_normal : $dep_info->working_hours_week;
-                $working_hours_goal = $dep_info->size * $working_hours;
+                $working_hours_goal = round($goal / $dep_info->commission_avg);
                 //Obliczenie % celu
                 $proc_goal = round(($report->success / $goal) * 100, 2);
                 //Obliczenie reszty celu
