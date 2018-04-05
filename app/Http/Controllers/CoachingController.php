@@ -127,6 +127,7 @@ class CoachingController extends Controller
         }else{
             $inprogres->whereBetween('coaching_date',[$request->date_start .' 00:00:00',$request->date_stop.' 23:00:00'])
                 ->where('coaching.status','=',$request->report_status)
+                ->where('coaching.manager_id','=',Auth::user()->id)
                 ->groupby('coaching.id');
         }
 
