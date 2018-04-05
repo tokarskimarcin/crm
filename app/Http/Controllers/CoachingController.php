@@ -151,7 +151,8 @@ class CoachingController extends Controller
             ->groupby('users.id')
             ->get();
 
-        $data=[];
+
+        $ready_data=[];
         foreach ($all_users as $user_form_all){
             $user = User::find($user_form_all->user_id);
             $item = $user->work_hours->sortbyDESC('date');
