@@ -1723,7 +1723,6 @@ class StatisticsController extends Controller
             $coach_week = DB::table('coaching')
                 ->select(DB::raw('
             users.id as user_id,
-            count(manager_id) sum_all_coaching,
             sum(case when coaching.status = 0 then 1 else 0 end) as in_progress,
             sum(case when coaching.status = 1 then 1 else 0 end) as end_possitive,
             sum(case when coaching.status = 2 then 1 else 0 end) as end_negative,
@@ -1739,17 +1738,20 @@ class StatisticsController extends Controller
             $empty_coach_list = new \stdClass();
             $ready_data = [];
             //Dodanie trenerów którzy nie znajdują się na liście
+            $lp = 0;
             foreach ($coach_from_department as $coach_from_department_list){
+                $lp++;
                 $empty_coach_list = new \stdClass();
                 $coach = $coach_week->where('user_id','=',$coach_from_department_list->id);
+
                 if((!$coach->isempty())){
+                    $coach = $coach->first();
                     $empty_coach_list->user_id = $coach->user_id;
                     $empty_coach_list->first_name = $coach->first_name;
                     $empty_coach_list->last_name =$coach->last_name;
                     $empty_coach_list->end_possitive = $coach->end_possitive;
                     $empty_coach_list->end_negative = $coach->end_negative;
                     $empty_coach_list->in_progress = $coach->in_progress;
-                    $empty_coach_list->sum_all_coaching = $coach->sum_all_coaching;
                     $empty_coach_list->coaching_sum = $coach->coaching_sum;
 
                 }else{
@@ -1759,7 +1761,6 @@ class StatisticsController extends Controller
                     $empty_coach_list->end_possitive = 0;
                     $empty_coach_list->end_negative = 0;
                     $empty_coach_list->in_progress = 0;
-                    $empty_coach_list->sum_all_coaching = 0;
                     $empty_coach_list->coaching_sum = 0;
 
                 }

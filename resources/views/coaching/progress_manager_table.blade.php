@@ -120,7 +120,6 @@
                                     <th>Wynik</th>
                                     <th>Aktualne RBH</th>
                                     <th>Cel</th>
-                                    <th>Komentarz</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -193,7 +192,6 @@
                             option_select += '<option value='+
                                 response[i].id+'>'+response[i].first_name+' '+response[i].last_name+'</option>';
                         }
-                        console.log(option_select);
                         $('#coach_dep').append(option_select);
                         //console.log(response);
                     }
@@ -218,7 +216,8 @@
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-                    if (data.couching_rbh > 64800) {
+                    console.log(data);
+                    if (data.couching_rbh >= 64800) {
                         $(row).hide();
                     }
                     $(row).attr('id', data.id);
@@ -249,11 +248,6 @@
                             },"name": "couching_rbh","searchable": false
                         },
                         {"data": "average_goal"},
-                        {"data":function (data, type, dataToSet) {
-                                return "<button class='button-edit-coaching btn btn-warning' style='margin: 3px;' data-id="+data.id+">Edycja</button>" +
-                                    "<button class='button-delete-coaching btn btn-danger' data-id="+data.id+">Usuń</button>";
-                            },"orderable": false, "searchable": false
-                        },
                     ],
             });
 
@@ -281,6 +275,12 @@
                         d.type              = 'manager';
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+                },"rowCallback": function( row, data, index ) {
+                    if (data.couching_rbh < 64800) {
+                        $(row).hide();
+                    }
+                    $(row).attr('id', data.id);
+                    return row;
                 },"columns":[
                     {"data":function (data, type, dataToSet) {
                             return data.manager_first_name + " " + data.manager_last_name;
@@ -292,11 +292,13 @@
                     },
                     {"data":"coaching_date"},
                     {"data": "subject"},
-
                     {"data":function (data, type, dataToSet) {
                             let color = 'green';
-                            if(data.avg_consultant < data.average_goal)
+                            if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal)){
                                 color = 'red';
+                                console.log(data.avg_consultant+' '+data.average_goal)
+                            }
+
                             return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
                         },"name": "avg_consultant","searchable": false
                     },
@@ -305,18 +307,6 @@
                         },"name": "couching_rbh","searchable": false
                     },
                     {"data": "average_goal"},
-                    {"data":function (data, type, dataToSet) {
-                            let comment = 'Brak';
-                            if(data.comment != null){
-                                comment = data.comment;
-                            }
-                            return "<textarea class='form-control comment_class' id=text_"+data.id+">"+comment+"</textarea>";
-                        },"name": "comment"
-                    },
-                    {"data":function (data, type, dataToSet) {
-                            return "<button class='btn-accept_coaching btn btn-success' data-id="+data.id+" >Akceptuj</button>";
-                        },"orderable": false, "searchable": false
-                    },
                 ],
 
             });

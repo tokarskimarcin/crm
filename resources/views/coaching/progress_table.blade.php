@@ -384,7 +384,7 @@
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-                    if (data.couching_rbh > 64800) {
+                    if (data.couching_rbh >= 64800) {
                         $(row).hide();
                     }
                     $(row).attr('id', data.id);
@@ -469,7 +469,7 @@
                         {"data": "subject"},
                         {"data":function (data, type, dataToSet) {
                                 let color = 'green';
-                                if(data.avg_consultant < data.average_goal)
+                                if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal))
                                     color = 'red';
                                 if(data.avg_consultant == null)
                                     return 'Brak';
@@ -524,6 +524,7 @@
                         let row = $(this).closest('tr');
                         let avrage_end =  row.find('td:nth-child(5)').text();
                         let rbh_end = row.find('td:nth-child(6)').text();
+                        console.log(avrage_end+' '+rbh_end+' '+coaching_id);
                         swal({
                             title: 'Jesteś pewien?',
                             text: "Nie będziesz w stanie cofnąć zmian!",
@@ -548,6 +549,7 @@
                                     'status'                : 1
                                 },
                                 success: function (response) {
+                                    console.log(response)
                                     table_unsettled.ajax.reload();
                                     table_settled.ajax.reload();
                                 }
@@ -569,7 +571,7 @@
 
                     {"data":function (data, type, dataToSet) {
                             let color = 'green';
-                            if(data.avg_consultant < data.average_goal)
+                            if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal))
                                 color = 'red';
                             return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
                         },"name": "avg_consultant","searchable": false
@@ -627,7 +629,7 @@
                     {"data": "subject"},
                     {"data":function (data, type, dataToSet) {
                             let color = 'green';
-                            if(data.avrage_end < data.average_goal)
+                            if(parseFloat(data.avrage_end) < parseFloat(data.average_goal))
                                 color = 'red';
                             return '<span style="color:' + color + '">' + data.avrage_end + '</span>';
                         },"name": "avrage_end","searchable": false
