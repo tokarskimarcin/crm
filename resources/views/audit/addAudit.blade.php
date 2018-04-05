@@ -125,6 +125,7 @@
             </div>
             <div class="panel-body">
                 @foreach($headers as $h)
+                    @if($h->status == 1)
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
@@ -140,6 +141,7 @@
                         <div class="well well-sm"><p style="text-align:center;">{{ucwords($h->name)}}</p></div>
                         @foreach($criterion as $c)
                             @if($c->audit_header_id == $h->id)
+                                @if($c->status == 1)
                         <tr>
                             <td class="first">{{ucwords(str_replace('_',' ',$c->name))}}</td>
                             <td>
@@ -171,11 +173,13 @@
                                 </div>
                             </td>
                         </tr>
+                                @endif
                         @endif
                         @endforeach
                         </tbody>
                     </table>
                 </div>
+                    @endif
                 @endforeach
             </div>
         </div>

@@ -573,19 +573,47 @@ class AdminController extends Controller
     }
 
     public function editAuditPost(Request $request) {
-        $criterions = AuditCriterions::where('audit_header_id', '=', $request->header_id)->get();
+        $criterions = AuditCriterions::where('audit_header_id', '=', $request->header_id)->where('status', '=', '1')->get();
         return $criterions;
     }
 
     public function editDatabasePost(Request $request) {
-        $headers = AuditHeaders::all();
-        dd($headers);
-        $crits = AuditCriterions::where('id', '=', $request->critSelect)->first();
-        $critAdd = $request->addingHeader;
-        if($critAdd == false) {
-            $crits->status = 0;
+        $addingHeader = $request->addingHeader;
+        $addingCrit = $request->addingCrit;
+
+        if($addingCrit == "true") {
+            $newName = strtolower(str_replace(' ', '_', trim($request->newCritName, ' ')));
+            $newCriterium = new AuditCriterions();
+            $newCriterium->name = $newName;
+            $newCriterium->audit_header_id = $request->relatedHeader;
+            $newCriterium->status = 1;
+            $newCriterium->save();
         }
 
+        else if($addingCrit == "false") {
+            $critToRemove = AuditCriterions::where('id', '=', $request->cID)->first();
+            $critToRemove->status = 0;
+            $critToRemove->save();
+        }
+
+        else if($addingHeader == "true") {
+            $newName = strtolower(str_replace(' ', '_', trim($request->newHeaderName, ' ')));
+            $newHeader = new AuditHeaders();
+            $newHeader->name = $newName;
+            $newHeader->status = 1;
+            $newHeader->save();
+        }
+        else if($addingHeader == "false") {
+            $headerToRemove = AuditHeaders::where('id', '=', $request->hID)->first();
+            $relatedCriterions = AuditCriterions::where('audit_header_id', '=', $request->hID)->where('status', '=', '1')->get();
+            $headerToRemove->status = 0;
+            $headerToRemove->save();
+            foreach($relatedCriterions as $rC) {
+                $rC->status = 0;
+                $rC->save();
+            }
+        }
+        return Redirect::to('editAudit');
     }
 
 
