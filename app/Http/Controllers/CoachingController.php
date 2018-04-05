@@ -146,7 +146,7 @@ class CoachingController extends Controller
                 users.id as user_id'
                 ))
             ->join('users','users.id','work_hours.id_user')
-            ->where('users.coach_id','=',Auth::user()->department_info_id)
+            ->where('users.coach_id','=',Auth::user()->id)
             ->where('users.status_work','=',1)
             ->groupby('users.id')
             ->get();
