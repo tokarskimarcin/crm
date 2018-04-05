@@ -64,20 +64,32 @@
                     </div>
 
                     <div class="row row2">
-                        <div class="col-md-6">
+                        <div class="col-md-6 headerAddDel">
                             <button type="button" class="btn btn-info bt" id="firstHeaderAdd" style="width:49%;">Dodaj</button>
                             <button type="button" class="btn btn-info bt" id="firstHeaderDelete" style="width:49%;">Usuń</button>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-6" critAddDel>
                             <button type="button" class="btn btn-info bt" id="firstCritAdd" style="width:49%;">Dodaj</button>
                             <button type="button"  class="btn btn-info bt" id="firstCritDelete" style="width:49%;">Usuń</button>
                         </div>
                     </div>
 
+                        <div class="row row-between">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control headerInp">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control critInp">
+                                </div>
+                            </div>
+                        </div>
                     <div class="row row3">
                         <div class="col-md-6">
-                            <div class="form-group">
+                            <div class="form-group headerSelect">
                                 <select name="headsSelect" class="form-control selectItem1">
                                     <option value="0">Wybierz</option>
                                     @foreach($headers as $h)
@@ -120,11 +132,13 @@
         var row2 = document.getElementsByClassName('row2')[0];
         var row3 = document.getElementsByClassName('row3')[0];
         var row4 = document.getElementsByClassName('row4')[0];
+        var rowBetween = document.getElementsByClassName('row-between')[0];
 
         //hide rows 2-4
         row2.classList.add('inactive');
         row3.classList.add('inactive');
         row4.classList.add('inactive');
+        rowBetween.classList.add('inactive');
 
 
         var headers = Array.from(document.querySelectorAll('.headers'));
@@ -133,6 +147,10 @@
         var selects2 = Array.from(document.querySelectorAll('.selectItem2'));
         var headerSubmit = document.querySelector('.btn-header');
         var critSubmit = document.querySelector('.btn-crit');
+        var headerInp = document.querySelector('.headerInp');
+        var critInp = document.querySelector('.critInp');
+        var headerSelect = document.querySelector('.headerSelect');
+        console.log(selects1);
 
         var addingHeader;
         var addingCrit;
@@ -172,11 +190,15 @@
         function handleButton(e) {
             if(e.target.id == 'firstHeaderAdd') {
                 addingHeader = true;
+                rowBetween.classList.remove('inactive');
+                headerSelect.classList.add('inactive');
                 row3.classList.remove('inactive');
             }
             else if(e.target.id == 'firstHeaderDelete') {
                 addingHeader = false;
                 row3.classList.remove('inactive');
+                headerSelect.classList.remove('inactive');
+                rowBetween.classList.add('inactive');
             }
 
             else if(e.target.id == 'firstCritAdd') {
@@ -207,7 +229,17 @@
             e.preventDefault();
             var $input = $('<input type="hidden" name="addingHeader" value="' + addingHeader + '">');
             $('.btn-crit').after($input);
-            document.querySelector('#formularz').submit();
+
+            if(addingHeader) {
+                if($('.headerInp').val() != null && $('.headerInp').val() != '') {
+                    document.querySelector('#formularz').submit();
+                }
+            }
+            else {
+                if($('.selectItem1').val() != 0) {
+                    document.querySelector('#formularz').submit();
+                }
+            }
         }
 
         function handleCritSubmit(e) {
@@ -217,6 +249,14 @@
             document.querySelector('#formularz').submit();
         }
 
+        //Show/hide akceptuj button
+        function headSelectChange(e) {
+            row4.classList.remove('inactive');
+            if(e.target.value == '') {
+                row4.classList.add('inactive');
+            }
+        }
+
         /*******************End Event listeners functions ***********************/
 
 
@@ -224,6 +264,7 @@
         buttons.forEach(button => button.addEventListener('click', handleButton));
         selects1.forEach(select => select.addEventListener('change', handleSelect1));
         selects2.forEach(select => select.addEventListener('change', handleSelect2));
+        headerInp.addEventListener('input', headSelectChange);
         headerSubmit.addEventListener('click', handleHeaderSubmit);
         critSubmit.addEventListener('click', handleCritSubmit);
 

@@ -577,6 +577,7 @@ class AdminController extends Controller
 
     public function editDatabasePost(Request $request) {
         $headers = AuditHeaders::all();
+        dd($headers);
         $crits = AuditCriterions::where('id', '=', $request->critSelect)->first();
         $critAdd = $request->addingHeader;
         if($critAdd == false) {
