@@ -203,7 +203,7 @@ class CoachingController extends Controller
                 $coaching->status       = 1;    // Coaching zaliczony
             $coaching->coaching_date_accept = date('Y-m-d');
             $coaching->avrage_end = $request->avrage_end;
-            $coaching->rhb_end = $request->rhb_end;
+            $coaching->rbh_end = $request->rbh_end;
             $coaching->save();
             return 1;
         }else
