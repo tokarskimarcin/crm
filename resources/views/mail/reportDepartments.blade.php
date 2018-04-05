@@ -285,7 +285,7 @@
             $total_week_avg = ($total_real_RBH != null && $total_real_RBH > 0) ? round(($total_success / $total_real_RBH), 2) : 0 ;
             $total_proc_janky = ($total_success != null && $total_success > 0) ? round(($total_bad / $total_success) * 100, 2) : 0 ;
             $total_goal_proc = ($total_goal != null && $total_goal > 0) ? round(($total_success / $total_goal) * 100, 2) : 0 ;
-            $total_sum_call_proc = ($total_sum_call_time != null && $total_sum_call_time > 0) ? round(($total_phone_time / $total_sum_call_time) * 100, 2) : 0 ;
+            $total_sum_call_proc = ($total_real_RBH != null && $total_real_RBH > 0) ? round(($total_phone_time / $total_real_RBH) * 100, 2) : 0 ;
         @endphp
 
         <tr>
@@ -301,7 +301,7 @@
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{round($total_goal_RBH)}}</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_week_avg}}</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_proc_janky}} %</b></td>
-            <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_sum_call_proc}}</b></td>
+            <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_sum_call_proc}} %</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_real_schedule}} %</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{round($total_schedule_lost, 2)}}</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_goal_proc}} %</b></td>
