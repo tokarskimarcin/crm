@@ -2319,6 +2319,9 @@ class StatisticsController extends Controller
             ->orderBy('last_name')
             ->get();
 
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
+
         return view('reportpage.MonthReportCoach')
             ->with([
                 'coaches'   => $coaches,
@@ -2449,7 +2452,12 @@ class StatisticsController extends Controller
             }
             return $user_sum;
         });
-        $coaches = User::whereIn('user_type_id', [4,12])->where('status_work', '=', 1)->get();
+        $coaches = User::whereIn('user_type_id', [4,12])
+            ->where('status_work', '=', 1)
+            ->get();
+
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+            $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
 
         return view('reportpage.MonthReportCoach')
             ->with([
