@@ -24,10 +24,11 @@
 
     {{--</style>--}}
 
-
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Raport Miesięczny Oddziały</h1>
+            <div class="page-header">
+                <div class="alert gray-nav">Raport Miesięczny Oddziały</div>
+            </div>
         </div>
     </div>
     <form method="POST" action="{{ URL::to('/pageReportDepartments') }}">

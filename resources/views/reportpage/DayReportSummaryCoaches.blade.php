@@ -2,7 +2,9 @@
 @section('content')
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Raport Dzienny Trenerzy (Zbiorczy)</h1>
+            <div class="page-header">
+                <div class="alert gray-nav">Raport Dzienny Trenerzy (Zbiorczy)</div>
+            </div>
         </div>
     </div>
     <form method="POST" action="{{ URL::to('/pageSummaryDayReportCoaches') }}" id="my_dep_form">
