@@ -162,6 +162,7 @@
         var critVal;
         var indexOfSelected;
         var lastOneSelected;
+        var lastOneSelected2;
         var firstClick = 0;
 
         //This function gets data from database about criterions related to given heading and paste them into table and inpuct(type=select)
@@ -172,10 +173,13 @@
             //Part responsible for highlighting clicked row
             if(indexOfSelected != null) {
                 lastOneSelected.style.backgroundColor="white";
+                lastOneSelected2.style.backgroundColor="white";
             }
             e.target.style.backgroundColor='#CBE86B';
+            e.target.nextElementSibling.style.backgroundColor='#CBE86B';
             indexOfSelected = e.target.id;
             lastOneSelected = document.querySelector('.tableInside td[id="' + indexOfSelected + '"]');
+            lastOneSelected2 = lastOneSelected.nextElementSibling;
 
             if(firstClick === 0) {
                 document.querySelector('.firstClick').style.display = 'none';

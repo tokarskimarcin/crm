@@ -40,8 +40,8 @@
             </div>
             <div class="panel-body">
                 <h4>
-                    <div class="alert alert-warning"><sup>*</sup></sup>Kolumny "Ilość" i "Jakość" są obowiązkowe.</p></div>
-                    <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formularza zaleca się wyłącznie panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
+                    <div class="alert alert-warning"><sup>*</sup></sup>Kolumny <strong>Ilość</strong> i <strong>Jakość</strong> są obowiązkowe.</p></div>
+                    <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formularza zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
                 </h4>
                 @foreach($headers as $h)
                     <div class="table-responsive">

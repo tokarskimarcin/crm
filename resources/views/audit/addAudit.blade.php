@@ -132,7 +132,7 @@
             </div>
             <div class="panel-body">
                 <h4>
-                    <div class="alert alert-warning"><sup>*</sup></sup>Kolumny "Ilość" i "Jakość" są obowiązkowe.</p></div>
+                    <div class="alert alert-warning"><sup>*</sup></sup>Kolumny <strong>Ilość</strong> i <strong>Jakość</strong> są obowiązkowe.</p></div>
                     <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formularza zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
                 </h4>
                 @foreach($headers as $h)
@@ -274,7 +274,7 @@
             function handleFirstButtonClick() {
                 secondPanel.classList.remove('inactivePanel');
                 secondButton.classList.remove('inactivePanel');
-                title.textContent = 'Audyt dla departamentu: ' + inputDepartment.options[inputDepartment.selectedIndex].text + ' wypełniony przez ' + inputTrainer.options[inputTrainer.selectedIndex].text + ' ' + inputDate.value;
+                title.textContent = 'Audyt dla departamentu: ' + inputDepartment.options[inputDepartment.selectedIndex].text + ', trener ' + inputTrainer.options[inputTrainer.selectedIndex].text + ' ' + inputDate.value;
                 firstPanel.classList.add('inactivePanel');
             }
 
