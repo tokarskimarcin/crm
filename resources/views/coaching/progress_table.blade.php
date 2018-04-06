@@ -22,7 +22,7 @@
             </div>
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label class="myLabel">Zakres od:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -31,7 +31,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label class="myLabel">Zakres do:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -78,7 +78,7 @@
             </div>
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label class="myLabel">Zakres od:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -87,7 +87,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label class="myLabel">Zakres do:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -133,7 +133,7 @@
             </div>
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label class="myLabel">Zakres od:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -142,7 +142,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label class="myLabel">Zakres do:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -300,7 +300,7 @@
             //     validation = false;
             //     swal('Błędna minimalna średnia')
             // }
-            else if(coaching_goal.trim('').length == 0 || isNaN(coaching_goal) ){
+            else if(coaching_goal.trim('').length == 0 || isNaN(coaching_goal) || coaching_goal <= 0 ){
                 validation = false;
                 swal('Błędna maksymalna średnia')
             }
@@ -384,7 +384,7 @@
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-                    if (data.couching_rbh > 64800) {
+                    if (data.couching_rbh >= 64800) {
                         $(row).hide();
                     }
                     $(row).attr('id', data.id);
@@ -469,7 +469,7 @@
                         {"data": "subject"},
                         {"data":function (data, type, dataToSet) {
                                 let color = 'green';
-                                if(data.avg_consultant < data.average_goal)
+                                if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal))
                                     color = 'red';
                                 if(data.avg_consultant == null)
                                     return 'Brak';
@@ -524,6 +524,7 @@
                         let row = $(this).closest('tr');
                         let avrage_end =  row.find('td:nth-child(5)').text();
                         let rbh_end = row.find('td:nth-child(6)').text();
+                        console.log(avrage_end+' '+rbh_end+' '+coaching_id);
                         swal({
                             title: 'Jesteś pewien?',
                             text: "Nie będziesz w stanie cofnąć zmian!",
@@ -548,6 +549,7 @@
                                     'status'                : 1
                                 },
                                 success: function (response) {
+                                    console.log(response)
                                     table_unsettled.ajax.reload();
                                     table_settled.ajax.reload();
                                 }
@@ -569,7 +571,7 @@
 
                     {"data":function (data, type, dataToSet) {
                             let color = 'green';
-                            if(data.avg_consultant < data.average_goal)
+                            if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal))
                                 color = 'red';
                             return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
                         },"name": "avg_consultant","searchable": false
@@ -627,7 +629,7 @@
                     {"data": "subject"},
                     {"data":function (data, type, dataToSet) {
                             let color = 'green';
-                            if(data.avrage_end < data.average_goal)
+                            if(parseFloat(data.avrage_end) < parseFloat(data.average_goal))
                                 color = 'red';
                             return '<span style="color:' + color + '">' + data.avrage_end + '</span>';
                         },"name": "avrage_end","searchable": false

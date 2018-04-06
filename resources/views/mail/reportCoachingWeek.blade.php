@@ -17,9 +17,10 @@
         <thead style="color:#efd88f">
             <tr>
                 <td rowspan="2" style="border:1px solid #231f20;padding:3px;background:#231f20;text-align: center">Trener</td>
-                <td colspan="4" style="border:1px solid #231f20;padding:3px;background:#231f20;text-align: center">TYDZIEN {{$week_number++}}</td>
+                <td colspan="5" style="border:1px solid #231f20;padding:3px;background:#231f20;text-align: center">TYDZIEN {{$week_number++}}</td>
             </tr>
             <tr>
+                <td style="border:1px solid #231f20;padding:3px;background:#231f20;">W toku</td>
                 <td style="border:1px solid #231f20;padding:3px;background:#231f20;">ZREALIZOWANE</td>
                 <td style="border:1px solid #231f20;padding:3px;background:#231f20;">NIEZREALIZOWANE</td>
                 <td style="border:1px solid #231f20;padding:3px;background:#231f20;">LICZBA COACHINGÓW</td>
@@ -30,9 +31,10 @@
         @foreach($item as $coach)
             <tr>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$coach->first_name.' '.$coach->last_name}}</td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$coach->in_progress}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$coach->end_possitive}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$coach->end_negative}}</td>
-                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$coach->sum_all_coaching}}</td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$coach->in_progress+$coach->end_possitive+$coach->end_negative}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$coach->coaching_sum}}</td>
             </tr>
 

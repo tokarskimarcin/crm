@@ -111,13 +111,12 @@ class CoachingController extends Controller
                     // wybrany oddział do filtracji
                     ->where('manager.department_info_id','=',$request->department_info);
             }else{ // opcja z dyrektorem
-                $dirId = substr($request->department_info_id, 2);
+                $dirId = substr($request->department_info, 2);
                 $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
                 $inprogres = $inprogres->whereBetween('coaching_date',[$request->date_start .' 00:00:00',$request->date_stop.' 23:00:00'])
                     ->where('coaching.status','=',$request->report_status)
                     // wybrany oddział do filtracji
                     ->whereIn('manager.department_info_id',$director_departments->pluck('id')->toArray());
-
             }
             // wybrany trener do filtracji
             if($request->coach_id != 'Wszyscy'){
@@ -127,6 +126,7 @@ class CoachingController extends Controller
         }else{
             $inprogres->whereBetween('coaching_date',[$request->date_start .' 00:00:00',$request->date_stop.' 23:00:00'])
                 ->where('coaching.status','=',$request->report_status)
+                ->where('coaching.manager_id','=',Auth::user()->id)
                 ->groupby('coaching.id');
         }
 
@@ -197,15 +197,15 @@ class CoachingController extends Controller
             $coaching               = Coaching::find($request->coaching_id);
             $coaching->comment      = $request->coaching__comment;
 
-            if($coaching->avrage_goal > $coaching->avrage_end) // Coaching niezaliczony
-                $coaching->status       = 2;
+            if(floatval($coaching->average_goal) > floatval($request->avrage_end)) // Coaching niezaliczony
+                $coaching->status  = 2;
             else
-                $coaching->status       = 1;    // Coaching zaliczony
+                $coaching->status  = 1;    // Coaching zaliczony
             $coaching->coaching_date_accept = date('Y-m-d');
             $coaching->avrage_end = $request->avrage_end;
             $coaching->rbh_end = $request->rbh_end;
             $coaching->save();
-            return 1;
+            return $coaching->average_goal;
         }else
             return 0;
     }

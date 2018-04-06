@@ -7,127 +7,60 @@
 <img src="http://teambox.pl/image/logovc.png"></td>
 </tr>
 <tr>
-<th style="border:1px solid #231f20;padding:3px;background:#231f20;">Lp.</th>
-<th style="border:1px solid #231f20;padding:3px;background:#231f20;">Oddział</th>
-<th style="border:1px solid #231f20;padding:3px;background:#231f20;">Data</th>
-<th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba odsłuchanych rozmów</th>
-<th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba poprawnych rozmów</th>
-<th style="border:1px solid #231f20;padding:3px;background:#231f20;">Jany</th>
-<th style="border:1px solid #231f20;padding:3px;background:#231f20;">% błędnych</th>
+    <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Lp.</th>
+    <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Oddział</th>
+    <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba Zaproszeń</th>
+    <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba odsłuchanych rozmów</th>
+    <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba poprawnych rozmów</th>
+    <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba błędnych rozmów</th>
+    <th style="border:1px solid #231f20;padding:3px;background:#231f20;">% błędnych</th>
+    <th style="border:1px solid #231f20;padding:3px;background:#231f20;">% Odsłuchanych</th>
 </tr>
 </thead>
 <tbody>
 
 @php
     $i = 1;
-    $total_all = 0;
-    $total_good = 0;
-    $total_bad = 0;
+    $sum_all_talks = 0;
+    $sum_all_good = 0;
+    $sum_all_bad = 0;
+    $sum_proc = 0;
+    $sum_succes = 0;
+    $sum_proc_check = 0;
 @endphp
-
 @foreach($dkj as $item)
-
-    @if($item->type == 'Badania/Wysyłka' && $item->wysylka != 0)
-        <tr>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dep_name . ' ' . $item->dep_name_type}} Wysyłka</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$today}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->wysylka}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->wysylka - $item->bad_wysylka}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->bad_wysylka}}</td>
-              @if($item->bad_wysylka > 0)
-                  <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($item->bad_wysylka / $item->wysylka * 100, 2)}} %</td>
-              @else
-                  <td style="border:1px solid #231f20;text-align:center;padding:3px;">0 %</td>
-              @endif
-
-              @php
-                  $total_all += $item->wysylka;
-                  $total_good += $item->wysylka - $item->bad_wysylka;
-                  $total_bad += $item->bad_wysylka;
-                  $i++;
-              @endphp
-        </tr>
-    @endif
-    @if($item->type == 'Badania/Wysyłka' && $item->badania != 0)
-      <tr>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dep_name . ' ' . $item->dep_name_type}} Badania</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$today}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->badania}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->badania - $item->bad_badania}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->bad_badania}}</td>
-            @if($item->bad_badania > 0)
-                <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($item->bad_badania / $item->badania * 100, 2)}} %</td>
-            @else
-                <td style="border:1px solid #231f20;text-align:center;padding:3px;">0 %</td>
-            @endif
-
-            @php
-                $total_all += $item->badania;
-                $total_good += $item->badania - $item->bad_badania;
-                $total_bad += $item->bad_badania;
-                $i++;
-            @endphp
-      </tr>
-    @endif
-    @if($item->type == 'Badania')
-        <tr>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dep_name . ' ' . $item->dep_name_type}} Badania</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$today}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->badania}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->badania - $item->bad_badania}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->bad_badania}}</td>
-              @if($item->bad_badania > 0)
-                  <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($item->bad_badania / $item->badania * 100, 2)}} %</td>
-              @else
-                  <td style="border:1px solid #231f20;text-align:center;padding:3px;">0 %</td>
-              @endif
-        </tr>
+    <tr>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dep}} {{$item->depname}}</td>
+        <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$item->success}}</td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_all_talks}}</td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_correct_talks}}</td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_janky}}</td>
         @php
-            $total_all += $item->badania;
-            $total_good += $item->badania - $item->bad_badania;
-            $total_bad += $item->bad_badania;
+            $bad_proc = (100*$item->sum_janky) / $item->sum_all_talks;
+            $check_proc = (100*$item->sum_all_talks) / $item->success;
             $i++;
-        @endphp
-    @elseif($item->type == 'Wysyłka')
-        <tr>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dep_name . ' ' . $item->dep_name_type}} Wysyłka</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$today}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->wysylka}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->wysylka - $item->bad_wysylka}}</td>
-              <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->bad_wysylka}}</td>
-              @if($item->bad_wysylka > 0)
-                  <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($item->bad_wysylka / $item->wysylka * 100, 2)}} %</td>
-              @else
-                  <td style="border:1px solid #231f20;text-align:center;padding:3px;">0 %</td>
-              @endif
-        </tr>
-        @php
-            $total_all += $item->wysylka;
-            $total_good += $item->wysylka - $item->bad_wysylka;
-            $total_bad += $item->bad_wysylka;
-            $i++;
-        @endphp
-    @endif
+            $sum_all_talks += $item->sum_all_talks;
+            $sum_all_good += $item->sum_correct_talks;
+            $sum_all_bad += $item->sum_janky;
+            $sum_succes += $item->success;
+            $sum_proc = (100*$sum_all_bad) / $sum_all_talks;
+            $sum_proc_check = (100*$sum_all_talks) / $sum_succes;
 
+        @endphp
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($bad_proc,2)}} %</td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($check_proc,2)}} %</td>
+    </tr>
 @endforeach
-
 <tr>
-      <td colspan="3" style="border:1px solid #231f20;text-align:center;padding:3px;"><b>TOTAL</b></td>
-      <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_all}}</td>
-      <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_good}}</td>
-      <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$total_bad}}</td>
-      @if($total_all > 0)
-          <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($total_bad / $total_all * 100, 2)}} %</td>
-      @else
-          <td style="border:1px solid #231f20;text-align:center;padding:3px;">0 %</td>
-      @endif
-
+    <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;" colspan="2">Total</td>
+    <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{$sum_succes}}</td>
+    <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{$sum_all_talks}}</td>
+    <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{$sum_all_good}} </td>
+    <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{$sum_all_bad}}</td>
+    <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{round($sum_proc,2)}} %</td>
+    <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{round($sum_proc_check,2)}} %</td>
 </tr>
-
 
   <tbody>
 </table>

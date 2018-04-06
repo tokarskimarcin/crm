@@ -2,7 +2,9 @@
 @section('content')
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Podsumowanie Trenerów - Raport Miesięczny/Tygodniowy</h1>
+            <div class="page-header">
+                <div class="alert gray-nav">Podsumowanie Trenerów - Raport Miesięczny/Tygodniowy</div>
+            </div>
         </div>
     </div>
     <form method="POST" action="{{ URL::to('/pageMonthReportCoachSummary') }}">

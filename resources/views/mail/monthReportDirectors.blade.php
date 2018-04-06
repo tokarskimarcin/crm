@@ -316,7 +316,7 @@
         <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{round($total_goal_RBH)}}</b></td>
         <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_week_avg}}</b></td>
         <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_proc_janky}} %</b></td>
-        <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_sum_call_proc}}</b></td>
+        <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_sum_call_proc}} %</b></td>
         <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_real_schedule}} %</b></td>
         <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{round($total_schedule_lost, 2)}}</b></td>
         <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_goal_proc}} %</b></td>
