@@ -38,6 +38,7 @@
                 </div>
 
                 <div class="panel-body">
+                    <div class="alert alert-info firstClick">Po naciśnięciu na dowolny nagłówek uzyskasz podgląd powiązanych kryteriów i uzyskasz możliwość dodawania.</div>
                     <form action="editAuditPage" method="post" id="formularz">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <div class="row row1">
@@ -161,6 +162,7 @@
         var critVal;
         var indexOfSelected;
         var lastOneSelected;
+        var firstClick = 0;
 
         //This function gets data from database about criterions related to given heading and paste them into table and inpuct(type=select)
         function handleClick(e) {
@@ -174,6 +176,11 @@
             e.target.style.backgroundColor='#CBE86B';
             indexOfSelected = e.target.id;
             lastOneSelected = document.querySelector('.tableInside td[id="' + indexOfSelected + '"]');
+
+            if(firstClick === 0) {
+                document.querySelector('.firstClick').style.display = 'none';
+                firstClick = 1;
+            }
 
             tableBody.textContent = '';
             $.ajax({ //generate list of trainers from given location

@@ -113,7 +113,7 @@
                     </div>
                     <div class="col-md-8">
                         <div class="alert alert-info">
-                            <p style="text-align:center;font-size:1.3em;">Krok 3: Wybierz date audytu a następnie naciśnij przycisk "Generuj raport".</p>
+                            <p style="text-align:center;font-size:1.3em;">Krok 3: Wybierz datę audytu a następnie naciśnij przycisk "Generuj raport".</p>
                         </div>
                     </div>
                 </div>
@@ -133,7 +133,7 @@
             <div class="panel-body">
                 <h4>
                     <div class="alert alert-warning"><sup>*</sup></sup>Kolumny "Ilość" i "Jakość" są obowiązkowe.</p></div>
-                    <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formulaża zaleca się wyłącznie panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
+                    <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formularza zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
                 </h4>
                 @foreach($headers as $h)
                     @if($h->status == 1)
