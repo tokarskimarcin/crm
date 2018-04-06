@@ -1,20 +1,29 @@
 @extends('layouts.main')
 @section('content')
+    {{--*************************************--}}
+    {{--THIS PAGE ALLOWS USER ADD NEW AUDIT--}}
+    {{--*************************************--}}
+
+
     <style>
-        th:nth-of-type(1) {
-            width: 25%;
-        }
-        th:nth-of-type(2) {
-            width: 10%;
-        }
-        th:nth-of-type(3) {
-            width: 10%;
-        }
-        th:nth-of-type(4) {
-            width: 50%;
+        .container-fluid {
+            padding: 5px;
         }
 
-        th:nth-of-type(5) {
+        .second-panel th:nth-of-type(1) {
+            width: 25%;
+        }
+        .second-panel th:nth-of-type(2) {
+            width: 10%;
+        }
+        .second-panel th:nth-of-type(3) {
+            width: 10%;
+        }
+        .second-panel th:nth-of-type(4) {
+            width: 45%;
+        }
+
+        .second-panel th:nth-of-type(5) {
             width: 5%;
         }
 
@@ -26,6 +35,9 @@
             background: #02779E;
         }
 
+        sup {
+            color: red;
+        }
 
         .inactivePanel {
             display: none;
@@ -34,10 +46,9 @@
         .activePanel {
             display: block;
         }
-
     </style>
 
-    <div class="container">
+    <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
             <div class="page-header">
@@ -51,9 +62,8 @@
     <div class="row">
         <div class="panel panel-default panel-primary first-panel">
             <div class="panel-heading">
-                <p>Nazwa Panelu</p>
+                <p>Informacje ogólne</p>
             </div>
-
             <div class="panel-body">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <div class="row first-row">
@@ -71,12 +81,11 @@
                         </div>
                     </div>
                     <div class="col-md-8">
-                        <div class="well well-lg">
-                            <p style="text-align:center;">Krok 1: Wybierz departament.</p>
+                        <div class="alert alert-info">
+                            <p style="text-align:center;font-size:1.3em;">Krok 1: Wybierz departament.</p>
                         </div>
                     </div>
                 </div>
-
                 <div class="row second-row">
                     <div class="col-md-4">
                         <div class="form-group">
@@ -87,12 +96,11 @@
                         </div>
                     </div>
                     <div class="col-md-8">
-                        <div class="well well-lg">
-                            <p style="text-align:center;">Krok 2: Wybierz trenera z listy.</p>
+                        <div class="alert alert-info">
+                            <p style="text-align:center;font-size:1.3em;">Krok 2: Wybierz trenera z listy.</p>
                         </div>
                     </div>
                 </div>
-
                 <div class="row third-row">
                     <div class="col-md-4">
                         <div class="form-group">
@@ -104,8 +112,8 @@
                         </div>
                     </div>
                     <div class="col-md-8">
-                        <div class="well well-lg">
-                            <p style="text-align:center;">Krok 3: Wybierz date audytu a następnie kliknij przycisk.</p>
+                        <div class="alert alert-info">
+                            <p style="text-align:center;font-size:1.3em;">Krok 3: Wybierz date audytu a następnie naciśnij przycisk "Generuj raport".</p>
                         </div>
                     </div>
                 </div>
@@ -117,13 +125,16 @@
             </div>
         </div>
     </div>
-
     <div class="row">
         <div class="panel panel-default second-panel">
             <div class="panel-heading titleOfSecondPanel">
                 <p>Nazwa drugiego panelu</p>
             </div>
             <div class="panel-body">
+                <h4>
+                    <div class="alert alert-warning"><sup>*</sup></sup>Kolumny "Ilość" i "Jakość" są obowiązkowe.</p></div>
+                    <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formulaża zaleca się wyłącznie panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
+                </h4>
                 @foreach($headers as $h)
                     @if($h->status == 1)
                 <div class="table-responsive">
@@ -131,14 +142,14 @@
                         <thead>
                         <tr>
                             <th class="first">Kryteria</th>
-                            <th>Ilość</th>
-                            <th>Jakość</th>
+                            <th>Ilość<sup>*</sup></th>
+                            <th>Jakość<sup>*</sup></th>
                             <th>Komentarz</th>
                             <th>Zdjęcia</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <div class="well well-sm"><p style="text-align:center;">{{ucwords($h->name)}}</p></div>
+                        <div class="well well-sm"><p style="text-align:center;font-weight:bold;font-size:1.1em;">{{ucwords($h->name)}}</p></div>
                         @foreach($criterion as $c)
                             @if($c->audit_header_id == $h->id)
                                 @if($c->status == 1)
@@ -174,7 +185,7 @@
                             </td>
                         </tr>
                                 @endif
-                        @endif
+                            @endif
                         @endforeach
                         </tbody>
                     </table>
@@ -195,40 +206,16 @@
 @endsection
 @section('script')
     <script>
-        $('.form_datetime').datetimepicker({
-            //language:  'fr',
-            weekStart: 1,
-            todayBtn:  1,
-            autoclose: 1,
-            todayHighlight: 1,
-            startView: 2,
-            forceParse: 0,
-            showMeridian: 1
-        });
         $('.form_date').datetimepicker({
-            language:  'fr',
-            weekStart: 1,
-            todayBtn:  1,
+            language:  'pl',
             autoclose: 1,
-            todayHighlight: 1,
-            startView: 2,
-            minView: 2,
-            forceParse: 0
-        });
-        $('.form_time').datetimepicker({
-            language:  'fr',
-            weekStart: 1,
-            todayBtn:  1,
-            autoclose: 1,
-            todayHighlight: 1,
-            startView: 1,
-            minView: 0,
-            maxView: 1,
-            forceParse: 0
+            minView : 2,
+            pickTime: false,
         });
 
         $(document).ready(function() {
-            /*************Functions related to event listeners*****************/
+
+            /*********************EVENT LISTENERS FUNCTIONS********************/
 
             /**
              * Function Show/Hide (2nd and next) steps and get list of trainers

@@ -1,31 +1,35 @@
 @extends('layouts.main')
 @section('content')
+    {{--*******************************************--}}
+    {{--THIS PAGE DISPLAYS TABLE WITH FILLED AUDITS--}}
+    {{--*******************************************--}}
     <link href="{{ asset('/css/dataTables.bootstrap.min.css')}}" rel="stylesheet">
-    <div class="row">
-        <div class="col-lg-12">
-
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    Lista Pracowników
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div id="start_stop">
-                                <div class="panel-body table-responsive">
-                                    <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
-                                        <thead>
-                                        <tr>
-                                            <th class="search-input-text" data-column="1">Wypełniającey</th>
-                                            <th>Trener</th>
-                                            <th>Department</th>
-                                            <th>Data</th>
-                                            <th>Podgląd/Edycja</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        </tbody>
-                                    </table>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Lista Pracowników
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div id="start_stop">
+                                    <div class="panel-body table-responsive">
+                                        <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
+                                            <thead>
+                                            <tr>
+                                                <th class="search-input-text" data-column="1">Wypełniającey</th>
+                                                <th>Trener</th>
+                                                <th>Department</th>
+                                                <th>Data</th>
+                                                <th>Podgląd/Edycja</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -34,15 +38,13 @@
             </div>
         </div>
     </div>
-
-
-
 @endsection
 @section('script')
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
         $(document).ready( function () {
 
+            //ajax reponsible for receiving and displaying data through datatable
             table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,
@@ -76,5 +78,4 @@
             } );
         });
     </script>
-
 @endsection

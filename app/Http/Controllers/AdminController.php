@@ -597,15 +597,15 @@ class AdminController extends Controller
         }
 
         else if($addingHeader == "true") {
-            $newName = strtolower(str_replace(' ', '_', trim($request->newHeaderName, ' ')));
+            $newName = strtolower(trim($request->newHeaderName, ' '));
             $newHeader = new AuditHeaders();
             $newHeader->name = $newName;
             $newHeader->status = 1;
             $newHeader->save();
         }
         else if($addingHeader == "false") {
-            $headerToRemove = AuditHeaders::where('id', '=', $request->hID)->first();
-            $relatedCriterions = AuditCriterions::where('audit_header_id', '=', $request->hID)->where('status', '=', '1')->get();
+            $headerToRemove = AuditHeaders::where('id', '=', $request->hid)->first();
+            $relatedCriterions = AuditCriterions::where('audit_header_id', '=', $request->hid)->where('status', '=', '1')->get();
             $headerToRemove->status = 0;
             $headerToRemove->save();
             foreach($relatedCriterions as $rC) {

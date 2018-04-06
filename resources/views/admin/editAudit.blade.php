@@ -1,5 +1,8 @@
 @extends('layouts.main')
 @section('content')
+    {{--****************************************--}}
+    {{--THIS PAGE SHOWS CONTROL PANEL FOR AUDITS--}}
+    {{--****************************************--}}
     <style>
         .active {
             display: block;
@@ -8,7 +11,6 @@
             display: none;
         }
     </style>
-
 
 <div class="container-fluid">
     <div class="row">
@@ -23,27 +25,27 @@
         <div class="col-lg-12">
             <div class="panel panel-default panel-primary first-panel">
                 <div class="panel-heading">
-                    edycja
+                    Edycja
                 </div>
 
                 <div class="panel-body">
                     <form action="editAuditPage" method="post" id="formularz">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-
                     <div class="row row1">
                         <div class="col-md-6">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
                                         <th>Nagłówki</th>
+                                        <th>Usuń</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="tableInside">
                                 @foreach($headers as $h)
                                     @if($h->status == 1)
                                     <tr>
                                         <td id="{{$h->id}}" class="headers">{{$h->name}}</td>
-                                        <td><span class="glyphicon glyphicon-minus gl-heads" data-headId="{{$h->id}}"></span></td>
+                                        <td><span class="glyphicon glyphicon-remove gl-heads"  style="font-size:2em;color:red;" data-headid="{{$h->id}}"></span></td>
                                     </tr>
                                     @endif
                                 @endforeach
@@ -51,12 +53,12 @@
 
                             </table>
                         </div>
-
                         <div class="col-md-6">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
                                         <th>Kryteria</th>
+                                        <th>Usuń</th>
                                     </tr>
                                 </thead>
                                 <tbody id="crit">
@@ -65,32 +67,29 @@
                             </table>
                         </div>
                     </div>
-
                     <div class="row row2">
                         <div class="col-md-6 headerAddDel">
-                            <button type="button" class="btn btn-info bt" id="firstHeaderAdd" style="width:49%;">Dodaj</button>
-                            <button type="button" class="btn btn-info bt" id="firstHeaderDelete" style="width:49%;">Usuń</button>
+                            <button type="button" class="btn btn-info bt" id="firstHeaderAdd" style="width:100%;">Dodaj nowy nagłówek</button>
                         </div>
-
                         <div class="col-md-6" critAddDel>
-                            <button type="button" class="btn btn-info bt" id="firstCritAdd" style="width:49%;">Dodaj</button>
-                            <button type="button"  class="btn btn-info bt" id="firstCritDelete" style="width:49%;">Usuń</button>
+                            <button type="button" class="btn btn-info bt" id="firstCritAdd" style="width:100%;">Dodaj nowe kryterium</button>
                         </div>
                     </div>
-
                         <div class="row row-between">
                             <div class="col-md-6">
                                 <div class="form-group headerInpDiv">
-                                    <input type="text" name="newHeaderName" class="form-control headerInp">
+                                    <p>Podaj nazwę nowego nagłówka:</p>
+                                    <input type="text" name="newHeaderName" class="form-control headerInp" style="margin-top:1em;">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group critInpDiv">
-                                    <input type="text" name="newCritName" class="form-control critInp">
+                                    <p>Podaj nazwę nowego kryterium:</p>
+                                    <input type="text" name="newCritName" class="form-control critInp" style="margin-top:1em;">
                                 </div>
-
                                 <div class="form-group relatedHeaderDiv">
-                                    <select name="relatedHeader" class="form-control headerRelated">
+                                    <label for="selectRelatedHeader">Wybierz nagłówek do którego ma być dodane kryterium:</label>
+                                    <select name="relatedHeader" class="form-control headerRelated" style="margin-top:1em;" id="selectRelatedHeader">
                                         <option value="0">Wybierz</option>
                                         @foreach($headers as $h)
                                             @if($h->status == 1)
@@ -101,40 +100,14 @@
                                 </div>
                             </div>
                         </div>
-                    <div class="row row3">
-                        <div class="col-md-6">
-                            <div class="form-group headerSelect">
-                                <select name="headsSelect" class="form-control selectItem1">
-                                    <option value="0">Wybierz</option>
-                                    @foreach($headers as $h)
-                                        @if($h->status == 1)
-                                        <option value="{{$h->id}}">{{$h->name}}</option>
-                                        @endif
-                                    @endforeach
-                                </select>
+                        <div class="row row4">
+                            <div class="col-md-6">
+                                <button class="btn btn-info btn-header" type="submit" style="margin:1em;">Akceptuj</button>
                             </div>
-
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group critSelect">
-                                <select name="critSelect" class="form-control selectItem2">
-                                    <option value="0" id="firstOption">Wybierz</option>
-                                </select>
+                            <div class="col-md-6">
+                                <button class="btn btn-info btn-crit" type="submit" style="margin:1em;">Akceptuj</button>
                             </div>
-
                         </div>
-                    </div>
-
-                    <div class="row row4">
-                        <div class="col-md-6">
-                            <button class="btn btn-info btn-header" type="submit">Akceptuj</button>
-                        </div>
-
-                        <div class="col-md-6">
-                            <button class="btn btn-info btn-crit" type="submit">Akceptuj</button>
-                        </div>
-                    </div>
                     </form>
                 </div>
             </div>
@@ -150,16 +123,13 @@
         /****************FIRST STAGE********************/
         //selects each row
         var row2 = document.getElementsByClassName('row2')[0];
-        var row3 = document.getElementsByClassName('row3')[0];
         var row4 = document.getElementsByClassName('row4')[0];
         var rowBetween = document.getElementsByClassName('row-between')[0];
 
         //hide rows 2-4
         row2.classList.add('inactive');
-        row3.classList.add('inactive');
         row4.classList.add('inactive');
         rowBetween.classList.add('inactive');
-
 
         var headers = Array.from(document.querySelectorAll('.headers'));
         var buttons = Array.from(document.querySelectorAll('.bt'));
@@ -169,8 +139,6 @@
         var critSubmit = document.querySelector('.btn-crit');
         var headerInp = document.querySelector('.headerInp');
         var critInp = document.querySelector('.critInp');
-        var headerSelect = document.querySelector('.headerSelect');
-        var critSelect = document.querySelector('.critSelect');
         var headerInpDiv = document.querySelector('.headerInpDiv');
         var critInpDiv = document.querySelector('.critInpDiv');
         var relatedHeader = document.querySelector('.relatedHeaderDiv');
@@ -178,17 +146,26 @@
         var critGl = [];
         var headGl = Array.from(document.querySelectorAll('.gl-heads'));
 
-
         var addingHeader;
         var addingCrit;
         var headerVal;
         var critVal;
+        var indexOfSelected;
+        var lastOneSelected;
 
-
-        //This function get data from database about criterions related to given heading and paste them into table and select
+        //This function gets data from database about criterions related to given heading and paste them into table and inpuct(type=select)
         function handleClick(e) {
             var tableBody = document.getElementById('crit');
             row2.classList.remove('inactive');
+
+            //Part responsible for highlighting clicked row
+            if(indexOfSelected != null) {
+                lastOneSelected.style.backgroundColor="white";
+            }
+            e.target.style.backgroundColor='#CBE86B';
+            indexOfSelected = e.target.id;
+            lastOneSelected = document.querySelector('.tableInside td[id="' + indexOfSelected + '"]');
+
             tableBody.textContent = '';
             $.ajax({ //generate list of trainers from given location
                 type: "POST",
@@ -201,11 +178,10 @@
                 },
                 success: function(response) {
                     for(var i = 0; i < response.length; i++) {
-                        var newItem = $('<tr><td class="crits" data-id="' + response[i].id + '">' + response[i].name.replace(/_/g , " ") + '</td><td><span class="glyphicon glyphicon-minus gl-crits" data-critId="' + response[i].id + '"></span></td></tr>');
+                        var newItem = $('<tr><td class="crits" data-id="' + response[i].id + '">' + response[i].name.replace(/_/g , " ") + '</td><td><span style="font-size:2em;color:red;" class="glyphicon glyphicon-remove gl-crits" data-critId="' + response[i].id + '"></span></td></tr>');
                         var option = $('<option value="' + response[i].id + '">' + response[i].name + '</option>');
                         $('#crit').append(newItem);
                         $('#firstOption').after(option);
-
                     }
                 }
             });
@@ -213,7 +189,7 @@
 
         function critGlHandle(e) {
                 swal({
-                    title: 'Jestes pewien?',
+                    title: 'Jesteś pewien?',
                     text: "Po potwierdzeniu, brak możliwości cofnięcia zmian!",
                     type: 'warning',
                     showCancelButton: true,
@@ -239,7 +215,7 @@
 
         function headGlHandle(e) {
                 swal({
-                    title: 'Jestes pewien?',
+                    title: 'Jesteś pewien?',
                     text: "Po potwierdzeniu, brak możliwości cofnięcia zmian!",
                     type: 'warning',
                     showCancelButton: true,
@@ -251,7 +227,7 @@
                     addingHeader = false;
                     var $input = $('<input type="hidden" name="addingHeader" value="' + addingHeader + '">');
                     $('.btn-crit').after($input);
-                    var $input2 = $('<input type="hidden" name="hID" value="' + e.target.dataset.headid + '">');
+                    var $input2 = $('<input type="hidden" name="hid" value="' + e.target.dataset.headid + '">');
                     $('.btn-crit').after($input2);
                     document.querySelector('#formularz').submit();
                     swal(
@@ -261,7 +237,6 @@
                     )
                 }
             });
-
         }
 
         $( document ).ajaxComplete(function() {
@@ -270,7 +245,6 @@
         });
 
         headGl.forEach(gl => gl.addEventListener('click', headGlHandle));
-
         headers.forEach(headers => headers.addEventListener('click', handleClick));
         /**************************END FIRST STAGE******************************/
 
@@ -281,18 +255,14 @@
                 addingHeader = true;
                 rowBetween.classList.remove('inactive');
                 critInpDiv.classList.add('inactive');
-                critSelect.classList.add('inactive');
                 headerInpDiv.classList.remove('inactive');
-                headerSelect.classList.add('inactive');
                 relatedHeader.classList.add('inactive');
-                row3.classList.remove('inactive');
+                row4.classList.remove('inactive');
             }
             else if(e.target.id == 'firstHeaderDelete') {
                 addingHeader = false;
-                row3.classList.remove('inactive');
-                headerSelect.classList.remove('inactive');
+                row4.classList.remove('inactive');
                 critInpDiv.classList.add('inactive');
-                critSelect.classList.add('inactive');
                 rowBetween.classList.add('inactive');
                 relatedHeader.classList.add('inactive');
             }
@@ -300,19 +270,15 @@
             else if(e.target.id == 'firstCritAdd') {
                 addingCrit = true;
                 rowBetween.classList.remove('inactive');
-                critSelect.classList.add('inactive');
                 headerInpDiv.classList.add('inactive');
-                headerSelect.classList.add('inactive');
                 critInpDiv.classList.remove('inactive');
                 relatedHeader.classList.remove('inactive');
-                row3.classList.remove('inactive');
+                row4.classList.remove('inactive');
             }
             else if(e.target.id == 'firstCritDelete') {
                 addingCrit = false;
-                row3.classList.remove('inactive');
-                critSelect.classList.remove('inactive');
+                row4.classList.remove('inactive');
                 headerInpDiv.classList.add('inactive');
-                headerSelect.classList.add('inactive');
                 relatedHeader.classList.add('inactive');
                 rowBetween.classList.add('inactive');
             }
@@ -342,7 +308,7 @@
             }
         }
 
-        //Show/hide akceptuj button
+        //Show/hide 'akceptuj' button
         function headSelectChange(e) {
             row4.classList.remove('inactive');
             if(e.target.value == '') {
@@ -407,8 +373,6 @@
                 }
             }
         }
-
-
 
         headerSubmit.addEventListener('click', handleHeaderSubmit);
         critSubmit.addEventListener('click', handleCritSubmit);
