@@ -10,6 +10,15 @@
         .inactive {
             display: none;
         }
+
+        .glyphicon-remove {
+            transition: all 0.8s ease-in-out;
+        }
+        .glyphicon-remove:hover {
+            transform: scale(1.2) rotate(180deg);
+            cursor: pointer;
+        }
+
     </style>
 
 <div class="container-fluid">
