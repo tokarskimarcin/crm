@@ -1643,8 +1643,7 @@ class StatisticsController extends Controller
         $month = date('m');
         $year = date('Y');
         $data = $this->getCoachingData( $month, $year, (array)$dep_id);
-
-
+        $dep = Department_info::find($dep_id);
         return view('reportpage.ReportCoachingWeek')
             ->with([
                 'departments'       => $departments,
@@ -1653,6 +1652,7 @@ class StatisticsController extends Controller
                 'dep_id'            => $dep_id,
                 'months'            => $this->getMonthsNames(),
                 'month'             => $month,
+                'dep_info'               => $dep,
                 'all_coaching'      => $data['all_coaching']
                 ]);
     }
@@ -1664,8 +1664,9 @@ class StatisticsController extends Controller
 
         $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
         $directors = User::whereIn('id', $directorsIds)->get();
-
         if (intval($request->selected_dep) < 100) {
+            $dep_info = Department_info::find($request->selected_dep);
+
             $dep_id = $request->selected_dep;
             $departments = Department_info::whereIn('id_dep_type', [1, 2])->get();
             $data = $this->getCoachingData($month, $year, (array)$dep_id);
@@ -1676,6 +1677,7 @@ class StatisticsController extends Controller
                     'directors' => $directors,
                     'wiev_type' => 'department',
                     'dep_id' => $dep_id,
+                    'dep_info'               => $dep_info,
                     'months' => $this->getMonthsNames(),
                     'month' => $month,
                     'all_coaching' => $data['all_coaching']
@@ -1685,6 +1687,7 @@ class StatisticsController extends Controller
             $dirId = substr($request->selected_dep, 2);
             $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
             $departments = Department_info::where('id_dep_type', '=', 2)->get();
+            $dep_info = Department_info::find(User::find($dirId)->main_department_id);
 
             $data = $this->getCoachingData($month, $year, $director_departments->pluck('id')->toArray());
 
@@ -1693,6 +1696,7 @@ class StatisticsController extends Controller
                     'departments' => $departments,
                     'directors' => $directors,
                     'wiev_type' => 'director',
+                    'dep_info'               => $dep_info,
                     'dep_id' => $request->selected_dep,
                     'months' => $this->getMonthsNames(),
                     'month' => $month,
