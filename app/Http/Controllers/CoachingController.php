@@ -113,10 +113,15 @@ class CoachingController extends Controller
             }else{ // opcja z dyrektorem
                 $dirId = substr($request->department_info, 2);
                 $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
-                $inprogres = $inprogres->whereBetween('coaching_date',[$request->date_start .' 00:00:00',$request->date_stop.' 23:00:00'])
-                    ->where('coaching.status','=',$request->report_status)
+                $inprogres = $inprogres->whereBetween('coaching_date',[$request->date_start .' 00:00:00',$request->date_stop.' 23:00:00']);
+                if($request->report_status == 1){
+                    $inprogres = $inprogres->whereIn('coaching.status',[1,2]);
+                }else
+                {
+                    $inprogres = $inprogres->where('coaching.status','=',$request->report_status);
+                }
                     // wybrany oddział do filtracji
-                    ->whereIn('manager.department_info_id',$director_departments->pluck('id')->toArray());
+                    $inprogres = $inprogres->whereIn('manager.department_info_id',$director_departments->pluck('id')->toArray());
             }
             // wybrany trener do filtracji
             if($request->coach_id != 'Wszyscy'){
