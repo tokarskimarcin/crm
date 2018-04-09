@@ -2,7 +2,7 @@
     <thead style="color:#efd88f">
     <tr>
         <td colspan="3" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
-            <font size="6" face="Calibri">RAPORT Coaching Tygodniowo/Miesięczny {{$dep->departments->name . ' ' . $dep->department_type->name}} </font></td>
+            <font size="6" face="Calibri">RAPORT Coaching Tygodniowo/Miesięczny {{$dep_info->departments->name . ' ' . $dep_info->department_type->name}} </font></td>
     </tr>
     </thead>
 </table>
