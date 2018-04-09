@@ -297,6 +297,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/create_link','AdminController@createLinkGet');
     Route::Post('/create_link','AdminController@createLinkPost');
 
+
     Route::get('/firewall_ip', 'AdminController@firewallGet');
     Route::POST('/firewall_ip', 'AdminController@firewallPost');
 
@@ -650,7 +651,10 @@ Route::get('/editAudit', 'AdminController@editAuditGet');
 Route::post('/editAudit', 'AdminController@editAuditPost')->name('api.editAudit');
 Route::post('/editAuditPage', 'AdminController@editDatabasePost');
 
-
+//LINK GROUP
+Route::Post('/addGroup', 'AdminController@addGroup');
+Route::Post('/removeGroup', 'AdminController@removeGroup');
+//END LINK GROUP
 Route::get('/dept/{id}','ScreensController@monitorMethod');
 Route::get('/screen_table','ScreensController@screenMethod');
 //pobieranie danych po oddziałach godzinny

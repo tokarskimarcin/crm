@@ -399,6 +399,21 @@ class AdminController extends Controller
         return Redirect::back();
     }
 
+    public function addGroup(Request $request) {
+        $newGroupName = trim($request->addLinkGroup, ' ');
+        $newGroup = new LinkGroups();
+        $newGroup->name = $newGroupName;
+        $newGroup->save();
+        return Redirect::back();
+    }
+
+    public function removeGroup(Request $request) {
+        $groupID = $request->removeLinkGroup;
+        $groupToDelete = LinkGroups::where('id', '=', $groupID)->first();
+        $groupToDelete->delete();
+        return Redirect::back();
+    }
+
     public function firewallGet() {
         $firewall = Firewall::all();
 
