@@ -237,10 +237,10 @@
                     $count_weeks++;
                     $total_week_real_schedule = ($week_schedule_goal != null && $week_schedule_goal > 0) ? round(($real_week_RBH / $week_schedule_goal) * 100, 2) : 0 ;
                     $total_week_avg = ($real_week_RBH != null && $real_week_RBH > 0) ? round(($total_week_success / $real_week_RBH), 2) : 0 ;
-                    $total_week_proc_janky = ($total_week_success != null && $total_week_success > 0) ? round(($total_week_bad / $total_week_success) * 100, 2) : 0 ;
+                    $total_week_proc_janky = ($total_week_checked != null && $total_week_checked > 0) ? round(($total_week_bad / $total_week_checked) * 100, 2) : 0 ;
                     $total_week_goal_proc = ($total_week_goal != null && $total_week_goal > 0) ? round(($total_week_success / $total_week_goal) * 100, 2) : 0 ;
                     $total_goal_proc = ($total_week_success != null && $total_week_success > 0) ?  : 0 ;
-                    $total_week_sum_call_proc = ($total_week_sum_call_time != null && $total_week_sum_call_time > 0) ? round(($real_week_phone_time / $total_week_sum_call_time) * 100, 2) : 0 ;
+                   $total_week_sum_call_proc = ($real_week_RBH != null && $real_week_RBH > 0) ? round(($real_week_phone_time / $real_week_RBH) * 100, 2) : 0 ;
                 @endphp
                 <tr>
                     <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA</b></td>
