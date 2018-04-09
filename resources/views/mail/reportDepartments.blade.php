@@ -202,7 +202,7 @@
                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$dep_info->size}}</td>
                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$goal}}</td>
                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($working_hours_goal)}}</td>
-               <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->average}}</td>
+               <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ ($report->success <=0 || $real_RBH <=0)  ? 0: round($report->success/$real_RBH,2) }}</td>
                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->janky_count}} %</td>
                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->call_time}} %</td>
                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$real_schedule}} %</td>
