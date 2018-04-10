@@ -27,61 +27,66 @@
         <tbody>
 
         @php
-            $week_average = 0;
-            $week_janky_proc = 0;
-            $week_success = 0;
-            $week_call_success_proc = 0;
-            $week_pause_time = 0;
-            $week_login_time = 0;
-            $week_received_calls = 0;
-            $week_received_calls_proc = 0;
-            $week_janky_count = 0;
+                $collect_week = collect();
+                $week_average = 0;
+                $week_janky_proc = 0;
+                $week_success = 0;
+                $week_call_success_proc = 0;
+                $week_pause_time = 0;
+                $week_login_time = 0;
+                $week_received_calls = 0;
+                $week_received_calls_proc = 0;
+                $week_janky_count = 0;
 
-            $total_average = 0;
-            $total_janky_proc = 0;
-            $total_success = 0;
-            $total_pause_time = 0;
-            $total_login_time = 0;
-            $total_received_calls = 0;
-            $total_received_calls_proc = 0;
-            $total_janky_count = 0;
+                $total_average = 0;
+                $total_janky_proc = 0;
+                $total_success = 0;
+                $total_pause_time = 0;
+                $total_login_time = 0;
+                $total_received_calls = 0;
+                $total_received_calls_proc = 0;
+                $total_janky_count = 0;
         @endphp
 
         @for($i = 1; $i <= 4; $i++)
 
             @foreach($coachData as $item)
                 @php
-                    $data = $item[$i];
+                        $collect_week->push($item[$i]);
+                        $data = $item[$i];
+                        $week_success += $data['success'];
+                        $week_pause_time += $data['pause_time'];
+                        $week_login_time += $data['login_time'];
+                        $week_received_calls += $data['received_calls'];
+                        $week_janky_count += $data['total_week_yanky'];
 
-                    $week_success += $data['success'];
-                    $week_pause_time += $data['pause_time'];
-                    $week_login_time += $data['login_time'];
-                    $week_received_calls += $data['received_calls'];
-                    $week_janky_count += $data['total_week_yanky'];
-
-                    $total_success += $data['success'];
-                    $total_pause_time += $data['pause_time'];
-                    $total_login_time += $data['login_time'];
-                    $total_received_calls += $data['received_calls'];
-                    $total_janky_count += $data['total_week_yanky'];
+                        $total_success += $data['success'];
+                        $total_pause_time += $data['pause_time'];
+                        $total_login_time += $data['login_time'];
+                        $total_received_calls += $data['received_calls'];
+                        $total_janky_count += $data['total_week_yanky'];
                 @endphp
+            @endforeach
+
+            @foreach($collect_week->sortbyDESC('average') as $item)
                 <tr>
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $data['last_name'] . ' ' . $data['first_name'] }}</b></td>
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $data['average'] }}</b></td>
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $data['janky_proc'] }} %</b></td>
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $data['received_calls'] }}</b></td>
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $data['success'] }}</b></td>
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $data['proc_received_calls'] }} %</b></td>
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ sprintf('%02d:%02d:%02d', ($data['pause_time']/3600),($data['pause_time']/60%60), $data['pause_time']%60) }}</b></td>
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $data['login_time'] }} h</b></td>
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['last_name'] . ' ' . $item['first_name'] }}</b></td>
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['average'] }}</b></td>
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['janky_proc'] }} %</b></td>
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['received_calls'] }}</b></td>
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['success'] }}</b></td>
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['proc_received_calls'] }} %</b></td>
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ sprintf('%02d:%02d:%02d', ($item['pause_time']/3600),($item['pause_time']/60%60), $item['pause_time']%60) }}</b></td>
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['login_time'] }} h</b></td>
                 </tr>
             @endforeach
 
             @php
-                $week_average = ($week_success > 0) ? round(($week_success / $week_login_time), 2) : 0 ;
-                $week_received_calls_proc = ($week_received_calls > 0) ? round(($week_success / $week_received_calls) * 100 , 2) : 0 ;
-                $week_janky_proc = ($week_success > 0) ? round(($week_janky_count / $week_success) * 100, 2) : 0 ;
-                $week_janky_count = 0;
+                    $collect_week = collect();
+                   $week_average = ($week_success > 0) ? round(($week_success / $week_login_time), 2) : 0 ;
+                   $week_received_calls_proc = ($week_received_calls > 0) ? round(($week_success / $week_received_calls) * 100 , 2) : 0 ;
+                   $week_janky_proc = ($week_success > 0) ? round(($week_janky_count / $week_success) * 100, 2) : 0 ;
+                   $week_janky_count = 0;
             @endphp
             <tr>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA {{ (isset($data['first_week_day'])) ? $data['first_week_day'] : 'null' . ' - ' . (isset($data['last_week_day']) ? $data['last_week_day'] : 'null')}}</b></td>

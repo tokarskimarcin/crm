@@ -77,10 +77,10 @@
 
             @php
                 $collect_week = collect();
-            $week_average = ($week_success > 0) ? round(($week_success / $week_login_time), 2) : 0 ;
-            $week_received_calls_proc = ($week_received_calls > 0) ? round(($week_success / $week_received_calls) * 100 , 2) : 0 ;
-            $week_janky_proc = ($week_success > 0) ? round(($week_janky_count / $week_success) * 100, 2) : 0 ;
-            $week_janky_count = 0;
+                $week_average = ($week_success > 0) ? round(($week_success / $week_login_time), 2) : 0 ;
+                $week_received_calls_proc = ($week_received_calls > 0) ? round(($week_success / $week_received_calls) * 100 , 2) : 0 ;
+                $week_janky_proc = ($week_success > 0) ? round(($week_janky_count / $week_success) * 100, 2) : 0 ;
+                $week_janky_count = 0;
             @endphp
             <tr>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA {{ $data['first_week_day'] . '-' . $data['last_week_day']}}</b></td>
