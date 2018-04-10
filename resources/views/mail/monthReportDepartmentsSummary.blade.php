@@ -55,10 +55,10 @@
             $week_three_success_sum = $department[2]['data']->map(function($item) { return $item->success; });
             $week_four_success_sum = $department[3]['data']->map(function($item) { return $item->success; });
 
-            $week_one_call_time = $department[0]['data']->map(function($item) { return $item->hour_time_use * ($item->call_time / 100); });
-            $week_two_call_time = $department[1]['data']->map(function($item) { return $item->hour_time_use * ($item->call_time / 100); });
-            $week_three_call_time = $department[2]['data']->map(function($item) { return $item->hour_time_use * ($item->call_time / 100); });
-            $week_four_call_time = $department[3]['data']->map(function($item) { return $item->hour_time_use * ($item->call_time / 100); });
+            $week_one_call_time = $department[0]['data']->map(function($item) { return $item->day_time_sum * ($item->call_time / 100); });
+            $week_two_call_time = $department[1]['data']->map(function($item) { return $item->day_time_sum * ($item->call_time / 100); });
+            $week_three_call_time = $department[2]['data']->map(function($item) { return $item->day_time_sum * ($item->call_time / 100); });
+            $week_four_call_time = $department[3]['data']->map(function($item) { return $item->day_time_sum * ($item->call_time / 100); });
 
             $week_one_janky_sum = $department[0]['data']->map(function($item) { return $item->success * ($item->janky_count / 100); });
             $week_two_janky_sum = $department[1]['data']->map(function($item) { return $item->success * ($item->janky_count / 100); });
@@ -76,6 +76,7 @@
             $week_four_avg = ($week_four_time_sum->avg() > 0) ? round(($week_four_success_sum->sum() / $week_four_time_sum->sum()), 2) : 0 ;
 
             $week_one_time_call_avg = ($week_one_time_sum->sum() > 0) ? round(($week_one_call_time->sum() / $week_one_time_sum->sum() * 100), 2) : 0 ;
+
             $week_two_time_call_avg = ($week_two_time_sum->sum() > 0) ? round(($week_two_call_time->sum() / $week_two_time_sum->sum() * 100), 2) : 0 ;
             $week_three_time_call_avg = ($week_three_time_sum->sum() > 0) ? round(($week_three_call_time->sum() / $week_three_time_sum->sum() * 100), 2) : 0 ;
             $week_four_time_call_avg = ($week_four_time_sum->sum() > 0) ? round(($week_four_call_time->sum() / $week_four_time_sum->sum() * 100), 2) : 0 ;
