@@ -39,7 +39,10 @@ class AuditController extends Controller
      */
     public function ajax(Request $request) {
         $trainers = User::whereIn('user_type_id', [4,12])->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->get();
-        return $trainers;
+        $hr = User::where('user_type_id', '=', '5')->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->get();
+        $collective = User::where('user_type_id', '=', '7')->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->first();
+        $arr = array("trainers" => $trainers, "hr" => $hr, "collective" => $collective);
+        return $arr;
     }
 
 

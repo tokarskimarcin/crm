@@ -89,15 +89,21 @@
                 <div class="row second-row">
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label class="myLabel">Trener:</label>
+                            <label class="myLabel">Osoba:</label>
                             <select class="form-control" style="font-size:18px;" id="trainer" name="trainer">
-                                <option value="0" id="trainerDefaultValue">Wybierz</option>
+                                <optgroup label="Trenerzy">
+                                    <option value="0" id="trainerDefaultValue">Wybierz</option>
+                                </optgroup>
+                                <optgroup label="HRowcy" id="hrGroup">
+                                </optgroup>
+                                <optgroup label="Zbiorczy" id="collective">
+                                </optgroup>
                             </select>
                         </div>
                     </div>
                     <div class="col-md-8">
                         <div class="alert alert-info">
-                            <p style="text-align:center;font-size:1.3em;">Krok 2: Wybierz trenera z listy.</p>
+                            <p style="text-align:center;font-size:1.3em;">Krok 2: Wybierz osobę z listy.</p>
                         </div>
                     </div>
                 </div>
@@ -234,10 +240,18 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function(response) {
-                            for(var i = 0; i < response.length; i++) {
-                                var newItem = $('<option class="generatedValues" value="' + response[i].id + '">' + response[i].first_name + ' ' + response[i].last_name + '</option>');
+                            console.log(response.collective);
+                            // console.log(response.trainers.length);
+                            for(var i = 0; i < response.trainers.length; i++) {
+                                var newItem = $('<option class="generatedValues" value="' + response.trainers[i].id + '">' + response.trainers[i].first_name + ' ' + response.trainers[i].last_name + '</option>');
                                 $('#trainerDefaultValue').after(newItem);
                             }
+                            for(var j = 0; j <response.hr.length; j++) {
+                                var newItem2 = $('<option class="generatedValues" value="' + response.hr[j].id + '">' + response.hr[j].first_name + ' ' + response.hr[j].last_name + '</option>');
+                                $('#hrGroup').after(newItem2);
+                            }
+                                var newItem3 = $('<option class="generatedValues" value="' + response.collective.id + '">' + response.collective.first_name + ' ' + response.collective.last_name + '</option>');
+                                $('#collective').after(newItem3);
                         }
                     });
                     return true;

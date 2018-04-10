@@ -36,7 +36,7 @@
     <div class="row">
         <div class="panel panel-default second-panel">
             <div class="panel-heading titleOfSecondPanel">
-                <p>Audyt dla departamentu {{$infoAboutAudit['0']->department}} wypełniony przez {{$infoAboutAudit['0']->user_name}} dla trenera {{$infoAboutAudit['0']->trainer}} w {{$infoAboutAudit['0']->date_audit}}</p>
+                <p>Audyt dla departamentu {{$infoAboutAudit['0']->department}} wypełniony przez {{$infoAboutAudit['0']->user_name}}, osoba wybrana {{$infoAboutAudit['0']->trainer}} w {{$infoAboutAudit['0']->date_audit}}</p>
             </div>
             <div class="panel-body">
                 <h4>
