@@ -268,7 +268,7 @@
             }
 
             /**
-             *Function Hide first panel, show 2nd panel and sets heading for 2nd panel
+             *Function hide first panel(panel with general info) and show 2nd panel(panel with form) and sets heading for 2nd panel
              */
             var title = document.querySelector('.titleOfSecondPanel > p').firstChild;
             function handleFirstButtonClick() {
@@ -279,7 +279,7 @@
             }
 
             /**
-             * Function check whether all inputs are filled by user(validation), if positive, send form.
+             * Function checks whether all inputs are filled by user(validation), if positive, send form.
              */
             function submitHandler(e) {
                 e.preventDefault();
@@ -334,7 +334,7 @@
            fourthStep.classList.add('inactivePanel');
            secondButton.classList.add('inactivePanel');
 
-            //Select inputs of first panel
+            //Select inputs of first panel(before form appears)
            var inputDepartment = document.getElementById('department_info');
            var inputTrainer = document.getElementById('trainer');
            var inputDate = document.getElementById('date');

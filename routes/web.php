@@ -655,6 +655,9 @@ Route::post('/editAuditPage', 'AdminController@editDatabasePost');
 Route::Post('/addGroup', 'AdminController@addGroup');
 Route::Post('/removeGroup', 'AdminController@removeGroup');
 //END LINK GROUP
+//CHARTS
+Route::get('/charts', 'ScreensController@showScreensGet');
+//ENDCHARTS
 Route::get('/dept/{id}','ScreensController@monitorMethod');
 Route::get('/screen_table','ScreensController@screenMethod');
 //pobieranie danych po oddziałach godzinny
