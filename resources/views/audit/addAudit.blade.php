@@ -132,7 +132,7 @@
             </div>
             <div class="panel-body">
                 <h4>
-                    <div class="alert alert-warning"><sup>*</sup></sup>Kolumny <strong>Ilość</strong> i <strong>Jakość</strong> są obowiązkowe.</p></div>
+                    <div class="alert alert-warning"><sup>*</sup>Kolumny <strong>Ilość</strong>, <strong>Jakość</strong> i <strong>Komentarz</strong> są obowiązkowe.</p></div>
                     <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formularza zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
                 </h4>
                 @foreach($headers as $h)
@@ -144,7 +144,7 @@
                             <th class="first">Kryteria</th>
                             <th>Ilość<sup>*</sup></th>
                             <th>Jakość<sup>*</sup></th>
-                            <th>Komentarz</th>
+                            <th>Komentarz<sup>*</sup></th>
                             <th>Zdjęcia</th>
                         </tr>
                         </thead>
@@ -175,7 +175,7 @@
                             </td>
                             <td>
                                 <div class="form-group">
-                                    <input type="text" id="{{$c->name . "_comment"}}" name="{{$c->name . "_comment"}}" class="form-control" style="width:100%;">
+                                    <input type="text" id="{{$c->name . "_comment"}}" name="{{$c->name . "_comment"}}" class="form-control thirdInp" style="width:100%;">
                                 </div>
                             </td>
                             <td>
@@ -286,6 +286,7 @@
                 var everythingIsOk = true; //true = form submits, false = form doesn's submit
                 var firstInp = document.getElementsByClassName('firstInp');
                 var secondInp = document.getElementsByClassName('secondInp');
+                var thirdInp = document.getElementsByClassName('thirdInp');
 
                  //Check if every amount input is selected
                 for(var i = 0; i < firstInp.length; i++) {
@@ -306,9 +307,18 @@
                     }
                 }
 
+                if(everythingIsOk == true) {
+                    for(var k = 0; k < thirdInp.length; k++) {
+                        if(thirdInp[k].value == "" || thirdInp[k].value == null) {
+                            everythingIsOk = false;
+                            break;
+                        }
+                    }
+                }
+
                 //Validation of required inputs
                 if(everythingIsOk != true) {
-                    swal('Wypełnij wszystkie pola w kolumnach "Ilość" i "Jakość"');
+                    swal('Wypełnij wszystkie pola w kolumnach "Ilość", "Jakość" i "Komentarz"');
                 }
 
                 if(everythingIsOk == true) {

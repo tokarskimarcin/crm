@@ -40,7 +40,7 @@
             </div>
             <div class="panel-body">
                 <h4>
-                    <div class="alert alert-warning"><sup>*</sup></sup>Kolumny <strong>Ilość</strong> i <strong>Jakość</strong> są obowiązkowe.</p></div>
+                    <div class="alert alert-warning"><sup>*</sup>Kolumny <strong>Ilość</strong>, <strong>Jakość</strong> i <strong>Komentarz</strong> są obowiązkowe.</p></div>
                     <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formularza zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
                 </h4>
                 @foreach($headers as $h)
@@ -51,7 +51,7 @@
                                 <th class="first">Kryteria</th>
                                 <th>Ilość<sup>*</sup></th>
                                 <th>Jakość<sup>*</sup></th>
-                                <th>Komentarz</th>
+                                <th>Komentarz<sup>*</sup></th>
                                 <th>Zdjęcia</th>
                                 <th>Załączniki</th>
                             </tr>
@@ -93,9 +93,9 @@
                                                 @foreach($audit_info as $a)
                                                     @if($c->id == $a->audit_criterion_id)
                                                         @if(isset($a->comment))
-                                                        <input type="text" id="{{$c->name . "_comment"}}" name="{{$c->name . "_comment"}}" class="form-control" style="width:100%;" value="{{$a->comment}}">
+                                                        <input type="text" id="{{$c->name . "_comment"}}" name="{{$c->name . "_comment"}}" class="form-control thirdInp" style="width:100%;" value="{{$a->comment}}">
                                                         @else
-                                                        <input type="text" id="{{$c->name . "_comment"}}" name="{{$c->name . "_comment"}}" class="form-control" style="width:100%;" value="">
+                                                        <input type="text" id="{{$c->name . "_comment"}}" name="{{$c->name . "_comment"}}" class="form-control thirdInp" style="width:100%;" value="">
                                                         @endif
                                                     @endif
                                                 @endforeach
@@ -155,6 +155,7 @@
             var everythingIsOk = true; //true = form submits, false = form doesn't submit
             var firstInp = document.getElementsByClassName('firstInp');
             var secondInp = document.getElementsByClassName('secondInp');
+            var thirdInp = document.getElementsByClassName('thirdInp');
 
             /**
              * Check if every "amount" input is selected
@@ -178,9 +179,18 @@
                 }
             }
 
+            if(everythingIsOk == true) {
+                for(var k = 0; k < thirdInp.length; k++) {
+                    if(thirdInp[k].value == null || thirdInp[k].value == '') {
+                        everythingIsOk = false;
+                        break;
+                    }
+                }
+            }
+
             //Validation of required inputs
             if(everythingIsOk != true) {
-                swal('Wypełnij wszystkie pola w kolumnach "Ilość" i "Jakość"');
+                swal('Wypełnij wszystkie pola w kolumnach "Ilość", "Jakość" i "Komentarz"');
             }
 
             if(everythingIsOk == true) {
