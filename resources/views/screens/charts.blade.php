@@ -53,23 +53,46 @@
             //     left: 30,
             //     top: 30
             // },
-            fontSize: 23,
+            fontSize: 24,
             fontName: "Tahoma",
             series: {
                 0: {lineDashStyle: [2, 2, 20, 2, 20,2]}
             },
             colors: ['#1A1567'],
             hAxis: {
-                minorGridlines: {count: 10}
+                minorGridlines: {count: 5},
+                textStyle: {
+                    bold: true,
+                    fontSize: 27
+                }
             },
             vAxis: {
-                gridlines: {count: 8}
+                gridlines: {count: 6},
+                maxValue: 6,
+                minValue: 0,
+                textStyle: {
+                    bold: true,
+                    fontSize: 32
+                }
             },
             titleTextStyle: {
                 color: "#C21A01",
-                fontSize: 40
+                fontSize: 70
+            },
+            viewWindowMode:'explicit',
+            viewWindow:{
+                max:6,
+                min:0
+            },
+            annotations: {
+                textStyle: {
+                    fontSize: 32,
+                    color: "black",
+                    bold: true
+                }
             }
-            // width: 1700
+
+                    // width: 1700
         };
 
         var chart = new google.visualization.LineChart(document.getElementById('my_chart'));
