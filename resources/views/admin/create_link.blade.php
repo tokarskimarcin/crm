@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
            showCancelButton: true,
            confirmButtonColor: '#3085d6',
            cancelButtonColor: '#d33',
-           confirmButtonText: 'Usuń!'
+           confirmButtonText: 'Dodaj!'
        }).then((result) => {
            if (result.value) {
            document.querySelector('#addGroupForm').submit();

@@ -147,14 +147,17 @@
         var submitButton = document.getElementById('secondButton');
         submitButton.addEventListener('click', submitHandler);
 
+        /**
+         * Event Listener function responsible for submiting form.
+         */
         function submitHandler(e) {
             e.preventDefault();
-            var everythingIsOk = true; //true = form submits, false = form doesn's submit
+            var everythingIsOk = true; //true = form submits, false = form doesn't submit
             var firstInp = document.getElementsByClassName('firstInp');
             var secondInp = document.getElementsByClassName('secondInp');
 
             /**
-             * Check if every amount input is selected
+             * Check if every "amount" input is selected
              */
             for(var i = 0; i < firstInp.length; i++) {
                 if(firstInp[i].value == 0) {
@@ -164,7 +167,7 @@
             }
 
             /**
-             * check if every quality input is selected
+             * check if every "quality" input is selected
              */
             if(everythingIsOk == true) {
                 for(var j = 0; j < secondInp.length; j++) {
@@ -186,7 +189,7 @@
 
         }
 
-        //THIS PART HIDES ALL HEADERS WHICH ARE ACTUALLY AVAILABLE BUT WERE NOT USE IN GIVEN AUDIT
+        //THIS PART HIDES ALL HEADERS WHICH ARE AVAILABLE AT THE MOMENT BUT WERE NOT AVAILABLE WHEN AUDIT WAS ADDED
         var allTables = document.getElementsByClassName('table');
         for(var i = 0; i < allTables.length; i++) {
             if(allTables[i].lastElementChild.childElementCount === 0) {
