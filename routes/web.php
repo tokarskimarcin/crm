@@ -297,6 +297,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/create_link','AdminController@createLinkGet');
     Route::Post('/create_link','AdminController@createLinkPost');
 
+
     Route::get('/firewall_ip', 'AdminController@firewallGet');
     Route::POST('/firewall_ip', 'AdminController@firewallPost');
 
@@ -635,6 +636,28 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 });
 //////////////////////Testing ORM///////////////
 ///
+///
+Route::get('/addAudit', 'AuditController@auditMethodGet');
+Route::post('/addAudit', 'AuditController@ajax')->name('api.ajax');
+Route::post('/handleForm', 'AuditController@handleFormPost');
+
+Route::get('/showAudits', 'AuditController@showAuditsGet');
+Route::post('/showAudits', 'AuditController@showAuditsPost')->name('api.auditTable');
+
+Route::get('/audit/{id}', 'AuditController@editAuditGet');
+Route::post('/handleEdit', 'AuditController@editAuditPost');
+
+Route::get('/editAudit', 'AdminController@editAuditGet');
+Route::post('/editAudit', 'AdminController@editAuditPost')->name('api.editAudit');
+Route::post('/editAuditPage', 'AdminController@editDatabasePost');
+
+//LINK GROUP
+Route::Post('/addGroup', 'AdminController@addGroup');
+Route::Post('/removeGroup', 'AdminController@removeGroup');
+//END LINK GROUP
+//CHARTS
+Route::get('/charts', 'ScreensController@showScreensGet');
+//ENDCHARTS
 Route::get('/dept/{id}','ScreensController@monitorMethod');
 Route::get('/screen_table','ScreensController@screenMethod');
 //pobieranie danych po oddziałach godzinny

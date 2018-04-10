@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\AuditCriterions;
+use App\AuditHeaders;
 use App\Department_info;
 use App\Department_types;
 use App\Departments;
@@ -397,6 +399,21 @@ class AdminController extends Controller
         return Redirect::back();
     }
 
+    public function addGroup(Request $request) {
+        $newGroupName = trim($request->addLinkGroup, ' ');
+        $newGroup = new LinkGroups();
+        $newGroup->name = $newGroupName;
+        $newGroup->save();
+        return Redirect::back();
+    }
+
+    public function removeGroup(Request $request) {
+        $groupID = $request->removeLinkGroup;
+        $groupToDelete = LinkGroups::where('id', '=', $groupID)->first();
+        $groupToDelete->delete();
+        return Redirect::back();
+    }
+
     public function firewallGet() {
         $firewall = Firewall::all();
 
@@ -564,5 +581,57 @@ class AdminController extends Controller
             return 1;
         }
     }
+
+    public function editAuditGet() {
+        $headers = AuditHeaders::all();
+        return view('admin.editAudit')->with('headers', $headers);
+    }
+
+    public function editAuditPost(Request $request) {
+        $criterions = AuditCriterions::where('audit_header_id', '=', $request->header_id)->where('status', '=', '1')->get();
+        return $criterions;
+    }
+
+    public function editDatabasePost(Request $request) {
+        $addingHeader = $request->addingHeader;
+        $addingCrit = $request->addingCrit;
+
+        if($addingCrit == "true") {
+            $newName = mb_strtolower(str_replace(' ', '_', trim($request->newCritName, ' ')), 'UTF-8');
+            $newCriterium = new AuditCriterions();
+            $newCriterium->name = $newName;
+            $newCriterium->audit_header_id = $request->relatedHeader;
+            $newCriterium->status = 1;
+            $newCriterium->save();
+        }
+
+        else if($addingCrit == "false") {
+            $critToRemove = AuditCriterions::where('id', '=', $request->cID)->first();
+            $critToRemove->status = 0;
+            $critToRemove->save();
+        }
+
+        else if($addingHeader == "true") {
+            $newName = mb_strtolower(trim($request->newHeaderName, ' '), 'UTF-8');
+            $newHeader = new AuditHeaders();
+            $newHeader->name = $newName;
+            $newHeader->status = 1;
+            $newHeader->save();
+        }
+        else if($addingHeader == "false") {
+            $headerToRemove = AuditHeaders::where('id', '=', $request->hid)->first();
+            $relatedCriterions = AuditCriterions::where('audit_header_id', '=', $request->hid)->where('status', '=', '1')->get();
+            $headerToRemove->status = 0;
+            $headerToRemove->save();
+            foreach($relatedCriterions as $rC) {
+                $rC->status = 0;
+                $rC->save();
+            }
+        }
+        return Redirect::to('editAudit');
+    }
+
+
+
 
 }
