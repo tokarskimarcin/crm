@@ -108,7 +108,7 @@ class ScreensController extends Controller
 
     public function showScreensGet() {
         $today = date("Y-m-d"); //2000-10-11
-        $reportData = HourReport::where('report_date', '=', "2018-03-28")->get();
+        $reportData = HourReport::where('report_date', '=', $today)->get();
         $department_info = Department_info::where('id_dep_type', '=', '2')->get();
         return view('screens.charts')->with('reportData', $reportData)->with('department_info', $department_info);
     }

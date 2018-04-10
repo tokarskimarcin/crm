@@ -22,6 +22,13 @@
     var stringVariable; //this variable contains string of hour
     var depName; //this variable contains name of given department
 
+    var successBefore = null;
+    var successAfter;
+    var useBefore = null;
+    var useAfter;
+    var realAverageValue;
+    var adnotation;
+
     @foreach($department_info as $department_i)
         @foreach($reportData as $reportD)
             @if($department_i->id == $reportD->department_info_id)
@@ -30,16 +37,38 @@
                 depName = "{{$department_i->departments->name}} " + "{{$department_i->department_type->name}}";
                 nameOfDepartment.push(depName);
             }
+
             stringVariable ="{{$reportD->hour}}";
             stringVariable = stringVariable.slice(0,5);
-            data1.push([stringVariable, parseFloat({{$reportD->average}}), "{{$reportD->average}}"]);
+
+            successAfter = parseFloat({{$reportD->success}});
+            useAfter = parseFloat({{$reportD->hour_time_use}});
+            if(successBefore === null || useBefore === null) {
+                data1.push([stringVariable, parseFloat({{$reportD->average}}), "{{$reportD->average}}"]);
+            }
+            else{
+                realAverageValue = Math.round(100 *((successAfter - successBefore) / (useAfter - useBefore)))/100;
+                if((successAfter - successBefore) > 0 && (useAfter - useBefore) > 0) {
+                    console.log('realAverageValue: ' + realAverageValue);
+                    adnotation = realAverageValue + '';
+                    data1.push([stringVariable, realAverageValue, adnotation]);
+                }
+            }
+
+            successBefore = successAfter;
+            useBefore  = useAfter;
             @endif
          @endforeach
                     if(data1.length != 1) {
-                    data2.push(data1);
+                        data2.push(data1);
+                        data1 = [];
+                    }
                     data1 = [];
-            }
-            data1 = [];
+                    successAfter = 1;
+                    useAfter = 1;
+                    successBefore = null;
+                    useBefore = null;
+                    adnotation = '';
     @endforeach
 
     function drawChart() {
@@ -91,8 +120,6 @@
                     bold: true
                 }
             }
-
-                    // width: 1700
         };
 
         var chart = new google.visualization.LineChart(document.getElementById('my_chart'));
