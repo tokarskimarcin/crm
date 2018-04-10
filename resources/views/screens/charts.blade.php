@@ -44,7 +44,7 @@
 
     function drawChart() {
         var data = google.visualization.arrayToDataTable(data2[i]);
-        i++;
+
         var options = {
             title: nameOfDepartment[i],
             lineWidth: 8,
@@ -74,12 +74,13 @@
 
         var chart = new google.visualization.LineChart(document.getElementById('my_chart'));
         chart.draw(data, options);
+        i++;
     }
 
-    setInterval(myfunc, 4000);
+    setInterval(myfunc, 10000);
     function myfunc() {
         drawChart();
-        if(i > data2.length) {
+        if(i == data2.length) {
             i = 0;
         }
     }
