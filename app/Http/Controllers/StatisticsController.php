@@ -1808,7 +1808,7 @@ class StatisticsController extends Controller
         $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
         $directors = User::whereIn('id', $directorsIds)->get();
 
-        $dep_id = $departments->first()->id;
+        $dep_id =  Auth::user()->department_info_id;//$departments->first()->id;
 
         $data = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep_id, $days_in_month);
 
@@ -2094,7 +2094,11 @@ class StatisticsController extends Controller
                     foreach ($rbh_departments as $rbh_department)
                     {
                         $sigle_hour_report = $reports->where('department_info_id','=',$rbh_department->department_info_id);
-                        $total_hour_time_use += round(($sigle_hour_report->first()->call_time * ($rbh_department->time_sum/3600)) / 100, 2);
+
+                        if(!$sigle_hour_report->isEmpty()){
+                            $total_hour_time_use += round(($sigle_hour_report->first()->call_time * ($rbh_department->time_sum/3600)) / 100, 2);
+                            }
+
                     }
                     $tempReport->hour_time_use += $total_hour_time_use;//floatval($item->hour_time_use);
                     $tempReport->total_time += floatval($item->hour_time_use);//($item->call_time > 0) ? ((100 * $item->hour_time_use) / $item->call_time) : 0 ;
