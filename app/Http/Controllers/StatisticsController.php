@@ -1889,7 +1889,6 @@ class StatisticsController extends Controller
                     'wiev_type'         => 'director',
                     'directors'         => $directors
                 ]);
-            dd('Nie mam Pojęcia');
         } else { // Zbiorczy Raport Dyrektorów
             $dirId = substr($request->selected_dep, 2);
             $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
