@@ -3218,6 +3218,21 @@ class StatisticsController extends Controller
             })
             ->get();
 
+        $janky = DB::table('pbx_dkj_team')
+            ->select(DB::raw('
+                pbx_dkj_team.*
+            '))
+            ->whereIn('id', function($query) use ($data_start, $data_stop, $department) {
+                $query->select(DB::raw('
+                        MAX(id) as id
+                    '))
+                    ->from('pbx_dkj_team')
+                    ->whereBetween('report_date', [$data_start, $data_stop])
+                    ->groupBy('report_date')
+                    ->where('department_info_id', '=', $department);
+            })
+            ->get();
+
         $work_time = DB::table('work_hours')
             ->select(DB::raw('
                 work_hours.date as date,
@@ -3230,12 +3245,14 @@ class StatisticsController extends Controller
             ->groupBy('work_hours.date')
             ->get();
 
-        $data = $hour_reports->map(function($item) use ($work_time) {
+        $data = $hour_reports->map(function($item) use ($work_time,$janky) {
             $day_work = $work_time->where('date', '=', $item->report_date)->first();
+            $day_janky = $janky->where('report_date', '=', $item->report_date)->first();
             $item->day_time_sum = (is_object($day_work)) ? $day_work->day_sum : 0 ;
+            $item->janky_count_all_check = (is_object($day_janky)) ? $day_janky->count_all_check : 0 ;
+            $item->count_bad_check = (is_object($day_janky)) ? $day_janky->count_bad_check : 0 ;
             return $item;
         });
-
         return [
             'data_start' => $data_start,
             'data_stop' => $data_stop,
