@@ -60,15 +60,21 @@
             $week_three_call_time = $department[2]['data']->map(function($item) { return $item->day_time_sum * ($item->call_time / 100); });
             $week_four_call_time = $department[3]['data']->map(function($item) { return $item->day_time_sum * ($item->call_time / 100); });
 
-            $week_one_janky_sum = $department[0]['data']->map(function($item) { return $item->success * ($item->janky_count / 100); });
-            $week_two_janky_sum = $department[1]['data']->map(function($item) { return $item->success * ($item->janky_count / 100); });
-            $week_three_janky_sum = $department[2]['data']->map(function($item) { return $item->success * ($item->janky_count / 100); });
-            $week_four_janky_sum = $department[3]['data']->map(function($item) { return $item->success * ($item->janky_count / 100); });
+            $week_one_janky_check_sum = $department[0]['data']->map(function($item) { return $item->janky_count_all_check; });
+            $week_two_janky_check_sum = $department[1]['data']->map(function($item) { return $item->janky_count_all_check; });
+            $week_three_janky_check_sum = $department[2]['data']->map(function($item) { return $item->janky_count_all_check; });
+            $week_four_janky_check_sum = $department[3]['data']->map(function($item) { return $item->janky_count_all_check; });
 
-            $week_one_janky_proc = ($week_one_success_sum->sum() > 0) ? round(($week_one_janky_sum->sum() / $week_one_success_sum->sum()) * 100, 2) : 0 ;
-            $week_two_janky_proc = ($week_two_success_sum->sum() > 0) ? round(($week_two_janky_sum->sum() / $week_two_success_sum->sum()) * 100, 2) : 0 ;
-            $week_three_janky_proc = ($week_three_success_sum->sum() > 0) ? round(($week_three_janky_sum->sum() / $week_three_success_sum->sum()) * 100, 2) : 0 ;
-            $week_four_janky_proc = ($week_four_success_sum->sum() > 0) ? round(($week_four_janky_sum->sum() / $week_four_success_sum->sum()) * 100, 2) : 0 ;
+            $week_one_janky_bad_sum = $department[0]['data']->map(function($item) { return $item->count_bad_check; });
+            $week_two_janky_bad_sum = $department[1]['data']->map(function($item) { return $item->count_bad_check; });
+            $week_three_janky_bad_sum = $department[2]['data']->map(function($item) { return $item->count_bad_check; });
+            $week_four_janky_bad_sum = $department[3]['data']->map(function($item) { return $item->count_bad_check; });
+
+            $week_one_janky_proc = ($week_one_janky_check_sum->sum() > 0) ? round(($week_one_janky_bad_sum->sum() * 100)/$week_one_janky_check_sum->sum(), 2) : 0 ;
+            $week_two_janky_proc = ($week_two_janky_check_sum->sum() > 0) ? round(($week_two_janky_bad_sum->sum() * 100)/$week_two_janky_check_sum->sum(), 2) : 0 ;
+            $week_three_janky_proc = ($week_three_janky_check_sum->sum() > 0) ? round(($week_three_janky_bad_sum->sum() * 100)/$week_three_janky_check_sum->sum(), 2) : 0 ;
+            $week_four_janky_proc = ($week_four_janky_check_sum->sum() > 0) ? round(($week_four_janky_bad_sum->sum() * 100)/$week_four_janky_check_sum->sum(), 2) : 0 ;
+
 
             $week_one_avg = ($week_one_time_sum->avg() > 0) ? round(($week_one_success_sum->sum() / $week_one_time_sum->sum()), 2) : 0 ;
             $week_two_avg = ($week_two_time_sum->avg() > 0) ? round(($week_two_success_sum->sum() / $week_two_time_sum->sum()), 2) : 0 ;
@@ -93,9 +99,14 @@
             $month_sum_call_time = $month_sum_call_time->merge($week_three_call_time);
             $month_sum_call_time = $month_sum_call_time->merge($week_four_call_time);
 
-            $month_sum_janky = $week_one_janky_sum->merge($week_two_janky_sum);
-            $month_sum_janky = $month_sum_janky->merge($week_three_janky_sum);
-            $month_sum_janky = $month_sum_janky->merge($week_four_janky_sum);
+            $month_sum_janky = $week_one_janky_check_sum->merge($week_two_janky_check_sum);
+            $month_sum_janky = $month_sum_janky->merge($week_three_janky_check_sum);
+            $month_sum_janky = $month_sum_janky->merge($week_four_janky_check_sum);
+
+            $month_sum_janky_bad = $week_one_janky_bad_sum->merge($week_two_janky_bad_sum);
+            $month_sum_janky_bad = $month_sum_janky_bad->merge($week_three_janky_bad_sum);
+            $month_sum_janky_bad = $month_sum_janky_bad->merge($week_four_janky_bad_sum);
+
 
             $month_avg = ($month_sum_rbh->sum() > 0) ? round($month_sum_success->sum() / $month_sum_rbh->sum(), 2) : 0 ;
             $month_call_time_avg = ($month_sum_rbh->sum() > 0) ? round(($month_sum_call_time->sum() / $month_sum_rbh->sum()) * 100, 2) : 0 ;
@@ -123,7 +134,7 @@
             $week_four_goal_proc = ($week_goals[3] > 0) ? round(($week_four_success_sum->sum() / $week_goals[3]) * 100, 2) : 0 ;
             $month_goal_proc = ($week_goals->sum() > 0) ? round(($month_sum_success->sum() / $week_goals->sum()) * 100, 2) : 0 ;
 
-            $month_janky_proc = ($month_sum_success->sum() > 0) ? round(($month_sum_janky->sum() / $month_sum_success->sum()) * 100, 2) : 0 ;
+            $month_janky_proc = ($month_sum_janky->sum() > 0) ? round(($month_sum_janky_bad->sum()*100) / $month_sum_janky->sum(), 2) : 0 ;
 
 
 
