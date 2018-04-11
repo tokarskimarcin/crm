@@ -58,8 +58,9 @@
             </div>
             <div class="panel-body">
                 <h4>
-                    <div class="alert alert-warning"><sup>*</sup>Kolumny <strong>Ilość</strong>, <strong>Jakość</strong> i <strong>Komentarz</strong> są obowiązkowe.</p></div>
+                    <div class="alert alert-warning"><p><sup>*</sup>Kolumny <strong>Ilość</strong>, <strong>Jakość</strong> i <strong>Komentarz</strong> są obowiązkowe.</p></div>
                     <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formularza zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
+                    <div class="alert alert-info"><p>Załączniki mogą być <i>tylko</i> w formatach: <strong>.pdf</strong> <strong>.jpg</strong> <strong>.jpeg</strong> <strong>.png</strong></p></div>
                 </h4>
                 @foreach($headers as $h)
                     {{--*****************************************ZMIENIC JAKOS 1 NA ZMIENNA ************************--}}
@@ -79,7 +80,7 @@
                         <div class="well well-sm"><p style="text-align:center;font-weight:bold;font-size:1.1em;">{{ucwords($h->name)}}</p></div>
                         @foreach($criterion as $c)
                             @if($c->audit_header_id == $h->id)
-                                @if($c->status == 1)
+                                @if($c->status == $templateType)
                         <tr>
                             <td class="first">{{ucwords(str_replace('_',' ',$c->name))}}</td>
                             <td>
@@ -127,7 +128,8 @@
             <input class="btn btn-success btn-block" type="submit" id="secondButton" value="Zapisz audyt!" style="margin-bottom:1em;">
             <input type="hidden" name="trainer" value="{{$trainerID}}">
             <input type="hidden" name="department_info" value="{{$department_info}}">
-            <input type="hidden" name="date_audit" value="{{$date_audit}}">
+            <input type="hidden" name="date" value="{{$date_audit}}">
+            <input type="hidden" name="templateType" value="{{$templateType}}">
         </div>
     </div>
     </form>

@@ -39,7 +39,7 @@
 
                 <div class="panel-body">
                     <div class="alert alert-info firstClick">Po naciśnięciu na dowolny nagłówek uzyskasz podgląd powiązanych kryteriów i uzyskasz możliwość dodawania.</div>
-                    <form action="editAuditPage" method="post" id="formularz">
+                    <form action="{{URL::to('/editAuditPage')}}" method="post" id="formularz">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <div class="row row1">
                         <div class="col-md-6">
@@ -52,7 +52,7 @@
                                 </thead>
                                 <tbody class="tableInside">
                                 @foreach($headers as $h)
-                                    @if($h->status == 1)
+                                    @if($h->status == $status)
                                     <tr>
                                         <td id="{{$h->id}}" class="headers">{{$h->name}}</td>
                                         <td><span class="glyphicon glyphicon-remove gl-heads"  style="font-size:2em;color:red;" data-headid="{{$h->id}}"></span></td>
@@ -102,7 +102,7 @@
                                     <select name="relatedHeader" class="form-control headerRelated" style="margin-top:1em;" id="selectRelatedHeader">
                                         <option value="0">Wybierz</option>
                                         @foreach($headers as $h)
-                                            @if($h->status == 1)
+                                            @if($h->status == $status)
                                             <option value="{{$h->id}}">{{$h->name}}</option>
                                             @endif
                                         @endforeach
@@ -118,6 +118,7 @@
                                 <button class="btn btn-info btn-crit" type="submit" style="margin:1em;">Akceptuj</button>
                             </div>
                         </div>
+                        <input type="hidden" name="status" value="{{$status}}">
                     </form>
                 </div>
             </div>
@@ -191,7 +192,8 @@
                 type: "POST",
                 url: '{{ route('api.editAudit') }}',
                 data: {
-                    "header_id": e.target.id
+                    "header_id": e.target.id,
+                    "status": {{$status}}
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

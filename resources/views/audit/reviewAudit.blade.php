@@ -40,8 +40,9 @@
             </div>
             <div class="panel-body">
                 <h4>
-                    <div class="alert alert-warning"><sup>*</sup>Kolumny <strong>Ilość</strong>, <strong>Jakość</strong> i <strong>Komentarz</strong> są obowiązkowe.</p></div>
+                    <div class="alert alert-warning"><p><sup>*</sup>Kolumny <strong>Ilość</strong>, <strong>Jakość</strong> i <strong>Komentarz</strong> są obowiązkowe.</p></div>
                     <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formularza zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
+                    <div class="alert alert-info"><p>Załączniki mogą być <i>tylko</i> w formatach: <strong>.pdf</strong> <strong>.jpg</strong> <strong>.jpeg</strong> <strong>.png</strong></p></div>
                 </h4>
                 @foreach($headers as $h)
                     <div class="table-responsive">

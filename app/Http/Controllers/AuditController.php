@@ -46,7 +46,7 @@ class AuditController extends Controller
         $user = Auth::user();
         $templateType = $request->template;
         $headers = AuditHeaders::all(); //there was where(status = 1)
-        $criterion = AuditCriterions::where('status', '=', '1')->get();
+        $criterion = AuditCriterions::where('status', '=', $templateType)->get();
 
         /*Fil "audit" table*/
 //        $newForm->user_id = $user->id;
@@ -81,6 +81,7 @@ class AuditController extends Controller
     public function handleFormPost(Request $request) {
         $newForm = new Audit();
         $user = Auth::user();
+        $template = $request->templateType;
 
         /*Fil "audit" table*/
         $newForm->user_id = $user->id;
@@ -92,8 +93,9 @@ class AuditController extends Controller
         $fileCatalog = "auditFiles";
         $suffix = '';
 
+
         /*fill "audit_info" table*/
-        $criterions = AuditCriterions::where('status', '=', '1')->get();
+        $criterions = AuditCriterions::where('status', '=', $template)->get();
         foreach($criterions as $c) {
             $nameAmount = $c->name . "_amount";
             $nameQuality = $c->name . "_quality";
