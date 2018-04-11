@@ -52,11 +52,9 @@
                                 value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
                             @endforeach
                         </optgroup>
-                        @if(Auth::user()->id == 1364)
                             <optgroup label="Suma oddziałów">
                                 <option @if($dep_id == 100001) selected @endif value="100001">Suma oddziałów</option>
                             </optgroup>
-                        @endif
                     </select>
                     @else
                         <select class="form-control" name="selected_dep">
