@@ -106,6 +106,9 @@ class ScreensController extends Controller
         return $arr;
     }
 
+    /**
+     * THis method return necesary data for displaying charts
+     */
     public function showScreensGet() {
         $today = date("Y-m-d"); //2000-10-11
         $reportData = HourReport::where('report_date', '=', $today)->get();
