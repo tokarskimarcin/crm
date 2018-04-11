@@ -638,8 +638,11 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 ///
 ///
 Route::get('/addAudit', 'AuditController@auditMethodGet');
-Route::post('/addAudit', 'AuditController@ajax')->name('api.ajax');
-Route::post('/handleForm', 'AuditController@handleFormPost');
+Route::post('/add', 'AuditController@ajax')->name('api.ajax');
+
+Route::post('/addAudit', 'AuditController@auditMethodPost');
+
+//Route::post('/handleForm', 'AuditController@handleFormPost');
 
 Route::get('/showAudits', 'AuditController@showAuditsGet');
 Route::post('/showAudits', 'AuditController@showAuditsPost')->name('api.auditTable');

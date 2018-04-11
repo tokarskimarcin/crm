@@ -7,6 +7,7 @@ use App\AuditCriterions;
 use App\AuditEdit;
 use App\AuditHeaders;
 use App\AuditInfo;
+use App\AuditStatus;
 use App\Department_info;
 use App\User;
 use App\AuditFiles;
@@ -28,10 +29,39 @@ class AuditController extends Controller
      */
     public function auditMethodGet() {
         $dept = Department_info::all();
-        $headers = AuditHeaders::where('status', '=', '1')->get();
+        $headers = AuditHeaders::all(); //there was where(status = 1)
+        $criterion = AuditCriterions::where('status', '=', '1')->get();
+        $templates = AuditStatus::all();
+
+        return view('audit.addAudit')
+            ->with('dept', $dept)
+            ->with('headers', $headers)
+            ->with('criterion', $criterion)
+            ->with('templates', $templates);
+    }
+
+
+    public function auditMethodPost(Request $request) {
+//        $newForm = new Audit();
+        $user = Auth::user();
+        $templateType = $request->template;
+        $headers = AuditHeaders::all(); //there was where(status = 1)
         $criterion = AuditCriterions::where('status', '=', '1')->get();
 
-        return view('audit.addAudit')->with('dept', $dept)->with('headers', $headers)->with('criterion', $criterion);
+        /*Fil "audit" table*/
+//        $newForm->user_id = $user->id;
+//        $newForm->trainer_id = $request->trainer;
+//        $newForm->department_info_id = $request->department_info;
+//        $newForm->date_audit = $request->date;
+//        $newForm->save();
+
+        return view('audit.newAudit')
+            ->with('templateType', $templateType)
+            ->with('headers', $headers)
+            ->with('trainerID', $request->trainer)
+            ->with('department_info', $request->department_info)
+            ->with('date_audit', $request->date)
+            ->with('criterion', $criterion);
     }
 
     /**
@@ -44,7 +74,6 @@ class AuditController extends Controller
         $arr = array("trainers" => $trainers, "hr" => $hr, "collective" => $collective);
         return $arr;
     }
-
 
     /**
      * Save newly created audit to database (audit) and (audit_info)

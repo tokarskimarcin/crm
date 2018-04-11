@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    <form action="{{URL::to('/handleForm')}}" method="POST" id="auditForm" enctype="multipart/form-data">
+    <form action="{{URL::to('/addAudit')}}" method="POST" id="auditForm" enctype="multipart/form-data">
 
     <div class="row">
         <div class="panel panel-default panel-primary first-panel">
@@ -107,6 +107,26 @@
                         </div>
                     </div>
                 </div>
+                <div class="row rowBetweenSecondAndThird">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="template">Rodzaj formularza</label>
+                            <select name="template" id="template" class="form-control">
+                                <option value="0" id="templateDefaultValue">Wybierz</option>
+                                @foreach($templates as $template)
+                                    @if($template->id != '0')
+                                        <option value="{{$template->id}}">{{$template->name}}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="alert alert-info">
+                            <p style="text-align:center;font-size:1.3em;">Krok 3: Wybierz rodzaj formularza</p>
+                        </div>
+                    </div>
+                </div>
                 <div class="row third-row">
                     <div class="col-md-4">
                         <div class="form-group">
@@ -119,91 +139,16 @@
                     </div>
                     <div class="col-md-8">
                         <div class="alert alert-info">
-                            <p style="text-align:center;font-size:1.3em;">Krok 3: Wybierz datę audytu a następnie naciśnij przycisk "Generuj raport".</p>
+                            <p style="text-align:center;font-size:1.3em;">Krok 4: Wybierz datę audytu a następnie naciśnij przycisk "Generuj raport".</p>
                         </div>
                     </div>
                 </div>
                 <div class="row fourth-row">
                     <div class="col-md-12">
-                        <input class="btn btn-info btn-block" type="button" id="firstButton" value="Generuj raport">
+                        <input class="btn btn-info btn-block" type="submit" id="firstButton" value="Generuj raport">
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="panel panel-default second-panel">
-            <div class="panel-heading titleOfSecondPanel">
-                <p>Nazwa drugiego panelu</p>
-            </div>
-            <div class="panel-body">
-                <h4>
-                    <div class="alert alert-warning"><sup>*</sup>Kolumny <strong>Ilość</strong>, <strong>Jakość</strong> i <strong>Komentarz</strong> są obowiązkowe.</p></div>
-                    <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formularza zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
-                </h4>
-                @foreach($headers as $h)
-                    @if($h->status == 1)
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th class="first">Kryteria</th>
-                            <th>Ilość<sup>*</sup></th>
-                            <th>Jakość<sup>*</sup></th>
-                            <th>Komentarz<sup>*</sup></th>
-                            <th>Zdjęcia</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <div class="well well-sm"><p style="text-align:center;font-weight:bold;font-size:1.1em;">{{ucwords($h->name)}}</p></div>
-                        @foreach($criterion as $c)
-                            @if($c->audit_header_id == $h->id)
-                                @if($c->status == 1)
-                        <tr>
-                            <td class="first">{{ucwords(str_replace('_',' ',$c->name))}}</td>
-                            <td>
-                                <div class="form-group">
-                                    <select class="form-control firstInp" style="font-size:18px;" id="{{$c->name . "_amount"}}" name="{{$c->name . "_amount"}}">
-                                        <option value="0">--</option>
-                                        <option value="1">Tak</option>
-                                        <option value="2">Nie</option>
-                                    </select>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="form-group">
-                                    <select class="form-control secondInp" style="font-size:18px;" id="{{$c->name . "_quality"}}" name="{{$c->name . "_quality"}}">
-                                        <option value="0">--</option>
-                                        <option value="1">Tak</option>
-                                        <option value="2">Nie</option>
-                                    </select>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="form-group">
-                                    <input type="text" id="{{$c->name . "_comment"}}" name="{{$c->name . "_comment"}}" class="form-control thirdInp" style="width:100%;">
-                                </div>
-                            </td>
-                            <td>
-                                <div class="form-group">
-                                    <input name="{{$c->name . "_files[]"}}" id="{{$c->name . "_files[]"}}" type="file" multiple="" />
-                                </div>
-                            </td>
-                        </tr>
-                                @endif
-                            @endif
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                    @endif
-                @endforeach
-            </div>
-        </div>
-    </div>
-    <div class="row last-row">
-        <div class="col-md-12">
-            <input class="btn btn-success btn-block" type="submit" id="secondButton" value="Zapisz audyt!" style="margin-bottom:1em;">
         </div>
     </div>
     </form>
@@ -240,8 +185,6 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function(response) {
-                            console.log(response.collective);
-                            // console.log(response.trainers.length);
                             for(var i = 0; i < response.trainers.length; i++) {
                                 var newItem = $('<option class="generatedValues" value="' + response.trainers[i].id + '">' + response.trainers[i].first_name + ' ' + response.trainers[i].last_name + '</option>');
                                 $('#trainerDefaultValue').after(newItem);
@@ -270,96 +213,49 @@
              */
             function handleChange2() {
                 if(inputDepartment.value != '0') {
+                    stepBetween.classList.remove('inactivePanel');
+                    // thirdStep.classList.remove('inactivePanel');
+                    // fourthStep.classList.remove('inactivePanel');
+                    return true;
+                }
+                else {
+                    stepBetween.classList.add('inactivePanel');
+                    // thirdStep.classList.add('inactivePanel');
+                    // fourthStep.classList.add('inactivePanel');
+                    return true;
+                }
+            }
+
+            function handleChangeTemplate() {
+                if(inputTemplate.value != '0') {
                     thirdStep.classList.remove('inactivePanel');
                     fourthStep.classList.remove('inactivePanel');
-                    return true;
                 }
                 else {
                     thirdStep.classList.add('inactivePanel');
                     fourthStep.classList.add('inactivePanel');
-                    return true;
                 }
-            }
-
-            /**
-             *Function hide first panel(panel with general info) and show 2nd panel(panel with form) and sets heading for 2nd panel
-             */
-            var title = document.querySelector('.titleOfSecondPanel > p').firstChild;
-            function handleFirstButtonClick() {
-                secondPanel.classList.remove('inactivePanel');
-                secondButton.classList.remove('inactivePanel');
-                title.textContent = 'Audyt dla departamentu: ' + inputDepartment.options[inputDepartment.selectedIndex].text + ', trener ' + inputTrainer.options[inputTrainer.selectedIndex].text + ' ' + inputDate.value;
-                firstPanel.classList.add('inactivePanel');
-            }
-
-            /**
-             * Function checks whether all inputs are filled by user(validation), if positive, send form.
-             */
-            function submitHandler(e) {
-                e.preventDefault();
-                var everythingIsOk = true; //true = form submits, false = form doesn's submit
-                var firstInp = document.getElementsByClassName('firstInp');
-                var secondInp = document.getElementsByClassName('secondInp');
-                var thirdInp = document.getElementsByClassName('thirdInp');
-
-                 //Check if every amount input is selected
-                for(var i = 0; i < firstInp.length; i++) {
-                    if(firstInp[i].value == 0) {
-                        everythingIsOk = false;
-                        break;
-                    }
-                }
-
-
-                 // check if every quality input is selected g
-                if(everythingIsOk == true) {
-                    for(var j = 0; j < secondInp.length; j++) {
-                        if(secondInp[j].value == 0) {
-                            everythingIsOk = false;
-                            break;
-                        }
-                    }
-                }
-
-                if(everythingIsOk == true) {
-                    for(var k = 0; k < thirdInp.length; k++) {
-                        if(thirdInp[k].value == "" || thirdInp[k].value == null) {
-                            everythingIsOk = false;
-                            break;
-                        }
-                    }
-                }
-
-                //Validation of required inputs
-                if(everythingIsOk != true) {
-                    swal('Wypełnij wszystkie pola w kolumnach "Ilość", "Jakość" i "Komentarz"');
-                }
-
-                if(everythingIsOk == true) {
-                    document.getElementById('auditForm').submit();
-                }
-
             }
 
             /************ End of event listeners functions ************/
 
             //select every div that should disappear/appear at some point of user experience
            var firstPanel = document.getElementsByClassName('first-panel')[0];
-           var secondPanel = document.getElementsByClassName('second-panel')[0];
            var secondStep = document.getElementsByClassName('second-row')[0];
+           var stepBetween = document.getElementsByClassName('rowBetweenSecondAndThird')[0];
            var thirdStep = document.getElementsByClassName('third-row')[0];
            var fourthStep = document.getElementsByClassName('fourth-row')[0];
-           var secondButton = document.getElementById('secondButton');
+
 
            //Hiding divs and button at beggining
-           secondPanel.classList.add('inactivePanel');
            secondStep.classList.add('inactivePanel');
+           stepBetween.classList.add('inactivePanel');
            thirdStep.classList.add('inactivePanel');
            fourthStep.classList.add('inactivePanel');
-           secondButton.classList.add('inactivePanel');
 
             //Select inputs of first panel(before form appears)
            var inputDepartment = document.getElementById('department_info');
+           var inputTemplate = document.getElementById('template');
            var inputTrainer = document.getElementById('trainer');
            var inputDate = document.getElementById('date');
            var firstButton = document.getElementById('firstButton');
@@ -367,11 +263,7 @@
             //event listeners responsible for showing/hiding first panel divs
             inputDepartment.addEventListener('change', handleChange1);
             inputTrainer.addEventListener('change', handleChange2);
-            firstButton.addEventListener('click', handleFirstButtonClick);
-
-            /***********Submit part*************/
-            var submitButton = document.getElementById('secondButton');
-            submitButton.addEventListener('click', submitHandler);
+            inputTemplate.addEventListener('change', handleChangeTemplate);
 
         });
     </script>
