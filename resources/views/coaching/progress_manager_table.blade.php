@@ -10,6 +10,22 @@
         </div>
     </div>
 
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Legenda
+        </div>
+        <div class="panel-body">
+            <div class="alert alert-success">
+                <h4>
+                    <p>Średnia wyjściowa - średnia przed rozpoczęciem coachingu. </p>
+                    <p>Aktualna średnia - średnia z aktualnie zaakceptowanych godzin (przyrostowa), liczona od daty rozpoczęcia coachingu.</p>
+                    <p>Aktualna RBH - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
+                    <p>Cel - Średnia wymagana.</p>
+                </h4>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
@@ -49,7 +65,7 @@
             <div class="form-group">
                 <label class="myLabel">Zakres od:</label>
                 <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                    <input class="form-control" id="date_start_in_progress" name="date_start_in_progress" type="text" value="{{date('Y-m-d')}}" >
+                    <input class="form-control" id="date_start_in_progress" name="date_start_in_progress" type="text" value="{{date('Y-m-01')}}" >
                     <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                 </div>
             </div>
@@ -82,7 +98,8 @@
                                         <th>Konsultant</th>
                                         <th>Data</th>
                                         <th>Temat</th>
-                                        <th>Wynik</th>
+                                        <th>Średnia wyjściowa</th>
+                                        <th>Aktualna średnia</th>
                                         <th>Aktualne RBH</th>
                                         <th>Cel</th>
                                     </tr>
@@ -117,7 +134,8 @@
                                     <th>Konsultant</th>
                                     <th>Data</th>
                                     <th>Temat</th>
-                                    <th>Wynik</th>
+                                    <th>Średnia wyjściowa</th>
+                                    <th>Aktualna średnia</th>
                                     <th>Aktualne RBH</th>
                                     <th>Cel</th>
                                 </tr>
@@ -150,7 +168,8 @@
                                     <th>Konsultant</th>
                                     <th>Data</th>
                                     <th>Temat</th>
-                                    <th>Wynik aktualny</th>
+                                    <th>Średnia wyjściowa</th>
+                                    <th>Aktualna średnia</th>
                                     <th>Aktualne RBH</th>
                                     <th>Cel</th>
                                     <th>Komentarz</th>
@@ -234,6 +253,7 @@
                         },
                         {"data":"coaching_date"},
                         {"data": "subject"},
+                        {"data": "coaching_actual_avg"},
                         {"data":function (data, type, dataToSet) {
                                 let color = 'green';
                                 if(data.avg_consultant < data.average_goal)
@@ -292,6 +312,7 @@
                     },
                     {"data":"coaching_date"},
                     {"data": "subject"},
+                    {"data": "coaching_actual_avg"},
                     {"data":function (data, type, dataToSet) {
                             let color = 'green';
                             if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal)){
@@ -340,6 +361,7 @@
                     },
                     {"data":"coaching_date"},
                     {"data": "subject"},
+                    {"data": "coaching_actual_avg"},
                     {"data":function (data, type, dataToSet) {
                             let color = 'green';
                             if(data.avg_consultant < data.average_goal)
