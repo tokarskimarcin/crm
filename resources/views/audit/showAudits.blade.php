@@ -3,6 +3,13 @@
     {{--*******************************************--}}
     {{--THIS PAGE DISPLAYS TABLE WITH FILLED AUDITS--}}
     {{--*******************************************--}}
+
+    <style>
+        td:nth-of-type(5)::after {
+            content: '%';
+        }
+
+    </style>
     <link href="{{ asset('/css/dataTables.bootstrap.min.css')}}" rel="stylesheet">
     <div class="container-fluid">
         <div class="row">
@@ -23,6 +30,7 @@
                                                 <th>Trener</th>
                                                 <th>Department</th>
                                                 <th>Data</th>
+                                                <th class="score">Wynik</th>
                                                 <th>Podgląd/Edycja</th>
                                             </tr>
                                             </thead>
@@ -64,6 +72,7 @@
                     {"data": "trainer"},
                     {"data": "department"},
                     {"data": "date_audit"},
+                    {"data": "audit_score"},
                     {"data":function (data, type, dataToSet) {
                             return '<a href="{{URL::to("audit")}}/' + data.audit_id + '">Link</a>';
                         },"orderable": false, "searchable": false
@@ -76,6 +85,7 @@
                 var v = $(this).text()  // getting search input value
                 table.columns(i).search(v).draw();
             } );
+
         });
     </script>
 @endsection

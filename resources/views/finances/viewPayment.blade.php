@@ -147,6 +147,7 @@
                                                                                 <th>Student</th>
                                                                                 <th>Dokumenty</th>
                                                                                 <th>Całość na konto</th>
+                                                                                <th>Max na konto</th>
                                                                                 <th>Wypłata</th>
                                                                             </tr>
                                                                             </thead>
@@ -165,6 +166,7 @@
                                                                                 $salary_total = 0;
                                                                                 $rbh = round($item2->sum/3600,2);
                                                                                 $janky_cost_per_price = 0;
+                                                                                $toAccount = ($item2->max_transaction == null) ? 0 : $item2->max_transaction;
 
                                                                                 if($item2->success == 0)
                                                                                     $avg = 0;
@@ -275,13 +277,15 @@
                                                                                 <td>{{($student)}}</td>
                                                                                 <td>{{($documents)}}</td>
                                                                                 <td>{{(($item2->salary_to_account == 0) ? "Nie" : "Tak")}}</td>
+                                                                                <td>{{$toAccount}}</td>
                                                                                 <td>{{(round($salary_total,2))}}</td>
                                                                             </tr>
                                                                         @endif
                                                                         @endforeach
                                                                         @php $payment_total += $salary_total_all;  @endphp
                                                                         <tr>
-                                                                            <td colspan="14"></td>
+                                                                            <td colspan="15"></td>
+                                                                            <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
@@ -296,6 +300,7 @@
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td> Suma:</td>
+
                                                                             <td>{{round($salary_total_all,2)}}</td>
                                                                         </tr>
                                                                             </tbody>

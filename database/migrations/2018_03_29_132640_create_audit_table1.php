@@ -20,6 +20,7 @@ class CreateAuditTable1 extends Migration
             $table->integer('department_info_id');
             $table->date('date_audit');
             $table->integer('edit_user_id');
+            $table->float('score');
         });
     }
 

@@ -81,7 +81,7 @@
                         @foreach($criterion as $c)
                             @if($c->audit_header_id == $h->id)
                                 @if($c->status == $templateType)
-                        <tr>
+                        <tr class="tableRow">
                             <td class="first">{{ucwords(str_replace('_',' ',$c->name))}}</td>
                             <td>
                                 <div class="form-group">
@@ -190,6 +190,22 @@
                 }
 
                 if(everythingIsOk == true) {
+
+                    var auditScore = 0;
+                    var percentAuditScore;
+                    var numberOfRows = 0;
+                    var allTableRows = document.querySelectorAll('.tableRow');
+
+                    allTableRows.forEach(function(element) {
+                        var firstInputInside = element.cells[1].firstElementChild.firstElementChild.value;
+                        var secondInputInside = element.cells[2].firstElementChild.firstElementChild.value;
+                        if(firstInputInside == 1 && secondInputInside == 1) {
+                            auditScore += 1;
+                        }
+                        numberOfRows += 1;
+                    });
+                    percentAuditScore = 100 * auditScore / numberOfRows;
+                    $('.last-row').after('<input type="hidden" name="score" value="' + percentAuditScore + '">');
                     document.getElementById('auditForm').submit();
                 }
 
