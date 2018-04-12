@@ -221,6 +221,9 @@
                                 <h4>
                                     W przypadku gdy, aktualna średnia jest większa niż 0.5, wymagane jest aby średnia docelowa mieściła się w przedziale od 10% do 30% aktualnej średniej.
                                 </h4>
+                                <h4>
+                                    Konsultant wyświetli się na liście, po zaakceptowaniu przynajmniej jednej godziny.
+                                </h4>
                             </div>
                         </div>
                     </div>
