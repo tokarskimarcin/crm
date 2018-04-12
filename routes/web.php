@@ -638,7 +638,10 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 ///
 ///
 Route::get('/addAudit', 'AuditController@auditMethodGet');
-Route::post('/addAudit', 'AuditController@ajax')->name('api.ajax');
+Route::post('/add', 'AuditController@ajax')->name('api.ajax');
+
+Route::post('/addAudit', 'AuditController@auditMethodPost');
+
 Route::post('/handleForm', 'AuditController@handleFormPost');
 
 Route::get('/showAudits', 'AuditController@showAuditsGet');
@@ -647,7 +650,9 @@ Route::post('/showAudits', 'AuditController@showAuditsPost')->name('api.auditTab
 Route::get('/audit/{id}', 'AuditController@editAuditGet');
 Route::post('/handleEdit', 'AuditController@editAuditPost');
 
-Route::get('/editAudit', 'AdminController@editAuditGet');
+Route::get('/editAuditTemplates', 'AdminController@editAuditTemplatesGet');
+Route::post('/addTemplate', 'AdminController@addTemplatePost');
+Route::get('/editAudit/{id}', 'AdminController@editAuditGet');
 Route::post('/editAudit', 'AdminController@editAuditPost')->name('api.editAudit');
 Route::post('/editAuditPage', 'AdminController@editDatabasePost');
 

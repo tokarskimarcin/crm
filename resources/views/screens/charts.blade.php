@@ -30,45 +30,88 @@
     var adnotation;
 
     @foreach($department_info as $department_i)
-        @foreach($reportData as $reportD)
-            @if($department_i->id == $reportD->department_info_id)
-            if(data1.length === 0) {
-                data1.push(["Godzina", "Średnia", {type: 'string', role: 'annotation'}]);
-                depName = "{{$department_i->departments->name}} " + "{{$department_i->department_type->name}}";
-                nameOfDepartment.push(depName);
-            }
+            @if($department_i->id == "2" || $department_i->id == "14" || $department_i->id =="8") //3 departments
+                @foreach($reportData as $reportD)
+                    @if($department_i->id == $reportD->department_info_id)
+                        if(data1.length === 0) {
+                            data1.push(["Godzina", "Średnia", {type: 'string', role: 'annotation'}, "Low", "Max"]);
+                            depName = "{{$department_i->departments->name}} " + "{{$department_i->department_type->name}}";
+                            nameOfDepartment.push(depName);
+                        }
 
-            stringVariable ="{{$reportD->hour}}";
-            stringVariable = stringVariable.slice(0,5);
+                        stringVariable ="{{$reportD->hour}}";
+                        stringVariable = stringVariable.slice(0,5);
 
-            successAfter = parseFloat({{$reportD->success}});
-            useAfter = parseFloat({{$reportD->hour_time_use}});
-            if(successBefore === null || useBefore === null) {
-                data1.push([stringVariable, parseFloat({{$reportD->average}}), "{{$reportD->average}}"]);
-            }
-            else{
-                realAverageValue = Math.round(100 *((successAfter - successBefore) / (useAfter - useBefore)))/100;
-                if((successAfter - successBefore) > 0 && (useAfter - useBefore) > 0) {
-                    console.log('realAverageValue: ' + realAverageValue);
-                    adnotation = realAverageValue + '';
-                    data1.push([stringVariable, realAverageValue, adnotation]);
-                }
-            }
+                        successAfter = parseFloat({{$reportD->success}});
+                        useAfter = parseFloat({{$reportD->hour_time_use}});
+                        if(successBefore === null || useBefore === null) {
+                            data1.push([stringVariable, parseFloat({{$reportD->average}}), "{{$reportD->average}}", 2, 3]);
+                        }
+                        else{
+                            realAverageValue = Math.round(100 *((successAfter - successBefore) / (useAfter - useBefore)))/100;
+                            if((successAfter - successBefore) > 0 && (useAfter - useBefore) > 0) {
+                                console.log('realAverageValue: ' + realAverageValue);
+                                adnotation = realAverageValue + '';
+                                data1.push([stringVariable, realAverageValue, adnotation, 2, 3]);
+                            }
+                        }
 
-            successBefore = successAfter;
-            useBefore  = useAfter;
-            @endif
-         @endforeach
-                    if(data1.length != 1) {
-                        data2.push(data1);
-                        data1 = [];
-                    }
+                        successBefore = successAfter;
+                        useBefore  = useAfter;
+                    @endif
+                @endforeach
+                if(data1.length != 1) {
+                    data2.push(data1);
                     data1 = [];
-                    successAfter = 1;
-                    useAfter = 1;
-                    successBefore = null;
-                    useBefore = null;
-                    adnotation = '';
+                }
+                data1 = [];
+                successAfter = 1;
+                useAfter = 1;
+                successBefore = null;
+                useBefore = null;
+                adnotation = '';
+            @else //rest of departments excluding 3 above
+
+                @foreach($reportData as $reportD)
+                    @if($department_i->id == $reportD->department_info_id)
+                        if(data1.length === 0) {
+                            data1.push(["Godzina", "Średnia", {type: 'string', role: 'annotation'}, "Low", "Max"]);
+                            depName = "{{$department_i->departments->name}} " + "{{$department_i->department_type->name}}";
+                            nameOfDepartment.push(depName);
+                        }
+
+                        stringVariable ="{{$reportD->hour}}";
+                        stringVariable = stringVariable.slice(0,5);
+
+                        successAfter = parseFloat({{$reportD->success}});
+                        useAfter = parseFloat({{$reportD->hour_time_use}});
+                        if(successBefore === null || useBefore === null) {
+                            data1.push([stringVariable, parseFloat({{$reportD->average}}), "{{$reportD->average}}", 2.5, 3.5]);
+                        }
+                        else{
+                            realAverageValue = Math.round(100 *((successAfter - successBefore) / (useAfter - useBefore)))/100;
+                            if((successAfter - successBefore) > 0 && (useAfter - useBefore) > 0) {
+                                console.log('realAverageValue: ' + realAverageValue);
+                                adnotation = realAverageValue + '';
+                                data1.push([stringVariable, realAverageValue, adnotation, 2.5, 3.5]);
+                            }
+                        }
+
+                        successBefore = successAfter;
+                        useBefore  = useAfter;
+                        @endif
+                @endforeach
+                if(data1.length != 1) {
+                    data2.push(data1);
+                    data1 = [];
+                }
+                data1 = [];
+                successAfter = 1;
+                useAfter = 1;
+                successBefore = null;
+                useBefore = null;
+                adnotation = '';
+            @endif
     @endforeach
 
     function drawChart() {
@@ -85,23 +128,25 @@
             fontSize: 24,
             fontName: "Tahoma",
             series: {
-                0: {lineDashStyle: [2, 2, 20, 2, 20,2]}
+                0: {lineDashStyle: [2, 2, 20, 2, 20,2], color: 'red', lineWidth: 11},
+                1: {lineWidth: 6},
+                2: {lineWidth: 6}
             },
             colors: ['#1A1567'],
             hAxis: {
                 minorGridlines: {count: 5},
                 textStyle: {
                     bold: true,
-                    fontSize: 27
+                    fontSize: 29
                 }
             },
             vAxis: {
-                gridlines: {count: 6},
+                gridlines: {count: 7},
                 maxValue: 6,
                 minValue: 0,
                 textStyle: {
                     bold: true,
-                    fontSize: 32
+                    fontSize: 34
                 }
             },
             titleTextStyle: {
@@ -115,7 +160,7 @@
             },
             annotations: {
                 textStyle: {
-                    fontSize: 32,
+                    fontSize: 34,
                     color: "black",
                     bold: true
                 }

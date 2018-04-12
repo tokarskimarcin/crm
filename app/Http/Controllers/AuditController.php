@@ -7,6 +7,7 @@ use App\AuditCriterions;
 use App\AuditEdit;
 use App\AuditHeaders;
 use App\AuditInfo;
+use App\AuditStatus;
 use App\Department_info;
 use App\User;
 use App\AuditFiles;
@@ -28,10 +29,39 @@ class AuditController extends Controller
      */
     public function auditMethodGet() {
         $dept = Department_info::all();
-        $headers = AuditHeaders::where('status', '=', '1')->get();
+        $headers = AuditHeaders::all(); //there was where(status = 1)
         $criterion = AuditCriterions::where('status', '=', '1')->get();
+        $templates = AuditStatus::all();
 
-        return view('audit.addAudit')->with('dept', $dept)->with('headers', $headers)->with('criterion', $criterion);
+        return view('audit.addAudit')
+            ->with('dept', $dept)
+            ->with('headers', $headers)
+            ->with('criterion', $criterion)
+            ->with('templates', $templates);
+    }
+
+
+    public function auditMethodPost(Request $request) {
+//        $newForm = new Audit();
+        $user = Auth::user();
+        $templateType = $request->template;
+        $headers = AuditHeaders::all(); //there was where(status = 1)
+        $criterion = AuditCriterions::where('status', '=', $templateType)->get();
+
+        /*Fil "audit" table*/
+//        $newForm->user_id = $user->id;
+//        $newForm->trainer_id = $request->trainer;
+//        $newForm->department_info_id = $request->department_info;
+//        $newForm->date_audit = $request->date;
+//        $newForm->save();
+
+        return view('audit.newAudit')
+            ->with('templateType', $templateType)
+            ->with('headers', $headers)
+            ->with('trainerID', $request->trainer)
+            ->with('department_info', $request->department_info)
+            ->with('date_audit', $request->date)
+            ->with('criterion', $criterion);
     }
 
     /**
@@ -39,9 +69,11 @@ class AuditController extends Controller
      */
     public function ajax(Request $request) {
         $trainers = User::whereIn('user_type_id', [4,12])->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->get();
-        return $trainers;
+        $hr = User::where('user_type_id', '=', '5')->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->get();
+        $collective = User::where('user_type_id', '=', '7')->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->first();
+        $arr = array("trainers" => $trainers, "hr" => $hr, "collective" => $collective);
+        return $arr;
     }
-
 
     /**
      * Save newly created audit to database (audit) and (audit_info)
@@ -49,6 +81,7 @@ class AuditController extends Controller
     public function handleFormPost(Request $request) {
         $newForm = new Audit();
         $user = Auth::user();
+        $template = $request->templateType;
 
         /*Fil "audit" table*/
         $newForm->user_id = $user->id;
@@ -60,8 +93,9 @@ class AuditController extends Controller
         $fileCatalog = "auditFiles";
         $suffix = '';
 
+
         /*fill "audit_info" table*/
-        $criterions = AuditCriterions::where('status', '=', '1')->get();
+        $criterions = AuditCriterions::where('status', '=', $template)->get();
         foreach($criterions as $c) {
             $nameAmount = $c->name . "_amount";
             $nameQuality = $c->name . "_quality";
