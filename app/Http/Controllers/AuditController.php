@@ -28,7 +28,7 @@ class AuditController extends Controller
      * @return view addAudit and info about departments, Audit Headers and Audit Criterions
      */
     public function auditMethodGet() {
-        $dept = Department_info::all();
+        $dept = Department_info::whereIn('id_dep_type', [1,2,6])->get();
         $headers = AuditHeaders::all(); //there was where(status = 1)
         $criterion = AuditCriterions::where('status', '=', '1')->get();
         $templates = AuditStatus::all();
