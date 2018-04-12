@@ -93,6 +93,7 @@ class UsersController extends Controller
 
 
 
+        $user->max_transaction = $request->maxTransaction;
         $user->username = $request->username;
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
@@ -369,7 +370,7 @@ class UsersController extends Controller
             $this->changeMedicalPackage($request, $user);
         }
 
-
+        $user->max_transaction = $request->maxTransaction;
         $user->username = $request->username;
         $user->email_off = $request->username;
         $user->first_name = $request->first_name;
