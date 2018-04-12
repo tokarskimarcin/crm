@@ -38,7 +38,7 @@
                 </div>
 
                 <div class="panel-body">
-                    <div class="alert alert-info firstClick">Po naciśnięciu na dowolny nagłówek uzyskasz podgląd powiązanych kryteriów i uzyskasz możliwość dodawania.</div>
+                    <div class="alert alert-info firstClick">Po naciśnięciu na dowolny nagłówek uzyskasz podgląd powiązanych kryteriów</div>
                     <form action="{{URL::to('/editAuditPage')}}" method="post" id="formularz">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <div class="row row1">
@@ -138,7 +138,6 @@
         var rowBetween = document.getElementsByClassName('row-between')[0];
 
         //hide rows 2-4
-        row2.classList.add('inactive');
         row4.classList.add('inactive');
         rowBetween.classList.add('inactive');
 
