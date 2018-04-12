@@ -61,7 +61,7 @@
                             <div class="well well-sm"><p style="text-align:center;font-weight:bold;font-size:1.1em;">{{ucwords($h->name)}}</p></div>
                             @foreach($criterion as $c)
                                 @if($c->audit_header_id == $h->id)
-                                    <tr>
+                                    <tr class="tableRow">
                                         <td class="first">{{ucwords(str_replace('_',' ',$c->name))}}</td>
                                         <td>
                                             <div class="form-group">
@@ -132,6 +132,11 @@
             </div>
         </div>
     </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-success final-alert">Wynik audytu to: </div>
+            </div>
+        </div>
     <div class="row last-row">
         <div class="col-md-12">
             <input class="btn btn-success btn-block" type="submit" id="secondButton" value="Zapisz zmiany!" style="margin-bottom:1em;">
@@ -195,6 +200,23 @@
             }
 
             if(everythingIsOk == true) {
+
+                var auditScore = 0;
+                var numberOfRows = 0;
+                var percentAuditScore;
+                var allTableRows = document.querySelectorAll('.tableRow');
+
+                allTableRows.forEach(function(element) {
+                    var firstInputInside = element.cells[1].firstElementChild.firstElementChild.value;
+                    var secondInputInside = element.cells[2].firstElementChild.firstElementChild.value;
+                    if(firstInputInside == 1 && secondInputInside == 1) {
+                        auditScore += 1;
+                    }
+                    numberOfRows += 1;
+                });
+                percentAuditScore = 100 * auditScore / numberOfRows;
+                $('.last-row').after('<input type="hidden" name="score" value="' + percentAuditScore + '">');
+
                 document.getElementById('auditForm').submit();
             }
 
@@ -208,6 +230,22 @@
                 allTables[i].nextSibling.parentNode.firstElementChild.style.display='none';
             }
         }
+
+        var auditScore = 0;
+        var numberOfRows = 0;
+        var allTableRows = document.querySelectorAll('.tableRow');
+
+        allTableRows.forEach(function(element) {
+        var firstInputInside = element.cells[1].firstElementChild.firstElementChild.value;
+        var secondInputInside = element.cells[2].firstElementChild.firstElementChild.value;
+        if(firstInputInside == 1 && secondInputInside == 1) {
+            auditScore += 1;
+        }
+        numberOfRows += 1;
+         });
+
+        $('.final-alert').append('<strong>' + auditScore + '</strong>' + '/' + numberOfRows + ' (' + (Math.round((100 * auditScore)/numberOfRows *100) / 100)+ '%)');
+
     });
     </script>
 @endsection

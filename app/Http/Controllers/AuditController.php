@@ -41,19 +41,14 @@ class AuditController extends Controller
     }
 
 
+    /**
+     * This method returns form to fill with necessary data
+     */
     public function auditMethodPost(Request $request) {
-//        $newForm = new Audit();
         $user = Auth::user();
         $templateType = $request->template;
         $headers = AuditHeaders::all(); //there was where(status = 1)
         $criterion = AuditCriterions::where('status', '=', $templateType)->get();
-
-        /*Fil "audit" table*/
-//        $newForm->user_id = $user->id;
-//        $newForm->trainer_id = $request->trainer;
-//        $newForm->department_info_id = $request->department_info;
-//        $newForm->date_audit = $request->date;
-//        $newForm->save();
 
         return view('audit.newAudit')
             ->with('templateType', $templateType)
@@ -79,6 +74,7 @@ class AuditController extends Controller
      * Save newly created audit to database (audit) and (audit_info)
      */
     public function handleFormPost(Request $request) {
+        $auditPercentScore = $request->score;
         $newForm = new Audit();
         $user = Auth::user();
         $template = $request->templateType;
@@ -88,6 +84,7 @@ class AuditController extends Controller
         $newForm->trainer_id = $request->trainer;
         $newForm->department_info_id = $request->department_info;
         $newForm->date_audit = $request->date;
+        $newForm->score = round($auditPercentScore, 2);
         $newForm->save();
 
         $fileCatalog = "auditFiles";
@@ -164,7 +161,8 @@ class AuditController extends Controller
                 CONCAT(departments.name, " ", department_type.name) as department,
                 date_audit,
                 CONCAT(trainer.first_name, " ", trainer.last_name) as trainer,
-                audit.id as audit_id
+                audit.id as audit_id,
+                audit.score as audit_score
                 '));
             return datatables($audit)->make(true);
     }
@@ -223,6 +221,7 @@ class AuditController extends Controller
         $loggedUser = Auth::user();
         $audit = Audit::find($id);
         $audit->edit_user_id = $loggedUser->id;
+        $audit->score = round($request->score, 2);
         $audit->save();
 
         //Saving info about edition to log file
