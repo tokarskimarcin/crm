@@ -134,8 +134,8 @@
                 } else {
                     $schedule_goal = 0;
                 }
-
-                $real_schedule = ($schedule_goal > 0 && $schedule_goal != null) ? round(($real_RBH / $schedule_goal) * 100, 2) : 0 ;
+                // zmiana sposobu liczenie grafik real
+                $real_schedule = ($working_hours_goal > 0 && $working_hours_goal != null) ? round(($real_RBH / $working_hours_goal) * 100, 2) : 0 ;
                 $lost_schedule = -1 * (round($schedule_goal) - $real_RBH);
 
                 $total_week_success += $report->success;
@@ -202,8 +202,8 @@
                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$dep_info->size}}</td>
                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$goal}}</td>
                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{round($working_hours_goal)}}</td>
-               <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->average}}</td>
-               <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->janky_count}} %</td>
+               <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ ($report->success <=0 || $real_RBH <=0)  ? 0: round($report->success/$real_RBH,2) }}</td>
+               <td style="border:1px solid #231f20;text-align:center;padding:3px">{{    $report->count_all_check == 0 ? '0' : round(($report->count_bad_check*100)/$report->count_all_check,2)}} %</td>
                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->call_time}} %</td>
                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$real_schedule}} %</td>
                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{($lost_schedule < 0) ? $lost_schedule : 0 }}</td>
@@ -235,12 +235,13 @@
             @if($add_week_total == true || $i == $total_days)
                 @php
                     $count_weeks++;
-                    $total_week_real_schedule = ($week_schedule_goal != null && $week_schedule_goal > 0) ? round(($real_week_RBH / $week_schedule_goal) * 100, 2) : 0 ;
+                    //ZMiana
+                    $total_week_real_schedule = ($total_week_goal_RBH != null && $total_week_goal_RBH > 0) ? round(($real_week_RBH / $total_week_goal_RBH) * 100, 2) : 0 ;
                     $total_week_avg = ($real_week_RBH != null && $real_week_RBH > 0) ? round(($total_week_success / $real_week_RBH), 2) : 0 ;
-                    $total_week_proc_janky = ($total_week_success != null && $total_week_success > 0) ? round(($total_week_bad / $total_week_success) * 100, 2) : 0 ;
+                    $total_week_proc_janky = ($total_week_checked != null && $total_week_checked > 0) ? round(($total_week_bad / $total_week_checked) * 100, 2) : 0 ;
                     $total_week_goal_proc = ($total_week_goal != null && $total_week_goal > 0) ? round(($total_week_success / $total_week_goal) * 100, 2) : 0 ;
                     $total_goal_proc = ($total_week_success != null && $total_week_success > 0) ?  : 0 ;
-                    $total_week_sum_call_proc = ($total_week_sum_call_time != null && $total_week_sum_call_time > 0) ? round(($real_week_phone_time / $total_week_sum_call_time) * 100, 2) : 0 ;
+                   $total_week_sum_call_proc = ($real_week_RBH != null && $real_week_RBH > 0) ? round(($real_week_phone_time / $real_week_RBH) * 100, 2) : 0 ;
                 @endphp
                 <tr>
                     <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA</b></td>
@@ -281,9 +282,9 @@
         @endfor
 
         @php
-            $total_real_schedule = ($total_schedule_goal != null && $total_schedule_goal > 0) ? round(($total_real_RBH / $total_schedule_goal) * 100, 2) : 0 ;
+            $total_real_schedule = ($total_goal_RBH != null && $total_goal_RBH > 0) ? round(($total_real_RBH / $total_goal_RBH) * 100, 2) : 0 ;
             $total_week_avg = ($total_real_RBH != null && $total_real_RBH > 0) ? round(($total_success / $total_real_RBH), 2) : 0 ;
-            $total_proc_janky = ($total_success != null && $total_success > 0) ? round(($total_bad / $total_success) * 100, 2) : 0 ;
+            $total_proc_janky = ($total_checked != null && $total_checked > 0) ? round(($total_bad / $total_checked) * 100, 2) : 0 ;
             $total_goal_proc = ($total_goal != null && $total_goal > 0) ? round(($total_success / $total_goal) * 100, 2) : 0 ;
             $total_sum_call_proc = ($total_real_RBH != null && $total_real_RBH > 0) ? round(($total_phone_time / $total_real_RBH) * 100, 2) : 0 ;
         @endphp

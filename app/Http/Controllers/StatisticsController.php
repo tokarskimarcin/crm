@@ -1808,7 +1808,7 @@ class StatisticsController extends Controller
         $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
         $directors = User::whereIn('id', $directorsIds)->get();
 
-        $dep_id = $departments->first()->id;
+        $dep_id =  Auth::user()->department_info_id;//$departments->first()->id;
 
         $data = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep_id, $days_in_month);
 
@@ -1840,7 +1840,7 @@ class StatisticsController extends Controller
         $year = date('Y');
         $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
         $directors = User::whereIn('id', $directorsIds)->get();
-
+        // Pojedyńczy Raport
         if ($request->selected_dep < 100) {
             $dep_id = $request->selected_dep;
 
@@ -1866,7 +1866,7 @@ class StatisticsController extends Controller
                     'wiev_type'         => 'department',
                     'directors'         => $directors
                 ]);
-        } else if ($request->selected_dep > 100000) {
+        } else if ($request->selected_dep > 100000) { // Nie mam pojęcia
             $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
             $data = $this->getMultiDepartmentData($first_day, $last_day, $month, $year, $departments->pluck('id')->toArray(), $days_in_month);
@@ -1889,7 +1889,7 @@ class StatisticsController extends Controller
                     'wiev_type'         => 'director',
                     'directors'         => $directors
                 ]);
-        } else {
+        } else { // Zbiorczy Raport Dyrektorów
             $dirId = substr($request->selected_dep, 2);
             $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
 
@@ -1959,6 +1959,22 @@ class StatisticsController extends Controller
             ->whereIn('users.department_info_id', $deps)
             ->whereIn('users.user_type_id', [1,2])
             ->groupBy('date')
+            ->get();
+
+        /**
+         * Pobranie danych z przepracowanych godzin
+         */
+        $acceptHours_2 = DB::table('work_hours')
+            ->select(DB::raw('
+                SUM(TIME_TO_SEC(accept_stop) - TIME_TO_SEC(accept_start)) as time_sum,
+                date,users.department_info_id
+                
+            '))
+            ->join('users', 'users.id', 'work_hours.id_user')
+            ->whereBetween('date', [$date_start, $date_stop])
+            ->whereIn('users.department_info_id', $deps)
+            ->whereIn('users.user_type_id', [1,2])
+            ->groupBy('date','users.department_info_id')
             ->get();
 
         /**
@@ -2071,10 +2087,23 @@ class StatisticsController extends Controller
 
                 foreach ($reports as $item) {
                     $tempReport->success += $item->success;
-                    $tempReport->hour_time_use += round($item->call_time * $item->hour_time_use / 100, 2);//floatval($item->hour_time_use);
+
+                    $rbh_departments = $acceptHours_2->where('date', '=', $item->report_date);
+                    $total_hour_time_use = 0;
+                    foreach ($rbh_departments as $rbh_department)
+                    {
+                        $sigle_hour_report = $reports->where('department_info_id','=',$rbh_department->department_info_id);
+
+                        if(!$sigle_hour_report->isEmpty()){
+                            $total_hour_time_use += round(($sigle_hour_report->first()->call_time * ($rbh_department->time_sum/3600)) / 100, 2);
+                            }
+
+                    }
+                    $tempReport->hour_time_use += $total_hour_time_use;//floatval($item->hour_time_use);
                     $tempReport->total_time += floatval($item->hour_time_use);//($item->call_time > 0) ? ((100 * $item->hour_time_use) / $item->call_time) : 0 ;
                 }
                 $tempReport->average = ($tempReport->hour_time_use > 0) ? round($tempReport->success / $tempReport->hour_time_use, 2) : 0 ;
+                $tempReport->hour_time_use = $total_hour_time_use;
                 $reps[] = $tempReport;
             }
         }
@@ -3189,6 +3218,21 @@ class StatisticsController extends Controller
             })
             ->get();
 
+        $janky = DB::table('pbx_dkj_team')
+            ->select(DB::raw('
+                pbx_dkj_team.*
+            '))
+            ->whereIn('id', function($query) use ($data_start, $data_stop, $department) {
+                $query->select(DB::raw('
+                        MAX(id) as id
+                    '))
+                    ->from('pbx_dkj_team')
+                    ->whereBetween('report_date', [$data_start, $data_stop])
+                    ->groupBy('report_date')
+                    ->where('department_info_id', '=', $department);
+            })
+            ->get();
+
         $work_time = DB::table('work_hours')
             ->select(DB::raw('
                 work_hours.date as date,
@@ -3201,12 +3245,14 @@ class StatisticsController extends Controller
             ->groupBy('work_hours.date')
             ->get();
 
-        $data = $hour_reports->map(function($item) use ($work_time) {
+        $data = $hour_reports->map(function($item) use ($work_time,$janky) {
             $day_work = $work_time->where('date', '=', $item->report_date)->first();
+            $day_janky = $janky->where('report_date', '=', $item->report_date)->first();
             $item->day_time_sum = (is_object($day_work)) ? $day_work->day_sum : 0 ;
+            $item->janky_count_all_check = (is_object($day_janky)) ? $day_janky->count_all_check : 0 ;
+            $item->count_bad_check = (is_object($day_janky)) ? $day_janky->count_bad_check : 0 ;
             return $item;
         });
-
         return [
             'data_start' => $data_start,
             'data_stop' => $data_stop,

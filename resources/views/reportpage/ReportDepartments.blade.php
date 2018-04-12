@@ -37,6 +37,8 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label>Oddział:</label>
+
+                    @if(Auth::user()->user_type_id != 4)
                     <select class="form-control" name="selected_dep">
                         <optgroup label="Oddziały">
                             @foreach($departments as $dep)
@@ -50,12 +52,19 @@
                                 value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
                             @endforeach
                         </optgroup>
-                        @if(Auth::user()->id == 4796)
                             <optgroup label="Suma oddziałów">
                                 <option @if($dep_id == 100001) selected @endif value="100001">Suma oddziałów</option>
                             </optgroup>
-                        @endif
                     </select>
+                    @else
+                        <select class="form-control" name="selected_dep">
+                                @foreach($departments as $dep)
+                                        @if($dep->id == Auth::user()->department_info_id)
+                                            <option value="{{$dep->id}}" @if(($wiev_type == 'department') && $dep->id == $dep_id) selected @endif>{{$dep->departments->name . ' ' . $dep->department_type->name}}</option>
+                                        @endif
+                                @endforeach
+                        </select>
+                    @endif
                 </div>
             </div>
             <div class="col-md-4">

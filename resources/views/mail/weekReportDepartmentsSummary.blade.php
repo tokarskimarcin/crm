@@ -1,3 +1,6 @@
+@php
+    $ip = 0;
+@endphp
 @foreach($data as $item)
 <table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px; margin-bottom: 20px;">
     <thead style="color:#efd88f">
@@ -34,29 +37,43 @@
             @endphp
             @if($dep !== null)
                 @php
-                    $week_avg = 0;
-                    $week_rbh = 0;
-                    $week_goal_proc = 0;
-                    $week_dkj_sum = 0;
-                    $week_avg_call_time = 0;
-                    $week_success = 0;
-                    $week_goal = 0;
-                    $week_hour_time_use = 0;
 
-                    $week_day_count = $department_repo['data']->count();
-                    foreach($department_repo['data'] as $value) {
-                        $week_rbh += $value->day_time_sum;
-                        $week_success += $value->success;
-                        $week_goal += (date('N', strtotime($value->report_date)) < 6) ? $dep->dep_aim : $dep->dep_aim_week ;
-                        $week_hour_time_use += ($value->hour_time_use * $value->call_time) / 100;
-                        $week_dkj_sum += ($value->success * $value->janky_count) / 100;
-                    }
 
-                    $week_avg = ($week_rbh > 0) ? round($week_success / $week_rbh, 2) : 0 ;
-                    $week_hour_time_use = ($week_rbh > 0) ? round($week_hour_time_use / $week_rbh * 100, 2) : 0 ;
-                    $week_rbh = ($week_day_count > 0) ? round($week_rbh / $week_day_count, 2) : 0 ;
-                    $week_goal_proc = ($week_goal > 0) ? round($week_success / $week_goal * 100, 2) : 0 ;
-                    $week_dkj_proc = ($week_success > 0) ? round(($week_dkj_sum / $week_success) * 100, 2) : 0 ;
+                        $week_avg = 0;
+                        $week_rbh = 0;
+                        $week_goal_proc = 0;
+                        $week_dkj_sum = 0;
+                        $week_avg_call_time = 0;
+                        $week_success = 0;
+                        $week_goal = 0;
+                        $week_hour_time_use = 0;
+
+                        $day_avg =0;
+                        $day_succes = 0;
+                        $day_rbh = 0;
+                        $day_check = 0;
+                        $day_bad = 0;
+
+                        $week_day_count = 0;
+                        foreach($department_repo['data'] as $value) {
+                            $week_rbh += $value->day_time_sum;
+                            $week_success += $value->success;
+                            if($value->success != 0){
+                               $week_goal += (date('N', strtotime($value->report_date)) < 6) ? $dep->dep_aim : $dep->dep_aim_week ;
+                               $week_day_count++;
+                            }
+                            $week_hour_time_use += ($value->day_time_sum * $value->call_time) / 100;
+                            $week_dkj_sum += ($value->success * $value->janky_count) / 100;
+                            $day_check+=    $value->janky_count_all_check;
+                            $day_bad+=  $value->count_bad_check;
+                        }
+
+                        $week_avg = ($week_rbh > 0) ? round($week_success / $week_rbh, 2) : 0 ;
+                        $week_hour_time_use = ($week_rbh > 0) ? round($week_hour_time_use / $week_rbh * 100, 2) : 0 ;
+                        $week_rbh = ($week_day_count > 0) ? round($week_rbh / $week_day_count, 2) : 0 ;
+                        $week_goal_proc = ($week_goal > 0) ? round($week_success / $week_goal * 100, 2) : 0 ;
+                        $week_dkj_proc = ($day_check > 0) ? round((($day_bad*100) / $day_check), 2) : 0 ;
+
                 @endphp
                 <tr>
                     <td rowspan="5" style="border:1px solid #231f20;text-align:center;padding:3px"><b>@if($dep !== null) {{ $dep->departments->name . ' ' . $dep->department_type->name }} @endif</b></td>
@@ -64,8 +81,12 @@
                     @foreach($headers as $report_date)
                         @php
                             $repo = (is_object($department_repo['data']->where('report_date', '=', $report_date)->first())) ? $department_repo['data']->where('report_date', '=', $report_date)->first() : null;
+                            if(is_object($repo))
+                                $day_avg = $repo->day_time_sum != 0 ? round($repo->success/$repo->day_time_sum,2) : 0;
+                            else
+                                $day_avg = 0;
                         @endphp
-                        <td style="border:1px solid #231f20;text-align:center;padding:3px">@if($repo !== null) {{$repo->average}} @else 0 @endif</td>
+                        <td style="border:1px solid #231f20;text-align:center;padding:3px">@if($day_avg !== null) {{$day_avg}} @else 0 @endif</td>
                     @endforeach
                     <td style="background-color: #5eff80;border:1px solid #231f20;text-align:center;padding:3px">{{ $week_avg }}</td>
                 </tr>
@@ -102,7 +123,7 @@
                         @php
                             $repo = (is_object($department_repo['data']->where('report_date', '=', $report_date)->first())) ? $department_repo['data']->where('report_date', '=', $report_date)->first() : null;
                         @endphp
-                        <td style="border:1px solid #231f20;text-align:center;padding:3px">@if($repo !== null) {{ $repo->janky_count }} @else 0 @endif %</td>
+                        <td style="border:1px solid #231f20;text-align:center;padding:3px">@if($repo !== null && $repo->janky_count_all_check !=0 ) {{ round(($repo->count_bad_check*100)/$repo->janky_count_all_check,2) }} @else 0 @endif %</td>
                     @endforeach
                     <td style="background-color: #5eff80;border:1px solid #231f20;text-align:center;padding:3px">{{ $week_dkj_proc }} %</td>
                 </tr>
@@ -126,4 +147,7 @@
 
     </tbody>
 </table>
+    @php
+        $ip++;
+    @endphp
 @endforeach
