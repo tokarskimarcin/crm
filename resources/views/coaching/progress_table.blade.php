@@ -14,6 +14,22 @@
         <span class="glyphicon glyphicon-plus"></span> <span>Nowy Coaching</span>
     </button>
 
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Legenda
+        </div>
+        <div class="panel-body">
+            <div class="alert alert-success">
+                <h4>
+                    <p>Średnia wyjściowa - średnia przed rozpoczęciem coachingu. </p>
+                    <p>Aktualna średnia - średnia z aktualnie zaakceptowanych godzin (przyrostowa), liczona od daty rozpoczęcia coachingu.</p>
+                    <p>Aktualna RBH - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
+                    <p>Cel - Średnia wymagana.</p>
+                </h4>
+            </div>
+        </div>
+    </div>
+
     {{--Tabela z coaching w toku--}}
     <div class="row">
         <div class="panel panel-default">
@@ -26,7 +42,7 @@
                         <div class="form-group">
                             <label class="myLabel">Zakres od:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                <input class="form-control" id="date_start_in_progress" name="date_start_in_progress" type="text" value="{{date('Y-m-d')}}" >
+                                <input class="form-control" id="date_start_in_progress" name="date_start_in_progress" type="text" value="{{date('Y-m-01')}}" >
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                             </div>
                         </div>
@@ -51,7 +67,8 @@
                                         <th>Konsultant</th>
                                         <th>Data</th>
                                         <th>Temat</th>
-                                        <th>Wynik</th>
+                                        <th>Średnia wyjściowa</th>
+                                        <th>Aktualna średnia</th>
                                         <th>Aktualne RBH</th>
                                         <th>Cel</th>
                                         <th>Akcja</th>
@@ -82,7 +99,7 @@
                         <div class="form-group">
                             <label class="myLabel">Zakres od:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                <input class="form-control" id="date_start_unsettled" name="date_start_unsettled" type="text" value="{{date('Y-m-d')}}" >
+                                <input class="form-control" id="date_start_unsettled" name="date_start_unsettled" type="text" value="{{date('Y-m-01')}}" >
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                             </div>
                         </div>
@@ -107,7 +124,8 @@
                                     <th>Konsultant</th>
                                     <th>Data</th>
                                     <th>Temat</th>
-                                    <th>Wynik</th>
+                                    <th>Średnia wyjściowa</th>
+                                    <th>Aktualna średnia</th>
                                     <th>Aktualne RBH</th>
                                     <th>Cel</th>
                                     <th>Komentarz</th>
@@ -137,7 +155,7 @@
                         <div class="form-group">
                             <label class="myLabel">Zakres od:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                <input class="form-control" id="date_start_settled" name="date_start_settled" type="text" value="{{date('Y-m-d')}}" >
+                                <input class="form-control" id="date_start_settled" name="date_start_settled" type="text" value="{{date('Y-m-01')}}" >
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                             </div>
                         </div>
@@ -162,7 +180,8 @@
                                     <th>Konsultant</th>
                                     <th>Data</th>
                                     <th>Temat</th>
-                                    <th>Wynik aktualny</th>
+                                    <th>Średnia wyjściowa</th>
+                                    <th>Aktualna średnia</th>
                                     <th>Aktualne RBH</th>
                                     <th>Cel</th>
                                     <th>Komentarz</th>
@@ -189,6 +208,23 @@
                     <h4 class="modal-title" id="modal_title">Ustal Coaching<span id="modal_category"></span></h4>
                 </div>
                 <div class="modal-body">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Legenda
+                        </div>
+                        <div class="panel-body">
+                            <div class="alert alert-success">
+                                <h4>
+                                    Aktualna średnia wyliczana jest na podstawie ostatnich ~18 RBH danego konsultanta.
+                                </h4>
+                                <h4>
+                                    W przypadku gdy, aktualna średnia jest większa niż 0.5, wymagane jest aby średnia docelowa mieściła się w przedziale od 10% do 30% aktualnej średniej.
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-md-12" id="header_modal">
 
@@ -282,6 +318,10 @@
             let coaching_goal = $("#coaching_goal").val();
             let coaching_comment = $("#comment_coaching").val();
             let coaching_actual_avg = $("#coaching_actual_avg").val();
+            let coaching_actual_avg_pom = parseFloat(coaching_actual_avg);
+            let proc_coaching_goal_min = Math.round((((coaching_actual_avg_pom*10)/100) + coaching_actual_avg_pom)*100)/100;
+            let proc_coaching_goal_max = Math.round((((coaching_actual_avg_pom*30)/100) + coaching_actual_avg_pom)*100)/100;
+            console.log(proc_coaching_goal_min+' '+proc_coaching_goal_max);
             let validation = true;
             if(consultant_id == 'Wybierz'){
                 validation = false;
@@ -300,9 +340,20 @@
             //     validation = false;
             //     swal('Błędna minimalna średnia')
             // }
-            else if(coaching_goal.trim('').length == 0 || isNaN(coaching_goal) || coaching_goal <= 0 ){
+            else if(coaching_goal.trim('').length == 0 || isNaN(coaching_goal) || coaching_goal <= 0){
                 validation = false;
-                swal('Błędna maksymalna średnia')
+                swal('Błędna docelowa średnia')
+            }
+
+            else if(coaching_actual_avg_pom > 0.5){
+            if(coaching_goal < proc_coaching_goal_min){
+                    validation = false;
+                    swal('Minimalna średnia musi być większa niż 10% aktualnej średniej')
+                }
+                else if(coaching_goal > proc_coaching_goal_max){
+                    validation = false;
+                    swal('Minimalna średnia musi być mniejsza niż 30% aktualnej średniej')
+                }
             }
             // else if(coaching_goal_min > coaching_goal_max) {
             //     validation = false;
@@ -467,6 +518,7 @@
                         },
                         {"data":"coaching_date"},
                         {"data": "subject"},
+                        {"data": "coaching_actual_avg"},
                         {"data":function (data, type, dataToSet) {
                                 let color = 'green';
                                 if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal))
@@ -568,7 +620,7 @@
                     },
                     {"data":"coaching_date"},
                     {"data": "subject"},
-
+                    {"data": "coaching_actual_avg"},
                     {"data":function (data, type, dataToSet) {
                             let color = 'green';
                             if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal))
@@ -627,6 +679,7 @@
                     },
                     {"data":"coaching_date"},
                     {"data": "subject"},
+                    {"data": "coaching_actual_avg"},
                     {"data":function (data, type, dataToSet) {
                             let color = 'green';
                             if(parseFloat(data.avrage_end) < parseFloat(data.average_goal))
