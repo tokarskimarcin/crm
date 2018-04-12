@@ -129,8 +129,8 @@
             fontName: "Tahoma",
             series: {
                 0: {lineDashStyle: [2, 2, 20, 2, 20,2], color: 'red', lineWidth: 11},
-                1: {lineWidth: 6},
-                2: {lineWidth: 6}
+                1: {lineWidth: 6, visibleInLegend: false},
+                2: {lineWidth: 6, visibleInLegend: false}
             },
             colors: ['#1A1567'],
             hAxis: {

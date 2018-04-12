@@ -118,7 +118,7 @@ class AuditController extends Controller
                     $newArray = $request->files->all();
                     $fileName = $file->getClientOriginalName();
                     $dotIndex = strripos($fileName, '.'); //last occurence of .
-                    $suffix = substr($fileName, $dotIndex); //rest of string after $dotIndex
+                    $suffix = strtolower(substr($fileName, $dotIndex)); //rest of string after $dotIndex
 
                     if($suffix == '.jpeg' || $suffix == '.jpg' || $suffix == '.png' || $suffix == '.pdf') {
                         $audit_files = new AuditFiles();
@@ -133,8 +133,9 @@ class AuditController extends Controller
                 }
             }
             $newCrit->save();
+            Session::flash('adnotation', "Audyt został dodany!");
         }
-        return Redirect::to('audit/'.$newForm->id);
+        return Redirect::to('/showAudits');
     }
 
     /**
@@ -260,7 +261,7 @@ class AuditController extends Controller
                     $newArray = $request->files->all();
                     $fileName = $file->getClientOriginalName();
                     $dotIndex = strripos($fileName, '.'); //last occurence of .
-                    $suffix = substr($fileName, $dotIndex); //rest of string after $dotIndex
+                    $suffix = strtolower(substr($fileName, $dotIndex)); //rest of string after $dotIndex
 
                     if ($suffix == '.jpeg' || $suffix == '.jpg' || $suffix == '.png' || $suffix == '.pdf') {
                         $audit_files = new AuditFiles();

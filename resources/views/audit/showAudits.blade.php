@@ -13,6 +13,13 @@
     <link href="{{ asset('/css/dataTables.bootstrap.min.css')}}" rel="stylesheet">
     <div class="container-fluid">
         <div class="row">
+            <div class="col-md-12">
+                <div class="page-header">
+                    <div class="alert gray-nav">Tabela wykonanych audytów</div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -23,6 +30,12 @@
                             <div class="col-lg-12">
                                 <div id="start_stop">
                                     <div class="panel-body table-responsive">
+                                        @if(Session::has('adnotation'))
+                                                    <div class="alert alert-success">{{Session::get('adnotation') }}</div>
+                                            @php
+                                                Session::forget('adnotation');
+                                            @endphp
+                                        @endif
                                         <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
                                             <thead>
                                             <tr>
