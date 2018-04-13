@@ -666,6 +666,7 @@ Route::get('/charts', 'ScreensController@showScreensGet');
 //COACHINGS
 Route::get('/pageReportCoachingSummary', 'StatisticsController@pageReportCoachingSummaryGet');
 Route::post('/pageReportCoachingSummary', 'StatisticsController@pageReportCoachingSummaryPost');
+Route::get('/ReportCoachingSummary', 'StatisticsController@MailReportCoachingSummary');
 //END COACHINGS
 Route::get('/dept/{id}','ScreensController@monitorMethod');
 Route::get('/screen_table','ScreensController@screenMethod');

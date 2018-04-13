@@ -3,7 +3,14 @@
     <thead style="color:#efd88f">
     <tr>
         <td colspan="3" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
-            <font size="6" face="Calibri">RAPORT Coaching Tygodniowo/Miesięczny Zbiorczy </font></td>
+            <font size="6" face="Calibri">RAPORT Coaching Tygodniowo/Miesięczny Zbiorczy
+                @if(isset($date))
+                    @foreach($months as $key => $value)
+                         @if($date == $key) {{ $value }}
+                        @endif
+                    @endforeach
+                @endif
+            </font></td>
     </tr>
     </thead>
 </table>
@@ -58,13 +65,13 @@
                             $startDate = $coach->start_date;
                         }
                         else {
-                            $startDate = "brak daty w bazie danych";
+                            $startDate = "brak daty";
                         }
                         if(isset($coach->stop_date)) {
                             $stopDate = $coach->stop_date;
                         }
                         else {
-                            $stopDate = "brak daty w bazie danych";
+                            $stopDate = "brak daty";
                         }
 
                         $sum_in_progress += $coach->in_progress;
