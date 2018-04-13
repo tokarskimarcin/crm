@@ -169,8 +169,8 @@
                                     <th>Data</th>
                                     <th>Temat</th>
                                     <th>Średnia wyjściowa</th>
-                                    <th>Aktualna średnia</th>
-                                    <th>Aktualne RBH</th>
+                                    <th>Osiągnieta średnia</th>
+                                    <th>Końcowe RBH</th>
                                     <th>Cel</th>
                                     <th>Komentarz</th>
                                 </tr>
