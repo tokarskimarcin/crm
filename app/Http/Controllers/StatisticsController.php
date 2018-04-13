@@ -3456,6 +3456,7 @@ class StatisticsController extends Controller
             $szczesny->last_name = 'Szczęsny';
             $accepted_users->push($szczesny);
         }
+
 //    $accepted_users = [
 //        'cytawa.verona@gmail.com',
 //        'jarzyna.verona@gmail.com'
@@ -3524,6 +3525,8 @@ class StatisticsController extends Controller
             $month = date('m');
             $date = $request->month_selected;
             $allInfo = $this->getAllDepartmentsData($date);
+
+            $this->MailReportCoachingSummary($date);
 //            dd($allInfo);
             return view('reportpage.ReportCoachingWeekSummary')
                 ->with('all_data', $allInfo)
@@ -3575,11 +3578,14 @@ class StatisticsController extends Controller
             }
             return $allDepArray;
         }
-//
-//    public function MailReportCoachingSummary() {
-//        $data = $this->getAllDepartmentsData();
-//        $title = 'Raport tygodniowy DKJ ' . $data['date_start'] . ' - ' . $data['date_stop'];
-//        $this->sendMailByVerona('reportCoachingWeekSummary', $data, $title);
-//    }
+
+    public function MailReportCoachingSummary() {
+        $month = date('m');
+        $user = User::where('id','=',6009)->get();
+//            dd($user);
+        $data = $this->getAllDepartmentsData($month);
+        $title = 'Raport tygodniowo/miesięczny Zbiorczy ';
+        $this->sendMailByVerona('reportCoachingWeekSummary', $data, $title, $user);
+    }
 
 }
