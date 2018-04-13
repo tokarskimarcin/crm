@@ -550,6 +550,7 @@
             });
 
             var table_unsettled = $('#table_unsettled').DataTable({
+                "bPaginate": false,
                 "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
