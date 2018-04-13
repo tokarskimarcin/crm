@@ -3545,7 +3545,7 @@ class StatisticsController extends Controller
 
             $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
             $directors = User::whereIn('id', $directorsIds)->get();
-            $allDepartments = Department_info::whereIn('id_dep_type', [1,2])->get();
+            $allDepartments = Department_info::whereIn('id_dep_type', [2])->get();
 
             foreach($allDepartments as $deps) {
                 array_push($depArray, $deps->id);
@@ -3557,7 +3557,7 @@ class StatisticsController extends Controller
                     $dep_name = $dep_info->departments->name . ' ' . $dep_info->department_type->name;
 
                     $dep_id = $depArr;
-                    $departments = Department_info::whereIn('id_dep_type', [1, 2])->get();
+                    $departments = Department_info::whereIn('id_dep_type', [2])->get();
                     $data = $this->getCoachingData($month, $year, (array)$dep_id);
                     $data += ["dep_name" => $dep_name];
                     array_push($allDepArray, $data);
@@ -3567,7 +3567,7 @@ class StatisticsController extends Controller
                     // usunięcie 10 przed id dyrektora
                     $dirId = substr($depArr, 2);
                     $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
-                    $departments = Department_info::whereIn('id_dep_type', [1, 2])->get();
+                    $departments = Department_info::whereIn('id_dep_type', [2])->get();
                     $dep_info = Department_info::find(User::find($dirId)->main_department_id);
                     $dep_name = $dep_info->departments->name . ' ' . $dep_info->department_type->name;
 

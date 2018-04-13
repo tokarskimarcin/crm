@@ -29,7 +29,9 @@
             @endphp
         <table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px; margin-bottom: 20px;">
             <thead style="color:#efd88f">
-            <h1 style="background:#231f20;color:white;margin:0;color:#efd88f;">{{$data['dep_name']}}</h1>
+            <tr style="background:#231f20;color:white;margin:0;color:#efd88f;">
+                <td colspan="6" style="text-align:center;font-size:1.4em;">{{$data['dep_name']}}</td>
+            </tr>
             <tr>
                 <th rowspan="2" style="border:1px solid #231f20;padding:3px;background:#231f20;text-align: center">Trener</th>
                 {{--<th colspan="5" style="border:1px solid #231f20;padding:3px;background:#231f20;text-align: center">TYDZIEN </th>--}}
