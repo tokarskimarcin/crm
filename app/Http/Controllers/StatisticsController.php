@@ -1785,6 +1785,8 @@ class StatisticsController extends Controller
 
             foreach ($coach_week as $coach_week_list){
                 if($ready_data_collection->where('user_id','=',$coach_week_list->user_id)->isEmpty()){
+                    $coach_week_list->start_date = $item['start_day'];
+                    $coach_week_list->stop_date = $item['stop_day'];
                     $ready_data_collection->push($coach_week_list);
                 }
             }
@@ -3525,6 +3527,7 @@ class StatisticsController extends Controller
 //            dd($allInfo);
             return view('reportpage.ReportCoachingWeekSummary')
                 ->with('all_data', $allInfo)
+                ->with('date', $date)
                 ->with('months', $this->getMonthsNames())
                 ->with('month', $month);
         }
@@ -3556,30 +3559,27 @@ class StatisticsController extends Controller
                     $data += ["dep_name" => $dep_name];
                     array_push($allDepArray, $data);
                 }
-//                else{
-//                    dd("1");
-//                    // usunięcie 10 przed id dyrektora
-//                    $dirId = substr($request->selected_dep, 2);
-//                    $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
-//                    $departments = Department_info::where('id_dep_type', '=', 2)->get();
-//                    $dep_info = Department_info::find(User::find($dirId)->main_department_id);
-//
-//                    $data = $this->getCoachingData($month, $year, $director_departments->pluck('id')->toArray());
-//
-//                    return view('reportpage.reportCoachingWeekSummary')
-//                        ->with([
-//                            'departments' => $departments,
-//                            'directors' => $directors,
-//                            'wiev_type' => 'director',
-//                            'dep_info'               => $dep_info,
-//                            'dep_id' => $request->selected_dep,
-//                            'months' => $this->getMonthsNames(),
-//                            'month' => $month,
-//                            'all_coaching' => $data['all_coaching']
-//                        ]);
-//                }
+                else{
+                    dd("1");
+                    // usunięcie 10 przed id dyrektora
+                    $dirId = substr($depArr, 2);
+                    $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
+                    $departments = Department_info::whereIn('id_dep_type', [1, 2])->get();
+                    $dep_info = Department_info::find(User::find($dirId)->main_department_id);
+                    $dep_name = $dep_info->departments->name . ' ' . $dep_info->department_type->name;
+
+                    $data = $this->getCoachingData($month, $year, $director_departments->pluck('id')->toArray());
+                      $data += ["dep_name" => $dep_name];
+                      array_push($allDepArray, $data);
+                  }
             }
             return $allDepArray;
         }
+//
+//    public function MailReportCoachingSummary() {
+//        $data = $this->getAllDepartmentsData();
+//        $title = 'Raport tygodniowy DKJ ' . $data['date_start'] . ' - ' . $data['date_stop'];
+//        $this->sendMailByVerona('reportCoachingWeekSummary', $data, $title);
+//    }
 
 }
