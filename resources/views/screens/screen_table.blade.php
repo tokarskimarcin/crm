@@ -1,5 +1,8 @@
 @extends('layouts.main')
 @section('content')
+    {{--************************************************************--}}
+    {{--THIS VIEW SHOWS TABLE OF DEPARTMENTS AND RELATED TO IT LINKS--}}
+    {{--************************************************************--}}
 
     {{--Header page --}}
     <div class="row">

@@ -7,6 +7,7 @@ use App\AuditCriterions;
 use App\AuditEdit;
 use App\AuditHeaders;
 use App\AuditInfo;
+use App\AuditStatus;
 use App\Department_info;
 use App\User;
 use App\AuditFiles;
@@ -27,11 +28,35 @@ class AuditController extends Controller
      * @return view addAudit and info about departments, Audit Headers and Audit Criterions
      */
     public function auditMethodGet() {
-        $dept = Department_info::all();
-        $headers = AuditHeaders::where('status', '=', '1')->get();
+        $dept = Department_info::whereIn('id_dep_type', [1,2,6])->get();
+        $headers = AuditHeaders::all(); //there was where(status = 1)
         $criterion = AuditCriterions::where('status', '=', '1')->get();
+        $templates = AuditStatus::all();
 
-        return view('audit.addAudit')->with('dept', $dept)->with('headers', $headers)->with('criterion', $criterion);
+        return view('audit.addAudit')
+            ->with('dept', $dept)
+            ->with('headers', $headers)
+            ->with('criterion', $criterion)
+            ->with('templates', $templates);
+    }
+
+
+    /**
+     * This method returns form to fill with necessary data
+     */
+    public function auditMethodPost(Request $request) {
+        $user = Auth::user();
+        $templateType = $request->template;
+        $headers = AuditHeaders::all(); //there was where(status = 1)
+        $criterion = AuditCriterions::where('status', '=', $templateType)->get();
+
+        return view('audit.newAudit')
+            ->with('templateType', $templateType)
+            ->with('headers', $headers)
+            ->with('trainerID', $request->trainer)
+            ->with('department_info', $request->department_info)
+            ->with('date_audit', $request->date)
+            ->with('criterion', $criterion);
     }
 
     /**
@@ -39,29 +64,35 @@ class AuditController extends Controller
      */
     public function ajax(Request $request) {
         $trainers = User::whereIn('user_type_id', [4,12])->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->get();
-        return $trainers;
+        $hr = User::where('user_type_id', '=', '5')->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->get();
+        $collective = User::where('user_type_id', '=', '7')->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->first();
+        $arr = array("trainers" => $trainers, "hr" => $hr, "collective" => $collective);
+        return $arr;
     }
-
 
     /**
      * Save newly created audit to database (audit) and (audit_info)
      */
     public function handleFormPost(Request $request) {
+        $auditPercentScore = $request->score;
         $newForm = new Audit();
         $user = Auth::user();
+        $template = $request->templateType;
 
         /*Fil "audit" table*/
         $newForm->user_id = $user->id;
         $newForm->trainer_id = $request->trainer;
         $newForm->department_info_id = $request->department_info;
         $newForm->date_audit = $request->date;
+        $newForm->score = round($auditPercentScore, 2);
         $newForm->save();
 
         $fileCatalog = "auditFiles";
         $suffix = '';
 
+
         /*fill "audit_info" table*/
-        $criterions = AuditCriterions::where('status', '=', '1')->get();
+        $criterions = AuditCriterions::where('status', '=', $template)->get();
         foreach($criterions as $c) {
             $nameAmount = $c->name . "_amount";
             $nameQuality = $c->name . "_quality";
@@ -87,7 +118,7 @@ class AuditController extends Controller
                     $newArray = $request->files->all();
                     $fileName = $file->getClientOriginalName();
                     $dotIndex = strripos($fileName, '.'); //last occurence of .
-                    $suffix = substr($fileName, $dotIndex); //rest of string after $dotIndex
+                    $suffix = strtolower(substr($fileName, $dotIndex)); //rest of string after $dotIndex
 
                     if($suffix == '.jpeg' || $suffix == '.jpg' || $suffix == '.png' || $suffix == '.pdf') {
                         $audit_files = new AuditFiles();
@@ -102,8 +133,9 @@ class AuditController extends Controller
                 }
             }
             $newCrit->save();
+            Session::flash('adnotation', "Audyt został dodany!");
         }
-        return Redirect::to('audit/'.$newForm->id);
+        return Redirect::to('/showAudits');
     }
 
     /**
@@ -130,7 +162,8 @@ class AuditController extends Controller
                 CONCAT(departments.name, " ", department_type.name) as department,
                 date_audit,
                 CONCAT(trainer.first_name, " ", trainer.last_name) as trainer,
-                audit.id as audit_id
+                audit.id as audit_id,
+                audit.score as audit_score
                 '));
             return datatables($audit)->make(true);
     }
@@ -189,6 +222,7 @@ class AuditController extends Controller
         $loggedUser = Auth::user();
         $audit = Audit::find($id);
         $audit->edit_user_id = $loggedUser->id;
+        $audit->score = round($request->score, 2);
         $audit->save();
 
         //Saving info about edition to log file
@@ -227,7 +261,7 @@ class AuditController extends Controller
                     $newArray = $request->files->all();
                     $fileName = $file->getClientOriginalName();
                     $dotIndex = strripos($fileName, '.'); //last occurence of .
-                    $suffix = substr($fileName, $dotIndex); //rest of string after $dotIndex
+                    $suffix = strtolower(substr($fileName, $dotIndex)); //rest of string after $dotIndex
 
                     if ($suffix == '.jpeg' || $suffix == '.jpg' || $suffix == '.png' || $suffix == '.pdf') {
                         $audit_files = new AuditFiles();

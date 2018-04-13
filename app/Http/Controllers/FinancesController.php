@@ -481,6 +481,7 @@ class FinancesController extends Controller
             '.$string_to_sql.',              
             `users`.`first_name`,
             `users`.`last_name`,
+            `users`.`max_transaction`,
             `users`.`username`,
             `users`.`rate`,
              SUM( time_to_sec(`work_hours`.`accept_stop`)-time_to_sec(`work_hours`.`accept_start`)) as `sum`,
@@ -514,7 +515,7 @@ class FinancesController extends Controller
                    `deleted`=0 AND `dkj_status`=1 AND `add_date` LIKE  "'.$month.'"
                     GROUP by `dkj`.`id_user`) h'),'r.id','h.id_user'
                 )
-                ->selectRaw('`id`,`agency_id`,`first_name`,`last_name`,`username`,`rate`,`sum`,`student`,`documents`,`kara`,`premia`,`success`,
+                ->selectRaw('`id`,`agency_id`,`first_name`,`last_name`,`max_transaction`,`username`,`rate`,`sum`,`student`,`documents`,`kara`,`premia`,`success`,
             `f`.`ods`,
             `h`.`janki`,
             `salary_to_account`')->get();

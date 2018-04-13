@@ -36,12 +36,13 @@
     <div class="row">
         <div class="panel panel-default second-panel">
             <div class="panel-heading titleOfSecondPanel">
-                <p>Audyt dla departamentu {{$infoAboutAudit['0']->department}} wypełniony przez {{$infoAboutAudit['0']->user_name}} dla trenera {{$infoAboutAudit['0']->trainer}} w {{$infoAboutAudit['0']->date_audit}}</p>
+                <p>Audyt dla departamentu {{$infoAboutAudit['0']->department}} wypełniony przez {{$infoAboutAudit['0']->user_name}}, osoba wybrana {{$infoAboutAudit['0']->trainer}} w {{$infoAboutAudit['0']->date_audit}}</p>
             </div>
             <div class="panel-body">
                 <h4>
-                    <div class="alert alert-warning"><sup>*</sup></sup>Kolumny <strong>Ilość</strong> i <strong>Jakość</strong> są obowiązkowe.</p></div>
+                    <div class="alert alert-warning"><p><sup>*</sup>Kolumny <strong>Ilość</strong>, <strong>Jakość</strong> i <strong>Komentarz</strong> są obowiązkowe.</p></div>
                     <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formularza zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
+                    <div class="alert alert-warning"><p>Załączniki mogą być <i>tylko</i> w formatach: <strong>.pdf</strong> <strong>.jpg</strong> <strong>.jpeg</strong> <strong>.png</strong></p></div>
                 </h4>
                 @foreach($headers as $h)
                     <div class="table-responsive">
@@ -51,7 +52,7 @@
                                 <th class="first">Kryteria</th>
                                 <th>Ilość<sup>*</sup></th>
                                 <th>Jakość<sup>*</sup></th>
-                                <th>Komentarz</th>
+                                <th>Komentarz<sup>*</sup></th>
                                 <th>Zdjęcia</th>
                                 <th>Załączniki</th>
                             </tr>
@@ -60,7 +61,7 @@
                             <div class="well well-sm"><p style="text-align:center;font-weight:bold;font-size:1.1em;">{{ucwords($h->name)}}</p></div>
                             @foreach($criterion as $c)
                                 @if($c->audit_header_id == $h->id)
-                                    <tr>
+                                    <tr class="tableRow">
                                         <td class="first">{{ucwords(str_replace('_',' ',$c->name))}}</td>
                                         <td>
                                             <div class="form-group">
@@ -93,9 +94,9 @@
                                                 @foreach($audit_info as $a)
                                                     @if($c->id == $a->audit_criterion_id)
                                                         @if(isset($a->comment))
-                                                        <input type="text" id="{{$c->name . "_comment"}}" name="{{$c->name . "_comment"}}" class="form-control" style="width:100%;" value="{{$a->comment}}">
+                                                        <input type="text" id="{{$c->name . "_comment"}}" name="{{$c->name . "_comment"}}" class="form-control thirdInp" style="width:100%;" value="{{$a->comment}}">
                                                         @else
-                                                        <input type="text" id="{{$c->name . "_comment"}}" name="{{$c->name . "_comment"}}" class="form-control" style="width:100%;" value="">
+                                                        <input type="text" id="{{$c->name . "_comment"}}" name="{{$c->name . "_comment"}}" class="form-control thirdInp" style="width:100%;" value="">
                                                         @endif
                                                     @endif
                                                 @endforeach
@@ -131,6 +132,11 @@
             </div>
         </div>
     </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-success final-alert">Wynik audytu to: </div>
+            </div>
+        </div>
     <div class="row last-row">
         <div class="col-md-12">
             <input class="btn btn-success btn-block" type="submit" id="secondButton" value="Zapisz zmiany!" style="margin-bottom:1em;">
@@ -155,6 +161,7 @@
             var everythingIsOk = true; //true = form submits, false = form doesn't submit
             var firstInp = document.getElementsByClassName('firstInp');
             var secondInp = document.getElementsByClassName('secondInp');
+            var thirdInp = document.getElementsByClassName('thirdInp');
 
             /**
              * Check if every "amount" input is selected
@@ -178,12 +185,38 @@
                 }
             }
 
+            if(everythingIsOk == true) {
+                for(var k = 0; k < thirdInp.length; k++) {
+                    if(thirdInp[k].value == null || thirdInp[k].value == '') {
+                        everythingIsOk = false;
+                        break;
+                    }
+                }
+            }
+
             //Validation of required inputs
             if(everythingIsOk != true) {
-                swal('Wypełnij wszystkie pola w kolumnach "Ilość" i "Jakość"');
+                swal('Wypełnij wszystkie pola w kolumnach "Ilość", "Jakość" i "Komentarz"');
             }
 
             if(everythingIsOk == true) {
+
+                var auditScore = 0;
+                var numberOfRows = 0;
+                var percentAuditScore;
+                var allTableRows = document.querySelectorAll('.tableRow');
+
+                allTableRows.forEach(function(element) {
+                    var firstInputInside = element.cells[1].firstElementChild.firstElementChild.value;
+                    var secondInputInside = element.cells[2].firstElementChild.firstElementChild.value;
+                    if(firstInputInside == 1 && secondInputInside == 1) {
+                        auditScore += 1;
+                    }
+                    numberOfRows += 1;
+                });
+                percentAuditScore = 100 * auditScore / numberOfRows;
+                $('.last-row').after('<input type="hidden" name="score" value="' + percentAuditScore + '">');
+
                 document.getElementById('auditForm').submit();
             }
 
@@ -197,6 +230,22 @@
                 allTables[i].nextSibling.parentNode.firstElementChild.style.display='none';
             }
         }
+
+        var auditScore = 0;
+        var numberOfRows = 0;
+        var allTableRows = document.querySelectorAll('.tableRow');
+
+        allTableRows.forEach(function(element) {
+        var firstInputInside = element.cells[1].firstElementChild.firstElementChild.value;
+        var secondInputInside = element.cells[2].firstElementChild.firstElementChild.value;
+        if(firstInputInside == 1 && secondInputInside == 1) {
+            auditScore += 1;
+        }
+        numberOfRows += 1;
+         });
+
+        $('.final-alert').append('<strong>' + auditScore + '</strong>' + '/' + numberOfRows + ' (' + (Math.round((100 * auditScore)/numberOfRows *100) / 100)+ '%)');
+
     });
     </script>
 @endsection

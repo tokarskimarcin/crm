@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Audit;
 use App\AuditCriterions;
 use App\AuditHeaders;
+use App\AuditStatus;
 use App\Department_info;
 use App\Department_types;
 use App\Departments;
@@ -582,16 +584,26 @@ class AdminController extends Controller
         }
     }
 
-    public function editAuditGet() {
-        $headers = AuditHeaders::all();
-        return view('admin.editAudit')->with('headers', $headers);
+    /**
+     * This method is responsible for sending data about headers for a given template
+     * @arg $id = id of template (audit_status->id)
+     */
+    public function editAuditGet($id) {
+        $headers = AuditHeaders::where('status', '=', $id)->get();
+        return view('admin.editAudit')->with('headers', $headers)->with('status', $id);
     }
 
+    /**
+     * This method is responsible for sending data about criterions for a given header by ajax
+     */
     public function editAuditPost(Request $request) {
-        $criterions = AuditCriterions::where('audit_header_id', '=', $request->header_id)->where('status', '=', '1')->get();
+        $criterions = AuditCriterions::where('audit_header_id', '=', $request->header_id)->where('status', '=', $request->status)->get();
         return $criterions;
     }
 
+    /**
+     * This function is responsible for adding/removing Headers AND Criterions for given audits templates
+     */
     public function editDatabasePost(Request $request) {
         $addingHeader = $request->addingHeader;
         $addingCrit = $request->addingCrit;
@@ -601,7 +613,7 @@ class AdminController extends Controller
             $newCriterium = new AuditCriterions();
             $newCriterium->name = $newName;
             $newCriterium->audit_header_id = $request->relatedHeader;
-            $newCriterium->status = 1;
+            $newCriterium->status = $request->status;
             $newCriterium->save();
         }
 
@@ -615,12 +627,12 @@ class AdminController extends Controller
             $newName = mb_strtolower(trim($request->newHeaderName, ' '), 'UTF-8');
             $newHeader = new AuditHeaders();
             $newHeader->name = $newName;
-            $newHeader->status = 1;
+            $newHeader->status = $request->status;
             $newHeader->save();
         }
         else if($addingHeader == "false") {
             $headerToRemove = AuditHeaders::where('id', '=', $request->hid)->first();
-            $relatedCriterions = AuditCriterions::where('audit_header_id', '=', $request->hid)->where('status', '=', '1')->get();
+            $relatedCriterions = AuditCriterions::where('audit_header_id', '=', $request->hid)->where('status', '=', $request->status)->get();
             $headerToRemove->status = 0;
             $headerToRemove->save();
             foreach($relatedCriterions as $rC) {
@@ -628,8 +640,37 @@ class AdminController extends Controller
                 $rC->save();
             }
         }
-        return Redirect::to('editAudit');
+        return Redirect::back();
     }
+
+    /**
+     * This method is responsible for sending all data about templates to editAuditTempalte view
+     */
+    public function editAuditTemplatesGet() {
+        $allTemplates = AuditStatus::all();
+        return view('admin.editAuditTemplates')->with('templates', $allTemplates);
+    }
+
+    /**
+     * This method is responsible for adding/removing audit templates
+     */
+    public function addTemplatePost(Request $request) {
+        $isAdding = $request->isAdding;
+        if($isAdding == null) { //condition satisfied when user is only adding new template
+            $templateName = $request->templateName;
+            $newTemplate = new AuditStatus();
+            $newTemplate->name = trim($templateName, ' ');
+            $newTemplate->save();
+        }
+        else { //condition satisfied when user is deleting given template
+            $idToDelete = $request->idToDelete;
+            $templateToDelete = AuditStatus::where('id', '=', $idToDelete)->first();
+            $templateToDelete->delete();
+        }
+
+        return Redirect::back();
+    }
+
 
 
 

@@ -1657,6 +1657,7 @@ class StatisticsController extends Controller
                 ]);
     }
 
+    //tylko do widoku
     public function pageReportCoachingPost(Request $request){
 
         $month = $request->month_selected;
@@ -1671,6 +1672,7 @@ class StatisticsController extends Controller
             $departments = Department_info::whereIn('id_dep_type', [1, 2])->get();
             $data = $this->getCoachingData($month, $year, (array)$dep_id);
 
+//            dd($data);
             return view('reportpage.ReportCoachingWeek')
                 ->with([
                     'departments' => $departments,
@@ -1749,9 +1751,15 @@ class StatisticsController extends Controller
             foreach ($coach_from_department as $coach_from_department_list){
                 $lp++;
                 $empty_coach_list = new \stdClass();
-                $coach = $coach_week->where('user_id','=',$coach_from_department_list->id);
+                $empty_coach_list->start_date =  $item['start_day'];
+                $empty_coach_list->stop_date =  $item['stop_day'];
 
+                $coach = $coach_week->where('user_id','=',$coach_from_department_list->id);
+//                if($coach_from_department_list->id == 4023) {
+//                    dd($coach_from_department_list);
+//                }
                 if((!$coach->isempty())){
+
                     $coach = $coach->first();
                     $empty_coach_list->user_id = $coach->user_id;
                     $empty_coach_list->first_name = $coach->first_name;
@@ -3477,4 +3485,90 @@ class StatisticsController extends Controller
            }
        });
     }
+
+
+        public function pageReportCoachingSummaryGet() {
+
+            $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
+            $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+            $directors = User::whereIn('id', $directorsIds)->get();
+            $dep_id = Auth::user()->department_info_id;
+            $month = date('m');
+            $year = date('Y');
+            $data = $this->getCoachingData( $month, $year, (array)$dep_id);
+            $dep = Department_info::find($dep_id);
+            return view('reportpage.ReportCoachingWeekSummary')
+                ->with([
+                    'departments'       => $departments,
+                    'directors'         => $directors,
+                    'wiev_type'         => 'department',
+                    'dep_id'            => $dep_id,
+                    'months'            => $this->getMonthsNames(),
+                    'month'             => $month,
+                    'dep_info'               => $dep,
+                    'all_coaching'      => $data['all_coaching']
+                ]);
+        }
+
+        public function pageReportCoachingSummaryPost(Request $request) {
+            $month = date('m');
+            $date = $request->month_selected;
+            $allInfo = $this->getAllDepartmentsData($date);
+//            dd($allInfo);
+            return view('reportpage.ReportCoachingWeekSummary')
+                ->with('all_data', $allInfo)
+                ->with('months', $this->getMonthsNames())
+                ->with('month', $month);
+        }
+
+        public function getAllDepartmentsData($month) {
+            $year = date('Y');
+            $depArray = array();
+            $allDepArray = array();
+
+            $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+            $directors = User::whereIn('id', $directorsIds)->get();
+            $allDepartments = Department_info::whereIn('id_dep_type', [1,2])->get();
+
+            foreach($allDepartments as $deps) {
+                array_push($depArray, $deps->id);
+            }
+
+            foreach($depArray as $depArr) {
+                if ($depArr < 100) {
+                    $dep_info = Department_info::find($depArr);
+                    $dep_name = $dep_info->departments->name . ' ' . $dep_info->department_type->name;
+
+                    $dep_id = $depArr;
+                    $departments = Department_info::whereIn('id_dep_type', [1, 2])->get();
+                    $data = $this->getCoachingData($month, $year, (array)$dep_id);
+                    $data += ["dep_name" => $dep_name];
+                    array_push($allDepArray, $data);
+                }
+//                else{
+//                    dd("1");
+//                    // usunięcie 10 przed id dyrektora
+//                    $dirId = substr($request->selected_dep, 2);
+//                    $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
+//                    $departments = Department_info::where('id_dep_type', '=', 2)->get();
+//                    $dep_info = Department_info::find(User::find($dirId)->main_department_id);
+//
+//                    $data = $this->getCoachingData($month, $year, $director_departments->pluck('id')->toArray());
+//
+//                    return view('reportpage.reportCoachingWeekSummary')
+//                        ->with([
+//                            'departments' => $departments,
+//                            'directors' => $directors,
+//                            'wiev_type' => 'director',
+//                            'dep_info'               => $dep_info,
+//                            'dep_id' => $request->selected_dep,
+//                            'months' => $this->getMonthsNames(),
+//                            'month' => $month,
+//                            'all_coaching' => $data['all_coaching']
+//                        ]);
+//                }
+            }
+            return $allDepArray;
+        }
+
 }

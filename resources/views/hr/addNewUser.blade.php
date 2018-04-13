@@ -241,8 +241,14 @@
                                     <input type="number" class="form-control" placeholder="000" id="login_phone" name="login_phone" value="">
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="for-group">
+                                    <label for="maxTransaction" class="myLabel">Maksymalny przelew</label>
+                                    <input type="number" step="0.01" placeholder="1000.50" class="form-control" value="0" min="0" id="maxTransaction" name="maxTransaction">
+                                </div>
+                            </div>
                         @endif
-                        <div class="col-md-8">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label class="myLabel">Opis:</label>
                                 <textarea class="form-control" name="description" id="description" placeholder="Opis dodawany do pracownika np. z jakiego ogłoszenia o pracę">@if(isset($candidate_comment)){{$candidate_comment}}@endif</textarea>
