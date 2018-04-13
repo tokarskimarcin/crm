@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">
-                <div class="well gray-nav">Tabela postępów</div>
+                <div class="well gray-nav">Tabela postępów Dyrektor</div>
             </div>
         </div>
     </div>
@@ -63,8 +63,8 @@
                                 <table id="table_in_progress" class="table table-striped thead-inverse">
                                     <thead>
                                     <tr>
-                                        <th>Trener</th>
-                                        <th>Konsultant</th>
+                                        <th>Dyrektor</th>
+                                        <th>Kierownik</th>
                                         <th>Data</th>
                                         <th>Temat</th>
                                         <th>Średnia wyjściowa</th>
@@ -181,8 +181,8 @@
                                     <th>Data</th>
                                     <th>Temat</th>
                                     <th>Średnia wyjściowa</th>
-                                    <th>Osiągnieta średnia</th>
-                                    <th>Końcowe RBH</th>
+                                    <th>Aktualna średnia</th>
+                                    <th>Aktualne RBH</th>
                                     <th>Cel</th>
                                     <th>Komentarz</th>
                                 </tr>
@@ -237,7 +237,8 @@
                                         <label class="myLabel">Konsultant</label>
                                         <select class="form-control" id="couaching_user_id">
                                             <option>Wybierz</option>
-                                            @foreach($consultant as $list)
+                                            {{dd($coachingManagerList)}}
+                                            @foreach($coachingManagerList as $list)
                                                 <option value={{$list->id}}>{{$list->first_name.' '.$list->last_name}}</option>
                                             @endforeach
                                         </select>
@@ -550,7 +551,6 @@
             });
 
             var table_unsettled = $('#table_unsettled').DataTable({
-                "bPaginate": false,
                 "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
@@ -578,9 +578,8 @@
                         let coaching_id = $(this).data('id');
                         let coaching_comment = $('#text_'+coaching_id).val();
                         let row = $(this).closest('tr');
-                        let avrage_end =  row.find('td:nth-child(6)').text();
-
-                        let rbh_end = row.find('td:nth-child(7)').text();
+                        let avrage_end =  row.find('td:nth-child(5)').text();
+                        let rbh_end = row.find('td:nth-child(6)').text();
                         console.log(avrage_end+' '+rbh_end+' '+coaching_id);
                         swal({
                             title: 'Jesteś pewien?',

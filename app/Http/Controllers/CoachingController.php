@@ -51,12 +51,36 @@ class CoachingController extends Controller
             return json_decode($coach);
         }else return 0;
     }
+
+
     /**
      * @return $this
-     * Wyświetlenie strony 'progress_table'
+     * Wyświetlenie strony 'progress_table' dla Dyrektorów
+     */
+    public function progress_table_for_directorGET(){
+        $coachingManagerList = $this::getCoachingManagerList(array(Auth::user()->id));
+        return view('coaching.progress_table_for_director')
+            ->with('consultant',$coachingManagerList);
+    }
+
+    /**
+     * @return $this
+     * Wyświetlenie strony 'progress_table' dla Kierowników
+     */
+    public function progress_table_for_managerGET(){
+        //pobranie trenerów i średnie ich grup dla danego kierownika
+        $consultant = $this::getCoachingCoachList();
+
+        return view('coaching.progress_table_for_manager')
+            ->with('consultant',$consultant);
+    }
+
+    /**
+     * @return $this
+     * Wyświetlenie strony 'progress_table' dla trenerów
      */
     public function progress_tableGET(){
-        $consultant = $this::getCoachConsultant();
+        $consultant = $this::getCoachConsultant(array(Auth::user()->id));
 
         return view('coaching.progress_table')
                 ->with('consultant',$consultant);
@@ -152,17 +176,131 @@ class CoachingController extends Controller
 
     /**
      * @return mixed
+     * pobranie kierowników dla danego dyrektorów
+     */
+    public function getCoachingManagerList(){
+        // Id dyrektora
+        $director_id = 2; //Auth::user()->id
+        // Pobranie oddziałów przypisanych do dyrektora
+        $director_departments = Department_info::
+            where('director_id','=',$director_id)
+                ->get();
+
+        //List Kierowników
+        $all_manager_list = User::
+        whereIn('department_info_id',$director_departments->pluck('id')->toarray())
+            ->where('status_work','=',1)
+            ->whereIn('user_type_id',[7,13])
+            ->where('id','!=',$director_id)
+            ->get();
+        // Pobranie statystyk dla kierownika
+        $department_statistics = $this::getDepartmentInfo(1,1,$director_departments->pluck('id')->toArray(),$all_manager_list);
+
+        return $department_statistics;
+    }
+
+    public function getDepartmentInfo($date_start,$date_stop,$director_id,$all_manager_list){
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+
+        $reports = DB::table('hour_report')
+            ->select(DB::raw(
+                'SUM(call_time)/count(`call_time`) as sum_call_time,
+                  SUM(success)/sum(`hour_time_use`) as avg_average,
+                  SUM(success) as sum_success,
+                  sum(`hour_time_use`) as hour_time_use,
+                  SUM(wear_base)/count(`call_time`) as avg_wear_base,
+                  SUM(janky_count)/count(`call_time`)  as sum_janky_count,
+                  department_type.name as dep_name,
+                  departments.name as dep_type_name,
+                  department_info.*
+                   '))
+            ->join('department_info', 'department_info.id', '=', 'hour_report.department_info_id')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->where('department_info.dep_aim','!=',0)
+            ->whereIn('hour_report.id', function($query) use($date_start, $date_stop){
+                $query->select(DB::raw(
+                    'MAX(hour_report.id)'
+                ))
+                    ->from('hour_report')
+                    ->whereBetween('report_date', [$date_start, $date_stop])
+                    ->where('call_time', '!=',0)
+                    ->groupBy('department_info_id','report_date');
+            })
+            ->whereIn('department_info.id',$director_id)
+            ->groupBy('hour_report.department_info_id')
+            ->get();
+
+        //tu był zmiana z godzin na liczbę
+        $work_hours = DB::table('work_hours')
+            ->select(DB::raw(
+                'sum(time_to_sec(register_stop) - time_to_sec(register_start))/3600 as realRBH,
+                department_info.id
+            '))
+            ->join('users', 'users.id', '=', 'work_hours.id_user')
+            ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
+            ->whereBetween('date', [$date_start, $date_stop])
+            ->whereIn('department_info.id',$director_id)
+            ->where('users.user_type_id', '=', 1)
+            ->groupBy('department_info.id')
+            ->get();
+
+        /**
+         * Przypisanie danych do jednego obiektu
+         * Dodanie RBH Do Kolekcji oraz imion kierowników
+         */
+        $collect_report = $reports->map(function($item) use ($work_hours,$all_manager_list) {
+            //Pobranie danych z jankami
+            $toAdd_rbh = $work_hours->where('id', '=', $item->id)->first();
+            $item->realRBH = ($toAdd_rbh != null) ? $toAdd_rbh->realRBH : 0;
+            $toAdd_manager = $all_manager_list->where('id','=',$item->menager_id)->first();
+            $item->manager_name = ($toAdd_manager != null) ? $toAdd_manager->first_name.' '.$toAdd_manager->last_name : 0;
+            return $item;
+        });
+
+        $data = [
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'collect_report' => $collect_report,
+        ];
+        return $data;
+    }
+    /**
+     * @return mixed
+     * pobranie trenerów dla danego kierownika
+     */
+    public function getCoachingCoachList(){
+        // Pobranie oddziałów przypisanych do kierownika
+        $manager_departments = Department_info::
+                                where('menager_id','=',Auth::user()->id)
+                                ->get();
+        //List Treneró
+        $all_coach_list = User::
+                        whereIn('department_info_id',$manager_departments->pluck('id')->toarray())
+                        ->where('status_work','=',1)
+                        ->whereIn('user_type_id',[4,12])
+                        ->get();
+        $group_status = collect();
+        dd($all_coach_list);
+        foreach ($all_coach_list as $item){
+            $group_status->push($this::getCoachConsultant(array($item->id)));
+        }
+        dd($group_status);
+    }
+
+    /**
+     * @return mixed
      * pobranie konsultantów dla zalogowanego trenera
      */
-    public function getCoachConsultant(){
-
+    public function getCoachConsultant($coach_id){
         $all_users = DB::table('work_hours')
             ->select(
                 DB::raw('               
                 users.id as user_id'
                 ))
             ->join('users','users.id','work_hours.id_user')
-            ->where('users.coach_id','=',Auth::user()->id)
+            ->whereIn('users.coach_id',$coach_id)
             ->where('users.status_work','=',1)
             ->groupby('users.id')
             ->get();
@@ -193,10 +331,15 @@ class CoachingController extends Controller
             $data->id = $user->id;
             $data->first_name = $user->first_name;
             $data->last_name = $user->last_name;
+            $data->success = $succes;
             if($rbh == 0){
                 $data->avg_consultant = 0;
-            }else
+                $data->rbh = 0;
+
+            }else{
+                $data->rbh = $rbh/3600;
                 $data->avg_consultant = round($succes/($rbh/3600),2);
+            }
             $ready_data[] = $data;
         }
         return collect($ready_data);
