@@ -667,8 +667,8 @@ Route::Post('/removeGroup', 'AdminController@removeGroup');
 Route::get('/charts', 'ScreensController@showScreensGet');
 //ENDCHARTS
 //COACHINGS
-Route::get('/pageReportCoachingSummary', 'StatisticsController@pageReportCoachingSummaryGet');
-Route::post('/pageReportCoachingSummary', 'StatisticsController@pageReportCoachingSummaryPost');
+Route::get('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryGet');
+Route::post('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryPost');
 Route::get('/ReportCoachingSummary', 'StatisticsController@MailReportCoachingSummary');
 //END COACHINGS
 Route::get('/dept/{id}','ScreensController@monitorMethod');

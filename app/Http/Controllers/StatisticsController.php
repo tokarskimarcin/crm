@@ -3427,6 +3427,7 @@ class StatisticsController extends Controller
             $mail_type = $mail_without_folder[count($mail_without_folder)-1];
             $mail_type2 = ucfirst($mail_type);
             $mail_type2 = 'page' . $mail_type2;
+//            dd($mail_type2);
             $accepted_users = $default_users;
         } else {
             $email = [];
@@ -3525,8 +3526,7 @@ class StatisticsController extends Controller
             $month = date('m');
             $date = $request->month_selected;
             $allInfo = $this->getAllDepartmentsData($date);
-
-            $this->MailReportCoachingSummary($date);
+//            $this->MailReportCoachingSummary($date);
 //            dd($allInfo);
             return view('reportpage.ReportCoachingWeekSummary')
                 ->with('all_data', $allInfo)
@@ -3582,7 +3582,6 @@ class StatisticsController extends Controller
     public function MailReportCoachingSummary() {
         $month = date('m');
         $user = User::where('id','=',6009)->get();
-//            dd($user);
         $data = $this->getAllDepartmentsData($month);
         $title = 'Raport tygodniowo/miesięczny Zbiorczy ';
         $this->sendMailByVerona('reportCoachingWeekSummary', $data, $title, $user);
