@@ -364,14 +364,14 @@
                     {"data": "coaching_actual_avg"},
                     {"data":function (data, type, dataToSet) {
                             let color = 'green';
-                            if(data.avg_consultant < data.average_goal)
+                            if(parseFloat(data.avrage_end) < parseFloat(data.average_goal))
                                 color = 'red';
-                            return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
-                        },"name": "avg_consultant","searchable": false
+                            return '<span style="color:' + color + '">' + data.avrage_end + '</span>';
+                        },"name": "avrage_end","searchable": false
                     },
                     {"data":function (data, type, dataToSet) {
-                            return Math.round(data.couching_rbh/3600,2);
-                        },"name": "couching_rbh","searchable": false
+                            return Math.round(data.rbh_end,2);
+                        },"name": "rbh_end","searchable": false
                     },
                     {"data": "average_goal"},
                     {"data":"comment"},
