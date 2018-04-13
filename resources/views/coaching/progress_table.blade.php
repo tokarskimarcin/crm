@@ -577,8 +577,9 @@
                         let coaching_id = $(this).data('id');
                         let coaching_comment = $('#text_'+coaching_id).val();
                         let row = $(this).closest('tr');
-                        let avrage_end =  row.find('td:nth-child(5)').text();
-                        let rbh_end = row.find('td:nth-child(6)').text();
+                        let avrage_end =  row.find('td:nth-child(6)').text();
+
+                        let rbh_end = row.find('td:nth-child(7)').text();
                         console.log(avrage_end+' '+rbh_end+' '+coaching_id);
                         swal({
                             title: 'Jesteś pewien?',
