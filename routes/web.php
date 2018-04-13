@@ -663,6 +663,10 @@ Route::Post('/removeGroup', 'AdminController@removeGroup');
 //CHARTS
 Route::get('/charts', 'ScreensController@showScreensGet');
 //ENDCHARTS
+//COACHINGS
+Route::get('/pageReportCoachingSummary', 'StatisticsController@pageReportCoachingSummaryGet');
+Route::post('/pageReportCoachingSummary', 'StatisticsController@pageReportCoachingSummaryPost');
+//END COACHINGS
 Route::get('/dept/{id}','ScreensController@monitorMethod');
 Route::get('/screen_table','ScreensController@screenMethod');
 //pobieranie danych po oddziałach godzinny
