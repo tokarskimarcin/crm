@@ -3486,7 +3486,9 @@ class StatisticsController extends Controller
        });
     }
 
-
+    /**
+     * This method displays view reportCoachingWeekSummary with summary of actual month
+     */
         public function pageReportCoachingSummaryGet() {
 
             $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
@@ -3495,6 +3497,8 @@ class StatisticsController extends Controller
             $dep_id = Auth::user()->department_info_id;
             $month = date('m');
             $year = date('Y');
+
+            $allInfo = $this->getAllDepartmentsData($month);
             $data = $this->getCoachingData( $month, $year, (array)$dep_id);
             $dep = Department_info::find($dep_id);
             return view('reportpage.ReportCoachingWeekSummary')
@@ -3507,9 +3511,13 @@ class StatisticsController extends Controller
                     'month'             => $month,
                     'dep_info'               => $dep,
                     'all_coaching'      => $data['all_coaching']
-                ]);
+                ])
+                ->with('all_data', $allInfo);
         }
 
+    /**
+     * This method gets month from user and displays view reportCoachingWeekSummary for a given month
+     */
         public function pageReportCoachingSummaryPost(Request $request) {
             $month = date('m');
             $date = $request->month_selected;
@@ -3521,6 +3529,9 @@ class StatisticsController extends Controller
                 ->with('month', $month);
         }
 
+    /**
+     * This method collect necessary data(for pageReportCoachingSumPost method) for every department (dep_type IN [1,2]) and returns array of data
+     */
         public function getAllDepartmentsData($month) {
             $year = date('Y');
             $depArray = array();
