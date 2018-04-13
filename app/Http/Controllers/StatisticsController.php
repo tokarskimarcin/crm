@@ -3475,6 +3475,10 @@ class StatisticsController extends Controller
 //     });
 
         $mail_type = $mail_type_pom;
+        $data = [
+            'fist_data' => $data
+        ];
+        dd($data);
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
        {
@@ -3583,6 +3587,7 @@ class StatisticsController extends Controller
         $month = date('m');
         $user = User::where('id','=',6009)->get();
         $data = $this->getAllDepartmentsData($month);
+        $data = ['all_data' => $data];
         $title = 'Raport tygodniowo/miesięczny Zbiorczy ';
         $this->sendMailByVerona('reportCoachingWeekSummary', $data, $title, $user);
     }
