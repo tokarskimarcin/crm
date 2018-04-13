@@ -8,7 +8,7 @@
             </div>
         </div>
     </div>
-    <form method="POST" action="{{ URL::to('/pageReportCoachingSummary') }}">
+    <form method="POST" action="{{ URL::to('/pageReportCoachingWeekSummary') }}">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <div class="row">
             <div class="col-md-4">
