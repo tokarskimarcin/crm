@@ -1657,6 +1657,33 @@ class StatisticsController extends Controller
                 ]);
     }
 
+    public function MailpageReportCoaching() {
+        $month = date('m');
+        $year = date('Y');
+        $dep_id = Auth::user()->department_info_id;
+        $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+        $directors = User::whereIn('id', $directorsIds)->get();
+        $dep = Department_info::find($dep_id);
+
+        $user = User::where('id','=',6009)->get();
+        $data = $this->getCoachingData( $month, $year, (array)$dep_id);
+
+        $allDataArray = [
+            'departments' => $departments,
+            'directors' => $directors,
+            'wiev_type' => 'department',
+            'dep_id' => $dep_id,
+            'months' => $this->getMonthsNames(),
+            'month' => $month,
+            'dep_info' => $dep,
+            'all_coaching' => $data['all_coaching']
+        ];
+
+        $title = 'Raport tygodniowo/miesięczny ';
+        $this->sendMailByVerona('reportCoachingWeek', $allDataArray, $title, $user);
+    }
+
     //tylko do widoku
     public function pageReportCoachingPost(Request $request){
 
@@ -3495,7 +3522,7 @@ class StatisticsController extends Controller
      */
         public function pageReportCoachingSummaryGet() {
 
-            $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
+            $departments = Department_info::whereIn('id_dep_type', [2])->get();
             $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
             $directors = User::whereIn('id', $directorsIds)->get();
             $dep_id = Auth::user()->department_info_id;
