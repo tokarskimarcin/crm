@@ -28,7 +28,7 @@ class AuditController extends Controller
      * @return view addAudit and info about departments, Audit Headers and Audit Criterions
      */
     public function auditMethodGet() {
-        $dept = Department_info::all();
+        $dept = Department_info::whereIn('id_dep_type', [1,2,6])->get();
         $headers = AuditHeaders::all(); //there was where(status = 1)
         $criterion = AuditCriterions::where('status', '=', '1')->get();
         $templates = AuditStatus::all();
@@ -118,7 +118,7 @@ class AuditController extends Controller
                     $newArray = $request->files->all();
                     $fileName = $file->getClientOriginalName();
                     $dotIndex = strripos($fileName, '.'); //last occurence of .
-                    $suffix = substr($fileName, $dotIndex); //rest of string after $dotIndex
+                    $suffix = strtolower(substr($fileName, $dotIndex)); //rest of string after $dotIndex
 
                     if($suffix == '.jpeg' || $suffix == '.jpg' || $suffix == '.png' || $suffix == '.pdf') {
                         $audit_files = new AuditFiles();
@@ -133,8 +133,9 @@ class AuditController extends Controller
                 }
             }
             $newCrit->save();
+            Session::flash('adnotation', "Audyt został dodany!");
         }
-        return Redirect::to('audit/'.$newForm->id);
+        return Redirect::to('/showAudits');
     }
 
     /**
@@ -260,7 +261,7 @@ class AuditController extends Controller
                     $newArray = $request->files->all();
                     $fileName = $file->getClientOriginalName();
                     $dotIndex = strripos($fileName, '.'); //last occurence of .
-                    $suffix = substr($fileName, $dotIndex); //rest of string after $dotIndex
+                    $suffix = strtolower(substr($fileName, $dotIndex)); //rest of string after $dotIndex
 
                     if ($suffix == '.jpeg' || $suffix == '.jpg' || $suffix == '.png' || $suffix == '.pdf') {
                         $audit_files = new AuditFiles();
