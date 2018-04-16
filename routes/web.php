@@ -627,6 +627,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     /** Tabela Postępów Coaching */
 
     Route::get('/progress_table', 'CoachingController@progress_tableGET');
+    Route::get('/progress_table_for_director', 'CoachingController@progress_table_for_directorGET');
+    Route::get('/progress_table_for_manager', 'CoachingController@progress_table_for_managerGET');
+
 
     Route::get('/pageReportCoaching', 'StatisticsController@pageReportCoachingGet');
     Route::post('/pageReportCoaching', 'StatisticsController@pageReportCoachingPost');

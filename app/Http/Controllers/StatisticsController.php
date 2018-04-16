@@ -3612,6 +3612,7 @@ class StatisticsController extends Controller
         $month = date('m');
         $user = User::where('id','=',6009)->get();
         $data = $this->getAllDepartmentsData($month);
+        $data = ['all_data' => $data];
         $title = 'Raport tygodniowo/miesięczny Zbiorczy ';
         $this->sendMailByVerona('reportCoachingWeekSummary', $data, $title, $user);
     }

@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">
-                <div class="well gray-nav">Tabela postępów</div>
+                <div class="well gray-nav">Tabela postępów Dyrektor</div>
             </div>
         </div>
     </div>
@@ -63,8 +63,8 @@
                                 <table id="table_in_progress" class="table table-striped thead-inverse">
                                     <thead>
                                     <tr>
-                                        <th>Trener</th>
-                                        <th>Konsultant</th>
+                                        <th>Dyrektor</th>
+                                        <th>Kierownik</th>
                                         <th>Data</th>
                                         <th>Temat</th>
                                         <th>Średnia wyjściowa</th>
@@ -181,8 +181,8 @@
                                     <th>Data</th>
                                     <th>Temat</th>
                                     <th>Średnia wyjściowa</th>
-                                    <th>Osiągnieta średnia</th>
-                                    <th>Końcowe RBH</th>
+                                    <th>Aktualna średnia</th>
+                                    <th>Aktualne RBH</th>
                                     <th>Cel</th>
                                     <th>Komentarz</th>
                                 </tr>
@@ -227,18 +227,16 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="row">
                         <div class="col-md-12" id="header_modal">
-
                             <div class="col-md-12">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label class="myLabel">Konsultant</label>
+                                        <label class="myLabel">Kierownik</label>
                                         <select class="form-control" id="couaching_user_id">
                                             <option>Wybierz</option>
-                                            @foreach($consultant as $list)
-                                                <option value={{$list->id}}>{{$list->first_name.' '.$list->last_name}}</option>
+                                            @foreach($coachingManagerList['collect_report'] as $list)
+                                                <option value={{$list->menager_id}}>{{$list->manager_name}}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -246,14 +244,23 @@
                             </div>
 
                             <div class="col-md-12">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="myLabel">Temat</label>
                                         <input type="text" class="form-control" id="coaching_subject" placeholder="Podaj temat"/>
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="myLabel">Typ Coachingu:</label>
+                                        <select class="form-control" id="couaching_user_id">
+                                            <option>Wybierz</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="myLabel">Data Coaching'u:</label>
                                         <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -273,6 +280,18 @@
                                         <input type="number" lang="en" class="form-control" name="coaching_actual_avg" id="coaching_actual_avg" placeholder="Wprawoadź aktualną średnią"/>
                                     </div>
                                 </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="myLabel">Aktualna Jakość</label>
+                                        <input type="number" lang="en" class="form-control" name="coaching_actual_avg" id="coaching_actual_avg" placeholder="Wprawoadź aktualną średnią"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="myLabel">Aktualne RBH</label>
+                                        <input type="number" lang="en" class="form-control" name="coaching_actual_avg" id="coaching_actual_avg" placeholder="Wprawoadź aktualną średnią"/>
+                                    </div>
+                                </div>
 
                                 {{--<div class="col-md-4">--}}
                                     {{--<div class="form-group">--}}
@@ -280,10 +299,24 @@
                                         {{--<input type="number" class="form-control" id="coaching_goal_min" placeholder="Wprawoadź minimalny cel"/>--}}
                                     {{--</div>--}}
                                 {{--</div>--}}
+                            </div>
 
-                                <div class="col-md-8">
+                            <div class="col-md-12">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="myLabel">Średnia docelowa</label>
+                                        <input type="number" class="form-control" id="coaching_goal" placeholder="Wprawoadź maksymalny cel"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="myLabel">Jakość docelowa</label>
+                                        <input type="number" class="form-control" id="coaching_goal" placeholder="Wprawoadź maksymalny cel"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="myLabel">RBH docelowa</label>
                                         <input type="number" class="form-control" id="coaching_goal" placeholder="Wprawoadź maksymalny cel"/>
                                     </div>
                                 </div>
@@ -314,7 +347,6 @@
          * @param e
          */
         function save_coaching(e) {
-
             let consultant_id = $('#couaching_user_id').val();
             let subject = $('#coaching_subject').val();
             let coaching_date = $('#date_start_new_coaching').val();
@@ -365,7 +397,6 @@
             // }
 
             if(validation){
-                e.disabled = true;
                 $.ajax({
                     type: "POST",
                     url: "{{route('api.saveCoaching')}}",
@@ -385,7 +416,6 @@
                     success: function (response) {
                         console.log(response);
                         $('#Modal_Coaching').modal('hide');
-                        e.disabled = false;
                     }
                 })
             }
@@ -404,7 +434,7 @@
                 clear_moda();
             });
 
-            var consultant = JSON.parse('{!!$consultant!!}');
+            var consultant = JSON.parse('{!!$coachingManagerList['collect_report']!!}');
             $('#couaching_user_id').on('change',function () {
                 for(var i =0;i<consultant.length;i++){
                     if(consultant[i].id == $(this).val()){
@@ -426,8 +456,6 @@
 
 
             var in_progress_table = $('#table_in_progress').DataTable({
-                "bPaginate": false,
-                "bInfo" : false,
                 "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
@@ -555,8 +583,6 @@
             });
 
             var table_unsettled = $('#table_unsettled').DataTable({
-                "bPaginate": false,
-                "bInfo" : false,
                 "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
@@ -584,9 +610,8 @@
                         let coaching_id = $(this).data('id');
                         let coaching_comment = $('#text_'+coaching_id).val();
                         let row = $(this).closest('tr');
-                        let avrage_end =  row.find('td:nth-child(6)').text();
-
-                        let rbh_end = row.find('td:nth-child(7)').text();
+                        let avrage_end =  row.find('td:nth-child(5)').text();
+                        let rbh_end = row.find('td:nth-child(6)').text();
                         console.log(avrage_end+' '+rbh_end+' '+coaching_id);
                         swal({
                             title: 'Jesteś pewien?',

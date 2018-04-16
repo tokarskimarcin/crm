@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">
-                <div class="well gray-nav">Tabela postępów</div>
+                <div class="well gray-nav">Tabela postępów Kierownik</div>
             </div>
         </div>
     </div>
@@ -181,8 +181,8 @@
                                     <th>Data</th>
                                     <th>Temat</th>
                                     <th>Średnia wyjściowa</th>
-                                    <th>Osiągnieta średnia</th>
-                                    <th>Końcowe RBH</th>
+                                    <th>Aktualna średnia</th>
+                                    <th>Aktualne RBH</th>
                                     <th>Cel</th>
                                     <th>Komentarz</th>
                                 </tr>
@@ -314,7 +314,6 @@
          * @param e
          */
         function save_coaching(e) {
-
             let consultant_id = $('#couaching_user_id').val();
             let subject = $('#coaching_subject').val();
             let coaching_date = $('#date_start_new_coaching').val();
@@ -365,7 +364,6 @@
             // }
 
             if(validation){
-                e.disabled = true;
                 $.ajax({
                     type: "POST",
                     url: "{{route('api.saveCoaching')}}",
@@ -385,7 +383,6 @@
                     success: function (response) {
                         console.log(response);
                         $('#Modal_Coaching').modal('hide');
-                        e.disabled = false;
                     }
                 })
             }
@@ -426,8 +423,6 @@
 
 
             var in_progress_table = $('#table_in_progress').DataTable({
-                "bPaginate": false,
-                "bInfo" : false,
                 "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
@@ -555,8 +550,6 @@
             });
 
             var table_unsettled = $('#table_unsettled').DataTable({
-                "bPaginate": false,
-                "bInfo" : false,
                 "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
@@ -584,9 +577,8 @@
                         let coaching_id = $(this).data('id');
                         let coaching_comment = $('#text_'+coaching_id).val();
                         let row = $(this).closest('tr');
-                        let avrage_end =  row.find('td:nth-child(6)').text();
-
-                        let rbh_end = row.find('td:nth-child(7)').text();
+                        let avrage_end =  row.find('td:nth-child(5)').text();
+                        let rbh_end = row.find('td:nth-child(6)').text();
                         console.log(avrage_end+' '+rbh_end+' '+coaching_id);
                         swal({
                             title: 'Jesteś pewien?',
