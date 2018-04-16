@@ -423,6 +423,8 @@
 
 
             var in_progress_table = $('#table_in_progress').DataTable({
+                "bPaginate": false,
+                "bInfo" : false,
                 "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
