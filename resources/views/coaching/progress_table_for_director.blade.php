@@ -227,19 +227,16 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="row">
                         <div class="col-md-12" id="header_modal">
-
                             <div class="col-md-12">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label class="myLabel">Konsultant</label>
+                                        <label class="myLabel">Kierownik</label>
                                         <select class="form-control" id="couaching_user_id">
                                             <option>Wybierz</option>
-                                            {{dd($coachingManagerList)}}
-                                            @foreach($coachingManagerList as $list)
-                                                <option value={{$list->id}}>{{$list->first_name.' '.$list->last_name}}</option>
+                                            @foreach($coachingManagerList['collect_report'] as $list)
+                                                <option value={{$list->menager_id}}>{{$list->manager_name}}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -247,14 +244,23 @@
                             </div>
 
                             <div class="col-md-12">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="myLabel">Temat</label>
                                         <input type="text" class="form-control" id="coaching_subject" placeholder="Podaj temat"/>
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="myLabel">Typ Coachingu:</label>
+                                        <select class="form-control" id="couaching_user_id">
+                                            <option>Wybierz</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="myLabel">Data Coaching'u:</label>
                                         <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -274,6 +280,18 @@
                                         <input type="number" lang="en" class="form-control" name="coaching_actual_avg" id="coaching_actual_avg" placeholder="Wprawoadź aktualną średnią"/>
                                     </div>
                                 </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="myLabel">Aktualna Jakość</label>
+                                        <input type="number" lang="en" class="form-control" name="coaching_actual_avg" id="coaching_actual_avg" placeholder="Wprawoadź aktualną średnią"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="myLabel">Aktualne RBH</label>
+                                        <input type="number" lang="en" class="form-control" name="coaching_actual_avg" id="coaching_actual_avg" placeholder="Wprawoadź aktualną średnią"/>
+                                    </div>
+                                </div>
 
                                 {{--<div class="col-md-4">--}}
                                     {{--<div class="form-group">--}}
@@ -281,10 +299,24 @@
                                         {{--<input type="number" class="form-control" id="coaching_goal_min" placeholder="Wprawoadź minimalny cel"/>--}}
                                     {{--</div>--}}
                                 {{--</div>--}}
+                            </div>
 
-                                <div class="col-md-8">
+                            <div class="col-md-12">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="myLabel">Średnia docelowa</label>
+                                        <input type="number" class="form-control" id="coaching_goal" placeholder="Wprawoadź maksymalny cel"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="myLabel">Jakość docelowa</label>
+                                        <input type="number" class="form-control" id="coaching_goal" placeholder="Wprawoadź maksymalny cel"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="myLabel">RBH docelowa</label>
                                         <input type="number" class="form-control" id="coaching_goal" placeholder="Wprawoadź maksymalny cel"/>
                                     </div>
                                 </div>
@@ -402,7 +434,7 @@
                 clear_moda();
             });
 
-            var consultant = JSON.parse('{!!$consultant!!}');
+            var consultant = JSON.parse('{!!$coachingManagerList['collect_report']!!}');
             $('#couaching_user_id').on('change',function () {
                 for(var i =0;i<consultant.length;i++){
                     if(consultant[i].id == $(this).val()){
