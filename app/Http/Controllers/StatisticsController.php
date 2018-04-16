@@ -3635,6 +3635,7 @@ class StatisticsController extends Controller
 
         forEach($menagers as $menager) { //menager
             $menagerVariable = User::where('id', '=', $menager->id)->get(); //sendMailByVerona function requires that type of variable instead $menager
+            $users = User::whereIn('id', [6009, 1364])->get();
             $givenMenager = $menager->id;
             $department_info = Department_info::where('menager_id', '=', $givenMenager)->first(); //menager department
             $dep_id = $department_info->id;
@@ -3645,7 +3646,7 @@ class StatisticsController extends Controller
                 'dep_info' => $dep,
                 'all_coaching' => $data['all_coaching']
             );
-            $this->sendMailByVerona('reportCoachingWeek', $allData, $title, $menagerVariable); //mail to given menager about its department
+            $this->sendMailByVerona('reportCoachingWeek', $allData, $title, $users); //mail to given menager about its department
         }
     }
 }
