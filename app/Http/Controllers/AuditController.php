@@ -237,7 +237,7 @@ class AuditController extends Controller
         foreach($criterions as $c) {
             //seting names for input identification purposes
             $nameAmount = $c->name . "_amount";
-            $nameQuality = $c->name . "_quality";
+//            $nameQuality = $c->name . "_quality";
             $nameComment = $c->name . "_comment";
             $arrFilename = $c->name . "_files";
             $fileCatalog = "auditFiles";
@@ -248,7 +248,7 @@ class AuditController extends Controller
                 continue;
             }
             $crit->amount = $request->$nameAmount;
-            $crit->quality = $request->$nameQuality;
+//            $crit->quality = $request->$nameQuality;
             $crit->comment = $request->$nameComment;
 
             //part responsible for uploading files from user

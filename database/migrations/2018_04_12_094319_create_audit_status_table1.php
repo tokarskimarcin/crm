@@ -16,6 +16,7 @@ class CreateAuditStatusTable1 extends Migration
         Schema::create('audit_status', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 100);
+            $table->integer('isActive');
         });
     }
 
