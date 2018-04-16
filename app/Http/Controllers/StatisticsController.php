@@ -3456,6 +3456,7 @@ class StatisticsController extends Controller
             $mail_type2 = 'page' . $mail_type2;
 //            dd($mail_type2);
             $accepted_users = $default_users;
+//            dd(gettype($accepted_users));
         } else {
             $email = [];
             $mail_type_pom = $mail_type;
@@ -3507,6 +3508,7 @@ class StatisticsController extends Controller
        {
            $message->from('noreply.verona@gmail.com', 'Verona Consulting');
            foreach($accepted_users as $user) {
+//               dd($user); -> zwraca ID tylko
             if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
                 $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
              }
@@ -3615,4 +3617,37 @@ class StatisticsController extends Controller
         $this->sendMailByVerona('reportCoachingWeekSummary', $data, $title, $user);
     }
 
+    /**
+     * This method sends email to every menager with month report related to its department
+     */
+    public function MailToEveryDirector() {
+
+        $menagers = DB::table('users')
+            ->select(DB::raw('
+                   users.*
+               '))
+            ->join('department_info', 'department_info.menager_id', 'users.id')
+            ->where('department_info.id_dep_type', '=', '2')
+            ->where('users.status_work', '=', 1)
+            ->get();
+
+        $month = date('m');
+        $year = date('Y');
+
+        forEach($menagers as $menager) { //menager
+            $menagerVariable = User::where('id', '=', $menager->id)->get(); //sendMailByVerona function requires that type of variable instead $menager
+            $users = User::whereIn('id', [6009, 1364])->get();
+            $givenMenager = $menager->id;
+            $department_info = Department_info::where('menager_id', '=', $givenMenager)->first(); //menager department
+            $dep_id = $department_info->id;
+            $data = $this->getCoachingData($month, $year, (array)$dep_id); //data about menager's department
+            $title = 'Raport tygodniowo/miesięczny';
+            $dep = Department_info::find($dep_id);
+            $allData = array(
+                'dep_info' => $dep,
+                'all_coaching' => $data['all_coaching']
+            );
+            $this->sendMailByVerona('reportCoachingWeek', $allData, $title, $users); //mail to given menager about its department
+        }
+    }
 }
