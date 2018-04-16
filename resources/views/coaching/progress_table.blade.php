@@ -314,6 +314,7 @@
          * @param e
          */
         function save_coaching(e) {
+
             let consultant_id = $('#couaching_user_id').val();
             let subject = $('#coaching_subject').val();
             let coaching_date = $('#date_start_new_coaching').val();
@@ -364,6 +365,7 @@
             // }
 
             if(validation){
+                e.disabled = true;
                 $.ajax({
                     type: "POST",
                     url: "{{route('api.saveCoaching')}}",
@@ -383,6 +385,7 @@
                     success: function (response) {
                         console.log(response);
                         $('#Modal_Coaching').modal('hide');
+                        e.disabled = false;
                     }
                 })
             }
