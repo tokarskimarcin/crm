@@ -26,9 +26,9 @@ $stopDate = '';
             </tr>
             <tr>
                 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">W toku</th>
-                <th style="border:1px solid #231f20;padding:3px;background:#231f20;">ZREALIZOWANE</th>
-                <th style="border:1px solid #231f20;padding:3px;background:#231f20;">NIEZREALIZOWANE</th>
-                <th style="border:1px solid #231f20;padding:3px;background:#231f20;">LICZBA COACHINGÓW</th>
+                <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Zrealizowane</th>
+                <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Niezrealizowane</th>
+                <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba coachingów</th>
                 <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Licznik celu</th>
             </tr>
         </thead>
