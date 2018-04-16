@@ -70,7 +70,6 @@
                 "autoWidth": true,
                 "processing": true,
                 "serverSide": true,
-                "searching": false,
                 "drawCallback": function( settings ) {
                 },
                 "ajax": {
@@ -81,11 +80,20 @@
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },"columns":[
-                    {"data": "user_name"},
-                    {"data": "trainer"},
-                    {"data": "department"},
+                    {"data":function (data, type, dataToSet) {
+                            return data.user_first_name+' '+data.user_last_name;
+                        },"name":"users.last_name"
+                    },
+                    {"data":function (data, type, dataToSet) {
+                            return data.trainer_first_name+' '+data.trainer_last_name;
+                        },"name":"trainer.last_name"
+                    },
+                    {"data":function (data, type, dataToSet) {
+                            return data.department_name+' '+data.department_type;
+                        },"name":"departments.name"
+                    },
                     {"data": "date_audit"},
-                    {"data": "audit_score"},
+                    {"data": "score"},
                     {"data":function (data, type, dataToSet) {
                             return '<a href="{{URL::to("audit")}}/' + data.audit_id + '">Link</a>';
                         },"orderable": false, "searchable": false
