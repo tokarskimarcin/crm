@@ -95,7 +95,7 @@ class AuditController extends Controller
         $criterions = AuditCriterions::where('status', '=', $template)->get();
         foreach($criterions as $c) {
             $nameAmount = $c->name . "_amount";
-            $nameQuality = $c->name . "_quality";
+//            $nameQuality = $c->name . "_quality";
             $nameComment = $c->name . "_comment";
             $arrFilename = $c->name . "_files";
 
@@ -104,7 +104,7 @@ class AuditController extends Controller
             $newCrit->audit_criterion_id = $c->id;
             $newCrit->audit_id = $newForm->id;
             $newCrit->amount = $request->$nameAmount;
-            $newCrit->quality = $request->$nameQuality;
+//            $newCrit->quality = $request->$nameQuality;
             $newCrit->comment = $request->$nameComment;
 
 

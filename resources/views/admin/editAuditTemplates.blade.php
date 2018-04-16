@@ -29,6 +29,7 @@
 
     <div class="row">
         <div class="col-lg-12">
+            <div class="alert alert-danger">Przed usunięciem szablonu należy usunąć wszystkie nagłówki i kryteria z nim powiązane!</div>
             <table class="table table-hover">
                 <thead>
                 <tr>
