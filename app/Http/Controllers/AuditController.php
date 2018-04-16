@@ -167,7 +167,8 @@ class AuditController extends Controller
                 trainer.last_name as trainer_last_name,
                 audit.id as audit_id,
                 audit.score
-                '));
+                '))
+                ->whereBetween('date_audit',[$request->date_start,$request->date_stop]);
             return datatables($audit)->make(true);
     }
 
