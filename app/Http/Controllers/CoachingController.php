@@ -60,7 +60,7 @@ class CoachingController extends Controller
     public function progress_table_for_directorGET(){
         $coachingManagerList = $this::getCoachingManagerList(array(Auth::user()->id));
         return view('coaching.progress_table_for_director')
-            ->with('consultant',$coachingManagerList);
+            ->with('coachingManagerList',$coachingManagerList);
     }
 
     /**
@@ -200,7 +200,7 @@ class CoachingController extends Controller
     }
 
     public function getDepartmentInfo($date_start,$date_stop,$director_id,$all_manager_list){
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-3,date("Y")));
         $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
 
         $reports = DB::table('hour_report')
