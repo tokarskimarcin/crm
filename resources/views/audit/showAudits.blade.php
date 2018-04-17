@@ -4,12 +4,11 @@
     {{--THIS PAGE DISPLAYS TABLE WITH FILLED AUDITS--}}
     {{--*******************************************--}}
 
-    <style>
-        td:nth-of-type(5)::after {
-            content: '%';
-        }
-
-    </style>
+    {{--<style>--}}
+        {{--td:nth-of-type(5)::after {--}}
+            {{--content: '%';--}}
+        {{--}--}}
+    {{--</style>--}}
     <link href="{{ asset('/css/dataTables.bootstrap.min.css')}}" rel="stylesheet">
     <div class="container-fluid">
         <div class="row">
@@ -23,9 +22,29 @@
             <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Lista Pracowników
+                        Lista wykonanych audytów
                     </div>
                     <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="myLabel">Zakres od:</label>
+                                    <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                        <input class="form-control" id="date_start" name="date_start" type="text" value="{{date('Y-m-01')}}" >
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="myLabel">Zakres do:</label>
+                                    <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                        <input class="form-control" id="date_stop" name="date_stop" type="text" value="{{date('Y-m-d')}}" >
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-lg-12">
                                 <div id="start_stop">
@@ -70,22 +89,39 @@
                 "autoWidth": true,
                 "processing": true,
                 "serverSide": true,
-                "searching": false,
                 "drawCallback": function( settings ) {
                 },
                 "ajax": {
                     'url': "{{ route('api.auditTable') }}",
                     'type': 'POST',
+                    'data': function (d) {
+                        d.date_start = $('#date_start').val();
+                        d.date_stop =  $('#date_stop').val();
+                    },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },"columns":[
-                    {"data": "user_name"},
-                    {"data": "trainer"},
-                    {"data": "department"},
+                    {"data":function (data, type, dataToSet) {
+                            return data.user_first_name+' '+data.user_last_name;
+                        },"name":"users.last_name"
+                    },
+                    {"data":function (data, type, dataToSet) {
+                            return data.trainer_first_name+' '+data.trainer_last_name;
+                        },"name":"trainer.last_name"
+                    },
+                    {"data":function (data, type, dataToSet) {
+                            return data.department_name+' '+data.department_type;
+                        },"name":"departments.name"
+                    },
                     {"data": "date_audit"},
-                    {"data": "audit_score"},
+                    {"data":function (data, type, dataToSet) {
+                        if(data.score != null && data.score != 'null' )
+                            return data.score + ' ' + '%';
+                        else return "0 %"
+                        },"name":"score"
+                    },
                     {"data":function (data, type, dataToSet) {
                             return '<a href="{{URL::to("audit")}}/' + data.audit_id + '">Link</a>';
                         },"orderable": false, "searchable": false
@@ -99,6 +135,17 @@
                 table.columns(i).search(v).draw();
             } );
 
+
+            $('#date_start, #date_stop').on('change',function (e) {
+                table.ajax.reload();
+            })
+
+            $('.form_date').datetimepicker({
+                language:  'pl',
+                autoclose: 1,
+                minView : 2,
+                pickTime: false,
+            });
         });
     </script>
 @endsection
