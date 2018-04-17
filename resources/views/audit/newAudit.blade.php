@@ -130,6 +130,7 @@
             <input type="hidden" name="department_info" value="{{$department_info}}">
             <input type="hidden" name="date" value="{{$date_audit}}">
             <input type="hidden" name="templateType" value="{{$templateType}}">
+            <input type="hidden" name="typeOfPerson" value="{{$typeOfPerson}}">
         </div>
     </div>
     </form>
