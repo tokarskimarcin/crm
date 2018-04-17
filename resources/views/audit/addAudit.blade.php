@@ -114,7 +114,7 @@
                             <select name="template" id="template" class="form-control">
                                 <option value="0" id="templateDefaultValue">Wybierz</option>
                                 @foreach($templates as $template)
-                                    @if($template->id != '0')
+                                    @if($template->id != '0' && $template->isActive == 1)
                                         <option value="{{$template->id}}">{{$template->name}}</option>
                                     @endif
                                 @endforeach

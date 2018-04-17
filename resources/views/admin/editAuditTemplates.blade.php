@@ -29,6 +29,7 @@
 
     <div class="row">
         <div class="col-lg-12">
+            <div class="alert alert-danger">Przed usunięciem szablonu należy usunąć wszystkie nagłówki i kryteria z nim powiązane!</div>
             <table class="table table-hover">
                 <thead>
                 <tr>
@@ -39,7 +40,7 @@
                 </thead>
                 <tbody>
                 @foreach($templates as $temp)
-                    @if($temp->id != 0)
+                    @if($temp->id != 0 && $temp->isActive == 1)
                     <tr>
                         <td>{{$temp->name}}</td>
                         <td><span style="font-size:2em;color:red;" class="glyphicon glyphicon-remove gl" data-tempid="{{$temp->id}}"></span></td>

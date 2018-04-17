@@ -647,7 +647,7 @@ class AdminController extends Controller
      * This method is responsible for sending all data about templates to editAuditTempalte view
      */
     public function editAuditTemplatesGet() {
-        $allTemplates = AuditStatus::all();
+        $allTemplates = AuditStatus::where('isActive', '=', '1')->get();
         return view('admin.editAuditTemplates')->with('templates', $allTemplates);
     }
 
@@ -660,12 +660,14 @@ class AdminController extends Controller
             $templateName = $request->templateName;
             $newTemplate = new AuditStatus();
             $newTemplate->name = trim($templateName, ' ');
+            $newTemplate->isActive = 1;
             $newTemplate->save();
         }
         else { //condition satisfied when user is deleting given template
             $idToDelete = $request->idToDelete;
             $templateToDelete = AuditStatus::where('id', '=', $idToDelete)->first();
-            $templateToDelete->delete();
+            $templateToDelete->isActive = 0;
+            $templateToDelete->save();
         }
 
         return Redirect::back();

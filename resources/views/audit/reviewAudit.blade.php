@@ -10,14 +10,14 @@
         th:nth-of-type(2) {
             width: 10%;
         }
+        /*th:nth-of-type(3) {*/
+            /*width: 10%;*/
+        /*}*/
         th:nth-of-type(3) {
-            width: 10%;
-        }
-        th:nth-of-type(4) {
             width: 50%;
         }
 
-        th:nth-of-type(5) {
+        th:nth-of-type(4) {
             width: 5%;
         }
 
@@ -40,9 +40,9 @@
             </div>
             <div class="panel-body">
                 <h4>
-                    <div class="alert alert-warning"><p><sup>*</sup>Kolumny <strong>Ilość</strong>, <strong>Jakość</strong> i <strong>Komentarz</strong> są obowiązkowe.</p></div>
+                    <div class="alert alert-warning"><p><sup>*</sup>Kolumny <strong>Tak/Nie</strong> i <strong>Dlaczego</strong> są obowiązkowe.</p></div>
                     <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formularza zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
-                    <div class="alert alert-warning"><p>Załączniki mogą być <i>tylko</i> w formatach: <strong>.pdf</strong> <strong>.jpg</strong> <strong>.jpeg</strong> <strong>.png</strong></p></div>
+                    <div class="alert alert-warning"><p>Zdjęcia mogą być <i>tylko</i> w formatach: <strong>.pdf</strong> <strong>.jpg</strong> <strong>.jpeg</strong> <strong>.png</strong></p></div>
                 </h4>
                 @foreach($headers as $h)
                     <div class="table-responsive">
@@ -50,8 +50,7 @@
                             <thead>
                             <tr>
                                 <th class="first">Kryteria</th>
-                                <th>Ilość<sup>*</sup></th>
-                                <th>Jakość<sup>*</sup></th>
+                                <th>Tak/Nie<sup>*</sup></th>
                                 <th>Komentarz<sup>*</sup></th>
                                 <th>Zdjęcia</th>
                                 <th>Załączniki</th>
@@ -76,19 +75,19 @@
                                                 </select>
                                             </div>
                                         </td>
-                                        <td>
-                                            <div class="form-group">
-                                                <select class="form-control secondInp" style="font-size:18px;" id="{{$c->name . "_quality"}}" name="{{$c->name . "_quality"}}">
-                                                    @foreach($audit_info as $a)
-                                                        @if($c->id == $a->audit_criterion_id)
-                                                    <option value="0" @if($a->quality == '0') selected @endif>--</option>
-                                                    <option value="1" @if($a->quality == '1') selected @endif>Tak</option>
-                                                    <option value="2" @if($a->quality == '2') selected @endif>Nie</option>
-                                                        @endif
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </td>
+                                        {{--<td>--}}
+                                            {{--<div class="form-group">--}}
+                                                {{--<select class="form-control secondInp" style="font-size:18px;" id="{{$c->name . "_quality"}}" name="{{$c->name . "_quality"}}">--}}
+                                                    {{--@foreach($audit_info as $a)--}}
+                                                        {{--@if($c->id == $a->audit_criterion_id)--}}
+                                                    {{--<option value="0" @if($a->quality == '0') selected @endif>--</option>--}}
+                                                    {{--<option value="1" @if($a->quality == '1') selected @endif>Tak</option>--}}
+                                                    {{--<option value="2" @if($a->quality == '2') selected @endif>Nie</option>--}}
+                                                        {{--@endif--}}
+                                                    {{--@endforeach--}}
+                                                {{--</select>--}}
+                                            {{--</div>--}}
+                                        {{--</td>--}}
                                         <td>
                                             <div class="form-group">
                                                 @foreach($audit_info as $a)
@@ -114,7 +113,7 @@
                                             <div class="form-group">
                                                 @foreach($audit_files as $f)
                                                     @if($c->id == $f->criterion_id)
-                                                <a href="/api/getAuditScan/{{$f->name}}" download>Załącznik{{$i}}</a>
+                                                <a href="/api/getAuditScan/{{$f->name}}" download>Zdjęcie {{$i}}</a>
                                                         <?php
                                                             $i++;
                                                         ?>
@@ -160,7 +159,7 @@
             e.preventDefault();
             var everythingIsOk = true; //true = form submits, false = form doesn't submit
             var firstInp = document.getElementsByClassName('firstInp');
-            var secondInp = document.getElementsByClassName('secondInp');
+            // var secondInp = document.getElementsByClassName('secondInp');
             var thirdInp = document.getElementsByClassName('thirdInp');
 
             /**
@@ -176,14 +175,14 @@
             /**
              * check if every "quality" input is selected
              */
-            if(everythingIsOk == true) {
-                for(var j = 0; j < secondInp.length; j++) {
-                    if(secondInp[j].value == 0) {
-                        everythingIsOk = false;
-                        break;
-                    }
-                }
-            }
+            // if(everythingIsOk == true) {
+            //     for(var j = 0; j < secondInp.length; j++) {
+            //         if(secondInp[j].value == 0) {
+            //             everythingIsOk = false;
+            //             break;
+            //         }
+            //     }
+            // }
 
             if(everythingIsOk == true) {
                 for(var k = 0; k < thirdInp.length; k++) {
@@ -196,7 +195,7 @@
 
             //Validation of required inputs
             if(everythingIsOk != true) {
-                swal('Wypełnij wszystkie pola w kolumnach "Ilość", "Jakość" i "Komentarz"');
+                swal('Wypełnij wszystkie pola w kolumnach "Tak/Nie" i "Komentarz"');
             }
 
             if(everythingIsOk == true) {
@@ -208,8 +207,8 @@
 
                 allTableRows.forEach(function(element) {
                     var firstInputInside = element.cells[1].firstElementChild.firstElementChild.value;
-                    var secondInputInside = element.cells[2].firstElementChild.firstElementChild.value;
-                    if(firstInputInside == 1 && secondInputInside == 1) {
+                    // var secondInputInside = element.cells[2].firstElementChild.firstElementChild.value;
+                    if(firstInputInside == 1) {
                         auditScore += 1;
                     }
                     numberOfRows += 1;
@@ -237,8 +236,8 @@
 
         allTableRows.forEach(function(element) {
         var firstInputInside = element.cells[1].firstElementChild.firstElementChild.value;
-        var secondInputInside = element.cells[2].firstElementChild.firstElementChild.value;
-        if(firstInputInside == 1 && secondInputInside == 1) {
+        // var secondInputInside = element.cells[2].firstElementChild.firstElementChild.value;
+        if(firstInputInside == 1) {
             auditScore += 1;
         }
         numberOfRows += 1;
