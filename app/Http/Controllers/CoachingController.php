@@ -11,7 +11,12 @@ use Illuminate\Support\Facades\DB;
 
 class CoachingController extends Controller
 {
-
+    /*
+     * Status 0 - w toku
+     * Status 1 - Coaching zaliczony
+     * Status 2 - Coaching niezaliczony
+     * Status 3 - Usunięty
+     */
 
 
     public function progress_table_managerGET(){

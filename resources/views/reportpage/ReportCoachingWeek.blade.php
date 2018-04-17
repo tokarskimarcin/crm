@@ -11,6 +11,26 @@
     <form method="POST" action="{{ URL::to('/pageReportCoaching') }}">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <div class="row">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Legenda
+                </div>
+                <div class="panel-body">
+                    <div class="alert alert-success">
+                        <h4>
+                            <p>W toku - coachingi, w których konsultant nie przepracował <strong>18 RBH.</strong> </p>
+                            <p>Nierozliczone - coachingi, po przepracowaniu 18RHB od daty założenia coachingu, <strong>oczekujące na akceptacje</strong> przez trenera. </p>
+                            <p>Rozliczone  - coachingi <strong>zakończone</strong>, zaakceptowane przez trenera.<p>
+                            <p>(Cel osiągnięty - <strong>'osiągnięta średnia' większa bądź równa 'założonemu celowi').</strong></p>
+                            <p>(Cel nieosiągnięty - <strong>'osiągnięta średnia' mniejsza od ''założonego  celu').</strong></p>
+                            <p>Liczba coachingów - suma wszystkich coachingów: <strong>W toku + Nierozliczone + (Cel osiągnięty + Cel nieosiągnięty).</strong></p>
+                            <p>Licznik celu - wyliczana z rozliczonych coachingów metodą : <strong>osiągnięta średnia - Cel.</strong></p>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+
             <div class="col-md-4">
                 <div class="form-group">
                     <label>Oddział:</label>
