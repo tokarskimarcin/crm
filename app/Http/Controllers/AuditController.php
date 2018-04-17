@@ -158,13 +158,17 @@ class AuditController extends Controller
                 ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
                 ->join('departments', 'departments.id', '=', 'department_info.id_dep')
                 ->select(DB::raw('
-                CONCAT(users.first_name, " ", users.last_name) as user_name,
-                CONCAT(departments.name, " ", department_type.name) as department,
+                users.first_name as user_first_name,
+                users.last_name as user_last_name,
+                departments.name as department_name,
+                department_type.name as department_type,
                 date_audit,
-                CONCAT(trainer.first_name, " ", trainer.last_name) as trainer,
+                trainer.first_name as trainer_first_name,
+                trainer.last_name as trainer_last_name,
                 audit.id as audit_id,
-                audit.score as audit_score
-                '));
+                audit.score
+                '))
+                ->whereBetween('date_audit',[$request->date_start,$request->date_stop]);
             return datatables($audit)->make(true);
     }
 
