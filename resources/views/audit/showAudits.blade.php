@@ -158,7 +158,7 @@
                             return "Hr";
                         }
                         else {
-                            return '-';
+                            return 'Oddział';
                         }
                         },"name":"users.last_name"
                     },
