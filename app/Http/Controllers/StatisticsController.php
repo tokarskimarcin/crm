@@ -1759,7 +1759,7 @@ class StatisticsController extends Controller
             $coach_week = DB::table('coaching')
                 ->select(DB::raw('
             users.id as user_id,
-            sum(case when coaching.status = 0 then 1 else 0 end) as in_progress,
+            sum(case when coaching.status = 0 then 1 else 0 end) as in_progress,            
             sum(case when coaching.status = 1 then 1 else 0 end) as end_possitive,
             sum(case when coaching.status = 2 then 1 else 0 end) as end_negative,
             sum(case when coaching.status  in (1,2) then
@@ -1772,6 +1772,7 @@ class StatisticsController extends Controller
                 ->groupBy('manager_id')
                 ->get();
             $empty_coach_list = new \stdClass();
+
             $ready_data = [];
             //Dodanie trenerów którzy nie znajdują się na liście
             $lp = 0;
@@ -1788,22 +1789,38 @@ class StatisticsController extends Controller
                 if((!$coach->isempty())){
 
                     $coach = $coach->first();
-                    $empty_coach_list->user_id = $coach->user_id;
-                    $empty_coach_list->first_name = $coach->first_name;
-                    $empty_coach_list->last_name =$coach->last_name;
-                    $empty_coach_list->end_possitive = $coach->end_possitive;
-                    $empty_coach_list->end_negative = $coach->end_negative;
-                    $empty_coach_list->in_progress = $coach->in_progress;
-                    $empty_coach_list->coaching_sum = $coach->coaching_sum;
+
+                    $count_unsettled = DB::table('coaching')
+                        ->select(DB::raw('coaching.*,
+                        (select sum(time_to_sec(`accept_stop`)-time_to_sec(`accept_start`)) from work_hours where work_hours.id_user = `coaching`.`consultant_id`
+                        and work_hours.date >= CONCAT(coaching_date," 00:00:00") ) as couching_rbh'))
+                        ->join('users as consultant','consultant.id','coaching.consultant_id')
+                        ->join('work_hours','work_hours.id_user','coaching.consultant_id')
+                        ->join('users as manager','manager.id','coaching.manager_id')
+                        ->whereBetween('coaching_date',[$item['start_day'] .' 00:00:00',$item['stop_day'].' 23:00:00'])
+                        ->where('coaching.status','=',0)
+                        ->where('coaching.manager_id','=',$coach->user_id)
+                        ->groupby('coaching.id')
+                    ->get();
+
+                    $empty_coach_list->user_id          = $coach->user_id;
+                    $empty_coach_list->first_name       = $coach->first_name;
+                    $empty_coach_list->last_name        = $coach->last_name;
+                    $empty_coach_list->end_possitive    = $coach->end_possitive;
+                    $empty_coach_list->end_negative     = $coach->end_negative;
+                    $empty_coach_list->in_progress      = $coach->in_progress;
+                    $empty_coach_list->coaching_sum     = $coach->coaching_sum;
+                    $empty_coach_list->unsettled        = $count_unsettled->where('couching_rbh','>=','64800')->count();
 
                 }else{
-                    $empty_coach_list->first_name = $coach_from_department_list->first_name;
-                    $empty_coach_list->last_name = $coach_from_department_list->last_name;
-                    $empty_coach_list->user_id = $coach_from_department_list->id;
-                    $empty_coach_list->end_possitive = 0;
-                    $empty_coach_list->end_negative = 0;
-                    $empty_coach_list->in_progress = 0;
-                    $empty_coach_list->coaching_sum = 0;
+                    $empty_coach_list->first_name       = $coach_from_department_list->first_name;
+                    $empty_coach_list->last_name        = $coach_from_department_list->last_name;
+                    $empty_coach_list->user_id          = $coach_from_department_list->id;
+                    $empty_coach_list->end_possitive    = 0;
+                    $empty_coach_list->end_negative     = 0;
+                    $empty_coach_list->in_progress      = 0;
+                    $empty_coach_list->coaching_sum     = 0;
+                    $empty_coach_list->unsettled        = 0;
 
                 }
                 $ready_data[] = $empty_coach_list;
@@ -1812,8 +1829,9 @@ class StatisticsController extends Controller
 
             foreach ($coach_week as $coach_week_list){
                 if($ready_data_collection->where('user_id','=',$coach_week_list->user_id)->isEmpty()){
-                    $coach_week_list->start_date = $item['start_day'];
-                    $coach_week_list->stop_date = $item['stop_day'];
+                    $coach_week_list->start_date        = $item['start_day'];
+                    $coach_week_list->stop_date         = $item['stop_day'];
+                    $coach_week_list->unsettled        = 0;
                     $ready_data_collection->push($coach_week_list);
                 }
             }
