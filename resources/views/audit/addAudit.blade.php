@@ -91,12 +91,12 @@
                         <div class="form-group">
                             <label class="myLabel">Osoba:</label>
                             <select class="form-control" style="font-size:18px;" id="trainer" name="trainer">
-                                <optgroup label="Trenerzy">
+                                <optgroup label="Trenerzy" data-nr="1">
                                     <option value="0" id="trainerDefaultValue">Wybierz</option>
                                 </optgroup>
-                                <optgroup label="HRowcy" id="hrGroup">
+                                <optgroup label="HRowcy" id="hrGroup" data-nr="2">
                                 </optgroup>
-                                <optgroup label="Zbiorczy" id="collective">
+                                <optgroup label="Zbiorczy dla oddziału" id="collective" data-nr="3">
                                 </optgroup>
                             </select>
                         </div>
@@ -166,6 +166,8 @@
 
         $(document).ready(function() {
 
+            var typeOfPerson; // 1 - trainer, 2 - hr, 3 - collective
+
             /*********************EVENT LISTENERS FUNCTIONS********************/
 
             /**
@@ -191,10 +193,10 @@
                             }
                             for(var j = 0; j <response.hr.length; j++) {
                                 var newItem2 = $('<option class="generatedValues" value="' + response.hr[j].id + '">' + response.hr[j].first_name + ' ' + response.hr[j].last_name + '</option>');
-                                $('#hrGroup').after(newItem2);
+                                $('#hrGroup').append(newItem2);
                             }
-                                var newItem3 = $('<option class="generatedValues" value="' + response.collective.id + '">' + response.collective.first_name + ' ' + response.collective.last_name + '</option>');
-                                $('#collective').after(newItem3);
+                                var newItem3 = $('<option class="generatedValues" value="' + response.collective.id + '">' + inputDepartment.options[inputDepartment.selectedIndex].textContent + '</option>');
+                                $('#collective').append(newItem3);
                         }
                     });
                     return true;
@@ -211,9 +213,11 @@
             /**
              *Function Show/Hide 3rd and 4th step.
              */
-            function handleChange2() {
+            function handleChange2(e) {
                 if(inputDepartment.value != '0') {
                     stepBetween.classList.remove('inactivePanel');
+                    var selectedOptionArray = Array.from(e.target.selectedOptions);
+                    typeOfPerson = selectedOptionArray[0].parentElement.dataset.nr;
                     // thirdStep.classList.remove('inactivePanel');
                     // fourthStep.classList.remove('inactivePanel');
                     return true;
@@ -235,6 +239,14 @@
                     thirdStep.classList.add('inactivePanel');
                     fourthStep.classList.add('inactivePanel');
                 }
+            }
+
+            function handleButtonClick(e) {
+                e.preventDefault();
+                placeInForm = $('.fourth-row');
+                hiddenInput = $('<input type="hidden" value="' + typeOfPerson + '" name="typeOfPerson">');
+                placeInForm.after(hiddenInput);
+                document.getElementById('auditForm').submit();
             }
 
             /************ End of event listeners functions ************/
@@ -264,6 +276,7 @@
             inputDepartment.addEventListener('change', handleChange1);
             inputTrainer.addEventListener('change', handleChange2);
             inputTemplate.addEventListener('change', handleChangeTemplate);
+            firstButton.addEventListener('click', handleButtonClick);
 
         });
     </script>

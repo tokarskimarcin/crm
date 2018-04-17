@@ -46,6 +46,32 @@
                             </div>
                         </div>
                         <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="department">Oddział</label>
+                                    <select name="department" id="department" class="form-control">
+                                        <option value="0">Wybierz</option>
+                                        @foreach($departments as $department)
+                                        <option value="{{$department->id}}">{{$department->departments->name}} {{$department->department_type->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="director">Dyrektor</label>
+                                    <select name="director" id="director" class="form-control">
+                                        <option value="0">Wybierz</option>
+                                        @foreach($directors as $director)
+                                            <option value="{{$director->id}}">{{$director->first_name}} {{$director->last_name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
                             <div class="col-lg-12">
                                 <div id="start_stop">
                                     <div class="panel-body table-responsive">
@@ -59,7 +85,8 @@
                                             <thead>
                                             <tr>
                                                 <th class="search-input-text" data-column="1">Wypełniającey</th>
-                                                <th>Trener</th>
+                                                <th>Oceniany</th>
+                                                <th>Typ</th>
                                                 <th>Department</th>
                                                 <th>Data</th>
                                                 <th class="score">Wynik</th>
@@ -83,6 +110,11 @@
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
         $(document).ready( function () {
+            var selectedDepartment = document.getElementById('department');
+            var departmentValue = null;
+            var selectedDirector = document.getElementById('director');
+            var directorId = null;
+
 
             //ajax reponsible for receiving and displaying data through datatable
             table = $('#datatable').DataTable({
@@ -97,6 +129,8 @@
                     'data': function (d) {
                         d.date_start = $('#date_start').val();
                         d.date_stop =  $('#date_stop').val();
+                        d.department = departmentValue;
+                        d.director = directorId;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -108,8 +142,25 @@
                         },"name":"users.last_name"
                     },
                     {"data":function (data, type, dataToSet) {
-                            return data.trainer_first_name+' '+data.trainer_last_name;
+                            if(data.user_type != 3) {
+                                return data.trainer_first_name+' '+data.trainer_last_name;
+                            }
+                            else {
+                                return data.department_name + ' ' + data.department_type;
+                            }
                         },"name":"trainer.last_name"
+                    },
+                    {"data":function (data, type, dataToSet) {
+                        if(data.user_type == 1) {
+                            return "Trener";
+                        }
+                        else if(data.user_type == 2) {
+                            return "Hr";
+                        }
+                        else {
+                            return '-';
+                        }
+                        },"name":"users.last_name"
                     },
                     {"data":function (data, type, dataToSet) {
                             return data.department_name+' '+data.department_type;
@@ -131,20 +182,33 @@
 
             $('.search-input-text').on( 'change', function () {   // for text boxes
                 var i =$(this).attr('data-column');  // getting column index
-                var v = $(this).text()  // getting search input value
+                var v = $(this).text();  // getting search input value
                 table.columns(i).search(v).draw();
             } );
 
 
-            $('#date_start, #date_stop').on('change',function (e) {
+            $('#date_start, #date_stop').on('change',function(e) {
                 table.ajax.reload();
-            })
+            });
+
+            $('#department').on('change', function(e) {
+                departmentValue = selectedDepartment.options[selectedDepartment.selectedIndex].value;
+                // console.log(departmentValue);
+                table.ajax.reload();
+                $departmentValue = null;
+            });
+
+            $('#director').on('change', function(e) {
+               directorId = selectedDirector.options[selectedDirector.selectedIndex].value;
+               table.ajax.reload();
+               directorId = null;
+            });
 
             $('.form_date').datetimepicker({
                 language:  'pl',
                 autoclose: 1,
                 minView : 2,
-                pickTime: false,
+                pickTime: false
             });
         });
     </script>

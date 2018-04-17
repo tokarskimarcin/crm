@@ -45,6 +45,7 @@ class AuditController extends Controller
      * This method returns form to fill with necessary data
      */
     public function auditMethodPost(Request $request) {
+        $typeOfPerson = $request->typeOfPerson; // 1 - trainer, 2 - hr, 3 - collective
         $user = Auth::user();
         $templateType = $request->template;
         $headers = AuditHeaders::all(); //there was where(status = 1)
@@ -56,7 +57,8 @@ class AuditController extends Controller
             ->with('trainerID', $request->trainer)
             ->with('department_info', $request->department_info)
             ->with('date_audit', $request->date)
-            ->with('criterion', $criterion);
+            ->with('criterion', $criterion)
+            ->with('typeOfPerson', $typeOfPerson);
     }
 
     /**
@@ -82,6 +84,7 @@ class AuditController extends Controller
         /*Fil "audit" table*/
         $newForm->user_id = $user->id;
         $newForm->trainer_id = $request->trainer;
+        $newForm->user_type = $request->typeOfPerson; // 1 - trainer, 2 - hr, 3 - collective
         $newForm->department_info_id = $request->department_info;
         $newForm->date_audit = $request->date;
         $newForm->score = round($auditPercentScore, 2);
@@ -143,14 +146,16 @@ class AuditController extends Controller
      */
     public function showAuditsGet(Request $request) {
             $audit = Audit::all();
-        return view('audit.showAudits')->with('audit', $audit);
+            $departments = Department_info::all();
+            $directors = User::where('user_type_id', '=', '7')->where('status_work', '=', '1')->get();
+        return view('audit.showAudits')->with('audit', $audit)->with('departments', $departments)->with('directors', $directors);
     }
 
     /**
      * @return Data for dataTable about all audits
      */
     public function showAuditsPost(Request $request) {
-
+//        dd($request);
             $audit = DB::table('audit')
                 ->join('users', 'users.id', '=', 'audit.user_id')
                 ->join('users as trainer', 'trainer.id', '=', 'audit.trainer_id')
@@ -166,9 +171,17 @@ class AuditController extends Controller
                 trainer.first_name as trainer_first_name,
                 trainer.last_name as trainer_last_name,
                 audit.id as audit_id,
+                audit.user_type as user_type,
                 audit.score
                 '))
-                ->whereBetween('date_audit',[$request->date_start,$request->date_stop]);
+
+                ->whereBetween('date_audit', [$request->date_start, $request->date_stop]);
+        if($request->department != null && $request->department != '0') {
+            $audit = $audit ->where('department_info.id', '=', $request->department);
+        }
+        if($request->director != null && $request->director != '0') {
+            $audit = $audit ->where('department_info.director_id' , '=', $request->director);
+        }
             return datatables($audit)->make(true);
     }
 
