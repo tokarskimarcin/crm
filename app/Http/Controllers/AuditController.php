@@ -182,6 +182,9 @@ class AuditController extends Controller
         if($request->director != null && $request->director != '0') {
             $audit = $audit ->where('department_info.director_id' , '=', $request->director);
         }
+        if($request->type != null && $request->type != '0') {
+            $audit = $audit ->where('audit.user_type', '=', $request->type);
+        }
             return datatables($audit)->make(true);
     }
 

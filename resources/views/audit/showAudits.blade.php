@@ -25,6 +25,7 @@
                         Lista wykonanych audytów
                     </div>
                     <div class="panel-body">
+                        <div class="alert alert-info">Filtrując tabelę po oddziałach można wybrać bezpośrednio oddział lub dyrektora, jeżeli zostanie wybrany dyrektor, zostaną wyfiltrowane rekordy z oddziałami mu podległymi</div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -51,21 +52,28 @@
                                     <label for="department">Oddział</label>
                                     <select name="department" id="department" class="form-control">
                                         <option value="0">Wybierz</option>
+                                        <optgroup label="departamenty">
                                         @foreach($departments as $department)
-                                        <option value="{{$department->id}}">{{$department->departments->name}} {{$department->department_type->name}}</option>
+                                        <option value="{{$department->id}}" data-type="1">{{$department->departments->name}} {{$department->department_type->name}}</option>
                                         @endforeach
+                                        </optgroup>
+                                        <optgroup label="dyrektorzy">
+                                            @foreach($directors as $director)
+                                                <option value="{{$director->id}}" data-type="2">{{$director->first_name}} {{$director->last_name}}</option>
+                                            @endforeach
+                                        </optgroup>
                                     </select>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="director">Dyrektor</label>
-                                    <select name="director" id="director" class="form-control">
+                                    <label for="type">Typ</label>
+                                    <select name="type" id="type" class="form-control">
                                         <option value="0">Wybierz</option>
-                                        @foreach($directors as $director)
-                                            <option value="{{$director->id}}">{{$director->first_name}} {{$director->last_name}}</option>
-                                        @endforeach
+                                        <option value="1">Trener</option>
+                                        <option value="2">Hr-owiec</option>
+                                        <option value="3">Oddział</option>
                                     </select>
                                 </div>
                             </div>
@@ -111,10 +119,10 @@
     <script>
         $(document).ready( function () {
             var selectedDepartment = document.getElementById('department');
+            var selectedType = document.getElementById('type');
             var departmentValue = null;
-            var selectedDirector = document.getElementById('director');
             var directorId = null;
-
+            var type = null;
 
             //ajax reponsible for receiving and displaying data through datatable
             table = $('#datatable').DataTable({
@@ -131,6 +139,7 @@
                         d.date_stop =  $('#date_stop').val();
                         d.department = departmentValue;
                         d.director = directorId;
+                        d.type = type;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -186,23 +195,42 @@
                 table.columns(i).search(v).draw();
             } );
 
-
+            /**
+             * This event listener filter table by selected date
+             */
             $('#date_start, #date_stop').on('change',function(e) {
                 table.ajax.reload();
             });
 
+            /**
+             * This event listener filter table by selected department
+             */
             $('#department').on('change', function(e) {
-                departmentValue = selectedDepartment.options[selectedDepartment.selectedIndex].value;
-                // console.log(departmentValue);
+                if(selectedDepartment.options[selectedDepartment.selectedIndex].dataset.type == 1) {
+                    departmentValue = selectedDepartment.options[selectedDepartment.selectedIndex].value;
+                }
+                if(selectedDepartment.options[selectedDepartment.selectedIndex].dataset.type == 2) {
+                    directorId = selectedDepartment.options[selectedDepartment.selectedIndex].value;
+                }
+
                 table.ajax.reload();
-                $departmentValue = null;
+                departmentValue = null;
+                directorId = null;
+
             });
 
-            $('#director').on('change', function(e) {
-               directorId = selectedDirector.options[selectedDirector.selectedIndex].value;
-               table.ajax.reload();
-               directorId = null;
+            /**
+             * This event listener filter table by selected type
+             */
+            $('#type').on('change', function(e) {
+                if(selectedType.options[selectedType.selectedIndex].value != 0) {
+                    type = selectedType.options[selectedType.selectedIndex].value;
+                }
+
+                table.ajax.reload();
+                type = null;
             });
+
 
             $('.form_date').datetimepicker({
                 language:  'pl',
