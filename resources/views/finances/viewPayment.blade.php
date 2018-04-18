@@ -176,8 +176,9 @@
                                                                                     $janky_proc = 0;
                                                                                 else
                                                                                     $janky_proc = round(($item2->janki*100)/$item2->ods ,2);
-                                                                                    // wyłączenie systemu janków
-                                                                                $janky_proc = 0;
+                                                                                    if(isset($month) && $month < '2018-04') {
+                                                                                        $janky_proc = 0;
+                                                                                    }
                                                                                 foreach ($janky_system as $system_item)
                                                                                 {
                                                                                    $system_item->max_proc;
