@@ -12,6 +12,7 @@ use App\PaymentAgencyStory;
 use App\PenaltyBonus;
 use App\SummaryPayment;
 use App\User;
+use App\UserEmploymentStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -31,6 +32,7 @@ class FinancesController extends Controller
     }
     public function viewPaymentCadrePost(Request $request)
     {
+
         $date_to_post = $request->search_money_month;
         $date = $request->search_money_month.'%';
         $agencies = Agencies::all();
@@ -484,6 +486,7 @@ class FinancesController extends Controller
             `users`.`max_transaction`,
             `users`.`username`,
             `users`.`rate`,
+            `users`.`login_phone`,
              SUM( time_to_sec(`work_hours`.`accept_stop`)-time_to_sec(`work_hours`.`accept_start`)) as `sum`,
             `users`.`student`,
             `users`.`documents`,
@@ -515,13 +518,76 @@ class FinancesController extends Controller
                    `deleted`=0 AND `dkj_status`=1 AND `add_date` LIKE  "'.$month.'"
                     GROUP by `dkj`.`id_user`) h'),'r.id','h.id_user'
                 )
-                ->selectRaw('`id`,`agency_id`,`first_name`,`last_name`,`max_transaction`,`username`,`rate`,`sum`,`student`,`documents`,`kara`,`premia`,`success`,
+                ->selectRaw('`id`,`agency_id`,`first_name`,`last_name`,`max_transaction`,`username`,`rate`,`login_phone`,`sum`,`student`,`documents`,`kara`,`premia`,`success`,
             `f`.`ods`,
             `h`.`janki`,
             `salary_to_account`')->get();
+            $result = $r->map(function($item) use($month) {
+                $user_empl_status = UserEmploymentStatus::
+                    where( function ($querry) use ($item) {
+                    $querry = $querry->orwhere('pbx_id', '=', $item->login_phone)
+                        ->orWhere('user_id', '=', $item->id);
+                    })
+                    ->where('pbx_id_add_date', 'like', $month)
+                    ->where('pbx_id', '!=', 0)
+                    ->get();
+                $user_empl_status = $user_empl_status->where('user_id','=',$item->id);
+                if(count($user_empl_status) == 0 || count($user_empl_status) == 1) {
+
+                    $reports = DB::table('pbx_report_extension')
+                        ->select(DB::raw(
+                            'SUM(`all_checked_talks`) as sum_all_checked_talks,
+                            SUM(`all_bad_talks`) as sum_all_bad_talks,
+                            SUM(success) as sum_success
+                            '))
+                        ->where('pbx_report_extension.pbx_id','=', $item->login_phone)
+                        ->whereIn('pbx_report_extension.id', function($query) use($month){
+                            $query->select(DB::raw(
+                                'MAX(pbx_report_extension.id)'
+                            ))
+                                ->from('pbx_report_extension')
+                                ->where('report_date', 'like', $month)
+                                ->groupBy('report_date', 'pbx_id');
+                        })
+                        ->first();
+                    $item->ods = $reports->sum_all_checked_talks;
+                    $item->janki = $reports->sum_all_bad_talks;
+                    $item->pbx_success = $reports->sum_success;
+                }
+                else if (count($user_empl_status) > 1) {
+                    $sum_janki = $sum_success = $sum_ods = 0;
+                    foreach($user_empl_status as $user_status) {
+
+                        $reports = DB::table('pbx_report_extension')
+                            ->select(DB::raw(
+                                'SUM(`all_checked_talks`) as sum_all_checked_talks,
+                            SUM(`all_bad_talks`) as sum_all_bad_talks,
+                            SUM(success) as sum_success
+                            '))
+                            ->where('pbx_report_extension.pbx_id','=', $user_status->pbx_id)
+                            ->whereIn('pbx_report_extension.id', function($query) use($user_status,$month){
+                                $query->select(DB::raw(
+                                    'MAX(pbx_report_extension.id)'
+                                ))
+                                    ->from('pbx_report_extension');
+                                if($user_status->pbx_id_remove_date == null || $user_status->pbx_id_remove_date == '0000-00-00'){
+                                    $query->whereBetween('report_date',[$user_status->pbx_id_add_date,substr($month,0,7).'-31',]);
+                                }else
+                                    $query->whereBetween('report_date',[substr($month,0,7).'-01',$user_status->pbx_id_remove_date]);
+                                 $query->groupBy('report_date', 'pbx_id');
+                            })
+                            ->first();
+                        $sum_ods += $reports->sum_all_checked_talks;
+                        $sum_janki += $reports->sum_all_bad_talks;
+                        $sum_success += $reports->sum_success;
+                    }
+                    $item->ods = $sum_ods;
+                    $item->janki = $sum_janki;
+                    $item->pbx_success = $sum_success;
+                }
+               return $item;
+            });
             $final_salary = $r->groupBy('agency_id');
-
-
             return $final_salary;
     }
 
