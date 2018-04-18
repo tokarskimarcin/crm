@@ -46,7 +46,7 @@
 
                         successAfter = parseFloat({{$reportD->success}});
                         useAfter = parseFloat({{$reportD->hour_time_use}});
-                        if(successBefore === null || useBefore === null) {
+                        if(successBefore === null || useBefore === null) { //First iteration, where variables are undefined
                             data1.push([stringVariable, parseFloat({{$reportD->average}}), "{{$reportD->average}}", 2, 3]);
                         }
                         else{
