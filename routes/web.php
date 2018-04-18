@@ -681,6 +681,7 @@ Route::get('/screen_table','ScreensController@screenMethod');
 
   //Pobieranie danych dla PBX_REPORT_EXTENSION
   Route::get('/pbx_report_ext', 'PBXDataAPI@PBXReportExtension');
+  Route::get('/temp_pbx_report_ext', 'PBXDataAPI@tempPBXReportExtension');
 
     //Dane DKJ dla oddziałów
     Route::get('/TeamDKJHourData', 'PBXDataAPI@TeamDKJHourData');
