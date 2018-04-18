@@ -250,4 +250,91 @@ class PBXDataAPI extends Controller
             fclose($handle);
         }
     }
+
+    public function tempPBXReportExtension() {
+        $department_id = null;
+        $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=23&groupType=TERMINAL&date=2018-04-03";
+
+        if (!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
+        if (($handle = fopen($url, "r")) !== FALSE) {
+
+            $row = 0;
+            $data_to_insert = [];
+            while (($rowData = fgetcsv($handle, 1000, ";")) !== false) {
+                if ($row > 2) {
+                    $temp_key = null;
+                    foreach ($rowData as $key => $rowItem) {
+                        $removeData = false;
+                        if ($key == 0) {
+                            $temp_key = $key;
+                            $pbx_number_array = explode(' ', $rowItem);
+                            if (count($pbx_number_array) > 1) {
+                                $pbx_number = $pbx_number_array[count($pbx_number_array) - 1];
+                                $temp_key = $pbx_number;
+                                $data_to_insert[$temp_key]['pbx_id'] = $pbx_number;
+                            }
+                        } else if ($key == 1) {
+                            $data_to_insert[$temp_key]['average'] = $rowItem;
+                        } else if ($key == 2) {
+                            $data_to_insert[$temp_key]['success'] = $rowItem;
+                        } else if ($key == 3) {
+                            $data_to_insert[$temp_key]['count_private_pause'] = floatval($rowItem);
+                        } else if ($key == 4) {
+                            $data_to_insert[$temp_key]['count_lesson_pause'] = floatval($rowItem);
+                        } else if ($key == 5) {
+                            $data_to_insert[$temp_key]['base_use_proc'] = floatval($rowItem);
+                        } else if ($key == 6) {
+                            $data_to_insert[$temp_key]['call_time_proc'] = floatval($rowItem);
+                        } else if ($key == 7) {
+                            // Ten wiersz jest nieistotny
+                        } else if ($key == 8) {
+                            $data_to_insert[$temp_key]['login_time'] = $rowItem;
+                        } else if ($key == 9) {
+                            $data_to_insert[$temp_key]['dkj_proc'] = floatval($rowItem);
+                        } else if ($key == 10) {
+                            $data_to_insert[$temp_key]['received_calls'] = intval($rowItem);
+                        } else if ($key == 11) {
+                            $data_to_insert[$temp_key]['pbx_id'] = $rowItem;
+                            $data_to_insert[$temp_key]['report_date'] = '2018-04-03';
+                            $data_to_insert[$temp_key]['report_hour'] =  '21:00:00';
+                        }
+                        else if ($key == 12) {
+                            $data_to_insert[$temp_key]['all_checked_talks'] = intval($rowItem);
+                        }
+                        else if ($key == 13) {
+                            $data_to_insert[$temp_key]['all_bad_talks'] = intval($rowItem);
+
+                            /**
+                             * Sumowanie danych
+                             */
+                            //zliczenie czasu przerw
+                            $sum_proc_pause = $data_to_insert[$temp_key]['count_private_pause'] + $data_to_insert[$temp_key]['count_lesson_pause'];
+                            $time_sum_sec_array = explode(":", $data_to_insert[$temp_key]['login_time']);
+                            $time_sum_sec = (($time_sum_sec_array[0] * 3600) + ($time_sum_sec_array[1] * 60) + $time_sum_sec_array[2]);
+                            $data_to_insert[$temp_key]['time_pause'] = intval(($time_sum_sec * $sum_proc_pause) / 100);
+
+                            //Tutaj sprawdzenie czy dodajemy ten wpis
+
+                            if ($data_to_insert[$temp_key]['login_time'] == '00:00:00') {
+                                $removeData = true;
+                            }
+                            if (!isset($data_to_insert[$temp_key]['pbx_id'])) {
+                                $removeData = true;
+                            }
+                            if ($data_to_insert[$temp_key]['pbx_id'] == 0) {
+                                $removeData = true;
+                            }
+                        }
+
+                        if ($removeData !== null && $removeData === true) {
+                            unset($data_to_insert[$temp_key]);
+                        }
+                    }
+                }
+                $row++;
+            }
+            Pbx_report_extension::insert($data_to_insert);
+            fclose($handle);
+        }
+    }
 }
