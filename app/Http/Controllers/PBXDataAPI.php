@@ -253,7 +253,7 @@ class PBXDataAPI extends Controller
 
     public function tempPBXReportExtension() {
         $department_id = null;
-        $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=23&groupType=TERMINAL&date=2018-04-10";
+        $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=23&groupType=TERMINAL&date=2018-04-11";
 
         if (!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
         if (($handle = fopen($url, "r")) !== FALSE) {
@@ -295,7 +295,7 @@ class PBXDataAPI extends Controller
                             $data_to_insert[$temp_key]['received_calls'] = intval($rowItem);
                         } else if ($key == 11) {
                             $data_to_insert[$temp_key]['pbx_id'] = $rowItem;
-                            $data_to_insert[$temp_key]['report_date'] = '2018-04-10';
+                            $data_to_insert[$temp_key]['report_date'] = '2018-04-11';
                             $data_to_insert[$temp_key]['report_hour'] =  '21:00:00';
                         }
                         else if ($key == 12) {
