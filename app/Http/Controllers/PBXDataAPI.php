@@ -210,6 +210,12 @@ class PBXDataAPI extends Controller
                             $data_to_insert[$temp_key]['pbx_id'] = $rowItem;
                             $data_to_insert[$temp_key]['report_date'] = date('Y-m-d');
                             $data_to_insert[$temp_key]['report_hour'] = date('H:') . '00:00';
+                        }
+                            else if ($key == 12) {
+                                $data_to_insert[$temp_key]['all_checked_talks'] = intval($rowItem);
+                            }
+                            else if ($key == 13) {
+                                $data_to_insert[$temp_key]['all_bad_talks'] = intval($rowItem);
 
                             /**
                              * Sumowanie danych
