@@ -154,7 +154,5 @@
         </tbody>
     </table>
 <div style="width: 100%; height: 25px"></div>
-    @else
-        <div class="alert alert-info">Brak danych</div>
     @endif
 @endforeach
