@@ -2749,11 +2749,11 @@ class StatisticsController extends Controller
         $data = [];
 
         foreach ($coaches as $coach) {
-            $data[$coach->id]['trainer_data'] = self::getWeekMonthCoachData(date('Y-m-d'), date('Y-m-t'), 6052);
+            $data[$coach->id]['trainer_data'] = self::getWeekMonthCoachData(date('Y-m'.'-01'), date('Y-m-t'), $coach->id);
             $data[$coach->id]['trainer'] = $coach;
-            $data[$coach->id]['date'] = [date('Y-m-d'), date('Y-m-t')];
+            $data[$coach->id]['date'] = [date('Y-m'.'-01'), date('Y-m-t')];
         }
-
+//        dd($data);
         return view('reportpage.monthReportCoachSummary')
             ->with([
                 'months'        => self::getMonthsNames(),
@@ -3444,6 +3444,8 @@ class StatisticsController extends Controller
 
                 $consultant_data = [];
 
+                $consultant_data['all_checked'] = 0;
+                $consultant_data['all_bad'] = 0;
                 $consultant_data['login_time'] = 0;
                 $consultant_data['pause_time'] = 0;
                 $consultant_data['call_success_proc'] = 0;
@@ -3456,6 +3458,8 @@ class StatisticsController extends Controller
 
                 foreach ($repos as $repo) {
                     $consultant_data['success'] += $repo->success;
+                    $consultant_data['all_checked'] += $repo->all_checked_talks;
+                    $consultant_data['all_bad'] += $repo->all_bad_talks;
                     $consultant_data['pause_time'] += $repo->time_pause;
                     $consultant_data['received_calls'] += $repo->received_calls;
                     $login_time_array = explode(':', $repo->login_time);
