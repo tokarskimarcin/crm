@@ -315,6 +315,7 @@ class UsersController extends Controller
         $userEmployment = UserEmploymentStatus::
         where('pbx_id', '=', $user->login_phone)
             -> where('user_id', '=', $user->id)
+            ->orderBy('id', 'desc')
             ->first();
         $date = date("Y-m-d"); // actual date
 
@@ -324,24 +325,41 @@ class UsersController extends Controller
                     if($user->login_phone != $request->login_phone) { //user changes pbx_id
                         if($userEmployment) { //user has history in user_employment_status
                             $userEmployment->pbx_id_remove_date = $date;
+                            $userEmployment->save();
                             $user->login_phone = $request->login_phone;
                             $userEmployment1 = new UserEmploymentStatus();
-                            $userEmployment1->pbx_id = $request->login_phone;
+                            if($request->login_phone == 0) {
+                                $userEmployment1->pbx_id = null;
+                            }
+                            else {
+                                $userEmployment1->pbx_id = $request->login_phone;
+                            }
                             $userEmployment1->pbx_id_add_date = $date;
-                            $userEmployment1->pbx_id_remove_date = 0;
                             $userEmployment1->user_id = $user->id;
-                            $userEmployment->save();
                             $userEmployment1->save();
+
                         }
                         else { //user has no history in user_employment_status and we add new insertion
                             $userEmployment4 = new UserEmploymentStatus(); //insertion with old pbx_id
-                            $userEmployment4->pbx_id = $user->login_phone;
+                            if($user->login_phone == 0) {
+                                $userEmployment4->pbx_id = 0;
+                            }
+                            else {
+                                $userEmployment4->pbx_id = $user->login_phone;
+                            }
+
                             $userEmployment4->user_id = $user->id;
                             $userEmployment4->pbx_id_add_date = $date;
                             $userEmployment4->pbx_id_remove_date = $date;
                             $userEmployment4->save();
                             $userEmployment1 = new UserEmploymentStatus(); //insertion with new pbx_id
-                            $userEmployment1->pbx_id = $request->login_phone;
+                            if($request->login_phone == 0) {
+                                $userEmployment1->pbx_id = null;
+                            }
+                            else {
+                                $userEmployment1->pbx_id = $request->login_phone;
+                            }
+
                             $userEmployment1->user_id = $user->id;
                             $userEmployment1->pbx_id_add_date = $date;
                             $userEmployment1->pbx_id_remove_date = 0;
@@ -396,7 +414,11 @@ class UsersController extends Controller
         $user->student = $request->student;
         $user->salary_to_account = $request->salary_to_account;
         $user->agency_id = $request->agency_id;
-        $user->login_phone = ($request->login_phone != null) ? $request->login_phone : 0 ;
+        if($user->user_type_id == 1 || $user->user_type_id == 2) {
+            if($user->status_work != "0") {
+                $user->login_phone = ($request->login_phone != null) ? $request->login_phone : 0 ;
+            }
+        }
 
         if($user->user_type_id == 1 || $user->user_type_id == 2) {
             if ($request->status_work == 0) { //firing employee
@@ -408,7 +430,12 @@ class UsersController extends Controller
                     } else { // user has no history in user_employment_status
                         $user->login_phone = null;
                         $userEmployment2 = new UserEmploymentStatus();
-                        $userEmployment2->pbx_id = $request->login_phone;
+                        if($request->login_phone == 0) {
+                            $userEmployment2->pbx_id = null;
+                        }
+                        else {
+                            $userEmployment2->pbx_id = $request->login_phone;
+                        }
                         $userEmployment2->user_id = $user->id;
                         $userEmployment2->pbx_id_add_date = $request->stop_date;
                         $userEmployment2->pbx_id_remove_date = $request->stop_date;
@@ -422,7 +449,15 @@ class UsersController extends Controller
             if ($request->status_work == 1) { //re-hiring employee
                 if ($user->status_work == 0) {
                     $userEmployment3 = new UserEmploymentStatus(); //adding new insertion
-                    $userEmployment3->pbx_id = $request->login_phone;
+                    if($request->login_phone == 0) {
+                        $userEmployment3->pbx_id = null;
+                    }
+                    else {
+                        $userEmployment3->pbx_id = $request->login_phone;
+                        $user->login_phone = $request->login_phone;
+                        $user->save();
+                    }
+
                     $userEmployment3->user_id = $user->id;
                     $userEmployment3->pbx_id_add_date = $request->start_date;
                     $userEmployment3->pbx_id_remove_date = null;
@@ -461,7 +496,13 @@ class UsersController extends Controller
                     else { //gdy nie mamy historii w bazie danych
                         $userEmployment5 = new UserEmploymentStatus();
                         $userEmployment5->user_id = $user->id;
-                        $userEmployment5->pbx_id = $user->login_phone;
+                        if($user->login_phone == 0) {
+                            $userEmployment5->pbx_id = null;
+                        }
+                        else {
+                            $userEmployment5->pbx_id = $user->login_phone;
+                        }
+
                         $user->login_phone = null;
                         $userEmployment5->pbx_id_add_date = $date;
                         $userEmployment5->pbx_id_remove_date = $date;

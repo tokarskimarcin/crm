@@ -2460,6 +2460,10 @@ class StatisticsController extends Controller
 
             for ($y = 1; $y <= 4; $y++) {
                 $user_sum[$y]['average'] = 0;
+
+                $user_sum[$y]['all_checked'] = 0;
+                $user_sum[$y]['all_bad'] = 0;
+
                 $user_sum[$y]['janky_proc'] = 0;
                 $user_sum[$y]['count_calls'] = 0;
                 $user_sum[$y]['success'] = 0;
@@ -2498,11 +2502,13 @@ class StatisticsController extends Controller
                     $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]) / 3600, 2);
 
                     $user_sum[$week_num]['success'] += $report->success;
+                    $user_sum[$week_num]['all_checked'] += $report->all_checked_talks;
+                    $user_sum[$week_num]['all_bad'] += $report->all_bad_talks;
                     $user_sum[$week_num]['login_time'] += $work_time;
                     $user_sum[$week_num]['pause_time'] += $report->time_pause;
                     $user_sum[$week_num]['received_calls'] += $report->received_calls;
 
-                    $week_yanky += ($report->success * ($report->dkj_proc / 100));
+                    //$week_yanky += ($report->all_checked_talks * ($report->all_bad_talks / 100));
                 }
 
                 if ($week_day == 7 && $start_day == false && $miss_first_week == false) {
@@ -2525,8 +2531,10 @@ class StatisticsController extends Controller
                 if (($week_day == 7 || $i == $days_in_month) &&  $add_week_sum == true && $miss_first_week == false) {
                     $user_sum[$week_num]['last_week_day'] = $actual_loop_day;
 
-                    $user_sum[$week_num]['total_week_yanky'] = $week_yanky;
-                    $user_sum[$week_num]['janky_proc'] = ($user_sum[$week_num]['success'] > 0) ? round(($week_yanky / $user_sum[$week_num]['success']) * 100, 2) : 0 ;
+                    if($user_sum[$week_num]['all_checked'] != 0 ){
+                        $user_sum[$week_num]['total_week_yanky'] = ($user_sum[$week_num]['all_bad']*100)/$user_sum[$week_num]['all_checked'];
+                    }else
+                        $user_sum[$week_num]['total_week_yanky'] =0;
                     $user_sum[$week_num]['average'] = ($user_sum[$week_num]['login_time']) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['login_time']), 2) : 0 ;
                     $user_sum[$week_num]['proc_received_calls'] = ($user_sum[$week_num]['received_calls'] > 0) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['received_calls']) * 100 , 2) : 0 ;
                     $week_num++;

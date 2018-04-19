@@ -530,6 +530,7 @@ class FinancesController extends Controller
                     })
                     ->where('pbx_id_add_date', 'like', $month)
                     ->where('pbx_id', '!=', 0)
+                    ->where('pbx_id', '!=', null)
                     ->get();
                 $user_empl_status = $user_empl_status->where('user_id','=',$item->id);
                 if(count($user_empl_status) == 0 || count($user_empl_status) == 1) {
