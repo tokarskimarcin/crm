@@ -78,7 +78,7 @@
 
         @foreach($collect_week->sortbyDESC('average') as $item)
             @php
-            $jank = $item['all_checked'] ? round((100 * $item['all_bad'] / $item['all_checked']),2) : 0;
+            $jank = $item['all_checked'] > 0 ? round((100 * $item['all_bad'] / $item['all_checked']),2) : 0;
             @endphp
 
             <tr>
