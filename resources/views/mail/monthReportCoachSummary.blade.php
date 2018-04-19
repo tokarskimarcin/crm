@@ -1,10 +1,12 @@
 @foreach($data as $data_item)
+
     @php
         $leader = $data_item['trainer'];
         $coachData = $data_item['trainer_data'];
         $date_start = $data_item['date'][0];
         $date_stop = $data_item['date'][1];
     @endphp
+    @if(!$coachData->isEmpty())
     <table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px">
         <thead style="color:#efd88f">
         <tr>
@@ -58,6 +60,8 @@
 
         @for($i = 1; $i <= 4; $i++)
 
+
+
             @foreach($coachData as $item)
                 @php
                         $collect_week->push($item[$i]);
@@ -81,6 +85,7 @@
             @endforeach
 
             @foreach($collect_week->sortbyDESC('average') as $item)
+
                 @php
                     $jank = $item['all_checked'] ? round((100 * $item['all_bad'] / $item['all_checked']),2) : 0;
                 @endphp
@@ -126,6 +131,7 @@
                 $week_login_time = 0;
             @endphp
 
+
         @endfor
 
         @php
@@ -148,4 +154,7 @@
         </tbody>
     </table>
 <div style="width: 100%; height: 25px"></div>
+    @else
+        <div class="alert alert-info">Brak danych</div>
+    @endif
 @endforeach
