@@ -38,6 +38,14 @@
                 $week_received_calls_proc = 0;
                 $week_janky_count = 0;
 
+                $week_checked = 0;
+                $week_all_bad = 0;
+                $total_week_checked = 0;
+                $total_week_all_bad = 0;
+
+                $total_checked = 0;
+                $total_bad = 0;
+
                 $total_average = 0;
                 $total_janky_proc = 0;
                 $total_success = 0;
@@ -55,12 +63,16 @@
                         $collect_week->push($item[$i]);
                         $data = $item[$i];
                         $week_success += $data['success'];
+                        $week_checked += $data['all_checked'];
+                        $week_all_bad += $data['all_bad'];
                         $week_pause_time += $data['pause_time'];
                         $week_login_time += $data['login_time'];
                         $week_received_calls += $data['received_calls'];
                         $week_janky_count += $data['total_week_yanky'];
 
                         $total_success += $data['success'];
+                        $total_checked += $data['all_checked'];
+                        $total_bad += $data['all_bad'];
                         $total_pause_time += $data['pause_time'];
                         $total_login_time += $data['login_time'];
                         $total_received_calls += $data['received_calls'];
@@ -69,10 +81,13 @@
             @endforeach
 
             @foreach($collect_week->sortbyDESC('average') as $item)
+                @php
+                    $jank = $item['all_checked'] ? round((100 * $item['all_bad'] / $item['all_checked']),2) : 0;
+                @endphp
                 <tr>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['last_name'] . ' ' . $item['first_name'] }}</b></td>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['average'] }}</b></td>
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['janky_proc'] }} %</b></td>
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $jank }} %</b></td>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['received_calls'] }}</b></td>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['success'] }}</b></td>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['proc_received_calls'] }} %</b></td>
@@ -85,7 +100,7 @@
                     $collect_week = collect();
                    $week_average = ($week_success > 0) ? round(($week_success / $week_login_time), 2) : 0 ;
                    $week_received_calls_proc = ($week_received_calls > 0) ? round(($week_success / $week_received_calls) * 100 , 2) : 0 ;
-                   $week_janky_proc = ($week_success > 0) ? round(($week_janky_count / $week_success) * 100, 2) : 0 ;
+                   $week_janky_proc = ($week_checked > 0) ? round(($week_all_bad / $week_checked) * 100, 2) : 0 ;
                    $week_janky_count = 0;
             @endphp
             <tr>
@@ -104,6 +119,8 @@
                 $week_janky_proc = 0;
                 $week_received_calls = 0;
                 $week_success = 0;
+                $week_checked = 0;
+                $week_all_bad = 0;
                 $week_received_calls_proc = 0;
                 $week_pause_time = 0;
                 $week_login_time = 0;
@@ -115,8 +132,8 @@
             $total_average = ($total_success > 0) ? round(($total_success / $total_login_time), 2) : 0 ;
             $total_received_calls_proc = ($total_received_calls > 0) ? round(($total_success / $total_received_calls) * 100, 2) : 0 ;
             $total_janky_proc = ($total_success > 0) ? round(($total_janky_count / $total_success) * 100, 2) : 0 ;
+            $total_janky_proc = ($total_checked > 0) ? round(($total_bad / $total_checked) * 100, 2) : 0 ;
         @endphp
-
         <tr>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $total_average }}</b></td>
