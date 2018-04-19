@@ -14,7 +14,7 @@
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Czas na rekord</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Czas rozmów</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Pozostało</th>
-        <th style="border:1px solid #231f20;padding:3px;background:#231f20">Razem</th>
+        <th style="border:1px solid #231f20;padding:3px;background:#231f20">Zamknięte</th>
     </tr>
 </thead>
     <tbody>
@@ -34,7 +34,7 @@
                   <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->time_on_record}}</td>
                   <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->time_call}} %</td>
                   <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->left_record}}</td>
-                  <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->sum_recored}}</td>
+                  <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->closed_record}}</td>
               </tr>
           @endif
       @endforeach
@@ -57,7 +57,7 @@
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Czas na rekord</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Czas rozmów</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Pozostało</th>
-        <th style="border:1px solid #231f20;padding:3px;background:#231f20">Razem</th>
+        <th style="border:1px solid #231f20;padding:3px;background:#231f20">Zamknięte</th>
     </tr>
     </thead>
     <tbody>
@@ -77,7 +77,7 @@
                 <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->time_on_record}}</td>
                 <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->time_call}} %</td>
                 <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->left_record}}</td>
-                <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->sum_recored}}</td>
+                <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->closed_record}}</td>
             </tr>
         @endif
     @endforeach
