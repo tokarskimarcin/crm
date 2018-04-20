@@ -2452,15 +2452,12 @@ class StatisticsController extends Controller
 
         $days_in_month = intval(date('t', strtotime($date_start)));
 
-        $terefere = $total_data->map(function($item, $key) use ($days_in_month, $date_start) {
+        $terefere = $total_data->map(function($item, $key) use ($days_in_month, $date_start,$leader) {
             $user_sum = [];
 
             $consultant = User::where('login_phone', '=', $item->first()->pbx_id)
-                ->join('work_hours', 'users.id', 'work_hours.id_user')
+                ->where('coach_id','=',$leader->id)
                 ->get();
-
-//            $consultant2 = DB::table('users')
-//                -join('work_hours', 'users.')
 
             for ($y = 1; $y <= 4; $y++) {
                 $user_sum[$y]['average'] = 0;
@@ -2479,16 +2476,10 @@ class StatisticsController extends Controller
 
                 $user_sum[$y]['first_name'] = $consultant->first()->first_name;
                 $user_sum[$y]['last_name'] = $consultant->first()->last_name;
-
-                $user_sum[$y]['real_login_start_time'] = 0;
-                $user_sum[$y]['real_login_end_time'] = 0;
-                $user_sum[$y]['real_login_time'] = 0;
-
                 $user_sum[$y]['week_num'] = $y;
                 $user_sum[$y]['total_week_yanky'] = 0;
                 $user_sum[$y]['first_week_day'] = null;
                 $user_sum[$y]['last_week_day'] = null;
-//                    dd($user_sum[$y]['last_name']);
             }
             $week_num = 1;
             $week_yanky = 0;
@@ -2511,14 +2502,6 @@ class StatisticsController extends Controller
                     $work_time_array = explode(":", $report->login_time);
                     $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]) / 3600, 2);
 
-                    //time in sec
-                    if(is_object($consultant->where('date', '=', $actual_loop_day)->first())) {
-                        $user_sum[$week_num]['real_login_start_time'] = strtotime($consultant->where('date', '=', $actual_loop_day)->first()->accept_start);
-                        $user_sum[$week_num]['real_login_end_time'] = strtotime($consultant->where('date', '=', $actual_loop_day)->first()->accept_stop);
-                    }
-                    $real_work_time = round(($user_sum[$week_num]['real_login_end_time'] - $user_sum[$week_num]['real_login_start_time'])/3600, 2);
-
-                    $user_sum[$week_num]['real_login_time'] += ($real_work_time > 0) ? $real_work_time : 0;
                     $user_sum[$week_num]['success'] += $report->success;
                     $user_sum[$week_num]['all_checked'] += $report->all_checked_talks;
                     $user_sum[$week_num]['all_bad'] += $report->all_bad_talks;
@@ -2620,15 +2603,10 @@ class StatisticsController extends Controller
             $user_sum = [];
 
             $consultant = User::where('login_phone', '=', $item->first()->pbx_id)
-                ->join('work_hours', 'users.id', 'work_hours.id_user')
                 ->get();
 
             for ($y = 1; $y <= 4; $y++) {
                 $user_sum[$y]['average'] = 0;
-
-                $user_sum[$y]['all_checked'] = 0;
-                $user_sum[$y]['all_bad'] = 0;
-
                 $user_sum[$y]['janky_proc'] = 0;
                 $user_sum[$y]['count_calls'] = 0;
                 $user_sum[$y]['success'] = 0;
@@ -2637,10 +2615,6 @@ class StatisticsController extends Controller
                 $user_sum[$y]['received_calls'] = 0;
                 $user_sum[$y]['login_time'] = 0;
                 $user_sum[$y]['proc_received_calls'] = 0;
-
-                $user_sum[$y]['real_login_start_time'] = 0;
-                $user_sum[$y]['real_login_end_time'] = 0;
-                $user_sum[$y]['real_login_time'] = 0;
 
                 $user_sum[$y]['first_name'] = $consultant->first()->first_name;
                 $user_sum[$y]['last_name'] = $consultant->first()->last_name;
@@ -2670,22 +2644,12 @@ class StatisticsController extends Controller
                     $work_time_array = explode(":", $report->login_time);
                     $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]) / 3600, 2);
 
-                    //time in sec
-                    if(is_object($consultant->where('date', '=', $actual_loop_day)->first())) {
-                        $user_sum[$week_num]['real_login_start_time'] = strtotime($consultant->where('date', '=', $actual_loop_day)->first()->accept_start);
-                        $user_sum[$week_num]['real_login_end_time'] = strtotime($consultant->where('date', '=', $actual_loop_day)->first()->accept_stop);
-                    }
-                    $real_work_time = round(($user_sum[$week_num]['real_login_end_time'] - $user_sum[$week_num]['real_login_start_time'])/3600, 2);
-
-                    $user_sum[$week_num]['real_login_time'] += ($real_work_time > 0) ? $real_work_time : 0;
                     $user_sum[$week_num]['success'] += $report->success;
-                    $user_sum[$week_num]['all_checked'] += $report->all_checked_talks;
-                    $user_sum[$week_num]['all_bad'] += $report->all_bad_talks;
                     $user_sum[$week_num]['login_time'] += $work_time;
                     $user_sum[$week_num]['pause_time'] += $report->time_pause;
                     $user_sum[$week_num]['received_calls'] += $report->received_calls;
 
-//                    $week_yanky += ($report->success * ($report->dkj_proc / 100));
+                    $week_yanky += ($report->success * ($report->dkj_proc / 100));
                 }
 
                 if ($week_day == 7 && $start_day == false && $miss_first_week == false) {
@@ -2708,11 +2672,7 @@ class StatisticsController extends Controller
                 if (($week_day == 7 || $i == $days_in_month) &&  $add_week_sum == true && $miss_first_week == false) {
                     $user_sum[$week_num]['last_week_day'] = $actual_loop_day;
 
-                    if($user_sum[$week_num]['all_checked'] != 0 ){
-                        $user_sum[$week_num]['total_week_yanky'] = ($user_sum[$week_num]['all_bad']*100)/$user_sum[$week_num]['all_checked'];
-                    }else
-                        $user_sum[$week_num]['total_week_yanky'] =0;
-
+                    $user_sum[$week_num]['total_week_yanky'] = $week_yanky;
                     $user_sum[$week_num]['janky_proc'] = ($user_sum[$week_num]['success'] > 0) ? round(($week_yanky / $user_sum[$week_num]['success']) * 100, 2) : 0 ;
                     $user_sum[$week_num]['average'] = ($user_sum[$week_num]['login_time']) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['login_time']), 2) : 0 ;
                     $user_sum[$week_num]['proc_received_calls'] = ($user_sum[$week_num]['received_calls'] > 0) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['received_calls']) * 100 , 2) : 0 ;
@@ -2780,11 +2740,11 @@ class StatisticsController extends Controller
         $data = [];
 
         foreach ($coaches as $coach) {
-            $data[$coach->id]['trainer_data'] = self::getWeekMonthCoachData(date('Y-m'.'-01'), date('Y-m-t'), $coach->id);
+            $data[$coach->id]['trainer_data'] = self::getWeekMonthCoachData(date('Y-m-d'), date('Y-m-t'), 6052);
             $data[$coach->id]['trainer'] = $coach;
-            $data[$coach->id]['date'] = [date('Y-m'.'-01'), date('Y-m-t')];
+            $data[$coach->id]['date'] = [date('Y-m-d'), date('Y-m-t')];
         }
-//        dd($data);
+
         return view('reportpage.monthReportCoachSummary')
             ->with([
                 'months'        => self::getMonthsNames(),
@@ -3016,7 +2976,7 @@ class StatisticsController extends Controller
         $department = Department_info::find($request->dep_id);
 
         $data = $this->getDayCoachStatistics($request->dep_id, $request->day_select);
-//        dd($data);
+
         return view('reportpage.DayReportSummaryCoaches')
             ->with([
                 'department_info'   => $department_info,
@@ -3058,13 +3018,9 @@ class StatisticsController extends Controller
                 ->select(DB::raw('
                     pbx_report_extension.*,
                     users.last_name as user_last_name,
-                    users.first_name as user_first_name,
-                    work_hours.accept_start as start_time,
-                    work_hours.accept_stop as stop_time
+                    users.first_name as user_first_name
                 '))
                 ->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id')
-                ->join('work_hours', 'work_hours.id_user', 'users.id')
-                ->where('work_hours.date', '=', $report_date)
                 ->where('users.coach_id', '=', $coach->id)
                 ->whereIn('pbx_report_extension.id', $ids->pluck('id')->toArray())
                 ->where('report_date', '=', $report_date)
@@ -3479,8 +3435,6 @@ class StatisticsController extends Controller
 
                 $consultant_data = [];
 
-                $consultant_data['all_checked'] = 0;
-                $consultant_data['all_bad'] = 0;
                 $consultant_data['login_time'] = 0;
                 $consultant_data['pause_time'] = 0;
                 $consultant_data['call_success_proc'] = 0;
@@ -3493,8 +3447,6 @@ class StatisticsController extends Controller
 
                 foreach ($repos as $repo) {
                     $consultant_data['success'] += $repo->success;
-                    $consultant_data['all_checked'] += $repo->all_checked_talks;
-                    $consultant_data['all_bad'] += $repo->all_bad_talks;
                     $consultant_data['pause_time'] += $repo->time_pause;
                     $consultant_data['received_calls'] += $repo->received_calls;
                     $login_time_array = explode(':', $repo->login_time);
