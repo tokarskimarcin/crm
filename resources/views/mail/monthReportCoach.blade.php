@@ -61,7 +61,7 @@
                     $week_checked += $data['all_checked'];
                     $week_all_bad += $data['all_bad'];
                     $week_pause_time += $data['pause_time'];
-                    $week_login_time += $data['real_login_time'];
+                    $week_login_time += $data['login_time'];
                     $week_received_calls += $data['received_calls'];
                     $week_janky_count += $data['total_week_yanky'];
 
@@ -69,7 +69,7 @@
                     $total_checked += $data['all_checked'];
                     $total_bad += $data['all_bad'];
                     $total_pause_time += $data['pause_time'];
-                    $total_login_time += $data['real_login_time'];
+                    $total_login_time += $data['login_time'];
                     $total_received_calls += $data['received_calls'];
                     $total_janky_count += $data['total_week_yanky'];
 
@@ -79,24 +79,23 @@
         @foreach($collect_week->sortbyDESC('average') as $item)
             @php
             $jank = $item['all_checked'] > 0 ? round((100 * $item['all_bad'] / $item['all_checked']),2) : 0;
-            $avg = ($item['real_login_time'] > 0) ? round($item['success'] / $item['real_login_time'],2) : 0;
             @endphp
 
             <tr>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['last_name'] . ' ' . $item['first_name'] }}</b></td>
-                <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $avg }}</b></td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['average'] }}</b></td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $jank }} %</b></td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['received_calls'] }}</b></td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['success'] }}</b></td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['proc_received_calls'] }} %</b></td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ sprintf('%02d:%02d:%02d', ($item['pause_time']/3600),($item['pause_time']/60%60), $item['pause_time']%60) }}</b></td>
-                <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['real_login_time'] }} h</b></td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['login_time'] }} h</b></td>
             </tr>
         @endforeach
 
         @php
             $collect_week = collect();
-            $week_average = ($week_success > 0 && $week_login_time > 0) ? round(($week_success / $week_login_time), 2) : 0 ;
+            $week_average = ($week_success > 0) ? round(($week_success / $week_login_time), 2) : 0 ;
             $week_received_calls_proc = ($week_received_calls > 0) ? round(($week_success / $week_received_calls) * 100 , 2) : 0 ;
             $week_janky_proc = ($week_checked > 0) ? round(($week_all_bad / $week_checked) * 100, 2) : 0 ;
             $week_janky_count = 0;
