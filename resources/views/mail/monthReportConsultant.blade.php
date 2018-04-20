@@ -28,6 +28,9 @@
         $total_success_calls_proc = 0;
         $total_pause_time = 0;
         $total_login_time = 0;
+
+        $total_checked = 0;
+        $total_bad = 0;
     @endphp
 
     @foreach($data as $item)
@@ -37,11 +40,16 @@
             $total_pause_time += $item['pause_time'];
             $total_login_time += $item['login_time'];
             $total_janky_count += $item['janky_count'];
+            $total_checked += $item['all_checked'];
+            $total_bad += $item['all_bad'];
+        @endphp
+        @php
+            $jank = $item['all_checked'] > 0 ? round((100 * $item['all_bad'] / $item['all_checked']),2) : 0;
         @endphp
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item['consultant']->last_name . ' ' . $item['consultant']->first_name }}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item['average'] }}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ round($item['janky_proc'] * 100, 2) }} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $jank }} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item['received_calls'] }}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item['success'] }}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item['call_success_proc'] }} %</td>
@@ -51,7 +59,7 @@
     @endforeach
 
     @php
-        $total_janky_proc = ($total_success > 0) ? round($total_janky_count / $total_success * 100 , 2) : 0 ;
+        $total_janky_proc = ($total_checked > 0) ? round($total_bad / $total_checked * 100 , 2) : 0 ;
         $total_average = ($total_login_time > 0) ? round($total_success / ($total_login_time / 3600), 2) : 0 ;
         $total_success_calls_proc = ($total_received_calls > 0 ) ? round($total_success / $total_received_calls * 100, 2) : 0 ;
     @endphp
