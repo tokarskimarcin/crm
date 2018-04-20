@@ -134,6 +134,11 @@ Route::POST('/deleteCoaching','CoachingController@deleteCoaching')->name('api.de
 Route::POST('/getCoaching','CoachingController@getCoaching')->name('api.getCoaching');
 Route::POST('/getcoach_list','CoachingController@getcoach_list')->name('api.getcoach_list');
 
+
+// Dla Dyrektora
+Route::POST('/saveCoachingDirector','CoachingController@saveCoachingDirector')->name('api.saveCoachingDirector');
+
+
 /* TEST AJAX ROUTES STOP */
 
 //** RECRUITMENT AJAX */
