@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Coaching;
+use App\CoachingDirector;
 use App\Department_info;
 use App\User;
 use Illuminate\Http\Request;
@@ -118,6 +119,44 @@ class CoachingController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * Zapisywanie nowego coaching'u Dla Kierownika oddziału
+     * status -> 0 Nowy coaching
+     * status -> 1 Edycja Coaching'u
+     */
+    public function saveCoachingDirector(Request $request){
+        if($request->ajax()){
+            if($request->status == 0)
+                $new_coaching =  new CoachingDirector();
+            else{
+                $new_coaching = CoachingDirector::find($request->status);
+            }
+            $new_coaching->user_id              = $request->manager_id;
+            $new_coaching->manager_id           = Auth::user()->id;
+            $new_coaching->coaching_date        = $request->coaching_date;
+            $new_coaching->subject              = $request->subject;
+            $new_coaching->comment              = $request->coaching_comment;
+
+            // Dane startowe coachingu
+            $new_coaching->average_start        = $request->manager_actual_avg      == '' ? 0 : $request->manager_actual_avg;
+            $new_coaching->janky_start          = $request->manager_actual_janky    == '' ? 0 : $request->manager_actual_janky;
+            $new_coaching->rbh_start            = $request->manager_actual_rbh      == '' ? 0 : $request->manager_actual_rbh ;
+            // Dane docelowe
+            $new_coaching->average_goal         = $request->coaching_manager_avg_goal   == '' ? 0 : $request->coaching_manager_avg_goal;
+            $new_coaching->janky_goal           = $request->coaching_manager_avg_janky  == '' ? 0 : $request->coaching_manager_avg_janky;
+            $new_coaching->rbh_goal             = $request->coaching_manager_avg_rbh    == '' ? 0 : $request->coaching_manager_avg_rbh;
+            //Typ coachingu
+            $new_coaching->coaching_type        = $request->coaching_type;
+
+            if($new_coaching->save()){
+                return 1;
+            }else{
+                return 0;
+            }
+        }
+    }
+
 
     public function datatableCoachingTable(Request $request){
         $inprogres = DB::table('coaching')
@@ -205,8 +244,8 @@ class CoachingController extends Controller
     }
 
     public function getDepartmentInfo($date_start,$date_stop,$director_id,$all_manager_list){
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-3,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-13,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-10,date("Y")));
 
         $reports = DB::table('hour_report')
             ->select(DB::raw(
