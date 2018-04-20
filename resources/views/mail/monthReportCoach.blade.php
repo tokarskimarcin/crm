@@ -83,7 +83,7 @@
 
             <tr>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['last_name'] . ' ' . $item['first_name'] }}</b></td>
-                <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $avg }}</b></td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['average'] }}</b></td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $jank }} %</b></td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['received_calls'] }}</b></td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item['success'] }}</b></td>

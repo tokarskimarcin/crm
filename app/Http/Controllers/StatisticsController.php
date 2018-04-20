@@ -2452,7 +2452,7 @@ class StatisticsController extends Controller
 
         $days_in_month = intval(date('t', strtotime($date_start)));
 
-        $terefere = $total_data->map(function($item, $key) use ($days_in_month, $date_start) {
+        $terefere = $total_data->map(function($item, $key) use ($days_in_month, $date_start,$leader) {
             $user_sum = [];
 
             $consultant = User::where('login_phone', '=', $item->first()->pbx_id)
