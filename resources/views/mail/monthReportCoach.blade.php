@@ -128,7 +128,7 @@
     @php
 
         $total_janky_end = ($total_week_checked != 0) ? 100 * ($total_week_all_bad / $total_week_checked) : 0;
-        $total_average = ($total_success > 0) ? round(($total_success / $total_login_time), 2) : 0 ;
+        $total_average = ($total_success > 0 && $total_login_time > 0) ? round(($total_success / $total_login_time), 2) : 0 ;
         $total_received_calls_proc = ($total_received_calls > 0) ? round(($total_success / $total_received_calls) * 100, 2) : 0 ;
         $total_janky_proc = ($total_checked > 0) ? round(($total_bad / $total_checked) * 100, 2) : 0 ;
     @endphp

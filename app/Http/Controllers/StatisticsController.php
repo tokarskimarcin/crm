@@ -2620,6 +2620,7 @@ class StatisticsController extends Controller
             $user_sum = [];
 
             $consultant = User::where('login_phone', '=', $item->first()->pbx_id)
+                ->join('work_hours', 'users.id', 'work_hours.id_user')
                 ->get();
 
             for ($y = 1; $y <= 4; $y++) {
@@ -2636,6 +2637,10 @@ class StatisticsController extends Controller
                 $user_sum[$y]['received_calls'] = 0;
                 $user_sum[$y]['login_time'] = 0;
                 $user_sum[$y]['proc_received_calls'] = 0;
+
+                $user_sum[$y]['real_login_start_time'] = 0;
+                $user_sum[$y]['real_login_end_time'] = 0;
+                $user_sum[$y]['real_login_time'] = 0;
 
                 $user_sum[$y]['first_name'] = $consultant->first()->first_name;
                 $user_sum[$y]['last_name'] = $consultant->first()->last_name;
@@ -2665,6 +2670,14 @@ class StatisticsController extends Controller
                     $work_time_array = explode(":", $report->login_time);
                     $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]) / 3600, 2);
 
+                    //time in sec
+                    if(is_object($consultant->where('date', '=', $actual_loop_day)->first())) {
+                        $user_sum[$week_num]['real_login_start_time'] = strtotime($consultant->where('date', '=', $actual_loop_day)->first()->accept_start);
+                        $user_sum[$week_num]['real_login_end_time'] = strtotime($consultant->where('date', '=', $actual_loop_day)->first()->accept_stop);
+                    }
+                    $real_work_time = round(($user_sum[$week_num]['real_login_end_time'] - $user_sum[$week_num]['real_login_start_time'])/3600, 2);
+
+                    $user_sum[$week_num]['real_login_time'] += ($real_work_time > 0) ? $real_work_time : 0;
                     $user_sum[$week_num]['success'] += $report->success;
                     $user_sum[$week_num]['all_checked'] += $report->all_checked_talks;
                     $user_sum[$week_num]['all_bad'] += $report->all_bad_talks;
