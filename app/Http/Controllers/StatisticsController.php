@@ -2658,14 +2658,6 @@ class StatisticsController extends Controller
                     $work_time_array = explode(":", $report->login_time);
                     $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]) / 3600, 2);
 
-                    //time in sec
-                    if(is_object($consultant->where('date', '=', $actual_loop_day)->first())) {
-                        $user_sum[$week_num]['real_login_start_time'] = strtotime($consultant->where('date', '=', $actual_loop_day)->first()->accept_start);
-                        $user_sum[$week_num]['real_login_end_time'] = strtotime($consultant->where('date', '=', $actual_loop_day)->first()->accept_stop);
-                    }
-                    $real_work_time = round(($user_sum[$week_num]['real_login_end_time'] - $user_sum[$week_num]['real_login_start_time'])/3600, 2);
-
-                    $user_sum[$week_num]['real_login_time'] += ($real_work_time > 0) ? $real_work_time : 0;
                     $user_sum[$week_num]['success'] += $report->success;
                     $user_sum[$week_num]['all_checked'] += $report->all_checked_talks;
                     $user_sum[$week_num]['all_bad'] += $report->all_bad_talks;
