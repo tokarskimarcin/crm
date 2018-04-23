@@ -1056,33 +1056,60 @@ class StatisticsController extends Controller
 
     private function getHourReportData($type, $date = null, $hour = null, $hour_start = null) {
 
-        $reports = DB::table('hour_report')
-              ->select(DB::raw('
-                  hour_report.department_info_id,
-                  hour_report.success,
-                  departments.name as dep_name,
-                  department_type.name as dep_name_type
-              '))
-              ->join('department_info', 'department_info.id', '=', 'hour_report.department_info_id')
-              ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-              ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type');
+//        $reports = DB::table('hour_report')
+//              ->select(DB::raw('
+//                  hour_report.department_info_id,
+//                  hour_report.success,
+//                  departments.name as dep_name,
+//                  department_type.name as dep_name_type
+//              '))
+//              ->join('department_info', 'department_info.id', '=', 'hour_report.department_info_id')
+//              ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+//              ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type');
+//
+//        if ($type == 'hourReport') {
+//            $reports->where('hour_report.report_date', '=', $date)
+//                ->where('hour_report.hour', '=', $hour);
+//        } else if ($type == 'dayReport') {
+//            $reports->whereIn('hour_report.id', function($query) use($date){
+//                  $query->select(DB::raw('
+//                    MAX(hour_report.id)
+//                  '))
+//                  ->from('hour_report')
+//                  ->where('hour_report.report_date', '=', $date)
+//                  ->groupBy('hour_report.department_info_id');
+//              });
+//        }
+
+        $reports_good = DB::table('pbx_dkj_team')
+            ->select(DB::raw('
+            department_info_id,
+            count_all_check as all_checked,
+            count_good_check as all_good,
+            success,
+            departments.name as dep_name,
+            department_type.name as dep_name_type
+            '))
+            ->join('department_info', 'department_info.id', 'pbx_dkj_team.department_info_id')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type');
 
         if ($type == 'hourReport') {
-            $reports->where('hour_report.report_date', '=', $date)
-                ->where('hour_report.hour', '=', $hour);
+            $reports_good->where('pbx_dkj_team.report_date', '=', $date)
+                ->where('pbx_dkj_team.hour', '=', $hour);
         } else if ($type == 'dayReport') {
-            $reports->whereIn('hour_report.id', function($query) use($date){
-                  $query->select(DB::raw('
-                    MAX(hour_report.id)
+            $reports_good->whereIn('pbx_dkj_team.id', function($query) use($date){
+                $query->select(DB::raw('
+                    MAX(pbx_dkj_team.id)
                   '))
-                  ->from('hour_report')
-                  ->where('hour_report.report_date', '=', $date)
-                  ->groupBy('hour_report.department_info_id');
-              });
+                    ->from('pbx_dkj_team')
+                    ->where('pbx_dkj_team.report_date', '=', $date)
+                    ->groupBy('pbx_dkj_team.department_info_id');
+            });
         }
 
-        $reports = $reports->get();
-        return $reports;
+        $reports_good = $reports_good->get();
+        return $reports_good;
     }
 
     private function hourReportCheckedData() {
