@@ -546,6 +546,8 @@ class CoachingController extends Controller
             $coaching               = CoachingDirector::find($request->coaching_id);
             $coaching->comment      = $request->coaching__comment;
 
+
+
             if(floatval($coaching->average_goal) > floatval($request->avrage_end)) // Coaching niezaliczony
                 $coaching->status  = 2;
             else
@@ -553,6 +555,9 @@ class CoachingController extends Controller
             $coaching->coaching_date_accept = date('Y-m-d');
             $coaching->avrage_end = $request->avrage_end;
             $coaching->rbh_end = $request->rbh_end;
+
+
+
             $coaching->save();
             return $coaching->average_goal;
         }else

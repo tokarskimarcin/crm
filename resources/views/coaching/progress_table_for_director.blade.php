@@ -738,9 +738,10 @@
                         let coaching_id = $(this).data('id');
                         let coaching_comment = $('#text_'+coaching_id).val();
                         let row = $(this).closest('tr');
-                        let avrage_end =  row.find('td:nth-child(5)').text();
-                        let rbh_end = row.find('td:nth-child(6)').text();
-                        console.log(avrage_end+' '+rbh_end+' '+coaching_id);
+                        let coaching_type =  row.find('td:nth-child(5)').text();
+                        let end_score =  row.find('td:nth-child(7)').text();
+                        let rbh_end = row.find('td:nth-child(9)').text();
+                        console.log(coaching_type+' '+end_score+' '+rbh_end);
                         swal({
                             title: 'Jesteś pewien?',
                             text: "Nie będziesz w stanie cofnąć zmian!",
@@ -758,11 +759,11 @@
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
                                 data: {
-                                    'coaching_id'           : coaching_id,
-                                    'coaching__comment'     : coaching_comment,
-                                    'avrage_end'            : avrage_end,
-                                    'rbh_end'               : rbh_end,
-                                    'status'                : 1
+                                    'coaching_id'               : coaching_id,
+                                    'coaching__comment'         : coaching_comment,
+                                    'coaching_type'             : coaching_type,
+                                    'end_score'                 : end_score,
+                                    'rbh_end'                   : rbh_end,
                                 },
                                 success: function (response) {
                                     console.log(response)
@@ -836,7 +837,14 @@
                             //return Math.round(data.couching_rbh/3600,2);
                         },"name": "actual_rbh","searchable": false
                     },
-                    {"data": "comment"},
+                    {"data":function (data, type, dataToSet) {
+                            let comment = 'Brak';
+                            if(data.comment != null){
+                                comment = data.comment;
+                            }
+                            return "<textarea class='form-control comment_class' id=text_"+data.id+">"+comment+"</textarea>";
+                        },"name": "comment"
+                    },
                     {"data":function (data, type, dataToSet) {
                             return "<button class='btn-accept_coaching btn btn-success' data-id="+data.id+" >Akceptuj</button>";
                         },"orderable": false, "searchable": false
