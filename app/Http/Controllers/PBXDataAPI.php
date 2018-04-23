@@ -171,12 +171,12 @@ class PBXDataAPI extends Controller
 
         if (!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
         if (($handle = fopen($url, "r")) !== FALSE) {
-
             $row = 0;
             $data_to_insert = [];
             while (($rowData = fgetcsv($handle, 1000, ";")) !== false) {
                 if ($row > 2) {
                     $temp_key = null;
+                    $save = true;
                     foreach ($rowData as $key => $rowItem) {
                         $removeData = false;
                         if ($key == 0) {
@@ -186,6 +186,8 @@ class PBXDataAPI extends Controller
                                 $pbx_number = $pbx_number_array[count($pbx_number_array) - 1];
                                 $temp_key = $pbx_number;
                                 $data_to_insert[$temp_key]['pbx_id'] = $pbx_number;
+                            }else{
+                                $save = false;
                             }
                         } else if ($key == 1) {
                             $data_to_insert[$temp_key]['average'] = $rowItem;
@@ -208,7 +210,10 @@ class PBXDataAPI extends Controller
                         } else if ($key == 10) {
                             $data_to_insert[$temp_key]['received_calls'] = intval($rowItem);
                         } else if ($key == 11) {
-                            $data_to_insert[$temp_key]['pbx_id'] = $rowItem;
+                            if($save)
+                                $data_to_insert[$temp_key]['pbx_id'] = $rowItem;
+                            else
+                                $data_to_insert[$temp_key]['pbx_id'] = 0;
                             $data_to_insert[$temp_key]['report_date'] = date('Y-m-d');
                             $data_to_insert[$temp_key]['report_hour'] = date('H:') . '00:00';
                         }
