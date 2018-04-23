@@ -38,7 +38,18 @@
             </div>
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="myLabel">Typ coaching'u:</label>
+                            <select class="form-control" id="type_coaching_in_progress">
+                                <option value="0">Wszystkie</option>
+                                <option value="1">Średnia</option>
+                                <option value="2">Jakość</option>
+                                <option value="3">RBH</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label class="myLabel">Zakres od:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -47,7 +58,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label class="myLabel">Zakres do:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -67,15 +78,15 @@
                                         <th>Kierownik</th>
                                         <th>Data</th>
                                         <th>Temat</th>
-                                        <th>Średnia wyjściowa</th>
-                                        <th>Aktualna średnia</th>
-                                        <th>Aktualne RBH</th>
+                                        <th>Typ coachingu</th>
+                                        <th>Wynik wyjściowy</th>
+                                        <th>Wynik Aktualny</th>
                                         <th>Cel</th>
+                                        <th>Aktualne RBH</th>
                                         <th>Akcja</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-
                                     </tbody>
                                 </table>
                         </div>
@@ -120,14 +131,15 @@
                             <table id="table_unsettled" class="table table-striped thead-inverse">
                                 <thead>
                                 <tr>
-                                    <th>Trener</th>
-                                    <th>Konsultant</th>
+                                    <th>Dyrektor</th>
+                                    <th>Kierownik</th>
                                     <th>Data</th>
                                     <th>Temat</th>
-                                    <th>Średnia wyjściowa</th>
-                                    <th>Aktualna średnia</th>
-                                    <th>Aktualne RBH</th>
+                                    <th>Typ coachingu</th>
+                                    <th>Wynik wyjściowy</th>
+                                    <th>Wynik Aktualny</th>
                                     <th>Cel</th>
+                                    <th>Aktualne RBH</th>
                                     <th>Komentarz</th>
                                     <th>Akcja</th>
                                 </tr>
@@ -176,14 +188,15 @@
                             <table id="table_settled" class="table table-striped thead-inverse">
                                 <thead>
                                 <tr>
-                                    <th>Trener</th>
-                                    <th>Konsultant</th>
+                                    <th>Dyrektor</th>
+                                    <th>Kierownik</th>
                                     <th>Data</th>
                                     <th>Temat</th>
-                                    <th>Średnia wyjściowa</th>
-                                    <th>Aktualna średnia</th>
-                                    <th>Aktualne RBH</th>
+                                    <th>Typ coachingu</th>
+                                    <th>Wynik wyjściowy</th>
+                                    <th>Wynik Aktualny</th>
                                     <th>Cel</th>
+                                    <th>Aktualne RBH</th>
                                     <th>Komentarz</th>
                                 </tr>
                                 </thead>
@@ -358,9 +371,9 @@
             let pom_manager_actual_rbh =  parseFloat(manager_actual_rbh);
 
 
-            let coaching_manager_avg_goal = $("#coaching_manager_avg_goal").val();
-            let coaching_manager_avg_janky = $("#coaching_manager_avg_janky").val();
-            let coaching_manager_avg_rbh = $("#coaching_manager_avg_rbh").val();
+            let coaching_manager_goal_avg = $("#coaching_manager_avg_goal").val();
+            let coaching_manager_goal_janky = $("#coaching_manager_avg_janky").val();
+            let coaching_manager_goal_rbh = $("#coaching_manager_avg_rbh").val();
 
             let validation = true;
             if(manager_id == 'Wybierz'){
@@ -385,7 +398,7 @@
                         validation = false;
                         swal('Błędna aktualna średnia')
                     }
-                    if(coaching_manager_avg_goal.trim('').length == 0 || isNaN(coaching_manager_avg_goal) || manager_actual_avg > coaching_manager_avg_goal ){
+                    if(coaching_manager_goal_avg.trim('').length == 0 || isNaN(coaching_manager_goal_avg) || manager_actual_avg > coaching_manager_goal_avg ){
                         validation = false;
                         swal('Błędna odcelowa średnia')
                     }
@@ -394,16 +407,16 @@
                         validation = false;
                         swal('Błędna aktualna jakość')
                     }
-                    if(coaching_manager_avg_janky.trim('').length == 0 || isNaN(coaching_manager_avg_janky) || manager_actual_janky < coaching_manager_avg_janky ){
+                    if(coaching_manager_goal_janky.trim('').length == 0 || isNaN(coaching_manager_goal_janky) || manager_actual_janky < coaching_manager_goal_janky ){
                         validation = false;
                         swal('Błędna odcelowa jakość')
                     }
                 }else if(coaching_type == 3){
-                    if(coaching_manager_avg_rbh.trim('').length == 0 || isNaN(coaching_manager_avg_rbh) ){
+                    if(manager_actual_rbh.trim('').length == 0 || isNaN(manager_actual_rbh) ){
                         validation = false;
                         swal('Błędne aktualne RBH')
                     }
-                    if(coaching_manager_avg_goal.trim('').length == 0 || isNaN(coaching_manager_avg_goal) ){
+                    if(coaching_manager_goal_rbh.trim('').length == 0 || isNaN(coaching_manager_goal_rbh) || manager_actual_rbh > coaching_manager_goal_rbh ){
                         validation = false;
                         swal('Błędne docelowe RBH')
                     }
@@ -431,9 +444,9 @@
                         'manager_actual_janky'          : manager_actual_janky,
                         'manager_actual_rbh'            : manager_actual_rbh,
 
-                        'coaching_manager_avg_goal'     :coaching_manager_avg_goal,
-                        'coaching_manager_avg_janky'    :coaching_manager_avg_janky,
-                        'coaching_manager_avg_rbh'      :coaching_manager_avg_rbh,
+                        'coaching_manager_avg_goal'     :coaching_manager_goal_avg,
+                        'coaching_manager_avg_janky'    :coaching_manager_goal_janky,
+                        'coaching_manager_avg_rbh'      :coaching_manager_goal_rbh,
 
                         'status'                : $('#status_coauching').val(),
                     },
@@ -504,9 +517,15 @@
                 $('#coaching_manager_avg_rbh').val('');
 
                 $('#date_start_new_coaching').val("{!! date('Y-m-d') !!}");
+
+                var input = document.getElementsByClassName('goal_manager');
+                for(var i = 0;i<input.length;i++){
+                    input[i].value = "";
+                        input[i].disabled = true;
+                }
             }
 
-
+            // coachingi w toku
             var in_progress_table = $('#table_in_progress').DataTable({
                 "autoWidth": false,
                 "processing": true,
@@ -514,22 +533,24 @@
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },"ajax": {
-                    'url': "{{ route('api.datatableCoachingTable') }}",
+                    'url': "{{ route('api.datatableCoachingTableDirector') }}",
                     'type': 'POST',
                     'data': function (d) {
                         d.report_status = 0;
+                        d.type          = $('#type_coaching_in_progress').val();
                         d.date_start    = $('#date_start_in_progress').val();
                         d.date_stop     = $('#date_stop_in_progress').val();
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
-                },"rowCallback": function( row, data, index ) {
-                    if (data.couching_rbh >= 64800) {
+                },
+                "rowCallback": function( row, data, index ) {
+                    if (parseFloat(data.actual_rbh) >= parseFloat(data.rbh_min)) {
                         $(row).hide();
                     }
-                    $(row).attr('id', data.id);
+                        $(row).attr('id', data.id);
                     return row;
-                },"fnDrawCallback": function(settings){
-
+                },
+                "fnDrawCallback": function(settings){
                     /**
                      * Usunięcie coachingu
                      */
@@ -548,7 +569,7 @@
 
                             $.ajax({
                                 type: "POST",
-                                url: "{{ route('api.deleteCoaching') }}", // do zamiany
+                                url: "{{ route('api.deleteCoachingTableDirector') }}", // do zamiany
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
@@ -570,7 +591,7 @@
                         coaching_id = $(this).data('id');
                         $.ajax({
                             type: "POST",
-                            url: "{{ route('api.getCoaching') }}", // do zamiany
+                            url: "{{ route('api.getCoachingDirector') }}", // do zamiany
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
@@ -578,49 +599,104 @@
                                 'coaching_id'         : coaching_id
                             },
                             success: function (response) {
-                                $('#couaching_user_id').val(response.consultant_id);
+
+                                $('#couaching_manager_id').val(response.user_id);
                                 $('#coaching_subject').val(response.subject);
+                                $('#couaching_manager_type').val(response.coaching_type);
+                                $('#manager_actual_avg').val(response.average_start);
+                                $('#manager_actual_janky').val(response.janky_start);
+                                $('#manager_actual_rbh').val(response.rbh_start);
+                                $('#coaching_manager_avg_goal').val(response.average_goal);
+                                $('#coaching_manager_avg_janky').val(response.janky_goal);
+                                $('#coaching_manager_avg_rbh').val(response.rbh_goal);
                                 $('#coaching_actual_avg').val(response.coaching_actual_avg);
                                 $('#coaching_goal').val(response.average_goal);
                                 $('#date_start_new_coaching').val(response.coaching_date);
                                 $('#save_coaching_modal').text('Edytuj Coaching');
                                 $('#status_coauching').val(response.id);
                                 $('#Modal_Coaching').modal('show');
+
+                                let select_value = response.coaching_type;
+                                var input = document.getElementsByClassName('goal_manager');
+                                for(var i = 0;i<input.length;i++){
+                                    if(select_value != 'Wybierz'){
+                                        if(select_value == i+1){
+                                            input[i].disabled = false;
+                                        } else{
+                                            input[i].disabled = true;
+                                        }
+                                    }else{
+                                        input[i].disabled = true;
+                                    }
+                                }
                                 in_progress_table.ajax.reload();
                             }
                         });
-
-
                     });
-
-
                 },
                 "columns":[
-                        {"data":function (data, type, dataToSet) {
-                                return data.manager_first_name + " " + data.manager_last_name;
-                            },"name": "manager.last_name"
+                        {data:function (data, type, dataToSet) {
+                                return data.manager_first_name+' '+data.manager_last_name;
+                            },"name": "manager_last_name"
                         },
                         {"data":function (data, type, dataToSet) {
-                                return data.consultant_first_name + " " + data.consultant_last_name;
-                            },"name": "consultant.last_name"
+                                return data.user_first_name + " " + data.user_last_name;
+                            },"name": "user.last_name"
                         },
                         {"data":"coaching_date"},
                         {"data": "subject"},
-                        {"data": "coaching_actual_avg"},
+                        // // typ coachingu
                         {"data":function (data, type, dataToSet) {
-                                let color = 'green';
-                                if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal))
-                                    color = 'red';
-                                if(data.avg_consultant == null)
-                                    return 'Brak';
-                                 return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
-                            },"name": "avg_consultant","searchable": false
+                                    if(data.coaching_type == 1){
+                                        return 'Średnia';
+                                    }else if(data.coaching_type == 2){
+                                        return 'Jakość';
+                                    }else
+                                        return 'RBH';
+                                },"name": "coaching_type"
                         },
+                        // wynik wyjściowy
                         {"data":function (data, type, dataToSet) {
-                                return Math.round(data.couching_rbh/3600,2);
-                            },"name": "couching_rbh","searchable": false
+                                if(data.coaching_type == 1){
+                                    return data.average_start;
+                                }else if(data.coaching_type == 2){
+                                    return data.janky_start;
+                                }else
+                                    return data.rbh_start;
+                            },"name": "average_start","searchable": false
                         },
-                        {"data": "average_goal"},
+                        // wynik aktualny
+                        {"data":function (data, type, dataToSet) {
+                                if(data.coaching_type == 1){
+                                    return data.actual_avg;
+                                }else if(data.coaching_type == 2){
+                                    return data.actual_janky;
+                                }else
+                                    return data.actual_rbh;
+                            },"name": "average_start","searchable": false
+                        },
+                        // // wynik cel
+                        {"data":function (data, type, dataToSet) {
+                                // let color = 'green';
+                                // if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal))
+                                //     color = 'red';
+                                // if(data.avg_consultant == null)
+                                //     return 'Brak';
+                                //  return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
+                                if(data.coaching_type == 1){
+                                    return data.average_goal;
+                                }else if(data.coaching_type == 2){
+                                    return data.janky_goal;
+                                }else
+                                    return data.rbh_goal;
+                            },"name": "average_start","searchable": false
+                        },
+                        // //ile rbh minęło po coachingu
+                        {"data":function (data, type, dataToSet) {
+                                return data.actual_rbh;
+                                //return Math.round(data.couching_rbh/3600,2);
+                            },"name": "actual_rbh","searchable": false
+                        },
                         {"data":function (data, type, dataToSet) {
                                 return "<button class='button-edit-coaching btn btn-warning' style='margin: 3px;' data-id="+data.id+">Edycja</button>" +
                                     "<button class='button-delete-coaching btn btn-danger' data-id="+data.id+">Usuń</button>";
@@ -630,7 +706,7 @@
             });
 
 
-            $('#date_start_in_progress, #date_stop_in_progress').on('change',function (e) {
+            $('#date_start_in_progress, #date_stop_in_progress,#type_coaching_in_progress').on('change',function (e) {
                 in_progress_table.ajax.reload();
             });
 
@@ -641,7 +717,7 @@
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },"ajax": {
-                    'url': "{{ route('api.datatableCoachingTable') }}",
+                    'url': "{{ route('api.datatableCoachingTableDirector') }}",
                     'type': 'POST',
                     'data': function (d) {
                         d.report_status = 0;
@@ -650,7 +726,7 @@
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-                    if (data.couching_rbh < 64800) {
+                    if (parseFloat(data.actual_rbh) < parseFloat(data.rbh_min)) {
                         $(row).hide();
                     }
                     $(row).attr('id', data.id);
@@ -698,37 +774,69 @@
                     });
                 }
                 ,"columns":[
-                    {"data":function (data, type, dataToSet) {
-                            return data.manager_first_name + " " + data.manager_last_name;
-                        },"name": "manager.last_name"
+                    {data:function (data, type, dataToSet) {
+                            return data.manager_first_name+' '+data.manager_last_name;
+                        },"name": "manager_last_name"
                     },
                     {"data":function (data, type, dataToSet) {
-                            return data.consultant_first_name + " " + data.consultant_last_name;
-                        },"name": "consultant.last_name"
+                            return data.user_first_name + " " + data.user_last_name;
+                        },"name": "user.last_name"
                     },
                     {"data":"coaching_date"},
                     {"data": "subject"},
-                    {"data": "coaching_actual_avg"},
+                    // // typ coachingu
                     {"data":function (data, type, dataToSet) {
-                            let color = 'green';
-                            if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal))
-                                color = 'red';
-                            return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
-                        },"name": "avg_consultant","searchable": false
+                            if(data.coaching_type == 1){
+                                return 'Średnia';
+                            }else if(data.coaching_type == 2){
+                                return 'Jakość';
+                            }else
+                                return 'RBH';
+                        },"name": "coaching_type"
                     },
+                    // wynik wyjściowy
                     {"data":function (data, type, dataToSet) {
-                            return Math.round(data.couching_rbh/3600,2);
-                        },"name": "couching_rbh","searchable": false
+                            if(data.coaching_type == 1){
+                                return data.average_start;
+                            }else if(data.coaching_type == 2){
+                                return data.janky_start;
+                            }else
+                                return data.rbh_start;
+                        },"name": "average_start","searchable": false
                     },
-                    {"data": "average_goal"},
+                    // wynik aktualny
                     {"data":function (data, type, dataToSet) {
-                            let comment = 'Brak';
-                            if(data.comment != null){
-                                comment = data.comment;
-                            }
-                            return "<textarea class='form-control comment_class' id=text_"+data.id+">"+comment+"</textarea>";
-                        },"name": "comment"
+                            if(data.coaching_type == 1){
+                                return data.actual_avg;
+                            }else if(data.coaching_type == 2){
+                                return data.actual_janky;
+                            }else
+                                return data.actual_rbh;
+                        },"name": "average_start","searchable": false
                     },
+                    // // wynik cel
+                    {"data":function (data, type, dataToSet) {
+                            // let color = 'green';
+                            // if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal))
+                            //     color = 'red';
+                            // if(data.avg_consultant == null)
+                            //     return 'Brak';
+                            //  return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
+                            if(data.coaching_type == 1){
+                                return data.average_goal;
+                            }else if(data.coaching_type == 2){
+                                return data.janky_goal;
+                            }else
+                                return data.rbh_goal;
+                        },"name": "average_start","searchable": false
+                    },
+                    // //ile rbh minęło po coachingu
+                    {"data":function (data, type, dataToSet) {
+                            return data.actual_rbh;
+                            //return Math.round(data.couching_rbh/3600,2);
+                        },"name": "actual_rbh","searchable": false
+                    },
+                    {"data": "comment"},
                     {"data":function (data, type, dataToSet) {
                             return "<button class='btn-accept_coaching btn btn-success' data-id="+data.id+" >Akceptuj</button>";
                         },"orderable": false, "searchable": false
@@ -737,52 +845,52 @@
 
             });
 
-            $('#date_start_unsettled, #date_stop_unsettled').on('change',function (e) {
-                table_unsettled.ajax.reload();
-            });
+            {{--$('#date_start_unsettled, #date_stop_unsettled').on('change',function (e) {--}}
+                {{--table_unsettled.ajax.reload();--}}
+            {{--});--}}
 
-            var table_settled = $('#table_settled').DataTable({
-                "autoWidth": false,
-                "processing": true,
-                "serverSide": true,
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
-                },"ajax": {
-                    'url': "{{ route('api.datatableCoachingTable') }}",
-                    'type': 'POST',
-                    'data': function (d) {
-                        d.report_status = 1;
-                        d.date_start = $('#date_start_settled').val();
-                        d.date_stop =  $('#date_stop_settled').val();
-                    },
-                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
-                },"columns":[
-                    {"data":function (data, type, dataToSet) {
-                            return data.manager_first_name + " " + data.manager_last_name;
-                        },"name": "manager.last_name"
-                    },
-                    {"data":function (data, type, dataToSet) {
-                            return data.consultant_first_name + " " + data.consultant_last_name;
-                        },"name": "consultant.last_name"
-                    },
-                    {"data":"coaching_date"},
-                    {"data": "subject"},
-                    {"data": "coaching_actual_avg"},
-                    {"data":function (data, type, dataToSet) {
-                            let color = 'green';
-                            if(parseFloat(data.avrage_end) < parseFloat(data.average_goal))
-                                color = 'red';
-                            return '<span style="color:' + color + '">' + data.avrage_end + '</span>';
-                        },"name": "avrage_end","searchable": false
-                    },
-                    {"data":function (data, type, dataToSet) {
-                            return Math.round(data.rbh_end,2);
-                        },"name": "rbh_end","searchable": false
-                    },
-                    {"data": "average_goal"},
-                    {"data":"comment"},
-                ]
-            });
+            {{--var table_settled = $('#table_settled').DataTable({--}}
+                {{--"autoWidth": false,--}}
+                {{--"processing": true,--}}
+                {{--"serverSide": true,--}}
+                {{--"language": {--}}
+                    {{--"url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"--}}
+                {{--},"ajax": {--}}
+                    {{--'url': "{{ route('api.datatableCoachingTable') }}",--}}
+                    {{--'type': 'POST',--}}
+                    {{--'data': function (d) {--}}
+                        {{--d.report_status = 1;--}}
+                        {{--d.date_start = $('#date_start_settled').val();--}}
+                        {{--d.date_stop =  $('#date_stop_settled').val();--}}
+                    {{--},--}}
+                    {{--'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}--}}
+                {{--},"columns":[--}}
+                    {{--{"data":function (data, type, dataToSet) {--}}
+                            {{--return data.manager_first_name + " " + data.manager_last_name;--}}
+                        {{--},"name": "manager.last_name"--}}
+                    {{--},--}}
+                    {{--{"data":function (data, type, dataToSet) {--}}
+                            {{--return data.consultant_first_name + " " + data.consultant_last_name;--}}
+                        {{--},"name": "consultant.last_name"--}}
+                    {{--},--}}
+                    {{--{"data":"coaching_date"},--}}
+                    {{--{"data": "subject"},--}}
+                    {{--{"data": "coaching_actual_avg"},--}}
+                    {{--{"data":function (data, type, dataToSet) {--}}
+                            {{--let color = 'green';--}}
+                            {{--if(parseFloat(data.avrage_end) < parseFloat(data.average_goal))--}}
+                                {{--color = 'red';--}}
+                            {{--return '<span style="color:' + color + '">' + data.avrage_end + '</span>';--}}
+                        {{--},"name": "avrage_end","searchable": false--}}
+                    {{--},--}}
+                    {{--{"data":function (data, type, dataToSet) {--}}
+                            {{--return Math.round(data.rbh_end,2);--}}
+                        {{--},"name": "rbh_end","searchable": false--}}
+                    {{--},--}}
+                    {{--{"data": "average_goal"},--}}
+                    {{--{"data":"comment"},--}}
+                {{--]--}}
+            {{--});--}}
 
             $('#date_start_settled, #date_stop_settled').on('change',function (e) {
                 table_settled.ajax.reload();
