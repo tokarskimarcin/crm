@@ -85,7 +85,7 @@ class PBXDataAPI extends Controller
         $report_type = 2;
         $department_id = null;
         $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=27&groupType=" . $this->report_type_array[$report_type];
-        $header_array = array(0=>'campain',1=>'team_name', 2=>'consultant_name', 13=>'time_on_record', 14=>'time_call',
+        $header_array = array(0=>'campain',1=>'team_name', 2=>'consultant_name', 7=>'approvals', 8=>'refusals', 13=>'time_on_record', 14=>'time_call',
             3=>'left_record', 12=>'closed_record');
         if (!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
         if (($handle = fopen($url, "r")) !== FALSE) {
@@ -95,7 +95,7 @@ class PBXDataAPI extends Controller
                     foreach ($data1 as $item) {
                             if ($item == '-' || $item == 'null')
                                 $item = 0;
-                            if ($i == 0 || $i == 1 || $i == 2 || $i == 3  || $i == 12 ||  $i == 13 || $i == 14) {
+                            if ($i == 0 || $i == 1 || $i == 2 || $i == 3 || $i == 7 || $i == 8 || $i == 12 ||  $i == 13 || $i == 14) {
                                 $spreadsheet_data[$lp][$header_array[$i]] = $this::w1250_to_utf8($item);  //utf8_encode($item);
                             }
                             $spreadsheet_data[$lp]['hour'] = date('H').":00:00";
