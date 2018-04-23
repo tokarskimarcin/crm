@@ -193,7 +193,8 @@
                                                                                 $student = ($item2->student == 0) ? "Nie" : "Tak";
                                                                                 $documents = ($item2->documents == 0) ? "Nie" : "Tak";
                                                                                 //System prowizyjny
-                                                                                  if ($rbh >= $department_info->commission_hour AND $janky_proc < $department_info->commission_janky) {
+
+                                                                                  if ($janky_proc < $department_info->commission_janky AND $standart_salary >= 8) {
                                                                                         $lp = 1;
                                                                                         for ($step = $department_info->commission_step; $step <= 20; $step = ($step+0.5)) {
                                                                                               $avg_min = ($department_info->commission_avg-0.25)+(0.25*$lp);
@@ -248,8 +249,15 @@
                                                                                         $bonus_per_hour = 0;
                                                                                     }
                                                                                 }
-                                                                                
+
+                                                                                if($rbh >= 120 AND $rbh < 160) {
+                                                                                    $salary_total = $standart_salary+$bonus_salary - $janky_cost+$bonus_penalty + 200;
+                                                                                } else if($rbh >= 160) {
+                                                                                    $salary_total = $standart_salary+$bonus_salary - $janky_cost+$bonus_penalty + 400;
+                                                                                } else {
                                                                                 $salary_total = $standart_salary+$bonus_salary - $janky_cost+$bonus_penalty;
+                                                                                }
+
                                                                                 if($salary_total <0)
                                                                                     $salary_total = 0;
                                                                                 $salary_total_all += $salary_total;
@@ -583,6 +591,12 @@
         if(payment_saved == 0){
             $(".buttons-html5").css('display','none');
         }
+
+        let submit_button = $('#show_load_data_info');
+        submit_button.on('click', function(e) {
+           e.target.style.cursor = "wait";
+           e.target.disabled = true;
+        });
 
     });
 

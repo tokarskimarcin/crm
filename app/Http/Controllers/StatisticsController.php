@@ -161,7 +161,6 @@ class StatisticsController extends Controller
                   SUM(success) as sum_success,
                   sum(`hour_time_use`) as hour_time_use,
                   SUM(wear_base)/count(`call_time`) as avg_wear_base,
-                  SUM(janky_count)/count(`call_time`)  as sum_janky_count,
                   department_type.name as dep_name,
                   departments.name as dep_type_name,
                   department_info.*
@@ -183,6 +182,22 @@ class StatisticsController extends Controller
             ->groupBy('hour_report.department_info_id')
             ->get();
 
+        $pbx_dkj_data = DB::table('pbx_dkj_team')
+            ->select(DB::raw('
+             (SUM(count_bad_check) * 100) / SUM(count_all_check) as janky_proc,
+             pbx_dkj_team.department_info_id as id
+            '))
+            ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop){
+                $query->select(DB::raw(
+                    'MAX(pbx_dkj_team.id)'
+                ))
+                    ->from('pbx_dkj_team')
+                    ->whereBetween('report_date', [$date_start, $date_stop])
+                    ->groupBy('department_info_id','report_date');
+            })
+            ->groupBy('pbx_dkj_team.department_info_id')
+            ->get();
+
             //tu był zmiana z godzin na liczbę
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
@@ -197,12 +212,19 @@ class StatisticsController extends Controller
             ->groupBy('department_info.id')
             ->get();
 
+        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data) {
+            $info_with_janky = $pbx_dkj_data->where('id', '=', $item->id)->first();
+            $item->janki = $info_with_janky != null ? $info_with_janky->janky_proc : 0;
+           return $item;
+        });
+
         $data = [
             'date_start' => $date_start,
             'date_stop' => $date_stop,
-            'reports' => $reports,
+            'reports' => $reports_with_dkj,
             'work_hours' => $work_hours,
         ];
+
         return $data;
     }
 //Mail do raportu Tygodniowego Telemarketing
@@ -237,7 +259,6 @@ class StatisticsController extends Controller
                   AVG(average) as avg_average,
                   SUM(success) as sum_success,
                   AVG(wear_base) as avg_wear_base,
-                  SUM(janky_count) as sum_janky_count,
                   department_type.name as dep_name,
                   departments.name as dep_type_name,
                   department_info.*
@@ -259,6 +280,22 @@ class StatisticsController extends Controller
             ->groupBy('hour_report.department_info_id')
             ->get();
 
+        $pbx_dkj_data = DB::table('pbx_dkj_team')
+            ->select(DB::raw('
+             (SUM(count_bad_check) * 100) / SUM(count_all_check) as janky_proc,
+             pbx_dkj_team.department_info_id as id
+            '))
+            ->whereIn('pbx_dkj_team.id', function($query) use($date){
+                $query->select(DB::raw(
+                    'MAX(pbx_dkj_team.id)'
+                ))
+                    ->from('pbx_dkj_team')
+                    ->where('report_date', '=',$date)
+                    ->groupBy('department_info_id','report_date');
+            })
+            ->groupBy('pbx_dkj_team.department_info_id')
+            ->get();
+
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
                 'sum(time_to_sec(register_stop) - time_to_sec(register_start))/3600 as realRBH,
@@ -271,9 +308,15 @@ class StatisticsController extends Controller
             ->groupBy('department_info.id')
             ->get();
 
+        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data) {
+            $info_with_janky = $pbx_dkj_data->where('id', '=', $item->id)->first();
+            $item->janki = $info_with_janky != null ? $info_with_janky->janky_proc : 0;
+            return $item;
+        });
+
         $data = [
             'date' => $date,
-            'reports' => $reports,
+            'reports' => $reports_with_dkj,
             'work_hours' => $work_hours,
         ];
         return $data;
@@ -432,6 +475,22 @@ class StatisticsController extends Controller
             ->groupBy('hour_report.department_info_id')
             ->get();
 
+        $pbx_dkj_data = DB::table('pbx_dkj_team')
+            ->select(DB::raw('
+             (SUM(count_bad_check) * 100) / SUM(count_all_check) as janky_proc,
+             pbx_dkj_team.department_info_id as id
+            '))
+            ->whereIn('pbx_dkj_team.id', function($query) use($month){
+                $query->select(DB::raw(
+                    'MAX(pbx_dkj_team.id)'
+                ))
+                    ->from('pbx_dkj_team')
+                    ->where('report_date', 'like', $month)
+                    ->groupBy('department_info_id','report_date');
+            })
+            ->groupBy('pbx_dkj_team.department_info_id')
+            ->get();
+
         //pobieranie sumy godzin pracy dla poszczególnych oddziałów
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
@@ -445,14 +504,19 @@ class StatisticsController extends Controller
             ->groupBy('department_info.id')
             ->get();
 
+        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data) {
+            $info_with_janky = $pbx_dkj_data->where('id', '=', $item->id)->first();
+            $item->janki = $info_with_janky != null ? $info_with_janky->janky_proc : 0;
+            return $item;
+        });
+
         $data = [
             'month_name' => $month_name,
-            'reports' => $reports,
+            'reports' => $reports_with_dkj,
             'work_hours' => $work_hours,
             'result_days' => $result_days
             //'days_list' => $days_list,
         ];
-        
         return $data;
     }
 // Wysłanie maila z raportem miesiecznym
