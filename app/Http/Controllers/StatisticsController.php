@@ -1229,28 +1229,53 @@ class StatisticsController extends Controller
           $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
           $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
 
-          $hour_reports = DB::table('hour_report')
+//          $hour_reports = DB::table('hour_report')
+//              ->select(DB::raw('
+//                department_info_id,
+//                sum(success) as success,
+//                departments.name as dep_name,
+//                department_type.name as dep_name_type
+//              '))
+//              ->join('department_info', 'department_info.id', '=', 'hour_report.department_info_id')
+//              ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+//              ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+//              ->whereIn('hour_report.id', function($query) use($date_start, $date_stop){
+//                  $query->select(DB::raw('
+//                    MAX(hour_report.id)
+//                  '))
+//                  ->from('hour_report')
+//                  ->whereBetween('hour_report.report_date', [$date_start, $date_stop])
+//                  ->groupBy('hour_report.department_info_id')
+//                  ->groupBy('hour_report.report_date');
+//              })
+//              //->where('department_info.id_dep_type', '=', 2)
+//              ->groupBy('hour_report.department_info_id')
+//              ->get();
+
+          $reports = DB::table('pbx_dkj_team')
               ->select(DB::raw('
-                department_info_id,
-                sum(success) as success,
-                departments.name as dep_name,
-                department_type.name as dep_name_type
+              department_info_id,
+              SUM(success) as success,
+              departments.name as dep_name,
+              department_type.name as dep_name_type,
+              SUM(count_all_check) as all_checked,
+              SUM(count_good_check) as all_good
               '))
-              ->join('department_info', 'department_info.id', '=', 'hour_report.department_info_id')
+              ->join('department_info', 'department_info.id', 'pbx_dkj_team.department_info_id')
               ->join('departments', 'departments.id', '=', 'department_info.id_dep')
               ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-              ->whereIn('hour_report.id', function($query) use($date_start, $date_stop){
-                  $query->select(DB::raw('
-                    MAX(hour_report.id)
-                  '))
-                  ->from('hour_report')
-                  ->whereBetween('hour_report.report_date', [$date_start, $date_stop])
-                  ->groupBy('hour_report.department_info_id')
-                  ->groupBy('hour_report.report_date');
-              })
-              //->where('department_info.id_dep_type', '=', 2)
-              ->groupBy('hour_report.department_info_id')
-              ->get();
+                ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop){
+                    $query->select(DB::raw('
+                            MAX(pbx_dkj_team.id)
+                          '))
+                        ->from('pbx_dkj_team')
+                        ->whereBetween('pbx_dkj_team.report_date', [$date_start, $date_stop])
+                        ->groupBy('pbx_dkj_team.department_info_id')
+                        ->groupBy('pbx_dkj_team.report_date');
+                })
+                    //->where('department_info.id_dep_type', '=', 2)
+                    ->groupBy('pbx_dkj_team.department_info_id')
+                    ->get();
 
           $day_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
           $day_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
@@ -1273,7 +1298,7 @@ class StatisticsController extends Controller
           $data = [
               'day_start' => $day_start,
               'day_stop' => $day_stop,
-              'hour_reports' => $hour_reports,
+              'hour_reports' => $reports,
               'dkj' => $dkj
           ];
           return $data;
