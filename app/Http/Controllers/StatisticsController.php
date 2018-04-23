@@ -259,7 +259,6 @@ class StatisticsController extends Controller
                   AVG(average) as avg_average,
                   SUM(success) as sum_success,
                   AVG(wear_base) as avg_wear_base,
-                  SUM(janky_count) as sum_janky_count,
                   department_type.name as dep_name,
                   departments.name as dep_type_name,
                   department_info.*
@@ -281,6 +280,22 @@ class StatisticsController extends Controller
             ->groupBy('hour_report.department_info_id')
             ->get();
 
+        $pbx_dkj_data = DB::table('pbx_dkj_team')
+            ->select(DB::raw('
+             (SUM(count_bad_check) * 100) / SUM(count_all_check) as janky_proc,
+             pbx_dkj_team.department_info_id as id
+            '))
+            ->whereIn('pbx_dkj_team.id', function($query) use($date){
+                $query->select(DB::raw(
+                    'MAX(pbx_dkj_team.id)'
+                ))
+                    ->from('pbx_dkj_team')
+                    ->where('report_date', '=',$date)
+                    ->groupBy('department_info_id','report_date');
+            })
+            ->groupBy('pbx_dkj_team.department_info_id')
+            ->get();
+
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
                 'sum(time_to_sec(register_stop) - time_to_sec(register_start))/3600 as realRBH,
@@ -293,9 +308,15 @@ class StatisticsController extends Controller
             ->groupBy('department_info.id')
             ->get();
 
+        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data) {
+            $info_with_janky = $pbx_dkj_data->where('id', '=', $item->id)->first();
+            $item->janki = $info_with_janky != null ? $info_with_janky->janky_proc : 0;
+            return $item;
+        });
+
         $data = [
             'date' => $date,
-            'reports' => $reports,
+            'reports' => $reports_with_dkj,
             'work_hours' => $work_hours,
         ];
         return $data;
