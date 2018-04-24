@@ -194,9 +194,9 @@
                                     <th>Temat</th>
                                     <th>Typ coachingu</th>
                                     <th>Wynik wyjściowy</th>
-                                    <th>Wynik Aktualny</th>
+                                    <th>Osiągnięty wynik</th>
                                     <th>Cel</th>
-                                    <th>Aktualne RBH</th>
+                                    <th>Końcowe RBH</th>
                                     <th>Komentarz</th>
                                 </tr>
                                 </thead>
@@ -726,6 +726,8 @@
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
+
+                    console.log(data)
                     if (parseFloat(data.actual_rbh) < parseFloat(data.rbh_min)) {
                         $(row).hide();
                     }
@@ -754,7 +756,7 @@
                             if (result.value) {
                             $.ajax({
                                 type: "POST",
-                                url: "{{ route('api.acceptCoaching') }}", // do zamiany
+                                url: "{{ route('api.acceptCoachingDirector') }}", // do zamiany
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
@@ -781,7 +783,7 @@
                     },
                     {"data":function (data, type, dataToSet) {
                             return data.user_first_name + " " + data.user_last_name;
-                        },"name": "user.last_name"
+                        },"name": "user_last_name"
                     },
                     {"data":"coaching_date"},
                     {"data": "subject"},
@@ -853,52 +855,91 @@
 
             });
 
-            {{--$('#date_start_unsettled, #date_stop_unsettled').on('change',function (e) {--}}
-                {{--table_unsettled.ajax.reload();--}}
-            {{--});--}}
+            $('#date_start_unsettled, #date_stop_unsettled').on('change',function (e) {
+                table_unsettled.ajax.reload();
+            });
 
-            {{--var table_settled = $('#table_settled').DataTable({--}}
-                {{--"autoWidth": false,--}}
-                {{--"processing": true,--}}
-                {{--"serverSide": true,--}}
-                {{--"language": {--}}
-                    {{--"url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"--}}
-                {{--},"ajax": {--}}
-                    {{--'url': "{{ route('api.datatableCoachingTable') }}",--}}
-                    {{--'type': 'POST',--}}
-                    {{--'data': function (d) {--}}
-                        {{--d.report_status = 1;--}}
-                        {{--d.date_start = $('#date_start_settled').val();--}}
-                        {{--d.date_stop =  $('#date_stop_settled').val();--}}
-                    {{--},--}}
-                    {{--'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}--}}
-                {{--},"columns":[--}}
-                    {{--{"data":function (data, type, dataToSet) {--}}
-                            {{--return data.manager_first_name + " " + data.manager_last_name;--}}
-                        {{--},"name": "manager.last_name"--}}
-                    {{--},--}}
-                    {{--{"data":function (data, type, dataToSet) {--}}
-                            {{--return data.consultant_first_name + " " + data.consultant_last_name;--}}
-                        {{--},"name": "consultant.last_name"--}}
-                    {{--},--}}
-                    {{--{"data":"coaching_date"},--}}
-                    {{--{"data": "subject"},--}}
-                    {{--{"data": "coaching_actual_avg"},--}}
-                    {{--{"data":function (data, type, dataToSet) {--}}
-                            {{--let color = 'green';--}}
-                            {{--if(parseFloat(data.avrage_end) < parseFloat(data.average_goal))--}}
-                                {{--color = 'red';--}}
-                            {{--return '<span style="color:' + color + '">' + data.avrage_end + '</span>';--}}
-                        {{--},"name": "avrage_end","searchable": false--}}
-                    {{--},--}}
-                    {{--{"data":function (data, type, dataToSet) {--}}
-                            {{--return Math.round(data.rbh_end,2);--}}
-                        {{--},"name": "rbh_end","searchable": false--}}
-                    {{--},--}}
-                    {{--{"data": "average_goal"},--}}
-                    {{--{"data":"comment"},--}}
-                {{--]--}}
-            {{--});--}}
+            var table_settled = $('#table_settled').DataTable({
+                "autoWidth": false,
+                "processing": true,
+                "serverSide": true,
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+                },"ajax": {
+                    'url': "{{ route('api.datatableCoachingTableDirector') }}",
+                    'type': 'POST',
+                    'data': function (d) {
+                        d.report_status = 1;
+                        d.date_start = $('#date_start_settled').val();
+                        d.date_stop =  $('#date_stop_settled').val();
+                    },
+                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+                },"columns":[
+                    {data:function (data, type, dataToSet) {
+                            return data.manager_first_name+' '+data.manager_last_name;
+                        },"name": "manager_last_name"
+                    },
+                    {"data":function (data, type, dataToSet) {
+                            return data.user_first_name + " " + data.user_last_name;
+                        },"name": "user_last_name"
+                    },
+                    {"data":"coaching_date"},
+                    {"data": "subject"},
+                    // // typ coachingu
+                    {"data":function (data, type, dataToSet) {
+                            if(data.coaching_type == 1){
+                                return 'Średnia';
+                            }else if(data.coaching_type == 2){
+                                return 'Jakość';
+                            }else
+                                return 'RBH';
+                        },"name": "coaching_type"
+                    },
+                    // wynik wyjściowy
+                    {"data":function (data, type, dataToSet) {
+                            if(data.coaching_type == 1){
+                                return data.average_start;
+                            }else if(data.coaching_type == 2){
+                                return data.janky_start;
+                            }else
+                                return data.rbh_start;
+                        },"name": "average_start","searchable": false
+                    },
+                    // wynik aktualny
+                    {"data":function (data, type, dataToSet) {
+                            if(data.coaching_type == 1){
+                                return data.actual_avg;
+                            }else if(data.coaching_type == 2){
+                                return data.actual_janky;
+                            }else
+                                return data.actual_rbh;
+                        },"name": "average_start","searchable": false
+                    },
+                    // // wynik cel
+                    {"data":function (data, type, dataToSet) {
+                            // let color = 'green';
+                            // if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal))
+                            //     color = 'red';
+                            // if(data.avg_consultant == null)
+                            //     return 'Brak';
+                            //  return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
+                            if(data.coaching_type == 1){
+                                return data.average_goal;
+                            }else if(data.coaching_type == 2){
+                                return data.janky_goal;
+                            }else
+                                return data.rbh_goal;
+                        },"name": "average_start","searchable": false
+                    },
+                    // //ile rbh minęło po coachingu
+                    {"data":function (data, type, dataToSet) {
+                            return data.actual_rbh;
+                            //return Math.round(data.couching_rbh/3600,2);
+                        },"name": "actual_rbh","searchable": false
+                    },
+                    {"data":"comment"},
+                ]
+            });
 
             $('#date_start_settled, #date_stop_settled').on('change',function (e) {
                 table_settled.ajax.reload();

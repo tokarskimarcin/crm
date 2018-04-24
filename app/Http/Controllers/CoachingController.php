@@ -186,9 +186,12 @@ class CoachingController extends Controller
                             '))
             ->join('users as user','user.id','coaching_director.user_id')
             ->join('users as manager','manager.id','coaching_director.manager_id')
-            ->join('department_info', 'department_info.id', '=', 'user.department_info_id')
-            ->where('status','=',$request->report_status)
-            ->whereBetween('coaching_date',[$date_start .' 00:00:00',$date_stop.' 23:00:00'])
+            ->join('department_info', 'department_info.id', '=', 'user.department_info_id');
+            if($request->report_status == 0){
+                $coaching_director_inprogres = $coaching_director_inprogres->where('status','=',$request->report_status);
+            }else
+                $coaching_director_inprogres = $coaching_director_inprogres ->whereIn('status',[1,2]);
+           $coaching_director_inprogres = $coaching_director_inprogres->whereBetween('coaching_date',[$date_start .' 00:00:00',$date_stop.' 23:00:00'])
             ->groupBy('user.id','coaching_director.id')
             ->get();
         //informacje z raportów godzinnych
@@ -250,7 +253,7 @@ class CoachingController extends Controller
             $sum_janky_check = $actual_janky->sum('sum_check');
             $sum_janky_bad = $actual_janky->sum('sum_bad');
             //Aktualna ilość janków
-            $iteam->actual_janky = ($sum_janky_bad != 0 && $sum_janky_check != 0 && $sum_janky_check == null) ? round(($sum_janky_bad*100)/$sum_janky_check,2) : 0;
+            $iteam->actual_janky = ($sum_janky_bad != 0 && $sum_janky_check != 0 && $sum_janky_check != null) ? round(($sum_janky_bad*100)/$sum_janky_check,2) : 0;
             //Próg RBH
             $iteam->rbh_min = $iteam->dep_aim / $iteam->commission_avg ;
             $iteam->rbh_min = $iteam->rbh_min * 3;
@@ -546,18 +549,32 @@ class CoachingController extends Controller
             $coaching               = CoachingDirector::find($request->coaching_id);
             $coaching->comment      = $request->coaching__comment;
 
-
-
-            if(floatval($coaching->average_goal) > floatval($request->avrage_end)) // Coaching niezaliczony
-                $coaching->status  = 2;
-            else
-                $coaching->status  = 1;    // Coaching zaliczony
+            if($request->coaching_type == 'Średnia'){
+                if(floatval($coaching->average_goal) > floatval($request->end_score)){
+                    $coaching->status  = 2; // Coaching niezaliczony
+                 }else{
+                    $coaching->status  = 1; // Coaching zaliczony
+                }
+                $coaching->average_end = $request->end_score;// Ostateczny wybik
+            }else if($request->coaching_type == 'Jakość'){
+                if(floatval($coaching->janky_goal) < floatval($request->end_score)){
+                    $coaching->status  = 2;// Coaching niezaliczony
+                }else{
+                    $coaching->status  = 1; // Coaching zaliczony
+                }
+                $coaching->janky_end = $request->end_score;// Ostateczny wybik
+            }else{ // RGH
+                if(floatval($coaching->rbh_goal) < floatval($request->end_score)){
+                    $coaching->status  = 2;// Coaching niezaliczony
+                }else{
+                    $coaching->status  = 1; // Coaching zaliczony
+                }
+                $coaching->rbh_end = $request->end_score; // Ostateczny wybik
+            }
+            //Data zaakceptowania coachingu
             $coaching->coaching_date_accept = date('Y-m-d');
-            $coaching->avrage_end = $request->avrage_end;
+            //Ilość rgb przed zaakceptowaniem coachingu
             $coaching->rbh_end = $request->rbh_end;
-
-
-
             $coaching->save();
             return $coaching->average_goal;
         }else
