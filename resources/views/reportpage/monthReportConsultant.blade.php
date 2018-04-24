@@ -40,7 +40,15 @@
             </div>
         </div>
     </form>
-
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-info"> <strong>Raport Miesięczny Konsultanci- zestawienie statystyk dotyczących wybranego trenera w wybranym miesiącu. </strong></br>
+                <div class="additional_info">Średnia = liczba godzin / umówienia </br>
+                    % janków = 100% * ilość janków / wszystkie sprawdzone rozmowy </br>
+                    % ilość um/poł = 100% * umówienia / ilość połączeń</div>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
