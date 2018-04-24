@@ -6,13 +6,16 @@ use App\Coaching;
 use App\CoachingDirector;
 use App\Department_info;
 use App\User;
+use function foo\func;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\Facades\DataTables;
 
 class CoachingController extends Controller
 {
     /*
+     * Status -1 - nierozliczony
      * Status 0 - w toku
      * Status 1 - Coaching zaliczony
      * Status 2 - Coaching niezaliczony
@@ -150,14 +153,117 @@ class CoachingController extends Controller
             $new_coaching->coaching_type        = $request->coaching_type;
 
             if($new_coaching->save()){
-                return 1;
-            }else{
                 return 0;
+            }else{
+                return -1;
             }
         }
     }
 
+    public function datatableCoachingTableDirector(Request $request){
+        $inprogres = $this::setInfoCoachingTableDirector($request);
+        return Datatables::of($inprogres)->make(true);
+    }
+    //Pobieranie danych o kierownikach dla dyrektora (oddziałowy)
+    public function setInfoCoachingTableDirector($request){
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
+        // informacje o coachingu
+        $coaching_director_inprogres = DB::table('coaching_director')
+            ->select(DB::raw('coaching_director.*,
+                            user.first_name as user_first_name,
+                            user.last_name as user_last_name,
+                            user.department_info_id as user_department_info,
+                            manager.first_name as manager_first_name,
+                            manager.last_name as manager_last_name,
+                            round((select sum(time_to_sec(`accept_stop`)-time_to_sec(`accept_start`)) from work_hours 
+                            join users on users.id = work_hours.id_user
+                            where users.department_info_id = user.department_info_id
+                            and users.user_type_id in (1,2)
+                            and work_hours.date >= CONCAT(coaching_date," 00:00:00") )/3600,2) as actual_rbh,
+                            department_info.commission_avg,
+                            department_info.dep_aim
+                            '))
+            ->join('users as user','user.id','coaching_director.user_id')
+            ->join('users as manager','manager.id','coaching_director.manager_id')
+            ->join('department_info', 'department_info.id', '=', 'user.department_info_id');
+            if($request->report_status == 0){
+                $coaching_director_inprogres = $coaching_director_inprogres->where('status','=',$request->report_status);
+            }else
+                $coaching_director_inprogres = $coaching_director_inprogres ->whereIn('status',[1,2]);
+           $coaching_director_inprogres = $coaching_director_inprogres->whereBetween('coaching_date',[$date_start .' 00:00:00',$date_stop.' 23:00:00'])
+            ->groupBy('user.id','coaching_director.id')
+            ->get();
+        //informacje z raportów godzinnych
+        $hour_report_inprogres = DB::table('hour_report')
+            ->select(DB::raw('
+                  SUM(call_time)/count(`call_time`) as sum_call_time,
+                  SUM(hour_report.success) as sum_success,
+                  sum(`hour_time_use`) as hour_time_use,
+                  SUM(wear_base)/count(`call_time`) as avg_wear_base, 
+                  report_date,                
+                  hour_report.department_info_id'))
+            ->whereIn('hour_report.id', function($query) use ($date_start){
+                $query->select(DB::raw(
+                    'MAX(hour_report.id)'
+                ))
+                    ->from('hour_report')
+                    ->where('report_date','>=',$date_start)
+                    ->where('call_time', '!=',0)
+                    ->groupBy('department_info_id','report_date');
+            })
+            ->groupby('department_info_id','report_date')
+            ->get();
+        // inforamcje o jankach
+        $janky_reports = DB::table('pbx_dkj_team')
+            ->select(DB::raw(
+                'sum(pbx_dkj_team.count_bad_check) as sum_bad,
+                  sum(pbx_dkj_team.count_all_check) as sum_check,
+                  department_info.id as janky_department_info,                  
+                  report_date'))
+            ->join('department_info', 'department_info.id', '=', 'pbx_dkj_team.department_info_id')
+            ->whereIn('pbx_dkj_team.id', function($query) use($date_start){
+                $query->select(DB::raw(
+                    'MAX(pbx_dkj_team.id)'
+                ))
+                    ->from('pbx_dkj_team')
+                    ->where('report_date','>=',$date_start)
+                    ->groupBy('department_info_id','report_date');
+            })
+            ->groupBy('pbx_dkj_team.department_info_id','report_date')
+            ->get();
+        //mapowanie wyniku
+        $coaching_director_inprogres = $coaching_director_inprogres->map(function ($iteam) use($hour_report_inprogres,$janky_reports){
+            //Zerowanie rhb
+            if($iteam->actual_rbh == null)
+                $iteam->actual_rbh = 0;
+            //Data coachingu
+            $coaching_date = $iteam->coaching_date;
+            //Aktualna średnia
+            $sum_success = $hour_report_inprogres
+                ->where('department_info_id','=',$iteam->user_department_info)
+                ->where('report_date','>=',$coaching_date)
+                ->sum('sum_success');
+            $iteam->actual_avg = ($sum_success != null && $iteam->actual_rbh != 0) ? round($sum_success/$iteam->actual_rbh,2) : 0;
 
+            $actual_janky = $janky_reports
+                ->where('janky_department_info','=',$iteam->user_department_info)
+                ->where('report_date','>=',$coaching_date);
+
+            $sum_janky_check = $actual_janky->sum('sum_check');
+            $sum_janky_bad = $actual_janky->sum('sum_bad');
+            //Aktualna ilość janków
+            $iteam->actual_janky = ($sum_janky_bad != 0 && $sum_janky_check != 0 && $sum_janky_check != null) ? round(($sum_janky_bad*100)/$sum_janky_check,2) : 0;
+            //Próg RBH
+            $iteam->rbh_min = $iteam->dep_aim / $iteam->commission_avg ;
+            $iteam->rbh_min = $iteam->rbh_min * 3;
+            return $iteam;
+        });
+        if(is_numeric($request->type) && $request->type!= 0){
+            $coaching_director_inprogres = $coaching_director_inprogres->where('coaching_type','=',$request->type);
+        }
+        return $coaching_director_inprogres;
+    }
     public function datatableCoachingTable(Request $request){
         $inprogres = DB::table('coaching')
             ->select(DB::raw('coaching.*,
@@ -213,8 +319,6 @@ class CoachingController extends Controller
                 ->where('coaching.manager_id','=',Auth::user()->id)
                 ->groupby('coaching.id');
         }
-
-
             return datatables($inprogres)->make(true);
     }
 
@@ -239,22 +343,22 @@ class CoachingController extends Controller
             ->get();
         // Pobranie statystyk dla kierownika
         $department_statistics = $this::getDepartmentInfo(1,1,$director_departments->pluck('id')->toArray(),$all_manager_list);
-
         return $department_statistics;
     }
 
+    // Informacje o oddziale kierownika
     public function getDepartmentInfo($date_start,$date_stop,$director_id,$all_manager_list){
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-13,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-10,date("Y")));
+        // od 02.04 do 08.04 tydzień
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-21,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-15,date("Y")));
 
+        //Info o statystykach oddziały poszczególnych pracowników
         $reports = DB::table('hour_report')
             ->select(DB::raw(
-                'SUM(call_time)/count(`call_time`) as sum_call_time,
-                  SUM(success)/sum(`hour_time_use`) as avg_average,
-                  SUM(success) as sum_success,
+                  'SUM(call_time)/count(`call_time`) as sum_call_time,
+                  SUM(hour_report.success) as sum_success,
                   sum(`hour_time_use`) as hour_time_use,
                   SUM(wear_base)/count(`call_time`) as avg_wear_base,
-                  SUM(janky_count)/count(`call_time`)  as sum_janky_count,
                   department_type.name as dep_name,
                   departments.name as dep_type_name,
                   department_info.*
@@ -275,7 +379,23 @@ class CoachingController extends Controller
             ->whereIn('department_info.id',$director_id)
             ->groupBy('hour_report.department_info_id')
             ->get();
-
+        //sumowanie janków
+        $janky_reports = DB::table('pbx_dkj_team')
+            ->select(DB::raw(
+                'round(SUM(pbx_dkj_team.count_bad_check)*100/SUM(pbx_dkj_team.count_all_check),2) as actual_janky,
+                 department_info.id'))
+            ->join('department_info', 'department_info.id', '=', 'pbx_dkj_team.department_info_id')
+            ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop){
+                $query->select(DB::raw(
+                    'MAX(pbx_dkj_team.id)'
+                ))
+                    ->from('pbx_dkj_team')
+                    ->whereBetween('report_date', [$date_start, $date_stop])
+                    ->groupBy('department_info_id','report_date');
+            })
+            ->whereIn('department_info.id',$director_id)
+            ->groupBy('pbx_dkj_team.department_info_id')
+            ->get();
         //tu był zmiana z godzin na liczbę
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
@@ -294,15 +414,21 @@ class CoachingController extends Controller
          * Przypisanie danych do jednego obiektu
          * Dodanie RBH Do Kolekcji oraz imion kierowników
          */
-        $collect_report = $reports->map(function($item) use ($work_hours,$all_manager_list) {
-            //Pobranie danych z jankami
+        $collect_report = $reports->map(function($item) use ($work_hours,$all_manager_list,$janky_reports,$date_stop) {
+            $item->report_date = $date_stop;
             $toAdd_rbh = $work_hours->where('id', '=', $item->id)->first();
+            //Pobranie danych z jankami
+            $sum_janky_count = $janky_reports->where('id', '=', $item->id)->first();
+            $item->sum_janky_count = ($sum_janky_count != null) ? $sum_janky_count->actual_janky : 0;
+            //Wpisanie liczby rbh
             $item->realRBH = ($toAdd_rbh != null) ? $toAdd_rbh->realRBH : 0;
+            //dodanie danych kierownika
             $toAdd_manager = $all_manager_list->where('id','=',$item->menager_id)->first();
             $item->manager_name = ($toAdd_manager != null) ? $toAdd_manager->first_name.' '.$toAdd_manager->last_name : 0;
+            //Wyliczenie odpowiedniej średniej
+            $item->avg_average =  round( $item->sum_success/$item->realRBH,2);
             return $item;
         });
-
         $data = [
             'date_start' => $date_start,
             'date_stop' => $date_stop,
@@ -414,6 +540,50 @@ class CoachingController extends Controller
     }
 
     /**
+     * Akceptacja Coaching'u Dyrektor
+     * @param Request $request
+     * @return int
+     */
+    public function acceptCoachingDirector(Request $request){
+        if($request->ajax()){
+            $coaching               = CoachingDirector::find($request->coaching_id);
+            $coaching->comment      = $request->coaching__comment;
+
+            if($request->coaching_type == 'Średnia'){
+                if(floatval($coaching->average_goal) > floatval($request->end_score)){
+                    $coaching->status  = 2; // Coaching niezaliczony
+                 }else{
+                    $coaching->status  = 1; // Coaching zaliczony
+                }
+                $coaching->average_end = $request->end_score;// Ostateczny wybik
+            }else if($request->coaching_type == 'Jakość'){
+                if(floatval($coaching->janky_goal) < floatval($request->end_score)){
+                    $coaching->status  = 2;// Coaching niezaliczony
+                }else{
+                    $coaching->status  = 1; // Coaching zaliczony
+                }
+                $coaching->janky_end = $request->end_score;// Ostateczny wybik
+            }else{ // RGH
+                if(floatval($coaching->rbh_goal) < floatval($request->end_score)){
+                    $coaching->status  = 2;// Coaching niezaliczony
+                }else{
+                    $coaching->status  = 1; // Coaching zaliczony
+                }
+                $coaching->rbh_end = $request->end_score; // Ostateczny wybik
+            }
+            //Data zaakceptowania coachingu
+            $coaching->coaching_date_accept = date('Y-m-d');
+            //Ilość rgb przed zaakceptowaniem coachingu
+            $coaching->rbh_end = $request->rbh_end;
+            $coaching->save();
+            return $coaching->average_goal;
+        }else
+            return 0;
+    }
+
+
+
+    /**
      * Usunięcie Coaching'u
      * @param Request $request
      * @return int
@@ -427,6 +597,22 @@ class CoachingController extends Controller
         }else
             return 0;
     }
+    /**
+     * Usunięcie Coaching'u dla kierownika
+     * @param Request $request
+     * @return int
+     */
+    public function deleteCoachingTableDirector(Request $request){
+        if($request->ajax()){
+            $coaching           = CoachingDirector::find($request->coaching_id);
+            $coaching->status   = 3;
+            $coaching->save();
+            return 1;
+        }else
+            return 0;
+    }
+
+
 
     public function getCoaching(Request $request){
         if($request->ajax()){
@@ -435,6 +621,15 @@ class CoachingController extends Controller
         }else
             return 0;
     }
+
+    public function getCoachingDirector(Request $request){
+        if($request->ajax()){
+            $coaching = CoachingDirector::find($request->coaching_id);
+            return $coaching;
+        }else
+            return 0;
+    }
+
 
 
 

@@ -200,6 +200,11 @@ Route::POST('/getDaysInMonth', 'StatisticsController@getDaysInMonth')->name('api
 
 
 Route::POST('/datatableCoachingTable','CoachingController@datatableCoachingTable')->name('api.datatableCoachingTable');
+
+
+
+//Route::POST('/datatableCoachingTableDirector','CoachingController@datatableCoachingTableDirector')->name('api.datatableCoachingTableDirector');
+
 Route::POST('/acceptCoaching', 'CoachingController@acceptCoaching')->name('api.acceptCoaching');;
 //Bootstrap notifications //
 
@@ -692,4 +697,13 @@ Route::get('/screen_table','ScreensController@screenMethod');
     Route::get('/TeamDKJHourData', 'PBXDataAPI@TeamDKJHourData');
     //Dane Czasu na rekord
     Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
+
+
+
+Route::POST('/datatableCoachingTableDirector','CoachingController@datatableCoachingTableDirector')->name('api.datatableCoachingTableDirector');
+
+Route::POST('/deleteCoachingTableDirector','CoachingController@deleteCoachingTableDirector')->name('api.deleteCoachingTableDirector');
+Route::POST('/getCoachingDirector','CoachingController@getCoachingDirector')->name('api.getCoachingDirector');
+Route::POST('/acceptCoachingDirector','CoachingController@acceptCoachingDirector')->name('api.acceptCoachingDirector');
+
 
