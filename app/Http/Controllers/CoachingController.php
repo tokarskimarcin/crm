@@ -160,6 +160,9 @@ class CoachingController extends Controller
         }
     }
 
+    /*
+     * Datatables dla dyrektorów
+     */
     public function datatableCoachingTableDirector(Request $request){
         $inprogres = $this::setInfoCoachingTableDirector($request);
         return Datatables::of($inprogres)->make(true);
@@ -264,6 +267,10 @@ class CoachingController extends Controller
         }
         return $coaching_director_inprogres;
     }
+
+    /*
+     * Datatable dla trenerów
+     */
     public function datatableCoachingTable(Request $request){
         $inprogres = DB::table('coaching')
             ->select(DB::raw('coaching.*,
@@ -328,7 +335,10 @@ class CoachingController extends Controller
      */
     public function getCoachingManagerList(){
         // Id dyrektora
-        $director_id = 2; //Auth::user()->id
+        $director_id = Auth::user()->id;
+        if( Auth::user()->id == 1364){
+            $director_id = 2;
+        }
         // Pobranie oddziałów przypisanych do dyrektora
         $director_departments = Department_info::
             where('director_id','=',$director_id)
@@ -352,88 +362,112 @@ class CoachingController extends Controller
         $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-21,date("Y")));
         $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-15,date("Y")));
 
-        //Info o statystykach oddziały poszczególnych pracowników
-        $reports = DB::table('hour_report')
-            ->select(DB::raw(
-                  'SUM(call_time)/count(`call_time`) as sum_call_time,
-                  SUM(hour_report.success) as sum_success,
-                  sum(`hour_time_use`) as hour_time_use,
-                  SUM(wear_base)/count(`call_time`) as avg_wear_base,
-                  department_type.name as dep_name,
-                  departments.name as dep_type_name,
-                  department_info.*
-                   '))
-            ->join('department_info', 'department_info.id', '=', 'hour_report.department_info_id')
-            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-            ->where('department_info.dep_aim','!=',0)
-            ->whereIn('hour_report.id', function($query) use($date_start, $date_stop){
-                $query->select(DB::raw(
-                    'MAX(hour_report.id)'
-                ))
-                    ->from('hour_report')
-                    ->whereBetween('report_date', [$date_start, $date_stop])
-                    ->where('call_time', '!=',0)
-                    ->groupBy('department_info_id','report_date');
-            })
-            ->whereIn('department_info.id',$director_id)
-            ->groupBy('hour_report.department_info_id')
-            ->get();
-        //sumowanie janków
-        $janky_reports = DB::table('pbx_dkj_team')
-            ->select(DB::raw(
-                'round(SUM(pbx_dkj_team.count_bad_check)*100/SUM(pbx_dkj_team.count_all_check),2) as actual_janky,
-                 department_info.id'))
-            ->join('department_info', 'department_info.id', '=', 'pbx_dkj_team.department_info_id')
-            ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop){
-                $query->select(DB::raw(
-                    'MAX(pbx_dkj_team.id)'
-                ))
-                    ->from('pbx_dkj_team')
-                    ->whereBetween('report_date', [$date_start, $date_stop])
-                    ->groupBy('department_info_id','report_date');
-            })
-            ->whereIn('department_info.id',$director_id)
-            ->groupBy('pbx_dkj_team.department_info_id')
-            ->get();
         //tu był zmiana z godzin na liczbę
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
-                'sum(time_to_sec(register_stop) - time_to_sec(register_start))/3600 as realRBH,
-                department_info.id
+                'sum(time_to_sec(accept_stop) - time_to_sec(accept_start))/3600 as realRBH,
+                work_hours.date,
+                department_info.*
             '))
             ->join('users', 'users.id', '=', 'work_hours.id_user')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
-            ->whereBetween('date', [$date_start, $date_stop])
             ->whereIn('department_info.id',$director_id)
             ->where('users.user_type_id', '=', 1)
-            ->groupBy('department_info.id')
+            ->groupBy('department_info.id','work_hours.date')
+            ->orderby('date','desc')
             ->get();
 
-        /**
-         * Przypisanie danych do jednego obiektu
-         * Dodanie RBH Do Kolekcji oraz imion kierowników
-         */
-        $collect_report = $reports->map(function($item) use ($work_hours,$all_manager_list,$janky_reports,$date_stop) {
-            $item->report_date = $date_stop;
-            $toAdd_rbh = $work_hours->where('id', '=', $item->id)->first();
-            //Pobranie danych z jankami
-            $sum_janky_count = $janky_reports->where('id', '=', $item->id)->first();
-            $item->sum_janky_count = ($sum_janky_count != null) ? $sum_janky_count->actual_janky : 0;
-            //Wpisanie liczby rbh
-            $item->realRBH = ($toAdd_rbh != null) ? $toAdd_rbh->realRBH : 0;
-            //dodanie danych kierownika
-            $toAdd_manager = $all_manager_list->where('id','=',$item->menager_id)->first();
-            $item->manager_name = ($toAdd_manager != null) ? $toAdd_manager->first_name.' '.$toAdd_manager->last_name : 0;
-            //Wyliczenie odpowiedniej średniej
-            $item->avg_average =  round( $item->sum_success/$item->realRBH,2);
-            return $item;
-        });
+
+        $ready_data= collect(); // Gotowe dane
+
+        foreach ($director_id as $item){
+            $range = $work_hours->where('id','=',$item);
+            $rbh = 0;
+            $succes  = 0;
+            $janky = 0;
+            $date_start = '';
+            $date_stop = '';
+            $i = 0;
+            if(is_object($range->first())){
+                $dep_aim = $range->first()->dep_aim;
+                $commission_avg = $range->first()->commission_avg;
+                // Pobranie informacji o rbh oraz zakres datowy
+               while($rbh < ($dep_aim/$commission_avg)*3){
+                   if($i==0){
+                       $date_stop = $range->first()->date;
+                       $i++;
+                   }
+                   $date_start = $range->first()->date;
+                   $rbh +=  $range->first()->realRBH;
+                   $range = $range->slice(1);
+               }
+                //sumowanie janków
+                $janky_reports = DB::table('pbx_dkj_team')
+                    ->select(DB::raw(
+                        'round(SUM(pbx_dkj_team.count_bad_check)*100/SUM(pbx_dkj_team.count_all_check),2) as actual_janky,
+                        SUM(success) as sum_success, 
+                     department_info.id'))
+                    ->join('department_info', 'department_info.id', '=', 'pbx_dkj_team.department_info_id')
+                    ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop){
+                        $query->select(DB::raw(
+                            'MAX(pbx_dkj_team.id)'
+                        ))
+                            ->from('pbx_dkj_team')
+                            ->whereBetween('report_date', [$date_start, $date_stop])
+                            ->groupBy('department_info_id','report_date');
+                    })
+                    ->where('department_info.id',$item)
+                    ->groupBy('pbx_dkj_team.department_info_id')
+                    ->get();
+                $janky = $janky_reports->first()->actual_janky;
+                $succes = $janky_reports->first()->sum_success;
+                $manager = DB::table('department_info')
+                    ->select(DB::raw('users.id as manager_id,
+                                users.first_name,
+                                users.last_name,
+                                department_info.id as department_info_id'))
+                    ->join('users','users.id','department_info.menager_id')
+                    ->where('department_info.id','=',$item)
+                    ->first();
+                $data = new \stdClass();
+                $data->department_info_id = $item;
+                $data->success = $succes;
+                $data->date_start = $date_start;
+                $data->date_stop = $date_stop;
+                $data->avg_average = round($succes / $rbh,2);
+                $data->realRBH = $rbh;
+                $data->sum_janky_count = $janky;
+                $data->menager_id = $manager->manager_id;
+                $data->manager_name = $manager->first_name.' '.$manager->last_name;
+                $ready_data->push($data);
+            }
+        }
+
+//        /**
+//         * Przypisanie danych do jednego obiektu
+//         * Dodanie RBH Do Kolekcji oraz imion kierowników
+//         */
+//        $collect_report = $reports->map(function($item) use ($work_hours,$all_manager_list,$janky_reports,$date_stop) {
+//            $item->report_date = $date_stop;
+//            $toAdd_rbh = $work_hours->where('id', '=', $item->id)->first();
+//            //Pobranie danych z jankami
+//            $sum_janky_count = $janky_reports->where('id', '=', $item->id)->first();
+//            $item->sum_janky_count = ($sum_janky_count != null) ? $sum_janky_count->actual_janky : 0;
+//            //Wpisanie liczby rbh
+//            $item->realRBH = ($toAdd_rbh != null) ? $toAdd_rbh->realRBH : 0;
+//            //dodanie danych kierownika
+//            $toAdd_manager = $all_manager_list->where('id','=',$item->menager_id)->first();
+//            $item->manager_name = ($toAdd_manager != null) ? $toAdd_manager->first_name.' '.$toAdd_manager->last_name : 0;
+//            //Wyliczenie odpowiedniej średniej
+//            $item->avg_average =  round( $item->sum_success/$item->realRBH,2);
+//            return $item;
+//        });
         $data = [
             'date_start' => $date_start,
             'date_stop' => $date_stop,
-            'collect_report' => $collect_report,
+            'collect_report' => $ready_data,
         ];
+
         return $data;
     }
     /**
@@ -564,7 +598,7 @@ class CoachingController extends Controller
                 }
                 $coaching->janky_end = $request->end_score;// Ostateczny wybik
             }else{ // RGH
-                if(floatval($coaching->rbh_goal) < floatval($request->end_score)){
+                if(floatval($coaching->rbh_goal) > floatval($request->end_score)){
                     $coaching->status  = 2;// Coaching niezaliczony
                 }else{
                     $coaching->status  = 1; // Coaching zaliczony

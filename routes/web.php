@@ -137,7 +137,10 @@ Route::POST('/getcoach_list','CoachingController@getcoach_list')->name('api.getc
 
 // Dla Dyrektora
 Route::POST('/saveCoachingDirector','CoachingController@saveCoachingDirector')->name('api.saveCoachingDirector');
-
+Route::POST('/datatableCoachingTableDirector','CoachingController@datatableCoachingTableDirector')->name('api.datatableCoachingTableDirector');
+Route::POST('/deleteCoachingTableDirector','CoachingController@deleteCoachingTableDirector')->name('api.deleteCoachingTableDirector');
+Route::POST('/getCoachingDirector','CoachingController@getCoachingDirector')->name('api.getCoachingDirector');
+Route::POST('/acceptCoachingDirector','CoachingController@acceptCoachingDirector')->name('api.acceptCoachingDirector');
 
 /* TEST AJAX ROUTES STOP */
 
@@ -700,10 +703,6 @@ Route::get('/screen_table','ScreensController@screenMethod');
 
 
 
-Route::POST('/datatableCoachingTableDirector','CoachingController@datatableCoachingTableDirector')->name('api.datatableCoachingTableDirector');
 
-Route::POST('/deleteCoachingTableDirector','CoachingController@deleteCoachingTableDirector')->name('api.deleteCoachingTableDirector');
-Route::POST('/getCoachingDirector','CoachingController@getCoachingDirector')->name('api.getCoachingDirector');
-Route::POST('/acceptCoachingDirector','CoachingController@acceptCoachingDirector')->name('api.acceptCoachingDirector');
 
 

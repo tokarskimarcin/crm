@@ -21,15 +21,16 @@
         <div class="panel-body">
             <div class="alert alert-success">
                 <h4>
-                    <p>Średnia wyjściowa - średnia przed rozpoczęciem coachingu. </p>
-                    <p>Aktualna średnia - średnia z aktualnie zaakceptowanych godzin (przyrostowa), liczona od daty rozpoczęcia coachingu.</p>
-                    <p>Aktualna RBH - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
-                    <p>Cel - Średnia wymagana.</p>
+                    <p><strong>Wynik wyjściowy</strong> - wynik danego typu (średniej,jakości,RBH) przed rozpoczęciem coachingu. </p>
+                    <p><strong>Aktualny Wynik</strong> - akrtualny wynik danego typu coachingu(przyrostowy), liczony od daty rozpoczęcia coachingu.</p>
+                    <p><strong>Aktualna RBH</strong> - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
+                    <p><strong>Cel</strong> -  Wymagany wynik na coachingu.</p>
+                    <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po następującej ilości RBH <strong>(PLAN RBH * 3)</strong>,
+                        gdzie plan rbh -> <strong> (Wymagana ilość zgód / Średnia na projekcie)</strong></p>
                 </h4>
             </div>
         </div>
     </div>
-
     {{--Tabela z coaching w toku--}}
     <div class="row">
         <div class="panel panel-default">
@@ -106,7 +107,19 @@
             </div>
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="form-group">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="myLabel">Typ coaching'u:</label>
+                                <select class="form-control" id="type_coaching_unsettled">
+                                    <option value="0">Wszystkie</option>
+                                    <option value="1">Średnia</option>
+                                    <option value="2">Jakość</option>
+                                    <option value="3">RBH</option>
+                                </select>
+                            </div>
+                        </div>
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label class="myLabel">Zakres od:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -115,7 +128,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label class="myLabel">Zakres do:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -163,7 +176,18 @@
             </div>
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="myLabel">Typ coaching'u:</label>
+                            <select class="form-control" id="type_coaching_settled">
+                                <option value="0">Wszystkie</option>
+                                <option value="1">Średnia</option>
+                                <option value="2">Jakość</option>
+                                <option value="3">RBH</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label class="myLabel">Zakres od:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -172,7 +196,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label class="myLabel">Zakres do:</label>
                             <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -229,13 +253,9 @@
                         <div class="panel-body">
                             <div class="alert alert-success">
                                 <h4>
-                                    Aktualna średnia wyliczana jest na podstawie ostatnich ~18 RBH danego konsultanta.
-                                </h4>
-                                <h4>
-                                    W przypadku gdy, aktualna średnia jest większa niż 0.5, wymagane jest aby średnia docelowa mieściła się w przedziale od 10% do 30% aktualnej średniej.
-                                </h4>
-                                <h4>
-                                    Konsultant wyświetli się na liście, po zaakceptowaniu przynajmniej jednej godziny.
+                                    <p>
+                                        Aktualne wyniki wyliczne są liczone po zaakceptowanej ilości RBH (PLAN RBH * 3) (Wymagana ilość zgód / Średnia na projekcie) * 3
+                                    </p>
                                 </h4>
                             </div>
                         </div>
@@ -416,7 +436,7 @@
                         validation = false;
                         swal('Błędne aktualne RBH')
                     }
-                    if(coaching_manager_goal_rbh.trim('').length == 0 || isNaN(coaching_manager_goal_rbh) || manager_actual_rbh > coaching_manager_goal_rbh ){
+                    if(coaching_manager_goal_rbh.trim('').length == 0 || isNaN(coaching_manager_goal_rbh) || manager_actual_rbh < coaching_manager_goal_rbh ){
                         validation = false;
                         swal('Błędne docelowe RBH')
                     }
@@ -530,6 +550,8 @@
                 "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
+                "bPaginate": false,
+                "bInfo" : false,
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },"ajax": {
@@ -667,22 +689,28 @@
                         },
                         // wynik aktualny
                         {"data":function (data, type, dataToSet) {
+                                var span_good_start =  '<span style="color: green">';
+                                var span_bad_start =  '<span style="color: red">';
+                                var span_end= '</span>';
                                 if(data.coaching_type == 1){
-                                    return data.actual_avg;
+                                    if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
+                                        return span_good_start+data.actual_avg+span_end;
+                                    else
+                                        return span_bad_start+data.actual_avg+span_end;
                                 }else if(data.coaching_type == 2){
-                                    return data.actual_janky;
+                                    if(parseFloat(data.actual_janky) < parseFloat(data.janky_goal))
+                                        return span_good_start+data.actual_janky+span_end;
+                                    else
+                                        return span_bad_start+data.actual_janky+span_end;
                                 }else
-                                    return data.actual_rbh;
+                                if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
+                                    return span_good_start+data.actual_rbh+span_end;
+                                else
+                                    return span_bad_start+data.actual_rbh+span_end;
                             },"name": "average_start","searchable": false
                         },
                         // // wynik cel
                         {"data":function (data, type, dataToSet) {
-                                // let color = 'green';
-                                // if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal))
-                                //     color = 'red';
-                                // if(data.avg_consultant == null)
-                                //     return 'Brak';
-                                //  return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
                                 if(data.coaching_type == 1){
                                     return data.average_goal;
                                 }else if(data.coaching_type == 2){
@@ -714,20 +742,21 @@
                 "autoWidth": false,
                 "processing": true,
                 "serverSide": true,
+                "bPaginate": false,
+                "bInfo" : false,
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },"ajax": {
                     'url': "{{ route('api.datatableCoachingTableDirector') }}",
                     'type': 'POST',
                     'data': function (d) {
+                        d.type          = $('#type_coaching_unsettled').val();
                         d.report_status = 0;
                         d.date_start = $('#date_start_unsettled').val();
                         d.date_stop =  $('#date_stop_unsettled').val();
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-
-                    console.log(data)
                     if (parseFloat(data.actual_rbh) < parseFloat(data.rbh_min)) {
                         $(row).hide();
                     }
@@ -809,23 +838,29 @@
                     },
                     // wynik aktualny
                     {"data":function (data, type, dataToSet) {
+                            var span_good_start =  '<span style="color: green">';
+                            var span_bad_start =  '<span style="color: red">';
+                            var span_end= '</span>';
                             if(data.coaching_type == 1){
-                                return data.actual_avg;
+                                if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
+                                    return span_good_start+data.actual_avg+span_end;
+                                else
+                                    return span_bad_start+data.actual_avg+span_end;
                             }else if(data.coaching_type == 2){
-                                return data.actual_janky;
+                                if(parseFloat(data.actual_janky) < parseFloat(data.janky_goal))
+                                    return span_good_start+data.actual_janky+span_end;
+                                else
+                                    return span_bad_start+data.actual_janky+span_end;
                             }else
-                                return data.actual_rbh;
+                            if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
+                                return span_good_start+data.actual_rbh+span_end;
+                            else
+                                return span_bad_start+data.actual_rbh+span_end;
                         },"name": "average_start","searchable": false
                     },
                     // // wynik cel
                     {"data":function (data, type, dataToSet) {
-                            // let color = 'green';
-                            // if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal))
-                            //     color = 'red';
-                            // if(data.avg_consultant == null)
-                            //     return 'Brak';
-                            //  return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
-                            if(data.coaching_type == 1){
+                             if(data.coaching_type == 1){
                                 return data.average_goal;
                             }else if(data.coaching_type == 2){
                                 return data.janky_goal;
@@ -855,7 +890,7 @@
 
             });
 
-            $('#date_start_unsettled, #date_stop_unsettled').on('change',function (e) {
+            $('#date_start_unsettled, #date_stop_unsettled,#type_coaching_unsettled').on('change',function (e) {
                 table_unsettled.ajax.reload();
             });
 
@@ -869,6 +904,7 @@
                     'url': "{{ route('api.datatableCoachingTableDirector') }}",
                     'type': 'POST',
                     'data': function (d) {
+                        d.type          = $('#type_coaching_settled').val()
                         d.report_status = 1;
                         d.date_start = $('#date_start_settled').val();
                         d.date_stop =  $('#date_stop_settled').val();
@@ -907,22 +943,28 @@
                     },
                     // wynik aktualny
                     {"data":function (data, type, dataToSet) {
+                            var span_good_start =  '<span style="color: green">';
+                            var span_bad_start =  '<span style="color: red">';
+                            var span_end= '</span>';
                             if(data.coaching_type == 1){
-                                return data.actual_avg;
+                                if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
+                                    return span_good_start+data.actual_avg+span_end;
+                                else
+                                    return span_bad_start+data.actual_avg+span_end;
                             }else if(data.coaching_type == 2){
-                                return data.actual_janky;
+                                if(parseFloat(data.actual_janky) < parseFloat(data.janky_goal))
+                                    return span_good_start+data.actual_janky+span_end;
+                                else
+                                    return span_bad_start+data.actual_janky+span_end;
                             }else
-                                return data.actual_rbh;
+                                if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
+                                    return span_good_start+data.actual_rbh+span_end;
+                                else
+                                    return span_bad_start+data.actual_rbh+span_end;
                         },"name": "average_start","searchable": false
                     },
                     // // wynik cel
                     {"data":function (data, type, dataToSet) {
-                            // let color = 'green';
-                            // if(parseFloat(data.avg_consultant) < parseFloat(data.average_goal))
-                            //     color = 'red';
-                            // if(data.avg_consultant == null)
-                            //     return 'Brak';
-                            //  return '<span style="color:' + color + '">' + data.avg_consultant + '</span>';
                             if(data.coaching_type == 1){
                                 return data.average_goal;
                             }else if(data.coaching_type == 2){
@@ -941,7 +983,7 @@
                 ]
             });
 
-            $('#date_start_settled, #date_stop_settled').on('change',function (e) {
+            $('#date_start_settled, #date_stop_settled,#type_coaching_settled').on('change',function (e) {
                 table_settled.ajax.reload();
             });
 
