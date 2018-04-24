@@ -3155,13 +3155,9 @@ class StatisticsController extends Controller
                 ->select(DB::raw('
                     pbx_report_extension.*,
                     users.last_name as user_last_name,
-                    users.first_name as user_first_name,
-                    work_hours.accept_start as start_time,
-                    work_hours.accept_stop as stop_time
+                    users.first_name as user_first_name
                 '))
                 ->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id')
-                ->join('work_hours', 'work_hours.id_user', 'users.id')
-                ->where('work_hours.date', '=', $report_date)
                 ->where('users.coach_id', '=', $coach->id)
                 ->whereIn('pbx_report_extension.id', $ids->pluck('id')->toArray())
                 ->where('report_date', '=', $report_date)
