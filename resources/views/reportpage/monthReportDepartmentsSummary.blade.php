@@ -27,6 +27,21 @@
             </div>
         </div>
     </form>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-info"> <strong>Podsumowanie oddziałów - zestawienie statystyk dotyczących wszystkich oddziałów w wybranym miesiącu, podzielonych na tygodnie. </strong></br>
+                <div class="additional_info">
+                    RBH = Roboczogodziny </br>
+                    Średnia = Zgody / RBH </br>
+                    % celu = 100% * Zgody / Cel zgód </br>
+                    % janków = 100% * liczba janków / liczba odsłuchanych rozmów </br>
+                    Czas Rozmów = 100% * Czas rozmów / RBH
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
