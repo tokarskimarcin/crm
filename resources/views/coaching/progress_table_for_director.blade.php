@@ -458,7 +458,7 @@
                         'subject'                       : subject,
                         'coaching_date'                 : coaching_date,
                         'coaching_comment'              : coaching_comment,
-
+                        'coaching_level'                : 3,
                         'coaching_type'                 : coaching_type,
                         'manager_actual_avg'            : manager_actual_avg,
                         'manager_actual_janky'          : manager_actual_janky,
@@ -562,6 +562,7 @@
                         d.type          = $('#type_coaching_in_progress').val();
                         d.date_start    = $('#date_start_in_progress').val();
                         d.date_stop     = $('#date_stop_in_progress').val();
+                        d.coaching_level = 3;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -754,6 +755,7 @@
                         d.report_status = 0;
                         d.date_start = $('#date_start_unsettled').val();
                         d.date_stop =  $('#date_stop_unsettled').val();
+                        d.coaching_level = 3;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
@@ -908,6 +910,7 @@
                         d.report_status = 1;
                         d.date_start = $('#date_start_settled').val();
                         d.date_stop =  $('#date_stop_settled').val();
+                        d.coaching_level = 3;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"columns":[
