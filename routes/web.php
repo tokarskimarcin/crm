@@ -672,6 +672,8 @@ Route::get('/editAudit/{id}', 'AdminController@editAuditGet');
 Route::post('/editAudit', 'AdminController@editAuditPost')->name('api.editAudit');
 Route::post('/editAuditPage', 'AdminController@editDatabasePost');
 
+Route::post('auditScoreAjax', 'AuditController@auditScoreAjax')->name('api.scores');
+
 //LINK GROUP
 Route::Post('/addGroup', 'AdminController@addGroup');
 Route::Post('/removeGroup', 'AdminController@removeGroup');
