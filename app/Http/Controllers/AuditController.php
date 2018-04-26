@@ -315,5 +315,11 @@ class AuditController extends Controller
         return $auditSum;
     }
 
+    public function delete_picture(Request $request){
+        if(AuditFiles::where('id','=',$request->id_picture)->delete()){
+            return 1;
+        }else return 0;
+    }
+
 
 }
