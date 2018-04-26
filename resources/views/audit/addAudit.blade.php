@@ -58,7 +58,7 @@
     </div>
 
     <form action="{{URL::to('/addAudit')}}" method="POST" id="auditForm" enctype="multipart/form-data">
-
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
     <div class="row">
         <div class="panel panel-default panel-primary first-panel">
             <div class="panel-heading">
