@@ -47,7 +47,7 @@
                             <div id="start_stop">
                                 <div class="panel-body">
                                         <div class="well">
-                                            <form action="view_payment" method="post">
+                                            <form action="view_payment" method="post" id="form">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <div class="col-md-8">
                                                     <select id="month_select" name="search_money_month" class="form-control" style="font-size:18px;">
@@ -595,7 +595,10 @@
         let submit_button = $('#show_load_data_info');
         submit_button.on('click', function(e) {
            e.target.style.cursor = "wait";
-           e.target.disabled = true;
+        });
+
+        $('#form').submit(function(){
+            $(this).find('#show_load_data_info').attr('disabled','disabled');
         });
 
     });

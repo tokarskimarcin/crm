@@ -185,7 +185,7 @@ class AuditController extends Controller
         if($request->type != null && $request->type != '0') {
             $audit = $audit ->where('audit.user_type', '=', $request->type);
         }
-            return datatables($audit)->make(true);
+        return datatables($audit)->make(true);
     }
 
     /**
@@ -298,6 +298,21 @@ class AuditController extends Controller
             $crit->save();
         }
         return Redirect::to('audit/'.$id);
+    }
+
+    public function auditScoreAjax(Request $request) {
+        $department = $request->departmentValue;
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
+        $auditSum = DB::table('audit')
+                ->select(DB::raw('
+                SUM(score) as total_score,
+                COUNT(*) as number_of_records
+                '))
+                ->whereBetween('date_audit', [$date_start, $date_stop])
+                ->where('department_info_id', '=', $department)
+                ->get();
+        return $auditSum;
     }
 
 

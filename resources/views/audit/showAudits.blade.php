@@ -31,7 +31,7 @@
                                 <div class="form-group">
                                     <label class="myLabel">Zakres od:</label>
                                     <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                        <input class="form-control" id="date_start" name="date_start" type="text" value="{{date('Y-m-01')}}" >
+                                        <input class="form-control listen_to" id="date_start" name="date_start" type="text" value="{{date('Y-m-01')}}" >
                                         <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                     </div>
                                 </div>
@@ -40,17 +40,17 @@
                                 <div class="form-group">
                                     <label class="myLabel">Zakres do:</label>
                                     <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                        <input class="form-control" id="date_stop" name="date_stop" type="text" value="{{date('Y-m-d')}}" >
+                                        <input class="form-control listen_to" id="date_stop" name="date_stop" type="text" value="{{date('Y-m-d')}}" >
                                         <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row row_to_insert">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="department">Oddział</label>
-                                    <select name="department" id="department" class="form-control">
+                                    <select name="department" id="department" class="form-control listen_to">
                                         <option value="0">Wybierz</option>
                                         <optgroup label="departamenty">
                                         @foreach($departments as $department)
@@ -79,6 +79,7 @@
                             </div>
 
                         </div>
+                        <div class="alert alert-info insertDiv"></div>
                         <div class="row">
                             <div class="col-lg-12">
                                 <div id="start_stop">
@@ -119,6 +120,8 @@
     <script>
         $(document).ready( function () {
             var selectedDepartment = document.getElementById('department');
+            var selectedStartDate = document.getElementById('date_start');
+            var selectedStopDate = document.getElementById('date_stop');
             var selectedType = document.getElementById('type');
             var departmentValue = null;
             var directorId = null;
@@ -200,6 +203,28 @@
              */
             $('#date_start, #date_stop').on('change',function(e) {
                 table.ajax.reload();
+                document.getElementsByClassName('insertDiv')[0].textContent = '';
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.scores') }}',
+                    data: {
+                        "departmentValue": selectedDepartment.options[selectedDepartment.selectedIndex].value,
+                        "date_start": document.getElementById('date_start').value,
+                        "date_stop": document.getElementById('date_stop').value
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        let average = response[0].number_of_records > 0 ? Math.round(response[0].total_score / response[0].number_of_records *100) / 100 : null;
+                        if(average != null) {
+                            $('.insertDiv').append('<p>Średnia z audytów:  ' + average + '%</p>');
+                        }
+                    },
+                    error: function(jqxhr, status, exception) {
+                        console.log('Exception:', exception);
+                    }
+                });
             });
 
             /**
@@ -238,6 +263,36 @@
                 minView : 2,
                 pickTime: false
             });
+            let inputs_to_listen = Array.from(document.getElementsByClassName('listen_to'));
+
+            inputs_to_listen.forEach(function(input) {
+                input.addEventListener('change', function(e) {
+                    document.getElementsByClassName('insertDiv')[0].textContent = '';
+                    $.ajax({
+                        type: "POST",
+                        url: '{{ route('api.scores') }}',
+                        data: {
+                            "departmentValue": selectedDepartment.options[selectedDepartment.selectedIndex].value,
+                            "date_start": document.getElementById('date_start').value,
+                            "date_stop": document.getElementById('date_stop').value
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            let average = response[0].number_of_records > 0 ? Math.round(response[0].total_score / response[0].number_of_records *100) / 100 : null;
+                            if(average != null) {
+                                $('.insertDiv').append('<p>Średnia z audytów:  ' + average + '%</p>');
+                            }
+                        },
+                        error: function(jqxhr, status, exception) {
+                            console.log('Exception:', exception);
+                        }
+                    });
+                });
+            });
+
+
         });
     </script>
 @endsection

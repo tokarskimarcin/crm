@@ -53,6 +53,15 @@
         </div>
     </form>
     <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-info"> <strong>Raport Dzienny Trenerzy (zbiorczy) - zestawienie statystyk dotyczących wszystkich trenerów z danego oddziału w wybranym dniu miesiąca. </strong></br>
+                <div class="additional_info">Średnia = liczba godzin / umówienia </br>
+                    % janków = 100% * ilość janków / wszystkie sprawdzone rozmowy </br>
+                    % ilość um/poł = 100% * umówienia / ilość połączeń</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="row">

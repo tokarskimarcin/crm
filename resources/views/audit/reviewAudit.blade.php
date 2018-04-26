@@ -17,7 +17,7 @@
             width: 50%;
         }
 
-        th:nth-of-type(4) {
+        th:nth-of-type(5) {
             width: 5%;
         }
 
@@ -52,8 +52,8 @@
                                 <th class="first">Kryteria</th>
                                 <th>Tak/Nie<sup>*</sup></th>
                                 <th>Komentarz<sup>*</sup></th>
+                                <th></th>
                                 <th>Zdjęcia</th>
-                                <th>Załączniki</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -101,6 +101,7 @@
                                                 @endforeach
                                             </div>
                                         </td>
+                                        <td> <a data-toggle="modal" data-info="{{$c->name . "_comment"}}" class="modal_trigger" href="#myModal"><span class="glyphicon glyphicon-search"></span></a></td>
                                         <td>
                                             <div class="form-group">
                                                 <input name="{{$c->name . "_files[]"}}" id="{{$c->name . "_files[]"}}" type="file" multiple="" />
@@ -142,6 +143,26 @@
         </div>
     </div>
     </form>
+    <!-- Modal -->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Komentarz</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Some text in the modal.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 @endsection
@@ -245,6 +266,13 @@
 
         $('.final-alert').append('<strong>' + auditScore + '</strong>' + '/' + numberOfRows + ' (' + (Math.round((100 * auditScore)/numberOfRows *100) / 100)+ '%)');
 
+        let modalTriggers = Array.from(document.getElementsByClassName('modal_trigger'));
+        modalTriggers.forEach(function(trigger) {
+           trigger.addEventListener('click', function(e) {
+               document.getElementsByClassName('modal-body')[0].textContent = document.getElementById(e.target.parentNode.dataset.info).value;
+               console.log(e.target.parentNode.dataset.info);
+           });
+        });
     });
     </script>
 @endsection

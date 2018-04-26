@@ -1773,32 +1773,7 @@ class StatisticsController extends Controller
                 ]);
     }
 
-    public function MailpageReportCoaching() {
-        $month = date('m');
-        $year = date('Y');
-        $dep_id = Auth::user()->department_info_id;
-        $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
-        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
-        $directors = User::whereIn('id', $directorsIds)->get();
-        $dep = Department_info::find($dep_id);
 
-        $user = User::where('id','=',6009)->get();
-        $data = $this->getCoachingData( $month, $year, (array)$dep_id);
-
-        $allDataArray = [
-            'departments' => $departments,
-            'directors' => $directors,
-            'wiev_type' => 'department',
-            'dep_id' => $dep_id,
-            'months' => $this->getMonthsNames(),
-            'month' => $month,
-            'dep_info' => $dep,
-            'all_coaching' => $data['all_coaching']
-        ];
-
-        $title = 'Raport tygodniowo/miesięczny ';
-        $this->sendMailByVerona('reportCoachingWeek', $allDataArray, $title, $user);
-    }
 
     //tylko do widoku
     public function pageReportCoachingPost(Request $request){
@@ -3782,11 +3757,11 @@ class StatisticsController extends Controller
 
     public function MailReportCoachingSummary() {
         $month = date('m');
-        $user = User::where('id','=',6009)->get();
+//        $user = User::where('id','=',6009)->get();
         $data = $this->getAllDepartmentsData($month);
         $data = ['all_data' => $data];
         $title = 'Raport tygodniowo/miesięczny Zbiorczy ';
-        $this->sendMailByVerona('reportCoachingWeekSummary', $data, $title, $user);
+        $this->sendMailByVerona('reportCoachingWeekSummary', $data, $title);
     }
 
     /**
@@ -3808,7 +3783,7 @@ class StatisticsController extends Controller
 
         forEach($menagers as $menager) { //menager
             $menagerVariable = User::where('id', '=', $menager->id)->get(); //sendMailByVerona function requires that type of variable instead $menager
-            $users = User::whereIn('id', [6009, 1364])->get();
+//            $users = User::whereIn('id', [6009, 1364])->get();
             $givenMenager = $menager->id;
             $department_info = Department_info::where('menager_id', '=', $givenMenager)->first(); //menager department
             $dep_id = $department_info->id;
@@ -3819,7 +3794,73 @@ class StatisticsController extends Controller
                 'dep_info' => $dep,
                 'all_coaching' => $data['all_coaching']
             );
-            $this->sendMailByVerona('reportCoachingWeek', $allData, $title, $users); //mail to given menager about its department
+            $this->sendMailByVerona('reportCoachingWeek', $allData, $title, $menagerVariable); //mail to given menager about its department
         }
+    }
+
+
+    public function MailpageReportCoaching() {
+
+        $menagers = DB::table('users')
+            ->select(DB::raw('
+                   users.*
+               '))
+            ->join('department_info', 'department_info.menager_id', 'users.id')
+            ->where('department_info.id_dep_type', '=', '2')
+            ->where('users.status_work', '=', 1)
+            ->get();
+
+        $month = date('m');
+        $year = date('Y');
+
+        forEach($menagers as $menager) {
+            $menagerVariable = User::where('id', '=', $menager->id)->get();
+            $givenMenager = $menager->id;
+            $department_info = Department_info::where('menager_id', '=', $givenMenager)->first(); //menager department
+            $dep_id = $department_info->id;
+            $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
+            $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+            $directors = User::whereIn('id', $directorsIds)->get();
+            $dep = Department_info::find($dep_id);
+            $data = $this->getCoachingData( $month, $year, (array)$dep_id);
+
+            $allDataArray = [
+            'departments' => $departments,
+            'directors' => $directors,
+            'wiev_type' => 'department',
+            'dep_id' => $dep_id,
+            'months' => $this->getMonthsNames(),
+            'month' => $month,
+            'dep_info' => $dep,
+            'all_coaching' => $data['all_coaching']
+        ];
+
+            $title = 'Raport tygodniowo/miesięczny ';
+            $this->sendMailByVerona('reportCoachingWeek', $allDataArray, $title, $menagerVariable);
+        }
+
+
+//        $dep_id = Auth::user()->department_info_id;
+//        $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
+//        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+//        $directors = User::whereIn('id', $directorsIds)->get();
+//        $dep = Department_info::find($dep_id);
+//
+//        $user = User::where('id','=',6009)->get();
+//        $data = $this->getCoachingData( $month, $year, (array)$dep_id);
+//
+//        $allDataArray = [
+//            'departments' => $departments,
+//            'directors' => $directors,
+//            'wiev_type' => 'department',
+//            'dep_id' => $dep_id,
+//            'months' => $this->getMonthsNames(),
+//            'month' => $month,
+//            'dep_info' => $dep,
+//            'all_coaching' => $data['all_coaching']
+//        ];
+//
+//        $title = 'Raport tygodniowo/miesięczny ';
+//        $this->sendMailByVerona('reportCoachingWeek', $allDataArray, $title, $user);
     }
 }
