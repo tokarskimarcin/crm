@@ -110,18 +110,35 @@
                                         <?php
                                             $i = 1;
                                         ?>
+                                        <style>
+                                            .inactive {
+                                                display: none;
+                                            }
+                                        </style>
                                         <td>
                                             <div class="form-group">
                                                 @foreach($audit_files as $f)
                                                     @if($c->id == $f->criterion_id)
-                                                <a href="/api/getAuditScan/{{$f->name}}" download>Zdjęcie {{$i}}</a>
+                                                        <a href="/api/getAuditScan/{{$f->name}}" download id="zdjecie_{{$f->id}}">Zdjęcie{{$i}}</a>
                                                         <?php
-                                                            $i++;
+                                                        $i++;
                                                         ?>
                                                     @endif
                                                 @endforeach
                                             </div>
                                         </td>
+                                        <td>
+                                            @foreach($audit_files as $f)
+                                                @if($c->id == $f->criterion_id)
+                                                    <span class="glyphicon glyphicon-remove" id="{{$f->id}}" onclick='removePhoto(this)'></span>
+                                                    <?php
+                                                    $i++;
+                                                    ?>
+                                                @endif
+                                            @endforeach
+
+                                        </td>
+                                    </tr>
                                     </tr>
                                 @endif
                             @endforeach
@@ -168,6 +185,41 @@
 @endsection
 @section('script')
    <script>
+       function removePhoto(e) {
+           swal({
+               title: 'Jesteś pewien?',
+               text: "Po potwierdzeniu, brak możliwości cofnięcia zmian!",
+               type: 'warning',
+               showCancelButton: true,
+               confirmButtonColor: '#3085d6',
+               cancelButtonColor: '#d33',
+               confirmButtonText: 'Usuń zdjęcie!'
+           }).then((result) => {
+               if (result.value) {
+               $.ajax({ //generate list of trainers from given location
+                   type: "POST",
+                   url: '{{ route('api.delete_picture') }}',
+                   data: {
+                       "id_picture": e.id
+                   },
+                   headers: {
+                       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                   },
+                   success: function(response) {
+                       if(response == 1){
+                           document.getElementById('zdjecie_'+e.id).classList.add('inactive');
+                           e.classList.add('inactive');
+                           swal('Zdjęcie usunięto')
+                       }
+                       else
+                           swal('Problem z usunięciem zdjęcia')
+                   }
+               });
+           }
+       });
+       }
+
+
     $(document).ready(function() {
 
         var submitButton = document.getElementById('secondButton');
@@ -273,6 +325,10 @@
                console.log(e.target.parentNode.dataset.info);
            });
         });
+
+
+
+
     });
     </script>
 @endsection
