@@ -3778,10 +3778,32 @@ class StatisticsController extends Controller
             ->where('users.status_work', '=', 1)
             ->get();
 
+        $directors = DB::table('users')
+            ->select(DB::raw('
+                   users.*
+               '))
+            ->join('department_info', 'department_info.director_id', 'users.id')
+            ->where('department_info.id_dep_type', '=', '2')
+            ->where('users.status_work', '=', 1)
+            ->get();
+        //this maping finds menagers who are directors elsewhere and exclude them.
+        $menagers_without_directors = $menagers->map(function($item) use ($directors) {
+            $flag = true;
+            foreach($directors as $director) {
+                if($item->id == $director->id) {
+                    $flag = false;
+                }
+            }
+            if($flag == true) {
+                return $item;
+            }
+        });
+
+        $menagers_without_directors = $menagers_without_directors->where('id','!=',null);
         $month = date('m');
         $year = date('Y');
 
-        forEach($menagers as $menager) { //menager
+        forEach($menagers_without_directors as $menager) { //menager
             $menagerVariable = User::where('id', '=', $menager->id)->get(); //sendMailByVerona function requires that type of variable instead $menager
 //            $users = User::whereIn('id', [6009, 1364])->get();
             $givenMenager = $menager->id;
@@ -3798,14 +3820,16 @@ class StatisticsController extends Controller
         }
     }
 
-
+    /**
+     * This method sends email to every director with month report related to its department
+     */
     public function MailpageReportCoaching() {
 
         $menagers = DB::table('users')
             ->select(DB::raw('
                    users.*
                '))
-            ->join('department_info', 'department_info.menager_id', 'users.id')
+            ->join('department_info', 'department_info.director_id', 'users.id')
             ->where('department_info.id_dep_type', '=', '2')
             ->where('users.status_work', '=', 1)
             ->get();
