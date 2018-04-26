@@ -114,6 +114,11 @@
                                             .inactive {
                                                 display: none;
                                             }
+
+                                            .gl-rem:hover {
+                                                cursor: pointer;
+                                                color: red;
+                                            }
                                         </style>
                                         <td>
                                             <div class="form-group">
@@ -130,7 +135,7 @@
                                         <td>
                                             @foreach($audit_files as $f)
                                                 @if($c->id == $f->criterion_id)
-                                                    <span class="glyphicon glyphicon-remove" id="{{$f->id}}" onclick='removePhoto(this)'></span>
+                                                    <span class="glyphicon glyphicon-remove gl-rem" id="{{$f->id}}" onclick='removePhoto(this)'></span>
                                                     <?php
                                                     $i++;
                                                     ?>
