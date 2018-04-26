@@ -567,10 +567,13 @@
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
                 "rowCallback": function( row, data, index ) {
-                    if (parseFloat(data.actual_rbh) >= parseFloat(data.rbh_min)) {
+                    var coaching_end_date = Date.parse(data.coaching_date);
+                    coaching_end_date +=345600*1000; // stworzenie daty + dodanie 4 dni
+                    var actual_date = new Date();
+                    if (actual_date > coaching_end_date ) {
                         $(row).hide();
                     }
-                        $(row).attr('id', data.id);
+                    $(row).attr('id', data.id);
                     return row;
                 },
                 "fnDrawCallback": function(settings){
@@ -759,7 +762,10 @@
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-                    if (parseFloat(data.actual_rbh) < parseFloat(data.rbh_min)) {
+                    var coaching_end_date = Date.parse(data.coaching_date);
+                    coaching_end_date +=345600*1000; // stworzenie daty + dodanie 4 dni
+                    var actual_date = new Date();
+                    if (actual_date < coaching_end_date ) {
                         $(row).hide();
                     }
                     $(row).attr('id', data.id);

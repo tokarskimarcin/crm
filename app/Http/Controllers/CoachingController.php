@@ -90,7 +90,6 @@ class CoachingController extends Controller
      */
     public function progress_tableGET(){
         $consultant = $this::getCoachConsultant(array(Auth::user()->id));
-
         return view('coaching.progress_table')
                 ->with('consultant',$consultant);
     }
@@ -162,7 +161,7 @@ class CoachingController extends Controller
     }
 
     /*
-     * Datatables dla dyrektorów
+     * Datatables dla dyrektorów i kierowników gdzie level 3 dyrektor 2 kierownik
      */
     public function datatableCoachingTableDirector(Request $request){
         $inprogres = $this::setInfoCoachingTableDirector($request);
@@ -254,6 +253,7 @@ class CoachingController extends Controller
                                })
                                ->groupBy('pbx_report_extension.pbx_id')
                                ->get();
+                           // gdy znaleziono jaki
                            if(is_object($janky_reports->first()))
                            {
                                $all_check += $janky_reports->first()->janky_all_check;
@@ -263,6 +263,7 @@ class CoachingController extends Controller
                                $all_bad += 0;
                            }
                        }
+                       //tworzenie obiektu z danymu
                        $single_data->coaching_id = $item->id;
                        $single_data->rbh =$rbh ;
                        $single_data->check_all = $all_check;
@@ -270,6 +271,7 @@ class CoachingController extends Controller
                        $single_data->succes = $succes;
                        $ready_data->push($single_data);
                    }
+                   // dodanie nowych wpisów z danymi użytkownika do coachingu głównego
                $coaching_manager_inprogres->map(function ($item) use($ready_data){
                $hold_date = $ready_data->where('coaching_id', '=', $item->id);
                if($hold_date->first() != null){
@@ -284,7 +286,7 @@ class CoachingController extends Controller
                }
                        return $item;
                });
-
+                // czy jest w toku czy rozliczony
                if(is_numeric($request->type) && $request->type!= 0){
                    $coaching_manager_inprogres = $coaching_manager_inprogres->where('coaching_type','=',$request->type);
                }
@@ -398,7 +400,7 @@ class CoachingController extends Controller
     }
 
     /*
-     * Datatable dla trenerów
+     * Datatable dla trenerów o konsultantach + dodać janki
      */
     public function datatableCoachingTable(Request $request){
         $inprogres = DB::table('coaching')
@@ -673,7 +675,7 @@ class CoachingController extends Controller
             $item = $user->work_hours->sortbyDESC('date');
             $succes  = 0;
             $rbh = 0;
-            while($rbh < 64800 && is_object($item->first())){
+            while($rbh < 64800 && is_object($item->first())){ // po przepracowaniu coanjmniej 18 rbh
                 $work_hours = $item->first();
                 if($i == 0){
                     $date_stop = $work_hours->date;
