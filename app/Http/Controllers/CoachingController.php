@@ -110,7 +110,10 @@ class CoachingController extends Controller
             $new_coaching->manager_id           = Auth::user()->id;
             $new_coaching->coaching_date        = $request->coaching_date;
             $new_coaching->subject              = $request->subject;
-            $new_coaching->comment              = $request->coaching_comment;
+            if($request->status == 0)
+                $new_coaching->comment              = 'Brak';
+            else
+                $new_coaching->comment              = $request->coaching_comment;
             $new_coaching->coaching_actual_avg  = $request->coaching_actual_avg;
             $new_coaching->average_goal         = $request->coaching_goal;
             if($new_coaching->save()){
