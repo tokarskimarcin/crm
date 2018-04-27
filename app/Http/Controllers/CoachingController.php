@@ -614,7 +614,8 @@ class CoachingController extends Controller
     public function getCoachingCoachList(){
         // Pobranie oddziałów przypisanych do kierownika
         $manager_id = Auth::user()->id;
-        if(Auth::user()->id == 1364){
+        if(Auth::user()->id == 1364 || Auth::user()->id == 11){
+            // za wołowskiego
             $manager_id = 23;
         }
         $manager_departments = Department_info::
