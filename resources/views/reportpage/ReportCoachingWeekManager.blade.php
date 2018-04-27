@@ -20,10 +20,10 @@
                     <div class="alert alert-success">
                         <h4>
                             <p>W toku - coachingi, w trwające mniej niż <strong>4 dni.</strong> </p>
-                            <p>Nierozliczone - coachingi, po <strong>4 dniach</strong> od daty założenie coachingu <strong>oczekujące na akceptacje</strong> przez trenera. </p>
+                            <p>Nierozliczone - coachingi, po <strong>4 dniach</strong> od daty założenia coachingu <strong>oczekujące na akceptacje</strong> przez trenera. </p>
                             <p>Rozliczone  - coachingi <strong>zakończone</strong>, zaakceptowane przez kierownika.<p>
-                            <p>(Cel osiągnięty - <strong>'osiągnięty wynik' większy bądź równay 'założonemu celowi').</strong></p>
-                            <p>(Cel nieosiągnięty - <strong>'osiągnięty wynik' mniejszay od ''założonego  celu').</strong></p>
+                            <p>(Cel osiągnięty - <strong>'osiągnięty wynik' większy bądź równy 'założonemu celowi').</strong></p>
+                            <p>(Cel nieosiągnięty - <strong>'osiągnięty wynik' mniejszy od ''założonego  celu').</strong></p>
                             <p>Liczba coachingów - suma wszystkich coachingów: <strong>W toku + Nierozliczone + (Cel osiągnięty + Cel nieosiągnięty).</strong></p>
                             <p>Licznik celu - wyliczana z rozliczonych coachingów metodą : <strong>osiągnięty wynik - Cel.</strong></p>
                         </h4>
