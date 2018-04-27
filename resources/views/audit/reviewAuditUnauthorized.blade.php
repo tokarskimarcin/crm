@@ -132,18 +132,6 @@
                                                 @endforeach
                                             </div>
                                         </td>
-                                        <td>
-                                            @foreach($audit_files as $f)
-                                                @if($c->id == $f->criterion_id)
-                                                    <span class="glyphicon glyphicon-remove gl-rem" id="{{$f->id}}" onclick='removePhoto(this)'></span>
-                                                    <?php
-                                                    $i++;
-                                                    ?>
-                                                @endif
-                                            @endforeach
-
-                                        </td>
-                                    </tr>
                                     </tr>
                                 @endif
                             @endforeach
@@ -159,11 +147,11 @@
                 <div class="alert alert-success final-alert">Wynik audytu to: </div>
             </div>
         </div>
-    <div class="row last-row">
-        <div class="col-md-12">
-            <input class="btn btn-success btn-block" type="submit" id="secondButton" value="Zapisz zmiany!" style="margin-bottom:1em;">
-        </div>
-    </div>
+    {{--<div class="row last-row">--}}
+        {{--<div class="col-md-12">--}}
+            {{--<input class="btn btn-success btn-block" type="submit" id="secondButton" value="Zapisz zmiany!" style="margin-bottom:1em;">--}}
+        {{--</div>--}}
+    {{--</div>--}}
     </form>
     <!-- Modal -->
     <div id="myModal" class="modal fade" role="dialog">
@@ -227,78 +215,6 @@
 
     $(document).ready(function() {
 
-        var submitButton = document.getElementById('secondButton');
-        submitButton.addEventListener('click', submitHandler);
-
-        /**
-         * Event Listener function responsible for submiting form.
-         */
-        function submitHandler(e) {
-            e.preventDefault();
-            var everythingIsOk = true; //true = form submits, false = form doesn't submit
-            var firstInp = document.getElementsByClassName('firstInp');
-            // var secondInp = document.getElementsByClassName('secondInp');
-            var thirdInp = document.getElementsByClassName('thirdInp');
-
-            /**
-             * Check if every "amount" input is selected
-             */
-            for(var i = 0; i < firstInp.length; i++) {
-                if(firstInp[i].value == 0) {
-                    everythingIsOk = false;
-                    break;
-                }
-            }
-
-            /**
-             * check if every "quality" input is selected
-             */
-            // if(everythingIsOk == true) {
-            //     for(var j = 0; j < secondInp.length; j++) {
-            //         if(secondInp[j].value == 0) {
-            //             everythingIsOk = false;
-            //             break;
-            //         }
-            //     }
-            // }
-
-            if(everythingIsOk == true) {
-                for(var k = 0; k < thirdInp.length; k++) {
-                    if(thirdInp[k].value == null || thirdInp[k].value == '') {
-                        everythingIsOk = false;
-                        break;
-                    }
-                }
-            }
-
-            //Validation of required inputs
-            if(everythingIsOk != true) {
-                swal('Wypełnij wszystkie pola w kolumnach "Tak/Nie" i "Komentarz"');
-            }
-
-            if(everythingIsOk == true) {
-
-                var auditScore = 0;
-                var numberOfRows = 0;
-                var percentAuditScore;
-                var allTableRows = document.querySelectorAll('.tableRow');
-
-                allTableRows.forEach(function(element) {
-                    var firstInputInside = element.cells[1].firstElementChild.firstElementChild.value;
-                    // var secondInputInside = element.cells[2].firstElementChild.firstElementChild.value;
-                    if(firstInputInside == 1) {
-                        auditScore += 1;
-                    }
-                    numberOfRows += 1;
-                });
-                percentAuditScore = 100 * auditScore / numberOfRows;
-                $('.last-row').after('<input type="hidden" name="score" value="' + percentAuditScore + '">');
-
-                document.getElementById('auditForm').submit();
-            }
-
-        }
-
         //THIS PART HIDES ALL HEADERS WHICH ARE AVAILABLE AT THE MOMENT BUT WERE NOT AVAILABLE WHEN AUDIT WAS ADDED
         var allTables = document.getElementsByClassName('table');
         for(var i = 0; i < allTables.length; i++) {
@@ -330,10 +246,6 @@
                console.log(e.target.parentNode.dataset.info);
            });
         });
-
-
-
-
     });
     </script>
 @endsection

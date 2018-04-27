@@ -15,6 +15,7 @@ Route::POST('/stopWork', 'HomeController@stopWork');
 Route::POST('/register_hour','WorkHoursController@registerHour');
 
 //********************AJAX*********************** */
+Route::post('/delete_picture', 'AuditController@delete_picture')->name('api.delete_picture');
 Route::post('/add', 'AuditController@ajax')->name('api.ajax');
 Route::post('auditScoreAjax', 'AuditController@auditScoreAjax')->name('api.scores');
 Route::post('/showAudits', 'AuditController@showAuditsPost')->name('api.auditTable');

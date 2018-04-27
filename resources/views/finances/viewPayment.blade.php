@@ -82,6 +82,12 @@
                                                     <h3>
                                                         Podstawa wypłaty jest nienaruszalna - w przypadku kary/kosztu janków przekraczających premię/prowizję, wszystkie kary i premie są zerowane a pracownik dostaje wypracowaną podstawę.
                                                     </h3>
+
+                                                    @if(isset($user) && $user->department_info->id_dep_type == 1)
+                                                        <h3>Jeśli pracownik przepracuje conajmniej 140 godzin, do wypłaty doliczane jest 200zł, zaś gdy przepracuje conajmniej 180 godzin, do wypłaty doliczane jest 400zł</h3>
+                                                    @else
+                                                        <h3>Jeśli pracownik przepracuje conajmniej 120 godzin, do wypłaty doliczane jest 200zł, gdy przepracuje conajmniej 160 godzin, do wypłaty doliczane jest 400zł</h3>
+                                                    @endif
                                                     <h3>
                                                         W każdym innym przypadku suma kar odejmowana jest od sumy premii/prowizji, a suma wypłaty dla danego pracownika to podstawa + pozostała premia.
                                                     </h3>

@@ -4016,10 +4016,32 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             ->where('users.status_work', '=', 1)
             ->get();
 
+        $directors = DB::table('users')
+            ->select(DB::raw('
+                   users.*
+               '))
+            ->join('department_info', 'department_info.director_id', 'users.id')
+            ->where('department_info.id_dep_type', '=', '2')
+            ->where('users.status_work', '=', 1)
+            ->get();
+        //this maping finds menagers who are directors elsewhere and exclude them.
+        $menagers_without_directors = $menagers->map(function($item) use ($directors) {
+            $flag = true;
+            foreach($directors as $director) {
+                if($item->id == $director->id) {
+                    $flag = false;
+                }
+            }
+            if($flag == true) {
+                return $item;
+            }
+        });
+
+        $menagers_without_directors = $menagers_without_directors->where('id','!=',null);
         $month = date('m');
         $year = date('Y');
 
-        forEach($menagers as $menager) { //menager
+        forEach($menagers_without_directors as $menager) { //menager
             $menagerVariable = User::where('id', '=', $menager->id)->get(); //sendMailByVerona function requires that type of variable instead $menager
 //            $users = User::whereIn('id', [6009, 1364])->get();
             $givenMenager = $menager->id;
@@ -4036,14 +4058,16 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         }
     }
 
-
+    /**
+     * This method sends email to every director with month report related to its department
+     */
     public function MailpageReportCoaching() {
 
         $menagers = DB::table('users')
             ->select(DB::raw('
                    users.*
                '))
-            ->join('department_info', 'department_info.menager_id', 'users.id')
+            ->join('department_info', 'department_info.director_id', 'users.id')
             ->where('department_info.id_dep_type', '=', '2')
             ->where('users.status_work', '=', 1)
             ->get();
@@ -4076,29 +4100,5 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             $title = 'Raport tygodniowo/miesięczny ';
             $this->sendMailByVerona('reportCoachingWeek', $allDataArray, $title, $menagerVariable);
         }
-
-
-//        $dep_id = Auth::user()->department_info_id;
-//        $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
-//        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
-//        $directors = User::whereIn('id', $directorsIds)->get();
-//        $dep = Department_info::find($dep_id);
-//
-//        $user = User::where('id','=',6009)->get();
-//        $data = $this->getCoachingData( $month, $year, (array)$dep_id);
-//
-//        $allDataArray = [
-//            'departments' => $departments,
-//            'directors' => $directors,
-//            'wiev_type' => 'department',
-//            'dep_id' => $dep_id,
-//            'months' => $this->getMonthsNames(),
-//            'month' => $month,
-//            'dep_info' => $dep,
-//            'all_coaching' => $data['all_coaching']
-//        ];
-//
-//        $title = 'Raport tygodniowo/miesięczny ';
-//        $this->sendMailByVerona('reportCoachingWeek', $allDataArray, $title, $user);
     }
 }

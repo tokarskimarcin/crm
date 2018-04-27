@@ -81,6 +81,7 @@
                                                     <h3>
                                                         Podstawa wypłaty jest nienaruszalna - w przypadku kary przekraczających premię, wszystkie kary są zerowane, a pracownik dostaje wypracowaną podstawę.
                                                     </h3>
+                                                    <h3>Jeśli pracownik przepracuje conajmniej 140 godzin, do wypłaty doliczane jest 200zł, zaś gdy przepracuje conajmniej 180 godzin, do wypłaty doliczane jest 400zł</h3>
                                                     <h3>
                                                         W każdym innym przypadku suma kar odejmowana jest od sumy premii, a suma wypłaty dla danego pracownika to podstawa + pozostała premia.
                                                     </h3>
@@ -147,6 +148,8 @@
                                                                             @php // set variable
                                                                                 $avg = 0;
                                                                                 $rbh = 0;
+                                                                                $hour_bonus = 0; //This variable holds bonus in case of RBH
+                                                                                $bonus_per_hour = 0;
                                                                                 $janky_proc = 0;
                                                                                 $standart_salary = 0;
                                                                                 $bonus_penalty = 0;
@@ -182,7 +185,23 @@
                                                                                 if ($bonus_penalty < 0) {
                                                                                     $bonus_penalty = 0;
                                                                                 }
-                                                                                $salary_total = $standart_salary+$bonus_penalty;//-$janky_cost;
+
+                                                                                /**
+                                                                                *We are counting salary in case of RBH,
+                                                                                */
+
+                                                                                if($department_info->id_dep_type == 1) {
+                                                                                     if($rbh >= 140 AND $rbh < 180) {
+                                                                                        $salary_total = $standart_salary + $bonus_penalty + 200;
+
+                                                                                    } else if($rbh >= 180) {
+                                                                                        $salary_total = $standart_salary + $bonus_penalty + 400;
+
+                                                                                    } else {
+                                                                                    $salary_total = $standart_salary+$bonus_penalty;
+                                                                                    }
+                                                                                }
+
                                                                                 if($salary_total < 0 )
                                                                                 {
                                                                                     $salary_total = 0;

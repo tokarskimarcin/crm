@@ -223,14 +223,27 @@ class AuditController extends Controller
         $audit_files = AuditFiles::where('audit_id', '=', $id)->get();
         $audit = Audit::find($id);
 
-        return view('audit.reviewAudit')
-            ->with('headers', $headers)
-            ->with('criterion', $selectedCrits)
-            ->with('audit_info', $audit_info)
-            ->with('audit', $audit)
-            ->with('givenId', $id)
-            ->with('audit_files', $audit_files)
-            ->with('infoAboutAudit', $infoAboutAudit);
+        $logged_usher = Auth::user();
+        if($logged_usher->user_type_id == 3 OR $logged_usher->id == 5578 OR $logged_usher->id == 6363) {
+            return view('audit.reviewAudit')
+                ->with('headers', $headers)
+                ->with('criterion', $selectedCrits)
+                ->with('audit_info', $audit_info)
+                ->with('audit', $audit)
+                ->with('givenId', $id)
+                ->with('audit_files', $audit_files)
+                ->with('infoAboutAudit', $infoAboutAudit);
+        }
+        else {
+            return view('audit.reviewAuditUnauthorized')
+                ->with('headers', $headers)
+                ->with('criterion', $selectedCrits)
+                ->with('audit_info', $audit_info)
+                ->with('audit', $audit)
+                ->with('givenId', $id)
+                ->with('audit_files', $audit_files)
+                ->with('infoAboutAudit', $infoAboutAudit);
+        }
     }
 
     /**
@@ -313,6 +326,12 @@ class AuditController extends Controller
                 ->where('department_info_id', '=', $department)
                 ->get();
         return $auditSum;
+    }
+
+    public function delete_picture(Request $request){
+        if(AuditFiles::where('id','=',$request->id_picture)->delete()){
+            return 1;
+        }else return 0;
     }
 
 
