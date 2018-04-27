@@ -24,7 +24,8 @@ class FinancesController extends Controller
 {
     public function viewPaymentGet()
     {
-        return view('finances.viewPayment');
+        $logged_user = Auth::user();
+        return view('finances.viewPayment')->with('user', $logged_user);
     }
     public function viewPaymentCadreGet()
     {
