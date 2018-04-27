@@ -25,8 +25,8 @@
                     <p><strong>Aktualny Wynik</strong> - akrtualny wynik danego typu coachingu(przyrostowy), liczony od daty rozpoczęcia coachingu.</p>
                     <p><strong>Aktualna RBH</strong> - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
                     <p><strong>Cel</strong> -  Wymagany wynik na coachingu.</p>
-                    <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po następującej ilości RBH <strong>(PLAN RBH * 3)</strong>,
-                        gdzie plan rbh -> <strong> (Wymagana ilość zgód / Średnia na projekcie)</strong></p>
+                    <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po <strong>4 dniach</strong>,
+                       od rozpoczęcia coachingu.</p>
                 </h4>
             </div>
         </div>
