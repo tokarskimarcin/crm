@@ -153,6 +153,7 @@
                                                                                 <th>Student</th>
                                                                                 <th>Dokumenty</th>
                                                                                 <th>Całość na konto</th>
+                                                                                <th>Premia za RBH</th>
                                                                                 <th>Max na konto</th>
                                                                                 <th>Wypłata</th>
                                                                             </tr>
@@ -163,6 +164,7 @@
                                                                             @php // set variable
                                                                                 $avg = 0;
                                                                                 $rbh = 0;
+                                                                                $rbh_bonus = 0;
                                                                                 $bonus_per_hour = 0;
                                                                                 $janky_proc = 0;
                                                                                 $janky_cost = 0;
@@ -258,10 +260,13 @@
 
                                                                                 if($rbh >= 120 AND $rbh < 160) {
                                                                                     $salary_total = $standart_salary+$bonus_salary - $janky_cost+$bonus_penalty + 200;
+                                                                                    $rbh_bonus = 200;
                                                                                 } else if($rbh >= 160) {
                                                                                     $salary_total = $standart_salary+$bonus_salary - $janky_cost+$bonus_penalty + 400;
+                                                                                    $rbh_bonus = 400;
                                                                                 } else {
-                                                                                $salary_total = $standart_salary+$bonus_salary - $janky_cost+$bonus_penalty;
+                                                                                    $salary_total = $standart_salary+$bonus_salary - $janky_cost+$bonus_penalty;
+                                                                                    $rbh_bonus = 0;
                                                                                 }
 
                                                                                 if($salary_total <0)
@@ -292,6 +297,7 @@
                                                                                 <td>{{($student)}}</td>
                                                                                 <td>{{($documents)}}</td>
                                                                                 <td>{{(($item2->salary_to_account == 0) ? "Nie" : "Tak")}}</td>
+                                                                                <td>{{$rbh_bonus}}</td>
                                                                                 <td>{{$toAccount}}</td>
                                                                                 <td>{{(round($salary_total,2))}}</td>
                                                                             </tr>
@@ -299,7 +305,8 @@
                                                                         @endforeach
                                                                         @php $payment_total += $salary_total_all;  @endphp
                                                                         <tr>
-                                                                            <td colspan="15"></td>
+                                                                            <td colspan="16"></td>
+                                                                            <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
