@@ -1745,6 +1745,138 @@ class StatisticsController extends Controller
         $title = 'Miesięczny Raport Rozmów Rekrutacyjnych '.$date_start.' - '.$date_stop;
         $this->sendMailByVerona('recruitmentMail.monthReportHireCandidate', $data, $title);
     }
+    /**
+     * Raporty Coaching'ow Podział na tygodnie Dyrektor
+     */
+
+    public function pageReportCoachingDirectorGet(){
+
+        $departments = Department_info::whereIn('id_dep_type', [2])->get();
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+        $directors = User::whereIn('id', $directorsIds)->get();
+        $dep_id = Auth::user()->department_info_id;
+        $director_id = Department_info::find($dep_id);
+        $director_departments = Department_info::select('id')->where('director_id', '=', $director_id->director_id)->get();
+        $month = date('m');
+        $year = date('Y');
+        $data = $this->getCoachingDataAllLevel( $month, $year, $director_departments,3);
+        $dep = Department_info::find($dep_id);
+        return view('reportpage.ReportCoachingWeekDirector')
+            ->with([
+                'departments'       => $departments,
+                'directors'         => $directors,
+                'wiev_type'         => 'department',
+                'dep_id'            => $dep_id,
+                'months'            => $this->getMonthsNames(),
+                'month'             => $month,
+                'dep_info'               => $dep,
+                'all_coaching'      => $data['all_coaching']
+            ]);
+    }
+    /**
+     * Raporty Coaching'ow Podział na tygodnie Dyrektor POST
+     */
+        public function pageReportCoachingDirectorPost(Request $request){
+            $departments = Department_info::whereIn('id_dep_type', [2])->get();
+            $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+            $directors = User::whereIn('id', $directorsIds)->get();
+            // usunięcie 10 przed id dyrektora
+            $dirId = substr($request->selected_dep, 2);
+            $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
+            $departments = Department_info::where('id_dep_type', '=', 2)->get();
+            $dep_info = Department_info::find(User::find($dirId)->main_department_id);
+            $month = date('m');
+            $year = date('Y');
+            $data = $this->getCoachingDataAllLevel( $month, $year, $director_departments->toarray(),3);
+            return view('reportpage.ReportCoachingWeekDirector')
+                ->with([
+                    'departments' => $departments,
+                    'directors' => $directors,
+                    'wiev_type' => 'director',
+                    'dep_info'  => $dep_info,
+                    'dep_id' => $request->selected_dep,
+                    'months' => $this->getMonthsNames(),
+                    'month' => $month,
+                    'all_coaching' => $data['all_coaching']
+                ]);
+    }
+
+    /**
+     * Raporty Coaching'ow Podział na tygodnie Kierownik
+     */
+
+    public function pageReportCoachingManagerGet(){
+        $departments = Department_info::whereIn('id_dep_type', [2])->get();
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+        $directors = User::whereIn('id', $directorsIds)->get();
+        $dep_id = Auth::user()->department_info_id;
+        $month = date('m');
+        $year = date('Y');
+        $data = $this->getCoachingDataAllLevel( $month, $year, (array)$dep_id,2);
+        $dep = Department_info::find($dep_id);
+        return view('reportpage.ReportCoachingWeekManager')
+            ->with([
+                'departments'       => $departments,
+                'directors'         => $directors,
+                'wiev_type'         => 'department',
+                'dep_id'            => $dep_id,
+                'months'            => $this->getMonthsNames(),
+                'month'             => $month,
+                'dep_info'               => $dep,
+                'all_coaching'      => $data['all_coaching']
+            ]);
+    }
+
+    /**
+     * Raporty Coaching'ow Podział na tygodnie Kierownik
+     */
+
+    public function pageReportCoachingManagerPost(Request $request){
+        $departments = Department_info::whereIn('id_dep_type', [2])->get();
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+        $directors = User::whereIn('id', $directorsIds)->get();
+
+        $dirId = $request->selected_dep;
+        if($dirId<100){
+            $dep_id = $dirId;
+            $month = date('m');
+            $year = date('Y');
+            $data = $this->getCoachingDataAllLevel( $month, $year, (array)$dep_id,2);
+            $dep = Department_info::find($dep_id);
+            return view('reportpage.ReportCoachingWeekManager')
+                ->with([
+                    'departments'       => $departments,
+                    'directors'         => $directors,
+                    'wiev_type'         => 'department',
+                    'dep_id'            => $dep_id,
+                    'months'            => $this->getMonthsNames(),
+                    'month'             => $month,
+                    'dep_info'          => $dep,
+                    'all_coaching'      => $data['all_coaching'],
+                    'wiev_type'          => 'department'
+                ]);
+        }else{
+            // usunięcie 10 przed id dyrektora
+            $dirId = substr($request->selected_dep, 2);
+            $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
+            $departments = Department_info::where('id_dep_type', '=', 2)->get();
+            $dep_info = Department_info::find(User::find($dirId)->main_department_id);
+            $month = date('m');
+            $year = date('Y');
+            $data = $this->getCoachingDataAllLevel( $month, $year, $director_departments->toarray(),2);
+            return view('reportpage.ReportCoachingWeekManager')
+                ->with([
+                    'departments' => $departments,
+                    'directors' => $directors,
+                    'wiev_type' => 'director',
+                    'dep_info'  => $dep_info,
+                    'dep_id' => $request->selected_dep,
+                    'months' => $this->getMonthsNames(),
+                    'month' => $month,
+                    'all_coaching' => $data['all_coaching']
+                ]);
+        }
+    }
 
     /**
      * Raporty Coaching'ow Podział na tygodnie
@@ -1816,7 +1948,7 @@ class StatisticsController extends Controller
                     'departments' => $departments,
                     'directors' => $directors,
                     'wiev_type' => 'director',
-                    'dep_info'               => $dep_info,
+                    'dep_info'  => $dep_info,
                     'dep_id' => $request->selected_dep,
                     'months' => $this->getMonthsNames(),
                     'month' => $month,
@@ -1825,6 +1957,112 @@ class StatisticsController extends Controller
         }
     }
 
+
+public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
+    $split_month = $this->monthPerWeekDivision($month,$year);
+    $coaching_statisctics_all = collect();
+     //Cztery tygodnie
+    //coaching_type 1 - srednia 2-jakosc 3-rbh
+    if($level_coaching == 2){
+        $manager = Department_info::find($dep_id);
+    }
+    else if($level_coaching == 3){
+        $manager = Department_info::find($dep_id);
+        $manager = $manager->first()->director_id;
+        $manager = User::find($manager);
+    }
+    foreach ($split_month as $item){
+        $coach_week = DB::table('coaching_director')
+            ->select(DB::raw('
+            coaching_director.id,
+            coaching_director.coaching_date,
+            coaching_director.coaching_type,
+            users.id as user_id,
+            sum(case when coaching_director.status = 0 and  DATE(NOW()) < DATE_ADD(coaching_director.coaching_date, INTERVAL 4 DAY) then 1 else 0 end) as in_progress,            
+            sum(case when coaching_director.status = 0 and  DATE(NOW()) >= DATE_ADD(coaching_director.coaching_date, INTERVAL 4 DAY) then 1 else 0 end) as unsettled,  
+            sum(case when coaching_director.status = 1 then 1 else 0 end) as end_possitive,
+            sum(case when coaching_director.status = 2 then 1 else 0 end) as end_negative,
+            sum(case when 
+                coaching_director.status in (1,2)
+                and coaching_director.coaching_type = 1 then
+                coaching_director.average_end - coaching_director.average_goal else 0 end) as coaching_sum_avg,
+            sum(case when 
+                coaching_director.status in (1,2)
+                and coaching_director.coaching_type = 3 then
+                coaching_director.rbh_end - coaching_director.rbh_goal else 0 end) as coaching_sum_rgh,
+            sum(case when 
+            coaching_director.status in (1,2)
+            and coaching_director.coaching_type = 2 then
+            coaching_director.janky_end - coaching_director.janky_goal else 0 end) as coaching_sum_jakny,
+            users.first_name,
+            users.last_name'))
+            ->join('users','users.id','manager_id')
+            ->whereIn('users.department_info_id',$dep_id)
+            ->where('coaching_level','=',$level_coaching)
+            ->wherebetween('coaching_date',[$item['start_day'].' 00:00:00',$item['stop_day'].' 23:00:00'])
+            ->groupBy('manager_id','coaching_type')
+            ->get();
+
+        if($level_coaching == 2){ // dla kierowników
+            foreach ($manager as $manager_item){
+                $manager_user_relation = $manager_item->menager;
+                $manager_in_list = $coach_week->where('user_id','=',$manager_user_relation->id)->first();
+                if(!is_object($manager_in_list)){
+                    for($i=1;$i<=3;$i++){
+                        $add_manager = collect();
+                        $add_manager->id = $manager_user_relation->id;
+                        $add_manager->coaching_date= '';
+                        $add_manager->coaching_type= $i;
+                        $add_manager->user_id= 0;
+                        $add_manager->in_progress=0;
+                        $add_manager->unsettled=0;
+                        $add_manager->end_possitive=0;
+                        $add_manager->end_negative=0;
+                        $add_manager->coaching_sum_avg=0;
+                        $add_manager->coaching_sum_rgh=0;
+                        $add_manager->coaching_sum_jakny=0;
+                        $add_manager->first_name=$manager_user_relation->first_name;
+                        $add_manager->last_name =$manager_user_relation->last_name;
+                        $coach_week->push($add_manager);
+                    }
+                }
+            }
+        }else if($level_coaching == 3){ // dla dyrektorów
+            $manager_in_list = $coach_week->where('user_id','=',$manager->id)->first();
+            if(!is_object($manager_in_list)){
+                for($i=1;$i<=3;$i++){
+                    $add_manager = collect();
+                    $add_manager->id = $manager->id;
+                    $add_manager->coaching_date= '';
+                    $add_manager->coaching_type= $i;
+                    $add_manager->user_id= 0;
+                    $add_manager->in_progress=0;
+                    $add_manager->unsettled=0;
+                    $add_manager->end_possitive=0;
+                    $add_manager->end_negative=0;
+                    $add_manager->coaching_sum_avg=0;
+                    $add_manager->coaching_sum_rgh=0;
+                    $add_manager->coaching_sum_jakny=0;
+                    $add_manager->first_name=$manager->first_name;
+                    $add_manager->last_name =$manager->last_name;
+                    $coach_week->push($add_manager);
+                }
+            }
+        }
+
+        $coach_week = $coach_week->map(function ($itemL) use ($item){
+            $itemL->start_date = $item['start_day'];
+            $itemL->stop_date = $item['stop_day'];
+            return $itemL;
+        });
+        $coaching_statisctics_all->push($coach_week);
+    }
+    $data = [
+        'month'  => $month,
+        'all_coaching' => $coaching_statisctics_all
+    ];
+    return $data;
+}
     /**
      * @param $month
      * @param $year

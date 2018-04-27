@@ -50,4 +50,7 @@ class Department_info extends Model
     public function menager() {
         return $this->belongsTo('App\User', 'menager_id');
     }
+    public function director() {
+        return $this->belongsTo('App\User', 'director_id');
+    }
 }
