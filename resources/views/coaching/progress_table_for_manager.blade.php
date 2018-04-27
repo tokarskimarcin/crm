@@ -434,7 +434,7 @@
                                 validation = false;
                                 swal('Błędne aktualne RBH')
                             }
-                            if(coaching_manager_goal_rbh.trim('').length == 0 || isNaN(coaching_manager_goal_rbh) || manager_actual_rbh < coaching_manager_goal_rbh ){
+                            if(coaching_manager_goal_rbh.trim('').length == 0 || isNaN(coaching_manager_goal_rbh) || manager_actual_rbh > coaching_manager_goal_rbh ){
                                 validation = false;
                                 swal('Błędne docelowe RBH')
                             }

@@ -1975,6 +1975,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $coach_week = DB::table('coaching_director')
             ->select(DB::raw('
             coaching_director.id,
+            coaching_director.coaching_level,
             coaching_director.coaching_date,
             coaching_director.coaching_type,
             users.id as user_id,
@@ -2006,31 +2007,37 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         if($level_coaching == 2){ // dla kierowników
             foreach ($manager as $manager_item){
                 $manager_user_relation = $manager_item->menager;
-                $manager_in_list = $coach_week->where('user_id','=',$manager_user_relation->id)->first();
-                if(!is_object($manager_in_list)){
-                    for($i=1;$i<=3;$i++){
-                        $add_manager = collect();
-                        $add_manager->id = $manager_user_relation->id;
-                        $add_manager->coaching_date= '';
-                        $add_manager->coaching_type= $i;
-                        $add_manager->user_id= 0;
-                        $add_manager->in_progress=0;
-                        $add_manager->unsettled=0;
-                        $add_manager->end_possitive=0;
-                        $add_manager->end_negative=0;
-                        $add_manager->coaching_sum_avg=0;
-                        $add_manager->coaching_sum_rgh=0;
-                        $add_manager->coaching_sum_jakny=0;
-                        $add_manager->first_name=$manager_user_relation->first_name;
-                        $add_manager->last_name =$manager_user_relation->last_name;
-                        $coach_week->push($add_manager);
-                    }
+                for($i=1;$i<=3;$i++) {
+                    $manager_in_list = $coach_week->where('user_id', '=', $manager_user_relation->id)
+                        ->where('coaching_type','=',$i)
+                        ->where('coaching_level','=',$level_coaching)
+                        ->first();
+                    if (!is_object($manager_in_list)) {
+                                $add_manager = collect();
+                                $add_manager->id = $manager_user_relation->id;
+                                $add_manager->coaching_date = '';
+                                $add_manager->coaching_type = $i;
+                                $add_manager->user_id = 0;
+                                $add_manager->in_progress = 0;
+                                $add_manager->unsettled = 0;
+                                $add_manager->end_possitive = 0;
+                                $add_manager->end_negative = 0;
+                                $add_manager->coaching_sum_avg = 0;
+                                $add_manager->coaching_sum_rgh = 0;
+                                $add_manager->coaching_sum_jakny = 0;
+                                $add_manager->first_name = $manager_user_relation->first_name;
+                                $add_manager->last_name = $manager_user_relation->last_name;
+                                $coach_week->push($add_manager);
+                            }
                 }
             }
         }else if($level_coaching == 3){ // dla dyrektorów
-            $manager_in_list = $coach_week->where('user_id','=',$manager->id)->first();
-            if(!is_object($manager_in_list)){
-                for($i=1;$i<=3;$i++){
+            for($i=1;$i<=3;$i++) {
+                $manager_in_list = $coach_week->where('user_id', '=',$manager->id)
+                    ->where('coaching_type','=',$i)
+                    ->where('coaching_level','=',$level_coaching)
+                    ->first();
+                if (!is_object($manager_in_list)) {
                     $add_manager = collect();
                     $add_manager->id = $manager->id;
                     $add_manager->coaching_date= '';
@@ -2057,6 +2064,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         });
         $coaching_statisctics_all->push($coach_week);
     }
+
     $data = [
         'month'  => $month,
         'all_coaching' => $coaching_statisctics_all
