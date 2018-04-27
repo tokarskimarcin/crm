@@ -207,6 +207,7 @@
                     });
                     percentAuditScore = 100 * auditScore / numberOfRows;
                     $('.last-row').after('<input type="hidden" name="score" value="' + percentAuditScore + '">');
+                    $("#secondButton").attr('disabled', 'disabled');
                     document.getElementById('auditForm').submit();
                 }
 
