@@ -649,9 +649,15 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/progress_table_for_director', 'CoachingController@progress_table_for_directorGET');
     Route::get('/progress_table_for_manager', 'CoachingController@progress_table_for_managerGET');
 
-
+    // dla trenerów
     Route::get('/pageReportCoaching', 'StatisticsController@pageReportCoachingGet');
     Route::post('/pageReportCoaching', 'StatisticsController@pageReportCoachingPost');
+    // dla kierowników
+    Route::get('/pageReportCoachingManager', 'StatisticsController@pageReportCoachingManagerGet');
+    Route::post('/pageReportCoachingManager', 'StatisticsController@pageReportCoachingManagerPost');
+    // dla dyrektorów
+    Route::get('/pageReportCoachingDirector', 'StatisticsController@pageReportCoachingDirectorGet');
+    Route::post('/pageReportCoachingDirector', 'StatisticsController@pageReportCoachingDirectorPost');
 
     Route::get('/progress_table_manager', 'CoachingController@progress_table_managerGET');
 

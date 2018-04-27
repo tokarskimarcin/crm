@@ -458,7 +458,7 @@
                         'subject'                       : subject,
                         'coaching_date'                 : coaching_date,
                         'coaching_comment'              : coaching_comment,
-
+                        'coaching_level'                : 3,
                         'coaching_type'                 : coaching_type,
                         'manager_actual_avg'            : manager_actual_avg,
                         'manager_actual_janky'          : manager_actual_janky,
@@ -562,14 +562,18 @@
                         d.type          = $('#type_coaching_in_progress').val();
                         d.date_start    = $('#date_start_in_progress').val();
                         d.date_stop     = $('#date_stop_in_progress').val();
+                        d.coaching_level = 3;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
                 "rowCallback": function( row, data, index ) {
-                    if (parseFloat(data.actual_rbh) >= parseFloat(data.rbh_min)) {
+                    var coaching_end_date = Date.parse(data.coaching_date);
+                    coaching_end_date +=345600*1000; // stworzenie daty + dodanie 4 dni
+                    var actual_date = new Date();
+                    if (actual_date > coaching_end_date ) {
                         $(row).hide();
                     }
-                        $(row).attr('id', data.id);
+                    $(row).attr('id', data.id);
                     return row;
                 },
                 "fnDrawCallback": function(settings){
@@ -754,10 +758,14 @@
                         d.report_status = 0;
                         d.date_start = $('#date_start_unsettled').val();
                         d.date_stop =  $('#date_stop_unsettled').val();
+                        d.coaching_level = 3;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-                    if (parseFloat(data.actual_rbh) < parseFloat(data.rbh_min)) {
+                    var coaching_end_date = Date.parse(data.coaching_date);
+                    coaching_end_date +=345600*1000; // stworzenie daty + dodanie 4 dni
+                    var actual_date = new Date();
+                    if (actual_date < coaching_end_date ) {
                         $(row).hide();
                     }
                     $(row).attr('id', data.id);
@@ -908,6 +916,7 @@
                         d.report_status = 1;
                         d.date_start = $('#date_start_settled').val();
                         d.date_stop =  $('#date_stop_settled').val();
+                        d.coaching_level = 3;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"columns":[
