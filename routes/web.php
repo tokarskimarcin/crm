@@ -656,6 +656,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     // dla trenerów Nowy
 
+    Route::get('/pageReportCoachingCoach', 'StatisticsController@pageReportCoachingCoachGet');
+    Route::post('/pageReportCoachingCoach', 'StatisticsController@pageReportCoachingCoachPost');
 
     // dla kierowników
     Route::get('/pageReportCoachingManager', 'StatisticsController@pageReportCoachingManagerGet');
@@ -724,5 +726,3 @@ Route::get('/screen_table','ScreensController@screenMethod');
     //Dane Czasu na rekord
     Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
 
-Route::get('/pageReportCoachingCoach', 'StatisticsController@pageReportCoachingCoachGet');
-Route::post('/pageReportCoachingCoach', 'StatisticsController@pageReportCoachingCoachPost');
