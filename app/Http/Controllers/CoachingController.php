@@ -61,6 +61,18 @@ class CoachingController extends Controller
         }else return 0;
     }
 
+    /**
+     * @return $this
+     * Wyświetlenie strony 'progress_table' dla Trenerów
+     */
+    public function progress_table_for_coachGET(){
+        $coachingConsultantList = $this::getCoachConsultant(array(Auth::user()->id));
+        $data = [
+            'collect_report' => $coachingConsultantList
+        ];
+        return view('coaching.progress_table_for_coach')
+            ->with('coachingManagerList',$data);
+    }
 
     /**
      * @return $this
@@ -174,12 +186,94 @@ class CoachingController extends Controller
     public function setInfoCoachingTableDirector($request){
         $date_start = $request->date_start;
         $date_stop = $request->date_stop;
+
 //        $date_start = '2018-04-01';
-//        $date_stop = '2018-04-25';
-//        $request->coaching_level = 2;
+//        $date_stop = '2018-04-30';
+//        $request->coaching_level = 1;
 //        $request->report_status = 0;
+
         //informacje o coachingu dla kierownika
-           if($request->coaching_level == 2){
+        if($request->coaching_level == 1){
+
+                $coaching_consultant_inprogres = DB::table('coaching_director')
+                    ->select(DB::raw('coaching_director.*,
+                            user.id as user_id,
+                            user.login_phone as login_phone,
+                            user.first_name as user_first_name,
+                            user.last_name as user_last_name,
+                            manager.first_name as manager_first_name,
+                            manager.last_name as manager_last_name,
+                            round((select sum(time_to_sec(`accept_stop`)-time_to_sec(`accept_start`)) 
+                                from work_hours where work_hours.id_user = `coaching_director`.`user_id`
+                            and work_hours.date >= CONCAT(coaching_date," 00:00:00") )/3600) as actual_rbh,
+                            (select sum(success) 
+                                from work_hours where work_hours.id_user = `coaching_director`.`user_id`
+                            and work_hours.date >= CONCAT(coaching_date," 00:00:00") ) as couching_success
+                        '))
+                        ->join('users as user','user.id','coaching_director.user_id')
+                        ->join('users as manager','manager.id','coaching_director.manager_id');
+                if(Auth::user()->id != 1364){
+                    $coaching_consultant_inprogres = $coaching_consultant_inprogres->where('manager_id','=',Auth::user()->id);
+                }
+                $coaching_consultant_inprogres = $coaching_consultant_inprogres->where('coaching_level','=',$request->coaching_level);
+                if($request->report_status == 0){
+                    $coaching_consultant_inprogres = $coaching_consultant_inprogres->where('coaching_director.status','=',$request->report_status);
+                }else
+                    $coaching_consultant_inprogres = $coaching_consultant_inprogres ->whereIn('coaching_director.status',[1,2]);
+                $coaching_consultant_inprogres = $coaching_consultant_inprogres->whereBetween('coaching_date',[$date_start .' 00:00:00',$date_stop.' 23:00:00'])
+                    ->groupBy('user.id','coaching_director.id')
+                    ->get();
+            $ready_data = collect();
+            $coaching_consultant_inprogres->map(function($item){
+
+                $date_start_janky = $item->coaching_date;
+                // sumowanie janków
+                $user_pbx_number = $item->login_phone;
+                $janky_reports = DB::table('pbx_report_extension')
+                    ->select(DB::raw(
+                        '
+                                 SUM(pbx_report_extension.all_bad_talks) as janky_all_bad,
+                                 SUM(pbx_report_extension.all_checked_talks) as janky_all_check,
+                                 SUM(success) as sum_success, 
+                                 pbx_id'))
+                    ->where('pbx_report_extension.pbx_id','=',$user_pbx_number)
+                    ->whereIn('pbx_report_extension.id', function($query) use($date_start_janky,$user_pbx_number){
+                        $query->select(DB::raw(
+                            'MAX(pbx_report_extension.id)'
+                        ))
+                            ->from('pbx_report_extension')
+                            ->where('pbx_report_extension.pbx_id','=',$user_pbx_number)
+                            ->where('report_date', '>=',$date_start_janky)
+                            ->groupBy('report_date');
+                    })
+                    ->groupBy('pbx_report_extension.pbx_id')
+                    ->get();
+                if($item->actual_rbh != 0){
+                    $item->actual_avg = round($item->couching_success/$item->actual_rbh,2);
+                }else{
+                    $item->actual_avg = 0;
+                }
+                // gdy znaleziono jaki
+                if(is_object($janky_reports->first()))
+                {
+                    $all_check = $janky_reports->first()->janky_all_check;
+                    $all_bad = $janky_reports->first()->janky_all_bad;
+                    $item->actual_janky = round(($all_bad*100)/$all_check,2);
+                }else {
+                    $all_check = 0;
+                    $all_bad = 0;
+                    $item->actual_janky = 0;
+                }
+
+                return $item;
+            });
+            // czy jest w toku czy rozliczony
+            if(is_numeric($request->type) && $request->type!= 0){
+                $coaching_consultant_inprogres = $coaching_consultant_inprogres->where('coaching_type','=',$request->type);
+            }
+            return $coaching_consultant_inprogres;
+        }
+        else if($request->coaching_level == 2){
                //informacje o coachingu dla kierownika
                $coaching_manager_inprogres = DB::table('coaching_director')
                    ->select(DB::raw('coaching_director.*,
@@ -657,6 +751,8 @@ class CoachingController extends Controller
      * pobranie konsultantów dla zalogowanego trenera
      */
     public function getCoachConsultant($coach_id){
+        if($coach_id[0] == 1364)
+            $coach_id[0] = 4153;
         $all_users = DB::table('work_hours')
             ->select(
                 DB::raw('               
@@ -667,8 +763,6 @@ class CoachingController extends Controller
             ->where('users.status_work','=',1)
             ->groupby('users.id')
             ->get();
-
-
         $ready_data=[];
         $date_start = '';
         $date_stop = '';
@@ -730,9 +824,14 @@ class CoachingController extends Controller
             {
                 $data->janky_all_check = $janky_reports->first()->janky_all_check;
                 $data->janky_all_bad = $janky_reports->first()->janky_all_bad;
+                if($data->janky_all_check != 0)
+                    $data->sum_janky_count = round(($data->janky_all_bad*100)/$data->janky_all_check,2);
+                else
+                    $data->sum_janky_count = 0;
             }else {
                 $data->janky_all_check = 0;
                 $data->janky_all_bad = 0;
+                $data->sum_janky_count = 0;
             }
             $data->rbh = $rbh;
             if($rbh == 0){
