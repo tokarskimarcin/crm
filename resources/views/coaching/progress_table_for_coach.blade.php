@@ -73,8 +73,8 @@
                                 <table id="table_in_progress" class="table table-striped thead-inverse">
                                     <thead>
                                     <tr>
-                                        <th>Dyrektor</th>
-                                        <th>Kierownik</th>
+                                        <th>Trener</th>
+                                        <th>Konsultant</th>
                                         <th>Data</th>
                                         <th>Temat</th>
                                         <th>Typ coachingu</th>
@@ -142,8 +142,8 @@
                             <table id="table_unsettled" class="table table-striped thead-inverse">
                                 <thead>
                                 <tr>
-                                    <th>Dyrektor</th>
-                                    <th>Kierownik</th>
+                                    <th>Trener</th>
+                                    <th>Konsultant</th>
                                     <th>Data</th>
                                     <th>Temat</th>
                                     <th>Typ coachingu</th>
@@ -210,8 +210,8 @@
                             <table id="table_settled" class="table table-striped thead-inverse">
                                 <thead>
                                 <tr>
-                                    <th>Dyrektor</th>
-                                    <th>Kierownik</th>
+                                    <th>Trener</th>
+                                    <th>Konsultant</th>
                                     <th>Data</th>
                                     <th>Temat</th>
                                     <th>Typ coachingu</th>
@@ -263,7 +263,7 @@
                             <div class="col-md-12">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label class="myLabel">Kierownik</label>
+                                        <label class="myLabel">Konsultant</label>
                                         <select class="form-control" id="couaching_manager_id">
                                             <option>Wybierz</option>
                                             @foreach($coachingManagerList['collect_report'] as $list)
