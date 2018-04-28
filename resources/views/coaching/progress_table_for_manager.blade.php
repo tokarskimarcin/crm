@@ -954,19 +954,19 @@
                                     var span_end= '</span>';
                                     if(data.coaching_type == 1){
                                         if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
-                                            return span_good_start+data.actual_avg+span_end;
+                                            return span_good_start+data.average_end+span_end;
                                         else
-                                            return span_bad_start+data.actual_avg+span_end;
+                                            return span_bad_start+data.average_end+span_end;
                                     }else if(data.coaching_type == 2){
                                         if(parseFloat(data.actual_janky) < parseFloat(data.janky_goal))
-                                            return span_good_start+data.actual_janky+span_end;
+                                            return span_good_start+data.janky_end+span_end;
                                         else
-                                            return span_bad_start+data.actual_janky+span_end;
+                                            return span_bad_start+data.janky_end+span_end;
                                     }else
                                     if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
-                                        return span_good_start+data.actual_rbh+span_end;
+                                        return span_good_start+data.rbh_end+span_end;
                                     else
-                                        return span_bad_start+data.actual_rbh+span_end;
+                                        return span_bad_start+data.rbh_end+span_end;
                                 },"name": "average_start","searchable": false
                             },
                             // // wynik cel
@@ -981,7 +981,7 @@
                             },
                             // //ile rbh minęło po coachingu
                             {"data":function (data, type, dataToSet) {
-                                    return data.actual_rbh;
+                                    return data.rbh_end;
                                     //return Math.round(data.couching_rbh/3600,2);
                                 },"name": "actual_rbh","searchable": false
                             },

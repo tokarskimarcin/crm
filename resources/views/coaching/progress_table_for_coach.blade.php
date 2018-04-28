@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">
-                <div class="well gray-nav">Tabela postępów Dyrektor</div>
+                <div class="well gray-nav">Tabela postępów Trener</div>
             </div>
         </div>
     </div>
@@ -21,12 +21,10 @@
         <div class="panel-body">
             <div class="alert alert-success">
                 <h4>
-                    <p><strong>Wynik wyjściowy</strong> - wynik danego typu (średniej,jakości,RBH) przed rozpoczęciem coachingu. </p>
-                    <p><strong>Aktualny Wynik</strong> - akrtualny wynik danego typu coachingu(przyrostowy), liczony od daty rozpoczęcia coachingu.</p>
-                    <p><strong>Aktualna RBH</strong> - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
-                    <p><strong>Cel</strong> -  Wymagany wynik na coachingu.</p>
-                    <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po <strong>4 dniach</strong>,
-                       od rozpoczęcia coachingu.</p>
+                    <p>Średnia wyjściowa - średnia przed rozpoczęciem coachingu. </p>
+                    <p>Aktualna średnia - średnia z aktualnie zaakceptowanych godzin (przyrostowa), liczona od daty rozpoczęcia coachingu.</p>
+                    <p>Aktualna RBH - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
+                    <p>Cel - Średnia wymagana.</p>
                 </h4>
             </div>
         </div>
@@ -269,7 +267,7 @@
                                         <select class="form-control" id="couaching_manager_id">
                                             <option>Wybierz</option>
                                             @foreach($coachingManagerList['collect_report'] as $list)
-                                                <option value={{$list->menager_id}}>{{$list->manager_name}}</option>
+                                                <option value={{$list->id}}>{{$list->first_name.' '.$list->last_name}}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -397,7 +395,6 @@
 
             let validation = true;
             if(manager_id == 'Wybierz'){
-                console.log('123')
                 validation = false;
                 swal('Wybierz kierownika')
             }else if(coaching_type == 'Wybierz'){
@@ -458,12 +455,11 @@
                         'subject'                       : subject,
                         'coaching_date'                 : coaching_date,
                         'coaching_comment'              : coaching_comment,
-                        'coaching_level'                : 3,
+                        'coaching_level'                : 1,
                         'coaching_type'                 : coaching_type,
                         'manager_actual_avg'            : manager_actual_avg,
                         'manager_actual_janky'          : manager_actual_janky,
                         'manager_actual_rbh'            : manager_actual_rbh,
-
                         'coaching_manager_avg_goal'     :coaching_manager_goal_avg,
                         'coaching_manager_avg_janky'    :coaching_manager_goal_janky,
                         'coaching_manager_avg_rbh'      :coaching_manager_goal_rbh,
@@ -493,12 +489,12 @@
 
             var manager = JSON.parse('{!!$coachingManagerList['collect_report']!!}');
             $('#couaching_manager_id').on('change',function () {
-                console.log(manager);
                 for(var i =0;i<manager.length;i++){
-                    if(manager[i].menager_id == $(this).val()){
-                        $('input[name="manager_actual_avg"]').val((Math.round(manager[i].avg_average*100))/100);
+                    if(manager[i].id == $(this).val()){
+                        console.log(manager);
+                        $('input[name="manager_actual_avg"]').val((Math.round(manager[i].avg_consultant*100))/100);
                         $('input[name="manager_actual_janky"]').val((Math.round(manager[i].sum_janky_count*100))/100);
-                        $('input[name="manager_actual_rbh"]').val((Math.round(manager[i].realRBH*100))/100);
+                        $('input[name="manager_actual_rbh"]').val((Math.round(manager[i].rbh*100))/100);
                         break;
                     }else{
                         $('#coaching_actual_avg').val('');
@@ -562,15 +558,12 @@
                         d.type          = $('#type_coaching_in_progress').val();
                         d.date_start    = $('#date_start_in_progress').val();
                         d.date_stop     = $('#date_stop_in_progress').val();
-                        d.coaching_level = 3;
+                        d.coaching_level = 1;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
                 "rowCallback": function( row, data, index ) {
-                    var coaching_end_date = Date.parse(data.coaching_date);
-                    coaching_end_date +=345600*1000; // stworzenie daty + dodanie 4 dni
-                    var actual_date = new Date();
-                    if (actual_date > coaching_end_date ) {
+                    if (parseInt(data.actual_rbh) >= parseInt(18)) {
                         $(row).hide();
                     }
                     $(row).attr('id', data.id);
@@ -758,14 +751,11 @@
                         d.report_status = 0;
                         d.date_start = $('#date_start_unsettled').val();
                         d.date_stop =  $('#date_stop_unsettled').val();
-                        d.coaching_level = 3;
+                        d.coaching_level = 1;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-                    var coaching_end_date = Date.parse(data.coaching_date);
-                    coaching_end_date +=345600*1000; // stworzenie daty + dodanie 4 dni
-                    var actual_date = new Date();
-                    if (actual_date < coaching_end_date ) {
+                    if (parseInt(data.actual_rbh) < parseInt(18)) {
                         $(row).hide();
                     }
                     $(row).attr('id', data.id);
@@ -916,7 +906,7 @@
                         d.report_status = 1;
                         d.date_start = $('#date_start_settled').val();
                         d.date_stop =  $('#date_stop_settled').val();
-                        d.coaching_level = 3;
+                        d.coaching_level = 1;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"columns":[

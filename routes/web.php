@@ -646,6 +646,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     /** Tabela Postępów Coaching */
 
     Route::get('/progress_table', 'CoachingController@progress_tableGET');
+    Route::get('/progress_table_for_coach', 'CoachingController@progress_table_for_coachGET');
     Route::get('/progress_table_for_director', 'CoachingController@progress_table_for_directorGET');
     Route::get('/progress_table_for_manager', 'CoachingController@progress_table_for_managerGET');
 
@@ -718,9 +719,5 @@ Route::get('/screen_table','ScreensController@screenMethod');
     Route::get('/TeamDKJHourData', 'PBXDataAPI@TeamDKJHourData');
     //Dane Czasu na rekord
     Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
-
-
-
-
 
 
