@@ -657,25 +657,15 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     /** AUDYTY **/
     Route::get('/addAudit', 'AuditController@auditMethodGet');
-
-
     Route::post('/addAudit', 'AuditController@auditMethodPost');
-
     Route::post('/handleForm', 'AuditController@handleFormPost');
-
     Route::get('/showAudits', 'AuditController@showAuditsGet');
-
-
     Route::get('/audit/{id}', 'AuditController@editAuditGet');
     Route::post('/handleEdit', 'AuditController@editAuditPost');
-
     Route::get('/editAuditTemplates', 'AdminController@editAuditTemplatesGet');
     Route::post('/addTemplate', 'AdminController@addTemplatePost');
     Route::get('/editAudit/{id}', 'AdminController@editAuditGet');
-
     Route::post('/editAuditPage', 'AdminController@editDatabasePost');
-
-
 
 
 });
@@ -712,6 +702,9 @@ Route::get('/screen_table','ScreensController@screenMethod');
     Route::get('/TeamDKJHourData', 'PBXDataAPI@TeamDKJHourData');
     //Dane Czasu na rekord
     Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
+    //dodawanie usuwanie przywilejów dla użytkowników
+    Route::get('/userPrivilages', 'AdminController@userPrivilagesGET');
+    Route::post('/userPrivilages', 'AdminController@userPrivilagesAjax')->name('api.privilageAjax');
 
 
 
