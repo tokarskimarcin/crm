@@ -619,12 +619,13 @@ class CoachingController extends Controller
             $date_start = '';
             $date_stop = '';
             $i = 0;
+            $date_array = [];
             if(is_object($range->first())){
                 $dep_aim = $range->first()->dep_aim;
                 $commission_avg = $range->first()->commission_avg;
                 // Pobranie informacji o rbh oraz zakres datowy
                while($rbh < ($dep_aim/$commission_avg)*3){
-                   if($i==0){
+                   if($i==0 && $range->first()->realRBH != null && $range->first()->realRBH > 10){
                        $date_stop = $range->first()->date;
                        $i++;
                    }
