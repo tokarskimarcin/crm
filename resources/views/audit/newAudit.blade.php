@@ -85,7 +85,7 @@
                             <td class="first">{{ucwords(str_replace('_',' ',$c->name))}}</td>
                             <td>
                                 <div class="form-group">
-                                    <select class="form-control firstInp" style="font-size:18px;" id="{{$c->name . "_amount"}}" name="{{$c->name . "_amount"}}">
+                                    <select class="form-control firstInp" style="font-size:18px;" id="{{$c->id . "_amount"}}" name="{{$c->id . "_amount"}}">
                                         <option value="0">--</option>
                                         <option value="1">Tak</option>
                                         <option value="2">Nie</option>
@@ -103,12 +103,12 @@
                             {{--</td>--}}
                             <td>
                                 <div class="form-group">
-                                    <input type="text" id="{{$c->name . "_comment"}}" name="{{$c->name . "_comment"}}" class="form-control thirdInp" style="width:100%;">
+                                    <input  type="text" id="{{$c->id . "_comment"}}" name="{{$c->id . "_comment"}}" class="form-control thirdInp" style="width:100%;">
                                 </div>
                             </td>
                             <td>
                                 <div class="form-group">
-                                    <input name="{{$c->name . "_files[]"}}" id="{{$c->name . "_files[]"}}" type="file" multiple="" />
+                                    <input name="{{$c->id . "_files[]"}}" id="{{$c->id . "_files[]"}}" type="file" multiple="" />
                                 </div>
                             </td>
                         </tr>

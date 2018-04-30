@@ -97,10 +97,10 @@ class AuditController extends Controller
         /*fill "audit_info" table*/
         $criterions = AuditCriterions::where('status', '=', $template)->get();
         foreach($criterions as $c) {
-            $nameAmount = $c->name . "_amount";
+            $nameAmount = $c->id . "_amount";
 //            $nameQuality = $c->name . "_quality";
-            $nameComment = $c->name . "_comment";
-            $arrFilename = $c->name . "_files";
+            $nameComment = $c->id . "_comment";
+            $arrFilename = $c->id . "_files";
 
             $newCrit = new AuditInfo();
             $newCrit->status = 1;
@@ -269,10 +269,10 @@ class AuditController extends Controller
         $criterions = AuditCriterions::all();
         foreach($criterions as $c) {
             //seting names for input identification purposes
-            $nameAmount = $c->name . "_amount";
+            $nameAmount = $c->id . "_amount";
 //            $nameQuality = $c->name . "_quality";
-            $nameComment = $c->name . "_comment";
-            $arrFilename = $c->name . "_files";
+            $nameComment = $c->id . "_comment";
+            $arrFilename = $c->id . "_files";
             $fileCatalog = "auditFiles";
             $suffix = '';
 

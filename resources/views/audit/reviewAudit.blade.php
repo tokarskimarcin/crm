@@ -64,7 +64,7 @@
                                         <td class="first">{{ucwords(str_replace('_',' ',$c->name))}}</td>
                                         <td>
                                             <div class="form-group">
-                                                <select class="form-control firstInp" style="font-size:18px;" id="{{$c->name . "_amount"}}" name="{{$c->name . "_amount"}}">
+                                                <select class="form-control firstInp" style="font-size:18px;" id="{{$c->id . "_amount"}}" name="{{$c->id . "_amount"}}">
                                                     @foreach($audit_info as $a)
                                                         @if($c->id == $a->audit_criterion_id)
                                                     <option value="0" @if($a->amount == '0') selected @endif>--</option>
@@ -93,18 +93,18 @@
                                                 @foreach($audit_info as $a)
                                                     @if($c->id == $a->audit_criterion_id)
                                                         @if(isset($a->comment))
-                                                        <input type="text" id="{{$c->name . "_comment"}}" name="{{$c->name . "_comment"}}" class="form-control thirdInp" style="width:100%;" value="{{$a->comment}}">
+                                                        <input type="text" id="{{$c->id . "_comment"}}" name="{{$c->id . "_comment"}}" class="form-control thirdInp" style="width:100%;" value="{{$a->comment}}">
                                                         @else
-                                                        <input type="text" id="{{$c->name . "_comment"}}" name="{{$c->name . "_comment"}}" class="form-control thirdInp" style="width:100%;" value="">
+                                                        <input type="text" id="{{$c->id . "_comment"}}" name="{{$c->id . "_comment"}}" class="form-control thirdInp" style="width:100%;" value="">
                                                         @endif
                                                     @endif
                                                 @endforeach
                                             </div>
                                         </td>
-                                        <td> <a data-toggle="modal" data-info="{{$c->name . "_comment"}}" class="modal_trigger" href="#myModal"><span class="glyphicon glyphicon-search"></span></a></td>
+                                        <td> <a data-toggle="modal" data-info="{{$c->id . "_comment"}}" class="modal_trigger" href="#myModal"><span class="glyphicon glyphicon-search"></span></a></td>
                                         <td>
                                             <div class="form-group">
-                                                <input name="{{$c->name . "_files[]"}}" id="{{$c->name . "_files[]"}}" type="file" multiple="" />
+                                                <input name="{{$c->id . "_files[]"}}" id="{{$c->id . "_files[]"}}" type="file" multiple="" />
                                             </div>
                                         </td>
                                         <?php
@@ -161,6 +161,7 @@
         </div>
     <div class="row last-row">
         <div class="col-md-12">
+            <input type="button" class="btn btn-info btn-block" id="back_button" value="Powrót">
             <input class="btn btn-success btn-block" type="submit" id="secondButton" value="Zapisz zmiany!" style="margin-bottom:1em;">
         </div>
     </div>
@@ -329,6 +330,12 @@
                document.getElementsByClassName('modal-body')[0].textContent = document.getElementById(e.target.parentNode.dataset.info).value;
                console.log(e.target.parentNode.dataset.info);
            });
+        });
+
+        //THIS PART IS RESPONSIBLE FOR REDIRECTING BACK USER AFTER CLICKING ON BUTTON
+        let back_button = document.getElementById('back_button');
+        back_button.addEventListener('click', function(e) {
+            window.location.href = '{{URL::to("/showAudits")}}';
         });
 
 
