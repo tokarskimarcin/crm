@@ -366,6 +366,8 @@
 
             if(validation){
                 e.disabled = true;
+                console.log(consultant_id+' '+subject+' '+ coaching_date+' '+ coaching_goal+' '+ coaching_comment+' '+
+                    coaching_comment+' '+ coaching_actual_avg+' '+ $('#status_coauching').val())
                 $.ajax({
                     type: "POST",
                     url: "{{route('api.saveCoaching')}}",
