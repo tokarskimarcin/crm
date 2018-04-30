@@ -2299,8 +2299,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
      */
     public function pageReportDepartmentsGet() {
         $first_day = date('Y-m') . '-01';
-        $days_in_month = date('t', strtotime(date('m')));
-        $last_day = date('Y-m-') . date('t', strtotime(date('m')));
+        $days_in_month = date('t', strtotime(date('Y-m')));
+        $last_day = date('Y-m-') . date('t', strtotime(date('Y-m')));
         $month = date('m');
         $year = date('Y');
 
@@ -2335,8 +2335,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
 
     public function pageReportDepartmentsPost(Request $request) {
         $first_day = date('Y-') . $request->month_selected . '-01';
-        $days_in_month = date('t', strtotime($request->month_selected));
-        $last_day = date('Y-m-') . date('t', strtotime($request->month_selected));
+        $days_in_month = date('t', strtotime(date('Y').'-'.$request->month_selected));
+        $last_day = date('Y').'-'.$request->month_selected.'-'. date('t', strtotime(date('Y').'-'.$request->month_selected));
         $month = $request->month_selected;
         $year = date('Y');
         $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
@@ -3340,8 +3340,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
 
         $year = date('Y');
         $month = date('m');
-        $days_in_month = date('t', strtotime($month));
-
+        $days_in_month = date('t', strtotime($year.'-'.$month));
         return view('reportpage.dayReportCoaches')
             ->with([
                 'coaches'   => $coaches,
@@ -3413,7 +3412,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
 
         $month = date('m');
         $year = date('Y');
-        $days_in_month = date('t', strtotime($month));
+        $days_in_month = date('t', strtotime($year.'-'.$month));
 
         return view('reportpage.DayReportSummaryCoaches')
             ->with([
@@ -3821,7 +3820,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
      */
     public function getDaysInMonth(Request $request) {
         $month = date('Y-') . $request->month_selected;
-        $days_in_month = date('t', strtotime('Y-' . $request->month_selected));
+        $days_in_month = date('t', strtotime($month));
         $data = [];
         for ($i = 1; $i <= $days_in_month; $i++) {
             $day = ($i < 10) ? '0' . $i : $i ;
