@@ -147,7 +147,9 @@ class AuditController extends Controller
     public function showAuditsGet(Request $request) {
             $audit = Audit::all();
             $departments = Department_info::all();
-            $directors = User::where('user_type_id', '=', '7')->where('status_work', '=', '1')->get();
+            $directors = Department_info::select('director_id')->where('director_id', '!=', 'null')->distinct()->get()->toarray();
+            $directors  = User::wherein('id',$directors)->get();
+//            $directors = User::where('user_type_id', '=', '7')->where('status_work', '=', '1')->get();
         return view('audit.showAudits')->with('audit', $audit)->with('departments', $departments)->with('directors', $directors);
     }
 
@@ -180,7 +182,7 @@ class AuditController extends Controller
             $audit = $audit ->where('department_info.id', '=', $request->department);
         }
         if($request->director != null && $request->director != '0') {
-            $audit = $audit ->where('department_info.director_id' , '=', $request->director);
+            $audit = $audit ->where('department_info.director_id' , '=', $request->director/100);
         }
         if($request->type != null && $request->type != '0') {
             $audit = $audit ->where('audit.user_type', '=', $request->type);
@@ -313,11 +315,16 @@ class AuditController extends Controller
         return Redirect::to('audit/'.$id);
     }
 
+    /**
+     * This method return audit score.
+     */
     public function auditScoreAjax(Request $request) {
         $department = $request->departmentValue;
         $date_start = $request->date_start;
         $date_stop = $request->date_stop;
-        $auditSum = DB::table('audit')
+
+        if($department < 100) {
+            $auditSum = DB::table('audit')
                 ->select(DB::raw('
                 SUM(score) as total_score,
                 COUNT(*) as number_of_records
@@ -325,9 +332,27 @@ class AuditController extends Controller
                 ->whereBetween('date_audit', [$date_start, $date_stop])
                 ->where('department_info_id', '=', $department)
                 ->get();
+        }
+        else {
+            $director_id = $department/100;
+            $director_dep = Department_info::where('director_id','=',$director_id)->get();
+            $director_dep = $director_dep->pluck('id')->toarray();
+            $auditSum = DB::table('audit')
+                ->select(DB::raw('
+                SUM(score) as total_score,
+                COUNT(*) as number_of_records
+                '))
+                ->whereBetween('date_audit', [$date_start, $date_stop])
+                ->whereIn('department_info_id', $director_dep)
+                ->get();
+        }
+
         return $auditSum;
     }
 
+    /**
+     * This method deletes image when user clicks on red cross glyphicon
+     */
     public function delete_picture(Request $request){
         if(AuditFiles::where('id','=',$request->id_picture)->delete()){
             return 1;
