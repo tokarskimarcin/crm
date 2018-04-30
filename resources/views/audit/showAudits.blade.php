@@ -9,6 +9,8 @@
             {{--content: '%';--}}
         {{--}--}}
     {{--</style>--}}
+
+
     <link href="{{ asset('/css/dataTables.bootstrap.min.css')}}" rel="stylesheet">
     <div class="container-fluid">
         <div class="row">
@@ -35,6 +37,15 @@
                                         <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                     </div>
                                 </div>
+                                <script>
+
+                                    let date_st = document.getElementById('date_start');
+                                    let storageVal1 = sessionStorage.getItem('date_start');
+                                    if(sessionStorage.getItem('date_start') != undefined || sessionStorage.getItem('date_start') != null) {
+                                        date_st.value = storageVal1;
+                                        sessionStorage.removeItem('date_start');
+                                    }
+                                </script>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -44,6 +55,14 @@
                                         <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                     </div>
                                 </div>
+                                <script>
+                                    let date_sto = document.getElementById('date_stop');
+                                    let storageVal2 = sessionStorage.getItem('date_stop');
+                                    if(sessionStorage.getItem('date_stop') != undefined || sessionStorage.getItem('date_stop') != null) {
+                                        date_sto.value = storageVal2;
+                                        sessionStorage.removeItem('date_stop');
+                                    }
+                                </script>
                             </div>
                         </div>
                         <div class="row row_to_insert">
@@ -54,14 +73,28 @@
                                         <option value="0">Wybierz</option>
                                         <optgroup label="departamenty">
                                         @foreach($departments as $department)
-                                        <option value="{{$department->id}}" data-type="1">{{$department->departments->name}} {{$department->department_type->name}}</option>
+                                        <option value="{{$department->id}}" data-type="1" class="all_departments">{{$department->departments->name}} {{$department->department_type->name}}</option>
                                         @endforeach
                                         </optgroup>
                                         <optgroup label="dyrektorzy">
                                             @foreach($directors as $director)
-                                                <option value="{{$director->id}}" data-type="2">{{$director->first_name}} {{$director->last_name}}</option>
+                                                <option value="{{$director->id * 100}}" class="all_departments" data-type="2">{{$director->first_name}} {{$director->last_name}}</option>
                                             @endforeach
                                         </optgroup>
+                                        <script>
+                                            let deps = document.getElementsByClassName('all_departments');
+                                            let storageVal3 = sessionStorage.getItem('departmentValue');
+                                            // if(storageVal3 > 100) {
+                                            //     storageVal3 /= 100;
+                                            // }
+                                            for(var i = 0; i < deps.length; i++) {
+                                                console.log(deps[i].value);
+                                                if(deps[i].value == storageVal3) {
+                                                    deps[i].selected = true;
+                                                }
+                                            }
+                                            sessionStorage.removeItem('departmentValue');
+                                        </script>
                                     </select>
                                 </div>
                             </div>
@@ -186,7 +219,7 @@
                         },"name":"score"
                     },
                     {"data":function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("audit")}}/' + data.audit_id + '">Link</a>';
+                            return '<a href="{{URL::to("audit")}}/' + data.audit_id + '" class="links">Link</a>';
                         },"orderable": false, "searchable": false
                     }
                 ]
@@ -292,7 +325,19 @@
                 });
             });
 
+            $( document ).ajaxComplete(function() {
+                let links = Array.from(document.getElementsByClassName('links'));
+                console.table(links);
+                links.forEach(function(link) {
+                    link.addEventListener('click', function(event) {
+                        console.log(event);
+                        sessionStorage.setItem('date_start', document.getElementById('date_start').value);
+                        sessionStorage.setItem('date_stop', document.getElementById('date_stop').value);
+                        sessionStorage.setItem('departmentValue', selectedDepartment.options[selectedDepartment.selectedIndex].value);
+                    });
+                });
+            })
 
-        });
+     });
     </script>
 @endsection
