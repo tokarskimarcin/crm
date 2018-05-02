@@ -498,18 +498,29 @@ class OtherCompanyStatisticsController extends Controller
     }
 
 
+
+    public  function getUserToSendMessage(){
+        $user = User::whereIn('id',[1364,6,11])->get();
+        $szczesny = new User();
+        $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
+        $szczesny->first_name = 'Bartosz';
+        $szczesny->last_name = 'Szczęsny';
+        $user = $user->push($szczesny);
+        return $user;
+    }
+
     // MAILE
     // Mail do raportu godzinnego telemarketing
     public function MailhourReportTelemarketing() {
         $data = $this::hourReportTelemarketing();
         $title = 'Raport godzinny telemarketing Gniezno ' . date('Y-m-d');
-        $user = User::where('id','=',1364)->get();
+        $user = $this::getUserToSendMessage();
         $this->sendMailByVerona('otherCompanyMail.hourReportTelemarketing', $data, $title,$user);
     }
     //Mail do raportu Tygodniowego Telemarketing
     public function MailweekReportTelemarketing() {
         $data = $this::weekReportTelemarketing();
-        $user = User::where('id','=',1364)->get();
+        $user = $this::getUserToSendMessage();
         $title = 'Raport tygodniowy telemarketing Gniezno ';
         $this->sendMailByVerona('otherCompanyMail.weekReportTelemarketing', $data, $title,$user);
     }
@@ -525,13 +536,13 @@ class OtherCompanyStatisticsController extends Controller
             $year -= 1;
         }
         $data = $this::monthReportTelemarketing($month,$year);
-        $user = User::where('id','=',1364)->get();
+        $user = $this::getUserToSendMessage();
         $title = 'Raport miesięczny telemarketing Gniezno ';
         $this->sendMailByVerona('otherCompanyMail.monthReportTelemarketing', $data, $title,$user);
     }
     public function MailDayReportTelemarketing() {
         $data = $this::dayReportTelemarketing('yesterday');
-        $user = User::where('id','=',1364)->get();
+        $user = $this::getUserToSendMessage();
         $title = 'Raport dzienny telemarketing Gniezno '.date("d.m.Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
         $this->sendMailByVerona('otherCompanyMail.dayReportTelemarketing', $data, $title,$user);
     }
@@ -541,13 +552,13 @@ class OtherCompanyStatisticsController extends Controller
         //$data = $this::hourReportDkj();
         $data = $this::hourReportDkj_PBX_READY(); //Gotowe na pbx
         $title = 'Raport godzinny DKJ Gniezno ' . date('Y-m-d');
-        $user = User::where('id','=',1364)->get();
+        $user = $this::getUserToSendMessage();
         $this->sendMailByVerona('otherCompanyMail.hourReportDkj', $data, $title,$user);
     }
 
     public function dayReportDkj() {
         $data = $this->dayReportDkjData('yesterday');
-        $user = User::where('id','=',1364)->get();
+        $user = $this::getUserToSendMessage();
         $title = 'Raport dzienny DKJ Gniezno '.date("d.m.Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
         $this->sendMailByVerona('otherCompanyMail.dayReportDkj', $data, $title,$user);
     }
@@ -555,14 +566,14 @@ class OtherCompanyStatisticsController extends Controller
     //wysyłanie email (raport tygodniowy dkj)
     public function MailWeekReportDkj() {
         $data = $this->weekReportDkjData();
-        $user = User::where('id','=',1364)->get();
+        $user = $this::getUserToSendMessage();
         $title = 'Raport tygodniowy DKJ Gniezno ' . $data['date_start'] . ' - ' . $data['date_stop'];
         $this->sendMailByVerona('otherCompanyMail.weekReportDkj', $data, $title,$user);
     }
 
     public function monthReportDkj() {
         $data = $this->MonthReportDkjData(1);
-        $user = User::where('id','=',1364)->get();
+        $user = $this::getUserToSendMessage();
         $title = 'Raport miesięczny DKJ Gniezno ';
         $this->sendMailByVerona('otherCompanyMail.monthReportDkj', $data, $title,$user);
     }
