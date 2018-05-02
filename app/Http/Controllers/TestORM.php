@@ -30,7 +30,7 @@ class TestORM extends Controller
         $report_type = 0;
         $department_id = null;
         $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=23&groupType=" . $this->report_type_array[$report_type];
-        $url ="https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=23&groupType=TEAM&date=2018-04-26";
+//        $url ="https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=23&groupType=TEAM&date=2018-04-26";
         $header_array = array('department_info_id', 'average', 'success', '', '', 'wear_base', 'call_time', 'employee_count', 'user_id', 'hour', 'report_date', 'is_send', 'janky_count');
         if (!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
         if (($handle = fopen($url, "r")) !== FALSE) {

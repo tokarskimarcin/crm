@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\HourRepoerOtherCompany;
+use App\PBXDKJTeamOtherCompany;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -82,20 +84,20 @@ class OtherCompanyStatisticsController extends Controller
             })
             ->groupBy('hour_report_other_company.department_info_id')
             ->get();
-        $pbx_dkj_data = DB::table('pbx_dkj_team')
+        $pbx_dkj_data = DB::table('pbx_dkj_team_other_company')
             ->select(DB::raw('
              (SUM(count_bad_check) * 100) / SUM(count_all_check) as janky_proc,
-             pbx_dkj_team.department_info_id as id
+             pbx_dkj_team_other_company.department_info_id as id
             '))
-            ->whereIn('pbx_dkj_team.id', function($query) use($date){
+            ->whereIn('pbx_dkj_team_other_company.id', function($query) use($date){
                 $query->select(DB::raw(
-                    'MAX(pbx_dkj_team.id)'
+                    'MAX(pbx_dkj_team_other_company.id)'
                 ))
-                    ->from('pbx_dkj_team')
+                    ->from('pbx_dkj_team_other_company')
                     ->where('report_date', '=',$date)
                     ->groupBy('department_info_id','report_date');
             })
-            ->groupBy('pbx_dkj_team.department_info_id')
+            ->groupBy('pbx_dkj_team_other_company.department_info_id')
             ->get();
 
         $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data) {
@@ -148,20 +150,20 @@ class OtherCompanyStatisticsController extends Controller
             ->groupBy('hour_report_other_company.department_info_id')
             ->get();
 
-        $pbx_dkj_data = DB::table('pbx_dkj_team')
+        $pbx_dkj_data = DB::table('pbx_dkj_team_other_company')
             ->select(DB::raw('
              (SUM(count_bad_check) * 100) / SUM(count_all_check) as janky_proc,
-             pbx_dkj_team.department_info_id as id
+             pbx_dkj_team_other_company.department_info_id as id
             '))
-            ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop){
+            ->whereIn('pbx_dkj_team_other_company.id', function($query) use($date_start, $date_stop){
                 $query->select(DB::raw(
-                    'MAX(pbx_dkj_team.id)'
+                    'MAX(pbx_dkj_team_other_company.id)'
                 ))
-                    ->from('pbx_dkj_team')
+                    ->from('pbx_dkj_team_other_company')
                     ->whereBetween('report_date', [$date_start, $date_stop])
                     ->groupBy('department_info_id','report_date');
             })
-            ->groupBy('pbx_dkj_team.department_info_id')
+            ->groupBy('pbx_dkj_team_other_company.department_info_id')
             ->get();
         $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data) {
             $info_with_janky = $pbx_dkj_data->where('id', '=', $item->id)->first();
@@ -282,20 +284,20 @@ class OtherCompanyStatisticsController extends Controller
             ->groupBy('hour_report_other_company.department_info_id')
             ->get();
 
-        $pbx_dkj_data = DB::table('pbx_dkj_team')
+        $pbx_dkj_data = DB::table('pbx_dkj_team_other_company')
             ->select(DB::raw('
              (SUM(count_bad_check) * 100) / SUM(count_all_check) as janky_proc,
-             pbx_dkj_team.department_info_id as id
+             pbx_dkj_team_other_company.department_info_id as id
             '))
-            ->whereIn('pbx_dkj_team.id', function($query) use($month){
+            ->whereIn('pbx_dkj_team_other_company.id', function($query) use($month){
                 $query->select(DB::raw(
-                    'MAX(pbx_dkj_team.id)'
+                    'MAX(pbx_dkj_team_other_company.id)'
                 ))
-                    ->from('pbx_dkj_team')
+                    ->from('pbx_dkj_team_other_company')
                     ->where('report_date', 'like', $month)
                     ->groupBy('department_info_id','report_date');
             })
-            ->groupBy('pbx_dkj_team.department_info_id')
+            ->groupBy('pbx_dkj_team_other_company.department_info_id')
             ->get();
 
         $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data) {
@@ -318,4 +320,188 @@ class OtherCompanyStatisticsController extends Controller
         $month = ($month < 0) ? 11 : $month ;
         return $month_names[$month];
     }
+
+    private function monthReverse($month) {
+        $month -= 1;
+        return ($month < 1) ? 12 : $month ;
+    }
+
+
+
+    /*
+     * DKJ
+     */
+    public function pageHourReportDKJ()
+    {
+        $data = $this::hourReportDkj_PBX_READY();// Gotowe na pbx
+        return view('reportpage.otherCompanyReport.hourReportDkj')
+            ->with('date', date('H') . ':00:00')
+            ->with('reports', $data['reports']);
+    }
+    // Przygotowanie danych do raportu godzinnego DKJ
+    private function hourReportDkj_PBX_READY() {
+
+        $date = date('Y-m-d');
+        $hour = date('H') . ':00:00'; //tutaj zmienic przy wydawaniu na produkcję na  date('H') - 1
+
+        $reports = PBXDKJTeamOtherCompany::where('report_date', '=', $date)
+            ->where('hour', $hour)
+            ->get();
+        $data = [
+            'hour' => $hour,
+            'date' => $date,
+            'reports' => $reports
+        ];
+        return $data;
+    }
+
+    public function pageDayReportDKJ() {
+        $data = $this->dayReportDkjData('today');
+        return view('reportpage.otherCompanyReport.DayReportDkj')
+            ->with('today', $data['today'])
+            ->with('dkj', $data['dkj']);
+    }
+
+    private function dayReportDkjData($type) {
+        if ($type == 'today') {
+            $date = date('Y-m-d');
+        } else if ($type == 'yesterday') {
+            $date = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+        }
+
+        $dkj = DB::table('pbx_dkj_team_other_company')
+            ->select(DB::raw(
+                '
+                  SUM(success) as success,
+                  sum(count_all_check) as sum_all_talks,
+                  sum(count_good_check) as sum_correct_talks,
+                  sum(count_bad_check) as sum_janky
+                   '))
+            ->whereIn('pbx_dkj_team_other_company.id', function($query) use($date){
+                $query->select(DB::raw(
+                    'MAX(pbx_dkj_team_other_company.id)'
+                ))
+                    ->from('pbx_dkj_team_other_company')
+                    ->where('report_date', '=',$date)
+                    ->groupBy('department_info_id');
+            })
+            ->groupBy('pbx_dkj_team_other_company.department_info_id')
+            ->get();
+
+        $data = [
+            'dkj' => $dkj,
+            'today' => $date
+        ];
+        return $data;
+    }
+
+    //wyswietlanie danych raportu tygodniowego dla DKJ
+    public function pageWeekReportDKJ() {
+        $data = $this->weekReportDkjData();
+
+        return view('reportpage.otherCompanyReport.WeekReportDkj')
+            ->with('date_start', $data['date_start'])
+            ->with('date_stop', $data['date_stop'])
+            ->with('dkj', $data['dkj']);
+    }
+
+    //przygotowanie danych do raportu tygodniowego dkj
+    private function weekReportDkjData() {
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+
+
+        $dkj = DB::table('pbx_dkj_team_other_company')
+            ->select(DB::raw(
+                'SUM(count_all_check) as sum_all_talks,
+                SUM(count_good_check) as sum_correct_talks,
+                SUM(count_bad_check) as sum_janky,
+                SUM(success) as success
+                   '))
+            ->whereIn('pbx_dkj_team_other_company.id', function($query) use($date_start, $date_stop){
+                $query->select(DB::raw(
+                    'MAX(pbx_dkj_team_other_company.id)'
+                ))
+                    ->from('pbx_dkj_team_other_company')
+                    ->whereBetween('report_date', [$date_start, $date_stop])
+                    ->groupBy('department_info_id','report_date');
+            })
+            ->groupBy('pbx_dkj_team_other_company.department_info_id')
+            ->get();
+
+//            dd($dkj);
+        $data = [
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'dkj' => $dkj
+        ];
+        return $data;
+    }
+
+    //wyswietlanie raoprtu miesiecznego pracownicy dkj
+    public function pageMonthReportDKJ(){
+        $data = $this->MonthReportDkjData(0);
+
+        return view('reportpage.otherCompanyReport.MonthReportDkj')
+            ->with('month_name', $data['month_name'])
+            ->with('dkj', $data['dkj']);
+    }
+
+    //przygotowanie danych do raportu miesięcznego dkj
+    //type - 0 bierzący miesiac, 1 poprzedni
+    private function MonthReportDkjData($type) {
+        $month = $this->monthReverse(date('m'));
+        $year = date('Y');
+        if ($month < 10) {
+            $month = '0' . $month;
+        }
+        if ($month == 12) {
+            $year -= 1;
+        }
+        $selected_date = $year . '-' . $month . '%';
+        if($type == 0)
+        {
+            $month_ini = new DateTime("first day of this month");
+            $date_start = $month_ini->format('Y-m-d');
+            $month_end = new DateTime("last day of this month");
+            $date_stop = $month_end->format('Y-m-d');
+        }else{
+            $month_ini = new DateTime("first day of last month");
+            $date_start = $month_ini->format('Y-m-d');
+            $month_end = new DateTime("last day of last month");
+            $date_stop = $month_end->format('Y-m-d');
+        }
+
+        $dkj = DB::table('pbx_dkj_team_other_company')
+            ->select(DB::raw(
+                'SUM(count_all_check) as sum_all_talks,
+                SUM(count_good_check) as sum_correct_talks,
+                SUM(count_bad_check) as sum_janky,
+                 SUM(success) as success
+                   '))
+            ->whereIn('pbx_dkj_team_other_company.id', function($query) use($date_start, $date_stop){
+                $query->select(DB::raw(
+                    'MAX(pbx_dkj_team_other_company.id)'
+                ))
+                    ->from('pbx_dkj_team_other_company')
+                    ->whereBetween('report_date', [$date_start, $date_stop])
+                    ->groupBy('department_info_id','report_date');
+            })
+            ->groupBy('pbx_dkj_team_other_company.department_info_id')
+            ->get();
+
+        $data = [
+            'month_name' => $this->monthReverseName($month),
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'dkj' => $dkj
+        ];
+
+        return $data;
+    }
+
+
+
+
+
 }

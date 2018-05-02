@@ -740,8 +740,13 @@ Route::get('/screen_table','ScreensController@screenMethod');
     //Dane Czasu na rekord
     Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
 
-//Gniezno
-Route::get('/pageHourReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageHourReportTelemarketing');
-Route::get('/pageWeekReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageWeekReportTelemarketing');
-Route::get('/pageMonthReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageMonthReportTelemarketing');
-Route::get('/pageDayReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageDayReportTelemarketing');
+    //Gniezno Telemarketing
+    Route::get('/pageHourReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageHourReportTelemarketing');
+    Route::get('/pageWeekReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageWeekReportTelemarketing');
+    Route::get('/pageMonthReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageMonthReportTelemarketing');
+    Route::get('/pageDayReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageDayReportTelemarketing');
+    //Gniezno DKJ
+    Route::get('/pageHourReportDKJGniezno', 'OtherCompanyStatisticsController@pageHourReportDKJ');
+    Route::get('/pageDayReportDKJGniezno', 'OtherCompanyStatisticsController@pageDayReportDKJ');
+    Route::get('/pageWeekReportDKJGniezno', 'OtherCompanyStatisticsController@pageWeekReportDKJ');
+    Route::get('/pageMonthReportDKJGniezno', 'OtherCompanyStatisticsController@pageMonthReportDKJ');
