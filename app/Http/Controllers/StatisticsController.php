@@ -129,7 +129,6 @@ class StatisticsController extends Controller
 // Mail do raportu godzinnego telemarketing
     public function MailhourReportTelemarketing() {
         $data = $this::hourReportTelemarketing();
-
         $title = 'Raport godzinny telemarketing ' . date('Y-m-d');
         $this->sendMailByVerona('hourReportTelemarketing', $data, $title);
         foreach ($data['reports'] as $report) {

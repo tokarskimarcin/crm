@@ -4,18 +4,15 @@ namespace App\Http\Controllers;
 
 use App\HourRepoerOtherCompany;
 use App\PBXDKJTeamOtherCompany;
+use App\User;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use Mail;
 class OtherCompanyStatisticsController extends Controller
 {
 
-//    //Maile
-//MailhourReportTelemarketing
-//MailweekReportTelemarketing
-//MailmonthReportTelemarketing
-//MailDayReportTelemarketing
+
 
 //Strona z raportem
 // Wyswietlenie raportu godzinnego na stronie
@@ -501,7 +498,155 @@ class OtherCompanyStatisticsController extends Controller
     }
 
 
+    // MAILE
+    // Mail do raportu godzinnego telemarketing
+    public function MailhourReportTelemarketing() {
+        $data = $this::hourReportTelemarketing();
+        $title = 'Raport godzinny telemarketing Gniezno ' . date('Y-m-d');
+        $user = User::where('id','=',1364)->get();
+        $this->sendMailByVerona('otherCompanyMail.hourReportTelemarketing', $data, $title,$user);
+    }
+    //Mail do raportu Tygodniowego Telemarketing
+    public function MailweekReportTelemarketing() {
+        $data = $this::weekReportTelemarketing();
+        $user = User::where('id','=',1364)->get();
+        $title = 'Raport tygodniowy telemarketing Gniezno ';
+        $this->sendMailByVerona('otherCompanyMail.weekReportTelemarketing', $data, $title,$user);
+    }
+    // Wysłanie maila z raportem miesiecznym
+    public function MailmonthReportTelemarketing() {
+        $month = date('m') - 1;
+        if ($month < 10) {
+            $month = '0' . $month;
+        }
+        $year = date('Y');
+
+        if ($month == 12) {
+            $year -= 1;
+        }
+        $data = $this::monthReportTelemarketing($month,$year);
+        $user = User::where('id','=',1364)->get();
+        $title = 'Raport miesięczny telemarketing Gniezno ';
+        $this->sendMailByVerona('otherCompanyMail.monthReportTelemarketing', $data, $title,$user);
+    }
+    public function MailDayReportTelemarketing() {
+        $data = $this::dayReportTelemarketing('yesterday');
+        $user = User::where('id','=',1364)->get();
+        $title = 'Raport dzienny telemarketing Gniezno '.date("d.m.Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+        $this->sendMailByVerona('otherCompanyMail.dayReportTelemarketing', $data, $title,$user);
+    }
+    // Mail do godzinnego raportu DKJ
+    public function MailhourReportDkj()
+    {
+        //$data = $this::hourReportDkj();
+        $data = $this::hourReportDkj_PBX_READY(); //Gotowe na pbx
+        $title = 'Raport godzinny DKJ Gniezno ' . date('Y-m-d');
+        $user = User::where('id','=',1364)->get();
+        $this->sendMailByVerona('otherCompanyMail.hourReportDkj', $data, $title,$user);
+    }
+
+    public function dayReportDkj() {
+        $data = $this->dayReportDkjData('yesterday');
+        $user = User::where('id','=',1364)->get();
+        $title = 'Raport dzienny DKJ Gniezno '.date("d.m.Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+        $this->sendMailByVerona('otherCompanyMail.dayReportDkj', $data, $title,$user);
+    }
+
+    //wysyłanie email (raport tygodniowy dkj)
+    public function MailWeekReportDkj() {
+        $data = $this->weekReportDkjData();
+        $user = User::where('id','=',1364)->get();
+        $title = 'Raport tygodniowy DKJ Gniezno ' . $data['date_start'] . ' - ' . $data['date_stop'];
+        $this->sendMailByVerona('otherCompanyMail.weekReportDkj', $data, $title,$user);
+    }
+
+    public function monthReportDkj() {
+        $data = $this->MonthReportDkjData(1);
+        $user = User::where('id','=',1364)->get();
+        $title = 'Raport miesięczny DKJ Gniezno ';
+        $this->sendMailByVerona('otherCompanyMail.monthReportDkj', $data, $title,$user);
+    }
 
 
 
+    /******** Główna funkcja do wysyłania emaili*************/
+    /*
+    * $mail_type - jaki mail ma być wysłany - typ to nazwa ścieżki z web.php
+    * $data - $dane przekazane z metody
+    *
+    */
+
+    private function sendMailByVerona($mail_type, $data, $mail_title, $default_users = null) {
+        if ($default_users !== null) {
+            $email = [];
+            $mail_type_pom = $mail_type;
+            $mail_without_folder = explode(".",$mail_type);
+            // podfoldery
+            $mail_type = $mail_without_folder[count($mail_without_folder)-1];
+            $mail_type2 = ucfirst($mail_type);
+            $mail_type2 = 'page' . $mail_type2;
+//            dd($mail_type2);
+            $accepted_users = $default_users;
+//            dd(gettype($accepted_users));
+        } else {
+            $email = [];
+            $mail_type_pom = $mail_type;
+            $mail_without_folder = explode(".",$mail_type);
+            // podfoldery
+            $mail_type = $mail_without_folder[count($mail_without_folder)-1];
+            $mail_type2 = ucfirst($mail_type);
+            $mail_type2 = 'page' . $mail_type2;
+            $accepted_users = DB::table('users')
+                ->select(DB::raw('
+            users.first_name,
+            users.last_name,
+            users.username,
+            users.email_off
+            '))
+                ->join('privilage_relation', 'privilage_relation.user_type_id', '=', 'users.user_type_id')
+                ->join('links', 'privilage_relation.link_id', '=', 'links.id')
+                ->where('links.link', '=', $mail_type2)
+                ->where('users.status_work', '=', 1)
+                ->where('users.id', '!=', 4592) // tutaj szczesna
+                ->get();
+
+            $szczesny = new User();
+            $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
+            $szczesny->first_name = 'Bartosz';
+            $szczesny->last_name = 'Szczęsny';
+            $accepted_users->push($szczesny);
+        }
+
+//    $accepted_users = [
+//        'cytawa.verona@gmail.com',
+//        'jarzyna.verona@gmail.com'
+//    ];
+
+//        $mail_type = $mail_type_pom;
+//     Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
+//     {
+//        $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+//        foreach ($accepted_users as $key => $user) {
+//          if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
+//              $message->to($user)->subject($mail_title);
+//          }
+//        }
+//     });
+
+        $mail_type = $mail_type_pom;
+        /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
+        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
+        {
+            $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+            foreach($accepted_users as $user) {
+//               dd($user); -> zwraca ID tylko
+                if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
+                    $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
+                }
+                if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
+                    $message->to($user->email_off, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
+                }
+            }
+        });
+    }
 }
