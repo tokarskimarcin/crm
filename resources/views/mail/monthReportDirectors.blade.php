@@ -63,7 +63,7 @@
         $total_schedule_lost = 0;
         $total_goal_proc = 0;
         $total_rest_goal = 0;
-
+        $size_total = 0;
         $total_sum_call_time = 0;
         $total_sum_call_proc = 0;
 
@@ -204,7 +204,6 @@
             $add_week_total = false;
         }
         @endphp
-
         @if($add_default_zero == false)
             <tr>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$year . '-' . $month . '-'}}{{($i < 10) ? '0' . $i : $i}}</td>
@@ -247,7 +246,6 @@
                 <td style="background-color: #5eff80;border:1px solid #231f20;text-align:center;padding:3px">0</td>
             </tr>
         @endif
-
         @if($add_week_total == true || $i == $total_days)
             @php
                 $count_weeks++;
@@ -292,7 +290,6 @@
                 $total_week_rest_goal = 0;
             @endphp
         @endif
-
     @endfor
 
     @php
