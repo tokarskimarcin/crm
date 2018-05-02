@@ -233,6 +233,15 @@ Route::get('/weekReportTelemarketing', 'StatisticsController@MailweekReportTelem
 Route::get('/monthReportTelemarketing', 'StatisticsController@MailmonthReportTelemarketing'); // ok
 Route::get('/dayReportTelemarketing', 'StatisticsController@MailDayReportTelemarketing'); // tutaj dodac
 
+
+//Gniezno
+Route::get('/hourReportTelemarketing', 'StatisticsController@MailhourReportTelemarketing'); // ok
+Route::get('/weekReportTelemarketing', 'StatisticsController@MailweekReportTelemarketing'); // ok
+Route::get('/monthReportTelemarketing', 'StatisticsController@MailmonthReportTelemarketing'); // ok
+Route::get('/dayReportTelemarketing', 'StatisticsController@MailDayReportTelemarketing'); // tutaj dodac
+
+
+
 Route::get('/weekReportJanky', 'StatisticsController@MailweekReportJanky');
 Route::get('/dayReportMissedRepo', 'StatisticsController@dayReportMissedRepo');
 
@@ -491,6 +500,11 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageMonthReportTelemarketing', 'StatisticsController@pageMonthReportTelemarketing');
     Route::get('/pageDayReportTelemarketing', 'StatisticsController@pageDayReportTelemarketing');
 
+//    //Gniezno
+//    Route::get('/pageHourReportTelemarketing', 'StatisticsController@pageHourReportTelemarketing');
+//    Route::get('/pageWeekReportTelemarketing', 'StatisticsController@pageWeekReportTelemarketing');
+//    Route::get('/pageMonthReportTelemarketing', 'StatisticsController@pageMonthReportTelemarketing');
+//    Route::get('/pageDayReportTelemarketing', 'StatisticsController@pageDayReportTelemarketing');
 
     Route::get('/pageHourReportDKJ', 'StatisticsController@pageHourReportDKJ');
     Route::get('/pageDayReportDKJ', 'StatisticsController@pageDayReportDKJ');
@@ -726,3 +740,8 @@ Route::get('/screen_table','ScreensController@screenMethod');
     //Dane Czasu na rekord
     Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
 
+//Gniezno
+Route::get('/pageHourReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageHourReportTelemarketing');
+Route::get('/pageWeekReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageWeekReportTelemarketing');
+Route::get('/pageMonthReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageMonthReportTelemarketing');
+Route::get('/pageDayReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageDayReportTelemarketing');
