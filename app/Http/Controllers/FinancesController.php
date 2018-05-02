@@ -65,9 +65,7 @@ class FinancesController extends Controller
 
             ->where('work_hours.date', 'like', $date)
             ->groupBy('users.id')
-
             ->orderBy('users.last_name')->get();
-
         /**
          * Pobranie danych osób którzy nie pracowali całego miesiąca
          */
@@ -468,8 +466,6 @@ class FinancesController extends Controller
             }else{
                 $string_to_sql = "`users`.`agency_id`";
             }
-
-
         $query = DB::table(DB::raw("users"))
             ->join('work_hours', 'work_hours.id_user', 'users.id')
             ->where('users.department_info_id',Auth::user()->department_info_id)

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\CsvReader;
 use App\Department_info;
+use App\HourRepoerOtherCompany;
 use App\HourReport;
 use App\PBXDKJTeam;
 use Illuminate\Support\Facades\DB;
@@ -29,12 +30,14 @@ class TestORM extends Controller
         $report_type = 0;
         $department_id = null;
         $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=23&groupType=" . $this->report_type_array[$report_type];
+//        $url ="https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=23&groupType=TEAM&date=2018-04-26";
         $header_array = array('department_info_id', 'average', 'success', '', '', 'wear_base', 'call_time', 'employee_count', 'user_id', 'hour', 'report_date', 'is_send', 'janky_count');
         if (!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
         if (($handle = fopen($url, "r")) !== FALSE) {
             while (($data1 = fgetcsv($handle, 1000, ";")) !== FALSE) {
                 if ($lp > 2) {
                     $dont_save = false;
+                    $save_other_company = false;
                     $i = 0;
                     $typ = 0;
                     $janky = 0;
@@ -49,6 +52,8 @@ class TestORM extends Controller
                                     $department_id = Department_info::where('pbx_id',$matches[0][0])->first();
                                     if(isset($department_id->id) && $department_id->id != null){
                                         $spreadsheet_data[$lp][$header_array[$i]] = $department_id->id;
+                                    }else if($matches[0][0] == 108){
+                                        $spreadsheet_data[$lp][$header_array[$i]] = 108;
                                     }else{
                                         $dont_save = true;
                                     }
@@ -109,7 +114,16 @@ class TestORM extends Controller
             }
             fclose($handle);
         }
-        HourReport::insert($spreadsheet_data);
+        $finall_array = [];
+        // usunięcie gniezna z raportu godzinowego
+        foreach ($spreadsheet_data as $item){
+            if($item['department_info_id'] == 108){
+                HourRepoerOtherCompany::insert($item);
+            }else
+                array_push($finall_array,$item);
+        }
+
+        HourReport::insert($finall_array);
 
     }
 }

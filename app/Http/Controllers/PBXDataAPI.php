@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Department_info;
 use App\PBXDKJTeam;
+use App\PBXDKJTeamOtherCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Pbx_report_extension;
@@ -25,7 +26,7 @@ class PBXDataAPI extends Controller
         $report_type = 0;
         $department_id = null;
         $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=30&groupType=" . $this->report_type_array[$report_type];
-        //$url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=30&groupType=TEAM&date=2018-02-10";
+//        $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=30&groupType=TEAM&date=2018-04-26";
         $header_array = array('department_info_id','success','count_all_check','count_good_check','count_bad_check','','','online_consultant',  'consultant_without_check','all_jaky_disagreement','','good_jaky_disagreement');
         if (!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
         if (($handle = fopen($url, "r")) !== FALSE) {
@@ -46,6 +47,8 @@ class PBXDataAPI extends Controller
                                     $department_id = Department_info::where('pbx_id',$matches[0][0])->first();
                                     if(isset($department_id->id) && $department_id->id != null){
                                         $spreadsheet_data[$lp][$header_array[$i]] = $department_id->id;
+                                    }else if($matches[0][0] == 108){
+                                        $spreadsheet_data[$lp][$header_array[$i]] = 108;
                                     }else{
                                         $dont_save = true;
                                     }
@@ -72,8 +75,15 @@ class PBXDataAPI extends Controller
             }
             fclose($handle);
         }
-        //dd($spreadsheet_data);
-        PBXDKJTeam::insert($spreadsheet_data);
+        $finall_array = [];
+        // usunięcie gniezna z raportu godzinowego
+        foreach ($spreadsheet_data as $item){
+            if($item['department_info_id'] == 108){
+                PBXDKJTeamOtherCompany::insert($item);
+            }else
+                array_push($finall_array,$item);
+        }
+        PBXDKJTeam::insert($finall_array);
 
     }
 
@@ -222,7 +232,9 @@ class PBXDataAPI extends Controller
                             }
                             else if ($key == 13) {
                                 $data_to_insert[$temp_key]['all_bad_talks'] = intval($rowItem);
-
+                            }else if($key == 14){
+                                if(intval($rowItem) != 108)
+                                    $data_to_insert[$temp_key]['pbx_department_info'] = intval($rowItem);
                             /**
                              * Sumowanie danych
                              */
