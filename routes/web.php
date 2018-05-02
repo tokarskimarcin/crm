@@ -233,6 +233,15 @@ Route::get('/weekReportTelemarketing', 'StatisticsController@MailweekReportTelem
 Route::get('/monthReportTelemarketing', 'StatisticsController@MailmonthReportTelemarketing'); // ok
 Route::get('/dayReportTelemarketing', 'StatisticsController@MailDayReportTelemarketing'); // tutaj dodac
 
+
+//Gniezno
+Route::get('/hourReportTelemarketingGniezno', 'OtherCompanyStatisticsController@MailhourReportTelemarketing'); // ok
+Route::get('/weekReportTelemarketingGniezno', 'OtherCompanyStatisticsController@MailweekReportTelemarketing'); // ok
+Route::get('/monthReportTelemarketingGniezno', 'OtherCompanyStatisticsController@MailmonthReportTelemarketing'); // ok
+Route::get('/dayReportTelemarketingGniezno', 'OtherCompanyStatisticsController@MailDayReportTelemarketing'); // tutaj dodac
+
+
+
 Route::get('/weekReportJanky', 'StatisticsController@MailweekReportJanky');
 Route::get('/dayReportMissedRepo', 'StatisticsController@dayReportMissedRepo');
 
@@ -240,6 +249,12 @@ Route::get('/hourReportDkj', 'StatisticsController@MailhourReportDkj'); // ok
 Route::get('/dayReportDkj', 'StatisticsController@dayReportDkj');// ok
 Route::get('/weekReportDkj', 'StatisticsController@MailWeekReportDkj');// ok
 Route::get('/monthReportDkj', 'StatisticsController@monthReportDkj');// ok
+
+//Gniezno
+Route::get('/hourReportDkjGniezno', 'OtherCompanyStatisticsController@MailhourReportDkj'); // ok
+Route::get('/dayReportDkjGniezno', 'OtherCompanyStatisticsController@dayReportDkj');// ok
+Route::get('/weekReportDkjGniezno', 'OtherCompanyStatisticsController@MailWeekReportDkj');// ok
+Route::get('/monthReportDkjGniezno', 'OtherCompanyStatisticsController@monthReportDkj');// ok
 
 Route::get('/dayReportEmployeeDkj', 'StatisticsController@MaildayReportEmployeeDkj');
 Route::get('/hourReportDkjEmployee', 'StatisticsController@MailHourReportDkjEmployee');
@@ -492,6 +507,18 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageDayReportTelemarketing', 'StatisticsController@pageDayReportTelemarketing');
 
 
+    //Gniezno Telemarketing
+    Route::get('/pageHourReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageHourReportTelemarketing');
+    Route::get('/pageWeekReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageWeekReportTelemarketing');
+    Route::get('/pageMonthReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageMonthReportTelemarketing');
+    Route::get('/pageDayReportTelemarketingGniezno', 'OtherCompanyStatisticsController@pageDayReportTelemarketing');
+    //Gniezno DKJ
+    Route::get('/pageHourReportDKJGniezno', 'OtherCompanyStatisticsController@pageHourReportDKJ');
+    Route::get('/pageDayReportDKJGniezno', 'OtherCompanyStatisticsController@pageDayReportDKJ');
+    Route::get('/pageWeekReportDKJGniezno', 'OtherCompanyStatisticsController@pageWeekReportDKJ');
+    Route::get('/pageMonthReportDKJGniezno', 'OtherCompanyStatisticsController@pageMonthReportDKJ');
+     //Gniezno   END
+
     Route::get('/pageHourReportDKJ', 'StatisticsController@pageHourReportDKJ');
     Route::get('/pageDayReportDKJ', 'StatisticsController@pageDayReportDKJ');
     Route::get('/pageWeekReportDKJ', 'StatisticsController@pageWeekReportDKJ');
@@ -719,4 +746,3 @@ Route::get('/screen_table','ScreensController@screenMethod');
     Route::get('/userPrivilages', 'AdminController@userPrivilagesGET');
     Route::post('/userPrivilages', 'AdminController@userPrivilagesAjax')->name('api.privilageAjax');
     Route::post('/userPrivilagesAjax', 'AdminController@userPrivilagesAjaxData')->name('api.privilageAjaxData');
-
