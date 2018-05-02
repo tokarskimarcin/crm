@@ -419,7 +419,7 @@
                             }
                             if(coaching_manager_goal_avg.trim('').length == 0 || isNaN(coaching_manager_goal_avg) || manager_actual_avg > coaching_manager_goal_avg ){
                                 validation = false;
-                                swal('Błędna odcelowa średnia')
+                                swal('Błędna docelowa średnia')
                             }
                         }else if(coaching_type == 2){
                             if(manager_actual_janky.trim('').length == 0 || isNaN(manager_actual_janky) ){
@@ -428,7 +428,7 @@
                             }
                             if(coaching_manager_goal_janky.trim('').length == 0 || isNaN(coaching_manager_goal_janky) || manager_actual_janky < coaching_manager_goal_janky ){
                                 validation = false;
-                                swal('Błędna odcelowa jakość')
+                                swal('Błędna docelowa jakość')
                             }
                         }else if(coaching_type == 3){
                             if(manager_actual_rbh.trim('').length == 0 || isNaN(manager_actual_rbh) ){
