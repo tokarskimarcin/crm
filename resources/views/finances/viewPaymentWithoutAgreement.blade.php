@@ -81,8 +81,10 @@
                                                     <h3>
                                                         Podstawa wypłaty jest nienaruszalna - w przypadku kary przekraczających premię, wszystkie kary są zerowane, a pracownik dostaje wypracowaną podstawę.
                                                     </h3>
+                                                    @if($department_info->id_dep_type == 1 || Auth::user()->department_info->id_dep_type == 1)
                                                     <h3>Jeśli pracownik przepracuje conajmniej 140 godzin, do wypłaty doliczane jest 200zł, zaś gdy przepracuje conajmniej 180 godzin, do wypłaty doliczane jest 400zł</h3>
-                                                    <h3>
+                                                    @endif
+                                                     <h3>
                                                         W każdym innym przypadku suma kar odejmowana jest od sumy premii, a suma wypłaty dla danego pracownika to podstawa + pozostała premia.
                                                     </h3>
                                                     <h2>Wypłaty należy zaakceptować, klikając przycisk "Zaakceptuj wypłaty"</h2>
@@ -204,6 +206,10 @@
                                                                                         $rbh_bonus = 0;
                                                                                     }
                                                                                 }
+                                                                                else{
+                                                                                  $salary_total = $standart_salary+$bonus_penalty;
+                                                                                }
+
 
                                                                                 if($salary_total < 0 )
                                                                                 {
