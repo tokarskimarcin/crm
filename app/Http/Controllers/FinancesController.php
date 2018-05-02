@@ -55,7 +55,7 @@ class FinancesController extends Controller
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "'.$date.'" AND `penalty_bonus`.`type`=1 AND `penalty_bonus`.`status`=1) as `penalty`,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$date.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `bonus`')
             ->where(function ($query) use ($date){
-                $query->orwhere(DB::raw('SUBSTRING(promotion_date,1,7)'),'<', substr($date,0,strlen($date)-2))
+                $query->orwhere(DB::raw('SUBSTRING(promotion_date,1,7)'),'<', substr($date,0,strlen($date)-1))
                     ->orwhere('users.promotion_date','=',null);
             })
             ->join('department_info','department_info.id','users.main_department_id')
@@ -474,7 +474,7 @@ class FinancesController extends Controller
             ->join('work_hours', 'work_hours.id_user', 'users.id')
             ->where('users.department_info_id',Auth::user()->department_info_id)
             ->where(function ($querry) use ($month){
-                $querry->orwhere(DB::raw('SUBSTRING(promotion_date,1,7)'),'>=',substr($month,0,strlen($month)-2))
+                $querry->orwhere(DB::raw('SUBSTRING(promotion_date,1,7)'),'>=',substr($month,0,strlen($month)-1))
                     ->orwhere('users.user_type_id','=',1)
                     ->orwhere('users.user_type_id','=',2);
             })
