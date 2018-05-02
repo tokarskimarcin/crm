@@ -718,4 +718,5 @@ Route::get('/screen_table','ScreensController@screenMethod');
     //dodawanie usuwanie przywilejów dla użytkowników
     Route::get('/userPrivilages', 'AdminController@userPrivilagesGET');
     Route::post('/userPrivilages', 'AdminController@userPrivilagesAjax')->name('api.privilageAjax');
+    Route::post('/userPrivilagesAjax', 'AdminController@userPrivilagesAjaxData')->name('api.privilageAjaxData');
 
