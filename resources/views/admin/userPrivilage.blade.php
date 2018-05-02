@@ -84,14 +84,12 @@
 @section('script')
     <script>
         document.addEventListener('DOMContentLoaded', function(e) {
-            var isChecked = false;
+            var isChecked = 0;
             document.getElementById('privilage_people').addEventListener('change', function(e) {
                isChecked = e.target.checked;
-
+               sessionStorage.setItem('isChecked', isChecked);
                table.ajax.reload();
-
             });
-
 
             table = $('#datatable').DataTable({
                 "autoWidth": false,
@@ -112,7 +110,6 @@
                 },"columns":[
                     {"data": "user_id"},
                     {"data": function (data, type, dataToSet) {
-                            console.log(isChecked);
                             let name = data.first_name;
                             let surname = data.last_name;
                             return name + ' ' + surname;
