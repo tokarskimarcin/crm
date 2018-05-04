@@ -24,7 +24,13 @@
     @endphp
     @foreach($reports as $report)
             <tr>
+                @if($report->department_info_id == 13)
+                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Badania </td>
+                @elseif($report->department_info_id == 4)
+                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Wysyłka </td>
+                @else
                 <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->department_info->departments->name.' '.$report->department_info->department_type->name}}</td>
+                @endif
                 <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->online_consultant}}</td>
                 <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->success}}</td>
                 <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->count_all_check}}</td>

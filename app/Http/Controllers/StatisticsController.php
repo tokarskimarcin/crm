@@ -720,6 +720,7 @@ class StatisticsController extends Controller
                   sum(count_all_check) as sum_all_talks,
                   sum(count_good_check) as sum_correct_talks,
                   sum(count_bad_check) as sum_janky,
+                  department_info.id as department_info_id,
                   department_type.name as dep,
                   departments.name as depname
                    '))
@@ -832,6 +833,7 @@ class StatisticsController extends Controller
                 SUM(count_good_check) as sum_correct_talks,
                 SUM(count_bad_check) as sum_janky,
                 SUM(success) as success,
+                department_info.id as department_info_id,
                 departments.name as dep, 
                 department_type.name as depname,
                 count(departments.name)
@@ -848,7 +850,6 @@ class StatisticsController extends Controller
                     ->whereBetween('report_date', [$date_start, $date_stop])
                     ->groupBy('department_info_id','report_date');
             })
-            ->where('department_info.id_dep_type', '=', 2)
             ->groupBy('pbx_dkj_team.department_info_id')
             ->get();
 
@@ -995,6 +996,7 @@ class StatisticsController extends Controller
                 SUM(count_good_check) as sum_correct_talks,
                 SUM(count_bad_check) as sum_janky,
                  SUM(success) as success,
+                 department_info.id as department_info_id,
                 departments.name as dep, 
                 department_type.name as depname,
                 count(departments.name)
@@ -1011,7 +1013,7 @@ class StatisticsController extends Controller
                     ->whereBetween('report_date', [$date_start, $date_stop])
                     ->groupBy('department_info_id','report_date');
             })
-            ->where('department_info.id_dep_type', '=', 2)
+//            ->where('department_info.id_dep_type', '=', 2)
             ->groupBy('pbx_dkj_team.department_info_id')
             ->get();
 
