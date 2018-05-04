@@ -394,6 +394,17 @@
                     let coaching_manager_goal_janky = $("#coaching_manager_avg_janky").val();
                     let coaching_manager_goal_rbh = $("#coaching_manager_avg_rbh").val();
 
+                    // Przedział 10 - 30 %
+                    let proc_manager_goal_min_avg = Math.round((((pom_manager_actual_avg*10)/100) + pom_manager_actual_avg)*100)/100;
+                    let proc_manager_goal_max_avg = Math.round((((pom_manager_actual_avg*30)/100) + pom_manager_actual_avg)*100)/100;
+
+                    let proc_manager_goal_min_rbh = Math.round((((pom_manager_actual_rbh*10)/100) + pom_manager_actual_rbh)*100)/100;
+                    let proc_manager_goal_max_rbh = Math.round((((pom_manager_actual_rbh*30)/100) + pom_manager_actual_rbh)*100)/100;
+
+                    let proc_manager_goal_min_jank = Math.round((pom_manager_actual_janky - ((pom_manager_actual_janky*10)/100))*100)/100;
+                    let proc_manager_goal_max_jank = Math.round((pom_manager_actual_janky - ((pom_manager_actual_janky*30)/100) )*100)/100;
+
+
                     let validation = true;
                     if(manager_id == 'Wybierz'){
                         console.log('123')
@@ -421,6 +432,15 @@
                                 validation = false;
                                 swal('Błędna docelowa średnia')
                             }
+                            if(manager_actual_avg > 0.5){
+                                if(coaching_manager_goal_avg < proc_manager_goal_min_avg){
+                                    validation = false;
+                                    swal('Minimalna średnia musi być większa niż 10% aktualnej średniej')
+                                }else if(coaching_manager_goal_avg > proc_manager_goal_max_avg){
+                                    validation = false;
+                                    swal('Minimalna średnia musi być mniejsza niż 30% aktualnej średniej')
+                                }
+                            }
                         }else if(coaching_type == 2){
                             if(manager_actual_janky.trim('').length == 0 || isNaN(manager_actual_janky) ){
                                 validation = false;
@@ -430,6 +450,15 @@
                                 validation = false;
                                 swal('Błędna docelowa jakość')
                             }
+                            if(manager_actual_janky > 0.5){
+                                if(coaching_manager_goal_janky > proc_manager_goal_min_jank){
+                                    validation = false;
+                                    swal('Minimalna jakość musi być mniejsza niż 10% aktualnej jakości')
+                                } else if(coaching_manager_goal_janky < proc_manager_goal_max_jank){
+                                    validation = false;
+                                    swal('Minimalna jakoś nie może być mniejsza niż 30% aktualnej jakości')
+                                }
+                            }
                         }else if(coaching_type == 3){
                             if(manager_actual_rbh.trim('').length == 0 || isNaN(manager_actual_rbh) ){
                                 validation = false;
@@ -438,6 +467,15 @@
                             if(coaching_manager_goal_rbh.trim('').length == 0 || isNaN(coaching_manager_goal_rbh) || parseFloat(manager_actual_rbh) > parseFloat(coaching_manager_goal_rbh) ){
                                 validation = false;
                                 swal('Błędne docelowe RBH')
+                            }
+                            if(manager_actual_rbh > 0.5){
+                                if(coaching_manager_goal_rbh < proc_manager_goal_min_rbh){
+                                    validation = false;
+                                    swal('Minimalne RBH musi być większe niż 10% aktualnego RBH')
+                                }else if(coaching_manager_goal_rbh > proc_manager_goal_max_rbh){
+                                    validation = false;
+                                    swal('Minimalne RBH musi być mniejsza niż 30% aktualnego RBH')
+                                }
                             }
                         }else{
                             validation = false;
