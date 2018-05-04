@@ -235,6 +235,9 @@ class PBXDataAPI extends Controller
                             }else if($key == 14){
                                 if(intval($rowItem) != 108)
                                     $data_to_insert[$temp_key]['pbx_department_info'] = intval($rowItem);
+                                else{
+                                    $removeData = true;
+                                }
                             /**
                              * Sumowanie danych
                              */
