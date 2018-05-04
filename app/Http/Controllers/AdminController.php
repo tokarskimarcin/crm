@@ -14,6 +14,7 @@ use App\LinkGroups;
 use App\Links;
 use App\Pbx_report_extension;
 use App\PrivilageRelation;
+use App\PrivilageUserRelation;
 use App\UserTypes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -673,8 +674,47 @@ class AdminController extends Controller
         return Redirect::back();
     }
 
+    public function userPrivilagesGET() {
+        $all_users = User::all();
+        $all_privilage_users = PrivilageUserRelation::all();
+        return view('admin.userPrivilage')->with('all_users', $all_users)->with('all_privilage_users', $all_privilage_users);
+    }
 
-
-
-
+    public function userPrivilagesAjax(Request $request) {
+//        if(Session::has('isChecked')) {
+//            $privilage_people = Session::get('isChecked');
+//        }
+//        else {
+//            $privilage_people = false;
+//        }
+//        if($request->session()->has('isChecked')) {
+//            $privilage_people = $request->session()->get('isChecked');
+//        }
+//        else {
+//            $privilage_people = false;
+//        }
+        if($privilage_people == 0) { //checkbox not checked
+            $all_users = DB::table('users')
+                ->select(DB::raw('
+               users.id as user_id,
+               users.first_name as first_name,
+               users.last_name as last_name 
+            '))
+                ->where('users.status_work', '=', 1)
+                ->get();
+            return datatables($all_users)->make(true);
+        }
+        else if($privilage_people == 1) { //checkbox is checked
+            $all_privilage_users = DB::table('users')
+                ->select(DB::raw('
+                Distinct(users.id) as user_id,
+               users.first_name as first_name,
+               users.last_name as last_name 
+            '))
+                ->join('privilage_user_relation', 'users.id', '=', 'privilage_user_relation.user_id')
+                ->where('users.status_work', '=', 1)
+                ->get();
+            return datatables($all_privilage_users)->make(true);
+        }
+    }
 }

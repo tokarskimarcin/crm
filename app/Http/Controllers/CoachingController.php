@@ -67,8 +67,10 @@ class CoachingController extends Controller
      */
     public function progress_table_for_coachGET(){
         $coachingConsultantList = $this::getCoachConsultant(array(Auth::user()->id));
+        $loggedUser = Auth::user()->department_info->id_dep_type;
         $data = [
-            'collect_report' => $coachingConsultantList
+            'collect_report' => $coachingConsultantList,
+            'user_department_type' =>  $loggedUser
         ];
         return view('coaching.progress_table_for_coach')
             ->with('coachingManagerList',$data);

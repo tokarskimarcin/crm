@@ -735,6 +735,13 @@
                 in_progress_table.ajax.reload();
             });
 
+            var average_avg;
+            var average_janky;
+            var average_rbh;
+            function isNumeric(n) {
+                return !isNaN(parseFloat(n)) && isFinite(n);
+            }
+
             var table_unsettled = $('#table_unsettled').DataTable({
                 "autoWidth": false,
                 "processing": true,
@@ -760,47 +767,97 @@
                     }
                     $(row).attr('id', data.id);
                     return row;
+                },"fnCreatedRow": function(createdRow) {
+                    let row = $('#table_unsettled tr');
+                    // console.log(row);
+                    // createdRow.addEventListener('input', function(e) {
+                    //     let avg_inp = document.getElementById('average_avg_inp');
+                    //     let janky_inp = document.getElementById('average_janky_inp');
+                    //     let rbh_inp = document.getElementById('average_rbh_inp');
+                    //     let numbers = [0,1,2,3,4,5,6,7,8,9,"."];
+                    //     if(e.target == avg_inp || e.target == janky_inp || e.target == rbh_inp) {
+                    //         let input_val = e.target.value;
+                    //         console.log(typeof(input_val));
+                    //         for(var i = 0; i < numbers.length - 1; i++) {
+                    //             var flag = true;
+                    //             if(input_val[input_val.length - 1] == numbers[i]) {
+                    //                 flag = false;
+                    //                 console.log("ostatnia cyferka: " + input_val[input_val.length - 1] + ' numbers[i]: ' + numbers[i]);
+                    //             }
+                    //
+                    //             if(flag == false) {
+                    //                 console.log('Lancuch: ' + input_val.slice(0, input_val.length - 1));
+                    //                 e.target.value = input_val.slice(0, -1);
+                    //             }
+                    //         }
+
+                        // }
+
+                    // });
+                    // event_listener_row.on('click', function(e) {
+                    //     console.log('dziala');
+                    // });
                 }
                 ,"fnDrawCallback": function(settings){
 
                     $('.btn-accept_coaching').on('click',function () {
+                        // average_avg = $('#average_avg_inp').val();
+                        // average_janky = $('#average_janky_inp').val();
+                        // average_rbh = $('#average_rbh_inp').val();
                         let coaching_id = $(this).data('id');
                         let coaching_comment = $('#text_'+coaching_id).val();
                         let row = $(this).closest('tr');
                         let coaching_type =  row.find('td:nth-child(5)').text();
-                        let end_score =  row.find('td:nth-child(7)').text();
+                        let user_department_typ ="{{$coachingManagerList['user_department_type']}}";
+                        let end_score;
+                        let is_a_number = true;
+                        end_score =  row.find('td:nth-child(7)').text() == null || row.find('td:nth-child(7)').text() == "" ? row.find('td:nth-child(7)').children().val() : row.find('td:nth-child(7)').text();
+
+                        if(isNumeric(row.find('td:nth-child(7)').children().val()) == false) {
+                            is_a_number = false;
+                        }
                         let rbh_end = row.find('td:nth-child(9)').text();
                         console.log(coaching_type+' '+end_score+' '+rbh_end);
-                        swal({
-                            title: 'Jesteś pewien?',
-                            text: "Nie będziesz w stanie cofnąć zmian!",
-                            type: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Tak, akceptuj coaching!'
-                        }).then((result) => {
-                            if (result.value) {
-                            $.ajax({
-                                type: "POST",
-                                url: "{{ route('api.acceptCoachingDirector') }}", // do zamiany
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                                data: {
-                                    'coaching_id'               : coaching_id,
-                                    'coaching__comment'         : coaching_comment,
-                                    'coaching_type'             : coaching_type,
-                                    'end_score'                 : end_score,
-                                    'rbh_end'                   : rbh_end,
-                                },
-                                success: function (response) {
-                                    console.log(response)
-                                    table_unsettled.ajax.reload();
-                                    table_settled.ajax.reload();
-                                }
-                            });
-                        }})
+                        if(is_a_number == true) {
+                            swal({
+                                title: 'Jesteś pewien?',
+                                text: "Nie będziesz w stanie cofnąć zmian!",
+                                type: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Tak, akceptuj coaching!'
+                            }).then((result) => {
+                                if (result.value) {
+                                $.ajax({
+                                    type: "POST",
+                                    url: "{{ route('api.acceptCoachingDirector') }}", // do zamiany
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    data: {
+                                        'coaching_id'               : coaching_id,
+                                        'coaching__comment'         : coaching_comment,
+                                        'coaching_type'             : coaching_type,
+                                        'end_score'                 : end_score,
+                                        'rbh_end'                   : rbh_end,
+                                    },
+                                    success: function (response) {
+                                        console.log(response);
+                                        table_unsettled.ajax.reload();
+                                        table_settled.ajax.reload();
+                                    }
+                                });
+                        }
+                        })
+                        }
+                        else {
+                            swal({
+                                type: 'error',
+                                title: 'Zła wartość',
+                                text: 'Wartość z pola wynik aktualny musi być liczbą'
+                            })
+                        }
                     });
                 }
                 ,"columns":[
@@ -839,21 +896,33 @@
                             var span_good_start =  '<span style="color: green">';
                             var span_bad_start =  '<span style="color: red">';
                             var span_end= '</span>';
-                            if(data.coaching_type == 1){
-                                if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
-                                    return span_good_start+data.actual_avg+span_end;
+                            var user_department_type ="{{$coachingManagerList['user_department_type']}}";
+
+                            if(user_department_type == 2) {
+                                if(data.coaching_type == 1){
+                                    if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
+                                        return span_good_start+data.actual_avg+span_end;
+                                    else
+                                        return span_bad_start+data.actual_avg+span_end;
+                                }else if(data.coaching_type == 2){
+                                    if(parseFloat(data.actual_janky) < parseFloat(data.janky_goal))
+                                        return span_good_start+data.actual_janky+span_end;
+                                    else
+                                        return span_bad_start+data.actual_janky+span_end;
+                                }else
+                                if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
+                                    return span_good_start+data.actual_rbh+span_end;
                                 else
-                                    return span_bad_start+data.actual_avg+span_end;
-                            }else if(data.coaching_type == 2){
-                                if(parseFloat(data.actual_janky) < parseFloat(data.janky_goal))
-                                    return span_good_start+data.actual_janky+span_end;
-                                else
-                                    return span_bad_start+data.actual_janky+span_end;
-                            }else
-                            if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
-                                return span_good_start+data.actual_rbh+span_end;
-                            else
-                                return span_bad_start+data.actual_rbh+span_end;
+                                    return span_bad_start+data.actual_rbh+span_end;
+                            }
+                            else if(user_department_type == 1) {
+                                if(data.coaching_type == 1){
+                                    return '<input type="number" name="average_avg_inp" class="typed_by_user">'
+                                }else if(data.coaching_type == 2){
+                                    return '<input type="number" name="average_janky_inp" class="typed_by_user">'
+                                }else
+                                    return '<input type="number" name="average_rbh_inp" class="typed_by_user">'
+                            }
                         },"name": "average_start","searchable": false
                     },
                     // // wynik cel
@@ -945,17 +1014,18 @@
                             var span_good_start =  '<span style="color: green">';
                             var span_bad_start =  '<span style="color: red">';
                             var span_end= '</span>';
-                            if(data.coaching_type == 1){
-                                if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
-                                    return span_good_start+data.average_end+span_end;
-                                else
-                                    return span_bad_start+data.average_end+span_end;
-                            }else if(data.coaching_type == 2){
-                                if(parseFloat(data.actual_janky) < parseFloat(data.janky_goal))
-                                    return span_good_start+data.janky_end+span_end;
-                                else
-                                    return span_bad_start+data.janky_end+span_end;
-                            }else
+                            // if(user_department_type == 2) {
+                                if(data.coaching_type == 1){
+                                    if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
+                                        return span_good_start+data.average_end+span_end;
+                                    else
+                                        return span_bad_start+data.average_end+span_end;
+                                }else if(data.coaching_type == 2){
+                                    if(parseFloat(data.actual_janky) < parseFloat(data.janky_goal))
+                                        return span_good_start+data.janky_end+span_end;
+                                    else
+                                        return span_bad_start+data.janky_end+span_end;
+                                }else
                                 if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
                                     return span_good_start+data.rbh_end+span_end;
                                 else
