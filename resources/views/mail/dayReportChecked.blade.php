@@ -22,7 +22,13 @@
         @foreach($hour_reports as $report)
 
             <tr>
+                @if($report->department_info_id == 13)
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Badania </td>
+                @elseif($report->department_info_id == 4)
+                    <td style="border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Wysyłka </td>
+                @else
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->dep_name . ' ' . $report->dep_name_type}}</td>
+                @endif
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->success}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$report->all_checked}}</td>
 

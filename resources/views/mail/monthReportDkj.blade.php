@@ -215,7 +215,13 @@
     @foreach($dkj as $item)
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
+            @if($item->department_info_id == 13)
+                <td style="border:1px solid #231f20;text-align:center;padding:3px;">Radom Potwierdzenia Badania </td>
+            @elseif($item->department_info_id == 4)
+                <td style="border:1px solid #231f20;text-align:center;padding:3px;">Radom Potwierdzenia Wysyłka </td>
+            @else
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dep}} {{$item->depname}}</td>
+            @endif
             <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$item->success}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_all_talks}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_correct_talks}}</td>
