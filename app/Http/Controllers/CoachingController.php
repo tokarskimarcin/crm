@@ -327,12 +327,12 @@ class CoachingController extends Controller
                             manager.last_name as manager_last_name'))
                    ->join('users as user','user.id','coaching_director.user_id')
                    ->join('users as manager','manager.id','coaching_director.manager_id');
-                   if(Auth::user()->id != 1364 || Auth::user()->id != 2 || Auth::user()->id != 29){
+                   if(Auth::user()->id != 1364 && Auth::user()->id != 2 && Auth::user()->id != 29){
                        $coaching_manager_inprogres = $coaching_manager_inprogres->where('manager.id','=',Auth::user()->id);
                    }
-//                   else{
-//                       $coaching_manager_inprogres = $coaching_manager_inprogres->where('manager.department_info_id','=',Auth::user()->department_info_id);
-//                   }
+                   else{
+                       $coaching_manager_inprogres = $coaching_manager_inprogres->where('manager.department_info_id','=',Auth::user()->department_info_id);
+                   }
                     $coaching_manager_inprogres = $coaching_manager_inprogres->where('coaching_level','=',$request->coaching_level);
                    if($request->report_status == 0){
                        $coaching_manager_inprogres = $coaching_manager_inprogres->where('status','=',$request->report_status);
