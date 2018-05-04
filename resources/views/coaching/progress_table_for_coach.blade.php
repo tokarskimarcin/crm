@@ -20,12 +20,12 @@
         </div>
         <div class="panel-body">
             <div class="alert alert-success">
-                <h4>
-                    <p>Średnia wyjściowa - średnia przed rozpoczęciem coachingu. </p>
-                    <p>Aktualna średnia - średnia z aktualnie zaakceptowanych godzin (przyrostowa), liczona od daty rozpoczęcia coachingu.</p>
-                    <p>Aktualna RBH - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
-                    <p>Cel - Średnia wymagana.</p>
-                </h4>
+                <p><strong>Wynik wyjściowy</strong> - wynik danego typu (średniej,jakości,RBH) przed rozpoczęciem coachingu. </p>
+                <p><strong>Aktualny Wynik</strong> - akrtualny wynik danego typu coachingu(przyrostowy), liczony od daty rozpoczęcia coachingu.</p>
+                <p><strong>Aktualna RBH</strong> - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
+                <p><strong>Cel</strong> -  Wymagany wynik na coachingu.</p>
+                <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po <strong>18 RBH konsultanta</strong>,
+                    od rozpoczęcia coachingu.</p>
             </div>
         </div>
     </div>
@@ -251,9 +251,9 @@
                         <div class="panel-body">
                             <div class="alert alert-success">
                                 <h4>
-                                    <p>
-                                        Aktualne wyniki wyliczne są liczone po zaakceptowanej ilości RBH (PLAN RBH * 3) (Wymagana ilość zgód / Średnia na projekcie) * 3
-                                    </p>
+                                    <p>Aktualny wynik wyliczany jest na podstawie ostatnich ~18 RBH danego konsultanta.</p>
+                                    <p>W przypadku gdy, aktualny wynik jest większy niż 0.5, wymagane jest aby wynik docelowy mieścił się w przedziale od 10% do 30% aktualnego wyniku.</p>
+                                    <p>Konsultant wyświetli się na liście, po zaakceptowaniu przynajmniej jednej godziny.</p>
                                 </h4>
                             </div>
                         </div>
@@ -311,19 +311,19 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="myLabel">Aktualna średnia</label>
-                                        <input type="number" lang="en" class="form-control" name="manager_actual_avg" id="manager_actual_avg" placeholder="Wprawoadź aktualną średnią" disabled="true"/>
+                                        <input type="number" lang="en" class="form-control" name="manager_actual_avg" id="manager_actual_avg" placeholder="Wprawoadź aktualną średnią" @php $coachingManagerList['user_department_type'] == 1 ? "disabled=true" : '' @endphp/>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="myLabel">Aktualna Jakość</label>
-                                        <input type="number" lang="en" class="form-control" name="manager_actual_janky" id="manager_actual_janky" placeholder="Wprawoadź aktualną jakość" disabled="true"/>
+                                        <input type="number" lang="en" class="form-control" name="manager_actual_janky" id="manager_actual_janky" placeholder="Wprawoadź aktualną jakość" @php $coachingManagerList['user_department_type'] == 1 ? "disabled=true" : '' @endphp/>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="myLabel">Aktualne RBH</label>
-                                        <input type="number" lang="en" class="form-control" name="manager_actual_rbh" id="manager_actual_rbh" placeholder="Wprawoadź aktualne RBH" disabled="true"/>
+                                        <input type="number" lang="en" class="form-control" name="manager_actual_rbh" id="manager_actual_rbh" placeholder="Wprawoadź aktualne RBH" @php $coachingManagerList['user_department_type'] == 1 ? "disabled=true" : '' @endphp/>
                                     </div>
                                 </div>
                             </div>
@@ -393,6 +393,17 @@
             let coaching_manager_goal_janky = $("#coaching_manager_avg_janky").val();
             let coaching_manager_goal_rbh = $("#coaching_manager_avg_rbh").val();
 
+
+            // Przedział 10 - 30 %
+            let proc_manager_goal_min_avg = Math.round((((pom_manager_actual_avg*10)/100) + pom_manager_actual_avg)*100)/100;
+            let proc_manager_goal_max_avg = Math.round((((pom_manager_actual_avg*30)/100) + pom_manager_actual_avg)*100)/100;
+
+            let proc_manager_goal_min_rbh = Math.round((((pom_manager_actual_rbh*10)/100) + pom_manager_actual_rbh)*100)/100;
+            let proc_manager_goal_max_rbh = Math.round((((pom_manager_actual_rbh*30)/100) + pom_manager_actual_rbh)*100)/100;
+
+            let proc_manager_goal_min_jank = Math.round((pom_manager_actual_janky - ((pom_manager_actual_janky*10)/100))*100)/100;
+            let proc_manager_goal_max_jank = Math.round((pom_manager_actual_janky - ((pom_manager_actual_janky*30)/100) )*100)/100;
+
             let validation = true;
             if(manager_id == 'Wybierz'){
                 validation = false;
@@ -415,27 +426,54 @@
                         validation = false;
                         swal('Błędna aktualna średnia')
                     }
-                    if(coaching_manager_goal_avg.trim('').length == 0 || isNaN(coaching_manager_goal_avg) || manager_actual_avg > coaching_manager_goal_avg ){
+                    if(coaching_manager_goal_avg.trim('').length == 0 || isNaN(coaching_manager_goal_avg) || parseFloat(manager_actual_avg) > parseFloat(coaching_manager_goal_avg) ){
                         validation = false;
                         swal('Błędna docelowa średnia')
+                    }
+                    if(manager_actual_avg > 0.5){
+                        if(coaching_manager_goal_avg < proc_manager_goal_min_avg){
+                            validation = false;
+                            swal('Minimalna średnia musi być większa niż 10% aktualnej średniej')
+                        }else if(coaching_manager_goal_avg > proc_manager_goal_max_avg){
+                            validation = false;
+                            swal('Minimalna średnia musi być mniejsza niż 30% aktualnej średniej')
+                        }
                     }
                 }else if(coaching_type == 2){
                     if(manager_actual_janky.trim('').length == 0 || isNaN(manager_actual_janky) ){
                         validation = false;
                         swal('Błędna aktualna jakość')
                     }
-                    if(coaching_manager_goal_janky.trim('').length == 0 || isNaN(coaching_manager_goal_janky) || manager_actual_janky < coaching_manager_goal_janky ){
+                    if(coaching_manager_goal_janky.trim('').length == 0 || isNaN(coaching_manager_goal_janky) || parseFloat(manager_actual_janky) < parseFloat(coaching_manager_goal_janky) ){
                         validation = false;
                         swal('Błędna docelowa jakość')
+                    }
+                    if(manager_actual_janky > 0.5){
+                        if(coaching_manager_goal_janky > proc_manager_goal_min_jank){
+                            validation = false;
+                            swal('Minimalna jakość musi być mniejsza niż 10% aktualnej jakości')
+                        } else if(coaching_manager_goal_janky < proc_manager_goal_max_jank){
+                            validation = false;
+                            swal('Minimalna jakoś nie może być mniejsza niż 30% aktualnej jakości')
+                        }
                     }
                 }else if(coaching_type == 3){
                     if(manager_actual_rbh.trim('').length == 0 || isNaN(manager_actual_rbh) ){
                         validation = false;
                         swal('Błędne aktualne RBH')
                     }
-                    if(coaching_manager_goal_rbh.trim('').length == 0 || isNaN(coaching_manager_goal_rbh) || manager_actual_rbh > coaching_manager_goal_rbh ){
+                    if(coaching_manager_goal_rbh.trim('').length == 0 || isNaN(coaching_manager_goal_rbh) || parseFloat(manager_actual_rbh) > parseFloat(coaching_manager_goal_rbh) ){
                         validation = false;
                         swal('Błędne docelowe RBH')
+                    }
+                    if(manager_actual_rbh > 0.5){
+                        if(coaching_manager_goal_rbh < proc_manager_goal_min_rbh){
+                            validation = false;
+                            swal('Minimalne RBH musi być większe niż 10% aktualnego RBH')
+                        }else if(coaching_manager_goal_rbh > proc_manager_goal_max_rbh){
+                            validation = false;
+                            swal('Minimalne RBH musi być mniejsza niż 30% aktualnego RBH')
+                        }
                     }
                 }else{
                     validation = false;
@@ -690,20 +728,28 @@
                                 var span_bad_start =  '<span style="color: red">';
                                 var span_end= '</span>';
                                 if(data.coaching_type == 1){
+                                    if(data.actual_avg == 'null')
+                                        data.actual_avg = 0;
                                     if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
                                         return span_good_start+data.actual_avg+span_end;
                                     else
                                         return span_bad_start+data.actual_avg+span_end;
                                 }else if(data.coaching_type == 2){
+                                    if(data.actual_janky == null)
+                                        data.actual_janky = 0;
                                     if(parseFloat(data.actual_janky) < parseFloat(data.janky_goal))
                                         return span_good_start+data.actual_janky+span_end;
                                     else
                                         return span_bad_start+data.actual_janky+span_end;
-                                }else
-                                if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
-                                    return span_good_start+data.actual_rbh+span_end;
-                                else
-                                    return span_bad_start+data.actual_rbh+span_end;
+                                }else{
+                                    if(data.actual_rbh == null)
+                                        data.actual_rbh = 0;
+                                    if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
+                                        return span_good_start+data.actual_rbh+span_end;
+                                    else
+                                        return span_bad_start+data.actual_rbh+span_end;
+                                }
+
                             },"name": "average_start","searchable": false
                         },
                         // // wynik cel
@@ -917,11 +963,11 @@
                             }
                             else if(user_department_type == 1) {
                                 if(data.coaching_type == 1){
-                                    return '<input type="number" name="average_avg_inp" class="typed_by_user">'
+                                    return '<input type="number" name="average_avg_inp" class="typed_by_user form-control">'
                                 }else if(data.coaching_type == 2){
-                                    return '<input type="number" name="average_janky_inp" class="typed_by_user">'
+                                    return '<input type="number" name="average_janky_inp" class="typed_by_user form-control">'
                                 }else
-                                    return '<input type="number" name="average_rbh_inp" class="typed_by_user">'
+                                    return '<input type="number" name="average_rbh_inp" class="typed_by_user form-control">'
                             }
                         },"name": "average_start","searchable": false
                     },
@@ -1016,17 +1062,17 @@
                             var span_end= '</span>';
                             // if(user_department_type == 2) {
                                 if(data.coaching_type == 1){
-                                    if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
+                                    if(parseFloat(data.average_end) > parseFloat(data.average_goal))
                                         return span_good_start+data.average_end+span_end;
                                     else
                                         return span_bad_start+data.average_end+span_end;
                                 }else if(data.coaching_type == 2){
-                                    if(parseFloat(data.actual_janky) < parseFloat(data.janky_goal))
+                                    if(parseFloat(data.janky_end) < parseFloat(data.janky_goal))
                                         return span_good_start+data.janky_end+span_end;
                                     else
                                         return span_bad_start+data.janky_end+span_end;
                                 }else
-                                if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
+                                if(parseFloat(data.rbh_end) > parseFloat(data.rbh_goal))
                                     return span_good_start+data.rbh_end+span_end;
                                 else
                                     return span_bad_start+data.rbh_end+span_end;

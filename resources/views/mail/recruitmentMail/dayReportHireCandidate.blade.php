@@ -11,7 +11,7 @@
         <th  style="border:1px solid #231f20;padding:3px;background:#231f20">Nazwisko</th>
         <th  style="border:1px solid #231f20;padding:3px;background:#231f20">Oddział</th>
         <th  style="border:1px solid #231f20;padding:3px;background:#231f20">Ilość dodanych kont</th>
-        <th  style="border:1px solid #231f20;padding:3px;background:#231f20">Ilość kont reaktywowanych</th>
+        <th  style="border:1px solid #231f20;padding:3px;background:#231f20">W tym kont reaktywowanych</th>
     </tr>
     </thead>
     <tbody>

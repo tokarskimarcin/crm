@@ -164,22 +164,45 @@ class RecruitmentStory extends Model
      */
     public static function getReportNewAccountData($date_start, $date_stop){
 
-        $date = DB::table('users')->
-        select(DB::raw('sum(case when `users`.`start_work` between "'.$date_start.'" and "'.$date_stop.'" then 1 else 0 end) as add_user,
-         sum(Case when `users`.`candidate_id` is not null and `users`.`start_work` between "'.$date_start.'" and "'.$date_stop.'" 
-          and `candidate`.`created_at` < `users`.`created_at`
-         then 1 else 0 end ) as add_candidate
-         ,`user`.`first_name`,`user`.`last_name`,`departments`.`name`,`department_type`.`name` as dep_type'))
-            ->join('users as user','user.id','users.id_manager')
-            ->leftjoin('candidate','candidate.id','users.candidate_id')
-            ->join('department_info','department_info.id','users.department_info_id')
-            ->join('departments','departments.id','department_info.id_dep')
-            ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
-            ->where('user.user_type_id','=','5')
-            ->groupby('users.id_manager')
-            ->having('add_user','!=',0)
-            ->orderBy('add_user','desc')
+        $all_hr = User::where('user_type_id','=','5')
+                ->select('users.id','users.first_name','users.last_name','departments.name','department_type.name as dep_type')
+                ->join('department_info','department_info.id','users.department_info_id')
+                ->join('departments','departments.id','department_info.id_dep')
+                ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
+                ->where('status_work','=',1)
+                ->get();
+        $all_hr->map(function ($item) use ($date_start, $date_stop) {
+
+        $all_candidate = Candidate::where('cadre_id','=',$item->id)
             ->get();
-        return $date;
+        $all_hire_candidate_new = User::whereIn('candidate_id',$all_candidate->pluck('id')->toArray())
+                    ->whereBetween('start_work',[$date_start,$date_stop])
+                    ->count();
+        $all_hire_candidate_reactive = User::whereIn('id',$all_candidate->pluck('id_user')->toArray())
+            ->whereBetween('start_work',[$date_start,$date_stop])
+            ->count();
+            $item->add_user = $all_hire_candidate_new;
+            $item->add_candidate = $all_hire_candidate_reactive;
+           return $item;
+        });
+
+//        dd($all_hr);
+//        $date = DB::table('users')->
+//        select(DB::raw('sum(case when `users`.`start_work` between "'.$date_start.'" and "'.$date_stop.'" then 1 else 0 end) as add_user,
+//         sum(Case when `users`.`candidate_id` is not null and `users`.`start_work` between "'.$date_start.'" and "'.$date_stop.'"
+//          and `candidate`.`created_at` < `users`.`created_at`
+//         then 1 else 0 end ) as add_candidate
+//         ,`user`.`first_name`,`user`.`last_name`,`departments`.`name`,`department_type`.`name` as dep_type'))
+//            ->join('users as user','user.id','users.id_manager')
+//            ->leftjoin('candidate','candidate.id','users.candidate_id')
+//            ->join('department_info','department_info.id','users.department_info_id')
+//            ->join('departments','departments.id','department_info.id_dep')
+//            ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
+//            ->where('user.user_type_id','=','5')
+//            ->groupby('users.id_manager')
+//            ->having('add_user','!=',0)
+//            ->orderBy('add_user','desc')
+//            ->get();
+        return $all_hr;
     }
 }
