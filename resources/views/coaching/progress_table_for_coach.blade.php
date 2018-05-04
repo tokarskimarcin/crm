@@ -859,9 +859,10 @@
                         let is_a_number = true;
                         end_score =  row.find('td:nth-child(7)').text() == null || row.find('td:nth-child(7)').text() == "" ? row.find('td:nth-child(7)').children().val() : row.find('td:nth-child(7)').text();
 
-                        if(isNumeric(row.find('td:nth-child(7)').children().val()) == false) {
-                            is_a_number = false;
-                        }
+                        if(user_department_typ == 1)
+                            if(isNumeric(row.find('td:nth-child(7)').children().val()) == false) {
+                                is_a_number = false;
+                            }
                         let rbh_end = row.find('td:nth-child(9)').text();
                         console.log(coaching_type+' '+end_score+' '+rbh_end);
                         if(is_a_number == true) {

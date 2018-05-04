@@ -42,6 +42,25 @@ class CoachingController extends Controller
         ]);
     }
 
+    public function progress_table_managerAllGET(){
+        $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+        $directors = User::whereIn('id', $directorsIds)->get();
+        $dep_id = Auth::user()->department_info_id;
+        $coach = User::where('status_work','=','1')
+            ->where('department_info_id','=',$dep_id)
+            ->whereIn('user_type_id',[4,12])
+            ->get();
+        return view('coaching.progress_manager_table_for_all')->with([
+            'departments'   => $departments,
+            'directorsIds'  => $directorsIds,
+            'wiev_type'     => 'department',
+            'directors'     => $directors,
+            'dep_id'        => $dep_id,
+            'coach'        => $coach,
+        ]);
+    }
+
     public function getcoach_list(Request $request){
         if($request->ajax()){
             if($request->department_info_id < 100){
@@ -213,17 +232,33 @@ class CoachingController extends Controller
                             and work_hours.date >= CONCAT(coaching_date," 00:00:00") ) as couching_success
                         '))
                         ->join('users as user','user.id','coaching_director.user_id')
-                        ->join('users as manager','manager.id','coaching_director.manager_id');
+                        ->join('users as manager','manager.id','coaching_director.manager_id')
+                        ->whereBetween('coaching_date',[$date_start .' 00:00:00',$date_stop.' 23:00:00'])
+                        ->where('coaching_level','=',$request->coaching_level);
+            if($request->report_status == 0){
+                $coaching_consultant_inprogres = $coaching_consultant_inprogres->where('coaching_director.status','=',$request->report_status);
+            }else
+                $coaching_consultant_inprogres = $coaching_consultant_inprogres ->whereIn('coaching_director.status',[1,2]);
+
+            if($request->type_table == 'manager'){ // tabela postępów menager
+                if($request->department_info < 100){ // wybrany oddział
+                    $coaching_consultant_inprogres = $coaching_consultant_inprogres->where('manager.department_info_id','=',$request->department_info);
+                }else{ // Wybrany dyrektor
+                    $dirId = substr($request->department_info, 2);
+                    $director_departments = Department_info::where('director_id', '=', $dirId)->get()->pluck('id')->toArray();
+                    $coaching_consultant_inprogres = $coaching_consultant_inprogres->whereIn('manager.department_info_id',$director_departments);
+                }
+                if($request->coach_id != 'Wszyscy'){
+                    $coaching_consultant_inprogres = $coaching_consultant_inprogres->where('manager.id','=',$request->coach_id);
+                }
+            }else
+            {
                 if(Auth::user()->id != 1364){
                     $coaching_consultant_inprogres = $coaching_consultant_inprogres->where('manager_id','=',Auth::user()->id);
                 }
-                $coaching_consultant_inprogres = $coaching_consultant_inprogres->where('coaching_level','=',$request->coaching_level);
-                if($request->report_status == 0){
-                    $coaching_consultant_inprogres = $coaching_consultant_inprogres->where('coaching_director.status','=',$request->report_status);
-                }else
-                    $coaching_consultant_inprogres = $coaching_consultant_inprogres ->whereIn('coaching_director.status',[1,2]);
-                $coaching_consultant_inprogres = $coaching_consultant_inprogres->whereBetween('coaching_date',[$date_start .' 00:00:00',$date_stop.' 23:00:00'])
-                    ->groupBy('user.id','coaching_director.id')
+            }
+
+            $coaching_consultant_inprogres = $coaching_consultant_inprogres->groupBy('user.id','coaching_director.id')
                     ->get();
             $ready_data = collect();
             $coaching_consultant_inprogres->map(function($item){
@@ -250,6 +285,9 @@ class CoachingController extends Controller
                     })
                     ->groupBy('pbx_report_extension.pbx_id')
                     ->get();
+                if($item->actual_rbh == null){
+                    $item->actual_rbh = 0;
+                }
                 if($item->actual_rbh != 0){
                     $item->actual_avg = round($item->couching_success/$item->actual_rbh,2);
                 }else{
@@ -289,8 +327,10 @@ class CoachingController extends Controller
                             manager.last_name as manager_last_name'))
                    ->join('users as user','user.id','coaching_director.user_id')
                    ->join('users as manager','manager.id','coaching_director.manager_id');
-                   if(Auth::user()->id != 1364){
-                       $coaching_manager_inprogres = $coaching_manager_inprogres->where('manager_id','=',Auth::user()->id);
+                   if(Auth::user()->id != 1364 || Auth::user()->id != 2 || Auth::user()->id != 29){
+                       $coaching_manager_inprogres = $coaching_manager_inprogres->where('manager.id','=',Auth::user()->id);
+                   }else{
+                       $coaching_manager_inprogres = $coaching_manager_inprogres->where('manager.department_info_id','=',Auth::user()->department_info_id);
                    }
                     $coaching_manager_inprogres = $coaching_manager_inprogres->where('coaching_level','=',$request->coaching_level);
                    if($request->report_status == 0){
@@ -415,7 +455,9 @@ class CoachingController extends Controller
                    ->join('users as manager','manager.id','coaching_director.manager_id')
                    ->join('department_info', 'department_info.id', '=', 'user.department_info_id');
                    if(Auth::user()->id != 1364){
-                       $coaching_director_inprogres = $coaching_director_inprogres->where('manager_id','=',Auth::user()->id);
+                       $coaching_director_inprogres = $coaching_director_inprogres->where('manager.id','=',Auth::user()->id);
+                   }else{
+                       $coaching_director_inprogres = $coaching_director_inprogres->where('manager.department_info_id','=',Auth::user()->department_info_id);
                    }
                     $coaching_director_inprogres = $coaching_director_inprogres->where('coaching_level','=',$request->coaching_level)
                    ->where('coaching_level','=',$request->coaching_level);

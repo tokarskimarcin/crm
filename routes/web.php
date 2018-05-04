@@ -746,3 +746,6 @@ Route::get('/screen_table','ScreensController@screenMethod');
     Route::get('/userPrivilages', 'AdminController@userPrivilagesGET');
     Route::post('/userPrivilages', 'AdminController@userPrivilagesAjax')->name('api.privilageAjax');
     Route::post('/userPrivilagesAjax', 'AdminController@userPrivilagesAjaxData')->name('api.privilageAjaxData');
+
+
+Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
