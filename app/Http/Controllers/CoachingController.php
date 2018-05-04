@@ -260,7 +260,10 @@ class CoachingController extends Controller
                 {
                     $all_check = $janky_reports->first()->janky_all_check;
                     $all_bad = $janky_reports->first()->janky_all_bad;
-                    $item->actual_janky = round(($all_bad*100)/$all_check,2);
+                    if($all_check != 0)
+                        $item->actual_janky = round(($all_bad*100)/$all_check,2);
+                    else
+                        $item->actual_janky = 0;
                 }else {
                     $all_check = 0;
                     $all_bad = 0;
@@ -341,13 +344,13 @@ class CoachingController extends Controller
                                  SUM(success) as sum_success, 
                                  pbx_id'))
                                ->where('pbx_report_extension.pbx_id','=',$user_pbx_number)
-                               ->whereIn('pbx_report_extension.id', function($query) use($date_start, $date_stop,$user_pbx_number){
+                               ->whereIn('pbx_report_extension.id', function($query) use($item,$user_pbx_number){
                                    $query->select(DB::raw(
                                        'MAX(pbx_report_extension.id)'
                                    ))
                                        ->from('pbx_report_extension')
                                        ->where('pbx_report_extension.pbx_id','=',$user_pbx_number)
-                                       ->whereBetween('report_date', [$date_start, $date_stop])
+                                       ->where('report_date','>=', $item->coaching_date)
                                        ->groupBy('report_date');
                                })
                                ->groupBy('pbx_report_extension.pbx_id')

@@ -417,7 +417,7 @@
                                 validation = false;
                                 swal('Błędna aktualna średnia')
                             }
-                            if(coaching_manager_goal_avg.trim('').length == 0 || isNaN(coaching_manager_goal_avg) || manager_actual_avg > coaching_manager_goal_avg ){
+                            if(coaching_manager_goal_avg.trim('').length == 0 || isNaN(coaching_manager_goal_avg) || parseFloat(manager_actual_avg) > parseFloat(coaching_manager_goal_avg) ){
                                 validation = false;
                                 swal('Błędna docelowa średnia')
                             }
@@ -426,7 +426,7 @@
                                 validation = false;
                                 swal('Błędna aktualna jakość')
                             }
-                            if(coaching_manager_goal_janky.trim('').length == 0 || isNaN(coaching_manager_goal_janky) || manager_actual_janky < coaching_manager_goal_janky ){
+                            if(coaching_manager_goal_janky.trim('').length == 0 || isNaN(coaching_manager_goal_janky) || parseFloat(manager_actual_janky) < parseFloat(coaching_manager_goal_janky) ){
                                 validation = false;
                                 swal('Błędna docelowa jakość')
                             }
@@ -435,7 +435,7 @@
                                 validation = false;
                                 swal('Błędne aktualne RBH')
                             }
-                            if(coaching_manager_goal_rbh.trim('').length == 0 || isNaN(coaching_manager_goal_rbh) || manager_actual_rbh > coaching_manager_goal_rbh ){
+                            if(coaching_manager_goal_rbh.trim('').length == 0 || isNaN(coaching_manager_goal_rbh) || parseFloat(manager_actual_rbh) > parseFloat(coaching_manager_goal_rbh) ){
                                 validation = false;
                                 swal('Błędne docelowe RBH')
                             }
@@ -564,6 +564,7 @@
                             'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                         },
                         "rowCallback": function( row, data, index ) {
+                            console.log(data);
                             var coaching_end_date = Date.parse(data.coaching_date);
                             coaching_end_date +=345600*1000; // stworzenie daty + dodanie 4 dni
                             var actual_date = new Date();
@@ -953,17 +954,17 @@
                                     var span_bad_start =  '<span style="color: red">';
                                     var span_end= '</span>';
                                     if(data.coaching_type == 1){
-                                        if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
+                                        if(parseFloat(data.average_end) > parseFloat(data.average_goal))
                                             return span_good_start+data.average_end+span_end;
                                         else
                                             return span_bad_start+data.average_end+span_end;
                                     }else if(data.coaching_type == 2){
-                                        if(parseFloat(data.actual_janky) < parseFloat(data.janky_goal))
+                                        if(parseFloat(data.janky_end) < parseFloat(data.janky_goal))
                                             return span_good_start+data.janky_end+span_end;
                                         else
                                             return span_bad_start+data.janky_end+span_end;
                                     }else
-                                    if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
+                                    if(parseFloat(data.rbh_end) > parseFloat(data.rbh_goal))
                                         return span_good_start+data.rbh_end+span_end;
                                     else
                                         return span_bad_start+data.rbh_end+span_end;
