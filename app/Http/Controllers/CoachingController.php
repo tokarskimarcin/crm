@@ -367,7 +367,7 @@ class CoachingController extends Controller
                                 ->select(
                                    DB::raw('     
                                    sum(success) as succes_sum,       
-                                   round((time_to_sec(`accept_stop`)-time_to_sec(`accept_start`))/3600) as rbh
+                                   sum(round((time_to_sec(`accept_stop`)-time_to_sec(`accept_start`))/3600)) as rbh
                                     '))
                                ->where('id_user','=',$user->id)
                                ->where('date','>=', $item->coaching_date)
