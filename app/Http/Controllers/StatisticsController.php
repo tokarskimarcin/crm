@@ -2055,8 +2055,36 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $manager = User::find($manager);
     }
     foreach ($split_month as $item){
-        $coach_week = DB::table('coaching_director')
-            ->select(DB::raw('
+        if($level_coaching == 1){
+            $coach_week = DB::table('coaching_director')
+                ->select(DB::raw('
+            coaching_director.id,
+            coaching_director.coaching_level,
+            coaching_director.coaching_date,
+            coaching_director.coaching_type,
+            users.id as user_id,
+            sum(case when coaching_director.status = 0 then 1 else 0 end) as in_progress,
+            0 as unsettled,  
+            sum(case when coaching_director.status = 1 then 1 else 0 end) as end_possitive,
+            sum(case when coaching_director.status = 2 then 1 else 0 end) as end_negative,
+            sum(case when 
+                coaching_director.status in (1,2)
+                and coaching_director.coaching_type = 1 then
+                coaching_director.average_end - coaching_director.average_goal else 0 end) as coaching_sum_avg,
+            sum(case when 
+                coaching_director.status in (1,2)
+                and coaching_director.coaching_type = 3 then
+                coaching_director.rbh_end - coaching_director.rbh_goal else 0 end) as coaching_sum_rgh,
+            sum(case when 
+            coaching_director.status in (1,2)
+            and coaching_director.coaching_type = 2 then
+            coaching_director.janky_end - coaching_director.janky_goal else 0 end) as coaching_sum_jakny,
+            users.first_name,
+            users.last_name'));
+        }
+        else {
+            $coach_week = DB::table('coaching_director')
+                ->select(DB::raw('
             coaching_director.id,
             coaching_director.coaching_level,
             coaching_director.coaching_date,
@@ -2079,12 +2107,13 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             and coaching_director.coaching_type = 2 then
             coaching_director.janky_end - coaching_director.janky_goal else 0 end) as coaching_sum_jakny,
             users.first_name,
-            users.last_name'))
-            ->join('users','users.id','manager_id')
-            ->whereIn('users.department_info_id',$dep_id)
-            ->where('coaching_level','=',$level_coaching)
-            ->wherebetween('coaching_date',[$item['start_day'].' 00:00:00',$item['stop_day'].' 23:00:00'])
-            ->groupBy('manager_id','coaching_type')
+            users.last_name'));
+        }
+        $coach_week = $coach_week->join('users', 'users.id', 'manager_id')
+            ->whereIn('users.department_info_id', $dep_id)
+            ->where('coaching_level', '=', $level_coaching)
+            ->wherebetween('coaching_date', [$item['start_day'] . ' 00:00:00', $item['stop_day'] . ' 23:00:00'])
+            ->groupBy('manager_id', 'coaching_type')
             ->get();
         if($level_coaching == 1){
             foreach ($manager as $manager_item){
@@ -2110,6 +2139,21 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                         $add_manager->first_name = $manager_user_relation->first_name;
                         $add_manager->last_name = $manager_user_relation->last_name;
                         $coach_week->push($add_manager);
+                    }else{
+                            $count_unsettled = DB::table('coaching_director')
+                                ->select(DB::raw('coaching_director.*,
+                        (select sum(time_to_sec(`accept_stop`)-time_to_sec(`accept_start`)) from work_hours where work_hours.id_user = `coaching_director`.`user_id`
+                        and work_hours.date >= CONCAT(coaching_date," 00:00:00") ) as couching_rbh'))
+                                ->join('users as consultant','consultant.id','coaching_director.user_id')
+                                ->join('work_hours','work_hours.id_user','coaching_director.user_id')
+                                ->join('users as manager','manager.id','coaching_director.manager_id')
+                                ->whereBetween('coaching_date',[$item['start_day'] .' 00:00:00',$item['stop_day'].' 23:00:00'])
+                                ->where('coaching_director.status','=',0)
+                                ->where('coaching_director.manager_id','=',$manager_in_list->user_id)
+                                ->groupby('coaching_director.id')
+                                ->get();
+                        $manager_in_list->unsettled = $count_unsettled->where('couching_rbh','>=','64800')->count();
+                        $manager_in_list->in_progress = $manager_in_list->in_progress- $manager_in_list->unsettled ;
                     }
                 }
             }
