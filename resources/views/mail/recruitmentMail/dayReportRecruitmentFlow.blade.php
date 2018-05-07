@@ -17,6 +17,9 @@
             <img src="http://teambox.pl/image/logovc.png" class="CToWUd"></td>
     </tr>
     <tr>
+        <td style="border:1px solid #231f20;padding:3px;background:#231f20;color:#efd88f;font-size:1.35em;" colspan="{{$number_of_sources + 3}}">Dane dla dnia {{$data['date_start']}}</td>
+    </tr>
+    <tr>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Oddział</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Spływ</th>
         @foreach($data['source'] as $src)
