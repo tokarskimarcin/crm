@@ -1448,7 +1448,7 @@ class StatisticsController extends Controller
      */
     public function pageWeekReportRecruitmentFlow(){
         $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-6,date("Y")));
         $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
@@ -1466,7 +1466,7 @@ class StatisticsController extends Controller
 
     public function MailweekReportRecruitmentFlow() {
         $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-6,date("Y")));
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
         $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
