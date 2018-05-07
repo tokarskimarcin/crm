@@ -534,7 +534,6 @@ class CoachingController extends Controller
                        ))
                            ->from('hour_report')
                            ->where('report_date','>=',$date_start)
-                           ->where('report_date','<','CURDATE()')
                            ->where('call_time', '!=',0)
                            ->groupBy('department_info_id','report_date');
                    })
@@ -554,7 +553,6 @@ class CoachingController extends Controller
                        ))
                            ->from('pbx_dkj_team')
                            ->where('report_date','>=',$date_start)
-                           ->where('report_date','<','CURDATE()')
                            ->groupBy('department_info_id','report_date');
                    })
                    ->groupBy('pbx_dkj_team.department_info_id','report_date')
@@ -570,12 +568,14 @@ class CoachingController extends Controller
                    $sum_success = $hour_report_inprogres
                        ->where('department_info_id','=',$iteam->user_department_info)
                        ->where('report_date','>=',$coaching_date)
+                       ->where('report_date','<','CURDATE()')
                        ->sum('sum_success');
                    $iteam->actual_avg = ($sum_success != null && $iteam->actual_rbh != 0) ? round($sum_success/$iteam->actual_rbh,2) : 0;
 
                    $actual_janky = $janky_reports
                        ->where('janky_department_info','=',$iteam->user_department_info)
-                       ->where('report_date','>=',$coaching_date);
+                       ->where('report_date','>=',$coaching_date)
+                       ->where('report_date','<','CURDATE()');
 
                    $sum_janky_check = $actual_janky->sum('sum_check');
                    $sum_janky_bad = $actual_janky->sum('sum_bad');
