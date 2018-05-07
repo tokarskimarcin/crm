@@ -1417,7 +1417,9 @@ class StatisticsController extends Controller
         $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
-            'source' => $candidate_source
+            'source' => $candidate_source,
+            'date_start' => $date_start,
+            'date_stop' => $date_stop
         ];
         return view('reportpage.recruitmentReport.DayReportRecruitmentFlow')
             ->with('data',$data);
@@ -1433,7 +1435,9 @@ class StatisticsController extends Controller
         $date_stop = date('Y-m-d', time() - 24 * 3600);
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
-            'source' => $candidate_source
+            'source' => $candidate_source,
+            'date_start' => $date_start,
+            'date_stop' => $date_stop
         ];
         $title = 'Raport Dzienny Spływu Rekrutacji ' . $date_start;
         $this->sendMailByVerona('recruitmentMail.dayReportRecruitmentFlow', $data, $title);
@@ -1448,7 +1452,9 @@ class StatisticsController extends Controller
         $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
-            'source' => $candidate_source
+            'source' => $candidate_source,
+            'date_start' => $date_start,
+            'date_stop' => $date_stop
         ];
         return view('reportpage.recruitmentReport.WeekReportRecruitmentFlow')
             ->with('data',$data);
@@ -1464,7 +1470,9 @@ class StatisticsController extends Controller
         $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
-            'source' => $candidate_source
+            'source' => $candidate_source,
+            'date_start' => $date_start,
+            'date_stop' => $date_stop
         ];
         $title = 'Raport Tygodniowy Spływu Rekrutacji '.$date_start.' - '.$date_stop;
         $this->sendMailByVerona('recruitmentMail.weekReportRecruitmentFlow', $data, $title);
@@ -1482,7 +1490,9 @@ class StatisticsController extends Controller
         $date_stop  = $month_end->format('Y-m-d');
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
-            'source' => $candidate_source
+            'source' => $candidate_source,
+            'date_start' => $date_start,
+            'date_stop' => $date_stop
         ];
         return view('reportpage.recruitmentReport.MonthReportRecruitmentFlow')
             ->with('data',$data);
@@ -1501,7 +1511,9 @@ class StatisticsController extends Controller
 
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
-            'source' => $candidate_source
+            'source' => $candidate_source,
+            'date_start' => $date_start,
+            'date_stop' => $date_stop
         ];
         $title = 'Miesięczny Raport Spływu Rekrutacji '.$date_start.' - '.$date_stop;
         $this->sendMailByVerona('recruitmentMail.monthReportRecruitmentFlow', $data, $title);

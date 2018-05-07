@@ -12,9 +12,12 @@
     <thead style="color:#efd88f">
     <tr>
         <td colspan="1" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
-            <font size="6" face="Calibri">Miesięczne Statystyki Spływu Rekrutacji  </font></td>
+            <font size="6" face="Calibri">Miesięczne Statystyki Spływu Rekrutacji</font></td>
         <td colspan="{{$number_of_sources + 1}}" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20">
             <img src="http://teambox.pl/image/logovc.png" class="CToWUd"></td>
+    </tr>
+    <tr>
+        <td style="border:1px solid #231f20;padding:3px;background:#231f20;color:#efd88f;font-size:1.35em;" colspan="{{$number_of_sources + 3}}">Dane za okres {{$data['date_start']}} - {{$data['date_stop']}}</td>
     </tr>
     <tr>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Oddział</th>
