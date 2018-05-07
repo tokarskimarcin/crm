@@ -29,6 +29,18 @@
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
+                <label>Grupa coaching'u:</label>
+                <select class="form-control" id="coaching_level" name="coaching_level">
+                    <option value="1">Trenerzy</option>
+                    <option value="2">Kierownicy</option>
+                    <option value="3">Dyrektorzy</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
                 <label>Oddział:</label>
                 <select class="form-control" id="selected_dep" name="selected_dep">
                     <optgroup label="Oddziały">
@@ -49,12 +61,12 @@
 
         <div class="col-md-4">
             <div class="form-group">
-                <label>Trener:</label>
+                <label id="label_name_users">Trener:</label>
                 <select class="form-control" id="coach_dep" name="coach_dep">
                     <option>Wszyscy</option>
                     @foreach($coach as  $item)
                         <option value={{$item->id}}>{{$item->first_name.' '.$item->last_name}}</option>
-                     @endforeach
+                    @endforeach
                 </select>
             </div>
         </div>
@@ -104,24 +116,24 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="table-responsive">
-                                <table id="table_in_progress" class="table table-striped thead-inverse">
-                                    <thead>
-                                    <tr>
-                                        <th>Coach</th>
-                                        <th>Osoba oceniana</th>
-                                        <th>Data</th>
-                                        <th>Temat</th>
-                                        <th>Typ coachingu</th>
-                                        <th>Wynik wyjściowy</th>
-                                        <th>Wynik Aktualny</th>
-                                        <th>Cel</th>
-                                        <th>Aktualne RBH</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
+                            <table id="table_in_progress" class="table table-striped thead-inverse">
+                                <thead>
+                                <tr>
+                                    <th>Coach</th>
+                                    <th>Osoba oceniana</th>
+                                    <th>Data</th>
+                                    <th>Temat</th>
+                                    <th>Typ coachingu</th>
+                                    <th>Wynik wyjściowy</th>
+                                    <th>Wynik Aktualny</th>
+                                    <th>Cel</th>
+                                    <th>Aktualne RBH</th>
+                                </tr>
+                                </thead>
+                                <tbody>
 
-                                    </tbody>
-                                </table>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -211,13 +223,23 @@
 
         $(document).ready(function(){
 
-            $('#selected_dep').on('change',function () {
+            $('#coaching_level').on('change',function (e) {
+                if(this.value == 1){
+                    document.getElementById('label_name_users').textContent = 'Trener';
+                    document.getElementById('selected_dep').disabled = false;
+                }else if(this.value == 2){
+                    document.getElementById('label_name_users').textContent = 'Kierownik';
+                    document.getElementById('selected_dep').disabled = true;
+                }else{
+                    document.getElementById('label_name_users').textContent = 'Dyrektor';
+                    document.getElementById('selected_dep').disabled = true;
+                }
                 $.ajax({
                     type: "POST",
                     url: '{{ route('api.getcoach_list') }}',
                     data: {
-                        "department_info_id": $(this).val(),
-                        "coaching_level"    : 1
+                        "department_info_id": document.getElementById('selected_dep').value,
+                        "coaching_level"    : $('#coaching_level').val()
                     },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -230,7 +252,30 @@
                                 response[i].id+'>'+response[i].first_name+' '+response[i].last_name+'</option>';
                         }
                         $('#coach_dep').append(option_select);
-                        //console.log(response);
+                    }
+                });
+
+            });
+
+            $('#selected_dep').on('change',function () {
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.getcoach_list') }}',
+                    data: {
+                        "department_info_id": $(this).val(),
+                        "coaching_level"    : $('#coaching_level').val()
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (response) {
+                        $('#coach_dep option').remove();
+                        let option_select = '<option>Wszyscy</option>';
+                        for(var i=0;i<response.length;i++){
+                            option_select += '<option value='+
+                                response[i].id+'>'+response[i].first_name+' '+response[i].last_name+'</option>';
+                        }
+                        $('#coach_dep').append(option_select);
                     }
                 });
             });
@@ -248,7 +293,7 @@
                     'data': function (d) {
 
                         d.type              = $('#type_coaching_in_progress').val();
-                        d.coaching_level    = 1;
+                        d.coaching_level    = $('#coaching_level').val();
                         d.report_status     = 0;
                         d.date_start        = $('#date_start_in_progress').val();
                         d.date_stop         = $('#date_stop_in_progress').val();
@@ -258,7 +303,6 @@
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-                    console.log(data);
                     if (parseInt(data.actual_rbh) >= parseInt(18)) {
                         $(row).hide();
                     }
@@ -345,7 +389,7 @@
                 ],
             });
 
-            $('#date_start_in_progress, #date_stop_in_progress,#selected_dep,#coach_dep,#type_coaching_in_progress').on('change',function (e) {
+            $('#date_start_in_progress, #date_stop_in_progress,#selected_dep,#coach_dep,#type_coaching_in_progress,#coaching_level').on('change',function (e) {
                 in_progress_table.ajax.reload();
                 table_unsettled.ajax.reload();
                 table_settled.ajax.reload();
@@ -364,7 +408,7 @@
                     'type': 'POST',
                     'data': function (d) {
                         d.type              = $('#type_coaching_in_progress').val();
-                        d.coaching_level    = 1;
+                        d.coaching_level    = $('#coaching_level').val();
                         d.report_status     = 0;
                         d.date_start        = $('#date_start_in_progress').val();
                         d.date_stop         = $('#date_stop_in_progress').val();
@@ -374,7 +418,6 @@
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-                    console.log(data.actual_rbh);
                     if (parseInt(data.actual_rbh) < parseInt(18)) {
                         $(row).hide();
                     }
@@ -417,21 +460,21 @@
                             var span_bad_start =  '<span style="color: red">';
                             var span_end= '</span>';
 
-                                if(data.coaching_type == 1){
-                                    if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
-                                        return span_good_start+data.actual_avg+span_end;
-                                    else
-                                        return span_bad_start+data.actual_avg+span_end;
-                                }else if(data.coaching_type == 2){
-                                    if(parseFloat(data.actual_janky) < parseFloat(data.janky_goal))
-                                        return span_good_start+data.actual_janky+span_end;
-                                    else
-                                        return span_bad_start+data.actual_janky+span_end;
-                                }else
-                                if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
-                                    return span_good_start+data.actual_rbh+span_end;
+                            if(data.coaching_type == 1){
+                                if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
+                                    return span_good_start+data.actual_avg+span_end;
                                 else
-                                    return span_bad_start+data.actual_rbh+span_end;
+                                    return span_bad_start+data.actual_avg+span_end;
+                            }else if(data.coaching_type == 2){
+                                if(parseFloat(data.actual_janky) < parseFloat(data.janky_goal))
+                                    return span_good_start+data.actual_janky+span_end;
+                                else
+                                    return span_bad_start+data.actual_janky+span_end;
+                            }else
+                            if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
+                                return span_good_start+data.actual_rbh+span_end;
+                            else
+                                return span_bad_start+data.actual_rbh+span_end;
                         },"name": "average_start","searchable": false
                     },
                     // // wynik cel
@@ -473,7 +516,7 @@
                     'type': 'POST',
                     'data': function (d) {
                         d.type              = $('#type_coaching_in_progress').val();
-                        d.coaching_level    = 1;
+                        d.coaching_level    = $('#coaching_level').val();
                         d.report_status     = 1;
                         d.date_start        = $('#date_start_in_progress').val();
                         d.date_stop         = $('#date_stop_in_progress').val();
