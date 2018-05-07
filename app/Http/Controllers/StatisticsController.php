@@ -1416,11 +1416,11 @@ class StatisticsController extends Controller
         $date_stop = date('Y-m-d');
         $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
         $data = [
-            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
+            'source' => $candidate_source
         ];
         return view('reportpage.recruitmentReport.DayReportRecruitmentFlow')
-            ->with('data',$data['data'])
-            ->with('source', $candidate_source);
+            ->with('data',$data);
     }
 
     /**
@@ -1445,11 +1445,11 @@ class StatisticsController extends Controller
         $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
         $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
         $data = [
-            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
+            'source' => $candidate_source
         ];
         return view('reportpage.recruitmentReport.WeekReportRecruitmentFlow')
-            ->with('data',$data['data'])
-            ->with('source', $candidate_source);
+            ->with('data',$data);
     }
 
     /**
@@ -1477,11 +1477,11 @@ class StatisticsController extends Controller
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
         $data = [
-            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
+            'source' => $candidate_source
         ];
         return view('reportpage.recruitmentReport.MonthReportRecruitmentFlow')
-            ->with('data',$data['data'])
-            ->with('source', $candidate_source);
+            ->with('data',$data);
     }
 
     /**
