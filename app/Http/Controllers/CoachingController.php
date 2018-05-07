@@ -489,6 +489,7 @@ class CoachingController extends Controller
                             join users on users.id = work_hours.id_user
                             where users.department_info_id = user.department_info_id
                             and users.user_type_id in (1,2)
+                            and work_hours.date < CURDATE()
                             and work_hours.date >= CONCAT(coaching_date," 00:00:00") )/3600,2) as actual_rbh,
                             department_info.commission_avg,
                             department_info.dep_aim
@@ -533,6 +534,7 @@ class CoachingController extends Controller
                        ))
                            ->from('hour_report')
                            ->where('report_date','>=',$date_start)
+                           ->where('report_date','<','CURDATE()')
                            ->where('call_time', '!=',0)
                            ->groupBy('department_info_id','report_date');
                    })
@@ -552,6 +554,7 @@ class CoachingController extends Controller
                        ))
                            ->from('pbx_dkj_team')
                            ->where('report_date','>=',$date_start)
+                           ->where('report_date','<','CURDATE()')
                            ->groupBy('department_info_id','report_date');
                    })
                    ->groupBy('pbx_dkj_team.department_info_id','report_date')
