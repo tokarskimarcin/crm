@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\CandidateSource;
 use App\DisableAccountInfo;
 use App\HourReport;
 use App\Pbx_report_extension;
@@ -1413,11 +1414,13 @@ class StatisticsController extends Controller
     public function pageDayReportRecruitmentFlow(){
         $date_start = date('Y-m-d');
         $date_stop = date('Y-m-d');
+        $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
         ];
         return view('reportpage.recruitmentReport.DayReportRecruitmentFlow')
-            ->with('data',$data['data']);
+            ->with('data',$data['data'])
+            ->with('source', $candidate_source);
     }
 
     /**
