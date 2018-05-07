@@ -726,8 +726,8 @@ Route::get('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoa
 Route::post('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryPost');
 Route::get('/ReportCoachingSummary', 'StatisticsController@MailReportCoachingSummary');
 
-Route::get('/ReportCoaching', 'StatisticsController@MailpageReportCoaching');
-Route::get('/MailToDirectors', 'StatisticsController@MailToEveryDirector');
+Route::get('/ReportCoaching', 'StatisticsController@MailpageReportCoaching2');
+Route::get('/MailToDirectors', 'StatisticsController@MailToEveryDirector2');
 //END COACHINGS
 Route::get('/dept/{id}','ScreensController@monitorMethod');
 Route::get('/screen_table','ScreensController@screenMethod');
