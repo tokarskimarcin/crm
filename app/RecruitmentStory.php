@@ -49,7 +49,7 @@ class RecruitmentStory extends Model
         $data_start = $data_start . ' 00:00:00';
         $data_stop = $data_stop . ' 23:00:00';
 
-        $candidate_source = CandidateSource::all();
+        $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
 
         $result = DB::table('department_info')
             ->select(DB::raw('               
