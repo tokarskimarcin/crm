@@ -344,7 +344,7 @@
                 ],
             });
 
-            $('#date_start_in_progress, #date_stop_in_progress,#selected_dep,#coach_dep').on('change',function (e) {
+            $('#date_start_in_progress, #date_stop_in_progress,#selected_dep,#coach_dep,#type_coaching_in_progress').on('change',function (e) {
                 in_progress_table.ajax.reload();
                 table_unsettled.ajax.reload();
                 table_settled.ajax.reload();
