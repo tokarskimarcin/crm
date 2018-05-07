@@ -4338,7 +4338,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             $givenMenager = $menager->id;
             $department_info = Department_info::where('menager_id', '=', $givenMenager)->first(); //menager department
             if(!isset($department_info->id)) {
-                dd($department_info);
+                dd($givenMenager);
             }
             if(!is_object($department_info)) {
                 dd($department_info);
