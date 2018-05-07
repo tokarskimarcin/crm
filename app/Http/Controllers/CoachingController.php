@@ -568,15 +568,14 @@ class CoachingController extends Controller
                    $sum_success = $hour_report_inprogres
                        ->where('department_info_id','=',$iteam->user_department_info)
                        ->where('report_date','>=',$coaching_date)
-                       ->where('report_date','<','CURDATE()')
+                       ->where('report_date','<',date('Y-m-d'))
                        ->sum('sum_success');
-                   $iteam->test = $sum_success;
                    $iteam->actual_avg = ($sum_success != null && $iteam->actual_rbh != 0) ? round($sum_success/$iteam->actual_rbh,2) : 0;
 
                    $actual_janky = $janky_reports
                        ->where('janky_department_info','=',$iteam->user_department_info)
                        ->where('report_date','>=',$coaching_date)
-                       ->where('report_date','<','CURDATE()');
+                       ->where('report_date','<',date('Y-m-d'));
 
                    $sum_janky_check = $actual_janky->sum('sum_check');
                    $sum_janky_bad = $actual_janky->sum('sum_bad');
