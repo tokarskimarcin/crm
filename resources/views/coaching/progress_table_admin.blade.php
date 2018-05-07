@@ -418,6 +418,7 @@
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
+                    console.log(data);
                     if (parseInt(data.actual_rbh) < parseInt(18)) {
                         $(row).hide();
                     }
