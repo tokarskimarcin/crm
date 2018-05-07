@@ -4306,7 +4306,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             $givenMenager = $menager->id;
             $department_info = Department_info::where('menager_id', '=', $givenMenager)->first(); //menager department
             $dep_id = $department_info->id;
-            $data = $this->getCoachingDataAllLevel($month, $year, (array)$dep_id, 2); //data about menager's department
+            $data = $this->getCoachingDataAllLevel($month, $year, (array)$dep_id, 1); //data about menager's department
             $title = 'Raport tygodniowo/miesięczny';
             $dep = Department_info::find($dep_id);
             $allData = array(
@@ -4341,7 +4341,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
             $directors = User::whereIn('id', $directorsIds)->get();
             $dep = Department_info::find($dep_id);
-            $data = $this->getCoachingDataAllLevel( $month, $year, (array)$dep_id, 3);
+            $data = $this->getCoachingDataAllLevel( $month, $year, (array)$dep_id, 2);
 
             $allDataArray = [
                 'departments' => $departments,
