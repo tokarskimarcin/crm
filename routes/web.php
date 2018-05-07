@@ -749,3 +749,4 @@ Route::get('/screen_table','ScreensController@screenMethod');
 
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
+Route::get('/progress_admin', 'CoachingController@progress_adminGET');
