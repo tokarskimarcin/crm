@@ -570,6 +570,7 @@ class CoachingController extends Controller
                        ->where('report_date','>=',$coaching_date)
                        ->where('report_date','<','CURDATE()')
                        ->sum('sum_success');
+                   $iteam->test = $sum_success;
                    $iteam->actual_avg = ($sum_success != null && $iteam->actual_rbh != 0) ? round($sum_success/$iteam->actual_rbh,2) : 0;
 
                    $actual_janky = $janky_reports
