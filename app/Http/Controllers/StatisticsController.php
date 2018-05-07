@@ -1807,7 +1807,7 @@ class StatisticsController extends Controller
      */
 
     public function pageReportCoachingManagerGet(){
-        $departments = Department_info::whereIn('id_dep_type', [2])->get();
+        $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
         $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
         $directors = User::whereIn('id', $directorsIds)->get();
         $dep_id = Auth::user()->department_info_id;
@@ -1833,7 +1833,7 @@ class StatisticsController extends Controller
      */
 
     public function pageReportCoachingManagerPost(Request $request){
-        $departments = Department_info::whereIn('id_dep_type', [2])->get();
+        $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
         $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
         $directors = User::whereIn('id', $directorsIds)->get();
 
@@ -1907,7 +1907,7 @@ class StatisticsController extends Controller
     }
 
     public function pageReportCoachingCoachPost(Request $request){
-        $departments = Department_info::whereIn('id_dep_type', [2])->get();
+        $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
         $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
         $directors = User::whereIn('id', $directorsIds)->get();
 
