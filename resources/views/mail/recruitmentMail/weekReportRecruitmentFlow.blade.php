@@ -14,17 +14,17 @@
     <tr>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Oddział</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Spływ</th>
-        @foreach($source as $src)
+        @foreach($data['source'] as $src)
             <th style="border:1px solid #231f20;padding:3px;background:#231f20" data-source_id="{{$src->id}}">{{$src->name}}</th>
         @endforeach
     </tr>
     </thead>
     <tbody>
-    @foreach($data as  $item)
+    @foreach($data['data'] as  $item)
         <tr>
             <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->name.' '.$item->dep_type}}</td>
             <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->count_flow}}</td>
-            @foreach($source as $src)
+            @foreach($data['source'] as $src)
                 @php
                     $id = $src->id;
                 @endphp
