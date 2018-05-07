@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\CandidateSource;
 use App\DisableAccountInfo;
 use App\HourReport;
 use App\Pbx_report_extension;
@@ -1413,11 +1414,13 @@ class StatisticsController extends Controller
     public function pageDayReportRecruitmentFlow(){
         $date_start = date('Y-m-d');
         $date_stop = date('Y-m-d');
+        $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
         ];
         return view('reportpage.recruitmentReport.DayReportRecruitmentFlow')
-            ->with('data',$data['data']);
+            ->with('data',$data['data'])
+            ->with('source', $candidate_source);
     }
 
     /**
@@ -1438,13 +1441,15 @@ class StatisticsController extends Controller
      * Wyswietlanie spływu rekrutacji Tygodniowego
      */
     public function pageWeekReportRecruitmentFlow(){
+        $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
         $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
         $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
         ];
         return view('reportpage.recruitmentReport.WeekReportRecruitmentFlow')
-            ->with('data',$data['data']);
+            ->with('data',$data['data'])
+            ->with('source', $candidate_source);
     }
 
     /**
@@ -1466,6 +1471,7 @@ class StatisticsController extends Controller
      * Wyswietlanie spływu rekrutacji Miesięczny
      */
     public function pageMonthReportRecruitmentFlow(){
+        $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
         $month_ini = new DateTime("first day of this month");
         $month_end = new DateTime("last day of this month");
         $date_start =  $month_ini->format('Y-m-d');
@@ -1474,7 +1480,8 @@ class StatisticsController extends Controller
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
         ];
         return view('reportpage.recruitmentReport.MonthReportRecruitmentFlow')
-            ->with('data',$data['data']);
+            ->with('data',$data['data'])
+            ->with('source', $candidate_source);
     }
 
     /**

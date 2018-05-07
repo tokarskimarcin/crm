@@ -49,22 +49,54 @@ class RecruitmentStory extends Model
         $data_start = $data_start . ' 00:00:00';
         $data_stop = $data_stop . ' 23:00:00';
 
+        $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
+
         $result = DB::table('department_info')
             ->select(DB::raw('               
                 departments.name, 
                 department_type.name as dep_type, 
+                department_info.id as dep_info_id,
                 SUM(CASE WHEN `candidate`.`created_at` between "' . $data_start . '" and "' . $data_stop . '" THEN 1 ELSE 0 END) as count_flow
             '))
             ->join('departments','departments.id','department_info.id_dep')
             ->join('department_type','department_type.id','department_info.id_dep_type')
             ->leftjoin('candidate', 'candidate.department_info_id', 'department_info.id')
+//            ->join('candidate_source', 'candidate.candidate_source_id', 'candidate_source.id')
             ->leftjoin('users', 'users.id', 'department_info.hr_id')
             ->groupBy('department_info.id')
             ->orderBy('count_flow', 'desc')
             ->where('commission_janky', '!=', 0)
             ->get();
 
-        return $result;
+        $result2 = $result->map(function ($item) use ($data_start, $data_stop, $candidate_source) {
+           forEach($candidate_source as $candidate) {
+               $result = DB::table('department_info')
+                   ->select(DB::raw('  
+                candidate_source.name as source_name,
+                SUM(CASE WHEN `candidate`.`created_at` between "' . $data_start . '" and "' . $data_stop . '" THEN 1 ELSE 0 END) as count_source
+            '))
+                   ->join('departments','departments.id','department_info.id_dep')
+                   ->join('department_type','department_type.id','department_info.id_dep_type')
+                   ->leftjoin('candidate', 'candidate.department_info_id', 'department_info.id')
+                    ->join('candidate_source', 'candidate.candidate_source_id', 'candidate_source.id')
+                   ->leftjoin('users', 'users.id', 'department_info.hr_id')
+                   ->groupBy('department_info.id')
+                   ->orderBy('count_source', 'desc')
+                   ->where('commission_janky', '!=', 0)
+                   ->where('candidate_source_id', '=', $candidate->id)
+                   ->where('department_info.id', '=', $item->dep_info_id)
+                   ->first();
+               if(!is_object($result)){
+                   $result = new \stdClass();
+                   $result->source_name = $candidate->name;
+                   $result->count_source = 0;
+               }
+               $candidate_id = $candidate->id;
+               $item->$candidate_id = $result;
+           }
+            return $item;
+        });
+        return $result2;
     }
 
     public static function getReportTrainingData($data_start,$data_stop){
