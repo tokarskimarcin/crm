@@ -1471,6 +1471,7 @@ class StatisticsController extends Controller
      * Wyswietlanie spływu rekrutacji Miesięczny
      */
     public function pageMonthReportRecruitmentFlow(){
+        $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
         $month_ini = new DateTime("first day of this month");
         $month_end = new DateTime("last day of this month");
         $date_start =  $month_ini->format('Y-m-d');
@@ -1479,7 +1480,8 @@ class StatisticsController extends Controller
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
         ];
         return view('reportpage.recruitmentReport.MonthReportRecruitmentFlow')
-            ->with('data',$data['data']);
+            ->with('data',$data['data'])
+            ->with('source', $candidate_source);
     }
 
     /**
