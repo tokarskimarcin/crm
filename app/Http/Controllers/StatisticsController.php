@@ -1428,10 +1428,12 @@ class StatisticsController extends Controller
      */
 
     public function MaildayReportRecruitmentFlow() {
+        $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
         $date_start = date('Y-m-d', time() - 24 * 3600);
         $date_stop = date('Y-m-d', time() - 24 * 3600);
         $data = [
-            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
+            'source' => $candidate_source
         ];
         $title = 'Raport Dzienny Spływu Rekrutacji ' . $date_start;
         $this->sendMailByVerona('recruitmentMail.dayReportRecruitmentFlow', $data, $title);
@@ -1457,10 +1459,12 @@ class StatisticsController extends Controller
      */
 
     public function MailweekReportRecruitmentFlow() {
+        $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
         $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
         $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
         $data = [
-            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
+            'source' => $candidate_source
         ];
         $title = 'Raport Tygodniowy Spływu Rekrutacji '.$date_start.' - '.$date_stop;
         $this->sendMailByVerona('recruitmentMail.weekReportRecruitmentFlow', $data, $title);
@@ -1489,13 +1493,15 @@ class StatisticsController extends Controller
      */
 
     public function MailmonthReportRecruitmentFlow() {
+        $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
         $month_ini = new DateTime("first day of last month");
         $month_end = new DateTime("last day of last month");
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
 
         $data = [
-            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop)
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
+            'source' => $candidate_source
         ];
         $title = 'Miesięczny Raport Spływu Rekrutacji '.$date_start.' - '.$date_stop;
         $this->sendMailByVerona('recruitmentMail.monthReportRecruitmentFlow', $data, $title);
