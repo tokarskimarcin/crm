@@ -4332,12 +4332,18 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
 
         $month = date('m');
         $year = date('Y');
-
         forEach($menagers as $menager) {
             $menagerVariable = User::where('id', '=', $menager->id)->get();
             $users = User::whereIn('id', [6009, 1364])->get();
             $givenMenager = $menager->id;
             $department_info = Department_info::where('menager_id', '=', $givenMenager)->first(); //menager department
+            if(!isset($department_info->id)) {
+                dd($department_info);
+            }
+            if(!is_object($department_info)) {
+                dd($department_info);
+            }
+
             $dep_id = $department_info->id;
             $departments = Department_info::whereIn('id_dep_type', [1,2])->get();
             $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
