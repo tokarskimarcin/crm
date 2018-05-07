@@ -501,11 +501,18 @@ class OtherCompanyStatisticsController extends Controller
 
     public  function getUserToSendMessage(){
         $user = User::whereIn('id',[1364,6,11])->get();
+
         $szczesny = new User();
         $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
         $szczesny->first_name = 'Bartosz';
         $szczesny->last_name = 'Szczęsny';
         $user = $user->push($szczesny);
+
+        $maniara = new User();
+        $maniara->username = 'damian.maniara@veronaconsulting.pl';
+        $maniara->first_name = 'Damian';
+        $maniara->last_name = 'Maniara';
+        $user = $user->push($maniara);
         return $user;
     }
 
