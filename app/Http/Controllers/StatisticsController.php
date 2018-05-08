@@ -2945,16 +2945,19 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $date_stop = date('Y-') . $request->month_selected . date('-t', strtotime(date('Y-') . $request->month_selected));
 
         $leader = User::find($request->coach_id);
+        $pbx_department_id = $leader->department_info->pbx_id;
 
         $ids = $leader->trainerConsultants->pluck('login_phone')->toArray();
-
         $max_from_day = DB::table('pbx_report_extension')
             ->select(DB::raw('
                 MAX(id) as id
             '))
             ->whereBetween('report_date', [$date_start, $date_stop])
-            ->whereIn('pbx_id', $ids)
-            ->groupBy('report_date')
+            ->whereIn('pbx_id', $ids);
+            if($date_start > '2018-05-31') {
+                $max_from_day = $max_from_day->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
+            }
+            $max_from_day = $max_from_day->groupBy('report_date')
             ->groupBy('pbx_id')
             ->get();
 
@@ -3101,6 +3104,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
      */
     private function getWeekMonthCoachData($date_start, $date_stop, $coach_id) {
         $leader = User::find($coach_id);
+        $pbx_department_id = $leader->department_info->pbx_id;
 
         $ids = $leader->trainerConsultants->pluck('login_phone')->toArray();
 
@@ -3109,8 +3113,11 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                 MAX(id) as id
             '))
             ->whereBetween('report_date', [$date_start, $date_stop])
-            ->whereIn('pbx_id', $ids)
-            ->groupBy('report_date')
+            ->whereIn('pbx_id', $ids);
+            if($date_start > '2018-05-31') {
+                $max_from_day = $max_from_day->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
+            }
+            $max_from_day = $max_from_day->groupBy('report_date')
             ->groupBy('pbx_id')
             ->get();
 
@@ -3439,6 +3446,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $month = $request->month_selected;
         $days_in_month = date('t', strtotime($month));
 
+        $coach = User::find($request->coach_id);
+        $pbx_department_id = $coach->department_info->pbx_id;
 
         $data = DB::table('pbx_report_extension')
             ->select(DB::raw('
@@ -3448,12 +3457,14 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             '))
             ->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id')
             ->where('users.coach_id', '=', $request->coach_id)
-            ->where('report_date', '=', $request->day_select)
-            ->where('report_hour', '=', $request->hour_select)
+            ->where('report_date', '=', $request->day_select);
+            if($request->day_select > '2018-05-09') {
+                $data = $data->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
+            }
+            $data = $data->where('report_hour', '=', $request->hour_select)
             ->orderBy('pbx_report_extension.average', 'desc')
             ->get();
 
-        $coach = User::find($request->coach_id);
 
         return view('reportpage.dayReportCoaches')
             ->with([
@@ -3535,17 +3546,20 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             ->where('department_info_id', '=', $department_info->id)
             ->get();
 
-
         $data = [];
 
         foreach ($coaches as $coach) {
+            $pbx_department_id = $coach->department_info->pbx_id;
             $ids = DB::table('pbx_report_extension')
                 ->select(DB::raw('
                     MAX(pbx_report_extension.id) as id
                 '))
                 ->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id')
-                ->where('users.coach_id', '=', $coach->id)
-                ->groupBy('users.id')
+                ->where('users.coach_id', '=', $coach->id);
+                if($report_date > '2018-05-09') {
+                    $ids = $ids->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
+                }
+                $ids = $ids->groupBy('users.id')
                 ->where('report_date', '=', $report_date)
                 ->get();
 
@@ -3957,6 +3971,9 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $consultants = User::where('coach_id', '=', $coach_id)
             ->get();
 
+        $leader = User::find($coach_id);
+        $pbx_department_id = $leader->department_info->pbx_id;
+
         foreach ($consultants as $consultant) {
             if ($consultant->login_phone > 0) {
                 $max_ids = DB::table('pbx_report_extension')
@@ -3964,8 +3981,11 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                         MAX(id) as id
                     '))
                     ->where('pbx_id', '=', $consultant->login_phone)
-                    ->whereBetween('report_date', [$date_start, $date_stop])
-                    ->groupBy('report_date')
+                    ->whereBetween('report_date', [$date_start, $date_stop]);
+                    if($date_start > '2018-05-31') {
+                        $max_ids = $max_ids->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
+                    }
+                    $max_ids = $max_ids->groupBy('report_date')
                     ->get();
 
                 $repos = Pbx_report_extension::where('pbx_id', '=',  $consultant->login_phone)
