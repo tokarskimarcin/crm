@@ -31,7 +31,7 @@ class TestORM extends Controller
         $department_id = null;
         $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=23&groupType=" . $this->report_type_array[$report_type];
 //        $url ="https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=23&groupType=TEAM&date=2018-04-26";
-        $header_array = array('department_info_id', 'average', 'success', '', '', 'wear_base', 'call_time', 'employee_count', 'user_id', 'hour', 'report_date', 'is_send', 'janky_count');
+        $header_array = array('department_info_id', 'average', 'success', '', '', 'wear_base', 'call_time', 'employee_count', 'user_id', 'hour', 'report_date', 'is_send','all_rates', 'all_bad_rates', 'janky_count',  );
         if (!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
         if (($handle = fopen($url, "r")) !== FALSE) {
             while (($data1 = fgetcsv($handle, 1000, ";")) !== FALSE) {
@@ -42,6 +42,8 @@ class TestORM extends Controller
                     $typ = 0;
                     $janky = 0;
                     $count_cehck =0;
+                    $all_rates = 0;
+                    $all_bad_rates = 0;
                     foreach ($data1 as $item) {
                         if ($i == 0) {
                             preg_match_all('!\d+!', $item, $matches);
@@ -69,6 +71,26 @@ class TestORM extends Controller
                             if ($i == 1 || $i == 2 || $i == 7) {
                                 $spreadsheet_data[$lp][$header_array[$i]] = utf8_encode($item);
                             }
+                            if($i == 12 || $i == 13) {
+                                $spreadsheet_data[$lp][$header_array[$i]] = utf8_encode($item);
+                                if($i == 13) {
+                                    $all_bad_rates = utf8_encode($item);
+                                }
+                                if($i == 12) {
+                                    $all_rates = utf8_encode($item);
+                                }
+
+                                //janky part
+                                if($all_rates == 0) {
+                                    $janky_proc_value = 0;
+                                }
+                                else {
+                                    $janky_proc_value = round(100 * $all_bad_rates / $all_rates ,2);
+                                }
+                                $spreadsheet_data[$lp]['janky_count'] = $janky_proc_value;
+                                //end janky part
+                            }
+
                             if ($i == 5 || $i == 6) {
                                 $split = explode(" ", $item);
                                 $item = $split[0];
@@ -78,25 +100,6 @@ class TestORM extends Controller
                             $spreadsheet_data[$lp]['hour'] = date('H').":00:00";
                             $spreadsheet_data[$lp]['report_date'] = date('Y-m-d');
                             $spreadsheet_data[$lp]['is_send'] = 0;
-
-                            $dkj = PBXDKJTeam::
-                            where('department_info_id','=',$spreadsheet_data[$lp]['department_info_id'])
-                                ->where('hour','=',date('H').":00:00")
-                                ->where('report_date','like',date('Y-m-d'))
-                                ->first();
-
-                            if(isset($dkj)){
-                                $count_cehck = $dkj->count_all_check;
-                                $janky = $dkj->count_bad_check;
-                            }
-                            if($count_cehck != 0){
-                                $janky_count = round($janky / $count_cehck * 100, 2);
-                            }else{
-                                $janky_count = 0;
-                            }
-
-                            $spreadsheet_data[$lp]['janky_count'] = $janky_count;
-                            $count_cehck = 0;
 
                             if($i == 7)
                             {
