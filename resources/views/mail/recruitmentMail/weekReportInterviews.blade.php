@@ -7,6 +7,9 @@
             <img src="http://teambox.pl/image/logovc.png" class="CToWUd"></td>
     </tr>
     <tr>
+        <td colspan="2" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20">Raport od {{$date_start}} do {{$date_stop}}</td>
+    </tr>
+    <tr>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Oddział</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Liczba przeprowadzonych rekrutacji</th>
     </tr>

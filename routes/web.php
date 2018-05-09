@@ -503,6 +503,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/pageHourReportTelemarketing', 'StatisticsController@pageHourReportTelemarketing');
     Route::get('/pageWeekReportTelemarketing', 'StatisticsController@pageWeekReportTelemarketing');
+    Route::post('/pageWeekReportTelemarketing', 'StatisticsController@pageWeekReportTelemarketingPost');
     Route::get('/pageMonthReportTelemarketing', 'StatisticsController@pageMonthReportTelemarketing');
     Route::get('/pageDayReportTelemarketing', 'StatisticsController@pageDayReportTelemarketing');
     Route::post('/pageDayReportTelemarketing', 'StatisticsController@pageDayReportTelemarketingPost');
@@ -524,19 +525,23 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageDayReportDKJ', 'StatisticsController@pageDayReportDKJ');
     Route::post('/pageDayReportDKJ', 'StatisticsController@pageDayReportDKJPost');
     Route::get('/pageWeekReportDKJ', 'StatisticsController@pageWeekReportDKJ');
+    Route::post('/pageWeekReportDKJ', 'StatisticsController@pageWeekReportDKJPost');
     Route::get('/pageMonthReportDKJ', 'StatisticsController@pageMonthReportDKJ');
 
     Route::get('/pageDayReportEmployeeDkj', 'StatisticsController@pageDayReportEmployeeDkj');
     Route::post('/pageDayReportEmployeeDkj', 'StatisticsController@pageDayReportEmployeeDkjPost');
 
     Route::get('/pageWeekReportEmployeeDkj', 'StatisticsController@pageWeekReportEmployeeDkj');
+    Route::post('/pageWeekReportEmployeeDkj', 'StatisticsController@pageWeekReportEmployeeDkjPost');
 
     Route::get('/pageHourReportChecked', 'StatisticsController@pageHourReportChecked');
     Route::get('/pageDayReportChecked', 'StatisticsController@pageDayReportChecked');
     Route::post('/pageDayReportChecked', 'StatisticsController@pageDayReportCheckedPost');
     Route::get('/pageWeekReportChecked', 'StatisticsController@pageWeekReportChecked');
+    Route::post('/pageWeekReportChecked', 'StatisticsController@pageWeekReportCheckedPost');
 
     Route::get('/pageWeekReportJanky', 'StatisticsController@pageWeekReportJanky');
+    Route::post('/pageWeekReportJanky', 'StatisticsController@pageWeekReportJankyPost');
 
     Route::get('/pageHourReportDkjEmployee', 'StatisticsController@pageHourReportDkjEmployee');
 
@@ -581,11 +586,16 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageDayReportInterviews','StatisticsController@pageDayReportInterviews');
     Route::post('/pageDayReportInterviews','StatisticsController@pageDayReportInterviewsPost');
     Route::get('/pageDayReportHireCandidate','StatisticsController@pageDayReportHireCandidate');
+    Route::post('/pageDayReportHireCandidate','StatisticsController@pageDayReportHireCandidatePost');
     //Tygodniowy
     Route::get('/pageWeekReportRecruitmentFlow','StatisticsController@pageWeekReportRecruitmentFlow');
+    Route::post('/pageWeekReportRecruitmentFlow','StatisticsController@pageWeekReportRecruitmentFlowPost');
     Route::get('/pageWeekReportTrainingGroup','StatisticsController@pageWeekReportTrainingGroup');
+    Route::post('/pageWeekReportTrainingGroup','StatisticsController@pageWeekReportTrainingGroupPost');
     Route::get('/pageWeekReportInterviews','StatisticsController@pageWeekReportInterviews');
+    Route::post('/pageWeekReportInterviews','StatisticsController@pageWeekReportInterviewsPost');
     Route::get('/pageWeekReportHireCandidate','StatisticsController@pageWeekReportHireCandidate');
+    Route::post('/pageWeekReportHireCandidate','StatisticsController@pageWeekReportHireCandidatePost');
     //Miesięczny
     Route::get('/pageMonthReportRecruitmentFlow','StatisticsController@pageMonthReportRecruitmentFlow');
     Route::get('/pageMonthReportTrainingGroup','StatisticsController@pageMonthReportTrainingGroup');
