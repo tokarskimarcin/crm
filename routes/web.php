@@ -505,6 +505,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageWeekReportTelemarketing', 'StatisticsController@pageWeekReportTelemarketing');
     Route::get('/pageMonthReportTelemarketing', 'StatisticsController@pageMonthReportTelemarketing');
     Route::get('/pageDayReportTelemarketing', 'StatisticsController@pageDayReportTelemarketing');
+    Route::post('/pageDayReportTelemarketing', 'StatisticsController@pageDayReportTelemarketingPost');
 
 
     //Gniezno Telemarketing
@@ -521,14 +522,18 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/pageHourReportDKJ', 'StatisticsController@pageHourReportDKJ');
     Route::get('/pageDayReportDKJ', 'StatisticsController@pageDayReportDKJ');
+    Route::post('/pageDayReportDKJ', 'StatisticsController@pageDayReportDKJPost');
     Route::get('/pageWeekReportDKJ', 'StatisticsController@pageWeekReportDKJ');
     Route::get('/pageMonthReportDKJ', 'StatisticsController@pageMonthReportDKJ');
 
     Route::get('/pageDayReportEmployeeDkj', 'StatisticsController@pageDayReportEmployeeDkj');
+    Route::post('/pageDayReportEmployeeDkj', 'StatisticsController@pageDayReportEmployeeDkjPost');
+
     Route::get('/pageWeekReportEmployeeDkj', 'StatisticsController@pageWeekReportEmployeeDkj');
 
     Route::get('/pageHourReportChecked', 'StatisticsController@pageHourReportChecked');
     Route::get('/pageDayReportChecked', 'StatisticsController@pageDayReportChecked');
+    Route::post('/pageDayReportChecked', 'StatisticsController@pageDayReportCheckedPost');
     Route::get('/pageWeekReportChecked', 'StatisticsController@pageWeekReportChecked');
 
     Route::get('/pageWeekReportJanky', 'StatisticsController@pageWeekReportJanky');
@@ -570,8 +575,11 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     //Dzienny
     Route::get('/pageDayReportRecruitmentFlow','StatisticsController@pageDayReportRecruitmentFlow');
+    Route::post('/pageDayReportRecruitmentFlow','StatisticsController@pageDayReportRecruitmentFlowPost');
     Route::get('/pageDayReportRecruitmentTrainingGroup','StatisticsController@pageDayReportTrainingGroup');
+    Route::post('/pageDayReportRecruitmentTrainingGroup','StatisticsController@pageDayReportTrainingGroupPost');
     Route::get('/pageDayReportInterviews','StatisticsController@pageDayReportInterviews');
+    Route::post('/pageDayReportInterviews','StatisticsController@pageDayReportInterviewsPost');
     Route::get('/pageDayReportHireCandidate','StatisticsController@pageDayReportHireCandidate');
     //Tygodniowy
     Route::get('/pageWeekReportRecruitmentFlow','StatisticsController@pageWeekReportRecruitmentFlow');
@@ -746,6 +754,7 @@ Route::get('/screen_table','ScreensController@screenMethod');
     Route::get('/userPrivilages', 'AdminController@userPrivilagesGET');
     Route::post('/userPrivilages', 'AdminController@userPrivilagesAjax')->name('api.privilageAjax');
     Route::post('/userPrivilagesAjax', 'AdminController@userPrivilagesAjaxData')->name('api.privilageAjaxData');
+    Route::post('/userPrivilage', 'AdminController@userPrivilagesPOST');
 
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');

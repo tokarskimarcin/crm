@@ -253,6 +253,9 @@ class StatisticsController extends Controller
         } else if ($type == 'yesterday') {
             $date = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
         }
+        else {
+            $date = $type;
+        }
         $reports = DB::table('hour_report')
             ->select(DB::raw(
                 'SUM(call_time) as sum_call_time,
@@ -331,6 +334,16 @@ class StatisticsController extends Controller
     // Wyswietlenie raportu dziennego na stronie 'telemarketing'
     public function pageDayReportTelemarketing() {
         $data = $this::dayReportTelemarketing('today');
+
+        return view('reportpage.dayReportTelemarketing')
+            ->with('date', $data['date'])
+            ->with('work_hours', $data['work_hours'])
+            ->with('reports', $data['reports']);
+    }
+
+    public function pageDayReportTelemarketingPost(Request $request) {
+        $date = $request->date;
+        $data = $this::dayReportTelemarketing($date);
 
         return view('reportpage.dayReportTelemarketing')
             ->with('date', $data['date'])
@@ -713,6 +726,9 @@ class StatisticsController extends Controller
         } else if ($type == 'yesterday') {
             $date = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
         }
+        else {
+            $date = $type;
+        }
 
         $dkj = DB::table('pbx_dkj_team')
             ->select(DB::raw(
@@ -758,6 +774,14 @@ class StatisticsController extends Controller
     public function pageDayReportDKJ() {
         $data = $this->dayReportDkjData('today');
 
+        return view('reportpage.DayReportDkj')
+            ->with('today', $data['today'])
+            ->with('dkj', $data['dkj']);
+    }
+
+    public function pageDayReportDKJPost(Request $request) {
+        $date = $request->date;
+        $data = $this->dayReportDkjData($date);
         return view('reportpage.DayReportDkj')
             ->with('today', $data['today'])
             ->with('dkj', $data['dkj']);
@@ -880,9 +904,23 @@ class StatisticsController extends Controller
             ->with('dkj', $data['dkj']);
     }
 
+    public function pageDayReportEmployeeDkjPost(Request $request) {
+        $date = $request->date;
+        $data = $this->dayReportEmployeeDkjData($date);
+        return view('reportpage.DayReportEmployeeDkj')
+            ->with('date', $data['date'])
+            ->with('work_hours', $data['work_hours'])
+            ->with('dkj', $data['dkj']);
+    }
+
     public function dayReportEmployeeDkjData($type)
     {
+        if($type == 'today') {
             $date = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+        }
+        else {
+            $date = $type;
+        }
 
             $dkj = DB::table('users')
             ->select(DB::raw('
@@ -1185,6 +1223,9 @@ class StatisticsController extends Controller
             $today = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
             $data_help = $today;
         }
+        else {
+            $today = $type;
+        }
 
         $hour_reports = $this->getHourReportData('dayReport', $today);
 
@@ -1219,6 +1260,16 @@ class StatisticsController extends Controller
     //wyświetlanie raportu odsłuchanych rozmów (raport dzienny)
     public function pageDayReportChecked() {
         $data = $this->dayReportCheckedData('today');
+
+        return view('reportpage.DayReportChecked')
+            ->with('hour_reports', $data['hour_reports'])
+            ->with('dkj', $data['dkj'])
+            ->with('today', $data['today']);
+    }
+
+    public function pageDayReportCheckedPost(Request $request) {
+        $date = $request->date;
+        $data = $this->dayReportCheckedData($date);
 
         return view('reportpage.DayReportChecked')
             ->with('hour_reports', $data['hour_reports'])
@@ -1425,6 +1476,21 @@ class StatisticsController extends Controller
             ->with('data',$data);
     }
 
+    public function pageDayReportRecruitmentFlowPost(Request $request) {
+        $date = $request->date;
+        $date_start = $date;
+        $date_stop = $date;
+        $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
+        $data = [
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
+            'source' => $candidate_source,
+            'date_start' => $date_start,
+            'date_stop' => $date_stop
+        ];
+        return view('reportpage.recruitmentReport.DayReportRecruitmentFlow')
+            ->with('data',$data);
+    }
+
     /**
      * Mail spływu rekrutacji dzienny
      */
@@ -1530,7 +1596,20 @@ class StatisticsController extends Controller
             'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
         ];
         return view('reportpage.recruitmentReport.DayReportRecruitmentTrainingGroup')
-            ->with('data',$data['data']);
+            ->with('data',$data['data'])
+            ->with('start_date', $date_start);
+    }
+
+    public function pageDayReportTrainingGroupPost(Request $request) {
+        $date = $request->date;
+        $date_start = $date;
+        $date_stop = $date;
+        $data = [
+            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
+        ];
+        return view('reportpage.recruitmentReport.DayReportRecruitmentTrainingGroup')
+            ->with('data',$data['data'])
+            ->with('start_date', $date_start);
     }
 
     /**
@@ -1613,7 +1692,20 @@ class StatisticsController extends Controller
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
         return view('reportpage.recruitmentReport.DayReportInterviews')
-            ->with('data',$data['data']);
+            ->with('data',$data['data'])
+            ->with('start_date', $date_start);
+    }
+
+    public function pageDayReportInterviewsPost(Request $request) {
+        $date = $request->date;
+        $date_start = $date;
+        $date_stop = $date;
+        $data = [
+            'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
+        ];
+        return view('reportpage.recruitmentReport.DayReportInterviews')
+            ->with('data',$data['data'])
+            ->with('start_date', $date_start);
     }
 
     /**
