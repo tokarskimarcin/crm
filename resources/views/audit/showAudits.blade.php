@@ -234,7 +234,24 @@
             /**
              * This event listener filter table by selected date
              */
-            $('#date_start, #date_stop').on('change',function(e) {
+            $('#date_start, #date_stop, #department, #type').on('change',function(e) {
+                if(selectedDepartment.options[selectedDepartment.selectedIndex].dataset.type == 1) {
+                    departmentValue = selectedDepartment.options[selectedDepartment.selectedIndex].value;
+                }
+                else {
+                    departmentValue = 0;
+                }
+                if(selectedDepartment.options[selectedDepartment.selectedIndex].dataset.type == 2) {
+                    directorId = selectedDepartment.options[selectedDepartment.selectedIndex].value;
+                }
+                else {
+                    directorId = 0;
+                }
+
+                if(selectedType.options[selectedType.selectedIndex].value != 0) {
+                    type = selectedType.options[selectedType.selectedIndex].value;
+                }
+
                 table.ajax.reload();
                 document.getElementsByClassName('insertDiv')[0].textContent = '';
                 $.ajax({
@@ -251,44 +268,18 @@
                     success: function(response) {
                         let average = response[0].number_of_records > 0 ? Math.round(response[0].total_score / response[0].number_of_records *100) / 100 : null;
                         if(average != null) {
-                            $('.insertDiv').append('<p>Średnia z audytów:  ' + average + '%</p>');
+                            $('.insertDiv').append('<p>Średnia ze wszystkich audytów(bez podziału na typ):  ' + average + '%</p>');
                         }
                     },
                     error: function(jqxhr, status, exception) {
                         console.log('Exception:', exception);
                     }
                 });
-            });
 
-            /**
-             * This event listener filter table by selected department
-             */
-            $('#department').on('change', function(e) {
-                if(selectedDepartment.options[selectedDepartment.selectedIndex].dataset.type == 1) {
-                    departmentValue = selectedDepartment.options[selectedDepartment.selectedIndex].value;
-                }
-                if(selectedDepartment.options[selectedDepartment.selectedIndex].dataset.type == 2) {
-                    directorId = selectedDepartment.options[selectedDepartment.selectedIndex].value;
-                }
-
-                table.ajax.reload();
                 departmentValue = null;
                 directorId = null;
-
-            });
-
-            /**
-             * This event listener filter table by selected type
-             */
-            $('#type').on('change', function(e) {
-                if(selectedType.options[selectedType.selectedIndex].value != 0) {
-                    type = selectedType.options[selectedType.selectedIndex].value;
-                }
-
-                table.ajax.reload();
                 type = null;
             });
-
 
             $('.form_date').datetimepicker({
                 language:  'pl',
@@ -296,34 +287,34 @@
                 minView : 2,
                 pickTime: false
             });
-            let inputs_to_listen = Array.from(document.getElementsByClassName('listen_to'));
+            {{--let inputs_to_listen = Array.from(document.getElementsByClassName('listen_to'));--}}
 
-            inputs_to_listen.forEach(function(input) {
-                input.addEventListener('change', function(e) {
-                    document.getElementsByClassName('insertDiv')[0].textContent = '';
-                    $.ajax({
-                        type: "POST",
-                        url: '{{ route('api.scores') }}',
-                        data: {
-                            "departmentValue": selectedDepartment.options[selectedDepartment.selectedIndex].value,
-                            "date_start": document.getElementById('date_start').value,
-                            "date_stop": document.getElementById('date_stop').value
-                        },
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            let average = response[0].number_of_records > 0 ? Math.round(response[0].total_score / response[0].number_of_records *100) / 100 : null;
-                            if(average != null) {
-                                $('.insertDiv').append('<p>Średnia z audytów:  ' + average + '%</p>');
-                            }
-                        },
-                        error: function(jqxhr, status, exception) {
-                            console.log('Exception:', exception);
-                        }
-                    });
-                });
-            });
+            {{--inputs_to_listen.forEach(function(input) {--}}
+                {{--input.addEventListener('change', function(e) {--}}
+                    {{--document.getElementsByClassName('insertDiv')[0].textContent = '';--}}
+                    {{--$.ajax({--}}
+                        {{--type: "POST",--}}
+                        {{--url: '{{ route('api.scores') }}',--}}
+                        {{--data: {--}}
+                            {{--"departmentValue": selectedDepartment.options[selectedDepartment.selectedIndex].value,--}}
+                            {{--"date_start": document.getElementById('date_start').value,--}}
+                            {{--"date_stop": document.getElementById('date_stop').value--}}
+                        {{--},--}}
+                        {{--headers: {--}}
+                            {{--'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
+                        {{--},--}}
+                        {{--success: function(response) {--}}
+                            {{--let average = response[0].number_of_records > 0 ? Math.round(response[0].total_score / response[0].number_of_records *100) / 100 : null;--}}
+                            {{--if(average != null) {--}}
+                                {{--$('.insertDiv').append('<p>Średnia z audytów:  ' + average + '%</p>');--}}
+                            {{--}--}}
+                        {{--},--}}
+                        {{--error: function(jqxhr, status, exception) {--}}
+                            {{--console.log('Exception:', exception);--}}
+                        {{--}--}}
+                    {{--});--}}
+                {{--});--}}
+            {{--});--}}
 
             $( document ).ajaxComplete(function() {
                 let links = Array.from(document.getElementsByClassName('links'));
