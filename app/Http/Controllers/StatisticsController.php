@@ -253,6 +253,9 @@ class StatisticsController extends Controller
         } else if ($type == 'yesterday') {
             $date = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
         }
+        else {
+            $date = $type;
+        }
         $reports = DB::table('hour_report')
             ->select(DB::raw(
                 'SUM(call_time) as sum_call_time,
@@ -331,6 +334,16 @@ class StatisticsController extends Controller
     // Wyswietlenie raportu dziennego na stronie 'telemarketing'
     public function pageDayReportTelemarketing() {
         $data = $this::dayReportTelemarketing('today');
+
+        return view('reportpage.dayReportTelemarketing')
+            ->with('date', $data['date'])
+            ->with('work_hours', $data['work_hours'])
+            ->with('reports', $data['reports']);
+    }
+
+    public function pageDayReportTelemarketingPost(Request $request) {
+        $date = $request->date;
+        $data = $this::dayReportTelemarketing($date);
 
         return view('reportpage.dayReportTelemarketing')
             ->with('date', $data['date'])
@@ -713,6 +726,9 @@ class StatisticsController extends Controller
         } else if ($type == 'yesterday') {
             $date = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
         }
+        else {
+            $date = $type;
+        }
 
         $dkj = DB::table('pbx_dkj_team')
             ->select(DB::raw(
@@ -758,6 +774,14 @@ class StatisticsController extends Controller
     public function pageDayReportDKJ() {
         $data = $this->dayReportDkjData('today');
 
+        return view('reportpage.DayReportDkj')
+            ->with('today', $data['today'])
+            ->with('dkj', $data['dkj']);
+    }
+
+    public function pageDayReportDKJPost(Request $request) {
+        $date = $request->date;
+        $data = $this->dayReportDkjData($date);
         return view('reportpage.DayReportDkj')
             ->with('today', $data['today'])
             ->with('dkj', $data['dkj']);
@@ -880,9 +904,23 @@ class StatisticsController extends Controller
             ->with('dkj', $data['dkj']);
     }
 
+    public function pageDayReportEmployeeDkjPost(Request $request) {
+        $date = $request->date;
+        $data = $this->dayReportEmployeeDkjData($date);
+        return view('reportpage.DayReportEmployeeDkj')
+            ->with('date', $data['date'])
+            ->with('work_hours', $data['work_hours'])
+            ->with('dkj', $data['dkj']);
+    }
+
     public function dayReportEmployeeDkjData($type)
     {
+        if($type == 'today') {
             $date = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+        }
+        else {
+            $date = $type;
+        }
 
             $dkj = DB::table('users')
             ->select(DB::raw('
@@ -1185,6 +1223,9 @@ class StatisticsController extends Controller
             $today = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
             $data_help = $today;
         }
+        else {
+            $today = $type;
+        }
 
         $hour_reports = $this->getHourReportData('dayReport', $today);
 
@@ -1219,6 +1260,16 @@ class StatisticsController extends Controller
     //wyświetlanie raportu odsłuchanych rozmów (raport dzienny)
     public function pageDayReportChecked() {
         $data = $this->dayReportCheckedData('today');
+
+        return view('reportpage.DayReportChecked')
+            ->with('hour_reports', $data['hour_reports'])
+            ->with('dkj', $data['dkj'])
+            ->with('today', $data['today']);
+    }
+
+    public function pageDayReportCheckedPost(Request $request) {
+        $date = $request->date;
+        $data = $this->dayReportCheckedData($date);
 
         return view('reportpage.DayReportChecked')
             ->with('hour_reports', $data['hour_reports'])
@@ -1425,6 +1476,21 @@ class StatisticsController extends Controller
             ->with('data',$data);
     }
 
+    public function pageDayReportRecruitmentFlowPost(Request $request) {
+        $date = $request->date;
+        $date_start = $date;
+        $date_stop = $date;
+        $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
+        $data = [
+            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
+            'source' => $candidate_source,
+            'date_start' => $date_start,
+            'date_stop' => $date_stop
+        ];
+        return view('reportpage.recruitmentReport.DayReportRecruitmentFlow')
+            ->with('data',$data);
+    }
+
     /**
      * Mail spływu rekrutacji dzienny
      */
@@ -1530,7 +1596,20 @@ class StatisticsController extends Controller
             'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
         ];
         return view('reportpage.recruitmentReport.DayReportRecruitmentTrainingGroup')
-            ->with('data',$data['data']);
+            ->with('data',$data['data'])
+            ->with('start_date', $date_start);
+    }
+
+    public function pageDayReportTrainingGroupPost(Request $request) {
+        $date = $request->date;
+        $date_start = $date;
+        $date_stop = $date;
+        $data = [
+            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
+        ];
+        return view('reportpage.recruitmentReport.DayReportRecruitmentTrainingGroup')
+            ->with('data',$data['data'])
+            ->with('start_date', $date_start);
     }
 
     /**
@@ -1613,7 +1692,20 @@ class StatisticsController extends Controller
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
         ];
         return view('reportpage.recruitmentReport.DayReportInterviews')
-            ->with('data',$data['data']);
+            ->with('data',$data['data'])
+            ->with('start_date', $date_start);
+    }
+
+    public function pageDayReportInterviewsPost(Request $request) {
+        $date = $request->date;
+        $date_start = $date;
+        $date_stop = $date;
+        $data = [
+            'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
+        ];
+        return view('reportpage.recruitmentReport.DayReportInterviews')
+            ->with('data',$data['data'])
+            ->with('start_date', $date_start);
     }
 
     /**
@@ -2945,16 +3037,19 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $date_stop = date('Y-') . $request->month_selected . date('-t', strtotime(date('Y-') . $request->month_selected));
 
         $leader = User::find($request->coach_id);
+        $pbx_department_id = $leader->department_info->pbx_id;
 
         $ids = $leader->trainerConsultants->pluck('login_phone')->toArray();
-
         $max_from_day = DB::table('pbx_report_extension')
             ->select(DB::raw('
                 MAX(id) as id
             '))
             ->whereBetween('report_date', [$date_start, $date_stop])
-            ->whereIn('pbx_id', $ids)
-            ->groupBy('report_date')
+            ->whereIn('pbx_id', $ids);
+            if($date_start > '2018-05-31') {
+                $max_from_day = $max_from_day->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
+            }
+            $max_from_day = $max_from_day->groupBy('report_date')
             ->groupBy('pbx_id')
             ->get();
 
@@ -3101,6 +3196,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
      */
     private function getWeekMonthCoachData($date_start, $date_stop, $coach_id) {
         $leader = User::find($coach_id);
+        $pbx_department_id = $leader->department_info->pbx_id;
 
         $ids = $leader->trainerConsultants->pluck('login_phone')->toArray();
 
@@ -3109,8 +3205,11 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                 MAX(id) as id
             '))
             ->whereBetween('report_date', [$date_start, $date_stop])
-            ->whereIn('pbx_id', $ids)
-            ->groupBy('report_date')
+            ->whereIn('pbx_id', $ids);
+            if($date_start > '2018-05-31') {
+                $max_from_day = $max_from_day->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
+            }
+            $max_from_day = $max_from_day->groupBy('report_date')
             ->groupBy('pbx_id')
             ->get();
 
@@ -3439,6 +3538,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $month = $request->month_selected;
         $days_in_month = date('t', strtotime($month));
 
+        $coach = User::find($request->coach_id);
+        $pbx_department_id = $coach->department_info->pbx_id;
 
         $data = DB::table('pbx_report_extension')
             ->select(DB::raw('
@@ -3448,12 +3549,14 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             '))
             ->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id')
             ->where('users.coach_id', '=', $request->coach_id)
-            ->where('report_date', '=', $request->day_select)
-            ->where('report_hour', '=', $request->hour_select)
+            ->where('report_date', '=', $request->day_select);
+            if($request->day_select > '2018-05-09') {
+                $data = $data->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
+            }
+            $data = $data->where('report_hour', '=', $request->hour_select)
             ->orderBy('pbx_report_extension.average', 'desc')
             ->get();
 
-        $coach = User::find($request->coach_id);
 
         return view('reportpage.dayReportCoaches')
             ->with([
@@ -3535,17 +3638,20 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             ->where('department_info_id', '=', $department_info->id)
             ->get();
 
-
         $data = [];
 
         foreach ($coaches as $coach) {
+            $pbx_department_id = $coach->department_info->pbx_id;
             $ids = DB::table('pbx_report_extension')
                 ->select(DB::raw('
                     MAX(pbx_report_extension.id) as id
                 '))
                 ->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id')
-                ->where('users.coach_id', '=', $coach->id)
-                ->groupBy('users.id')
+                ->where('users.coach_id', '=', $coach->id);
+                if($report_date > '2018-05-09') {
+                    $ids = $ids->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
+                }
+                $ids = $ids->groupBy('users.id')
                 ->where('report_date', '=', $report_date)
                 ->get();
 
@@ -3957,6 +4063,9 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $consultants = User::where('coach_id', '=', $coach_id)
             ->get();
 
+        $leader = User::find($coach_id);
+        $pbx_department_id = $leader->department_info->pbx_id;
+
         foreach ($consultants as $consultant) {
             if ($consultant->login_phone > 0) {
                 $max_ids = DB::table('pbx_report_extension')
@@ -3964,8 +4073,11 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                         MAX(id) as id
                     '))
                     ->where('pbx_id', '=', $consultant->login_phone)
-                    ->whereBetween('report_date', [$date_start, $date_stop])
-                    ->groupBy('report_date')
+                    ->whereBetween('report_date', [$date_start, $date_stop]);
+                    if($date_start > '2018-05-31') {
+                        $max_ids = $max_ids->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
+                    }
+                    $max_ids = $max_ids->groupBy('report_date')
                     ->get();
 
                 $repos = Pbx_report_extension::where('pbx_id', '=',  $consultant->login_phone)

@@ -187,7 +187,6 @@ class RecruitmentStory extends Model
                 ->get();
         }
 
-
         return collect($data)->sortByDesc('counted');
     }
 
