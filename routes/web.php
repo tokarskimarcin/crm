@@ -567,6 +567,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageMonthReportDepartmentsSummary', 'StatisticsController@pageMonthReportDepartmentsSummaryGet');
     Route::post('/pageMonthReportDepartmentsSummary', 'StatisticsController@pageMonthReportDepartmentsSummaryPost');
 
+    Route::get('/pageWeekReportDepartmentsRanking', 'StatisticsController@pageWeekReportDepartmentsRankingGet');
+    Route::POST('/pageWeekReportDepartmentsRanking', 'StatisticsController@pageWeekReportDepartmentsRankingPost');
+
     Route::get('/pageWeekReportDepartmentsSummary', 'StatisticsController@pageWeekReportDepartmentsSummaryGet');
     Route::post('/pageWeekReportDepartmentsSummary', 'StatisticsController@pageWeekReportDepartmentsSummaryPost');
 
@@ -768,3 +771,4 @@ Route::get('/screen_table','ScreensController@screenMethod');
 
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
+

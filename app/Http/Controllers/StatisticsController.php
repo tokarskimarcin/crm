@@ -3996,6 +3996,118 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             ]);
     }
 
+    public function pageWeekReportDepartmentsRankingGet() {
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $weeks = $this->monthPerWeekDivision(date('m'), date('Y'));
+        $weeksLastMonth = $this->monthPerWeekDivision(date('m',strtotime('last month')), date('Y'));
+        foreach ($weeks as $item){
+            array_push($weeksLastMonth,$item);
+        }
+        $weeks =  $weeksLastMonth;
+        $toDay = date('Y-m-d');
+        $data = [];
+        $collectFinalData = collect();
+        foreach ($weeks as $key => $week) {
+            if($toDay >= $weeks[$key]['start_day'] &&  $toDay <= $weeks[$key]['stop_day']){
+                foreach ($departments as $department) {
+                    $collectData = collect();
+                    $data = self::dataWeekReportDepartmentsSummary($weeks[$key]['start_day'], $weeks[$key]['stop_day'], $department->id);
+                    $collectDataFromMethodAll = $data['data'];
+                    $week_success = 0;
+                    $week_goal = 0;
+                    $week_day_count = 0;
+                    $dep = $department;
+                    foreach($collectDataFromMethodAll as $value) {
+                        $week_success += $value->success;
+                        if($value->success != 0){
+                            $week_goal += (date('N', strtotime($value->report_date)) < 6) ? $dep->dep_aim : $dep->dep_aim_week ;
+                            $week_day_count++;
+                        }
+                    }
+                    $collectData->department_info_id = $dep->id;
+                    $collectData->department_name = $dep->departments->name.' '.$dep->department_type->name;
+                    $janky_count_all_check = $collectDataFromMethodAll->sum('janky_count_all_check');
+                    $count_bad_check = $collectDataFromMethodAll->sum('count_bad_check');
+                    if($janky_count_all_check != 0){
+                        $collectData->janky_proc = round(($count_bad_check*100)/$janky_count_all_check,2);
+                    }else{
+                        $collectData = 0;
+                    }
+                    $collectData->week_goal_proc = $week_goal_proc = ($week_goal > 0) ? round($week_success / $week_goal * 100, 2) : 0 ;
+                    $collectData->start_day = $weeks[$key]['start_day'];
+                    $collectData->stop_day  = $weeks[$key]['stop_day'];
+                    $collectFinalData->push($collectData);
+                }
+            }
+        }
+        $collectFinalData = $collectFinalData->sortByDesc('week_goal_proc');
+        return view('reportpage.weekReportDepartmentRanking')
+            ->with([
+                'departments'   => $departments,
+                'dep_id'        => 2,
+                'weeks'        => $weeks,
+                'week'         => $collectFinalData->first()->start_day,
+                'data'          => $collectFinalData,
+            ]);
+    }
+
+    public function pageWeekReportDepartmentsRankingPost(Request $request) {
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $weeks = $this->monthPerWeekDivision(date('m'), date('Y'));
+        $weeksLastMonth = $this->monthPerWeekDivision(date('m',strtotime('last month')), date('Y'));
+        foreach ($weeks as $item){
+            array_push($weeksLastMonth,$item);
+        }
+        $weeks =  $weeksLastMonth;
+        $toDay = $request->week_selected;
+        $data = [];
+        $collectFinalData = collect();
+        foreach ($weeks as $key => $week) {
+            if($toDay >= $weeks[$key]['start_day'] &&  $toDay <= $weeks[$key]['stop_day']){
+                foreach ($departments as $department) {
+                    $collectData = collect();
+                    $data = self::dataWeekReportDepartmentsSummary($weeks[$key]['start_day'], $weeks[$key]['stop_day'], $department->id);
+                    $collectDataFromMethodAll = $data['data'];
+                    $week_success = 0;
+                    $week_goal = 0;
+                    $week_day_count = 0;
+                    $dep = $department;
+                    foreach($collectDataFromMethodAll as $value) {
+                        $week_success += $value->success;
+                        if($value->success != 0){
+                            $week_goal += (date('N', strtotime($value->report_date)) < 6) ? $dep->dep_aim : $dep->dep_aim_week ;
+                            $week_day_count++;
+                        }
+                    }
+                    $collectData->department_info_id = $dep->id;
+                    $collectData->department_name = $dep->departments->name.' '.$dep->department_type->name;
+                    $janky_count_all_check = $collectDataFromMethodAll->sum('janky_count_all_check');
+                    $count_bad_check = $collectDataFromMethodAll->sum('count_bad_check');
+                    if($janky_count_all_check != 0){
+                        $collectData->janky_proc = round(($count_bad_check*100)/$janky_count_all_check,2);
+                    }else{
+                        $collectData->janky_proc = 0;
+                    }
+                    $collectData->week_goal_proc = $week_goal_proc = ($week_goal > 0) ? round($week_success / $week_goal * 100, 2) : 0 ;
+                    $collectData->start_day = $weeks[$key]['start_day'];
+                    $collectData->stop_day  = $weeks[$key]['stop_day'];
+                    $collectFinalData->push($collectData);
+                }
+            }
+        }
+        $collectFinalData = $collectFinalData->sortByDesc('week_goal_proc');
+        return view('reportpage.weekReportDepartmentRanking')
+            ->with([
+                'departments'   => $departments,
+                'dep_id'        => 2,
+                'weeks'        => $weeks,
+                'week'         => $collectFinalData->first()->start_day,
+                'data'          => $collectFinalData,
+            ]);
+    }
+
     /*
      * Raport tygodniowy podsumowanie oddziałów - tylko do wglądu
      */
