@@ -1903,6 +1903,7 @@ class StatisticsController extends Controller
         $date = $request->date;
         $date_start = $date;
         $date_stop = $date;
+
         return view('reportpage.recruitmentReport.DayReportInterviews')
             ->with([
                 'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0),

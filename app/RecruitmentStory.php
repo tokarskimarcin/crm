@@ -145,7 +145,8 @@ class RecruitmentStory extends Model
                 count(recruitment_story.id) as counted,
                     department_info.id as dep_id,
                     departments.name as dep_name,
-                    department_type.name as dep_name_type
+                    department_type.name as dep_name_type,
+                    recruitment_story.attempt_result_id
                 '))
                 ->join('candidate', 'candidate.id', 'recruitment_story.candidate_id')
                 ->join('department_info', 'candidate.department_info_id', 'department_info.id')
@@ -157,6 +158,12 @@ class RecruitmentStory extends Model
                 ->orderBy('counted','desc')
                 ->get();
 
+            //zlicza ile jest poszczególnych wyników rekrutacji
+            $status_other_offert = $dataCount->where('attempt_result_id', '=', 2);
+            $status_not_interested = $dataCount->where('attempt_result_id', '=', 3);
+            $status_other = $dataCount->where('attempt_result_id', '=', 5);
+            $status_finished_positive = $dataCount->where('attempt_result_id', '=', 6);
+
             $deps = Department_info::all();
 
             $data = [];
@@ -165,9 +172,33 @@ class RecruitmentStory extends Model
                 $dep_data->dep_name = $dep->departments->name;
                 $dep_data->dep_name_type = $dep->department_type->name;
                 $dep_data->counted = 0;
+                $dep_data->other_offer = 0;
+                $dep_data->not_interested = 0;
+                $dep_data->other = 0;
+                $dep_data->finished_positive = 0;
                 foreach($dataCount as $item) {
                     if ($item->dep_id == $dep->id) {
                         $dep_data->counted = $item->counted;
+                    }
+                }
+                foreach($status_other_offert as $item) {
+                    if ($item->dep_id == $dep->id) {
+                        $dep_data->other_offer = $item->counted;
+                    }
+                }
+                foreach($status_not_interested as $item) {
+                    if ($item->dep_id == $dep->id) {
+                        $dep_data->not_interested = $item->counted;
+                    }
+                }
+                foreach($status_other as $item) {
+                    if ($item->dep_id == $dep->id) {
+                        $dep_data->other = $item->counted;
+                    }
+                }
+                foreach($status_finished_positive as $item) {
+                    if ($item->dep_id == $dep->id) {
+                        $dep_data->finished_positive = $item->counted;
                     }
                 }
                 $data[] = $dep_data;
