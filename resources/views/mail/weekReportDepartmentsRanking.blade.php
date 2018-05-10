@@ -2,7 +2,7 @@
     <thead style="color:#efd88f">
     <tr>
         <td colspan="4" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
-            <font size="5" face="Calibri">Raport Filli {{ $data->first()->start_day. ' - ' . $data->first()->stop_day }}</font></td>
+            <font size="5" face="Calibri">Raport Filii {{ $data->first()->start_day. ' - ' . $data->first()->stop_day }}</font></td>
     </tr>
     <tr>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20; width: 15%;">FILIA</td>

@@ -295,6 +295,8 @@ Route::get('/monthReportHireCandidate', 'StatisticsController@MailmonthReportHir
 //Emaile dotyczące statystyk oddziałów
 Route::get('/monthReportSummaryDepartments', 'StatisticsController@MailMonthReportDepartments');
 
+Route::get('/weekReportDepartmentsRanking', 'StatisticsController@WeekReportDepartmentsRanking');
+
 Route::get('/dayReportDepartments', 'StatisticsController@MailDayDepartmentsReport');
 Route::get('/dayReportCoaches', 'StatisticsController@MailDayReportCoaches');
 Route::get('/hourReportCoaches', 'StatisticsController@MailHourReportCoaches');

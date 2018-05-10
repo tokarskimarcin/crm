@@ -4090,63 +4090,48 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             ]);
     }
 
+    /**
+     * Raport Rankingu Filii GET
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function pageWeekReportDepartmentsRankingGet() {
-        $departments = Department_info::where('id_dep_type', '=', 2)->get();
-
-        $weeks = $this->monthPerWeekDivision(date('m'), date('Y'));
-        $weeksLastMonth = $this->monthPerWeekDivision(date('m',strtotime('last month')), date('Y'));
-        foreach ($weeks as $item){
-            array_push($weeksLastMonth,$item);
-        }
-        $weeks =  $weeksLastMonth;
         $toDay = date('Y-m-d');
-        $data = [];
-        $collectFinalData = collect();
-        foreach ($weeks as $key => $week) {
-            if($toDay >= $weeks[$key]['start_day'] &&  $toDay <= $weeks[$key]['stop_day']){
-                foreach ($departments as $department) {
-                    $collectData = collect();
-                    $data = self::dataWeekReportDepartmentsSummary($weeks[$key]['start_day'], $weeks[$key]['stop_day'], $department->id);
-                    $collectDataFromMethodAll = $data['data'];
-                    $week_success = 0;
-                    $week_goal = 0;
-                    $week_day_count = 0;
-                    $dep = $department;
-                    foreach($collectDataFromMethodAll as $value) {
-                        $week_success += $value->success;
-                        if($value->success != 0){
-                            $week_goal += (date('N', strtotime($value->report_date)) < 6) ? $dep->dep_aim : $dep->dep_aim_week ;
-                            $week_day_count++;
-                        }
-                    }
-                    $collectData->department_info_id = $dep->id;
-                    $collectData->department_name = $dep->departments->name.' '.$dep->department_type->name;
-                    $janky_count_all_check = $collectDataFromMethodAll->sum('janky_count_all_check');
-                    $count_bad_check = $collectDataFromMethodAll->sum('count_bad_check');
-                    if($janky_count_all_check != 0){
-                        $collectData->janky_proc = round(($count_bad_check*100)/$janky_count_all_check,2);
-                    }else{
-                        $collectData = 0;
-                    }
-                    $collectData->week_goal_proc = $week_goal_proc = ($week_goal > 0) ? round($week_success / $week_goal * 100, 2) : 0 ;
-                    $collectData->start_day = $weeks[$key]['start_day'];
-                    $collectData->stop_day  = $weeks[$key]['stop_day'];
-                    $collectFinalData->push($collectData);
-                }
-            }
-        }
-        $collectFinalData = $collectFinalData->sortByDesc('week_goal_proc');
+        $setData = $this::setDataReportDepartmentsRanking($toDay);
         return view('reportpage.weekReportDepartmentRanking')
             ->with([
-                'departments'   => $departments,
-                'dep_id'        => 2,
-                'weeks'        => $weeks,
-                'week'         => $collectFinalData->first()->start_day,
-                'data'          => $collectFinalData,
+                'departments'   => $setData['departments'],
+                'dep_id'        => $setData['dep_id'],
+                'weeks'         => $setData['weeks'],
+                'week'          => $setData['week'],
+                'data'          => $setData['data'],
             ]);
     }
 
+    /**
+     * Raport Rankingu Filii POST
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function pageWeekReportDepartmentsRankingPost(Request $request) {
+
+        $toDay = $request->week_selected;
+        $setData = $this::setDataReportDepartmentsRanking($toDay);
+        return view('reportpage.weekReportDepartmentRanking')
+            ->with([
+                'departments'   => $setData['departments'],
+                'dep_id'        => $setData['dep_id'],
+                'weeks'         => $setData['weeks'],
+                'week'          => $setData['week'],
+                'data'          => $setData['data'],
+            ]);
+    }
+
+    /**
+     * Przyogtowanie danych do rankingu filii
+     * @param $toDay
+     * @return array
+     */
+    public function setDataReportDepartmentsRanking($toDay){
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
         $weeks = $this->monthPerWeekDivision(date('m'), date('Y'));
@@ -4155,8 +4140,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             array_push($weeksLastMonth,$item);
         }
         $weeks =  $weeksLastMonth;
-        $toDay = $request->week_selected;
-        $data = [];
         $collectFinalData = collect();
         foreach ($weeks as $key => $week) {
             if($toDay >= $weeks[$key]['start_day'] &&  $toDay <= $weeks[$key]['stop_day']){
@@ -4192,14 +4175,25 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             }
         }
         $collectFinalData = $collectFinalData->sortByDesc('week_goal_proc');
-        return view('reportpage.weekReportDepartmentRanking')
-            ->with([
-                'departments'   => $departments,
-                'dep_id'        => 2,
-                'weeks'        => $weeks,
-                'week'         => $collectFinalData->first()->start_day,
-                'data'          => $collectFinalData,
-            ]);
+        $data = [
+            'departments'   => $departments,
+            'dep_id'        => 2,
+            'weeks'         => $weeks,
+            'week'          => $collectFinalData->first()->start_day,
+            'weekLastDay'   => $collectFinalData->first()->stop_day,
+            'data'          => $collectFinalData,
+        ];
+        return $data;
+    }
+
+    public function weekReportDepartmentsRanking(){
+        $toDay = date('Y-m-d');
+        $data = $this::setDataReportDepartmentsRanking($toDay);
+        $user = User::where('id','=',1364);
+        //if($data['weekLastDay'] == $toDay){
+            $title = 'Raport Tygodniowy Filii '.$data['week'].' - '.$data['weekLastDay'];
+            $this->sendMailByVerona('weekReportDepartmentsRanking', $data, $title,$user);
+       // }
     }
 
     /*
@@ -4521,6 +4515,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
 
         return collect($reports)->sortByDesc('average');
     }
+
+
 
     /******** Główna funkcja do wysyłania emaili*************/
     /*
