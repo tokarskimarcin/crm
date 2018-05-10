@@ -142,7 +142,6 @@ class RecruitmentStory extends Model
         if ($select_type == 0) {
             $dataCount = DB::table('recruitment_story')
                 ->select(DB::raw('
-                count(recruitment_story.id) as counted,
                     department_info.id as dep_id,
                     departments.name as dep_name,
                     department_type.name as dep_name_type,
@@ -154,20 +153,30 @@ class RecruitmentStory extends Model
                 ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
                 ->whereBetween('recruitment_story.created_at', [$date_start . ' 01:00:00', $date_stop . ' 23:00:00'])
                 ->where('recruitment_story.attempt_status_id','=',17)
-                ->groupBy('candidate.department_info_id')
-                ->orderBy('counted','desc')
+                ->groupBy('candidate.department_info_id','recruitment_story.attempt_result_id')
                 ->get();
 
             //zlicza ile jest poszczególnych wyników rekrutacji
-            $status_other_offert = $dataCount->where('attempt_result_id', '=', 2);
-            $status_not_interested = $dataCount->where('attempt_result_id', '=', 3);
-            $status_other = $dataCount->where('attempt_result_id', '=', 5);
-            $status_finished_positive = $dataCount->where('attempt_result_id', '=', 6);
 
             $deps = Department_info::all();
 
             $data = [];
             foreach ($deps as $dep) {
+
+                $status_other_offert = $dataCount
+                    ->where('attempt_result_id', '=', 2)
+                    ->where('dep_id', '=', $dep->id)->count();
+                $status_not_interested = $dataCount
+                    ->where('attempt_result_id', '=', 3)
+                    ->where('dep_id', '=', $dep->id)->count();
+                $status_other = $dataCount
+                    ->where('attempt_result_id', '=', 5)
+                    ->where('dep_id', '=', $dep->id)->count();
+                $status_finished_positive = $dataCount
+                    ->where('attempt_result_id', '=', 6)
+                    ->where('dep_id', '=', $dep->id)->count();
+
+                $dataCount_all = $dataCount->where('dep_id', '=', $dep->id)->count();
                 $dep_data = new \stdClass();
                 $dep_data->dep_name = $dep->departments->name;
                 $dep_data->dep_name_type = $dep->department_type->name;
@@ -176,34 +185,18 @@ class RecruitmentStory extends Model
                 $dep_data->not_interested = 0;
                 $dep_data->other = 0;
                 $dep_data->finished_positive = 0;
-                foreach($dataCount as $item) {
-                    if ($item->dep_id == $dep->id) {
-                        $dep_data->counted = $item->counted;
+
+
+                $dep_data->counted = $dataCount_all;
+                $dep_data->other_offer = $status_other_offert;
+                $dep_data->not_interested = $status_not_interested;
+                $dep_data->other = $status_other;
+                $dep_data->finished_positive = $status_finished_positive;
+
+                array_push($data, $dep_data);
                     }
-                }
-                foreach($status_other_offert as $item) {
-                    if ($item->dep_id == $dep->id) {
-                        $dep_data->other_offer = $item->counted;
-                    }
-                }
-                foreach($status_not_interested as $item) {
-                    if ($item->dep_id == $dep->id) {
-                        $dep_data->not_interested = $item->counted;
-                    }
-                }
-                foreach($status_other as $item) {
-                    if ($item->dep_id == $dep->id) {
-                        $dep_data->other = $item->counted;
-                    }
-                }
-                foreach($status_finished_positive as $item) {
-                    if ($item->dep_id == $dep->id) {
-                        $dep_data->finished_positive = $item->counted;
-                    }
-                }
-                $data[] = $dep_data;
             }
-        } else if ($select_type == 1) {
+         else if ($select_type == 1) {
             $data = DB::table('recruitment_story')
                 ->select(DB::raw('
                     first_name,
