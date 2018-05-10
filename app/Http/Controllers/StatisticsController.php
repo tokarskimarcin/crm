@@ -1710,14 +1710,27 @@ class StatisticsController extends Controller
         $month_end = new DateTime("last day of this month");
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
-        $data = [
-            'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
-            'source' => $candidate_source,
-            'date_start' => $date_start,
-            'date_stop' => $date_stop
-        ];
         return view('reportpage.recruitmentReport.MonthReportRecruitmentFlow')
-            ->with('data',$data);
+            ->with([
+                'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
+                'source' => $candidate_source,
+                'date_start' => $date_start,
+                'date_stop' => $date_stop
+            ]);
+    }
+
+    public function pageMonthReportRecruitmentFlowPost(Request $request) {
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
+
+        $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
+        return view('reportpage.recruitmentReport.MonthReportRecruitmentFlow')
+            ->with([
+                'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
+                'source' => $candidate_source,
+                'date_start' => $date_start,
+                'date_stop' => $date_stop
+            ]);
     }
 
     /**
@@ -1737,6 +1750,7 @@ class StatisticsController extends Controller
             'date_start' => $date_start,
             'date_stop' => $date_stop
         ];
+
         $title = 'Miesięczny Raport Spływu Rekrutacji '.$date_start.' - '.$date_stop;
         $this->sendMailByVerona('recruitmentMail.monthReportRecruitmentFlow', $data, $title);
     }

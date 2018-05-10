@@ -599,6 +599,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::post('/pageWeekReportHireCandidate','StatisticsController@pageWeekReportHireCandidatePost');
     //Miesięczny
     Route::get('/pageMonthReportRecruitmentFlow','StatisticsController@pageMonthReportRecruitmentFlow');
+    Route::post('/pageMonthReportRecruitmentFlow','StatisticsController@pageMonthReportRecruitmentFlowPost');
     Route::get('/pageMonthReportTrainingGroup','StatisticsController@pageMonthReportTrainingGroup');
     Route::get('/pageMonthReportInterviews','StatisticsController@pageMonthReportInterviews');
     Route::get('/pageMonthReportHireCandidate','StatisticsController@pageMonthReportHireCandidate');
