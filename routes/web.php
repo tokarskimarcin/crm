@@ -602,6 +602,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::post('/pageMonthReportRecruitmentFlow','StatisticsController@pageMonthReportRecruitmentFlowPost');
     Route::get('/pageMonthReportTrainingGroup','StatisticsController@pageMonthReportTrainingGroup');
     Route::get('/pageMonthReportInterviews','StatisticsController@pageMonthReportInterviews');
+    Route::post('/pageMonthReportInterviews','StatisticsController@pageMonthReportInterviewsPost');
     Route::get('/pageMonthReportHireCandidate','StatisticsController@pageMonthReportHireCandidate');
 
 

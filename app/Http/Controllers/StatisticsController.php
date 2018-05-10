@@ -1961,11 +1961,25 @@ class StatisticsController extends Controller
         $month_end = new DateTime("last day of this month");
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
-        $data = [
-            'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
-        ];
+
         return view('reportpage.recruitmentReport.MonthReportInterviews')
-            ->with('data',$data['data']);
+            ->with([
+                'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0),
+                'date_start' => $date_start,
+                'date_stop' => $date_stop
+            ]);
+    }
+
+    public function pageMonthReportInterviewsPost(Request $request) {
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
+
+        return view('reportpage.recruitmentReport.MonthReportInterviews')
+            ->with([
+                'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0),
+                'date_start' => $date_start,
+                'date_stop' => $date_stop
+            ]);
     }
 
     /**
