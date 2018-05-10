@@ -212,7 +212,7 @@ class RecruitmentStory extends Model
                 ->get();
         }
 
-        return collect($data);
+        return collect($data)->sortByDesc('counted');
     }
 
     /**
