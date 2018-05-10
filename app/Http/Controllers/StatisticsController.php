@@ -1067,28 +1067,31 @@ class StatisticsController extends Controller
 
     //przygotowanie danych do raportu miesięcznego dkj
     //type - 0 bierzący miesiac, 1 poprzedni
-    private function MonthReportDkjData($type) {
-        $month = $this->monthReverse(date('m'));
-        $year = date('Y');
+    private function MonthReportDkjData($date_start, $date_stop) {
+        $month = $this->monthReverse(substr($date_start, 5,2));
+//        $year = date('Y');
         if ($month < 10) {
             $month = '0' . $month;
         }
-        if ($month == 12) {
-            $year -= 1;
-        }
-        $selected_date = $year . '-' . $month . '%';
-        if($type == 0)
-        {
-            $month_ini = new DateTime("first day of this month");
-            $date_start = $month_ini->format('Y-m-d');
-            $month_end = new DateTime("last day of this month");
-            $date_stop = $month_end->format('Y-m-d');
-        }else{
-            $month_ini = new DateTime("first day of last month");
-            $date_start = $month_ini->format('Y-m-d');
-            $month_end = new DateTime("last day of last month");
-            $date_stop = $month_end->format('Y-m-d');
-        }
+//        if ($month == 12) {
+//            $year -= 1;
+//        }
+//        $selected_date = $year . '-' . $month . '%';
+//        if($type == 0)
+//        {
+//            $month_ini = new DateTime("first day of this month");
+//            $date_start = $month_ini->format('Y-m-d');
+//            $month_end = new DateTime("last day of this month");
+//            $date_stop = $month_end->format('Y-m-d');
+//        }else{
+//            $month_ini = new DateTime("first day of last month");
+//            $date_start = $month_ini->format('Y-m-d');
+//            $month_end = new DateTime("last day of last month");
+//            $date_stop = $month_end->format('Y-m-d');
+//        }
+
+//        $selected_date = substr($date_start, 0, 7) . '%';
+
 
 
 //        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
@@ -1115,7 +1118,7 @@ class StatisticsController extends Controller
                 sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as work_time
             '))
             ->join('work_hours', 'users.id', '=', 'work_hours.id_user')
-            ->where('work_hours.date', 'like', $selected_date)
+            ->whereIn('work_hours.date',[$date_start, $date_stop])
             ->groupBy('users.id')
             ->where('users.user_type_id', '=', 2)
             ->get();
@@ -1166,19 +1169,49 @@ class StatisticsController extends Controller
 
     //wysyłanie raportu miesięcznego pracownicy dkj
     public function monthReportDkj() {
-      $data = $this->MonthReportDkjData(1);
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m")-1,date("d"),date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+      $all_data = $this->MonthReportDkjData($date_start, $date_stop);
+      $data = [
+          'month_name' => $all_data['month_name'],
+          'dkj' => $all_data['dkj'],
+          'work_hours' => $all_data['work_hours'],
+          'date_start' => $date_start,
+          'date_stop' => $date_stop
+      ];
       $title = 'Raport miesięczny DKJ';
       $this->sendMailByVerona('monthReportDkj', $data, $title);
     }
 
     //wyswietlanie raoprtu miesiecznego pracownicy dkj
     public function pageMonthReportDKJ(){
-        $data = $this->MonthReportDkjData(0);
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m")-1,date("d"),date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $data = $this->MonthReportDkjData($date_start, $date_stop);
 
         return view('reportpage.MonthReportDkj')
-            ->with('month_name', $data['month_name'])
-            ->with('dkj', $data['dkj'])
-            ->with('work_hours', $data['work_hours']);
+            ->with([
+                'month_name' => $data['month_name'],
+                'dkj' => $data['dkj'],
+                'work_hours' => $data['work_hours'],
+                'date_start' => $date_start,
+                'date_stop' => $date_stop
+            ]);
+    }
+
+    public function pageMonthReportDKJPost(Request $request) {
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
+        $data = $this->MonthReportDkjData($date_start, $date_stop);
+
+        return view('reportpage.MonthReportDkj')
+            ->with([
+                'month_name' => $data['month_name'],
+                'dkj' => $data['dkj'],
+                'work_hours' => $data['work_hours'],
+                'date_start' => $date_start,
+                'date_stop' => $date_stop
+            ]);
     }
 
     /****************** RAPORTY ODSŁUCH ***********************/

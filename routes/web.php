@@ -527,6 +527,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageWeekReportDKJ', 'StatisticsController@pageWeekReportDKJ');
     Route::post('/pageWeekReportDKJ', 'StatisticsController@pageWeekReportDKJPost');
     Route::get('/pageMonthReportDKJ', 'StatisticsController@pageMonthReportDKJ');
+    Route::post('/pageMonthReportDKJ', 'StatisticsController@pageMonthReportDKJPost');
 
     Route::get('/pageDayReportEmployeeDkj', 'StatisticsController@pageDayReportEmployeeDkj');
     Route::post('/pageDayReportEmployeeDkj', 'StatisticsController@pageDayReportEmployeeDkjPost');
