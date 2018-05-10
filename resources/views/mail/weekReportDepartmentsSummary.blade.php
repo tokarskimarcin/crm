@@ -58,7 +58,7 @@
                         foreach($department_repo['data'] as $value) {
                             $week_rbh += $value->day_time_sum;
                             $week_success += $value->success;
-                            if($value->success != 0){
+                            if($value->day_time_sum != 0){
                                $week_goal += (date('N', strtotime($value->report_date)) < 6) ? $dep->dep_aim : $dep->dep_aim_week ;
                                $week_day_count++;
                             }
