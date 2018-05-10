@@ -2099,11 +2099,25 @@ class StatisticsController extends Controller
         $month_end = new DateTime("last day of this month");
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
-        $data = [
-            'data' => RecruitmentStory::getReportNewAccountData($date_start,$date_stop,0)
-        ];
+
         return view('reportpage.recruitmentReport.MonthReportHireCandidate')
-            ->with('data',$data['data']);
+            ->with([
+                'data' => RecruitmentStory::getReportNewAccountData($date_start,$date_stop,0),
+                'date_start' => $date_start,
+                'date_stop' => $date_stop
+            ]);
+    }
+
+    public function pageMonthReportHireCandidatePost(Request $request) {
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
+
+        return view('reportpage.recruitmentReport.MonthReportHireCandidate')
+            ->with([
+                'data' => RecruitmentStory::getReportNewAccountData($date_start,$date_stop,0),
+                'date_start' => $date_start,
+                'date_stop' => $date_stop
+            ]);
     }
 
     /**
@@ -2115,7 +2129,9 @@ class StatisticsController extends Controller
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
         $data = [
-            'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0)
+            'data' => RecruitmentStory::getReportNewAccountData($date_start,$date_stop,0),
+            'date_start' => $date_start,
+            'date_stop' => $date_stop
         ];
         $title = 'Miesięczny Raport Rozmów Rekrutacyjnych '.$date_start.' - '.$date_stop;
         $this->sendMailByVerona('recruitmentMail.monthReportHireCandidate', $data, $title);

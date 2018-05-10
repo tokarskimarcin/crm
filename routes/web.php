@@ -604,6 +604,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageMonthReportInterviews','StatisticsController@pageMonthReportInterviews');
     Route::post('/pageMonthReportInterviews','StatisticsController@pageMonthReportInterviewsPost');
     Route::get('/pageMonthReportHireCandidate','StatisticsController@pageMonthReportHireCandidate');
+    Route::post('/pageMonthReportHireCandidate','StatisticsController@pageMonthReportHireCandidatePost');
 
 
     //Raport Usunietych kont
