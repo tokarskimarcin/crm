@@ -1846,11 +1846,25 @@ class StatisticsController extends Controller
         $month_end = new DateTime("last day of this month");
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
-        $data = [
-            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
-        ];
+
         return view('reportpage.recruitmentReport.MonthReportRecruitmentTrainingGroup')
-            ->with('data',$data['data']);
+            ->with([
+                'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop),
+                'date_start' => $date_start,
+                'date_stop' => $date_stop
+            ]);
+    }
+
+    public function pageMonthReportTrainingGroupPost(Request $request) {
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
+
+        return view('reportpage.recruitmentReport.MonthReportRecruitmentTrainingGroup')
+            ->with([
+                'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop),
+                'date_start' => $date_start,
+                'date_stop' => $date_stop
+            ]);
     }
 
     /**
@@ -1862,7 +1876,9 @@ class StatisticsController extends Controller
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
         $data = [
-            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop)
+            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop),
+            'date_start' => $date_start,
+            'date_stop' => $date_stop
         ];
         $title = 'Miesięczny Raport Szkoleń '.$date_start.' - '.$date_stop;
         $this->sendMailByVerona('recruitmentMail.monthReportRecruitmentTrainingGroup', $data, $title);
