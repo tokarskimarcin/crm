@@ -2017,8 +2017,8 @@ class StatisticsController extends Controller
      * Raport zatrudnienie
      */
     public function pageDayReportHireCandidate(){
-        $date_start = date('Y-m-d');
-        $date_stop = date('Y-m-d');
+        $date_start = date('Y-m-d', time() - 24 * 3600);
+        $date_stop = date('Y-m-d', time() - 24 * 3600);
         $data = [
             'data' => RecruitmentStory::getReportNewAccountData($date_start,$date_stop,0)
         ];
@@ -2031,8 +2031,8 @@ class StatisticsController extends Controller
     }
 
     public function pageDayReportHireCandidatePost(Request $request) {
-        $date_start = $request->date_start;
-        $date_stop = $request->date_stop;
+        $date_start = $request->date;
+        $date_stop = $request->date;
 
         $data = [
             'data' => RecruitmentStory::getReportNewAccountData($date_start,$date_stop,0)
