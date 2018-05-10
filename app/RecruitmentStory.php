@@ -142,6 +142,7 @@ class RecruitmentStory extends Model
         if ($select_type == 0) {
             $dataCount = DB::table('recruitment_story')
                 ->select(DB::raw('
+                    count(*) as count_record,
                     department_info.id as dep_id,
                     departments.name as dep_name,
                     department_type.name as dep_name_type,
@@ -165,18 +166,18 @@ class RecruitmentStory extends Model
 
                 $status_other_offert = $dataCount
                     ->where('attempt_result_id', '=', 2)
-                    ->where('dep_id', '=', $dep->id)->count();
+                    ->where('dep_id', '=', $dep->id)->pluck('count_record')->first();
                 $status_not_interested = $dataCount
                     ->where('attempt_result_id', '=', 3)
-                    ->where('dep_id', '=', $dep->id)->count();
+                    ->where('dep_id', '=', $dep->id)->pluck('count_record')->first();
                 $status_other = $dataCount
                     ->where('attempt_result_id', '=', 5)
-                    ->where('dep_id', '=', $dep->id)->count();
+                    ->where('dep_id', '=', $dep->id)->pluck('count_record')->first();
                 $status_finished_positive = $dataCount
                     ->where('attempt_result_id', '=', 6)
-                    ->where('dep_id', '=', $dep->id)->count();
+                    ->where('dep_id', '=', $dep->id)->pluck('count_record')->first();
 
-                $dataCount_all = $dataCount->where('dep_id', '=', $dep->id)->count();
+                $dataCount_all = $dataCount->where('dep_id', '=', $dep->id)->sum('count_record');
                 $dep_data = new \stdClass();
                 $dep_data->dep_name = $dep->departments->name;
                 $dep_data->dep_name_type = $dep->department_type->name;
@@ -187,11 +188,11 @@ class RecruitmentStory extends Model
                 $dep_data->finished_positive = 0;
 
 
-                $dep_data->counted = $dataCount_all;
-                $dep_data->other_offer = $status_other_offert;
-                $dep_data->not_interested = $status_not_interested;
-                $dep_data->other = $status_other;
-                $dep_data->finished_positive = $status_finished_positive;
+                $dep_data->counted = $dataCount_all != null ? $dataCount_all : 0;
+                $dep_data->other_offer = $status_other_offert != null ? $status_other_offert : 0;
+                $dep_data->not_interested = $status_not_interested != null ? $status_not_interested : 0;
+                $dep_data->other = $status_other != null ? $status_other : 0;
+                $dep_data->finished_positive = $status_finished_positive != null ? $status_finished_positive : 0;
 
                 array_push($data, $dep_data);
                     }
@@ -211,7 +212,7 @@ class RecruitmentStory extends Model
                 ->get();
         }
 
-        return collect($data)->sortByDesc('counted');
+        return collect($data);
     }
 
     /**
