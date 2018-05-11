@@ -4696,12 +4696,25 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
     public function dayReportCampaignGet() {
         $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d"),date("Y")));
         $date_stop = date("Y-m-d",mktime(23,0,0,date("m"),date("d"),date("Y")));
+
         return view('reportpage.DayReportCampaign')
             ->with([
                 'today' => $date_start,
                 'data' => $this->getCampaignData($date_start, $date_stop, 0), // 0 - regular data
                 'sum' => $this->getCampaignData($date_start, $date_stop, 1) // 1 - sum of all data(agreggate)
                 ]);
+        }
+
+    public function dayReportCampaignPost(Request $request) {
+        $date_start = $request->date;
+        $date_stop = $request->date;
+
+        return view('reportpage.DayReportCampaign')
+            ->with([
+                'today' => $date_start,
+                'data' => $this->getCampaignData($date_start, $date_stop, 0), // 0 - regular data
+                'sum' => $this->getCampaignData($date_start, $date_stop, 1) // 1 - sum of all data(agreggate)
+            ]);
     }
 
     /**

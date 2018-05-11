@@ -774,6 +774,7 @@ Route::get('/screen_table','ScreensController@screenMethod');
     //campaign
     Route::get('/report_campaign', 'PBXDataAPI@report_campaign');
     Route::get('/dayReportCampaign', 'StatisticsController@dayReportCampaignGet');
+    Route::post('/dayReportCampaign', 'StatisticsController@dayReportCampaignPost');
 
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
