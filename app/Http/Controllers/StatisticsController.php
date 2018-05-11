@@ -4782,8 +4782,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
      */
     public function getCampaignData($date_start, $date_stop, $sum) {
         if($sum == 0) { //raw data
-            $campaign_data = ReportCampaign::whereIn('date', [$date_start, $date_stop])
-                ->whereBetween('time', ['00:00:00', '23:59:59'])
+            $campaign_data = DB::table('report_campaign')
+                ->whereBetween('date', [$date_start, $date_stop])
                 ->where('all_campaigns', '>', 0)
                 ->get();
         }
@@ -4794,8 +4794,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             SUM(received_campaigns) AS sum_received,
             SUM(unreceived_campaigns) AS sum_unreceived
             '))
-                ->whereIn('date', [$date_start, $date_stop])
-                ->whereBetween('time', ['00:00:00', '23:59:59'])
+                ->whereBetween('date', [$date_start, $date_stop])
                 ->get();
         }
 

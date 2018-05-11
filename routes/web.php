@@ -500,6 +500,16 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     //Report Page Start
     Route::get('/pageDayReportMissedRepo', 'StatisticsController@dayReportMissedRepo');
 
+    //Campaign reports
+    Route::get('/dayReportCampaign', 'StatisticsController@dayReportCampaignGet');
+    Route::post('/dayReportCampaign', 'StatisticsController@dayReportCampaignPost');
+
+    Route::get('/weekReportCampaign', 'StatisticsController@weekReportCampaignGet');
+    Route::post('/weekReportCampaign', 'StatisticsController@weekReportCampaignPost');
+
+    Route::get('/monthReportCampaign', 'StatisticsController@monthReportCampaignGet');
+    Route::post('/monthReportCampaign', 'StatisticsController@monthReportCampaignPost');
+
 
     Route::get('/pageHourReportTelemarketing', 'StatisticsController@pageHourReportTelemarketing');
     Route::get('/pageWeekReportTelemarketing', 'StatisticsController@pageWeekReportTelemarketing');
@@ -771,16 +781,9 @@ Route::get('/screen_table','ScreensController@screenMethod');
     Route::post('/userPrivilagesAjax', 'AdminController@userPrivilagesAjaxData')->name('api.privilageAjaxData');
     Route::post('/userPrivilage', 'AdminController@userPrivilagesPOST');
 
-    //campaign
-    Route::get('/report_campaign', 'PBXDataAPI@report_campaign');
-    Route::get('/dayReportCampaign', 'StatisticsController@dayReportCampaignGet');
-    Route::post('/dayReportCampaign', 'StatisticsController@dayReportCampaignPost');
+//campaign reports mothod for database
+Route::get('/report_campaign', 'PBXDataAPI@report_campaign');
 
-    Route::get('/weekReportCampaign', 'StatisticsController@weekReportCampaignGet');
-    Route::post('/weekReportCampaign', 'StatisticsController@weekReportCampaignPost');
-
-    Route::get('/monthReportCampaign', 'StatisticsController@monthReportCampaignGet');
-    Route::post('/monthReportCampaign', 'StatisticsController@monthReportCampaignPost');
 
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
