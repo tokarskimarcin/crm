@@ -4722,7 +4722,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
      */
     public function weekReportCampaignGet() {
         $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d"),date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
 
         return view('reportpage.WeekReportCampaign')
             ->with([
@@ -4746,6 +4746,34 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             ]);
     }
 
+    /**
+     * @return $this method shows month campaign report
+     */
+    public function monthReportCampaignGet() {
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m")-1,date("d")-1,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+
+        return view('reportpage.MonthReportCampaign')
+            ->with([
+                'date_start' => $date_start,
+                'date_stop' => $date_stop,
+                'data' => $this->getCampaignData($date_start, $date_stop, 0), // 0 - regular data
+                'sum' => $this->getCampaignData($date_start, $date_stop, 1) // 1 - sum of all data(agreggate)
+            ]);
+    }
+
+    public function monthReportCampaignPost(Request $request) {
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
+
+        return view('reportpage.MonthReportCampaign')
+            ->with([
+                'date_start' => $date_start,
+                'date_stop' => $date_stop,
+                'data' => $this->getCampaignData($date_start, $date_stop, 0), // 0 - regular data
+                'sum' => $this->getCampaignData($date_start, $date_stop, 1) // 1 - sum of all data(agreggate)
+            ]);
+    }
     /**
      * @param $date_start
      * @param $date_stop

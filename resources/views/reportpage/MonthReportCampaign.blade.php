@@ -5,13 +5,13 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="page-header">
-                <div class="alert gray-nav">Raport Tygodniowy Kampanii</div>
+                <div class="alert gray-nav">Raport Miesięczny Kampanii</div>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-lg-12">
-            <form action="{{URL::to('/weekReportCampaign')}}" method="post">
+            <form action="{{URL::to('/monthReportCampaign')}}" method="post">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <div class="form-group">
                     <label for="date" class="myLabel">Data początkowa:</label>
@@ -38,7 +38,7 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <div class="panel-body">
-                                        @include('mail.weekReportCampaign')
+                                        @include('mail.monthReportCampaign')
                                     </div>
                                 </div>
                             </div>

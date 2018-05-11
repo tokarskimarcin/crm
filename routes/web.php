@@ -779,5 +779,8 @@ Route::get('/screen_table','ScreensController@screenMethod');
     Route::get('/weekReportCampaign', 'StatisticsController@weekReportCampaignGet');
     Route::post('/weekReportCampaign', 'StatisticsController@weekReportCampaignPost');
 
+    Route::get('/monthReportCampaign', 'StatisticsController@monthReportCampaignGet');
+    Route::post('/monthReportCampaign', 'StatisticsController@monthReportCampaignPost');
+
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
