@@ -8,6 +8,7 @@ use App\HourReport;
 use App\Pbx_report_extension;
 use App\PBXDKJTeam;
 use App\RecruitmentStory;
+use App\ReportCampaign;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -4687,5 +4688,47 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             $title = 'Raport tygodniowo/miesięczny (dyrektor)';
             $this->sendMailByVerona('reportCoachingWeekCoach', $allDataArray, $title, $menagerVariable);
         }
+    }
+
+    /**
+     * @return $this method returns data for day campaign report
+     */
+    public function dayReportCampaignGet() {
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d"),date("Y")));
+        $date_stop = date("Y-m-d",mktime(23,0,0,date("m"),date("d"),date("Y")));
+        return view('reportpage.DayReportCampaign')
+            ->with([
+                'today' => $date_start,
+                'data' => $this->getCampaignData($date_start, $date_stop, 0), // 0 - regular data
+                'sum' => $this->getCampaignData($date_start, $date_stop, 1) // 1 - sum of all data(agreggate)
+                ]);
+    }
+
+    /**
+     * @param $date_start
+     * @param $date_stop
+     * @param $sum == 0 indices that we want raw data, $sum == 1 indices that we want agreggate data
+     * @return data about camapigns
+     */
+    public function getCampaignData($date_start, $date_stop, $sum) {
+        if($sum == 0) { //raw data
+            $campaign_data = ReportCampaign::whereIn('date', [$date_start, $date_stop])
+                ->whereBetween('time', ['00:00:00', '23:59:59'])
+                ->where('all_campaigns', '>', 0)
+                ->get();
+        }
+        else { //agreggate data
+            $campaign_data = ReportCampaign::select(DB::raw('
+            SUM(all_campaigns) AS sum_campaign,
+            SUM(active_campaigns) AS sum_active,
+            SUM(received_campaigns) AS sum_received,
+            SUM(unreceived_campaigns) AS sum_unreceived
+            '))
+                ->whereIn('date', [$date_start, $date_stop])
+                ->whereBetween('time', ['00:00:00', '23:59:59'])
+                ->get();
+        }
+
+        return $campaign_data->sortByDesc('all_campaigns');
     }
 }
