@@ -872,6 +872,9 @@ class CoachingController extends Controller
             $item = $user->work_hours->sortbyDESC('date');
             $succes  = 0;
             $rbh = 0;
+            $date_start = '';
+            $date_stop = '';
+            $i = 0;
             while($rbh < 64800 && is_object($item->first())){ // po przepracowaniu coanjmniej 18 rbh
                 $work_hours = $item->first();
                 if($i == 0){
@@ -918,7 +921,10 @@ class CoachingController extends Controller
             $data->id = $user->id;
             $data->first_name = $user->first_name;
             $data->last_name = $user->last_name;
+            $data->start_date = $date_start;
+            $data->stop_date = $date_stop;
             $data->success = $succes;
+            $data->pbx = $user_pbx_number;
             if(is_object($janky_reports->first()))
             {
                 $data->janky_all_check = $janky_reports->first()->janky_all_check;
