@@ -421,6 +421,8 @@
 
             if(validation)
             {
+                let user_department_typ ="{{$coachingManagerList['user_department_type']}}";
+
                 if(coaching_type == 1){
                     if(manager_actual_avg.trim('').length == 0 || isNaN(manager_actual_avg) ){
                         validation = false;
@@ -430,15 +432,22 @@
                         validation = false;
                         swal('Błędna docelowa średnia')
                     }
-                    if(manager_actual_avg > 0.5){
-                        if(coaching_manager_goal_avg < proc_manager_goal_min_avg){
-                            validation = false;
-                            swal('Minimalna średnia musi być większa niż 10% aktualnej średniej')
-                        }else if(coaching_manager_goal_avg > proc_manager_goal_max_avg){
-                            validation = false;
-                            swal('Minimalna średnia musi być mniejsza niż 30% aktualnej średniej')
+
+                    if(user_department_typ != 1){
+                        if(manager_actual_avg > 0.5){
+                            if(coaching_manager_goal_avg < proc_manager_goal_min_avg){
+                                validation = false;
+                                swal('Minimalna średnia musi być większa niż 10% aktualnej średniej')
+                            }else if(coaching_manager_goal_avg > proc_manager_goal_max_avg){
+                                validation = false;
+                                swal('Minimalna średnia musi być mniejsza niż 30% aktualnej średniej')
+                            }
                         }
+                    }else{
+                        console.log('nie sprawdzam');
                     }
+
+
                 }else if(coaching_type == 2){
                     if(manager_actual_janky.trim('').length == 0 || isNaN(manager_actual_janky) ){
                         validation = false;
@@ -730,7 +739,7 @@
                                 if(data.coaching_type == 1){
                                     if(data.actual_avg == 'null')
                                         data.actual_avg = 0;
-                                    if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
+                                    if(parseFloat(data.actual_avg) >= parseFloat(data.average_goal))
                                         return span_good_start+data.actual_avg+span_end;
                                     else
                                         return span_bad_start+data.actual_avg+span_end;
@@ -744,7 +753,7 @@
                                 }else{
                                     if(data.actual_rbh == null)
                                         data.actual_rbh = 0;
-                                    if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
+                                    if(parseFloat(data.actual_rbh) >= parseFloat(data.rbh_goal))
                                         return span_good_start+data.actual_rbh+span_end;
                                     else
                                         return span_bad_start+data.actual_rbh+span_end;
@@ -947,7 +956,7 @@
 
                             if(user_department_type == 2) {
                                 if(data.coaching_type == 1){
-                                    if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
+                                    if(parseFloat(data.actual_avg) >= parseFloat(data.average_goal))
                                         return span_good_start+data.actual_avg+span_end;
                                     else
                                         return span_bad_start+data.actual_avg+span_end;
@@ -957,7 +966,7 @@
                                     else
                                         return span_bad_start+data.actual_janky+span_end;
                                 }else
-                                if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
+                                if(parseFloat(data.actual_rbh) >= parseFloat(data.rbh_goal))
                                     return span_good_start+data.actual_rbh+span_end;
                                 else
                                     return span_bad_start+data.actual_rbh+span_end;
@@ -1063,7 +1072,7 @@
                             var span_end= '</span>';
                             // if(user_department_type == 2) {
                                 if(data.coaching_type == 1){
-                                    if(parseFloat(data.average_end) > parseFloat(data.average_goal))
+                                    if(parseFloat(data.average_end) >= parseFloat(data.average_goal))
                                         return span_good_start+data.average_end+span_end;
                                     else
                                         return span_bad_start+data.average_end+span_end;
@@ -1073,7 +1082,7 @@
                                     else
                                         return span_bad_start+data.janky_end+span_end;
                                 }else
-                                if(parseFloat(data.rbh_end) > parseFloat(data.rbh_goal))
+                                if(parseFloat(data.rbh_end) >= parseFloat(data.rbh_goal))
                                     return span_good_start+data.rbh_end+span_end;
                                 else
                                     return span_bad_start+data.rbh_end+span_end;
