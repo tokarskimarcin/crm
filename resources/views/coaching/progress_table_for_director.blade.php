@@ -736,7 +736,7 @@
                                 var span_bad_start =  '<span style="color: red">';
                                 var span_end= '</span>';
                                 if(data.coaching_type == 1){
-                                    if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
+                                    if(parseFloat(data.actual_avg) >= parseFloat(data.average_goal))
                                         return span_good_start+data.actual_avg+span_end;
                                     else
                                         return span_bad_start+data.actual_avg+span_end;
@@ -746,7 +746,7 @@
                                     else
                                         return span_bad_start+data.actual_janky+span_end;
                                 }else
-                                if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
+                                if(parseFloat(data.actual_rbh) >= parseFloat(data.rbh_goal))
                                     return span_good_start+data.actual_rbh+span_end;
                                 else
                                     return span_bad_start+data.actual_rbh+span_end;
@@ -889,7 +889,7 @@
                             var span_bad_start =  '<span style="color: red">';
                             var span_end= '</span>';
                             if(data.coaching_type == 1){
-                                if(parseFloat(data.actual_avg) > parseFloat(data.average_goal))
+                                if(parseFloat(data.actual_avg) >= parseFloat(data.average_goal))
                                     return span_good_start+data.actual_avg+span_end;
                                 else
                                     return span_bad_start+data.actual_avg+span_end;
@@ -899,7 +899,7 @@
                                 else
                                     return span_bad_start+data.actual_janky+span_end;
                             }else
-                            if(parseFloat(data.actual_rbh) > parseFloat(data.rbh_goal))
+                            if(parseFloat(data.actual_rbh) >= parseFloat(data.rbh_goal))
                                 return span_good_start+data.actual_rbh+span_end;
                             else
                                 return span_bad_start+data.actual_rbh+span_end;
@@ -995,7 +995,7 @@
                             var span_bad_start =  '<span style="color: red">';
                             var span_end= '</span>';
                             if(data.coaching_type == 1){
-                                if(parseFloat(data.average_end) > parseFloat(data.average_goal))
+                                if(parseFloat(data.average_end) >= parseFloat(data.average_goal))
                                     return span_good_start+data.average_end+span_end;
                                 else
                                     return span_bad_start+data.average_end+span_end;
@@ -1005,7 +1005,7 @@
                                 else
                                     return span_bad_start+data.janky_end+span_end;
                             }else
-                                if(parseFloat(data.rbh_end) > parseFloat(data.rbh_goal))
+                                if(parseFloat(data.rbh_end) >= parseFloat(data.rbh_goal))
                                     return span_good_start+data.rbh_end+span_end;
                                 else
                                     return span_bad_start+data.rbh_end+span_end;
