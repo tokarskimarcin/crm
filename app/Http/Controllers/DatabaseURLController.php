@@ -168,7 +168,7 @@ class DatabaseURLController extends Controller
         {
             $id_base =  $item->old_base;
             $count_record = $item->count_record;
-            if($id_base == 8)
+            if($id_base == 8 || $id_base == 38)
             {
                 $bisnode_count += $count_record;
             }else if($id_base == 6)
