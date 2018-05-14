@@ -43,7 +43,6 @@
                                     let storageVal1 = sessionStorage.getItem('date_start');
                                     if(sessionStorage.getItem('date_start') != undefined || sessionStorage.getItem('date_start') != null) {
                                         date_st.value = storageVal1;
-                                        sessionStorage.removeItem('date_start');
                                     }
                                 </script>
                             </div>
@@ -60,7 +59,6 @@
                                     let storageVal2 = sessionStorage.getItem('date_stop');
                                     if(sessionStorage.getItem('date_stop') != undefined || sessionStorage.getItem('date_stop') != null) {
                                         date_sto.value = storageVal2;
-                                        sessionStorage.removeItem('date_stop');
                                     }
                                 </script>
                             </div>
@@ -88,12 +86,11 @@
                                             //     storageVal3 /= 100;
                                             // }
                                             for(var i = 0; i < deps.length; i++) {
-                                                console.log(deps[i].value);
                                                 if(deps[i].value == storageVal3) {
                                                     deps[i].selected = true;
                                                 }
                                             }
-                                            sessionStorage.removeItem('departmentValue');
+                                            // sessionStorage.removeItem('departmentValue');
                                         </script>
                                     </select>
                                 </div>
@@ -109,6 +106,13 @@
                                         <option value="3">Oddział</option>
                                     </select>
                                 </div>
+                                <script>
+                                    let type = document.getElementById('type');
+                                    let typeValue = sessionStorage.getItem('type');
+                                    if(sessionStorage.getItem('type') != undefined || sessionStorage.getItem('type') != null) {
+                                        type.selectedIndex = typeValue;
+                                    }
+                                </script>
                             </div>
 
                         </div>
@@ -318,16 +322,47 @@
 
             $( document ).ajaxComplete(function() {
                 let links = Array.from(document.getElementsByClassName('links'));
-                console.table(links);
                 links.forEach(function(link) {
                     link.addEventListener('click', function(event) {
-                        console.log(event);
                         sessionStorage.setItem('date_start', document.getElementById('date_start').value);
                         sessionStorage.setItem('date_stop', document.getElementById('date_stop').value);
                         sessionStorage.setItem('departmentValue', selectedDepartment.options[selectedDepartment.selectedIndex].value);
+                        sessionStorage.setItem('type', document.getElementById('type').value);
                     });
                 });
             })
+
+
+            //session part - setting variable values for ajax and removing session
+            let storageVal2 = sessionStorage.getItem('date_stop');
+            let storageVal1 = sessionStorage.getItem('date_start');
+            let storageVal3 = sessionStorage.getItem('departmentValue');
+            let storageVal4 = sessionStorage.getItem('type');
+            if(storageVal3 != null) {
+                if(selectedDepartment.options[selectedDepartment.selectedIndex].value < 100) {
+                    departmentValue = selectedDepartment.options[selectedDepartment.selectedIndex].value;
+                }
+                else {
+                    directorId = selectedDepartment.options[selectedDepartment.selectedIndex].value;
+                }
+                sessionStorage.removeItem('departmentValue');
+                table.ajax.reload();
+            }
+            if(storageVal4 != null) {
+                type = selectedType.options[selectedType.selectedIndex].value;
+                sessionStorage.removeItem('type');
+                table.ajax.reload();
+            }
+
+            if(storageVal2 != null) {
+                table.ajax.reload();
+                sessionStorage.removeItem('date_stop');
+            }
+
+            if(storageVal1 != null) {
+                table.ajax.reload();
+                sessionStorage.removeItem('date_start');
+            }
 
      });
     </script>
