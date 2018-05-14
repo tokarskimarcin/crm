@@ -677,23 +677,15 @@ class AdminController extends Controller
     public function userPrivilagesGET() {
         $all_users = User::all();
         $all_privilage_users = PrivilageUserRelation::all();
-        return view('admin.userPrivilage')->with('all_users', $all_users)->with('all_privilage_users', $all_privilage_users);
+        $all_links = Links::select('id', 'name')
+            ->get();
+
+        return view('admin.userPrivilage')->with('all_users', $all_users)->with('all_privilage_users', $all_privilage_users)->with('all_links', $all_links);
     }
 
     public function userPrivilagesAjax(Request $request) {
-//        if(Session::has('isChecked')) {
-//            $privilage_people = Session::get('isChecked');
-//        }
-//        else {
-//            $privilage_people = false;
-//        }
-//        if($request->session()->has('isChecked')) {
-//            $privilage_people = $request->session()->get('isChecked');
-//        }
-//        else {
-//            $privilage_people = false;
-//        }
-        if($privilage_people == 0) { //checkbox not checked
+        $privilage_people = $request->privilage_people;
+        if($privilage_people == "false") { //checkbox not checked
             $all_users = DB::table('users')
                 ->select(DB::raw('
                users.id as user_id,
@@ -704,7 +696,7 @@ class AdminController extends Controller
                 ->get();
             return datatables($all_users)->make(true);
         }
-        else if($privilage_people == 1) { //checkbox is checked
+        else if($privilage_people == "true") { //checkbox is checked
             $all_privilage_users = DB::table('users')
                 ->select(DB::raw('
                 Distinct(users.id) as user_id,
@@ -716,5 +708,44 @@ class AdminController extends Controller
                 ->get();
             return datatables($all_privilage_users)->make(true);
         }
+    }
+
+    public function userPrivilagesAjaxData(Request $request) {
+        $user_id = $request->id_of_user;
+        $all_privilages = PrivilageUserRelation::where('user_id', '=', $user_id)->get();
+        $all = DB::table('privilage_user_relation')
+            ->select(DB::raw('
+                privilage_user_relation.link_id as link_id,
+                links.name
+            '))
+            ->join('links', 'privilage_user_relation.link_id', 'links.id')
+            ->where('privilage_user_relation.user_id', '=', $user_id)
+            ->get();
+        return $all;
+    }
+
+    //usuwanie i dodawanie uprawnień
+    public function userPrivilagesPOST(Request $request) {
+        $remove_id = $request->remove_privilage_id; //link_id
+        $user_id = $request->user_id; //user_id
+        $adding = $request->isAdding;
+        if($adding == 'false') {
+            if(!(is_null($remove_id) || is_null($user_id))) {
+                $givenPrivilage = DB::table('privilage_user_relation')
+                    ->where('user_id', '=', $user_id)
+                    ->where('link_id', '=', $remove_id)
+                    ->delete();
+            }
+        }
+        else {
+            $new_privilage_number = $request->add_new_privilage; // link_id
+            $new_privilage = new PrivilageUserRelation();
+            $new_privilage->link_id = $new_privilage_number;
+            $new_privilage->user_id = $user_id;
+            $new_privilage->save();
+        }
+
+        return redirect()->back();
+
     }
 }
