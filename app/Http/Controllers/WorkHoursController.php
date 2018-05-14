@@ -560,7 +560,12 @@ class WorkHoursController extends Controller
             $accept_stop = $request->accept_stop;
             $succes = $request->success;
             $id_manager = Auth::id();
-            $work_hour = new Work_Hour;
+            $try_find_user = Work_Hour::where('id_user','=',$date[0])
+                ->where('date','=',$date[1])->first();
+            if(is_object($try_find_user)){
+                $work_hour = $try_find_user;
+            }else
+                $work_hour = new Work_Hour;
             $work_hour->status = 4;
             $work_hour->accept_sec = 100;
             $work_hour->success = $succes;
