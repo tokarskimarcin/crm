@@ -187,6 +187,9 @@ class AuditController extends Controller
         if($request->type != null && $request->type != '0') {
             $audit = $audit ->where('audit.user_type', '=', $request->type);
         }
+        if($request->type != null && $request->type == '0') {
+            $audit = $audit ->whereIn('audit.user_type', [1,2,3]);
+        }
         return datatables($audit)->make(true);
     }
 

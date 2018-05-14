@@ -255,9 +255,9 @@
                     directorId = 0;
                 }
 
-                if(selectedType.options[selectedType.selectedIndex].value != 0) {
+                // if(selectedType.options[selectedType.selectedIndex].value != 0) {
                     type = selectedType.options[selectedType.selectedIndex].value;
-                }
+                // }
 
                 table.ajax.reload();
                 document.getElementsByClassName('insertDiv')[0].textContent = '';
