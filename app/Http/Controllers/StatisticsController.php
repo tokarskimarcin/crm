@@ -4705,6 +4705,9 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                 ]);
         }
 
+    /**
+     * @return $this method returns data for day campaign report with picked by user date
+     */
     public function dayReportCampaignPost(Request $request) {
         $date_start = $request->date;
         $date_stop = $request->date;
@@ -4733,6 +4736,9 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             ]);
     }
 
+    /**
+     * @return $this method shows week campaign report with picked by user date interval
+     */
     public function weekReportCampaignPost(Request $request) {
         $date_start = $request->date_start;
         $date_stop = $request->date_stop;
@@ -4762,6 +4768,9 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             ]);
     }
 
+    /**
+     * @return $this method shows month campaign report with picked by user date interval
+     */
     public function monthReportCampaignPost(Request $request) {
         $date_start = $request->date_start;
         $date_stop = $request->date_stop;
@@ -4774,9 +4783,87 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                 'sum' => $this->getCampaignData($date_start, $date_stop, 1) // 1 - sum of all data(agreggate)
             ]);
     }
+
     /**
-     * @param $date_start
-     * @param $date_stop
+     * This method sends email with day campaign report
+     */
+    public function mailDayReportCampaign() {
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+
+        $data = [
+            'today' => $date_start,
+            'data' => $this->getCampaignData($date_start, $date_stop, 0), // 0 - regular data
+            'sum' => $this->getCampaignData($date_start, $date_stop, 1) // 1 - sum of all data(agreggate)
+        ];
+
+        $title = 'Raport dzienny dotyczący kampani ' . $date_start;
+
+        $users = User::where([
+            ['user_type_id', '=', 3],
+            ['status_work', '=', 1]
+        ])
+            ->orWhere('id', '=', 6)
+            ->orWhere('user_type_id', '=', 8)
+            ->get();
+
+        $this->sendMailByVerona('dayReportCampaign', $data, $title, $users);
+    }
+
+    /**
+     * This method sends email with week campaign report
+     */
+    public function mailWeekReportCampaign() {
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+
+        $data = [
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'data' => $this->getCampaignData($date_start, $date_stop, 0), // 0 - regular data
+            'sum' => $this->getCampaignData($date_start, $date_stop, 1) // 1 - sum of all data(agreggate)
+        ];
+
+        $title = 'Raport tygodniowy dotyczący kampani ' . $date_start . ' - ' . $date_stop;
+
+        $users = User::where([
+            ['user_type_id', '=', 3],
+            ['status_work', '=', 1]
+        ])
+            ->orWhere('id', '=', 6)
+            ->orWhere('user_type_id', '=', 8)
+            ->get();
+
+        $this->sendMailByVerona('weekReportCampaign', $data, $title, $users);
+    }
+
+    /**
+     * This method sends email with month campaign report
+     */
+    public function mailMonthReportCampaign() {
+        $date_start = date("Y-m-d",mktime(0,0,0,date("m")-1,date("d")-1,date("Y")));
+        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+
+        $data = [
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'data' => $this->getCampaignData($date_start,$date_stop, 0), // 0 - regular data
+            'sum' => $this->getCampaignData($date_start, $date_stop, 1) // 1 - sum of all data(agreggate)
+        ];
+
+        $title = 'Raport miesięczny dotyczący kampani ' . $date_start . ' - ' . $date_stop;
+
+        $users = User::where([
+            ['user_type_id', '=', 3],
+            ['status_work', '=', 1]
+        ])
+            ->orWhere('id', '=', 6)
+            ->orWhere('user_type_id', '=', 8)
+            ->get();
+
+        $this->sendMailByVerona('monthReportCampaign', $data, $title, $users);
+    }
+    /**
      * @param $sum == 0 indices that we want raw data, $sum == 1 indices that we want agreggate data
      * @return data about camapigns
      */

@@ -299,6 +299,11 @@ Route::get('/dayReportDepartments', 'StatisticsController@MailDayDepartmentsRepo
 Route::get('/dayReportCoaches', 'StatisticsController@MailDayReportCoaches');
 Route::get('/hourReportCoaches', 'StatisticsController@MailHourReportCoaches');
 
+//Emaile dotyczące raportów kampani
+Route::get('/mailDayReportCampaign', 'StatisticsController@mailDayReportCampaign');
+Route::get('/mailWeekReportCampaign', 'StatisticsController@mailWeekReportCampaign');
+Route::get('/mailMonthReportCampaign', 'StatisticsController@mailMonthReportCampaign');
+
 //Maila dotyczące wyłączonych kont
 //Raport Usunietych kont
 Route::get('/weekReportUnuserdAccount','StatisticsController@MailWeekReportUnuserdAccount');
