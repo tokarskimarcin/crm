@@ -188,7 +188,7 @@
                 },"columns":[
                     {"data":function (data, type, dataToSet) {
                             return data.user_first_name+' '+data.user_last_name;
-                        },"name":"users.last_name"
+                        },"name":"users.last_name", "orderable": false
                     },
                     {"data":function (data, type, dataToSet) {
                             if(data.user_type != 3) {
@@ -197,7 +197,7 @@
                             else {
                                 return data.department_name + ' ' + data.department_type;
                             }
-                        },"name":"trainer.last_name"
+                        },"name":"trainer.last_name","orderable": false
                     },
                     {"data":function (data, type, dataToSet) {
                         if(data.user_type == 1) {
@@ -209,18 +209,21 @@
                         else {
                             return 'Oddział';
                         }
-                        },"name":"users.last_name"
+                        },"name":"users.last_name","orderable": false
                     },
                     {"data":function (data, type, dataToSet) {
                             return data.department_name+' '+data.department_type;
-                        },"name":"departments.name"
+                        },"name":"departments.name","orderable": false
                     },
-                    {"data": "date_audit"},
+                    {"data": function (data, type, dataToSet) {
+                        return data.date_audit;
+                        },"orderable": false},
+                    // {"data": "date_audit"},
                     {"data":function (data, type, dataToSet) {
                         if(data.score != null && data.score != 'null' )
                             return data.score + ' ' + '%';
                         else return "0 %"
-                        },"name":"score"
+                        },"name":"score","orderable": false
                     },
                     {"data":function (data, type, dataToSet) {
                             return '<a href="{{URL::to("audit")}}/' + data.audit_id + '" class="links">Link</a>';
@@ -330,7 +333,7 @@
                         sessionStorage.setItem('type', document.getElementById('type').value);
                     });
                 });
-            })
+            });
 
 
             //session part - setting variable values for ajax and removing session
