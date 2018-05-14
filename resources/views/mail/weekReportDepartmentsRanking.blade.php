@@ -8,7 +8,7 @@
         <td style="border:1px solid #231f20;padding:3px;background:#231f20; width: 15%;">FILIA</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">% CELU</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">% JANKÓW</td>
-        <td style="border:1px solid #231f20;padding:3px;background:#231f20;">% NAGRODA</td>
+        <td style="border:1px solid #231f20;padding:3px;background:#231f20;">NAGRODA</td>
     </tr>
     </thead>
     <tbody>
