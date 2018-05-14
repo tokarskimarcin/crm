@@ -1,9 +1,9 @@
 <table style ="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px;">
     <thead style="color:#efd88f;">
         <tr>
-            <td colspan="4" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20; color:#efd88f;">
-                <font size="4" face="sans-serif">RAPORT TYGODNIOWY DKJ {{$date_start . ' - ' . $date_stop}} </td>
-            <td colspan="4" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20;">
+            <td colspan="6" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20; color:#efd88f;">
+                <font size="5" face="sans-serif">RAPORT TYGODNIOWY DKJ {{$date_start . ' - ' . $date_stop}} </td>
+            <td colspan="6" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20;">
             <img src="http://teambox.pl/image/logovc.png"></td>
         </tr>
         <tr>
@@ -15,6 +15,9 @@
             <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba błędnych rozmów</th>
             <th style="border:1px solid #231f20;padding:3px;background:#231f20;">% błędnych</th>
             <th style="border:1px solid #231f20;padding:3px;background:#231f20;">% Odsłuchanych</th>
+            <th style="border:1px solid #231f20;padding:3px;background:#231f20">Ilość podważonych (słusznie i niesłusznie)</th>
+            <th style="border:1px solid #231f20;padding:3px;background:#231f20">Ilość podważonych słusznie</th>
+            <th style="border:1px solid #231f20;padding:3px;background:#231f20">% podważonych słusznie</th>
         </tr>
     </thead>
     <tbody>
@@ -26,6 +29,9 @@
         $sum_proc = 0;
         $sum_succes = 0;
         $sum_proc_check = 0;
+        $all_good_jaky_disagreement = $sum_all_janky_disagreement = 0;
+        $proc_disagreement_good = 0;
+        $all_disagreement_proc = 0;
     @endphp
     @foreach($dkj as $item)
             <tr>
@@ -51,10 +57,21 @@
                     $sum_succes += $item->success;
                     $sum_proc = (100*$sum_all_bad) / $sum_all_talks;
                     $sum_proc_check = (100*$sum_all_talks) / $sum_succes;
+                    $sum_all_janky_disagreement += $item->all_jaky_disagreement;
+                    $all_good_jaky_disagreement +=  $item->good_jaky_disagreement;
+                    if( $item->all_jaky_disagreement != 0){
+                                    $proc_disagreement_good = round(($item->good_jaky_disagreement*100)/$item->all_jaky_disagreement,2);
+                                }
+                    if($sum_all_janky_disagreement != 0){
+                            $all_disagreement_proc = round(($all_good_jaky_disagreement*100)/$sum_all_janky_disagreement,2);
+                        }
 
                 @endphp
                 <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($bad_proc,2)}} %</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($check_proc,2)}} %</td>
+                <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$item->all_jaky_disagreement}}</td>
+                <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$item->good_jaky_disagreement}}</td>
+                <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$proc_disagreement_good}} %</td>
             </tr>
     @endforeach
             <tr>
@@ -65,6 +82,9 @@
                 <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{$sum_all_bad}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{round($sum_proc,2)}} %</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{round($sum_proc_check,2)}} %</td>
+                <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$sum_all_janky_disagreement}} </td>
+                <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$all_good_jaky_disagreement}} </td>
+                <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$all_disagreement_proc}} %</td>
             </tr>
     <tbody>
 </table>
