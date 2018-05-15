@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="page-header">
-                <div class="alert gray-nav">Raport Dzienny Kampanii</div>
+                <div class="alert gray-nav">Raport Dzienny Zużycia Bazy</div>
             </div>
         </div>
     </div>
