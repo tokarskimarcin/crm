@@ -794,5 +794,9 @@ Route::get('/screen_table','ScreensController@screenMethod');
 //campaign reports mothod for database
 Route::get('/report_campaign', 'PBXDataAPI@report_campaign');
 
+
+Route::get('/crmRoute_index', 'CrmRouteController@index');
+
+
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
 
