@@ -147,6 +147,11 @@
                 <div class="alert alert-success final-alert">Wynik audytu to: </div>
             </div>
         </div>
+        <div class="row last-row">
+            <div class="col-md-12">
+                <input type="button" class="btn btn-info btn-block" id="back_button" value="Powrót">
+            </div>
+        </div>
     {{--<div class="row last-row">--}}
         {{--<div class="col-md-12">--}}
             {{--<input class="btn btn-success btn-block" type="submit" id="secondButton" value="Zapisz zmiany!" style="margin-bottom:1em;">--}}
@@ -245,6 +250,12 @@
                document.getElementsByClassName('modal-body')[0].textContent = document.getElementById(e.target.parentNode.dataset.info).value;
                console.log(e.target.parentNode.dataset.info);
            });
+        });
+
+        //THIS PART IS RESPONSIBLE FOR REDIRECTING BACK USER AFTER CLICKING ON BUTTON
+        let back_button = document.getElementById('back_button');
+        back_button.addEventListener('click', function(e) {
+            window.location.href = '{{URL::to("/showAudits")}}';
         });
     });
     </script>
