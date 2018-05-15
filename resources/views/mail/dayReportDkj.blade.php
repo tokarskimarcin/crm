@@ -19,6 +19,7 @@
         <th style="border:1px solid #231f20;padding:3px;background:#231f20;">% Odsłuchanych</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Ilość podważonych (słusznie i niesłusznie)</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Ilość podważonych słusznie</th>
+        <th style="border:1px solid #231f20;padding:3px;background:#231f20">% podważonych</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">% podważonych słusznie</th>
     </tr>
     </thead>
@@ -35,6 +36,8 @@
         $all_good_jaky_disagreement = $sum_all_janky_disagreement = 0;
         $proc_disagreement_good = 0;
         $all_disagreement_proc = 0;
+        $sum_diss_proc= 0;
+        $sum_dissa_proc_all = 0;
     @endphp
     @foreach($dkj as $item)
         <tr>
@@ -63,6 +66,8 @@
                         $sum_all_janky_disagreement += $item->all_jaky_disagreement;
                         $all_good_jaky_disagreement +=  $item->good_jaky_disagreement;
                         $sum_proc = $sum_all_talks > 0 ? (100*$sum_all_bad) / $sum_all_talks : 0;
+                        $sum_dissa_proc = $item->sum_janky > 0 ? (100*$item->all_jaky_disagreement) / $item->sum_janky : 0;
+                        $sum_dissa_proc_all = $sum_all_bad > 0 ? (100*$sum_all_janky_disagreement) / $sum_all_bad : 0;
                         $sum_proc_check = $sum_succes > 0 ? (100*$sum_all_talks) / $sum_succes : 0;
                         if( $item->all_jaky_disagreement != 0){
                                 $proc_disagreement_good = round(($item->good_jaky_disagreement*100)/$item->all_jaky_disagreement,2);
@@ -76,6 +81,7 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{round($check_proc,2)}} %</td>
             <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$item->all_jaky_disagreement}}</td>
             <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$item->good_jaky_disagreement}}</td>
+            <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round($sum_dissa_proc,2)}}%</td>
             <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$proc_disagreement_good}} %</td>
         </tr>
     @endforeach
@@ -89,9 +95,9 @@
         <td style="border:1px solid #231f20;text-align:center;padding:3px;font-weight:bolder;">{{round($sum_proc_check,2)}} %</td>
         <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$sum_all_janky_disagreement}} </td>
         <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$all_good_jaky_disagreement}} </td>
+        <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{round($sum_dissa_proc_all,2)}}% </td>
         <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$all_disagreement_proc}} %</td>
     </tr>
 
     <tbody>
 </table>
-
