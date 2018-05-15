@@ -1,14 +1,15 @@
 @extends('layouts.main')
 @section('style')
     <style>
-
+        .panel-body {
+            background-color: #ebecf1;
+        }
     </style>
 @endsection
 @section('content')
 
 
 {{--Header page --}}
-
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
