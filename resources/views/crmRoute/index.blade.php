@@ -24,8 +24,9 @@
                     Tworzenie Tras
                 </div>
                 <div class="panel-body">
-                    <div class="row">
+                        @include('crmRoute.routes')
 
+                    <div class="row">
                     </div>
                 </div>
             </div>
@@ -36,6 +37,14 @@
 
 @section('script')
 <script>
+    $('.form_date').datetimepicker({
+        language:  'pl',
+        autoclose: 1,
+        minView : 2,
+        pickTime: false
+    });
+
+
     $(document).ready(function() {
 
     });
