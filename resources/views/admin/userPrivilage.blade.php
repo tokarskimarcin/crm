@@ -47,7 +47,7 @@
                                 <label for="privilage_people">Tylko ludzie posiadający specjalne uprawnienia</label>
                                 <input type="checkbox" checked style="display:inline-block;" id="privilage_people">
                             </div>
-                            <form action="{{URL::to('/userPrivilage')}}" method="POST" id="formularz">
+                            <form action="{{URL::to('/userPrivilages')}}" method="POST" id="formularz">
 
 
                             </form>
@@ -126,8 +126,7 @@
                             let name = data.first_name;
                             let surname = data.last_name;
                             return name + ' ' + surname;
-                    }}
-
+                    },"name": "last_name"}
                 ]
             });
 

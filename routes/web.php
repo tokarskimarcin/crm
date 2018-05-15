@@ -15,6 +15,9 @@ Route::POST('/stopWork', 'HomeController@stopWork');
 Route::POST('/register_hour','WorkHoursController@registerHour');
 
 //********************AJAX*********************** */
+Route::post('/userPrivilage', 'AdminController@userPrivilagesAjax')->name('api.privilageAjax');
+Route::post('/userPrivilagesAjax', 'AdminController@userPrivilagesAjaxData')->name('api.privilageAjaxData');
+
 Route::post('/delete_picture', 'AuditController@delete_picture')->name('api.delete_picture');
 Route::post('/add', 'AuditController@ajax')->name('api.ajax');
 Route::post('auditScoreAjax', 'AuditController@auditScoreAjax')->name('api.scores');
@@ -750,13 +753,15 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/editAudit/{id}', 'AdminController@editAuditGet');
     Route::post('/editAuditPage', 'AdminController@editDatabasePost');
 
+    //dodawanie usuwanie przywilejów dla użytkowników
+    Route::get('/userPrivilages', 'AdminController@userPrivilagesGET');
+    Route::post('/userPrivilages', 'AdminController@userPrivilagesPOST');
+
 
 });
 //////////////////////Testing ORM///////////////
 ///
 ///
-
-
 //LINK GROUP
 Route::Post('/addGroup', 'AdminController@addGroup');
 Route::Post('/removeGroup', 'AdminController@removeGroup');
@@ -785,14 +790,11 @@ Route::get('/screen_table','ScreensController@screenMethod');
     Route::get('/TeamDKJHourData', 'PBXDataAPI@TeamDKJHourData');
     //Dane Czasu na rekord
     Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
-    //dodawanie usuwanie przywilejów dla użytkowników
-    Route::get('/userPrivilages', 'AdminController@userPrivilagesGET');
-    Route::post('/userPrivilages', 'AdminController@userPrivilagesAjax')->name('api.privilageAjax');
-    Route::post('/userPrivilagesAjax', 'AdminController@userPrivilagesAjaxData')->name('api.privilageAjaxData');
-    Route::post('/userPrivilage', 'AdminController@userPrivilagesPOST');
 
 //campaign reports mothod for database
 Route::get('/report_campaign', 'PBXDataAPI@report_campaign');
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
+
+
 

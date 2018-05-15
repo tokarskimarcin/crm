@@ -4914,11 +4914,10 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $title = 'Raport dzienny zużycia bazy ' . $date_start;
 
         $users = User::where([
-            ['user_type_id', '=', 3],
             ['status_work', '=', 1]
         ])
+            ->whereIn('user_type_id', [8,3])
             ->orWhere('id', '=', 6)
-            ->orWhere('user_type_id', '=', 8)
             ->get();
 
         $this->sendMailByVerona('dayReportCampaign', $data, $title, $users);
@@ -4941,11 +4940,10 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $title = 'Raport tygodniowy zużycia bazy ' . $date_start . ' - ' . $date_stop;
 
         $users = User::where([
-            ['user_type_id', '=', 3],
             ['status_work', '=', 1]
         ])
+            ->whereIn('user_type_id', [8,3])
             ->orWhere('id', '=', 6)
-            ->orWhere('user_type_id', '=', 8)
             ->get();
 
         $this->sendMailByVerona('weekReportCampaign', $data, $title, $users);
@@ -4968,11 +4966,10 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $title = 'Raport miesięczny zużycia bazy ' . $date_start . ' - ' . $date_stop;
 
         $users = User::where([
-            ['user_type_id', '=', 3],
             ['status_work', '=', 1]
         ])
+            ->whereIn('user_type_id', [8,3])
             ->orWhere('id', '=', 6)
-            ->orWhere('user_type_id', '=', 8)
             ->get();
 
         $this->sendMailByVerona('monthReportCampaign', $data, $title, $users);
