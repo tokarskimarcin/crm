@@ -4911,7 +4911,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             'sum' => $this->getCampaignData($date_start, $date_stop, 1) // 1 - sum of all data(agreggate)
         ];
 
-        $title = 'Raport dzienny dotyczący kampani ' . $date_start;
+        $title = 'Raport dzienny zużycia bazy ' . $date_start;
 
         $users = User::where([
             ['user_type_id', '=', 3],
@@ -4938,7 +4938,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             'sum' => $this->getCampaignData($date_start, $date_stop, 1) // 1 - sum of all data(agreggate)
         ];
 
-        $title = 'Raport tygodniowy dotyczący kampani ' . $date_start . ' - ' . $date_stop;
+        $title = 'Raport tygodniowy zużycia bazy ' . $date_start . ' - ' . $date_stop;
 
         $users = User::where([
             ['user_type_id', '=', 3],
@@ -4965,7 +4965,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             'sum' => $this->getCampaignData($date_start, $date_stop, 1) // 1 - sum of all data(agreggate)
         ];
 
-        $title = 'Raport miesięczny dotyczący kampani ' . $date_start . ' - ' . $date_stop;
+        $title = 'Raport miesięczny zużycia bazy ' . $date_start . ' - ' . $date_stop;
 
         $users = User::where([
             ['user_type_id', '=', 3],
