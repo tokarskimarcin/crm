@@ -58,7 +58,7 @@
                             @endforeach
                         </optgroup>
                             <optgroup label="Suma oddziałów">
-                                <option @if($dep_id == 100001) selected @endif value="100001">Suma oddziałów</option>
+                                <option @if($dep_id == 100001) selected @endif value="1000001">Suma oddziałów</option>
                             </optgroup>
                     </select>
                     @else
