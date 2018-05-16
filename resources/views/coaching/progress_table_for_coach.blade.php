@@ -311,19 +311,19 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="myLabel">Aktualna średnia</label>
-                                        <input type="number" lang="en" class="form-control" name="manager_actual_avg" id="manager_actual_avg" placeholder="Wprawoadź aktualną średnią" @php $coachingManagerList['user_department_type'] == 1 ? "disabled=true" : '' @endphp/>
+                                        <input type="number" lang="en" class="form-control" name="manager_actual_avg" id="manager_actual_avg" placeholder="Wprawoadź aktualną średnią" @php $coachingManagerList['user_department_type'] == 1 ? print "" : print "disabled=true" @endphp />
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="myLabel">Aktualna Jakość</label>
-                                        <input type="number" lang="en" class="form-control" name="manager_actual_janky" id="manager_actual_janky" placeholder="Wprawoadź aktualną jakość" @php $coachingManagerList['user_department_type'] == 1 ? "disabled=true" : '' @endphp/>
+                                        <input type="number" lang="en" class="form-control" name="manager_actual_janky" id="manager_actual_janky" placeholder="Wprawoadź aktualną jakość" @php $coachingManagerList['user_department_type'] == 1 ? print"" : print "disabled=true" @endphp />
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="myLabel">Aktualne RBH</label>
-                                        <input type="number" lang="en" class="form-control" name="manager_actual_rbh" id="manager_actual_rbh" placeholder="Wprawoadź aktualne RBH" @php $coachingManagerList['user_department_type'] == 1 ? "disabled=true" : '' @endphp/>
+                                        <input type="number" lang="en" class="form-control" name="manager_actual_rbh" id="manager_actual_rbh" placeholder="Wprawoadź aktualne RBH" @php $coachingManagerList['user_department_type'] == 1 ? print "" : print "disabled=true" @endphp />
                                     </div>
                                 </div>
                             </div>
