@@ -134,8 +134,10 @@ class CoachingController extends Controller
      */
     public function progress_table_for_directorGET(){
         $coachingManagerList = $this::getCoachingManagerList(array(Auth::user()->id));
+        $loggedUser = Auth::user()->department_info->id_dep_type;
         return view('coaching.progress_table_for_director')
-            ->with('coachingManagerList',$coachingManagerList);
+            ->with('coachingManagerList',$coachingManagerList)
+            ->with('user_department_type' , $loggedUser);
     }
 
     /**
@@ -145,8 +147,10 @@ class CoachingController extends Controller
     public function progress_table_for_managerGET(){
         //pobranie trenerów i średnie ich grup dla danego kierownika
         $coachingManagerList = $this::getCoachingCoachList(array(Auth::user()->id));
+        $loggedUser = Auth::user()->department_info->id_dep_type;
         return view('coaching.progress_table_for_manager')
-            ->with('coachingManagerList',$coachingManagerList);
+            ->with('coachingManagerList',$coachingManagerList)
+            ->with('user_department_type' , $loggedUser);
 
     }
 

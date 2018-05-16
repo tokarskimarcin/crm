@@ -312,19 +312,19 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label class="myLabel">Aktualna średnia</label>
-                                            <input type="number" lang="en" class="form-control" name="manager_actual_avg" id="manager_actual_avg" placeholder="Wprawoadź aktualną średnią" disabled="true"/>
+                                            <input type="number" lang="en" class="form-control" name="manager_actual_avg" id="manager_actual_avg" placeholder="Wprawoadź aktualną średnią" @php $user_department_type == 1 ? print "" : print "disabled=true" @endphp />
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label class="myLabel">Aktualna Jakość</label>
-                                            <input type="number" lang="en" class="form-control" name="manager_actual_janky" id="manager_actual_janky" placeholder="Wprawoadź aktualną jakość" disabled="true"/>
+                                            <input type="number" lang="en" class="form-control" name="manager_actual_janky" id="manager_actual_janky" placeholder="Wprawoadź aktualną jakość" @php $user_department_type == 1 ? print "" : print "disabled=true" @endphp />
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label class="myLabel">Aktualne RBH</label>
-                                            <input type="number" lang="en" class="form-control" name="manager_actual_rbh" id="manager_actual_rbh" placeholder="Wprawoadź aktualne RBH" disabled="true"/>
+                                            <input type="number" lang="en" class="form-control" name="manager_actual_rbh" id="manager_actual_rbh" placeholder="Wprawoadź aktualne RBH" @php $user_department_type == 1 ? print "" : print "disabled=true" @endphp />
                                         </div>
                                     </div>
                                 </div>
@@ -423,6 +423,8 @@
 
                     if(validation)
                     {
+                        let user_department_typ ="{{$user_department_type}}";
+
                         if(coaching_type == 1){
                             if(manager_actual_avg.trim('').length == 0 || isNaN(manager_actual_avg) ){
                                 validation = false;
@@ -432,14 +434,18 @@
                                 validation = false;
                                 swal('Błędna docelowa średnia')
                             }
-                            if(manager_actual_avg > 0.5){
-                                if(coaching_manager_goal_avg < proc_manager_goal_min_avg){
-                                    validation = false;
-                                    swal('Minimalna średnia musi być większa niż 10% aktualnej średniej')
-                                }else if(coaching_manager_goal_avg > proc_manager_goal_max_avg){
-                                    validation = false;
-                                    swal('Minimalna średnia musi być mniejsza niż 30% aktualnej średniej')
+                            if(user_department_typ != 1) {
+                                if (manager_actual_avg > 0.5) {
+                                    if (coaching_manager_goal_avg < proc_manager_goal_min_avg) {
+                                        validation = false;
+                                        swal('Minimalna średnia musi być większa niż 10% aktualnej średniej')
+                                    } else if (coaching_manager_goal_avg > proc_manager_goal_max_avg) {
+                                        validation = false;
+                                        swal('Minimalna średnia musi być mniejsza niż 30% aktualnej średniej')
+                                    }
                                 }
+                            }else{
+                                console.log('nie sprawdzam');
                             }
                         }else if(coaching_type == 2){
                             if(manager_actual_janky.trim('').length == 0 || isNaN(manager_actual_janky) ){
@@ -513,6 +519,10 @@
                             }
                         })
                     }
+                }
+
+                function isNumeric(n) {
+                    return !isNaN(parseFloat(n)) && isFinite(n);
                 }
 
                 $(document).ready(function(){
@@ -814,39 +824,56 @@
                                 let coaching_comment = $('#text_'+coaching_id).val();
                                 let row = $(this).closest('tr');
                                 let coaching_type =  row.find('td:nth-child(5)').text();
-                                let end_score =  row.find('td:nth-child(7)').text();
+                                let end_score =  row.find('td:nth-child(7)').text() == null || row.find('td:nth-child(7)').text() == "" ? row.find('td:nth-child(7)').children().val() : row.find('td:nth-child(7)').text();
                                 let rbh_end = row.find('td:nth-child(9)').text();
+                                let user_department_typ ="{{$user_department_type}}";
+                                let is_a_number = true;
                                 console.log(coaching_type+' '+end_score+' '+rbh_end);
-                                swal({
-                                    title: 'Jesteś pewien?',
-                                    text: "Nie będziesz w stanie cofnąć zmian!",
-                                    type: 'warning',
-                                    showCancelButton: true,
-                                    confirmButtonColor: '#3085d6',
-                                    cancelButtonColor: '#d33',
-                                    confirmButtonText: 'Tak, akceptuj coaching!'
-                                }).then((result) => {
-                                    if (result.value) {
-                                    $.ajax({
-                                        type: "POST",
-                                        url: "{{ route('api.acceptCoachingDirector') }}", // do zamiany
-                                        headers: {
-                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                        },
-                                        data: {
-                                            'coaching_id'               : coaching_id,
-                                            'coaching__comment'         : coaching_comment,
-                                            'coaching_type'             : coaching_type,
-                                            'end_score'                 : end_score,
-                                            'rbh_end'                   : rbh_end,
-                                        },
-                                        success: function (response) {
-                                            console.log(response)
-                                            table_unsettled.ajax.reload();
-                                            table_settled.ajax.reload();
+
+                                if(user_department_typ == 1)
+                                    if(isNumeric(row.find('td:nth-child(7)').children().val()) == false) {
+                                        is_a_number = false;
+                                    }
+                                console.log(coaching_type+' '+end_score+' '+rbh_end);
+                                if(is_a_number == true) {
+                                    swal({
+                                        title: 'Jesteś pewien?',
+                                        text: "Nie będziesz w stanie cofnąć zmian!",
+                                        type: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#3085d6',
+                                        cancelButtonColor: '#d33',
+                                        confirmButtonText: 'Tak, akceptuj coaching!'
+                                    }).then((result) => {
+                                        if (result.value) {
+                                            $.ajax({
+                                                type: "POST",
+                                                url: "{{ route('api.acceptCoachingDirector') }}", // do zamiany
+                                                headers: {
+                                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                                },
+                                                data: {
+                                                    'coaching_id': coaching_id,
+                                                    'coaching__comment': coaching_comment,
+                                                    'coaching_type': coaching_type,
+                                                    'end_score': end_score,
+                                                    'rbh_end': rbh_end,
+                                                },
+                                                success: function (response) {
+                                                    console.log(response)
+                                                    table_unsettled.ajax.reload();
+                                                    table_settled.ajax.reload();
+                                                }
+                                            });
                                         }
-                                    });
-                                }})
+                                    })
+                                }else{
+                                    swal({
+                                        type: 'error',
+                                        title: 'Zła wartość',
+                                        text: 'Wartość z pola wynik aktualny musi być liczbą'
+                                    })
+                                }
                             });
                         }
                         ,"columns":[
@@ -885,21 +912,31 @@
                                     var span_good_start =  '<span style="color: green">';
                                     var span_bad_start =  '<span style="color: red">';
                                     var span_end= '</span>';
-                                    if(data.coaching_type == 1){
-                                        if(parseFloat(data.actual_avg) >= parseFloat(data.average_goal))
-                                            return span_good_start+data.actual_avg+span_end;
+                                    var user_department_type ="{{$user_department_type}}";
+
+                                    if(user_department_type == 2) {
+                                        if (data.coaching_type == 1) {
+                                            if (parseFloat(data.actual_avg) >= parseFloat(data.average_goal))
+                                                return span_good_start + data.actual_avg + span_end;
+                                            else
+                                                return span_bad_start + data.actual_avg + span_end;
+                                        } else if (data.coaching_type == 2) {
+                                            if (parseFloat(data.actual_janky) < parseFloat(data.janky_goal))
+                                                return span_good_start + data.actual_janky + span_end;
+                                            else
+                                                return span_bad_start + data.actual_janky + span_end;
+                                        } else if (parseFloat(data.actual_rbh) >= parseFloat(data.rbh_goal))
+                                            return span_good_start + data.actual_rbh + span_end;
                                         else
-                                            return span_bad_start+data.actual_avg+span_end;
-                                    }else if(data.coaching_type == 2){
-                                        if(parseFloat(data.actual_janky) < parseFloat(data.janky_goal))
-                                            return span_good_start+data.actual_janky+span_end;
-                                        else
-                                            return span_bad_start+data.actual_janky+span_end;
-                                    }else
-                                    if(parseFloat(data.actual_rbh) >= parseFloat(data.rbh_goal))
-                                        return span_good_start+data.actual_rbh+span_end;
-                                    else
-                                        return span_bad_start+data.actual_rbh+span_end;
+                                            return span_bad_start + data.actual_rbh + span_end;
+                                    }else if(user_department_type == 1) {
+                                        if(data.coaching_type == 1){
+                                            return '<input type="number" name="average_avg_inp" class="typed_by_user form-control">'
+                                        }else if(data.coaching_type == 2){
+                                            return '<input type="number" name="average_janky_inp" class="typed_by_user form-control">'
+                                        }else
+                                            return '<input type="number" name="average_rbh_inp" class="typed_by_user form-control">'
+                                    }
                                 },"name": "average_start","searchable": false
                             },
                             // // wynik cel
