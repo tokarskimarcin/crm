@@ -136,7 +136,7 @@ class EquipmentsController extends Controller
             'Dodanie sprzętu firmowego' => '',
             'equipment_type' => $request->equipment_type,
             'serial_code' => $request->serial_code,
-            'model' => $request->model,
+            'model' => $request->model
         ];
 
         new ActivityRecorder(6, $data);

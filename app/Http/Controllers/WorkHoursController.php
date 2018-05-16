@@ -251,7 +251,7 @@ class WorkHoursController extends Controller
             'register_start' => $request->register_start,
             'register_stop' => $request->register_stop,
             'type_edit' => $request->type_edit,
-            'succes' => $request->succes,
+            'succes' => $request->succes
         ];
 
         new ActivityRecorder(5, $data);
@@ -544,7 +544,7 @@ class WorkHoursController extends Controller
                 'Edycja godzin pracy, wpis id godzin pracy:' => $id,
                 'accept_start' => $request->accept_start,
                 'accept_stop' => $request->accept_stop,
-                'success' => $request->success,
+                'success' => $request->success
             ];
             new ActivityRecorder(5, $data);
             return 1;
