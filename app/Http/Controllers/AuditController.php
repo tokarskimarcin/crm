@@ -93,6 +93,12 @@ class AuditController extends Controller
         $fileCatalog = "auditFiles";
         $suffix = '';
 
+        //Saving info about edition to log file
+        $log = [
+            "ID nowego audytu" => $newForm->id,
+            "ID osoby tworzącej" => $user->id
+        ];
+        new ActivityRecorder(10, $log);
 
         /*fill "audit_info" table*/
         $criterions = AuditCriterions::where('status', '=', $template)->get();
@@ -266,10 +272,9 @@ class AuditController extends Controller
         //Saving info about edition to log file
         $log = [
             "ID edytowanego audytu" => $audit->id,
-            "ID osoby edytujacej" => $loggedUser->id,
-            "Data edycji" => $today
+            "ID osoby edytujacej" => $loggedUser->id
         ];
-        new ActivityRecorder(3, $log);
+        new ActivityRecorder(10, $log);
 
         $criterions = AuditCriterions::all();
         foreach($criterions as $c) {
