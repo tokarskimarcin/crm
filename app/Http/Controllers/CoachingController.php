@@ -134,8 +134,10 @@ class CoachingController extends Controller
      */
     public function progress_table_for_directorGET(){
         $coachingManagerList = $this::getCoachingManagerList(array(Auth::user()->id));
+        $loggedUser = Auth::user()->department_info->id_dep_type;
         return view('coaching.progress_table_for_director')
-            ->with('coachingManagerList',$coachingManagerList);
+            ->with('coachingManagerList',$coachingManagerList)
+            ->with('user_department_type' , $loggedUser);
     }
 
     /**
@@ -145,8 +147,10 @@ class CoachingController extends Controller
     public function progress_table_for_managerGET(){
         //pobranie trenerów i średnie ich grup dla danego kierownika
         $coachingManagerList = $this::getCoachingCoachList(array(Auth::user()->id));
+        $loggedUser = Auth::user()->department_info->id_dep_type;
         return view('coaching.progress_table_for_manager')
-            ->with('coachingManagerList',$coachingManagerList);
+            ->with('coachingManagerList',$coachingManagerList)
+            ->with('user_department_type' , $loggedUser);
 
     }
 
@@ -807,18 +811,19 @@ class CoachingController extends Controller
     public function getCoachingCoachList(){
         // Pobranie oddziałów przypisanych do kierownika
         $manager_id = Auth::user()->id;
-        if(Auth::user()->id == 1364 || Auth::user()->id == 11 || Auth::user()->id == 2 || Auth::user()->id == 29 || Auth::user()->id == 4272){
+        if(Auth::user()->id == 1364 || Auth::user()->id == 11  || Auth::user()->id == 4272){
             // za wołowskiego
             $manager_id = 23;
         }
         $manager_departments = Department_info::
                                 where('menager_id','=',$manager_id)
+                                ->orwhere('director_id','=',$manager_id)
                                 ->get();
-        //List Treneró
+        //List Treneró i Hrowców
         $all_coach_list = User::
                         whereIn('department_info_id',$manager_departments->pluck('id')->toarray())
                         ->where('status_work','=',1)
-                        ->whereIn('user_type_id',[4,12])
+                        ->whereIn('user_type_id',[4,12,5])
                         ->get();
         $group_status = collect();
         foreach ($all_coach_list as $item){
@@ -840,6 +845,7 @@ class CoachingController extends Controller
             $manager_info->manager_actual_rbh = $rbh;
             $manager_info->manager_actual_check = $janky_all_check;
             $manager_info->manager_actual_bad = $janky_all_bad;
+            $manager_info->user_type = $item->user_type_id;
             $group_status->push($manager_info);
         }
         return $group_status;
@@ -1065,6 +1071,15 @@ class CoachingController extends Controller
             return $coaching;
         }else
             return 0;
+    }
+
+    public function getManagerId(Request $request){
+        if($request->ajax()){
+            $coaching  = CoachingDirector::find($request->coaching_id);
+            $user      = User::where('id','=',$coaching->user_id);
+            return json_decode($user->pluck('user_type_id'));
+        }
+
     }
 
 

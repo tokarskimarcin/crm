@@ -151,6 +151,9 @@ Route::POST('/deleteCoachingTableDirector','CoachingController@deleteCoachingTab
 Route::POST('/getCoachingDirector','CoachingController@getCoachingDirector')->name('api.getCoachingDirector');
 Route::POST('/acceptCoachingDirector','CoachingController@acceptCoachingDirector')->name('api.acceptCoachingDirector');
 
+Route::POST('/getManagerId','CoachingController@getManagerId')->name('api.getManagerId');
+
+
 /* TEST AJAX ROUTES STOP */
 
 //** RECRUITMENT AJAX */

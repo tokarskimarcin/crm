@@ -21,6 +21,7 @@
                     Tworzenie Tras
                 </div>
                 <div class="panel-body">
+                        @include('crmRoute.client')
                         @include('crmRoute.routes')
 
                     <div class="row">
@@ -53,6 +54,65 @@
 
             let iterator = 1;
             let mainContainer = document.querySelector('.routes-wrapper'); //zaznaczamy główny container
+        function clear_modal() {
+            // document.getElementsByName('client_name')[0]
+            // document.getElementsByName('client_phone')[0].value ='';
+            // document.getElementsByName('client_type')[0].value ='Wybierz';
+            // console.log(document.getElementsByName('client_name')[0]);
+        }
+        function edit_client(e) {
+            var client_id = e.getAttribute('data-id');
+            var tr_line = e.closest('tr');
+            var tr_line_name = tr_line.getElementsByClassName('client_name')[0].textContent;
+            var tr_line_phone = tr_line.getElementsByClassName('client_phone')[0].textContent;
+            var tr_line_type = tr_line.getElementsByClassName('client_type')[0].textContent;
+            clear_modal();
+            $('#Modal_Client').modal('show');
+            console.log(tr_line);
+        }
+        function save_client(e){
+            alert('Klient dodany');
+            $('#Modal_Client').modal('hide');
+        }
+        $(document).ready(function(){
+            var table_client = $('#table_client').DataTable({
+                "autoWidth": false,
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+                },"columns":[
+                    {"width": "10%"},
+                    {"width": "5%"},
+                    {"width": "10%"},
+                    {"width": "10%"},
+                    {"width": "1%"},
+                ]
+            });
+        });
+
+        function Stack() {
+            let items = [];
+            this.push = function(element) { //add element to stack
+                items.push(element);
+            };
+            this.pop = function() { //remove element from stack
+                return items.pop();
+            };
+            this.peek = function() { //what is top element
+                return items[items.length - 1];
+            };
+            this.isEmpty = function() { //sprawdza czy jest pusta true = tak/ false = nie
+                return items.length == 0;
+            };
+            this.size = function() {  // return lenght of queue
+                return items.length;
+            };
+            this.print = function() { //print queue elements
+                console.log(items.toString());
+            };
+            this.clear = function() {
+                items = [];
+            }
+        }
 
             /**
              *Ta funkcja tworzy nowy show - tu jest napisany kod html całego formularza
