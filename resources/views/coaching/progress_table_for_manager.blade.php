@@ -370,6 +370,20 @@
             <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
             <script>
 
+                //Sprawdzenie czy osoba wybrana jest z hr
+                function isHr(manager_id) {
+                    let coachingManagerList ="{{$coachingManagerList}}";
+                    isHR = false;
+                    for(var i = 0; i < coachingManagerList.length; i++){
+                        if(coachingManagerList[i].manager_id == manager_id){
+                            if(user_type == 5){
+                                isHR = true;
+                            }
+                        }
+                    }
+                    return isHR;
+                }
+
                 /**
                  * Zapisywanie nowego coaching'u
                  * @param e
@@ -424,6 +438,8 @@
                     if(validation)
                     {
                         let user_department_typ ="{{$user_department_type}}";
+                        let isHR = isHr(manager_id);
+
 
                         if(coaching_type == 1){
                             if(manager_actual_avg.trim('').length == 0 || isNaN(manager_actual_avg) ){
@@ -434,7 +450,7 @@
                                 validation = false;
                                 swal('Błędna docelowa średnia')
                             }
-                            if(user_department_typ != 1) {
+                            if(user_department_typ != 1 && isHR == false) {
                                 if (manager_actual_avg > 0.5) {
                                     if (coaching_manager_goal_avg < proc_manager_goal_min_avg) {
                                         validation = false;
@@ -821,6 +837,7 @@
 
                             $('.btn-accept_coaching').on('click',function () {
                                 let coaching_id = $(this).data('id');
+
                                 let coaching_comment = $('#text_'+coaching_id).val();
                                 let row = $(this).closest('tr');
                                 let coaching_type =  row.find('td:nth-child(5)').text();
@@ -829,8 +846,28 @@
                                 let user_department_typ ="{{$user_department_type}}";
                                 let is_a_number = true;
                                 console.log(coaching_type+' '+end_score+' '+rbh_end);
+                                let manager_type_id = $.ajax({
+                                    async: false,
+                                    type: "POST",
+                                    url: "{{ route('api.getManagerId') }}", // do zamiany
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    data: {
+                                        'coaching_id'         : coaching_id
+                                    },
+                                    success: function (response) {
+                                        return response[0];
+                                    }
+                                });
+                                //sprawdzenie czy osoba jest od hr
+                                let manager_type_id_JSON = JSON.parse(manager_type_id.responseText);
+                                manager_type_id_JSON = manager_type_id_JSON[0];
+                                let isHR = false;
+                                    if(manager_type_id_JSON == 5)
+                                        isHR = true;
 
-                                if(user_department_typ == 1)
+                                if(user_department_typ == 1 || isHR == true)
                                     if(isNumeric(row.find('td:nth-child(7)').children().val()) == false) {
                                         is_a_number = false;
                                     }
@@ -912,9 +949,31 @@
                                     var span_good_start =  '<span style="color: green">';
                                     var span_bad_start =  '<span style="color: red">';
                                     var span_end= '</span>';
+                                    let coaching_id = data.id;
+                                    let manager_type_id = $.ajax({
+                                        async: false,
+                                        type: "POST",
+                                        url: "{{ route('api.getManagerId') }}", // do zamiany
+                                        headers: {
+                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                        },
+                                        data: {
+                                            'coaching_id'         : coaching_id
+                                        },
+                                        success: function (response) {
+                                            return response[0];
+                                        }
+                                    });
+                                    //sprawdzenie czy osoba jest od hr
+                                    let manager_type_id_JSON = JSON.parse(manager_type_id.responseText);
+                                    manager_type_id_JSON = manager_type_id_JSON[0];
+                                    let isHR = false;
+                                    if(manager_type_id_JSON == 5)
+                                        isHR = true;
+
                                     var user_department_type ="{{$user_department_type}}";
 
-                                    if(user_department_type == 2) {
+                                    if(user_department_type == 2 && isHR == false) {
                                         if (data.coaching_type == 1) {
                                             if (parseFloat(data.actual_avg) >= parseFloat(data.average_goal))
                                                 return span_good_start + data.actual_avg + span_end;
@@ -929,7 +988,8 @@
                                             return span_good_start + data.actual_rbh + span_end;
                                         else
                                             return span_bad_start + data.actual_rbh + span_end;
-                                    }else if(user_department_type == 1) {
+                                    }else if(user_department_type == 1 || isHR == true) {
+                                        console.log(isHR);
                                         if(data.coaching_type == 1){
                                             return '<input type="number" name="average_avg_inp" class="typed_by_user form-control">'
                                         }else if(data.coaching_type == 2){
@@ -1028,6 +1088,7 @@
                                     var span_good_start =  '<span style="color: green">';
                                     var span_bad_start =  '<span style="color: red">';
                                     var span_end= '</span>';
+
                                     if(data.coaching_type == 1){
                                         if(parseFloat(data.average_end) >= parseFloat(data.average_goal))
                                             return span_good_start+data.average_end+span_end;
