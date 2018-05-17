@@ -33,165 +33,189 @@
 @endsection
 
 @section('script')
-<script>
-    $('.form_date').datetimepicker({
-        language:  'pl',
-        autoclose: 1,
-        minView : 2,
-        pickTime: false
-    });
+    <script>
+        $('.form_date').datetimepicker({
+            language:  'pl',
+            autoclose: 1,
+            minView : 2,
+            pickTime: false
+        });
 
+        $(document).ready(function() {
 
-    $(document).ready(function() {
+            Element.prototype.appendAfter = function (element) {
+                element.parentNode.insertBefore(this, element.nextSibling);
+            },false;
 
-        function Stack() {
-            let items = [];
-            this.push = function(element) { //add element to stack
-                items.push(element);
-            };
-            this.pop = function() { //remove element from stack
-                return items.pop();
-            };
-            this.peek = function() { //what is top element
-                return items[items.length - 1];
-            };
-            this.isEmpty = function() { //sprawdza czy jest pusta true = tak/ false = nie
-                return items.length == 0;
-            };
-            this.size = function() {  // return lenght of queue
-                return items.length;
-            };
-            this.print = function() { //print queue elements
-                console.log(items.toString());
-            };
-            this.clear = function() {
-                items = [];
-            }
-        }
+            Element.prototype.appendBefore = function (element) {
+                element.parentNode.insertBefore(this, element);
+            },false;
 
-        /**
-         *Ta funkcja tworzy nowy route
-         */
-        function create_new_route() {
-            let number_of_route = route_stack.size() + 1;
+            let iterator = 1;
+            let mainContainer = document.querySelector('.routes-wrapper'); //zaznaczamy główny container
 
-            newElement = document.createElement('div');
-            newElement.className = 'routes-container';
-            newElement.innerHTML = '        <div class="row">\n' +
-                    '<div class="button_section button_section_gl_nr' + number_of_route + '">' +
-                    '<span class="glyphicon glyphicon-remove" id="remove-route"></span>' +
+            /**
+             *Ta funkcja tworzy nowy show - tu jest napisany kod html całego formularza
+             */
+            function createNewShow() {
+                let numberOfShow = iterator;
+                newElement = document.createElement('div');
+                newElement.className = 'routes-container';
+                newElement.innerHTML = '        <div class="row">\n' +
+                    '<div class="button_section button_section_gl_nr' + numberOfShow + '">' +
+                    '<span class="glyphicon glyphicon-remove" data-remove="show"></span>' +
                     '</div>' +
-                '        <header>Trasa #' + number_of_route + '</header>\n' +
-                '\n' +
-                '            <div class="col-md-4">\n' +
-                '                <div class="form-group">\n' +
-                '                    <label for="woj' + number_of_route + '">Województwo</label>\n' +
-                '                    <select name="woj' + number_of_route + '" id="woj' + number_of_route + '" class="form-control">\n' +
-                '                        <option value="0">Wybierz</option>\n' +
-                '                        <option value="1">Lubelskie</option>\n' +
-                '                        <option value="2">Mazowieckie</option>\n' +
-                '                    </select>\n' +
-                '                </div>\n' +
-                '            </div>\n' +
-                '\n' +
-                '            <div class="col-md-4">\n' +
-                '                <div class="form-group">\n' +
-                '                    <label for="city' + number_of_route + '">Miasto</label>\n' +
-                '                    <select name="city' + number_of_route + '" id="city' + number_of_route + '" class="form-control">\n' +
-                '                        <option value="0">Wybierz</option>\n' +
-                '                        <option value="1">Lublin</option>\n' +
-                '                        <option value="2">Świdnik</option>\n' +
-                '                    </select>\n' +
-                '                </div>\n' +
-                '            </div>\n' +
-                '\n' +
-                '            <div class="col-md-4">\n' +
-                '                <div class="form-group">\n' +
-                '                    <label for="karencja' + number_of_route + '">Karencja</label>\n' +
-                '                    <select name="karencja' + number_of_route + '" id="karencja' + number_of_route + '" class="form-control">\n' +
-                '                        <option>Wybierz</option>\n' +
-                '                        <option value="0">0</option>\n' +
-                '                        <option value="1">1</option>\n' +
-                '                        <option value="2">2</option>\n' +
-                '                        <option value="3">3</option>\n' +
-                '                    </select>\n' +
-                '                </div>\n' +
-                '            </div>\n' +
-                '\n' +
-                '            <div class="form-group">\n' +
-                '                <label for="date">Data:</label>\n' +
-                '                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">\n' +
-                '                    <input class="form-control" name="start_date' + number_of_route + '" type="text">\n' +
-                '                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>\n' +
-                '                </div>\n' +
-                '            </div>\n' +
-                '\n' +
-                '            <div class="col-lg-12 button_section button_section_nr' + number_of_route + '">\n' +
-                '                \n' +
-                '                <input type="button" class="btn btn-success" id="add_new_routes" value="Zapisz!" style="width:100%;">\n' +
-                '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_route" value="Dodaj nową trasę" style="width:100%;margin-top:1em;margin-bottom:1em;">' +
-                '            </div>\n' +
-                '        </div>';
-            return newElement;
-        }
+                    '        <header>Pokaz </header>\n' +
+                    '\n' +
+                    '            <div class="col-md-4">\n' +
+                    '                <div class="form-group">\n' +
+                    '                    <label for="woj' + numberOfShow + '">Województwo</label>\n' +
+                    '                    <select name="woj' + numberOfShow + '" id="woj' + numberOfShow + '" class="form-control">\n' +
+                    '                        <option value="0">Wybierz</option>\n' +
+                    '                        <option value="1">Lubelskie</option>\n' +
+                    '                        <option value="2">Mazowieckie</option>\n' +
+                    '                    </select>\n' +
+                    '                </div>\n' +
+                    '            </div>\n' +
+                    '\n' +
+                    '            <div class="col-md-4">\n' +
+                    '                <div class="form-group">\n' +
+                    '                    <label for="city' + numberOfShow + '">Miasto</label>\n' +
+                    '                    <select name="city' + numberOfShow + '" id="city' + numberOfShow + '" class="form-control">\n' +
+                        @foreach($departments as $department)
+                            '<option value ="{{$department->id}}">{{$department->departments->name}}</option>' +
+                        @endforeach
+                            '                    </select>\n' +
+                    '                </div>\n' +
+                    '            </div>\n' +
+                    '\n' +
+                    '            <div class="col-md-4">\n' +
+                    '                <div class="form-group">\n' +
+                    '                    <label for="karencja' + numberOfShow + '">Karencja</label>\n' +
+                    '                    <select name="karencja' + numberOfShow + '" id="karencja' + numberOfShow + '" class="form-control">\n' +
+                    '                        <option>Wybierz</option>\n' +
+                    '                        <option value="0">0</option>\n' +
+                    '                        <option value="1">1</option>\n' +
+                    '                        <option value="2">2</option>\n' +
+                    '                        <option value="3">3</option>\n' +
+                    '                    </select>\n' +
+                    '                </div>\n' +
+                    '            </div>\n' +
+                    '\n' +
+                    // '            <div class="form-group">\n' +
+                    // '                <label for="date">Data:</label>\n' +
+                    // '                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">\n' +
+                    // '                    <input class="form-control form-all-dates" name="start_date' + numberOfShow + '" type="text">\n' +
+                    // '                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>\n' +
+                    // '                </div>\n' +
+                    // '            </div>\n' +
+                    '<div class="form-group hour_div">' +
 
-        /**
-         * Ta funkcja usuwa wszystkie buttony z dotychczasowych routów
-         */
-        function clear_button_section() {
-            let button_section = Array.from(document.getElementsByClassName('button_section'));
-            button_section.forEach(function(section) {
-                section.textContent = '';
-            });
-        }
-
-        /**
-         * Ta funkcja dodaje nowy route
-         */
-        function add_new_route() {
-            let new_route = create_new_route(); //otrzymujemy nowy formularz
-            clear_button_section();
-            route_stack.push(new_route); //dodajemy go do stosu
-            let main_container = document.querySelector('.routes-wrapper'); //zaznaczamy główny container
-            main_container.appendChild(new_route); //dodajemy nowy element jako ostatnie dziecko
-
-            $('.form_date').datetimepicker({
-                language:  'pl',
-                autoclose: 1,
-                minView : 2,
-                pickTime: false
-            });
-        }
-
-        function click_button_handler(e) {
-            if(e.target.id == 'add_new_route') {
-                add_new_route();
+                    '</div>' +
+                    '\n' +
+                    // '            <div class="col-lg-12 new_hour_section">\n' +
+                    // '<input type="button" class="btn btn-primary" data-hour="true" value="Dodaj godzinę pokazu" style="width:30%;margin-bottom:1em;">' +
+                    // '</div>' +
+                    '            <div class="col-lg-12 button_section">\n' +
+                    '                <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">\n' +
+                    '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nową trasę" style="width:100%;margin-bottom:1em;">' +
+                    '            </div>\n' +
+                    '        </div>';
+                return newElement;
             }
-            if(e.target.id == "remove-route") {
-                let last_route = document.getElementsByClassName('routes-container')[route_stack.size() - 1];
-                let route_wrapper = document.getElementsByClassName('routes-wrapper')[0];
-                route_wrapper.removeChild(last_route); //deleta last route
 
-                let button_div_class_name = 'button_section_nr' + (route_stack.size() - 1);
-                let button_div_gl_class_name = 'button_section_gl_nr' + (route_stack.size() - 1);
-                let pre_last_button_div = document.getElementsByClassName(button_div_class_name)[0]; //select previous route's buttons div
-                let pre_last_button_gl_div = document.getElementsByClassName(button_div_gl_class_name)[0]; //select previous route's buttons div
-                pre_last_button_div.innerHTML = '                <input type="button" class="btn btn-success" id="add_new_routes" value="Zapisz!" style="width:100%;">\n' +
-                '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_route" value="Dodaj nową trasę" style="width:100%;margin-top:1em;margin-bottom:1em;">';
-                pre_last_button_gl_div.innerHTML = '<span class="glyphicon glyphicon-remove" id="remove-route"></span>';
 
-                route_stack.pop();
+            /**
+             * Ta funkcja dodaje nowy pokaz.
+             */
+            function addNewShow() {
+                removeButtonsFromLastShow();
+                let newShow = createNewShow(); //otrzymujemy nowy formularz z pokazem.
+                mainContainer.appendChild(newShow);
+
+                iterator++;
+
+                $('.form_date').datetimepicker({
+                    language:  'pl',
+                    autoclose: 1,
+                    minView : 2,
+                    pickTime: false
+                });
             }
-        }
 
-        let route_stack = new Stack();
 
-        add_new_route();
+            function removeButtonsFromLastShow() {
+                let buttonSection = document.getElementsByClassName('button_section')[document.getElementsByClassName('button_section').length - 1];
+                if(buttonSection != null) {
+                    buttonSection.parentNode.removeChild(buttonSection);
+                }
+            }
 
-        let routes_wrapper = document.getElementsByClassName('routes-wrapper')[0];
-        routes_wrapper.addEventListener('click', click_button_handler);
+            function removeGlyInFirstShow() {
+                let firstShow = document.getElementsByClassName('routes-container')[0];
+                let removeGlyphicon = firstShow.getElementsByClassName('glyphicon-remove')[0];
+                removeGlyphicon.parentNode.removeChild(removeGlyphicon);
+            }
 
-    });
+            function removeGivenHour(container) {
+                container.parentNode.removeChild(container);
+            }
 
-</script>
+            function insertHourInput(container) {
+                let hourInputContainer = document.createElement('div');
+                hourInputContainer.innerHTML = '<label class="remove_hour_section">Godzina pokazu  <span class="glyphicon glyphicon-minus" data-remove="hour" style="color:red"></span></label><input type="time" class="form-control" name="show_hour">';
+                container.appendChild(hourInputContainer);
+            }
+
+            function removeGivenShow(container) {
+                let allShows = document.getElementsByClassName('routes-container');
+                let lastShowContainer = allShows[allShows.length - 1];
+                if(container == lastShowContainer) {
+                    addButtonsToPreviousContainer(container);
+                    container.parentNode.removeChild(container);
+                }
+                else {
+                    container.parentNode.removeChild(container);
+                }
+            }
+
+            function addButtonsToPreviousContainer(container) {
+                let previousContainer = container.previousElementSibling;
+                let placeInPreviousContainer = previousContainer.getElementsByClassName('hour_div')[0];
+                let buttonsElement = document.createElement('div');
+                buttonsElement.classList.add('col-lg-12');
+                buttonsElement.classList.add('button_section');
+                buttonsElement.innerHTML = '                <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">\n' +
+                    '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nową trasę" style="width:100%;margin-bottom:1em;">';
+                buttonsElement.appendAfter(placeInPreviousContainer);
+            }
+
+
+            function buttonHandler(e) {
+                if(e.target.id == 'add_new_show') { // click on add new show button
+                    addNewShow();
+                }
+                else if(e.target.dataset.remove == 'show') { // click on X glyphicon
+                    let showContainer = e.target.parentElement.parentElement.parentElement;
+                    removeGivenShow(showContainer);
+                }
+                else if(e.target.dataset.hour == 'true') { // click on add hour button
+                    let hourContainer = e.target.parentElement;
+                    insertHourInput(hourContainer);
+                }
+                else if(e.target.dataset.remove == 'hour') { // click on - glyphicon(hour)
+                    let givenHourInputContainer = e.target.parentElement.parentElement;
+                    removeGivenHour(givenHourInputContainer);
+                }
+
+            }
+            /***********************************************/
+
+            mainContainer.addEventListener('click', buttonHandler);
+
+            addNewShow();
+            removeGlyInFirstShow();
+
+        });
+    </script>
 @endsection
