@@ -799,6 +799,7 @@ Route::get('/report_campaign', 'PBXDataAPI@report_campaign');
 
 
 Route::get('/crmRoute_index', 'CrmRouteController@index');
+Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet');
 
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');

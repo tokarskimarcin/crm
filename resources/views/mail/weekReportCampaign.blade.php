@@ -1,5 +1,17 @@
 @php
     $active_proc = 0;
+    $dep_names = array(
+    'WR' => 'Radom',
+    'TSK' => 'Skarżysko Kamienna',
+    'TOS' => 'Ostrowiec Św.',
+    'TST' => 'Starachowice',
+    'LBN' => 'Lublin',
+    'LKR' => 'Kraśnik',
+    'LZA' => 'Zamość',
+    'LCH' => 'Chełm',
+    'LDZ' => 'Łódź',
+    'BST' => 'Białystok'
+    );
 @endphp
 
 <table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px">
@@ -22,12 +34,16 @@
     </thead>
     <tbody>
 
-    @foreach($data as $item)
+    @foreach($dep_names as $key => $value)
         @php
-            $active_proc = $item->all_campaigns > 0 ? round((100* $item->active_campaigns) / $item->all_campaigns,2) : 0;
+            $item = $data->where('split_name', '=', $key)->first();
         @endphp
+        @if(is_object($item))
+            @php
+                $active_proc = $item->all_campaigns > 0 ? round((100* $item->active_campaigns) / $item->all_campaigns,2) : 0;
+            @endphp
             <tr>
-                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->name}}</td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$value}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->all_campaigns}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->active_campaigns}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$active_proc}}%</td>
@@ -35,6 +51,14 @@
         @php
             $active_proc = 0;
         @endphp
+        @else
+            <tr>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$value}}</td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">0</td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">0</td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">0%</td>
+            </tr>
+        @endif
     @endforeach
     @php
         $active_proc_total = $sum[0]->sum_campaign > 0 ? round((100* $sum[0]->sum_active) / $sum[0]->sum_campaign,2) : 0;
