@@ -40,9 +40,31 @@
         cursor: pointer;
     }
 
+    .header {
+        text-align: center;
+        font-size: 2em;
+        font-weight: bold;
+        box-shadow: 0 1px 15px 1px rgba(39,39,39,.1);
+        width: 100%;
+        padding-top: 1em;
+        padding-bottom: 1em;
+    }
+
 </style>
-
 <div class="routes-wrapper">
+    @if(Session::has('adnotation'))
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-success">{{Session::get('adnotation') }}</div>
+            </div>
+        </div>
+        @php
+            Session::forget('adnotation');
+        @endphp
+    @endif
 
+    <div class="header">
+        <span>Nowa trasa</span>
+    </div>
 </div>
 
