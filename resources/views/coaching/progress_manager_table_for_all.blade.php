@@ -16,12 +16,12 @@
         </div>
         <div class="panel-body">
             <div class="alert alert-success">
-                <h4>
-                    <p>Średnia wyjściowa - średnia przed rozpoczęciem coachingu. </p>
-                    <p>Aktualna średnia - średnia z aktualnie zaakceptowanych godzin (przyrostowa), liczona od daty rozpoczęcia coachingu.</p>
-                    <p>Aktualna RBH - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
-                    <p>Cel - Średnia wymagana.</p>
-                </h4>
+                <p><strong>Wynik wyjściowy</strong> - wynik danego typu (średniej,jakości,RBH) przed rozpoczęciem coachingu. </p>
+                <p><strong>Aktualny Wynik</strong> - aktualny wynik danego typu coachingu(przyrostowy), liczony od daty rozpoczęcia coachingu.</p>
+                <p><strong>Aktualna RBH</strong> - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
+                <p><strong>Cel</strong> -  Wymagany wynik na coachingu.</p>
+                <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po <strong>18 RBH konsultanta</strong>,
+                    licząc od daty rozpoczęcia coachingu.</p>
             </div>
         </div>
     </div>

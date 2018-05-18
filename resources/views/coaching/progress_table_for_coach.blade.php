@@ -21,11 +21,11 @@
         <div class="panel-body">
             <div class="alert alert-success">
                 <p><strong>Wynik wyjściowy</strong> - wynik danego typu (średniej,jakości,RBH) przed rozpoczęciem coachingu. </p>
-                <p><strong>Aktualny Wynik</strong> - akrtualny wynik danego typu coachingu(przyrostowy), liczony od daty rozpoczęcia coachingu.</p>
+                <p><strong>Aktualny Wynik</strong> - aktualny wynik danego typu coachingu(przyrostowy), liczony od daty rozpoczęcia coachingu.</p>
                 <p><strong>Aktualna RBH</strong> - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
                 <p><strong>Cel</strong> -  Wymagany wynik na coachingu.</p>
                 <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po <strong>18 RBH konsultanta</strong>,
-                    od rozpoczęcia coachingu.</p>
+                    licząc od daty rozpoczęcia coachingu.</p>
             </div>
         </div>
     </div>
