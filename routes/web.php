@@ -797,9 +797,16 @@ Route::get('/screen_table','ScreensController@screenMethod');
 //campaign reports mothod for database
 Route::get('/report_campaign', 'PBXDataAPI@report_campaign');
 
-
+//Routes
 Route::get('/crmRoute_index', 'CrmRouteController@index');
 Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet');
+Route::post('/addNewRoute', 'CrmRouteController@addNewRoutePost');
+Route::post('/addNewRoutes', 'CrmRouteController@addNewRouteAjax')->name('api.getCitiesNames');
+
+Route::get('/showRoutes', 'CrmRouteController@showRoutesGet');
+Route::post('/showRoutesAjax', 'CrmRouteController@showRoutesAjax')->name('api.showRoutesAjax');
+
+Route::get('/route/{id}', 'CrmRouteController@routeGet');
 
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
