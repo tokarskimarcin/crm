@@ -224,6 +224,7 @@ class TestsController extends Controller
             return view('errors.404');
         }
 
+
         /**
          * Sprawdzenie czy użytkownik ma uprawnienia do podglądania ocen wszystkich testów
          */
@@ -237,10 +238,14 @@ class TestsController extends Controller
         foreach($ids as $item) {
             $arr[] = $item->user_id;
         }
-
-        if ($test->user_id != Auth::user()->id && !in_array(Auth::user()->id, $arr)) {
-            return view('errors.404');
+        //gdy test jest stworzony przez osobę zarządzającą lub jest to osoba wypełniająca test
+        if($test->user_id == Auth::user()->id || $test->cadre_id == Auth::user()->id){
+            return view('tests.testResult')
+                ->with('test', $test);
         }
+        else if (!in_array(Auth::user()->id, $arr)) {
+                return view('errors.404');
+            }
 
         return view('tests.testResult')
             ->with('test', $test);
@@ -261,12 +266,33 @@ class TestsController extends Controller
     */
 
     public function addTestGet() {
-        // pobranie wszystkich kategorii
-        $categories = TestCategory::where('deleted','=',0)->get();
-        // pobranie wszystkich pracowników kardy(pracujących)
-        $cadre = User::where('status_work','=',1)
-            ->whereNotin('user_type_id',[1,2])->orderBy('last_name')->get();
-        $teplate = TemplateUserTest::where('deleted',0)->get();
+
+        if(Auth::user()->user_type_id == 4){
+            // pobranie kategorii dla konsultantów
+            $categories = TestCategory::where('deleted','=',0)
+                ->where('level_category','=','1')->get();
+            // pobranie wszystkich Konsultantów(pracujących)
+            $cadre = User::where('status_work','=',1)
+                ->whereIn('user_type_id',[1,2])
+                ->orderBy('last_name');
+            if(Auth::user()->id != 1364){
+                $cadre = $cadre->where('coach_id','=',Auth::user()->id);
+            }
+            $cadre = $cadre->get();
+            $teplate = TemplateUserTest::where('deleted',0)
+                    ->where('level_template','=','1')
+                    ->get();
+        }else{
+            // pobranie wszystkich kategorii dla kadry
+            $categories = TestCategory::where('deleted','=',0)
+                ->where('level_category','=','0')->get();
+            // pobranie wszystkich pracowników kardy(pracujących)
+            $cadre = User::where('status_work','=',1)
+                ->whereNotin('user_type_id',[1,2])->orderBy('last_name')->get();
+            $teplate = TemplateUserTest::where('deleted',0)
+                ->where('level_template','=','0')
+                ->get();
+        }
         //generowanie widoku
         return view('tests.addTest')
             ->with('categories',$categories)
@@ -341,7 +367,7 @@ class TestsController extends Controller
 
             $find_template = TemplateUserTest::where('id',$request->template_id)->get();
             if($status != null ) {
-                if (($all_users->count() == count($request->id_user) && $all_users->count() == 1) && ($request->template_id == 0 || ($find_template->count() == 1))) {
+                if (($all_users->count() == 1) && ($request->template_id == 0 || ($find_template->count() == 1))) {
                     if ($status->status == 1) {
 
                         $user_question = UserQuestion::where('test_id', $test_id)->get();
@@ -437,12 +463,33 @@ class TestsController extends Controller
             if ($test_by_id->status == 1 || $test_by_id->status == 2) {
                 // pobranie pytań z testu
                 $all_question_id = $test_by_id->questions()->get();
-                // pobranie wszystkich kategorii
-                $categories = TestCategory::where('deleted', '=', 0)->get();
-                // pobranie wszystkich pracowników kardy(pracujących)
-                $cadre = User::where('status_work', '=', 1)
-                    ->whereNotin('user_type_id', [1, 2])->orderBy('last_name')->get();
-                $teplate = TemplateUserTest::where('deleted', 0)->get();
+                //Sprawdzenie czy jest to wersja dla trenerów
+                if(Auth::user()->user_type_id == 4){
+                    // pobranie kategorii dla konsultantów
+                    $categories = TestCategory::where('deleted','=',0)
+                        ->where('level_category','=','1')->get();
+                    // pobranie wszystkich Konsultantów(pracujących)
+                    $cadre = User::where('status_work','=',1)
+                        ->whereIn('user_type_id',[1,2])
+                        ->orderBy('last_name');
+                    if(Auth::user()->id != 1364){
+                        $cadre = $cadre->where('coach_id','=',Auth::user()->id);
+                    }
+                    $cadre = $cadre->get();
+                    $teplate = TemplateUserTest::where('deleted',0)
+                        ->where('level_template','=','1')
+                        ->get();
+                }else{
+                    // pobranie wszystkich kategorii dla kadry
+                    $categories = TestCategory::where('deleted','=',0)
+                        ->where('level_category','=','0')->get();
+                    // pobranie wszystkich pracowników kardy(pracujących)
+                    $cadre = User::where('status_work','=',1)
+                        ->whereNotin('user_type_id',[1,2])->orderBy('last_name')->get();
+                    $teplate = TemplateUserTest::where('deleted',0)
+                        ->where('level_template','=','0')
+                        ->get();
+                }
                 //generowanie widoku
                 $all_question = array();
                 foreach ($all_question_id as $item) {
@@ -497,9 +544,27 @@ class TestsController extends Controller
     */
     public function addTestTemplate()
     {
-        $categories = TestCategory::where('deleted','=',0)->get();
-        $cadre = User::where('status_work','=',1)
-            ->whereNotin('user_type_id',[1,2])->orderBy('last_name')->get();
+        if(Auth::user()->user_type_id == 4){
+            // pobranie kategorii dla konsultantów
+            $categories = TestCategory::where('deleted','=',0)
+                ->where('level_category','=','1')->get();
+            // pobranie wszystkich Konsultantów(pracujących)
+            $cadre = User::where('status_work','=',1)
+                ->whereIn('user_type_id',[1,2])
+                ->orderBy('last_name');
+            if(Auth::user()->id != 1364){
+                $cadre = $cadre->where('coach_id','=',Auth::user()->id);
+            }
+            $cadre = $cadre->get();
+        }else{
+            // pobranie wszystkich kategorii dla kadry
+            $categories = TestCategory::where('deleted','=',0)
+                ->where('level_category','=','0')->get();
+            // pobranie wszystkich pracowników kardy(pracujących)
+            $cadre = User::where('status_work','=',1)
+                ->whereNotin('user_type_id',[1,2])->orderBy('last_name')->get();
+        }
+
         return view('tests.addTestTemplate')
             ->with('categories',$categories)
             ->with('users',$cadre);
@@ -516,6 +581,7 @@ class TestsController extends Controller
                 $new_template->template_name = $request->template;
                 $new_template->cadre_id = Auth::user()->id;
                 $new_template->name= $request->subject;
+                $new_template->level_template = Auth::user()->user_type_id == 4 ? 1 : 0;
                 $new_template->save();
                 $id_template = $new_template->id;
                 $question_array = $request->question_test_array;
@@ -538,7 +604,19 @@ class TestsController extends Controller
     */
     public function showTestTemplate()
     {
-        $template = TemplateUserTest::where('deleted','=',0)->get();
+        if(Auth::user()->user_type_id == 4){
+            $template = TemplateUserTest::where('deleted','=',0)
+                ->where('level_template','=',1)
+                ->get();
+        }else if(Auth::user()->id != 1364) {
+            $template = TemplateUserTest::where('deleted', '=', 0)
+                ->where('level_template', '=', 0)
+                ->get();
+            }
+        else{
+            $template = TemplateUserTest::where('deleted', '=', 0)
+                ->get();
+        }
         return view('tests.showTemplate')
             ->with('template',$template);
     }
@@ -559,9 +637,31 @@ class TestsController extends Controller
      */
     public function viewTestTemplate($id)
     {
-        $categories = TestCategory::where('deleted','=',0)->get();
-        $cadre = User::where('status_work','=',1)
-            ->whereNotin('user_type_id',[1,2])->orderBy('last_name')->get();
+        $template = TemplateUserTest::find($id);
+        $user = User::find($template->cadre_id);
+        if(Auth::user()->user_type_id == $user->user_type_id && Auth::user()->user_type_id == 4)
+        {
+            // pobranie kategorii dla konsultantów
+            $categories = TestCategory::where('deleted','=',0)
+                ->where('level_category','=','1')->get();
+            // pobranie wszystkich Konsultantów(pracujących)
+            $cadre = User::where('status_work','=',1)
+                ->whereIn('user_type_id',[1,2])
+                ->orderBy('last_name');
+            if(Auth::user()->id != 1364){
+                $cadre = $cadre->where('coach_id','=',Auth::user()->id);
+            }
+            $cadre = $cadre->get();
+        }else if(Auth::user()->user_type_id != 4){
+            // pobranie wszystkich kategorii dla kadry
+            $categories = TestCategory::where('deleted','=',0)
+                ->where('level_category','=','0')->get();
+            // pobranie wszystkich pracowników kardy(pracujących)
+            $cadre = User::where('status_work','=',1)
+                ->whereNotin('user_type_id',[1,2])->orderBy('last_name')->get();
+        }else{
+            return view('errors.404');
+        }
         $template = TemplateUserTest::find($id);
         $template_content = TemplateUserTest::find($id)->questionsData();
 
@@ -726,8 +826,8 @@ class TestsController extends Controller
         /**
          * Przesłanie maila z informacją o wyniku testu
          */
-        $this->sendMail($user_mail, $user_name, $mail_title, $data, $mail_type);
-
+        if($user->user_type_id != 1 && $user->user_type_id != 2)
+            $this->sendMail($user_mail, $user_name, $mail_title, $data, $mail_type);
         Session::flash('message_ok', "Ocena została przesłana!");
         return Redirect::back();
     }
@@ -787,7 +887,13 @@ class TestsController extends Controller
         Wyświetlanie widoku dla panelu administarcyjnego testów
     */
     public function testsAdminPanelGet() {
-        $testCategory = TestCategory::all();
+
+        if(Auth::user()->user_type_id == 4)
+        {
+            $testCategory = TestCategory::where('level_category','=',1)
+                            ->get();
+        }else
+            $testCategory = TestCategory::all();
 
         return view('tests.testsAdminPanel')
             ->with('testCategory', $testCategory);
@@ -802,6 +908,11 @@ class TestsController extends Controller
         $category->name = $request->category_name;
         $category->user_id = Auth::user()->id;
         $category->cadre_id = Auth::user()->id;
+        if(Auth::user()->user_type_id == 4){
+            $category->level_category = 1;
+        }else{
+            $category->level_category = $request->coach_checkbox == null ? 0 : 1;
+        }
         $category->created_at = date('Y-m-d H:i:s');
         $category->updated_at = date('Y-m-d H:i:s');
         $category->deleted = 0;
