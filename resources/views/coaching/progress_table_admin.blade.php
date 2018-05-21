@@ -431,6 +431,9 @@
                         if (parseInt(data.actual_rbh) < parseInt(18)) {
                             $(row).hide();
                         }
+                        if(parseInt(data.actual_rbh) > 26){
+                            $(row).css("background-color","#c500002e");
+                        }
                     }else{
                         var coaching_end_date = Date.parse(data.coaching_date);
                         coaching_end_date += 345600*1000; // stworzenie daty + dodanie 4 dni
