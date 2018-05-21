@@ -60,7 +60,7 @@
                 <h4>
                     <div class="alert alert-warning"><p><sup>*</sup>Kolumny <strong>Tak/Nie</strong> i <strong>Dlaczego</strong> są obowiązkowe.</p></div>
                     <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formularza zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
-                    <div class="alert alert-warning"><p>Zdjęcia mogą być <i>tylko</i> w formatach: <strong>.pdf</strong> <strong>.jpg</strong> <strong>.jpeg</strong> <strong>.png</strong>. Pliki dźwiękowe mogą być <i>tylko</i> w formatach: <strong>.wav</strong> <strong>.mp3</strong></p></div>
+                    <div class="alert alert-warning"><p>Zdjęcia mogą być <i>tylko</i> w formatach: <strong>.pdf</strong> <strong>.jpg</strong> <strong>.jpeg</strong> <strong>.png</strong>.</p></div>
                 </h4>
                 @foreach($headers as $h)
                     {{--*****************************************ZMIENIC JAKOS 1 NA ZMIENNA ************************--}}
