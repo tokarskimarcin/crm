@@ -73,7 +73,7 @@
                             <th>Tak/Nie<sup>*</sup></th>
                             {{--<th>Jakość<sup>*</sup></th>--}}
                             <th>Dlaczego<sup>*</sup></th>
-                            <th>Zdjęcia</th>
+                            <th>Zdjęcia/Pliki audio</th>
                         </tr>
                         </thead>
                         <tbody>

@@ -54,6 +54,7 @@
                                 <th>Komentarz<sup>*</sup></th>
                                 <th></th>
                                 <th>Zdjęcia</th>
+                                <th>Pliki audio</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -102,11 +103,6 @@
                                             </div>
                                         </td>
                                         <td> <a data-toggle="modal" data-info="{{$c->name . "_comment"}}" class="modal_trigger" href="#myModal"><span class="glyphicon glyphicon-search"></span></a></td>
-                                        <td>
-                                            <div class="form-group">
-                                                <input name="{{$c->name . "_files[]"}}" id="{{$c->name . "_files[]"}}" type="file" multiple="" />
-                                            </div>
-                                        </td>
                                         <?php
                                             $i = 1;
                                         ?>
@@ -131,6 +127,19 @@
                                                     @endif
                                                 @endforeach
                                             </div>
+                                        </td>
+                                        <?php
+                                        $i = 1;
+                                        ?>
+                                        <td>
+                                            @foreach($audit_audios as $audio)
+                                                @if($c->id == $audio->criterion_id)
+                                                    <a href="/api/getAuditScan/{{$audio->name}}" download id="audio_{{$audio->id}}">Audio{{$i}}</a>
+                                                    <?php
+                                                    $i++;
+                                                    ?>
+                                                @endif
+                                            @endforeach
                                         </td>
                                     </tr>
                                 @endif
