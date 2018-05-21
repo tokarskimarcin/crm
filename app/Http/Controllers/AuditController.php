@@ -45,7 +45,7 @@ class AuditController extends Controller
      * This method returns form to fill with necessary data
      */
     public function auditMethodPost(Request $request) {
-        $typeOfPerson = $request->typeOfPerson; // 1 - trainer, 2 - hr, 3 - collective
+        $typeOfPerson = $request->typeOfPerson; // 1 - trainer, 2 - hr, 3 - collective, 4-kierownik
         $user = Auth::user();
         $templateType = $request->template;
         $headers = AuditHeaders::all(); //there was where(status = 1)
@@ -68,7 +68,16 @@ class AuditController extends Controller
         $trainers = User::whereIn('user_type_id', [4,12])->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->get();
         $hr = User::where('user_type_id', '=', '5')->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->get();
         $collective = User::where('user_type_id', '=', '7')->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->first();
-        $arr = array("trainers" => $trainers, "hr" => $hr, "collective" => $collective);
+        $kierownik = DB::table('department_info')
+            ->select(DB::raw('
+                users.first_name as first_name,
+                users.last_name as last_name,
+                users.id as id
+            '))
+            ->join('users', 'users.id', 'department_info.menager_id')
+            ->where('department_info.id', '=', $request->wybranaOpcja)
+            ->get();
+        $arr = array("trainers" => $trainers, "hr" => $hr, "collective" => $collective, "kierownik" => $kierownik);
         return $arr;
     }
 
@@ -84,7 +93,7 @@ class AuditController extends Controller
         /*Fil "audit" table*/
         $newForm->user_id = $user->id;
         $newForm->trainer_id = $request->trainer;
-        $newForm->user_type = $request->typeOfPerson; // 1 - trainer, 2 - hr, 3 - collective
+        $newForm->user_type = $request->typeOfPerson; // 1 - trainer, 2 - hr, 3 - collective, 4-kierownik
         $newForm->department_info_id = $request->department_info;
         $newForm->date_audit = $request->date;
         $newForm->score = round($auditPercentScore, 2);
@@ -194,7 +203,7 @@ class AuditController extends Controller
             $audit = $audit ->where('audit.user_type', '=', $request->type);
         }
         if($request->type != null && $request->type == '0') {
-            $audit = $audit ->whereIn('audit.user_type', [1,2,3]);
+            $audit = $audit ->whereIn('audit.user_type', [1,2,3,4]);
         }
         return datatables($audit)->make(true);
     }

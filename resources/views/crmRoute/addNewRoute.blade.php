@@ -73,8 +73,8 @@
                     '                    <label>Województwo</label>\n' +
                     '                    <select class="form-control voivodeship" data-type="voivode">\n' +
                     '                        <option value="0">Wybierz</option>\n' +
-                                                @foreach($headers as $header)
-                                                    '<option value ="{{$header->id}}">{{$header->name}}</option>' +
+                                                @foreach($voivodes as $voivode)
+                                                    '<option value ="{{$voivode->id}}">{{$voivode->name}}</option>' +
                                                 @endforeach
                     '                    </select>\n' +
                     '                </div>\n' +
@@ -245,12 +245,13 @@
                                 basicOption.value = '0';
                                 basicOption.textContent = 'Wybierz';
                                 placeToAppend.appendChild(basicOption);
+                                for(var i = 0; i < response.length; i++) {
+                                    let responseOption = document.createElement('option');
+                                    responseOption.value = response[i].id;
+                                    responseOption.textContent = response[i].name;
+                                    placeToAppend.appendChild(responseOption);
+                                }
 
-                                let responseOption = document.createElement('option');
-                                responseOption.value = response[0].id;
-                                responseOption.textContent = response[0].name;
-                                placeToAppend.appendChild(responseOption);
-                                console.log(response);
                             }
                         });
 
@@ -310,12 +311,12 @@
                         basicOption.value = '0';
                         basicOption.textContent = 'Wybierz';
                         placeToAppend.appendChild(basicOption);
-
-                        let responseOption = document.createElement('option');
-                        responseOption.value = response[0].id;
-                        responseOption.textContent = response[0].name;
-                        placeToAppend.appendChild(responseOption);
-                        console.log(response);
+                        for(var i = 0; i < response.length; i++) {
+                            let responseOption = document.createElement('option');
+                            responseOption.value = response[i].id;
+                            responseOption.textContent = response[i].name;
+                            placeToAppend.appendChild(responseOption);
+                        }
                     }
                 });
             });

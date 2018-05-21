@@ -96,8 +96,11 @@
                                 </optgroup>
                                 <optgroup label="HRowcy" id="hrGroup" data-nr="2">
                                 </optgroup>
+                                <optgroup label="Kierownik" id="kierownik" data-nr="4">
+                                </optgroup>
                                 <optgroup label="Zbiorczy dla oddziału" id="collective" data-nr="3">
                                 </optgroup>
+
                             </select>
                         </div>
                     </div>
@@ -187,6 +190,7 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function(response) {
+                            console.log(response);
                             for(var i = 0; i < response.trainers.length; i++) {
                                 var newItem = $('<option class="generatedValues" value="' + response.trainers[i].id + '">' + response.trainers[i].first_name + ' ' + response.trainers[i].last_name + '</option>');
                                 $('#trainerDefaultValue').after(newItem);
@@ -197,6 +201,12 @@
                             }
                                 var newItem3 = $('<option class="generatedValues" value="' + response.collective.id + '">' + inputDepartment.options[inputDepartment.selectedIndex].textContent + '</option>');
                                 $('#collective').append(newItem3);
+
+                            for(var k = 0; k < response.kierownik.length; k++) {
+                                var newItem4 = $('<option class="generatedValues" value="' + response.kierownik[k].id + '">' + response.kierownik[k].first_name + ' ' + response.kierownik[k].last_name + '</option>');
+                                $('#kierownik').append(newItem4);
+                            }
+
                         }
                     });
                     return true;

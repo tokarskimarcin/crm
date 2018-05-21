@@ -104,6 +104,7 @@
                                         <option value="1">Trener</option>
                                         <option value="2">Hr-owiec</option>
                                         <option value="3">Oddział</option>
+                                        <option value="4">Kierownik</option>
                                     </select>
                                 </div>
                                 <script>
@@ -205,6 +206,9 @@
                         }
                         else if(data.user_type == 2) {
                             return "Hr";
+                        }
+                        else if(data.user_type == 4) {
+                            return "Kierownik";
                         }
                         else {
                             return 'Oddział';

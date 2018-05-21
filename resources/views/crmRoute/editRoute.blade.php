@@ -10,7 +10,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="alert gray-nav ">Tworzenie Tras</div>
+            <div class="alert gray-nav ">    @if(isset($editFlag))Edycja trasy @else Tworzenie trasy @endif</div>
         </div>
     </div>
 </div>
@@ -19,7 +19,7 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                   Utwórz nową trasę
+                    @if(isset($editFlag)) Edytuj trasę @else Utwórz nową trasę @endif
                 </div>
                 <div class="panel-body">
                         @include('crmRoute.routes')
@@ -73,8 +73,8 @@
                     '                    <label>Województwo</label>\n' +
                     '                    <select class="form-control voivodeship" data-type="voivode">\n' +
                     '                        <option value="0">Wybierz</option>\n' +
-                                                @foreach($headers as $header)
-                                                    '<option value ="{{$header->id}}">{{$header->name}}</option>' +
+                                                @foreach($voivodes as $voivode)
+                                                    '<option value ="{{$voivode->id}}">{{$voivode->name}}</option>' +
                                                 @endforeach
                     '                    </select>\n' +
                     '                </div>\n' +
@@ -245,12 +245,12 @@
                                 basicOption.value = '0';
                                 basicOption.textContent = 'Wybierz';
                                 placeToAppend.appendChild(basicOption);
-
-                                let responseOption = document.createElement('option');
-                                responseOption.value = response[0].id;
-                                responseOption.textContent = response[0].name;
-                                placeToAppend.appendChild(responseOption);
-                                console.log(response);
+                                for(var i = 0; i < response.length; i++) {
+                                    let responseOption = document.createElement('option');
+                                    responseOption.value = response[i].id;
+                                    responseOption.textContent = response[i].name;
+                                    placeToAppend.appendChild(responseOption);
+                                }
                             }
                         });
 
@@ -285,8 +285,8 @@
             mainContainer.addEventListener('click', buttonHandler);
             mainContainer.addEventListener('change', voivodeSelectionHandler);
 
-            addNewShow();
-            removeGlyInFirstShow();
+            {{--addNewShow();--}}
+            {{--removeGlyInFirstShow();--}}
 
             $('.city').select2();
             $('.voivodeship').select2();
