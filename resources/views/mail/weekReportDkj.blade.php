@@ -44,9 +44,9 @@
                 @elseif($item->department_info_id == 4)
                     <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Wysyłka </td>
                 @elseif($item->department_info_id == 1)
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px;">Lublin Potwierdzenia Badania </td>
+                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Lublin Potwierdzenia Badania </td>
                 @elseif($item->department_info_id == 15)
-                    <td style="border:1px solid #231f20;text-align:center;padding:3px;">Lublin Potwierdzenia Wysyłka </td>
+                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Lublin Potwierdzenia Wysyłka </td>
                 @else
                     <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$item->dep}} {{$item->depname}}</td>
                 @endif
