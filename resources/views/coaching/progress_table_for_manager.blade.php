@@ -26,6 +26,7 @@
                     <p><strong>Cel</strong> -  Wymagany wynik na coachingu.</p>
                     <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po <strong>4 dniach</strong>,
                         od rozpoczęcia coachingu.</p>
+                    <p>Coaching zmieni kolor na czerwony po <strong>5 dniach</strong> od daty coachingu</p>
                 </h4>
             </div>
         </div>

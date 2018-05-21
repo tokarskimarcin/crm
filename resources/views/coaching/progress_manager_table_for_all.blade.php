@@ -23,6 +23,7 @@
                     <p><strong>Cel</strong> -  Wymagany wynik na coachingu.</p>
                     <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po <strong>18 RBH konsultanta</strong>,
                         licząc od daty rozpoczęcia coachingu.</p>
+                    <p>Gdy pracownik przepracuje więcej niż <strong>26 RBH</strong> podświetli się na czerwono w tabeli "Nierozliczone"</p>
                 </h4>
             </div>
         </div>
