@@ -129,6 +129,9 @@ class AuditController extends Controller
 
             //part responsible for saving files from user
             $files = $request->file($arrFilename);
+            $picExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf');
+            $audExtensionArr = array('.mp3', '.m4A', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
+            $allFilesExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf', '.mp3', '.m4A', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
 
             if($request->hasFile($arrFilename))
             {
@@ -139,14 +142,14 @@ class AuditController extends Controller
                     $dotIndex = strripos($fileName, '.'); //last occurence of .
                     $suffix = strtolower(substr($fileName, $dotIndex)); //rest of string after $dotIndex
 
-                    if($suffix == '.jpeg' || $suffix == '.jpg' || $suffix == '.png' || $suffix == '.pdf' || $suffix == '.wav' || $suffix == '.mp3') {
+                    if(in_array($suffix, $allFilesExtensionArr)) {
                         $audit_files = new AuditFiles();
                         $audit_files->audit_id = $newForm->id;
                         $audit_files->criterion_id = $c->id;
-                        if($suffix == '.jpeg' || $suffix == '.jpg' || $suffix == '.png' || $suffix == '.pdf') {
+                        if(in_array($suffix, $picExtensionArr)) {
                             $audit_files->type = 0; // 0 - zdjęcia, 1 - pliki audio
                         }
-                        else if($suffix == '.wav' || $suffix == '.mp3') {
+                        else if(in_array($suffix, $audExtensionArr)) {
                             $audit_files->type = 1; // 0 - zdjęcia, 1 - pliki audio
                         }
                         $audit_files->save();
@@ -323,7 +326,9 @@ class AuditController extends Controller
 
             //part responsible for uploading files from user
             $files = $request->file($arrFilename);
-
+            $picExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf');
+            $audExtensionArr = array('.mp3', '.m4A', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
+            $allFilesExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf', '.mp3', '.m4A', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
             if($request->hasFile($arrFilename))
             {
 
@@ -333,14 +338,14 @@ class AuditController extends Controller
                     $dotIndex = strripos($fileName, '.'); //last occurence of .
                     $suffix = strtolower(substr($fileName, $dotIndex)); //rest of string after $dotIndex
 
-                    if ($suffix == '.jpeg' || $suffix == '.jpg' || $suffix == '.png' || $suffix == '.pdf' || $suffix == '.wav' || $suffix == '.mp3') {
+                    if (in_array($suffix, $allFilesExtensionArr)) {
                         $audit_files = new AuditFiles();
                         $audit_files->audit_id = $audit->id;
                         $audit_files->criterion_id = $c->id;
-                        if($suffix == '.jpeg' || $suffix == '.jpg' || $suffix == '.png' || $suffix == '.pdf') {
+                        if(in_array($suffix, $picExtensionArr)) {
                             $audit_files->type = 0; // 0 - zdjęcia, 1 - pliki audio
                         }
-                        else if($suffix == '.wav' || $suffix == '.mp3') {
+                        else if(in_array($suffix, $audExtensionArr)) {
                             $audit_files->type = 1; // 0 - zdjęcia, 1 - pliki audio
                         }
                         $audit_files->save();
