@@ -178,7 +178,7 @@
                     // '</div>' +
                     '            <div class="col-lg-12 button_section">\n' +
                     '                <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">\n' +
-                    '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nową trasę" style="width:100%;margin-bottom:1em;">' +
+                    '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;">' +
                     '            </div>\n' +
                     '        </div>';
                 return newElement;
@@ -246,7 +246,7 @@
                 buttonsElement.classList.add('col-lg-12');
                 buttonsElement.classList.add('button_section');
                 buttonsElement.innerHTML = '                <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">\n' +
-                    '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nową trasę" style="width:100%;margin-bottom:1em;">';
+                    '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;">';
                 buttonsElement.appendAfter(placeInPreviousContainer);
             }
 

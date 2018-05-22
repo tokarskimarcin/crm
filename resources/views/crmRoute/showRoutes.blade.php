@@ -67,7 +67,7 @@
                         },"name":"score","orderable": false
                     },
                     {"data":function (data, type, dataToSet) {
-                            return '<a href="www.google.pl">Edytuj</a>';
+                            return '<a href="{{URL::to("route")}}/' + data.id + '" class="links">Edycja</a>';
                         },"orderable": false, "searchable": false
                     }
                 ]
