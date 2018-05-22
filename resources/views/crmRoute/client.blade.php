@@ -28,6 +28,9 @@
         font-size: 2em;
         font-weight: bold;
     }
+    .check{
+        background: #B0BED9 !important;
+    }
 
 
 
@@ -56,7 +59,7 @@
                         <th></th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody>                        
                         <tr id="clientId_1">
                             <td class="client_name">Exito - Vigor Life</td>
                             <td class="client_phone">798987985</td>
@@ -140,16 +143,16 @@
     <div class="client-container">
         <div class="col-md-12">
             <div class="col-md-4">
-                <label id="client_choice_name">Klient:</label>
-                <label id="client_choice_name"> XYZ</label>
+                <label>Klient:</label>
+                <label id="client_choice_name"></label>
             </div>
             <div class="col-md-4">
-                <label id="client_choice_name">Telefon:</label>
-                <label id="client_choice_name"> 123654789</label>
+                <label>Telefon:</label>
+                <label id="client_choice_phone"></label>
             </div>
             <div class="col-md-4">
-                <label id="client_choice_name">Typ:</label>
-                <label id="client_choice_name"> Badania</label>
+                <label>Typ:</label>
+                <label id="client_choice_type"></label>
             </div>
         </div>
     </div>
@@ -207,11 +210,4 @@
     </div>
 </div>
 
-
-
-{{--@section('script')--}}
-    {{--<script>--}}
-       {{----}}
-    {{--</script>--}}
-{{--@endsection--}}
 

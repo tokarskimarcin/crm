@@ -27,8 +27,12 @@
                 Sprawdź statystyki pracownika
             </div>
             <div class="panel-body">
-                <form method="POST" action="{{ URL::to('/tests_statistics') }}" id="user_form">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
+                @if($redirect == 1)
+                    <form method="POST" action="{{ URL::to('/tests_statistics') }}" id="user_form">
+                @else
+                    <form method="POST" action="{{ URL::to('/tests_statistics_coach') }}" id="user_form">
+                @endif
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
                     <div class="form-group">
                         <select class="form-control" name="user_id" id="user_id">
                             <option value="0">Wybierz</option>
