@@ -832,6 +832,47 @@ class TestsController extends Controller
         return Redirect::back();
     }
 
+    /*
+        Sttatystyki testów dla osoby testującej TRENERZY
+    */
+    public function testsStatisticsCoachGet() {
+        $departments_stats = DB::table('user_tests')
+            ->select(DB::raw('
+                departments.name as dep_name,
+                department_type.name as dep_type_name,
+                count(user_tests.id) as dep_sum
+            '))
+            ->join('users', 'users.id', 'user_tests.user_id')
+            ->join('department_info', 'users.department_info_id', 'department_info.id')
+            ->join('departments', 'departments.id', 'department_info.id_dep')
+            ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
+            ->groupBy('users.department_info_id')
+            ->whereIn('users.user_type_id', [1,2])
+            ->get();
+
+        $results = DB::table('user_questions')
+            ->select(DB::raw('
+                SUM(CASE WHEN user_questions.result = 1 THEN 1 ELSE 0 END) as good,
+                SUM(CASE WHEN user_questions.result = 0 THEN 1 ELSE 0 END) as bad
+            '))
+            ->join('user_tests', 'user_tests.id', 'user_questions.test_id')
+            ->join('users', 'users.id', 'user_tests.user_id')
+            ->whereIn('users.user_type_id', [1,2])
+            ->get();
+
+        $users = User::whereIn('user_type_id', [1,2])
+            ->orderBy('last_name')
+            ->where('status_work', '=', 1)
+            ->where('department_info_id','=',Auth::user()->department_info_id)
+            ->get();
+
+        return view('tests.testsStatistics')
+            ->with('users', $users)
+            ->with('results', $results[0])
+            ->with('departments_stats', $departments_stats)
+            ->with('redirect',0);
+    }
+
     /* 
         Sttatystyki testów dla osoby testującej
     */
@@ -846,14 +887,18 @@ class TestsController extends Controller
             ->join('department_info', 'users.department_info_id', 'department_info.id')
             ->join('departments', 'departments.id', 'department_info.id_dep')
             ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
+            ->whereNotIn('users.user_type_id', [1,2])
             ->groupBy('users.department_info_id')
             ->get();
 
         $results = DB::table('user_questions')
             ->select(DB::raw('
-                SUM(CASE WHEN result = 1 THEN 1 ELSE 0 END) as good,
-                SUM(CASE WHEN result = 0 THEN 1 ELSE 0 END) as bad
+                SUM(CASE WHEN user_questions.result = 1 THEN 1 ELSE 0 END) as good,
+                SUM(CASE WHEN user_questions.result = 0 THEN 1 ELSE 0 END) as bad
             '))
+            ->join('user_tests', 'user_tests.id', 'user_questions.test_id')
+            ->join('users', 'users.id', 'user_tests.user_id')
+            ->whereNotIn('users.user_type_id', [1,2])
             ->get();
 
         $users = User::whereNotIn('user_type_id', [1,2])
@@ -864,7 +909,23 @@ class TestsController extends Controller
         return view('tests.testsStatistics')
             ->with('users', $users)
             ->with('results', $results[0])
-            ->with('departments_stats', $departments_stats);
+            ->with('departments_stats', $departments_stats)
+            ->with('redirect',1);
+    }
+
+
+    /**
+     * Przekierowanie do statystyk konkretnego użytkownika KONSULTANTA
+     */
+    public function testsStatisticsCoachPost(Request $request) {
+        $id = $request->user_id;
+        $check = User::find($id);
+        if ($check == null || $check->user_type_id >2) {
+            return view('errors.404');
+        }
+
+        return redirect('/employee_statistics/' . $id);
+
     }
 
     /**
@@ -931,6 +992,11 @@ class TestsController extends Controller
         if ($user == null) {
             return view('errors.404');
         }
+        if(Auth::user()->user_type_id == 4){
+            if($user->user_type_id > 2){
+                return view('errors.404');
+            }
+        }
 
         $cadre = DB::table('user_tests')
             ->select(DB::raw('
@@ -977,7 +1043,6 @@ class TestsController extends Controller
     */
     public function departmentTestsStatisticsGet() {
         $department_info = Department_info::all();
-
         return view('tests.departmentStatistics') 
             ->with('department_info', $department_info);
     }
@@ -988,7 +1053,8 @@ class TestsController extends Controller
 
      public function departmentTestsStatisticsPost(Request $request) {
         $id = $request->dep_id;
-
+        // Określenie grupy statystyk
+        $type_statistics = $request->type_statistic;
         $department = Department_info::find($id);
 
         if ($department == null) {
@@ -1005,8 +1071,14 @@ class TestsController extends Controller
                 count(*) as dep_sum
             '))
             ->leftJoin('users', 'users.id', 'user_tests.user_id')
-            ->where('users.department_info_id', '=', $id)
-            ->get();
+            ->where('users.department_info_id', '=', $id);
+            if($type_statistics == 1)
+                $count_dep_test_sum = $count_dep_test_sum
+                    ->whereIn('users.user_type_id',[1,2]);
+            else
+                $count_dep_test_sum = $count_dep_test_sum
+                    ->whereNotIn('users.user_type_id',[1,2]);
+        $count_dep_test_sum = $count_dep_test_sum->get();
 
         /**
          * Pobranie ilości dobrych i złych odpowiedzi
@@ -1019,8 +1091,15 @@ class TestsController extends Controller
             ->join('user_tests', 'user_tests.id', 'user_questions.test_id')
             ->join('users', 'users.id', 'user_tests.user_id')
             ->where('user_tests.result', '!=', null)
-            ->where('users.department_info_id', '=', $id)
-            ->get();
+            ->where('users.department_info_id', '=', $id);
+         if($type_statistics == 1){
+             $results = $results
+                 ->whereIn('users.user_type_id',[1,2]);
+         }else{
+             $results = $results
+                 ->whereNotIn('users.user_type_id',[1,2]);
+         }
+         $results = $results->get();
 
         /**
          * Pobranie ilosci testow na uzytkownika
@@ -1032,8 +1111,15 @@ class TestsController extends Controller
                 count(*) as user_sum
             '))
             ->leftJoin('users', 'users.id', 'user_tests.user_id')
-            ->where('users.department_info_id', '=', $id)
-            ->groupBy('users.id')
+            ->where('users.department_info_id', '=', $id);
+         if($type_statistics == 1){
+             $tests_by_user = $tests_by_user
+                 ->whereIn('users.user_type_id',[1,2]);
+         }else{
+             $tests_by_user = $tests_by_user
+                 ->whereNotIn('users.user_type_id',[1,2]);
+         }
+         $tests_by_user = $tests_by_user->groupBy('users.id')
             ->get();
 
         /**
@@ -1046,8 +1132,15 @@ class TestsController extends Controller
                 count(*) as user_sum
             '))
             ->leftJoin('users', 'users.id', 'user_tests.cadre_id')
-            ->where('users.department_info_id', '=', $id)
-            ->groupBy('users.id')
+            ->where('users.department_info_id', '=', $id);
+         if($type_statistics == 1){
+             $tests_by_cadre = $tests_by_cadre
+                 ->whereIn('users.user_type_id',[4]);
+         }else{
+             $tests_by_cadre = $tests_by_cadre
+                 ->whereNotIn('users.user_type_id',[4]);
+         }
+         $tests_by_cadre = $tests_by_cadre->groupBy('users.id')
             ->get();
 
         /**
@@ -1061,8 +1154,15 @@ class TestsController extends Controller
             ->join('user_tests', 'user_tests.id', 'user_questions.test_id')
             ->join('test_questions', 'test_questions.id', 'user_questions.question_id')
             ->join('test_categories', 'test_categories.id', 'test_questions.category_id')
-            ->join('users', 'users.id', 'user_tests.user_id')
-            ->where('users.department_info_id', '=', $id)
+            ->join('users', 'users.id', 'user_tests.user_id');
+             if($type_statistics == 1){
+                 $categories = $categories
+                     ->whereIn('users.user_type_id',[1,2]);
+             }else{
+                 $categories = $categories
+                     ->whereNotIn('users.user_type_id',[1,2]);
+             }
+            $categories = $categories->where('users.department_info_id', '=', $id)
             ->groupBy('test_categories.id')
             ->get();
 
@@ -1074,14 +1174,19 @@ class TestsController extends Controller
             ->with('tests_by_cadre', $tests_by_cadre)
             ->with('categories', $categories)
             ->with('department_info', $department_info)
-            ->with('department', $department);
+            ->with('department', $department)
+            ->with('type_statistic',$type_statistics);
      }
 
     /* 
         Statystyki poszczególnych testów
     */
     public function testStatisticsGet() {
-        $templates = TemplateUserTest::all();
+        if(Auth::user()->user_type_id == 4){
+            $templates = TemplateUserTest::where('level_template','=',1)->get();
+        }else{
+            $templates = TemplateUserTest::all();
+        }
 
         return view('tests.oneTestStatistics')
             ->with('templates', $templates);
