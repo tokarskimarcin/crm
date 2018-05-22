@@ -45,7 +45,7 @@ class AuditController extends Controller
      * This method returns form to fill with necessary data
      */
     public function auditMethodPost(Request $request) {
-        $typeOfPerson = $request->typeOfPerson; // 1 - trainer, 2 - hr, 3 - collective
+        $typeOfPerson = $request->typeOfPerson; // 1 - trainer, 2 - hr, 3 - collective, 4-kierownik
         $user = Auth::user();
         $templateType = $request->template;
         $headers = AuditHeaders::all(); //there was where(status = 1)
@@ -68,7 +68,16 @@ class AuditController extends Controller
         $trainers = User::whereIn('user_type_id', [4,12])->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->get();
         $hr = User::where('user_type_id', '=', '5')->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->get();
         $collective = User::where('user_type_id', '=', '7')->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->first();
-        $arr = array("trainers" => $trainers, "hr" => $hr, "collective" => $collective);
+        $kierownik = DB::table('department_info')
+            ->select(DB::raw('
+                users.first_name as first_name,
+                users.last_name as last_name,
+                users.id as id
+            '))
+            ->join('users', 'users.id', 'department_info.menager_id')
+            ->where('department_info.id', '=', $request->wybranaOpcja)
+            ->get();
+        $arr = array("trainers" => $trainers, "hr" => $hr, "collective" => $collective, "kierownik" => $kierownik);
         return $arr;
     }
 
@@ -84,7 +93,7 @@ class AuditController extends Controller
         /*Fil "audit" table*/
         $newForm->user_id = $user->id;
         $newForm->trainer_id = $request->trainer;
-        $newForm->user_type = $request->typeOfPerson; // 1 - trainer, 2 - hr, 3 - collective
+        $newForm->user_type = $request->typeOfPerson; // 1 - trainer, 2 - hr, 3 - collective, 4-kierownik
         $newForm->department_info_id = $request->department_info;
         $newForm->date_audit = $request->date;
         $newForm->score = round($auditPercentScore, 2);
@@ -93,6 +102,12 @@ class AuditController extends Controller
         $fileCatalog = "auditFiles";
         $suffix = '';
 
+        //Saving info about edition to log file
+        $log = [
+            "ID nowego audytu" => $newForm->id,
+            "ID osoby tworzącej" => $user->id
+        ];
+        new ActivityRecorder(10, $log);
 
         /*fill "audit_info" table*/
         $criterions = AuditCriterions::where('status', '=', $template)->get();
@@ -101,6 +116,7 @@ class AuditController extends Controller
 //            $nameQuality = $c->name . "_quality";
             $nameComment = $c->id . "_comment";
             $arrFilename = $c->id . "_files";
+//            $arrAudioname = $c->id . "_audios";
 
             $newCrit = new AuditInfo();
             $newCrit->status = 1;
@@ -113,6 +129,9 @@ class AuditController extends Controller
 
             //part responsible for saving files from user
             $files = $request->file($arrFilename);
+            $picExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf');
+            $audExtensionArr = array('.mp3', '.m4A', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
+            $allFilesExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf', '.mp3', '.m4A', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
 
             if($request->hasFile($arrFilename))
             {
@@ -123,18 +142,26 @@ class AuditController extends Controller
                     $dotIndex = strripos($fileName, '.'); //last occurence of .
                     $suffix = strtolower(substr($fileName, $dotIndex)); //rest of string after $dotIndex
 
-                    if($suffix == '.jpeg' || $suffix == '.jpg' || $suffix == '.png' || $suffix == '.pdf') {
+                    if(in_array($suffix, $allFilesExtensionArr)) {
                         $audit_files = new AuditFiles();
                         $audit_files->audit_id = $newForm->id;
                         $audit_files->criterion_id = $c->id;
+                        if(in_array($suffix, $picExtensionArr)) {
+                            $audit_files->type = 0; // 0 - zdjęcia, 1 - pliki audio
+                        }
+                        else if(in_array($suffix, $audExtensionArr)) {
+                            $audit_files->type = 1; // 0 - zdjęcia, 1 - pliki audio
+                        }
                         $audit_files->save();
                         $nameOfFile = $newForm->id . '-' . $c->name . '-' . $audit_files->id . $suffix;
                         $audit_files->name = $nameOfFile;
                         $audit_files->save();
                         $file->storeAs($fileCatalog, $newForm->id . '-' . $c->name . '-' . $audit_files->id . $suffix);
                     }
+
                 }
             }
+
             $newCrit->save();
             Session::flash('adnotation', "Audyt został dodany!");
         }
@@ -188,7 +215,7 @@ class AuditController extends Controller
             $audit = $audit ->where('audit.user_type', '=', $request->type);
         }
         if($request->type != null && $request->type == '0') {
-            $audit = $audit ->whereIn('audit.user_type', [1,2,3]);
+            $audit = $audit ->whereIn('audit.user_type', [1,2,3,4]);
         }
         return datatables($audit)->make(true);
     }
@@ -225,7 +252,14 @@ class AuditController extends Controller
         $headers = AuditHeaders::all();
 //        $criterion = AuditCriterions::where('status', '=', '1')->Audit_info->get();
         $audit_info = AuditInfo::where('audit_id', '=', $id)->get();
-        $audit_files = AuditFiles::where('audit_id', '=', $id)->get();
+        $audit_files = AuditFiles::where('audit_id', '=', $id)
+            ->where('type', '=', 0)
+            ->get();
+
+        $audit_audios = AuditFiles::where('audit_id', '=', $id)
+            ->where('type', '=', 1)
+            ->get();
+
         $audit = Audit::find($id);
 
         $logged_usher = Auth::user();
@@ -237,7 +271,8 @@ class AuditController extends Controller
                 ->with('audit', $audit)
                 ->with('givenId', $id)
                 ->with('audit_files', $audit_files)
-                ->with('infoAboutAudit', $infoAboutAudit);
+                ->with('infoAboutAudit', $infoAboutAudit)
+                ->with('audit_audios', $audit_audios);
         }
         else {
             return view('audit.reviewAuditUnauthorized')
@@ -247,7 +282,8 @@ class AuditController extends Controller
                 ->with('audit', $audit)
                 ->with('givenId', $id)
                 ->with('audit_files', $audit_files)
-                ->with('infoAboutAudit', $infoAboutAudit);
+                ->with('infoAboutAudit', $infoAboutAudit)
+                ->with('audit_audios', $audit_audios);
         }
     }
 
@@ -266,10 +302,9 @@ class AuditController extends Controller
         //Saving info about edition to log file
         $log = [
             "ID edytowanego audytu" => $audit->id,
-            "ID osoby edytujacej" => $loggedUser->id,
-            "Data edycji" => $today
+            "ID osoby edytujacej" => $loggedUser->id
         ];
-        new ActivityRecorder(3, $log);
+        new ActivityRecorder(10, $log);
 
         $criterions = AuditCriterions::all();
         foreach($criterions as $c) {
@@ -291,7 +326,9 @@ class AuditController extends Controller
 
             //part responsible for uploading files from user
             $files = $request->file($arrFilename);
-
+            $picExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf');
+            $audExtensionArr = array('.mp3', '.m4A', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
+            $allFilesExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf', '.mp3', '.m4A', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
             if($request->hasFile($arrFilename))
             {
 
@@ -301,10 +338,16 @@ class AuditController extends Controller
                     $dotIndex = strripos($fileName, '.'); //last occurence of .
                     $suffix = strtolower(substr($fileName, $dotIndex)); //rest of string after $dotIndex
 
-                    if ($suffix == '.jpeg' || $suffix == '.jpg' || $suffix == '.png' || $suffix == '.pdf') {
+                    if (in_array($suffix, $allFilesExtensionArr)) {
                         $audit_files = new AuditFiles();
                         $audit_files->audit_id = $audit->id;
                         $audit_files->criterion_id = $c->id;
+                        if(in_array($suffix, $picExtensionArr)) {
+                            $audit_files->type = 0; // 0 - zdjęcia, 1 - pliki audio
+                        }
+                        else if(in_array($suffix, $audExtensionArr)) {
+                            $audit_files->type = 1; // 0 - zdjęcia, 1 - pliki audio
+                        }
                         $audit_files->save();
                         $nameOfFile = $id . '-' . $c->name . '-' . $audit_files->id . $suffix; //name = id + input name + id(from audit_files) + file extension
                         $audit_files->name = $nameOfFile;

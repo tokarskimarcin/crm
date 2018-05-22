@@ -27,6 +27,7 @@
                     <p><strong>Cel</strong> -  Wymagany wynik na coachingu.</p>
                     <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po <strong>18 RBH konsultanta</strong>,
                         licząc od daty rozpoczęcia coachingu.</p>
+                    <p>Gdy pracownik przepracuje więcej niż <strong>26 RBH</strong> podświetli się na czerwono w tabeli "Nierozliczone"</p>
                 </h4>
             </div>
         </div>
@@ -821,6 +822,9 @@
                 },"rowCallback": function( row, data, index ) {
                     if (parseInt(data.actual_rbh) < parseInt(18)) {
                         $(row).hide();
+                    }
+                    if(parseInt(data.actual_rbh) > 26){
+                        $(row).css("background-color","#c500002e");
                     }
                     $(row).attr('id', data.id);
                     return row;

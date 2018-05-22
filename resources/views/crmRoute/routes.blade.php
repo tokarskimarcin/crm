@@ -27,6 +27,7 @@
         text-align: center;
         font-size: 2em;
         font-weight: bold;
+        padding-bottom: .5em;
     }
 
     .glyphicon-remove {
@@ -40,9 +41,77 @@
         cursor: pointer;
     }
 
+    .header {
+        text-align: center;
+        font-size: 2em;
+        font-weight: bold;
+        box-shadow: 0 1px 15px 1px rgba(39,39,39,.1);
+        width: 100%;
+        padding-top: 1em;
+        padding-bottom: 1em;
+    }
+
 </style>
-
 <div class="routes-wrapper">
+    @if(Session::has('adnotation'))
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-success">{{Session::get('adnotation') }}</div>
+            </div>
+        </div>
+        @php
+            Session::forget('adnotation');
+        @endphp
+    @endif
+        <div class="header">
+    @if(isset($editFlag))
+                <span>Edytuj trasę</span>
+        @else
+                <span>Nowa trasa</span>
+        @endif
+            </div>
 
+
+
+    @if(isset($routeInfo))
+        @foreach($routeInfo as $routeInf)
+            <div class="routes-container">
+                <div class="row">
+                <div class="button_section button_section_gl_nr">
+                    <span class="glyphicon glyphicon-remove" data-remove="show"></span>
+                </div>
+                <header>Pokaz </header>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Województwo</label>
+                        <select class="form-control voivodeship" data-type="voivode">
+                            <option value="0">Wybierz</option>
+                            @foreach($voivodes as $voivode)
+                                <option value ="{{$voivode->id}}" @if($voivode->id == $routeInf->voivodeship_id) selected @endif>{{$voivode->name}}</option>'
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="city">Miasto</label>
+                        <select class="form-control city">
+                            <option value="0">Wybierz</option>
+                            <option value="{{$routeInf->city_id}}" selected>{{$routeInf->city->name}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group hour_div">
+                </div>
+                <div class="col-lg-12 button_section">
+                    <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">
+                    <input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;">
+                </div>
+                </div>
+            </div>
+            @endforeach
+        @endif
 </div>
 

@@ -32,6 +32,10 @@
                     <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Badania </td>
                 @elseif($report->department_info_id == 4)
                     <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Wysyłka </td>
+                @elseif($report->department_info_id == 1)
+                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Lublin Potwierdzenia Badania </td>
+                @elseif($report->department_info_id == 15)
+                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Lublin Potwierdzenia Wysyłka </td>
                 @else
                 <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->department_info->departments->name.' '.$report->department_info->department_type->name}}</td>
                 @endif

@@ -27,6 +27,7 @@
                     <p><strong>Cel</strong> -  Wymagany wynik na coachingu.</p>
                     <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po <strong>4 dniach</strong>,
                        od rozpoczęcia coachingu.</p>
+                    <p>Coaching zmieni kolor na czerwony po <strong>5 dniach</strong> od daty coachingu</p>
                 </h4>
             </div>
         </div>
@@ -802,10 +803,14 @@
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
                     var coaching_end_date = Date.parse(data.coaching_date);
-                    coaching_end_date +=345600*1000; // stworzenie daty + dodanie 4 dni
+                    coaching_end_date += 345600*1000; // stworzenie daty + dodanie 4 dni
+                    var limit_date = coaching_end_date + (86400*1000);
                     var actual_date = new Date();
                     if (actual_date < coaching_end_date ) {
                         $(row).hide();
+                    }
+                    if(actual_date >= limit_date){
+                        $(row).css("background-color","#c500002e");
                     }
                     $(row).attr('id', data.id);
                     return row;

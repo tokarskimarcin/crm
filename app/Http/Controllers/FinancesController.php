@@ -270,7 +270,7 @@ class FinancesController extends Controller
             'typ' => $request->penalty_type,
             'amount' => $request->cost,
             'event_date' => date('Y-m-d'),
-            'comment' => $request->reason,
+            'comment' => $request->reason
         ];
 
         new ActivityRecorder(2, $data);
@@ -603,7 +603,7 @@ class FinancesController extends Controller
                 $data = [
                     'Usunięcie kary/premii' => '',
                     'data' => date('Y-m-d H:i:s'),
-                    'Id kary/premii' => $object->id,
+                    'Id kary/premii' => $object->id
                 ];
                 new ActivityRecorder(2, $data);
                 return 1;

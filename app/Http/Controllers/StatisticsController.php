@@ -4979,9 +4979,14 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
      */
     public function getCampaignData($date_start, $date_stop, $sum) {
         if($sum == 0) { //raw data
-            $campaign_data = DB::table('report_campaign')
+            $campaign_data = DB::table('report_campaign')->select(DB::raw('
+            SUM(all_campaigns) as all_campaigns,
+            SUM(active_campaigns) as active_campaigns,
+            SUBSTRING_INDEX(name,"_",1) as split_name
+            '))
                 ->whereBetween('date', [$date_start, $date_stop])
                 ->where('all_campaigns', '>', 0)
+                ->groupBy('split_name')
                 ->get();
         }
         else { //agreggate data

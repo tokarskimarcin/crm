@@ -106,7 +106,7 @@ class NotificationController extends Controller
             $data = [
                 'Edycja statusu powiadomienia o problemie' => '',
                 'Id problemu' => $notification->id,
-                'status' => $request->status,
+                'status' => $request->status
             ];
             new ActivityRecorder(7, $data);
 

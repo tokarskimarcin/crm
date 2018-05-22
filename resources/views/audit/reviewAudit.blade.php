@@ -42,7 +42,7 @@
                 <h4>
                     <div class="alert alert-warning"><p><sup>*</sup>Kolumny <strong>Tak/Nie</strong> i <strong>Dlaczego</strong> są obowiązkowe.</p></div>
                     <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formularza zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
-                    <div class="alert alert-warning"><p>Zdjęcia mogą być <i>tylko</i> w formatach: <strong>.pdf</strong> <strong>.jpg</strong> <strong>.jpeg</strong> <strong>.png</strong></p></div>
+                    <div class="alert alert-warning"><p>Zdjęcia mogą być <i>tylko</i> w formatach: <strong>.pdf</strong> <strong>.jpg</strong> <strong>.jpeg</strong> <strong>.png</strong>.</p></div>
                 </h4>
                 @foreach($headers as $h)
                     <div class="table-responsive">
@@ -53,7 +53,11 @@
                                 <th>Tak/Nie<sup>*</sup></th>
                                 <th>Komentarz<sup>*</sup></th>
                                 <th></th>
+                                <th>Zdjęcia/Pliki audio</th>
                                 <th>Zdjęcia</th>
+                                <th></th>
+                                <th>Pliki audio</th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -143,7 +147,29 @@
                                             @endforeach
 
                                         </td>
-                                    </tr>
+                                        <?php
+                                        $i = 1;
+                                        ?>
+                                        <td>
+                                            @foreach($audit_audios as $audio)
+                                                @if($c->id == $audio->criterion_id)
+                                                    <a href="/api/getAuditScan/{{$audio->name}}" download id="audio_{{$audio->id}}">Audio{{$i}}</a>
+                                                    <?php
+                                                    $i++;
+                                                    ?>
+                                                @endif
+                                            @endforeach
+                                        </td>
+                                        <td>
+                                            @foreach($audit_audios as $audio)
+                                                @if($c->id == $audio->criterion_id)
+                                                    <span class="glyphicon glyphicon-remove gl-rem" id="{{$audio->id}}" onclick='removeAudio(this)'></span>
+                                                    <?php
+                                                    $i++;
+                                                    ?>
+                                                @endif
+                                            @endforeach
+                                        </td>
                                     </tr>
                                 @endif
                             @endforeach
@@ -216,6 +242,40 @@
                            document.getElementById('zdjecie_'+e.id).classList.add('inactive');
                            e.classList.add('inactive');
                            swal('Zdjęcie usunięto')
+                       }
+                       else
+                           swal('Problem z usunięciem zdjęcia')
+                   }
+               });
+           }
+       });
+       }
+
+       function removeAudio(e) {
+           swal({
+               title: 'Jesteś pewien?',
+               text: "Po potwierdzeniu, brak możliwości cofnięcia zmian!",
+               type: 'warning',
+               showCancelButton: true,
+               confirmButtonColor: '#3085d6',
+               cancelButtonColor: '#d33',
+               confirmButtonText: 'Usuń audio!'
+           }).then((result) => {
+               if (result.value) {
+               $.ajax({ //generate list of trainers from given location
+                   type: "POST",
+                   url: '{{ route('api.delete_picture') }}',
+                   data: {
+                       "id_picture": e.id
+                   },
+                   headers: {
+                       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                   },
+                   success: function(response) {
+                       if(response == 1){
+                           document.getElementById('audio_'+e.id).classList.add('inactive');
+                           e.classList.add('inactive');
+                           swal('Plik audio został usunięty')
                        }
                        else
                            swal('Problem z usunięciem zdjęcia')
