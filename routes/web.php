@@ -802,14 +802,25 @@ Route::get('/crmRoute_index', 'CrmRouteController@index');
 Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet');
 Route::post('/addNewRoute', 'CrmRouteController@addNewRoutePost');
 Route::post('/addNewRoutes', 'CrmRouteController@addNewRouteAjax')->name('api.getCitiesNames');
+Route::post('/editRoute', 'CrmRouteController@editRoute');
 
 Route::get('/showRoutes', 'CrmRouteController@showRoutesGet');
 Route::post('/showRoutesAjax', 'CrmRouteController@showRoutesAjax')->name('api.showRoutesAjax');
 
 Route::get('/route/{id}', 'CrmRouteController@routeGet');
 
+Route::get('/addNewHotel', 'CrmRouteController@addNewHotelGet');
+Route::post('/addNewHotel', 'CrmRouteController@addNewHotelPost');
+
+Route::get('/showHotels', 'CrmRouteController@showHotelsGet');
+Route::post('/showHotelsAjax', 'CrmRouteController@showHotelsAjax')->name('api.showHotelsAjax');
+
+Route::get('/hotel/{id}', 'CrmRouteController@hotelGet');
+Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
+
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
+
 
 
 
