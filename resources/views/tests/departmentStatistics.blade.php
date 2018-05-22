@@ -12,18 +12,30 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="col-md-4">
+
             <form action="{{ URL::to('/department_statistics') }}" method="POST" id="dep_form">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                <div class="form-group">
-                    <select class="form-control" name="dep_id" id="dep_id">
-                        <option value="0">Wybierz</option>
-                        @foreach($department_info as $item)
-                            @if($item->id != 13)
-                                <option @if(isset($id) && $id == $item->id) selected @endif value="{{$item->id}}">{{$item->departments->name . ' ' . $item->department_type->name}}</option>
-                            @endif
-                        @endforeach
-                    </select>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <select class="form-control" name="dep_id" id="dep_id">
+                            <option value="0">Wybierz</option>
+                            @foreach($department_info as $item)
+                                @if($item->id != 13)
+                                    <option @if(isset($id) && $id == $item->id) selected @endif value="{{$item->id}}">{{$item->departments->name . ' ' . $item->department_type->name}}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+
+                        <select class="form-control" name="type_statistic" id="type_statistic">
+                            <option value="0">Wybierz</option>
+                            <option value="1" @if(isset($type_statistic) && $type_statistic == 1) selected @endif>Trenerzy</option>
+                            <option value="2" @if(isset($type_statistic) && $type_statistic == 2) selected @endif>Kadra</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group">
                     <button role="submit" class="btn btn-info" id="show_department">
@@ -31,7 +43,6 @@
                     </button>
                 </div>
             </form>
-        </div>
     </div>
 </div>
 
@@ -62,9 +73,15 @@
             <div class="panel-heading">
                 <b>Ilość pracowników kadry</b>
             </div>
-            <div class="panel-body">
-                {{$department->users->whereNotIn('user_type_id', [1,2])->where('status_work', '=', 1)->count()}}
-            </div>
+            @if($type_statistic == 1)
+                <div class="panel-body">
+                    {{$department->users->whereIn('user_type_id', [1,2])->where('status_work', '=', 1)->count()}}
+                </div>
+            @else
+                <div class="panel-body">
+                    {{$department->users->whereNotIn('user_type_id', [1,2])->where('status_work', '=', 1)->count()}}
+                </div>
+            @endif
         </div>
     </div>
     <div class="col-md-6">
@@ -91,9 +108,13 @@ $(document).ready(function() {
     $('#show_department').click(function(e) {
         e.preventDefault();
         var dep_id = $('#dep_id').val();
-    
-        if (dep_id == 0) {
+        var type_id = $('#type_statistic').val();
+        if (dep_id == 0 ) {
             swal('Wybierz oddział!')
+            return;
+        }
+        if (type_id == 0) {
+            swal('Wybierz Typ statystyk!')
             return;
         }
 

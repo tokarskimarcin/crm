@@ -17,10 +17,10 @@
         <div class="panel-body">
             <div class="alert alert-success">
                 <h4>
-                    <p>Średnia wyjściowa - średnia przed rozpoczęciem coachingu. </p>
-                    <p>Aktualna średnia - średnia z aktualnie zaakceptowanych godzin (przyrostowa), liczona od daty rozpoczęcia coachingu.</p>
-                    <p>Aktualna RBH - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
-                    <p>Cel - Średnia wymagana.</p>
+                    <p><strong>Wynik wyjściowy</strong> - wynik danego typu (średniej,jakości,RBH) przed rozpoczęciem coachingu. </p>
+                    <p><strong>Aktualny Wynik</strong> - aktualny wynik danego typu coachingu(przyrostowy), liczony od daty rozpoczęcia coachingu.</p>
+                    <p><strong>Aktualna RBH</strong> - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
+                    <p><strong>Cel</strong> -  Wymagany wynik na coachingu.</p>
                 </h4>
             </div>
         </div>
@@ -303,8 +303,17 @@
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-                    if (parseInt(data.actual_rbh) >= parseInt(18)) {
-                        $(row).hide();
+                    if($('#coaching_level').val() == 1) {
+                        if (parseInt(data.actual_rbh) >= parseInt(18)) {
+                            $(row).hide();
+                        }
+                    }else{
+                        var coaching_end_date = Date.parse(data.coaching_date);
+                        coaching_end_date +=345600*1000; // stworzenie daty + dodanie 4 dni
+                        var actual_date = new Date();
+                        if (actual_date > coaching_end_date ) {
+                            $(row).hide();
+                        }
                     }
                     $(row).attr('id', data.id);
                     return row;
@@ -418,9 +427,24 @@
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-                    console.log(data);
-                    if (parseInt(data.actual_rbh) < parseInt(18)) {
-                        $(row).hide();
+                    if($('#coaching_level').val() == 1) {
+                        if (parseInt(data.actual_rbh) < parseInt(18)) {
+                            $(row).hide();
+                        }
+                        if(parseInt(data.actual_rbh) > 26){
+                            $(row).css("background-color","#c500002e");
+                        }
+                    }else{
+                        var coaching_end_date = Date.parse(data.coaching_date);
+                        coaching_end_date += 345600*1000; // stworzenie daty + dodanie 4 dni
+                        var limit_date = coaching_end_date + (86400*1000);
+                        var actual_date = new Date();
+                        if (actual_date < coaching_end_date ) {
+                            $(row).hide();
+                        }
+                        if(actual_date >= limit_date){
+                            $(row).css("background-color","#c500002e");
+                        }
                     }
                     $(row).attr('id', data.id);
                     return row;

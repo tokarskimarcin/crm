@@ -210,9 +210,9 @@ class AdminController extends Controller
         $department_info->working_hours_normal = ($request->work_hour > 0) ? $request->work_hour : 0 ;
         $department_info->working_hours_week = ($request->work_hour_weekend > 0) ? $request->work_hour_weekend : 0 ;
         $department_info->blocked = 0;
-        $department_info->menager_id = ($request->menager != 0) ? $request->menager : 0 ;
-        $department_info->director_id = ($request->director != 0) ? $request->director : 0 ;
-        $department_info->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : 0 ;
+        $department_info->menager_id = ($request->menager != 0) ? $request->menager : null ;
+        $department_info->director_id = ($request->director != 0) ? $request->director : null ;
+        $department_info->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : null ;
 
         $department_info->save();
 
@@ -293,9 +293,9 @@ class AdminController extends Controller
             $selected_department->pbx_id = ($request->pbx_id != null) ? $request->pbx_id : 0 ;
             $selected_department->working_hours_normal = ($request->work_hour > 0) ? $request->work_hour : 0 ;
             $selected_department->working_hours_week = ($request->work_hour_weekend > 0) ? $request->work_hour_weekend : 0 ;
-            $selected_department->menager_id = ($request->menager != 0) ? $request->menager : 0 ;
-            $selected_department->director_id = ($request->director != 0) ? $request->director : 0 ;
-            $selected_department->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : 0 ;
+            $selected_department->menager_id = ($request->menager != 0) ? $request->menager : null ;
+            $selected_department->director_id = ($request->director != 0) ? $request->director : null ;
+            $selected_department->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : null ;
             $selected_department->save();
         }
 

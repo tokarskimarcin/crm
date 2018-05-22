@@ -664,6 +664,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/tests_statistics', 'TestsController@testsStatisticsGet');
     Route::POST('/tests_statistics', 'TestsController@testsStatisticsPost');
 
+    Route::get('/tests_statistics_coach', 'TestsController@testsStatisticsCoachGet');
+    Route::POST('/tests_statistics_coach', 'TestsController@testsStatisticsCoachPost');
+
     Route::get('/one_test_statistics', 'TestsController@testStatisticsGet');
     Route::POST('/one_test_statistics', 'TestsController@testStatisticsPost');
 
@@ -676,7 +679,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/add_test_template', 'TestsController@addTestTemplate'); // szablony testów
     Route::get('/showTestTemplate', 'TestsController@showTestTemplate'); //wyświetlenie szablonów
-    Route::get('/deleteTemplate/{id}', 'TestsController@deleteTemplate'); //usunięcie szablonów
+    Route::get('/deleteshowTestTemplateTemplate/{id}', 'TestsController@deleteTemplate'); //usunięcie szablonów
     Route::get('/viewTestTemplate/{id}', 'TestsController@viewTestTemplate'); //edycja szablonów
 
 

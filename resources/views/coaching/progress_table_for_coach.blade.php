@@ -20,12 +20,15 @@
         </div>
         <div class="panel-body">
             <div class="alert alert-success">
-                <p><strong>Wynik wyjściowy</strong> - wynik danego typu (średniej,jakości,RBH) przed rozpoczęciem coachingu. </p>
-                <p><strong>Aktualny Wynik</strong> - akrtualny wynik danego typu coachingu(przyrostowy), liczony od daty rozpoczęcia coachingu.</p>
-                <p><strong>Aktualna RBH</strong> - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
-                <p><strong>Cel</strong> -  Wymagany wynik na coachingu.</p>
-                <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po <strong>18 RBH konsultanta</strong>,
-                    od rozpoczęcia coachingu.</p>
+                <h4>
+                    <p><strong>Wynik wyjściowy</strong> - wynik danego typu (średniej,jakości,RBH) przed rozpoczęciem coachingu. </p>
+                    <p><strong>Aktualny Wynik</strong> - aktualny wynik danego typu coachingu(przyrostowy), liczony od daty rozpoczęcia coachingu.</p>
+                    <p><strong>Aktualna RBH</strong> - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
+                    <p><strong>Cel</strong> -  Wymagany wynik na coachingu.</p>
+                    <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po <strong>18 RBH konsultanta</strong>,
+                        licząc od daty rozpoczęcia coachingu.</p>
+                    <p>Gdy pracownik przepracuje więcej niż <strong>26 RBH</strong> podświetli się na czerwono w tabeli "Nierozliczone"</p>
+                </h4>
             </div>
         </div>
     </div>
@@ -819,6 +822,9 @@
                 },"rowCallback": function( row, data, index ) {
                     if (parseInt(data.actual_rbh) < parseInt(18)) {
                         $(row).hide();
+                    }
+                    if(parseInt(data.actual_rbh) > 26){
+                        $(row).css("background-color","#c500002e");
                     }
                     $(row).attr('id', data.id);
                     return row;

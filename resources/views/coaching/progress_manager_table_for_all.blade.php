@@ -17,10 +17,13 @@
         <div class="panel-body">
             <div class="alert alert-success">
                 <h4>
-                    <p>Średnia wyjściowa - średnia przed rozpoczęciem coachingu. </p>
-                    <p>Aktualna średnia - średnia z aktualnie zaakceptowanych godzin (przyrostowa), liczona od daty rozpoczęcia coachingu.</p>
-                    <p>Aktualna RBH - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
-                    <p>Cel - Średnia wymagana.</p>
+                    <p><strong>Wynik wyjściowy</strong> - wynik danego typu (średniej,jakości,RBH) przed rozpoczęciem coachingu. </p>
+                    <p><strong>Aktualny Wynik</strong> - aktualny wynik danego typu coachingu(przyrostowy), liczony od daty rozpoczęcia coachingu.</p>
+                    <p><strong>Aktualna RBH</strong> - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
+                    <p><strong>Cel</strong> -  Wymagany wynik na coachingu.</p>
+                    <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po <strong>18 RBH konsultanta</strong>,
+                        licząc od daty rozpoczęcia coachingu.</p>
+                    <p>Gdy pracownik przepracuje więcej niż <strong>26 RBH</strong> podświetli się na czerwono w tabeli "Nierozliczone"</p>
                 </h4>
             </div>
         </div>
@@ -377,6 +380,9 @@
                     console.log(data.actual_rbh);
                     if (parseInt(data.actual_rbh) < parseInt(18)) {
                         $(row).hide();
+                    }
+                    if(parseInt(data.actual_rbh) > 26){
+                        $(row).css("background-color","#c500002e");
                     }
                     $(row).attr('id', data.id);
                     return row;

@@ -41,6 +41,12 @@
             <div class="form-group">
                 <label><h3>Dodaj kategorię testów</h3></label>
                 <input type="text" class="form-control" name="category_name" id="category_name" placeholder="Kategoria..."/>
+
+                @if(Auth::user()->user_type_id != 4)
+                    <label> Kategoria dla trenerów: </label>
+                    <input type="checkbox" style="display: inline-block" name="coach_checkbox" id="coach_checkbox"/>
+
+                @endif
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-info" id="category_submit" value="Zapisz">
