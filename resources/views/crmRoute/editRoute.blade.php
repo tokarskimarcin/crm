@@ -10,7 +10,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="alert gray-nav ">    @if(isset($editFlag))Edycja trasy @else Tworzenie trasy @endif</div>
+            <div class="alert gray-nav ">    @if(isset($editFlag))Edycja trasy {{$route->name}} @else Tworzenie trasy @endif</div>
         </div>
     </div>
 </div>
@@ -91,7 +91,7 @@
                     '\n' +
                     '<div class="form-group hour_div">' +
                     '</div>' +
-                    '            <div class="col-lg-12 button_section">\n' +
+                    '            <div class="col-lg-12 button_section second_button_section">\n' +
                     '                <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">\n' +
                     '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;">' +
                     '            </div>\n' +
@@ -99,6 +99,18 @@
                 return newElement;
             }
 
+            function clearButtons() {
+                let saveButton = null;
+                let routesContainer = document.getElementsByClassName('routes-container');
+                let thisContainer = null;
+                let thisElement = null;
+                for(var i = 0; i < routesContainer.length - 1; i++) {
+                    thisContainer = routesContainer[i];
+                    buttonSectionCollection = thisContainer.getElementsByClassName('second_button_section');
+                    thisElement = buttonSectionCollection[0];
+                    thisElement.parentNode.removeChild(thisElement);
+                }
+            }
 
             /**
              * Ta funkcja dodaje nowy pokaz.
@@ -183,7 +195,7 @@
 
                 if(everythingIsGood == true) {
                     let formContainer = document.createElement('div');
-                    formContainer.innerHTML = '<form method="post" action="{{URL::to('/addNewRoute')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"></form>';
+                    formContainer.innerHTML = '<form method="post" action="{{URL::to('/editRoute')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + {{$route->id}} + '" name="route_id"></form>';
                     let place = document.getElementsByClassName('routes-wrapper')[0];
                     place.appendChild(formContainer);
                     let userForm = document.getElementById('user_form');
@@ -319,6 +331,7 @@
                     }
                 });
             });
+            clearButtons();
         });
     </script>
 @endsection

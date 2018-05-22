@@ -105,7 +105,7 @@
                 </div>
                 <div class="form-group hour_div">
                 </div>
-                <div class="col-lg-12 button_section">
+                <div class="col-lg-12 button_section second_button_section">
                     <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">
                     <input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;">
                 </div>
