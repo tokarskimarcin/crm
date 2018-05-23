@@ -25,6 +25,20 @@
             color:red;
         }
 
+        .glyphicon-play-circle, .glyphicon-search {
+            transition: all 0.8s ease-in-out;
+        }
+
+        .glyphicon-play-circle:hover {
+            transform: scale(1.3);
+            color: green;
+        }
+
+        .glyphicon-search:hover {
+            transform: scale(1.3);
+            color: orange;
+        }
+
         .panel-default > .panel-heading {
             background: #83BFC6;
         }
@@ -55,6 +69,7 @@
                                 <th></th>
                                 <th>Zdjęcia</th>
                                 <th>Pliki audio</th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -141,6 +156,13 @@
                                                 @endif
                                             @endforeach
                                         </td>
+                                        <td>
+                                            @foreach($audit_audios as $audio)
+                                                @if($c->id == $audio->criterion_id)
+                                                    <a data-toggle="modal" data-info="{{$audio->id}}" class="modal_trigger2" href="#play"> <span data-nameOfFile="{{$audio->name}}"  class="glyphicon glyphicon-play-circle" data-element="play" data-identyfier="{{$audio->id}}"></span></a>
+                                                @endif
+                                            @endforeach
+                                        </td>
                                     </tr>
                                 @endif
                             @endforeach
@@ -158,7 +180,7 @@
         </div>
         <div class="row last-row">
             <div class="col-md-12">
-                <input type="button" class="btn btn-info btn-block" id="back_button" value="Powrót">
+                <input type="button" class="btn btn-info btn-block" id="back_button" value="Powrót" style="margin-bottom:1em;">
             </div>
         </div>
     {{--<div class="row last-row">--}}
@@ -182,6 +204,27 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="play" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Odtwórz nagranie</h4>
+                </div>
+                <div class="modal2-body">
+                    <p>Some text in the modal.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
 
@@ -259,6 +302,16 @@
                document.getElementsByClassName('modal-body')[0].textContent = document.getElementById(e.target.parentNode.dataset.info).value;
                console.log(e.target.parentNode.dataset.info);
            });
+        });
+
+        /**
+         * This event listener add media player for sounds
+         */
+        let modalTriggers2 = Array.from(document.getElementsByClassName('modal_trigger2'));
+        modalTriggers2.forEach(function(trigger) {
+            trigger.addEventListener('click', function(e) {
+                document.getElementsByClassName('modal2-body')[0].innerHTML = "<audio controls style='width:100%;'> <source src='/api/getAuditScan/" + e.target.dataset.nameoffile + "'>Twoja przeglądarka nie obsługuje tego formatu pliku.</audio>";
+            });
         });
 
         //THIS PART IS RESPONSIBLE FOR REDIRECTING BACK USER AFTER CLICKING ON BUTTON
