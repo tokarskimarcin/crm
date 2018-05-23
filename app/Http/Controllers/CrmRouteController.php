@@ -52,9 +52,9 @@ class CrmRouteController extends Controller
 
         $nameOfRoute = '';
         foreach($cityNamesArr as $name) {
-            $nameOfRoute .= $name . '-';
+            $nameOfRoute .= $name . ' | ';
         }
-        $nameOfRoute = trim($nameOfRoute, '-');
+        $nameOfRoute = trim($nameOfRoute, ' | ');
 
         $newRoute = new Route();
         $newRoute->status = 1; // 1 - aktywne dane, 0 - usunięte dane
@@ -116,9 +116,9 @@ class CrmRouteController extends Controller
 
             $nameOfRoute = '';
             foreach ($cityNamesArr as $name) {
-                $nameOfRoute .= $name . '-';
+                $nameOfRoute .= $name . ' | ';
             }
-            $nameOfRoute = trim($nameOfRoute, '-');
+            $nameOfRoute = trim($nameOfRoute, ' | ');
 
             $thisRoute = Route::find($request->route_id);
             $thisRoute->name = $nameOfRoute;

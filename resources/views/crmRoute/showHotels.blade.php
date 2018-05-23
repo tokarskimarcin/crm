@@ -92,15 +92,15 @@
                 },"columns":[
                     {"data":function (data, type, dataToSet) {
                                 return data.name;
-                        },"name":"score","orderable": false
+                        },"name":"name","orderable": true
                     },
                     {"data": function(data, type, dataToSet) {
                             return data.voivodeName;
-                        },"name":"wojewodztwo", "orderable": false
+                        },"name":"voivodeName", "orderable": true
                     },
                     {"data": function(data, type, dataToSet) {
                             return data.cityName;
-                        },"name":"miasto", "orderable": false
+                        },"name":"cityName", "orderable": true
                     },
                     {"data":function (data, type, dataToSet) {
                             return '<a href="{{URL::to("hotel")}}/' + data.id + '" class="links">Edycja</a>';
