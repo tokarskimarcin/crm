@@ -25,6 +25,25 @@
             color:red;
         }
 
+        .glyphicon-remove, .glyphicon-play-circle, .glyphicon-search {
+            transition: all 0.8s ease-in-out;
+        }
+
+        .glyphicon-remove:hover {
+            transform: scale(1.3) rotate(180deg);
+            cursor: pointer;
+        }
+
+        .glyphicon-play-circle:hover {
+            transform: scale(1.3);
+            color: green;
+        }
+
+        .glyphicon-search:hover {
+            transform: scale(1.3);
+            color: orange;
+        }
+
         .panel-default > .panel-heading {
             background: #83BFC6;
         }
@@ -57,6 +76,7 @@
                                 <th>Zdjęcia</th>
                                 <th></th>
                                 <th>Pliki audio</th>
+                                <th></th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -170,6 +190,13 @@
                                                 @endif
                                             @endforeach
                                         </td>
+                                        <td>
+                                            @foreach($audit_audios as $audio)
+                                                @if($c->id == $audio->criterion_id)
+                                                    <a data-toggle="modal" data-info="{{$audio->id}}" class="modal_trigger2" href="#play"> <span data-nameOfFile="{{$audio->name}}"  class="glyphicon glyphicon-play-circle" data-element="play" data-identyfier="{{$audio->id}}"></span></a>
+                                                @endif
+                                            @endforeach
+                                        </td>
                                     </tr>
                                 @endif
                             @endforeach
@@ -207,6 +234,28 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div id="play" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Odtwórz nagranie</h4>
+                </div>
+                <div class="modal2-body">
+                    <p>Some text in the modal.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
 
@@ -384,13 +433,26 @@
 
         $('.final-alert').append('<strong>' + auditScore + '</strong>' + '/' + numberOfRows + ' (' + (Math.round((100 * auditScore)/numberOfRows *100) / 100)+ '%)');
 
+        /**
+         * This event Listener add comment into modal
+         */
         let modalTriggers = Array.from(document.getElementsByClassName('modal_trigger'));
         modalTriggers.forEach(function(trigger) {
            trigger.addEventListener('click', function(e) {
                document.getElementsByClassName('modal-body')[0].textContent = document.getElementById(e.target.parentNode.dataset.info).value;
-               console.log(e.target.parentNode.dataset.info);
            });
         });
+
+        /**
+         * This event listener add media player for sounds
+         */
+        let modalTriggers2 = Array.from(document.getElementsByClassName('modal_trigger2'));
+        modalTriggers2.forEach(function(trigger) {
+           trigger.addEventListener('click', function(e) {
+              document.getElementsByClassName('modal2-body')[0].innerHTML = "<audio controls style='width:100%;'> <source src='/api/getAuditScan/" + e.target.dataset.nameoffile + "'>Twoja przeglądarka nie obsługuje tego formatu pliku.</audio>";
+           });
+        });
+
 
         //THIS PART IS RESPONSIBLE FOR REDIRECTING BACK USER AFTER CLICKING ON BUTTON
         let back_button = document.getElementById('back_button');
