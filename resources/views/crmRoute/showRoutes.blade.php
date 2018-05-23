@@ -64,7 +64,7 @@
                 },"columns":[
                     {"data":function (data, type, dataToSet) {
                                 return data.name;
-                        },"name":"score","orderable": false
+                        },"name":"name","orderable": true
                     },
                     {"data":function (data, type, dataToSet) {
                             return '<a href="{{URL::to("route")}}/' + data.id + '" class="links">Edycja</a>';
