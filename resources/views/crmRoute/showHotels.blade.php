@@ -40,7 +40,7 @@
                                 <select name="city" id="city" class="form-control" multiple="multiple">
                                     <option value="0">Wybierz</option>
                                     @foreach($cities as $city)
-                                        <option value="{{$city->id}}">{{$city->ndepartment_typeame}}</option>
+                                        <option value="{{$city->id}}">{{$city->name}}</option>
                                     @endforeach
                                 </select>
                             </div>
