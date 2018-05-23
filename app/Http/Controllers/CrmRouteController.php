@@ -57,6 +57,7 @@ class CrmRouteController extends Controller
         $nameOfRoute = trim($nameOfRoute, '-');
 
         $newRoute = new Route();
+        $newRoute->status = 1; // 1 - aktywne dane, 0 - usunięte dane
         $newRoute->name = $nameOfRoute;
         $newRoute->save();
 
@@ -81,54 +82,74 @@ class CrmRouteController extends Controller
     }
 
     /**
-     * This method saves changes related to given audit.
+     * This method saves changes related to given route.
      */
     public function editRoute(Request $request)
     {
-        $voivode = $request->voivode;
-        $city = $request->city;
+        if(isset($request->toDelete)) { // usuwamy
+            $oldRoute = Route::find($request->route_id);
+            $oldRoute->status = 0; // status 0 - usunięty, 1 - aktywny
+            $oldRoute->save();
 
-        $voivodeIdArr = explode(',', $voivode);
-        $cityIdArr = explode(',', $city);
+            $oldRoutesInfo = RouteInfo::where('routes_id', '=', $request->route_id)->get();
+            foreach($oldRoutesInfo as $oldInfo) {
+                $oldInfo->status = 0; // status 0 - usunięty, 1 - aktywny
+                $oldInfo->save();
+            }
 
-        $cityNamesArr = array();
-
-        foreach ($cityIdArr as $city) {
-            $givenCity = Cities::where('id', '=', $city)->first();
-            $name = $givenCity->name;
-            array_push($cityNamesArr, $name);
+            return Redirect::to('/showRoutes');
         }
+        else { //edytujemy
+            $voivode = $request->voivode;
+            $city = $request->city;
 
-        $nameOfRoute = '';
-        foreach ($cityNamesArr as $name) {
-            $nameOfRoute .= $name . '-';
-        }
-        $nameOfRoute = trim($nameOfRoute, '-');
+            $voivodeIdArr = explode(',', $voivode);
+            $cityIdArr = explode(',', $city);
 
-        $oldRoute = RouteInfo::where([
-            ['routes_id', '=', $request->route_id],
-            ['status', '=', 1]
-        ])
-            ->get();
+            $cityNamesArr = array();
 
-        foreach ($oldRoute as $item) {
-            $item->status = '0';
-            $item->save();
-        }
+            foreach ($cityIdArr as $city) {
+                $givenCity = Cities::where('id', '=', $city)->first();
+                $name = $givenCity->name;
+                array_push($cityNamesArr, $name);
+            }
 
-        foreach ($voivodeIdArr as $voivodekey => $voivode) {
-            foreach ($cityIdArr as $citykey => $city) {
-                if ($voivodekey == $citykey) {
-                    $newRouteInfo = new RouteInfo();
-                    $newRouteInfo->routes_id = $request->route_id;
-                    $newRouteInfo->voivodeship_id = $voivode;
-                    $newRouteInfo->city_id = $city;
-                    $newRouteInfo->status = 1; // 1 - aktywne dane, 0 - usunięte dane
-                    $newRouteInfo->save();
+            $nameOfRoute = '';
+            foreach ($cityNamesArr as $name) {
+                $nameOfRoute .= $name . '-';
+            }
+            $nameOfRoute = trim($nameOfRoute, '-');
+
+            $thisRoute = Route::find($request->route_id);
+            $thisRoute->name = $nameOfRoute;
+            $thisRoute->save();
+
+            $oldRoute = RouteInfo::where([
+                ['routes_id', '=', $request->route_id],
+                ['status', '=', 1]
+            ])
+                ->get();
+
+            foreach ($oldRoute as $item) {
+                $item->status = '0';
+                $item->save();
+            }
+
+            foreach ($voivodeIdArr as $voivodekey => $voivode) {
+                foreach ($cityIdArr as $citykey => $city) {
+                    if ($voivodekey == $citykey) {
+                        $newRouteInfo = new RouteInfo();
+                        $newRouteInfo->routes_id = $request->route_id;
+                        $newRouteInfo->voivodeship_id = $voivode;
+                        $newRouteInfo->city_id = $city;
+                        $newRouteInfo->status = 1; // 1 - aktywne dane, 0 - usunięte dane
+                        $newRouteInfo->save();
+                    }
                 }
             }
+            return Redirect::to('/route/' . $request->route_id);
         }
-        return Redirect::to('/route/' . $request->route_id);
+
     }
 
     /**
@@ -153,7 +174,7 @@ class CrmRouteController extends Controller
      * @return This method sends data about all routes to datatable in showRoutes view
      */
     public function showRoutesAjax(Request $request) {
-        $routes = Route::all();
+        $routes = Route::where('status', '=', 1)->get();
 
         return datatables($routes)->make(true);
     }
@@ -195,7 +216,7 @@ class CrmRouteController extends Controller
         $cityId = $request->city;
         $price = $request->price;
         $comment = $request->comment;
-        $status = 1;
+        $status = 1; // 1 - aktywne dane, 0 - usunięte dane
 
         $newHotel = new Hotel();
         $newHotel->name = $hotelName;
@@ -216,8 +237,8 @@ class CrmRouteController extends Controller
      * This method returns view showHotels
      */
     public function showHotelsGet() {
-        $voivodes = Voivodes::all();
-        $cities = Cities::all();
+        $voivodes = Voivodes::all()->sortByDesc('name');
+        $cities = Cities::all()->sortBy('name');
         return view('crmRoute.showHotels')
             ->with('voivodes', $voivodes)
             ->with('cities', $cities);
@@ -227,29 +248,39 @@ class CrmRouteController extends Controller
      * This method sends data to ajax request about all hotels for view showHotels
      */
     public function showHotelsAjax(Request $request) {
-        $voivodeId = $request->voivode;
-        $cityId = $request->city;
-        if(($voivodeId == 0 || $voivodeId == "null") && ($cityId == 0 || $cityId == "null")) {
+        $voivodeIdArr = $request->voivode;
+        $cityIdArr = $request->city;
+
+        if(is_null($voivodeIdArr) && is_null($cityIdArr)) {
             $hotels = Hotel::where('status', '=', 1)->get();
         }
-        else if(($cityId == 0 || $cityId == "null") && ($voivodeId != 0 || $voivodeId != "null")){
+        else if(!is_null($voivodeIdArr) != 0 && is_null($cityIdArr)) {
             $hotels = Hotel::where('status', '=', 1)
-                ->where('voivode_id', '=', $voivodeId)
+                ->whereIn('voivode_id', $voivodeIdArr)
                 ->get();
         }
-
-        else if(($voivodeId == 0 || $voivodeId == "null") && ($cityId != 0 || $cityId != "null")) {
+        else if(is_null($voivodeIdArr) && !is_null($cityIdArr) != 0) {
             $hotels = Hotel::where('status', '=', 1)
-                ->where('city_id', '=', $cityId)
+                ->whereIn('city_id', $cityIdArr)
                 ->get();
         }
         else {
-            $hotels = Hotel::where('status', '=', 1)
-                ->where('city_id', '=', $cityId)
-                ->where('voivode_id', '=', $voivodeId)
-                ->get();
+            $hotels = Hotel::where('status', '=', 1)->get();
         }
-
+//        if(($voivodeId == 0 || $voivodeId == "null") && ($cityId == 0 || $cityId == "null")) {
+//            $hotels = Hotel::where('status', '=', 1)->get();
+//        }
+//        else if(($cityId == 0 || $cityId == "null") && ($voivodeId != 0 || $voivodeId != "null")){
+//            $hotels = Hotel::where('status', '=', 1)
+//                ->where('voivode_id', '=', $voivodeId)
+//                ->get();
+//        }
+//
+//        else if(($voivodeId == 0 || $voivodeId == "null") && ($cityId != 0 || $cityId != "null")) {
+//            $hotels = Hotel::where('status', '=', 1)
+//                ->where('city_id', '=', $cityId)
+//                ->get();
+//        }
 
         $voivodes = Voivodes::all();
         $cities = Cities::all();
@@ -316,6 +347,16 @@ class CrmRouteController extends Controller
             $hotel->comment = $request->comment;
             $hotel->save();
         }
-        return Redirect::back();
+        return Redirect::to('/hotel/'. $id);
+    }
+
+    public function addNewClientGet() {
+
+
+        return view('crmRoute.addNewClient');
+    }
+
+    public function addNewClientPost(Request $request) {
+
     }
 }

@@ -26,7 +26,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="voivode">Województwo</label>
-                                <select name="voivode" id="voivode" class="form-control">
+                                <select name="voivode" id="voivode" class="form-control" multiple="multiple">
                                     <option value="0">Wybierz</option>
                                     @foreach($voivodes as $voivode)
                                         <option value="{{$voivode->id}}">{{$voivode->name}}</option>
@@ -37,7 +37,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="city">Miasto</label>
-                                <select name="city" id="city" class="form-control">
+                                <select name="city" id="city" class="form-control" multiple="multiple">
                                     <option value="0">Wybierz</option>
                                     @foreach($cities as $city)
                                         <option value="{{$city->id}}">{{$city->name}}</option>
@@ -69,8 +69,8 @@
 @section('script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script>
-        let voivodeeId = null;
-        let cityId = null;
+        let voivodeeId = [];
+        let cityId = [];
         document.addEventListener('DOMContentLoaded', function(event) {
             table = $('#datatable').DataTable({
                 "autoWidth": true,
@@ -113,17 +113,17 @@
             $('#city').select2();
 
 
-            $('#voivode').on('select2:select', function (e) {
+            $('#voivode').on('select2:select select2:unselect', function (e) {
                 let voivodeInp = document.querySelector('#voivode');
-                voivodeeId = voivodeInp.options[voivodeInp.selectedIndex].value;
-                cityId = null;
+                voivodeeId = $('#voivode').val();
+                cityId = [];
                 table.ajax.reload();
             });
 
-            $('#city').on('select2:select', function (e) {
+            $('#city').on('select2:select select2:unselect', function (e) {
                 let cityInp = document.querySelector('#city');
-                cityId = cityInp.options[cityInp.selectedIndex].value;
-                voivodeeId = null;
+                cityId = $('#city').val();
+                voivodeeId = [];
                 table.ajax.reload();
             });
         });

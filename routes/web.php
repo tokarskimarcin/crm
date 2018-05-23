@@ -821,6 +821,8 @@ Route::post('/showHotelsAjax', 'CrmRouteController@showHotelsAjax')->name('api.s
 Route::get('/hotel/{id}', 'CrmRouteController@hotelGet');
 Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
 
+Route::get('/addNewClient', 'CrmRouteController@addNewClientGet');
+Route::post('/addNewClient', 'CrmRouteController@addNewClientPost');
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
 
