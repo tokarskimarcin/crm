@@ -351,9 +351,9 @@ class CrmRouteController extends Controller
     }
 
     public function addNewClientGet() {
+        $departments = Department_info::all();
 
-
-        return view('crmRoute.addNewClient');
+        return view('crmRoute.addNewClient2')->with('departments', $departments);
     }
 
     public function addNewClientPost(Request $request) {

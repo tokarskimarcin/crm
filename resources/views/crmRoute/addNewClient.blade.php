@@ -66,6 +66,23 @@
                                         <input type="text" id="name" class="form-control" name="name" placeholder="Tutaj wprowadź nazwę klienta" required>
                                     </div>
                                 </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="priority">Priorytet (0 - najniższy, 2 - najwyższy)</label>
+                                        <input type="number" id="priority" class="form-control" name="priority" placeholder="0-4 [0-najniższy, 2-najwyższy]" min="0" max="2" value="0" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="type">Typ</label>
+                                        <select name="type" id="type" class="form-control">
+                                            <option value="0">Brak</option>
+                                            <option value="1">Badania</option>
+                                            <option value="2">Wysyłka</option>
+                                        </select>
+                                    </div>
+                                </div>
 
                                 <div class="col-md-12">
                                     <div class="button-container">
@@ -108,6 +125,19 @@
                    window.location.href = "{{URL::to('/showHotels')}}"
                }
            }
+
+            var table_client = $('#table_client').DataTable({
+                "autoWidth": false,
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+                },"columns":[
+                    {"width": "10%"},
+                    {"width": "5%"},
+                    {"width": "10%"},
+                    {"width": "10%"},
+                    {"width": "1%"},
+                ]
+            });
 
            formContainer.addEventListener('click', clickEventHandler)
         });
