@@ -71,7 +71,7 @@
                     '            <div class="col-md-6">\n' +
                     '                <div class="form-group">\n' +
                     '                    <label>Województwo</label>\n' +
-                    '                    <select class="form-control voivodeship" data-type="voivode">\n' +
+                    '                    <select class="form-control voivodeship" data-type="voivode" data-element="voivode">\n' +
                     '                        <option value="0">Wybierz</option>\n' +
                                                 @foreach($voivodes as $voivode)
                                                     '<option value ="{{$voivode->id}}">{{$voivode->name}}</option>' +
@@ -92,6 +92,7 @@
                     '<div class="form-group hour_div">' +
                     '</div>' +
                     '            <div class="col-lg-12 button_section second_button_section">\n' +
+                        '<input type="button" class="btn btn-danger" value="Usuń trasę" data-element="usun" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">' +
                     '                <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">\n' +
                     '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;">' +
                     '            </div>\n' +
@@ -172,39 +173,71 @@
                 let buttonsElement = document.createElement('div');
                 buttonsElement.classList.add('col-lg-12');
                 buttonsElement.classList.add('button_section');
-                buttonsElement.innerHTML = '                <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">\n' +
+                buttonsElement.innerHTML = '  <input type="button" class="btn btn-danger" value="Usuń trasę" data-element="usun" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">              <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">\n' +
                     '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;">';
                 buttonsElement.appendAfter(placeInPreviousContainer);
             }
 
-            function saveRoute() {
-                let voivodeElements = Array.from(document.getElementsByClassName('voivodeship'));
-                let cityElements = Array.from(document.getElementsByClassName('city'));
+            function saveRoute(toDelete) {
+                if(toDelete == undefined || toDelete == null || toDelete == '') { //przypadek gdy nie usuwamy trasy
+                    let voivodeElements = Array.from(document.getElementsByClassName('voivodeship'));
+                    let cityElements = Array.from(document.getElementsByClassName('city'));
 
-                let voivodeArr = [];
-                let cityArr = [];
-                voivodeElements.forEach(function(element) {
-                   voivodeArr.push(element.options[element.selectedIndex].value);
-                });
+                    let voivodeArr = [];
+                    let cityArr = [];
+                    voivodeElements.forEach(function(element) {
+                        voivodeArr.push(element.options[element.selectedIndex].value);
+                    });
 
-                cityElements.forEach(function(element) {
-                   cityArr.push(element.options[element.selectedIndex].value);
-                });
+                    cityElements.forEach(function(element) {
+                        cityArr.push(element.options[element.selectedIndex].value);
+                    });
 
-                everythingIsGood = formValidation(voivodeArr, cityArr);
+                    everythingIsGood = formValidation(voivodeArr, cityArr);
 
-                if(everythingIsGood == true) {
-                    let formContainer = document.createElement('div');
-                    formContainer.innerHTML = '<form method="post" action="{{URL::to('/editRoute')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + {{$route->id}} + '" name="route_id"></form>';
-                    let place = document.getElementsByClassName('routes-wrapper')[0];
-                    place.appendChild(formContainer);
-                    let userForm = document.getElementById('user_form');
-                    userForm.submit();
+                    if(everythingIsGood == true) {
+                        let formContainer = document.createElement('div');
+                        formContainer.innerHTML = '<form method="post" action="{{URL::to('/editRoute')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + {{$route->id}} + '" name="route_id"></form>';
+                        let place = document.getElementsByClassName('routes-wrapper')[0];
+                        place.appendChild(formContainer);
+                        let userForm = document.getElementById('user_form');
+                        userForm.submit();
+                    }
+                    else {
+                        clearArrays(voivodeArr, cityArr);
+                        swal('W każdym polu wartości muszą zostać wybrane!');
+                    }
                 }
-                else {
-                    clearArrays(voivodeArr, cityArr);
-                    swal('W każdym polu wartości muszą zostać wybrane!');
+                else { //przypadek gdy usuwamy trasę
+                    let voivodeElements = Array.from(document.getElementsByClassName('voivodeship'));
+                    let cityElements = Array.from(document.getElementsByClassName('city'));
+
+                    let voivodeArr = [];
+                    let cityArr = [];
+                    voivodeElements.forEach(function(element) {
+                        voivodeArr.push(element.options[element.selectedIndex].value);
+                    });
+
+                    cityElements.forEach(function(element) {
+                        cityArr.push(element.options[element.selectedIndex].value);
+                    });
+
+                    everythingIsGood = formValidation(voivodeArr, cityArr);
+
+                    if(everythingIsGood == true) {
+                        let formContainer = document.createElement('div');
+                        formContainer.innerHTML = '<form method="post" action="{{URL::to('/editRoute')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + toDelete + '" name="toDelete"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + {{$route->id}} + '" name="route_id"></form>';
+                        let place = document.getElementsByClassName('routes-wrapper')[0];
+                        place.appendChild(formContainer);
+                        let userForm = document.getElementById('user_form');
+                        userForm.submit();
+                    }
+                    else {
+                        clearArrays(voivodeArr, cityArr);
+                        swal('W każdym polu wartości muszą zostać wybrane!');
+                    }
                 }
+
             }
 
             /**
@@ -283,19 +316,16 @@
                 else if(e.target.id == 'save_route') {
                     saveRoute();
                 }
-
-            }
-
-            function voivodeSelectionHandler(e) {
-                console.log(e.target);
-                if(e.target.dataset.type == 'voivode') {
-                    console.log('dziala');
+                else if(e.target.dataset.element == 'usun') {
+                    saveRoute("delete");
                 }
+
             }
+
             /***********************************************/
 
             mainContainer.addEventListener('click', buttonHandler);
-            mainContainer.addEventListener('change', voivodeSelectionHandler);
+
 
             {{--addNewShow();--}}
             {{--removeGlyInFirstShow();--}}
@@ -323,11 +353,12 @@
                         basicOption.textContent = 'Wybierz';
                         placeToAppend.appendChild(basicOption);
 
-                        let responseOption = document.createElement('option');
-                        responseOption.value = response[0].id;
-                        responseOption.textContent = response[0].name;
-                        placeToAppend.appendChild(responseOption);
-                        console.log(response);
+                        for(var i = 0; i < response.length; i++) {
+                            let responseOption = document.createElement('option');
+                            responseOption.value = response[i].id;
+                            responseOption.textContent = response[i].name;
+                            placeToAppend.appendChild(responseOption);
+                        }
                     }
                 });
             });
