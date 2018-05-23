@@ -102,7 +102,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-12">
-                                    <button class="btn btn-info" type="button" id="redir" style="width:100%;margin-top:1em;margin-bottom:1em;">Pzejdz do listy hoteli</button>
+                                    <button class="btn btn-info" type="button" id="redir" style="width:100%;margin-top:1em;margin-bottom:1em;">Przejdź do listy hoteli</button>
                                 </div>
                             </div>
                         </div>
