@@ -1,8 +1,18 @@
+/*
+*@category: CRM,
+*@info: This view is responsible for adding new hotel to database(DB table: "hotels"),
+*@controller: CrmRouteController,
+*@methods: addNewHotelGet, addNewHotelPost
+*/
+
+
 @extends('layouts.main')
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 @endsection
 @section('content')
+
+
 
     <style>
         .heading-container {
@@ -87,13 +97,13 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="price">Cena za salę</label>
-                                        <input type="number" step="0.01" name="price" id="price" class="form-control" placeholder="Cena w złotówkach np. 125,99">
+                                        <input type="number" step="0.01" min="0" name="price" id="price" class="form-control" placeholder="Cena w złotówkach np. 125,99">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="comment">Komentarz</label>
-                                        <input type="text" name="comment" id="comment" class="form-control" placeholder="Tutaj wprowadź krótki komentarz">
+                                        <input type="text" name="comment" id="comment" class="form-control" placeholder="Tutaj wprowadź krótki komentarz max 255 znaków">
                                     </div>
                                 </div>
                                 <div class="col-md-12">
@@ -102,7 +112,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-12">
-                                    <button class="btn btn-info" type="button" id="redir" style="width:100%;margin-top:1em;margin-bottom:1em;">Przejdź do listy hoteli</button>
+                                    <button class="btn btn-info" type="button" id="redir" style="width:100%;margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;">Przejdź do listy hoteli</button>
                                 </div>
                             </div>
                         </div>

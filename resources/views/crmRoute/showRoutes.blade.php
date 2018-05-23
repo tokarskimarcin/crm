@@ -22,6 +22,16 @@
                    Wybierz trasę
                 </div>
                 <div class="panel-body">
+                    @if(Session::has('adnotation'))
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-success">{{Session::get('adnotation') }}</div>
+                            </div>
+                        </div>
+                        @php
+                            Session::forget('adnotation');
+                        @endphp
+                    @endif
                     <div class="row">
                         <div class="col-mg-10">
                             <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">

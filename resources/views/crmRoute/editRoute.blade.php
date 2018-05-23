@@ -319,12 +319,20 @@
                 else if(e.target.dataset.element == 'usun') {
                     saveRoute("delete");
                 }
+                else if(e.target.id == "return") {
+                    window.location.href = "{{URL::to('/showRoutes')}}";
+                }
 
             }
 
             /***********************************************/
+            let returnGly = document.querySelector('.glyphicon-share-alt');
 
             mainContainer.addEventListener('click', buttonHandler);
+
+
+
+
 
 
             {{--addNewShow();--}}

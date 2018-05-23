@@ -97,6 +97,8 @@ class CrmRouteController extends Controller
                 $oldInfo->save();
             }
 
+            $request->session()->flash('adnotation', 'Trasa została usunięta pomyślnie!');
+
             return Redirect::to('/showRoutes');
         }
         else { //edytujemy
@@ -147,7 +149,8 @@ class CrmRouteController extends Controller
                     }
                 }
             }
-            return Redirect::to('/route/' . $request->route_id);
+            $request->session()->flash('adnotation', 'Trasa została edytowana pomyślnie!');
+            return Redirect::to('/showRoutes');
         }
 
     }
@@ -218,6 +221,8 @@ class CrmRouteController extends Controller
         $comment = $request->comment;
         $status = 1; // 1 - aktywne dane, 0 - usunięte dane
 
+        $hotelName = trim($hotelName);
+
         $newHotel = new Hotel();
         $newHotel->name = $hotelName;
         $newHotel->voivode_id = $voivodeId;
@@ -267,20 +272,6 @@ class CrmRouteController extends Controller
         else {
             $hotels = Hotel::where('status', '=', 1)->get();
         }
-//        if(($voivodeId == 0 || $voivodeId == "null") && ($cityId == 0 || $cityId == "null")) {
-//            $hotels = Hotel::where('status', '=', 1)->get();
-//        }
-//        else if(($cityId == 0 || $cityId == "null") && ($voivodeId != 0 || $voivodeId != "null")){
-//            $hotels = Hotel::where('status', '=', 1)
-//                ->where('voivode_id', '=', $voivodeId)
-//                ->get();
-//        }
-//
-//        else if(($voivodeId == 0 || $voivodeId == "null") && ($cityId != 0 || $cityId != "null")) {
-//            $hotels = Hotel::where('status', '=', 1)
-//                ->where('city_id', '=', $cityId)
-//                ->get();
-//        }
 
         $voivodes = Voivodes::all();
         $cities = Cities::all();
@@ -337,6 +328,7 @@ class CrmRouteController extends Controller
             $hotel = Hotel::find($id);
             $hotel->status = 0; // status 0 - usuniety, status = 1 - aktywny
             $hotel->save();
+            $request->session()->flash('adnotation', 'Hotel został usunięty pomyślnie!');
         }
         else {
             $hotel = Hotel::find($id);
@@ -346,6 +338,7 @@ class CrmRouteController extends Controller
             $hotel->price = $request->price;
             $hotel->comment = $request->comment;
             $hotel->save();
+            $request->session()->flash('adnotation', 'Hotel został edytowany pomyślnie!');
         }
         return Redirect::to('/hotel/'. $id);
     }
