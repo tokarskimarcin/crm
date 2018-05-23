@@ -53,7 +53,7 @@
                     <thead>
                     <tr>
                         <th>Nazwa</th>
-                        <th>Telefon</th>
+                        <th>Priorytet</th>
                         <th>Typ</th>
                         <th style="text-align: center">Akcja</th>
                         <th></th>
@@ -147,8 +147,8 @@
                 <label id="client_choice_name"></label>
             </div>
             <div class="col-md-4">
-                <label>Telefon:</label>
-                <label id="client_choice_phone"></label>
+                <label>Priorytet:</label>
+                <label id="client_choice_priority"></label>
             </div>
             <div class="col-md-4">
                 <label>Typ:</label>
@@ -182,8 +182,8 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="myLabel">Telefon kontaktowy</label>
-                                    <input class="form-control" name="client_phone" />
+                                    <label class="myLabel">Priorytet</label>
+                                    <input class="form-control" name="priority" />
                                 </div>
                             </div>
                             <div class="col-md-4">
