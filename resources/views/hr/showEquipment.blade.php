@@ -192,7 +192,7 @@ table = $('#laptop').DataTable({
             if(data.id_user != 0 && data.first_name != 'null' && data.first_name != null)
                 return data.first_name + " " + data.last_name;
             else return 'Brak'
-        }, "name": "id_user"},
+        }, "name": "last_name"},
         {"data": function (data, type, dataToSet) {
             return "<a class='btn btn-default' href={{URL::to('/edit_equipment/')}}/" + data.id + ">Edytuj</a>";
         }, "name": "id_user"},
@@ -237,7 +237,7 @@ table = $('#tablet').DataTable({
              if(data.id_user != 0 && data.first_name != 'null' && data.first_name != null)
                 return data.first_name + " " + data.last_name;
             else return 'Brak'
-        }, "name": "id_user"},
+        }, "name": "last_name"},
         {"data": function (data, type, dataToSet) {
             return "<a class='btn btn-default' href={{URL::to('/edit_equipment/')}}/" + data.id + ">Edytuj</a>";
         }, "name": "id_user"},
@@ -286,7 +286,7 @@ table = $('#phone').DataTable({
              if(data.id_user != 0 && data.first_name != 'null' && data.first_name != null)
                 return data.first_name + " " + data.last_name;
             else return 'Brak'
-        }, "name": "id_user"},
+        }, "name": "last_name"},
         {"data": function (data, type, dataToSet) {
             return "<a class='btn btn-default' href={{URL::to('/edit_equipment/')}}/" + data.id + ">Edytuj</a>";
         }, "name": "id_user"},
@@ -335,7 +335,7 @@ table = $('#sim_card').DataTable({
              if(data.id_user != 0 && data.first_name != 'null' && data.first_name != null)
                 return data.first_name + " " + data.last_name;
             else return 'Brak'
-        }, "name": "id_user"},
+        }, "name": "last_name"},
         {"data": function (data, type, dataToSet) {
             return "<a class='btn btn-default' href={{URL::to('/edit_equipment/')}}/" + data.id + ">Edytuj</a>";
         }, "name": "id_user"},
@@ -385,7 +385,7 @@ table = $('#monitor').DataTable({
              if(data.id_user != 0 && data.first_name != 'null' && data.first_name != null)
                 return data.first_name + " " + data.last_name;
             else return 'Brak'
-        }, "name": "id_user"},
+        }, "name": "last_name"},
         {"data": function (data, type, dataToSet) {
             return "<a class='btn btn-default' href={{URL::to('/edit_equipment/')}}/" + data.id + ">Edytuj</a>";
         }, "name": "id_user"},
@@ -424,7 +424,7 @@ table = $('#printer').DataTable({
              if(data.id_user != 0 && data.first_name != 'null' && data.first_name != null)
                 return data.first_name + " " + data.last_name;
             else return 'Brak'
-        }, "name": "id_user"},
+        }, "name": "last_name"},
         {"data": function (data, type, dataToSet) {
             return "<a class='btn btn-default' href={{URL::to('/edit_equipment/')}}/" + data.id + ">Edytuj</a>";
         }, "name": "id_user"},
