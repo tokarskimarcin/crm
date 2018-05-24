@@ -344,15 +344,7 @@ class CrmRouteController extends Controller
         return Redirect::to('/hotel/'. $id);
     }
 
-    public function addNewClientGet() {
-        $departments = Department_info::all();
 
-        return view('crmRoute.addNewClient2')->with('departments', $departments);
-    }
-
-    public function addNewClientPost(Request $request) {
-
-    }
 
     /**
      * Panel to managment all settings about city (VIEW)
