@@ -747,6 +747,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/progress_table_manager', 'CoachingController@progress_table_managerGET');
 
+    Route::get('/coachAscription', 'CoachingController@coachAscriptionGet');
+    Route::post('/coachAscription', 'CoachingController@coachAscriptionPost');
+
     /** AUDYTY **/
     Route::get('/addAudit', 'AuditController@auditMethodGet');
     Route::post('/addAudit', 'AuditController@auditMethodPost');
@@ -824,7 +827,10 @@ Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
 Route::get('/addNewClient', 'CrmRouteController@addNewClientGet');
 Route::post('/addNewClient', 'CrmRouteController@addNewClientPost');
 
+
+
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
+
 
 
 
