@@ -13,6 +13,7 @@ use App\Voivodes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
+use function MongoDB\BSON\toJSON;
 use Session;
 
 class CrmRouteController extends Controller
@@ -377,11 +378,57 @@ class CrmRouteController extends Controller
     public function getCity(Request $request){
         if($request->ajax()){
             $cities = Cities::select(['city.id','city.name','city.max_hour'
-                ,'city.grace_period','voivodeship.name as vojName',
+                ,'city.grace_period','city.status','voivodeship.name as vojName',
                 'voivodeship.id as vojId'])
                 ->join('voivodeship','voivodeship.id','city.voivodeship_id')
                 ->get();
             return datatables($cities)->make(true);
         }
     }
+
+    /**
+     * Save new/edit city
+     * @param Request $request
+     */
+    public function saveNewCity(Request $request){
+        if($request->ajax()){
+            if($request->cityID == 0) // new city
+                $newCity = new Cities();
+            else    // Edit city
+                $newCity = Cities::find($request->cityID);
+            $newCity->voivodeship_id = $request->voiovedshipID;
+            $newCity->name = $request->cityName;
+            $newCity->max_hour = $request->eventCount;
+            $newCity->grace_period = $request->gracePeriod;
+            $newCity->status = 0;
+            $newCity->save();
+            return 200;
+        }
+    }
+
+    /**
+     * turn off city change status to 1 disable or 0 avaible
+     * @param Request $request
+     */
+    public function changeStatusCity(Request $request){
+        if($request->ajax()){
+            $newCity = Cities::find($request->cityId);
+            if($newCity->status == 0)
+                $newCity->status = 1;
+            else
+                $newCity->status = 0;
+            $newCity->save();
+        }
+    }
+    /**
+     * find city by id
+     */
+    public function findCity(Request $request){
+        if($request->ajax()){
+            $city = Cities::find($request->cityId);
+            return $city;
+        }
+    }
+
+
 }

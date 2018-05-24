@@ -824,7 +824,15 @@ Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
 Route::get('/addNewClient', 'CrmRouteController@addNewClientGet');
 Route::post('/addNewClient', 'CrmRouteController@addNewClientPost');
 Route::get('/cityPanel', 'CrmRouteController@cityPanel');
+
 Route::post('/getCity', 'CrmRouteController@getCity')->name('api.getCity');
+Route::post('/findCity', 'CrmRouteController@findCity')->name('api.findCity');
+Route::POST('/saveNewCity','CrmRouteController@saveNewCity')->name('api.saveNewCity');
+
+
+Route::POST('/changeStatusCity','CrmRouteController@changeStatusCity')->name('api.changeStatusCity');
+
+
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
 

@@ -137,39 +137,59 @@
         </div>
     </div>
 
+    <input type="hidden" value="0" id="cityID" />
 @endsection
 
 @section('script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
 
+
+        function clearModal() {
+            $('#voiovedshipID').val("1");
+            $('#cityName').val("");
+            $('#eventCount').val("");
+            $('#gracePeriod').val("");
+            $('#status_coauching').val(0);
+        }
+        //Zapisanie miasta
         function saveCity(e) {
             let voiovedshipID = $('#voiovedshipID').val();
             let cityName = $('#cityName').val();
             let eventCount = $('#eventCount').val();
             let gracePeriod = $('#gracePeriod').val();
             let validation = true;
-            console.log(gracePeriod+' '+eventCount+' '+cityName+' '+voiovedshipID);
 
             if(validation){
                 $.ajax({
                     type: "POST",
-                    url: "{{route('api.saveCoachingDirector')}}",
+                    url: "{{route('api.saveNewCity')}}",
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     data: {
-                        'manager_id'                    : manager_id,
-
+                        'voiovedshipID' : voiovedshipID,
+                        'cityName'      : cityName,
+                        'eventCount'    : eventCount,
+                        'gracePeriod'   : gracePeriod,
+                        'cityID'          : $('#cityID').val()
                     },
                     success: function (response) {
                         console.log(response);
-                        $('#Modal_Coaching').modal('hide');
+                        $('#ModalCity').modal('hide');
                     }
                 })
             }
         }
       $(document).ready(function () {
+
+          $('#ModalCity').on('hidden.bs.modal',function () {
+              $('#cityID').val("0");
+              clearModal();
+              table.ajax.reload();
+          });
+
           table = $('#datatable').DataTable({
               "autoWidth": true,
               "processing": true,
@@ -186,14 +206,88 @@
               },
               "language": {
                   "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
-              },"columns":[
+              },"rowCallback": function( row, data, index ) {
+                  if (data.status == 1) {
+                      $(row).css('background','#c500002e')
+                  }
+                  $(row).attr('id', data.id);
+                  return row;
+              },"fnDrawCallback": function(settings){
+                      /**
+                       * Zmiana statusu miasta
+                       */
+                      $('.button-status-city').on('click',function () {
+                          let cityId = $(this).data('id');
+                          let cityStatus = $(this).data('status');
+                          let nameOfAction = "";
+                          if(cityStatus == 0)
+                              nameOfAction = "Tak, wyłącz Miasto";
+                          else
+                              nameOfAction = "Tak, włącz Miasto";
+                          swal({
+                              title: 'Jesteś pewien?',
+                              type: 'warning',
+                              showCancelButton: true,
+                              confirmButtonColor: '#3085d6',
+                              cancelButtonColor: '#d33',
+                              confirmButtonText: nameOfAction
+                          }).then((result) => {
+                              if (result.value) {
+
+                                  $.ajax({
+                                      type: "POST",
+                                      url: "{{ route('api.changeStatusCity') }}", // do zamiany
+                                      headers: {
+                                          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                      },
+                                      data: {
+                                          'cityId'         : cityId
+                                      },
+                                      success: function (response) {
+                                          table.ajax.reload();
+                                      }
+                                  });
+                              }})
+                      });
+
+                      /**
+                       * Educja coachingu
+                       */
+                      $('.button-edit-city').on('click',function () {
+                          cityId = $(this).data('id');
+                          $.ajax({
+                              type: "POST",
+                              url: "{{ route('api.findCity') }}", // do zamiany
+                              headers: {
+                                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                              },
+                              data: {
+                                  'cityId'         : cityId
+                              },
+                              success: function (response) {
+                                  clearModal();
+                                  $('#voiovedshipID').val(response.voivodeship_id);
+                                  $('#cityName').val(response.name);
+                                  $('#eventCount').val(response.max_hour);
+                                  $('#gracePeriod').val(response.grace_period);
+                                  $('#cityID').val(response.id);
+                                  $('#ModalCity').modal('show');
+                              }
+                          });
+                      });
+                  },"columns":[
                   {"data":"vojName"},
                   {"data":"name"},
                   {"data":"max_hour"},
                   {"data":"grace_period"},
                   {"data":function (data, type, dataToSet) {
-                          return '<button class="btn btn-info" >Edycja</button>';
-                      },"orderable": false, "searchable": false
+                          let returnButton = "<button class='button-edit-city btn btn-warning' style='margin: 3px;' data-id="+data.id+">Edycja</button>";
+                          if(data.status == 0)
+                              returnButton += "<button class='button-status-city btn btn-danger' data-id="+data.id+" data-status=0 >Wyłącz</button>";
+                          else
+                              returnButton += "<button class='button-status-city btn btn-success' data-id="+data.id+" data-status=1 >Włącz</button>";
+                                return returnButton;
+                          },"orderable": false, "searchable": false
                   }
               ]
           });
