@@ -144,14 +144,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
-
-
+        //Sprawdzenie czy parametr jest liczba 
+        function isNumber(n) {
+            return !isNaN(parseFloat(n)) && isFinite(n);
+        }
+        // czyszczenie modalu
         function clearModal() {
             $('#voiovedshipID').val("1");
             $('#cityName').val("");
             $('#eventCount').val("");
             $('#gracePeriod').val("");
-            $('#status_coauching').val(0);
+            $('#cityID').val(0);
         }
         //Zapisanie miasta
         function saveCity(e) {
@@ -161,6 +164,18 @@
             let gracePeriod = $('#gracePeriod').val();
             let validation = true;
 
+            if(cityName.trim().length == 0){
+                validation = false;
+                swal("Podaj nazwę miasta")
+            }
+            if(!isNumber(gracePeriod)){
+                validation = false;
+                swal("Podaj prawdiłową liczbę karencji")
+            }
+            if(!isNumber(eventCount)){
+                validation = false;
+                swal("Podaj prawdiłową liczbę godzin pokazu")
+            }
             if(validation){
                 $.ajax({
                     type: "POST",
