@@ -130,8 +130,8 @@ class AuditController extends Controller
             //part responsible for saving files from user
             $files = $request->file($arrFilename);
             $picExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf');
-            $audExtensionArr = array('.mp3', '.m4A', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
-            $allFilesExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf', '.mp3', '.m4A', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
+            $audExtensionArr = array('.mp3', '.m4a', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
+            $allFilesExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf', '.mp3', '.m4a', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
 
             if($request->hasFile($arrFilename))
             {
@@ -327,8 +327,8 @@ class AuditController extends Controller
             //part responsible for uploading files from user
             $files = $request->file($arrFilename);
             $picExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf');
-            $audExtensionArr = array('.mp3', '.m4A', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
-            $allFilesExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf', '.mp3', '.m4A', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
+            $audExtensionArr = array('.mp3', '.m4a', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
+            $allFilesExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf', '.mp3', '.m4a', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
             if($request->hasFile($arrFilename))
             {
 
