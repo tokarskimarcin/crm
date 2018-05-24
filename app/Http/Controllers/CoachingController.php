@@ -826,7 +826,7 @@ class CoachingController extends Controller
         }
         //List Treneró i Hrowców
         $all_coach_list = User::
-                        whereIn('department_info_id',$manager_departments->pluck('id')->toarray())
+                        whereIn('main_department_id',$manager_departments->pluck('id')->toarray())
                         ->where('status_work','=',1)
                         ->whereIn('user_type_id',[4,12,5])
                         ->get();
