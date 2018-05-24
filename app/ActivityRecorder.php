@@ -149,6 +149,14 @@ class ActivityRecorder extends Model
                 }
                 break;
 
+            case '11':
+                $contents = Storage::get('coachingActivity.txt');
+                $size = File::size(storage_path('app/coachingActivity.txt'));
+                if ($size < 104857600) {
+                    Storage::append('coachingActivity.txt', $content);
+                }
+                break;
+
           default:
 
             break;

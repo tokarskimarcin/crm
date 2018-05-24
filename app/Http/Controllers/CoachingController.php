@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ActivityRecorder;
 use App\Coaching;
 use App\CoachingDirector;
 use App\Department_info;
@@ -10,6 +11,7 @@ use function foo\func;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 use Yajra\DataTables\Facades\DataTables;
 
 class CoachingController extends Controller
@@ -1085,9 +1087,62 @@ class CoachingController extends Controller
 
     }
 
+    /**
+     * This method return view coachingAscription with necessary data
+     */
+    public function coachAscriptionGet() {
+        $departmentOfLoggedUser = Auth::user()->department_info_id;
 
+        $coachingOwners = DB::table('coaching_director')
+            ->select(DB::raw('
+                coaching_director.manager_id as manager_id,
+                users.first_name as first_name,
+                users.last_name as last_name,
+                users.id as id
+            '))
+            ->join('users', 'users.id', 'coaching_director.manager_id')
+            ->where([
+                ['status', '=', 0],
+                ['coaching_level', '=', 1],
+                ['users.department_info_id', '=', $departmentOfLoggedUser]
+            ])
+            ->distinct()
+            ->get();
 
+        $allTrenersFromUserDepartment = User::where([
+            ['status_work', '=', 1],
+            ['user_type_id', '=', 4],
+            ['department_info_id', '=', $departmentOfLoggedUser]
+        ])
+        ->get();
 
+        return view('coaching.coachingAscription')
+            ->with('coachingOwners', $coachingOwners)
+            ->with('allTrainers', $allTrenersFromUserDepartment);
+    }
 
+    /**
+     * This method save to database info about changing coach
+     */
+    public function coachAscriptionPost(Request $request) {
+        $previousCoach = $request->coaches;
+        $newCoach = $request->newCoach;
+
+        $allCoachingsOfPreviousCoach = CoachingDirector::where([
+            ['manager_id', '=', $previousCoach],
+            ['status', '=', 0],
+            ['coaching_level', '=', 1]
+        ])->get();
+
+        foreach($allCoachingsOfPreviousCoach as $oldCoach) {
+            $oldCoach->manager_id = $newCoach;
+            $oldCoach->save();
+        }
+
+        new ActivityRecorder('11','Przepisanie coachingu z ' . $previousCoach . ' na '. $newCoach);
+
+        $request->session()->flash('adnotation', 'Coachingi zostały przypisane do nowego trenera');
+        return Redirect::back();
+    }
 
 }
