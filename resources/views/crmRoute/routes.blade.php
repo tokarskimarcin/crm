@@ -51,6 +51,9 @@
         padding-bottom: 1em;
     }
 
+
+
+
 </style>
 <div class="routes-wrapper">
     @if(Session::has('adnotation'))
@@ -107,8 +110,8 @@
                 </div>
                 <div class="col-lg-12 button_section second_button_section">
                     <input type="button" class="btn btn-danger" value="Usuń trasę" data-element="usun" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">
-                    <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">
-                    <input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;">
+                    <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">
+                    <input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">
                 </div>
                 </div>
             </div>

@@ -1,3 +1,10 @@
+/*
+*@category: CRM,
+*@info: This view allows user to edit given hotel (DB table: "hotels"),
+*@controller: CrmRouteController,
+*@methods: hotelGet, hotelPost
+*/
+
 @extends('layouts.main')
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
@@ -38,6 +45,16 @@
                 <div class="panel-heading">
                 </div>
                 <div class="panel-body">
+                    @if(Session::has('adnotation'))
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-success">{{Session::get('adnotation') }}</div>
+                            </div>
+                        </div>
+                        @php
+                            Session::forget('adnotation');
+                        @endphp
+                    @endif
                     <div class="row">
                         <div class="col-md-12">
                             <div class="heading-container">
@@ -92,13 +109,13 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="price">Cena za salę</label>
-                                        <input type="number" step="0.01" name="price" id="price" class="form-control" placeholder="Cena w złotówkach np. 125,99" value="{{$hotel->price}}">
+                                        <input type="number" step="0.01" min="0" name="price" id="price" class="form-control" placeholder="Cena w złotówkach np. 125,99" value="{{$hotel->price}}">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="comment">Komentarz</label>
-                                        <input type="text" name="comment" id="comment" class="form-control" placeholder="Tutaj wprowadź krótki komentarz" value="{{$hotel->comment}}">
+                                        <input type="text" name="comment" id="comment" class="form-control" placeholder="Tutaj wprowadź krótki komentarz max 255 znaków" value="{{$hotel->comment}}">
                                     </div>
                                 </div>
                                 <div class="col-md-12">

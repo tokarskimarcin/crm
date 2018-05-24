@@ -1,3 +1,11 @@
+/*
+*@category: CRM,
+*@info: This view is responsible for adding new route to DataBase (DB table: "routes, routes_info"),
+*@controller: CrmRouteController,
+*@methods: addNewRouteGet, addNewRoutePost
+*/
+
+
 @extends('layouts.main')
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
@@ -92,8 +100,8 @@
                     '<div class="form-group hour_div">' +
                     '</div>' +
                     '            <div class="col-lg-12 button_section">\n' +
-                    '                <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">\n' +
-                    '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;">' +
+                    '                <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">\n' +
+                    '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
                     '            </div>\n' +
                     '        </div>';
                 return newElement;
