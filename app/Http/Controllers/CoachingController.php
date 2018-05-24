@@ -818,7 +818,6 @@ class CoachingController extends Controller
                                 ->get();
         // gdy koching chce zrobić osoba która nie jest kierownikiem lub dyrektorem
         if($manager_departments->isempty()){
-            dd(123);
             $manager_departments = Department_info::
                 where('id','=',Auth::user()->department_info_id)
                     ->get();
