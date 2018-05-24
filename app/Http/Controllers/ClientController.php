@@ -25,46 +25,45 @@ class ClientController extends Controller
     }
 
     /**
-     * Save new/edit city
+     * Save new/edit client
      * @param Request $request
      */
-    public function saveNewCity(Request $request){
+    public function saveClient(Request $request){
         if($request->ajax()){
-            if($request->cityID == 0) // new city
-                $newCity = new Cities();
+            if($request->clientID == 0) // new city
+                $client= new Clients();
             else    // Edit city
-                $newCity = Cities::find($request->cityID);
-            $newCity->voivodeship_id = $request->voiovedshipID;
-            $newCity->name = $request->cityName;
-            $newCity->max_hour = $request->eventCount;
-            $newCity->grace_period = $request->gracePeriod;
-            $newCity->status = 0;
-            $newCity->save();
+                $client = Clients::find($request->clientID);
+            $client->name = $request->clientName;
+            $client->priority = $request->clientPriority;
+            $client->type = $request->clientType;
+            $client->status = 0;
+            $client->save();
             return 200;
         }
     }
 
     /**
-     * turn off city change status to 1 disable or 0 avaible
+     * turn off client change status to 1 disable or 0 avaible
      * @param Request $request
      */
-    public function changeStatusCity(Request $request){
+    public function changeStatusClient(Request $request){
         if($request->ajax()){
-            $newCity = Cities::find($request->cityId);
-            if($newCity->status == 0)
-                $newCity->status = 1;
+            $client = Clients::find($request->clientId);
+            if($client->status == 0)
+                $client->status = 1;
             else
-                $newCity->status = 0;
-            $newCity->save();
+                $client->status = 0;
+            $client->save();
         }
     }
     /**
-     * find city by id
+     * find client by id
      */
-    public function findCity(Request $request){
+    public function findClient(Request $request){
         if($request->ajax()){
-            $city = Cities::find($request->cityId);
-            return $city;
+            $client = Clients::find($request->clientId);
+            return $client;
         }
     }
 
