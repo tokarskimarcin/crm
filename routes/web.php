@@ -823,6 +823,8 @@ Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
 
 Route::get('/addNewClient', 'CrmRouteController@addNewClientGet');
 Route::post('/addNewClient', 'CrmRouteController@addNewClientPost');
+Route::get('/cityPanel', 'CrmRouteController@cityPanel');
+Route::post('/getCity', 'CrmRouteController@getCity')->name('api.getCity');
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
 

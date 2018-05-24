@@ -359,4 +359,29 @@ class CrmRouteController extends Controller
     public function addNewClientPost(Request $request) {
 
     }
+
+    /**
+     * Panel to managment all settings about city (VIEW)
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function cityPanel(){
+        $allVoivodeship = Voivodes::all();
+        $allCity = Cities::all();
+        return view('crmRoute.cityPanel')
+            ->with('allVoivodeship',$allVoivodeship);
+    }
+
+    /**
+     *  Return all city with info
+     */
+    public function getCity(Request $request){
+        if($request->ajax()){
+            $cities = Cities::select(['city.id','city.name','city.max_hour'
+                ,'city.grace_period','voivodeship.name as vojName',
+                'voivodeship.id as vojId'])
+                ->join('voivodeship','voivodeship.id','city.voivodeship_id')
+                ->get();
+            return datatables($cities)->make(true);
+        }
+    }
 }

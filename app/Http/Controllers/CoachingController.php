@@ -811,14 +811,18 @@ class CoachingController extends Controller
     public function getCoachingCoachList(){
         // Pobranie oddziałów przypisanych do kierownika
         $manager_id = Auth::user()->id;
-        if(Auth::user()->id == 1364 || Auth::user()->id == 11  || Auth::user()->id == 4272){
-            // za wołowskiego
-            $manager_id = 23;
-        }
+
         $manager_departments = Department_info::
                                 where('menager_id','=',$manager_id)
                                 ->orwhere('director_id','=',$manager_id)
                                 ->get();
+        // gdy koching chce zrobić osoba która nie jest kierownikiem lub dyrektorem
+        if($manager_departments->isempty()){
+            dd(123);
+            $manager_departments = Department_info::
+                where('id','=',Auth::user()->department_info_id)
+                    ->get();
+        }
         //List Treneró i Hrowców
         $all_coach_list = User::
                         whereIn('department_info_id',$manager_departments->pluck('id')->toarray())

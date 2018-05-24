@@ -8,4 +8,8 @@ class Cities extends Model
 {
     protected $table = 'city';
     public $timestamps = false;
+
+    public function voivodes_info() {
+        return $this->belongsTo('App\Voivodes','voivodeship_id');
+    }
 }
