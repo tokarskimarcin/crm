@@ -60,7 +60,7 @@
                 element.parentNode.insertBefore(this, element);
             },false;
 
-            let iterator = 1;
+            let iterator = 1; //This variable is helpful for adding id's
             let mainContainer = document.querySelector('.routes-wrapper'); //zaznaczamy główny container
 
             /**
@@ -126,7 +126,9 @@
                 });
             }
 
-
+            /*
+            This function is responsible for removing buttons from last show container
+             */
             function removeButtonsFromLastShow() {
                 let buttonSection = document.getElementsByClassName('button_section')[document.getElementsByClassName('button_section').length - 1];
                 if(buttonSection != null) {
@@ -134,22 +136,18 @@
                 }
             }
 
+            /*
+            This function removes "X" button from first show container
+             */
             function removeGlyInFirstShow() {
                 let firstShow = document.getElementsByClassName('routes-container')[0];
                 let removeGlyphicon = firstShow.getElementsByClassName('glyphicon-remove')[0];
                 removeGlyphicon.parentNode.removeChild(removeGlyphicon);
             }
 
-            function removeGivenHour(container) {
-                container.parentNode.removeChild(container);
-            }
-
-            function insertHourInput(container) {
-                let hourInputContainer = document.createElement('div');
-                hourInputContainer.innerHTML = '<label class="remove_hour_section">Godzina pokazu  <span class="glyphicon glyphicon-minus" data-remove="hour" style="color:red"></span></label><input type="time" class="form-control" name="show_hour">';
-                container.appendChild(hourInputContainer);
-            }
-
+            /*
+            This function is responsible for removing given show container
+             */
             function removeGivenShow(container) {
                 let allShows = document.getElementsByClassName('routes-container');
                 let lastShowContainer = allShows[allShows.length - 1];
@@ -162,6 +160,9 @@
                 }
             }
 
+            /*
+            This function is responsible for attaching buttons to previous container
+             */
             function addButtonsToPreviousContainer(container) {
                 let previousContainer = container.previousElementSibling;
                 let placeInPreviousContainer = previousContainer.getElementsByClassName('hour_div')[0];
@@ -173,6 +174,9 @@
                 buttonsElement.appendAfter(placeInPreviousContainer);
             }
 
+            /*
+            This function creates form with input's data and sending it to server.
+             */
             function saveRoute() {
                 let voivodeElements = Array.from(document.getElementsByClassName('voivodeship'));
                 let cityElements = Array.from(document.getElementsByClassName('city'));
@@ -213,7 +217,7 @@
                 }
             }
             /**
-             * This function checks if there is any value == 0 in value arrays.
+             * This function validate form
              */
             function formValidation() {
                 let args = arguments;
@@ -228,6 +232,9 @@
                 return flag;
             }
 
+            /*
+            This eventListener is responsible for clicking on add new show button, remove-glyphicon, and save_route
+             */
             function buttonHandler(e) {
                 if(e.target.id == 'add_new_show') { // click on add new show button
                     addNewShow();
@@ -269,30 +276,17 @@
                     let showContainer = e.target.parentElement.parentElement.parentElement;
                     removeGivenShow(showContainer);
                 }
-                else if(e.target.dataset.hour == 'true') { // click on add hour button
-                    let hourContainer = e.target.parentElement;
-                    insertHourInput(hourContainer);
-                }
-                else if(e.target.dataset.remove == 'hour') { // click on - glyphicon(hour)
-                    let givenHourInputContainer = e.target.parentElement.parentElement;
-                    removeGivenHour(givenHourInputContainer);
-                }
                 else if(e.target.id == 'save_route') {
                     saveRoute();
                 }
 
             }
 
-            function voivodeSelectionHandler(e) {
-                console.log(e.target);
-                if(e.target.dataset.type == 'voivode') {
-                    console.log('dziala');
-                }
-            }
+
             /***********************************************/
 
             mainContainer.addEventListener('click', buttonHandler);
-            mainContainer.addEventListener('change', voivodeSelectionHandler);
+
 
             addNewShow();
             removeGlyInFirstShow();
