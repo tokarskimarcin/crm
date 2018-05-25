@@ -91,7 +91,7 @@
                let newCoachSelected = newCoachInput.options[newCoachInput.selectedIndex].value;
                let prevCoachSelected = prevCoachInput.options[prevCoachInput.selectedIndex].value;
                if(prevCoachSelected === "0" || newCoachSelected === "0") {
-                   swal('Wybierz trenerów w obu polach')
+                   swal('Wybierz trenerów w obu polach');
                }
                else {
                    thisForm = document.getElementById('formularz');

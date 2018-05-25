@@ -21,8 +21,47 @@ class CrmRouteController extends Controller
     public function index()
     {
         $departments = Department_info::all();
-        return view('crmRoute.index')->with('departments', $departments);
+        $voivodes = Voivodes::all();
+        return view('crmRoute.index')->with('departments', $departments)->with('voivodes', $voivodes);
     }
+
+    public function getSelectedRoute(Request $request) {
+        $idNotTrimmed = $request->route_id;
+        $posOfId = strpos($idNotTrimmed,'_');
+        $id = substr($idNotTrimmed, $posOfId + 1);
+        $voivodes = Voivodes::all();
+        $cities = Cities::all();
+        $route = RouteInfo::where([
+            ['routes_id', '=', $id],
+            ['status', '=', 1]
+        ])
+            ->get();
+
+        $routeExtendedArr = array();
+        foreach($route as $item) {
+            $routeExtended = new \stdClass();
+            $routeExtended->id = $item->id;
+            $routeExtended->routes_id = $item->routes_id;
+            $routeExtended->voivodeship_id = $item->voivodeship_id;
+            $routeExtended->city_id = $item->city_id;
+            $routeExtended->status = $item->status;
+            foreach($voivodes as $voivode) {
+                if($item->voivodeship_id == $voivode->id) {
+                    $routeExtended->voivode_name = $voivode->name;
+                }
+            }
+            foreach($cities as $city) {
+                if($item->city_id == $city->id) {
+                    $routeExtended->city_name = $city->name;
+                }
+            }
+            array_push($routeExtendedArr, $routeExtended);
+        }
+
+        $routeExt = collect($routeExtendedArr);
+        return $routeExt;
+    }
+
 
     /**
      * @return $this method returns view addNewRoute with data about all voivodes

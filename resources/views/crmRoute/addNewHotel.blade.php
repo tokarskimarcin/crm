@@ -1,6 +1,7 @@
 /*
 *@category: CRM,
-*@info: This view is responsible for adding new hotel to database(DB table: "hotels"),
+*@info: This view is responsible for adding new hotel to database
+*@DB table: "hotels",
 *@controller: CrmRouteController,
 *@methods: addNewHotelGet, addNewHotelPost
 */
@@ -11,8 +12,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 @endsection
 @section('content')
-
-
 
     <style>
         .heading-container {
