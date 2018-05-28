@@ -228,7 +228,7 @@
                     });
 
                     /**
-                     * Educja coachingu
+                     * Educja clienta
                      */
                     $('.button-edit-client').on('click',function () {
                         clientId = $(this).data('id');
