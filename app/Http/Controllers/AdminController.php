@@ -165,12 +165,14 @@ class AdminController extends Controller
         $departments = Departments::all();
         $menagers = User::where('user_type_id', '=', '7')->where('status_work', '=', '1')->get();
         $hr = User::where('user_type_id', '=', '5')->where('status_work', '=', '1')->get();
+        $hrDirectors = User::where('user_type_id', '=', '14')->where('status_work', '=', '1')->get();
 
         return view('admin.addDepartment')
             ->with('departments', $departments)
             ->with('department_types', $department_types)
             ->with('menagers', $menagers)
-            ->with('hrEmployee', $hr);
+            ->with('hrEmployee', $hr)
+            ->with('hrDirectors', $hrDirectors);
     }
 
     public function addDepartmentPost(Request $request) {
@@ -212,6 +214,7 @@ class AdminController extends Controller
         $department_info->blocked = 0;
         $department_info->menager_id = ($request->menager != 0) ? $request->menager : null ;
         $department_info->director_id = ($request->director != 0) ? $request->director : null ;
+        $department_info->director_hr_id = ($request->director_hr != 0) ? $request->director_hr : null;
         $department_info->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : null ;
 
         $department_info->save();
@@ -239,6 +242,7 @@ class AdminController extends Controller
         //1 - wybranie oddziału
         //2 - edycja oddziału
         $menagers = User::where('user_type_id', '=', '7')->where('status_work', '=', '1')->get();
+        $hrDirectors = User::where('user_type_id', '=', '14')->where('status_work', '=', '1')->get();
         $hrEmployee = User::where('user_type_id', '=', '5')->where('status_work', '=', '1')->get();
         $department_info = Department_info::all();
         $department_types = Department_types::all();
@@ -254,7 +258,8 @@ class AdminController extends Controller
               ->with('department_types', $department_types)
               ->with('department_info', $department_info)
               ->with('hrEmployee', $hrEmployee)
-              ->with('menagers', $menagers);
+              ->with('menagers', $menagers)
+              ->with('hrDirectors', $hrDirectors);
         }
 
         if ($request->post_type == 2) {
@@ -295,6 +300,7 @@ class AdminController extends Controller
             $selected_department->working_hours_week = ($request->work_hour_weekend > 0) ? $request->work_hour_weekend : 0 ;
             $selected_department->menager_id = ($request->menager != 0) ? $request->menager : null ;
             $selected_department->director_id = ($request->director != 0) ? $request->director : null ;
+            $selected_department->director_hr_id = ($request->director_hr != 0) ? $request->director_hr : null;
             $selected_department->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : null ;
             $selected_department->save();
         }
