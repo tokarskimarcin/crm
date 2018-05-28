@@ -255,7 +255,11 @@
                                 <div class="alert alert-info">
                                     Wybierz szablon trasy z listy. Jeśli nie ma odpowiedniej trasy na liście, stwórz ją naciskając na przycisk <strong>Dodaj trasę ręcznie</strong>
                                 </div>
-                                <button class="btn btn-default" id="add-new-route" style="margin-bottom: 14px;width:20%;"><span class="glyphicon glyphicon-plus"></span> <span>Dodaj trasę ręcznie</span></button>
+                                <div class="col-md-4">
+                                    <a href="#jump-here">
+                                        <button class="btn btn-default" id="add-new-route" style="margin-bottom: 14px;"><span class="glyphicon glyphicon-plus"></span>Dodaj trasę ręcznie</button>
+                                    </a>
+                                </div>
                                 <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
                                     <thead>
                                     <tr>
@@ -267,13 +271,13 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="client-container route-here">
+                            <div class="client-container route-here" id="jump-here">
 
                             </div>
                         </div>
                         <div class="client-wrapper">
                             <div class="client-container">
-                                <button class="btn btn-success" style="margin-top:1em;margin-bottom:1em;" id="save">Zapisz</button>
+                                <button class="btn btn-success" style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;" id="save">Zapisz</button>
                             </div>
                         </div>
                     </div>
@@ -429,12 +433,12 @@
                                     },
                                     success: function(response) {
 
-                                        let routeContainer = document.createElement('div');
-                                        routeContainer.classList.add('routes-container');
-
                                         for(var i = 0; i < response.length; i++) {
+                                            let routeContainer = document.createElement('div');
+                                            routeContainer.className = 'routes-container';
                                             routeContainer.innerHTML += '<div class="row">\n' +
                                             '<div class="button_section">' +
+                                                '<span class="glyphicon glyphicon-remove" data-remove="show"></span>' +
                                             '</div>' +
                                             '        <header>Pokaz </header>\n' +
                                             '\n' +
@@ -466,8 +470,11 @@
                                                     '<div class="col-md-4">' +
                                                     '</div>' +
                                             '\n' +
-                                            '<div class="form-group hour_div">' +
-                                            '</div>' +
+                                                '<div class="form-group hour_div">' +
+                                                '</div>' +
+                                                '            <div class="col-lg-12 button_section button_new_show_section">\n' +
+                                                '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
+                                                '            </div>\n' +
                                             '        </div>';
 
                                             placeToAppend.appendChild(routeContainer);
@@ -479,6 +486,11 @@
                                                 pickTime: false
                                             });
 
+                                        }
+                                        //This part is responsible for button showing on given route
+                                        const allNewShowSections = Array.from(document.querySelectorAll('.routes-container .button_new_show_section'));
+                                        for(let i = allNewShowSections.length - 2; i >= 0; i--) {
+                                            allNewShowSections[i].parentNode.removeChild(allNewShowSections[i]);
                                         }
                                     }
                                 });
@@ -551,6 +563,7 @@
             }
             function buttonHandler(e) {
                 if(e.target.id == 'add-new-route') {
+
                     let newShow = createNewShow(); //otrzymujemy nowy formularz z pokazem.
                     let appendPlace = document.querySelector('.route-here');
                     appendPlace.innerHTML = ''; //czyści container
@@ -661,11 +674,37 @@
                     });
 
                     everythingIsGood = formValidation(voivodeArr, cityArr, hourArr);
+
+                    if(everythingIsGood == true) {
+                        let formContainer = document.createElement('div');
+                        formContainer.innerHTML = '<form method="post" action="" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="city"></form>';
+                        let place = document.querySelector('.route-here');
+                        place.appendChild(formContainer);
+                        let userForm = document.getElementById('user_form');
+                        console.log(userForm);
+                        // userForm.submit();
+                    }
+                    else {
+                        clearArrays(voivodeArr, cityArr, hourArr);
+                        swal('W każdym polu wartości muszą zostać wybrane!');
+                    }
                 }
 
             }
 
+            /**
+             * This function clear given arrays;
+             */
+            function clearArrays() {
+                let args = arguments;
+                for(var i = 0; i < args.length; i++) {
+                    args[i] = [];
+                }
+            }
 
+            /**
+             * This function validate form
+             */
             function formValidation() {
                 let args = arguments;
                 let flag = true;
@@ -702,7 +741,7 @@
                 let buttonsElement = document.createElement('div');
                 buttonsElement.classList.add('col-lg-12');
                 buttonsElement.classList.add('button_section');
-                buttonsElement.innerHTML = '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;">';
+                buttonsElement.innerHTML = '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">';
                 buttonsElement.appendAfter(placeInPreviousContainer);
             }
 

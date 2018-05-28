@@ -117,7 +117,7 @@ class CrmRouteController extends Controller
 
         $request->session()->flash('adnotation', 'Trasa została dodana pomyślnie!');
 
-        return Redirect::to('/route/' . $newRoute->id);
+        return Redirect::to('/showRoutes');
 
     }
 
