@@ -6,6 +6,7 @@ use App\Department_info;
 use App\PBXDKJTeam;
 use App\PBXDKJTeamOtherCompany;
 use App\ReportCampaign;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Pbx_report_extension;
@@ -221,8 +222,16 @@ class PBXDataAPI extends Controller
                         } else if ($key == 10) {
                             $data_to_insert[$temp_key]['received_calls'] = intval($rowItem);
                         } else if ($key == 11) {
-                            if($save)
+                            if($save){
                                 $data_to_insert[$temp_key]['pbx_id'] = $rowItem;
+                                if(User::where('login_phone', '=', $rowItem)->first()){
+                                    $userWithThisPbxNumber = User::where('login_phone', '=', $rowItem)->first()->id;
+                                    $data_to_insert[$temp_key]['user_id'] = $userWithThisPbxNumber;
+                                }
+                                else {
+                                    $data_to_insert[$temp_key]['user_id'] = null;
+                                }
+                            }
                             else
                                 $data_to_insert[$temp_key]['pbx_id'] = 0;
                             $data_to_insert[$temp_key]['report_date'] = date('Y-m-d');
