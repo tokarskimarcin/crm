@@ -1,10 +1,10 @@
-/*
-*@category: CRM,
-*@info: This view is responsible for connecting clients with routes
-*@database tables: voivodeship, city, routes_info,
-*@controller: CrmRouteController,
-*@methods: index, getSelectedRoute
-*/
+{{--/*--}}
+{{--*@category: CRM,--}}
+{{--*@info: This view is responsible for connecting clients with routes--}}
+{{--*@database tables: voivodeship, city, routes_info,--}}
+{{--*@controller: CrmRouteController,--}}
+{{--*@methods: index, getSelectedRoute--}}
+{{--*/--}}
 
 
 @extends('layouts.main')
@@ -84,7 +84,7 @@
                                 Wybierz klienta z listy. Jeśli nie ma klienta na liście, dodaj go wypełniając formularz, który pojawi się po naciśnięciu przycisku <strong>Dodaj klienta</strong>
                             </div>
                             <div class="col-md-12">
-                                <button data-toggle="modal" class="btn btn-default new_client_to_modal" id="new_client_modal" data-target="#Modal_Client" data-id="1" title="Nowy Klient" style="margin-bottom: 14px">
+                                <button data-toggle="modal" class="btn btn-default" id="clietnModal" data-target="#ModalClient" data-id="1" title="Nowy Klient" style="margin-bottom: 14px">
                                     <span class="glyphicon glyphicon-plus"></span> <span>Dodaj Klienta</span>
                                 </button>
                                 <div class="table-responsive">
@@ -99,78 +99,18 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr id="clientId_1">
-                                            <td class="client_name">Exito - Vigor Life</td>
-                                            <td class="client_phone">798987985</td>
-                                            <td class="client_type">Kamery</td>
-                                            <td>
-                                                <button class="btn btn-info"  data-id=1 onclick = "edit_client(this)" >Edycja</button>
-                                                <button class="btn btn-danger" data-id=1 onclick = "edit_client(this)" >Wyłącz</button>
-                                            </td>
-                                            <td>
-                                                <input style="display: inline-block;" type="checkbox" class="client_check"/>
-                                            </td>
-                                        </tr>
-                                        <tr id="clientId_2">
-                                            <td class="client_name">Pollana Med - Pro Active	</td>
-                                            <td class="client_phone">798987985</td>
-                                            <td class="client_type">Kamery</td>
-                                            <td>
-                                                <button class="btn btn-info" data-id=2 onclick = "edit_client(this)" >Edycja</button>
-                                                <button class="btn btn-danger" data-id=2 onclick = "edit_client(this)" >Wyłącz</button>
-                                            </td>
-                                            <td>
-                                                <input style="display: inline-block;" type="checkbox" class="client_check"/>
-                                            </td>
-                                        </tr>
-                                        <tr id="clientId_3">
-                                            <td class="client_name">Damages</td>
-                                            <td class="client_phone">798987985</td>
-                                            <td class="client_type">Badania</td>
-                                            <td>
-                                                <button class="btn btn-info" data-id=3 onclick = "edit_client(this)" >Edycja</button>
-                                                <button class="btn btn-danger" data-id=3 onclick = "edit_client(this)" >Wyłącz</button>
-                                            </td>
-                                            <td>
-                                                <input style="display: inline-block;" type="checkbox" class="client_check"/>
-                                            </td>
-                                        </tr>
-                                        <tr id="clientId_4">
-                                            <td class="client_name">PromoMedi</td>
-                                            <td class="client_phone">798987985</td>
-                                            <td class="client_type">Kamery</td>
-                                            <td>
-                                                <button class="btn btn-info" data-id=4 onclick = "edit_client(this)" >Edycja</button>
-                                                <button class="btn btn-danger" data-id=4 onclick = "edit_client(this)" >Wyłącz</button>
-                                            </td>
-                                            <td>
-                                                <input style="display: inline-block;" type="checkbox" class="client_check"/>
-                                            </td>
-                                        </tr>
-                                        <tr id="clientId_5">
-                                            <td class="client_name">MarMed</td>
-                                            <td class="client_phone">798987985</td>
-                                            <td class="client_type">Badania</td>
-                                            <td>
-                                                <button class="btn btn-info" data-id=5 onclick = "edit_client(this)" >Edycja</button>
-                                                <button class="btn btn-danger" data-id=5 onclick = "edit_client(this)" >Wyłącz</button>
-                                            </td>
-                                            <td>
-                                                <input style="display: inline-block;" type="checkbox" class="client_check"/>
-                                            </td>
-                                        </tr>
-                                        <tr id="clientId_6">
-                                            <td class="client_name">Exito - Vigor Life</td>
-                                            <td class="client_phone">798987985</td>
-                                            <td class="client_type">Badania</td>
-                                            <td>
-                                                <button class="btn btn-info" onclick = "edit_client(this)" >Edycja</button>
-                                                <button class="btn btn-danger" onclick = "edit_client(this)" >Wyłącz</button>
-                                            </td>
-                                            <td>
-                                                <input style="display: inline-block;" type="checkbox" class="client_check"/>
-                                            </td>
-                                        </tr>
+                                        {{--<tr id="clientId_1">--}}
+                                            {{--<td class="client_name">Exito - Vigor Life</td>--}}
+                                            {{--<td class="client_phone">798987985</td>--}}
+                                            {{--<td class="client_type">Kamery</td>--}}
+                                            {{--<td>--}}
+                                                {{--<button class="btn btn-info"  data-id=1 onclick = "edit_client(this)" >Edycja</button>--}}
+                                                {{--<button class="btn btn-danger" data-id=1 onclick = "edit_client(this)" >Wyłącz</button>--}}
+                                            {{--</td>--}}
+                                            {{--<td>--}}
+                                                {{--<input style="display: inline-block;" type="checkbox" class="client_check"/>--}}
+                                            {{--</td>--}}
+                                        {{--</tr>--}}
                                         </tbody>
                                     </table>
                                 </div>
@@ -198,7 +138,7 @@
                     </div>
 
                     {{--MODAL Dodaj Klienta--}}
-                    <div id="Modal_Client" class="modal fade" role="dialog">
+                    <div id="ModalClient" class="modal fade" role="dialog">
                         <div class="modal-dialog modal-lg" style="width: 90%">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -216,20 +156,25 @@
                                                 <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label class="myLabel">Nazwa Klienta</label>
-                                                        <input class="form-control" name="client_name" />
+                                                        <input class="form-control" name="clientName" id="clientName" />
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label class="myLabel">Priorytet</label>
-                                                        <input class="form-control" name="priority" />
+                                                        <select class="form-control" id="clientPriority">
+                                                            <option value="0">Wybierz</option>
+                                                            <option value="1">Niski</option>
+                                                            <option value="2">Średni</option>
+                                                            <option value="3">Wysoki</option>
+                                                        </select>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label class="myLabel">Typ</label>
-                                                        <select class="form-control" id="client_type">
-                                                            <option>Wybierz</option>
+                                                        <select class="form-control" id="clientType">
+                                                            <option value="0">Wybierz</option>
                                                             <option>Badania</option>
                                                             <option>Wysyłka</option>
                                                         </select>
@@ -237,7 +182,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-12">
-                                                <button class="btn btn-success form-control" id="save_client_modal" onclick = "save_client(this)" >Zapisz Klienta</button>
+                                                <button class="btn btn-success form-control" id="saveClient" onclick = "saveClient(this)" >Zapisz Klienta</button>
                                             </div>
                                         </div>
                                     </div>
@@ -248,6 +193,7 @@
                             </div>
                         </div>
                     </div>
+                    <input type="hidden" value="0" id="clientID" />
 
 
                         <div class="client-wrapper">
@@ -289,6 +235,7 @@
 
 @section('script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
         $('.form_date').datetimepicker({
             language:  'pl',
@@ -297,7 +244,56 @@
             pickTime: false
         });
 
+        //Clear Client modal
+        function clearModal() {
+            $('#clientName').val("");
+            $('#clientPriority').val("0");
+            $('#clientType').val("1");
+            $('#clientID').val(0);
+        }
+
+        //Zapisanie klienta
+        function saveClient(e) {
+            let clientName = $('#clientName').val();
+            let clientPriority = $('#clientPriority').val();
+            let clientType = $('#clientType').val();
+            let clientID = $('#clientID').val();
+            let validation = true;
+            if(clientName.trim().length == 0){
+                validation = false;
+                swal("Podaj nazwę klienta")
+            }
+            if(clientPriority == 0){
+                validation = false;
+                swal("Wybierz priorytet klienta")
+            }
+            if(clientType == 0){
+                validation = false;
+                swal("Wybierz typ klienta")
+            }
+            if(validation){
+                $.ajax({
+                    type: "POST",
+                    url: "{{route('api.saveClient')}}",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        'clientName'    : clientName,
+                        'clientPriority': clientPriority,
+                        'clientType'    : clientType,
+                        'clientID'      : clientID
+                    },
+                    success: function (response) {
+                        $('#ModalClient').modal('hide');
+                    }
+                })
+            }
+        }
+
+
         $(document).ready(function() {
+
 
             Element.prototype.appendAfter = function (element) {
                 element.parentNode.insertBefore(this, element.nextSibling);
@@ -312,75 +308,169 @@
             let route_id = 0;
             let client_id = 0;
 
+//*********************START CLIENT SECTON***************************
 
-            function clear_modal() {
-// document.getElementsByName('client_name')[0]
-// document.getElementsByName('client_phone')[0].value ='';
-// document.getElementsByName('client_type')[0].value ='Wybierz';
-// console.log(document.getElementsByName('client_name')[0]);
-            }
-            function edit_client(e) {
-                var client_id = e.getAttribute('data-id');
-                var tr_line = e.closest('tr');
-                var tr_line_name = tr_line.getElementsByClassName('client_name')[0].textContent;
-                var tr_line_phone = tr_line.getElementsByClassName('client_phone')[0].textContent;
-                var tr_line_type = tr_line.getElementsByClassName('client_type')[0].textContent;
-                clear_modal();
-                $('#Modal_Client').modal('show');
-                console.log(tr_line);
-            }
-            function save_client(e){
-                alert('Klient dodany');
-                $('#Modal_Client').modal('hide');
-            }
+            $('#ModalClient').on('hidden.bs.modal',function () {
+                $('#clientID').val("0");
+                clearModal();
+                table_client.ajax.reload();
+            });
+
             function writeCheckedClientInfo(){
                 tr_line = document.getElementsByClassName('check')[0];
                 var tr_line_name = tr_line.getElementsByClassName('client_name')[0].textContent;
-                var tr_line_phone = tr_line.getElementsByClassName('client_phone')[0].textContent;
+                var tr_line_phone = tr_line.getElementsByClassName('client_priority')[0].textContent;
                 var tr_line_type = tr_line.getElementsByClassName('client_type')[0].textContent;
                 document.getElementById('client_choice_name').textContent = tr_line_name;
                 document.getElementById('client_choice_priority').textContent = tr_line_phone;
                 document.getElementById('client_choice_type').textContent = tr_line_type;
             }
+
             function clearCheckedClientInfo(){
                 document.getElementById('client_choice_name').textContent = "";
                 document.getElementById('client_choice_priority').textContent = "";
                 document.getElementById('client_choice_type').textContent = "";
             }
 
-            var table_client = $('#table_client').DataTable({
-                "autoWidth": false,
+
+            table_client = $('#table_client').DataTable({
+                "autoWidth": true,
+                "processing": true,
+                "serverSide": true,
+                "drawCallback": function( settings ) {
+                },
+                "ajax": {
+                    'url': "{{ route('api.getClient') }}",
+                    'type': 'POST',
+                    'data': function (d) {
+                        // d.date_start = $('#date_start').val();
+                    },
+                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+                },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
-                },"columns":[
-                    {"width": "10%"},
-                    {"width": "5%"},
-                    {"width": "10%"},
-                    {"width": "10%"},
-                    {"width": "1%"},
-                ]
-            });
+                },"rowCallback": function( row, data, index ) {
+                    if (data.status == 1) {
+                        $(row).css('background','#c500002e')
+                    }
+                    $(row).attr('id', "clientId_"+data.id);
+                    return row;
+                },"fnDrawCallback": function(settings){
+                    /**
+                     * Zmiana statusu klienta
+                     */
+                    $('.button-status-client').on('click',function () {
+                        let clientId = $(this).data('id');
+                        let clienStatus = $(this).data('status');
+                        let nameOfAction = "";
+                        if(clienStatus == 0)
+                            nameOfAction = "Tak, wyłącz Klienta";
+                        else
+                            nameOfAction = "Tak, włącz Klienta";
+                        swal({
+                            title: 'Jesteś pewien?',
+                            type: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: nameOfAction
+                        }).then((result) => {
+                            if (result.value) {
 
-            $('#table_client tbody tr').on('click',function () {
-                if ( $(this).hasClass('check') ) {
-                    $(this).removeClass('check');
-                    $(this).find('.client_check').prop('checked',false);
-                    client_id = 0;
-                    clearCheckedClientInfo();
-                }
-                else {
-                    table_client.$('tr.check').removeClass('check');
-                    $.each($('#table_client').find('.client_check'), function (item,val) {
-                        $(val).prop('checked',false);
+                                $.ajax({
+                                    type: "POST",
+                                    url: "{{ route('api.changeStatusClient') }}", // do zamiany
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    data: {
+                                        'clientId'   : clientId
+                                    },
+                                    success: function (response) {
+                                        table_client.ajax.reload();
+                                    }
+                                });
+                            }})
                     });
-                    $(this).addClass('check');
-                    $(this).find('.client_check').prop('checked',true);
-                    client_id = $(this).attr('id');
-                    writeCheckedClientInfo();
-                }
+
+                    /**
+                     * Educja coachingu
+                     */
+                    $('.button-edit-client').on('click',function () {
+                        clientId = $(this).data('id');
+                        $.ajax({
+                            type: "POST",
+                            url: "{{ route('api.findClient') }}", // do zamiany
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            data: {
+                                'clientId'         : clientId
+                            },
+                            success: function (response) {
+                                clearModal();
+                                $('#clientName').val(response.name);
+                                $('#clientPriority').val(response.priority);
+                                $('#clientType').val(response.type);
+                                $('#clientID').val(response.id);
+                                $('#ModalClient').modal('show');
+                            }
+                        });
+                    });
+                    //Zaznaczenie kolumny
+                    $('#table_client tbody tr').on('click',function () {
+                        if ( $(this).hasClass('check') ) {
+                            $(this).removeClass('check');
+                            $(this).find('.client_check').prop('checked',false);
+                            client_id = 0;
+                            clearCheckedClientInfo();
+                        }
+                        else {
+                            table_client.$('tr.check').removeClass('check');
+                            $.each($('#table_client').find('.client_check'), function (item,val) {
+                                $(val).prop('checked',false);
+                            });
+                            $(this).addClass('check');
+                            $(this).find('.client_check').prop('checked',true);
+                            client_id = $(this).attr('id');
+                            writeCheckedClientInfo();
+                        }
+                    });
+
+                },"columns":[
+                    {"data":"name","className": "client_name"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            if(data.priority == 1){
+                                return "Niski";
+                            }else if(data.priority == 2){
+                                return "Średni"
+                            }else{
+                                return "Wysoki";
+                            }
+                        },"name": "priority","className": "client_priority"
+                    },
+                    {"data":"type","className": "client_type"},
+                    {"data":function (data, type, dataToSet) {
+                            let returnButton = "<button class='button-edit-client btn btn-warning' style='margin: 3px;' data-id="+data.id+">Edycja</button>";
+                            if(data.status == 0)
+                                returnButton += "<button class='button-status-client btn btn-danger' data-id="+data.id+" data-status=0 >Wyłącz</button>";
+                            else
+                                returnButton += "<button class='button-status-client btn btn-success' data-id="+data.id+" data-status=1 >Włącz</button>";
+                            return returnButton;
+                        },"orderable": false, "searchable": false
+                    },
+                    {"data": function (data, type, dataToSet) {
+                            return ' <input style="display: inline-block;" type="checkbox" class="client_check"/>';
+                        },"orderable": false, "searchable": false
+                    }
+                ],
             });
 
 
+
+
+//*********************END CLIENT SECTON***************************
 
             table = $('#datatable').DataTable({
                 "autoWidth": true,

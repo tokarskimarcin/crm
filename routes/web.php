@@ -835,8 +835,9 @@ Route::POST('/changeStatusCity','CrmRouteController@changeStatusCity')->name('ap
 
 Route::get('/clientPanel', 'ClientController@clientPanel');
 Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
-
-
+Route::post('/findClient', 'ClientController@findClient')->name('api.findClient');
+Route::POST('/changeStatusClient','ClientController@changeStatusClient')->name('api.changeStatusClient');
+Route::POST('/saveClient','ClientController@saveClient')->name('api.saveClient');
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
 
