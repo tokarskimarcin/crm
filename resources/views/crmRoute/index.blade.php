@@ -310,6 +310,8 @@
 
 //*********************START CLIENT SECTON***************************
 
+            let finalClientId = null; //This variable is needed for form submit
+
             $('#ModalClient').on('hidden.bs.modal',function () {
                 $('#clientID').val("0");
                 clearModal();
@@ -423,6 +425,7 @@
                             $(this).removeClass('check');
                             $(this).find('.client_check').prop('checked',false);
                             client_id = 0;
+                            finalClientId = 0;
                             clearCheckedClientInfo();
                         }
                         else {
@@ -433,6 +436,7 @@
                             $(this).addClass('check');
                             $(this).find('.client_check').prop('checked',true);
                             client_id = $(this).attr('id');
+                            finalClientId = $(this).attr('id');
                             writeCheckedClientInfo();
                         }
                     });
@@ -554,7 +558,7 @@
                                                 '<div class="col-md-4">' +
                                                 '<div class="form-group">' +
                                                 '<label class="myLabel">Ilość godzin pokazów</label>' +
-                                                '<input class="form-control show-hours" min="0" type="number" step="0.1" placeholder="Np. 2">' +
+                                                '<input class="form-control show-hours" min="0" type="number" placeholder="Np. 2">' +
                                                 '</div>' +
                                                 '</div>' +
                                                     '<div class="col-md-4">' +
@@ -637,7 +641,7 @@
                     '<div class="col-md-4">' +
                     '<div class="form-group">' +
                     '<label class="myLabel">Ilość godzin pokazów</label>' +
-                    '<input class="form-control" min="0" type="number" step="0.1" placeholder="Np. 2">' +
+                    '<input class="form-control" min="0" type="number" placeholder="Np. 2">' +
                     '</div>' +
                     '</div>' +
                     '<div class="col-md-4">' +
@@ -763,20 +767,31 @@
                        hourArr.push(element.value);
                     });
 
-                    everythingIsGood = formValidation(voivodeArr, cityArr, hourArr);
+                    if(finalClientId != null && finalClientId != '0') {
+                        everythingIsGood = formValidation(voivodeArr, cityArr, hourArr);
+                    }
+                    else {
+                        everythingIsGood = false;
+                    }
+
 
                     if(everythingIsGood == true) {
                         let formContainer = document.createElement('div');
-                        formContainer.innerHTML = '<form method="post" action="" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="city"></form>';
+                        formContainer.innerHTML = '<form method="post" action="{{URL::to('/crmRoute_index')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"></form>';
                         let place = document.querySelector('.route-here');
                         place.appendChild(formContainer);
                         let userForm = document.getElementById('user_form');
-                        console.log(userForm);
-                        // userForm.submit();
+                        userForm.submit();
                     }
                     else {
                         clearArrays(voivodeArr, cityArr, hourArr);
-                        swal('W każdym polu wartości muszą zostać wybrane!');
+                        if(finalClientId == null || finalClientId == '0') {
+                            swal('Wybierz klienta');
+                        }
+                        else {
+                            swal('Wszystkie pola muszą zostać wybrane!');
+                        }
+
                     }
                 }
 
@@ -840,7 +855,6 @@
                 let routePlace = document.querySelector('.route-here');
                 let newShow = createNewShow(); //otrzymujemy nowy formularz z pokazem.
                 routePlace.appendChild(newShow);
-
 
                 $('.form_date').datetimepicker({
                     language:  'pl',
