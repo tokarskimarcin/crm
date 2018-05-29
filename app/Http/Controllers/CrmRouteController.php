@@ -403,7 +403,8 @@ class CrmRouteController extends Controller
         if($request->ajax()){
             $cities = Cities::select(['city.id','city.name','city.max_hour'
                 ,'city.grace_period','city.status','voivodeship.name as vojName',
-                'voivodeship.id as vojId'])
+                'voivodeship.id as vojId',
+                'city.zip_code','city.latitude','city.longitude'])
                 ->join('voivodeship','voivodeship.id','city.voivodeship_id')
                 ->get();
             return datatables($cities)->make(true);
