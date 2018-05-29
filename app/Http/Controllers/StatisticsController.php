@@ -4357,6 +4357,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             ->get();
 
         $data = $hour_reports->map(function($item) use ($work_time,$janky) {
+
             $day_work = $work_time->where('date', '=', $item->report_date)->first();
             $day_janky = $janky->where('report_date', '=', $item->report_date)->first();
             $item->day_time_sum = (is_object($day_work)) ? $day_work->day_sum : 0 ;
