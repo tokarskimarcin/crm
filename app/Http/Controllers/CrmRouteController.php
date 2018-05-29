@@ -74,6 +74,7 @@ class CrmRouteController extends Controller
     }
 
     public function specificRouteGet($id) {
+        //Przy ostatmi obrocie foreach nie zapisuje do tablicy
         $clientRouteInfo = ClientRouteInfo::where('client_route_id', '=', $id)->get();
         $clients = Clients::all();
         $cities = Cities::all();
@@ -81,8 +82,27 @@ class CrmRouteController extends Controller
         $hotels = Hotel::all();
 
         $clientRouteInfoExtended = array();
+        $insideArr = array();
+        $cityId = null;
+        $flag = 0; //indices whether $insideArr push into $clientRouteInfoExtended 1 - push, 0 - don't push
+        $iterator = 0;
 
         foreach($clientRouteInfo as $info) {
+            if($cityId == null) {
+                $flag = 0;
+                $cityId = $info->city_id;
+            }
+            else if($info->city_id == $cityId) {
+                $flag = 0;
+                $cityId = $info->city_id;
+            }
+            else {
+                array_push($clientRouteInfoExtended, $insideArr);
+                $insideArr = [];
+                $flag = 1;
+                $cityId = $info->city_id;
+            }
+
             $stdClass = new \stdClass();
 
             foreach($cities as $city) {
@@ -109,14 +129,21 @@ class CrmRouteController extends Controller
             $stdClass->date = $info->date;
             $stdClass->hotel_id = $info->hotel_id;
             $stdClass->hour = $info->hour;
-            array_push($clientRouteInfoExtended, $stdClass);
+
+            array_push($insideArr, $stdClass);
+            if($flag == 1) {
+                $flag = 0;
+            }
         }
+
         $clientRouteInfo = collect($clientRouteInfoExtended);
 
-        if($clientRouteInfo[0]) {
-            $clientName = $clientRouteInfo[0]->clientName;
-        }
+        dd($clientRouteInfo);
 
+        if($clientRouteInfo[0][0]) {
+            $clientName = $clientRouteInfo[0][0]->clientName;
+        }
+//        dd($clientRouteInfo);
         return view('crmRoute.specificInfo')
             ->with('clientRouteInfo', $clientRouteInfoExtended)
             ->with('hotels', $hotels)
