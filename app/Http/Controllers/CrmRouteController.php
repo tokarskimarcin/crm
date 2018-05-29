@@ -138,16 +138,16 @@ class CrmRouteController extends Controller
 
         $clientRouteInfo = collect($clientRouteInfoExtended);
 
-        dd($clientRouteInfo);
+//        dd($clientRouteInfo);
 
-        if($clientRouteInfo[0][0]) {
-            $clientName = $clientRouteInfo[0][0]->clientName;
-        }
+//        if($clientRouteInfo[0][0]) {
+//            $clientName = $clientRouteInfo[0][0]->clientName;
+//        }
 //        dd($clientRouteInfo);
         return view('crmRoute.specificInfo')
             ->with('clientRouteInfo', $clientRouteInfoExtended)
-            ->with('hotels', $hotels)
-            ->with('clientName', $clientName);
+            ->with('hotels', $hotels);
+//            ->with('clientName', $clientName);
     }
 
     public function getSelectedRoute(Request $request) {
@@ -528,7 +528,8 @@ class CrmRouteController extends Controller
         if($request->ajax()){
             $cities = Cities::select(['city.id','city.name','city.max_hour'
                 ,'city.grace_period','city.status','voivodeship.name as vojName',
-                'voivodeship.id as vojId'])
+                'voivodeship.id as vojId',
+                'city.zip_code','city.latitude','city.longitude'])
                 ->join('voivodeship','voivodeship.id','city.voivodeship_id')
                 ->get();
             return datatables($cities)->make(true);

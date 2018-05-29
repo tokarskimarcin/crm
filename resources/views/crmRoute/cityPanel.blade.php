@@ -50,6 +50,9 @@
                                             <tr>
                                                 <th>Wojweództwo</th>
                                                 <th>Miasto</th>
+                                                <th>Kod Pocztowy</th>
+                                                <th>Szerokość Geo.</th>
+                                                <th>Długość Geo.</th>
                                                 <th>Ilość Pokazów</th>
                                                 <th>Karencja</th>
                                                 <th>Edycja</th>
@@ -112,6 +115,24 @@
                                             <input class="form-control" id="gracePeriod" name="gracePeriod" placeholder="Karencja" type="number" >
                                         </div>
                                     </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label class="myLabel">Kod pocztowy:</label>
+                                            <input class="form-control" id="zipCode" name="zipCode" placeholder="Kod Pocztowy" type="number" >
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label class="myLabel">Szerokość geograficzna:</label>
+                                            <input class="form-control" id="latitude" name="latitude" placeholder="Karencja" type="number" >
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label class="myLabel">Długość geograficzna:</label>
+                                            <input class="form-control" id="longitude" name="longitude" placeholder="Karencja" type="number" >
+                                        </div>
+                                    </div>
                                     <div class="col-md-12">
                                         <button class="btn btn-success form-control" id="saveCityModal" onclick = "saveCity(this)">Dodaj Miasto</button>
                                     </div>
@@ -152,6 +173,11 @@
         function clearModal() {
             $('#voiovedshipID').val("1");
             $('#cityName').val("");
+
+            $('#zipCode').val("");
+            $('#latitude').val("");
+            $('#longitude').val("");
+
             $('#eventCount').val("");
             $('#gracePeriod').val("");
             $('#cityID').val(0);
@@ -162,8 +188,25 @@
             let cityName = $('#cityName').val();
             let eventCount = $('#eventCount').val();
             let gracePeriod = $('#gracePeriod').val();
+
+            let zipCode = $('#zipCode').val();
+            let latitude = $('#latitude').val();
+            let longitude = $('#longitude').val();
+
             let validation = true;
 
+            if(zipCode.trim().length == 0){
+                validation = false;
+                swal("Podaj kod pocztowy")
+            }
+            if(latitude.trim().length == 0){
+                validation = false;
+                swal("Podaj szerokość geograficzną")
+            }
+            if(longitude.trim().length == 0){
+                validation = false;
+                swal("Podaj dlugość geograficzną")
+            }
             if(cityName.trim().length == 0){
                 validation = false;
                 swal("Podaj nazwę miasta")
@@ -188,6 +231,9 @@
                         'cityName'      : cityName,
                         'eventCount'    : eventCount,
                         'gracePeriod'   : gracePeriod,
+                        'latitude'   : latitude,
+                        'longitude'   : longitude,
+                        'zipCode'   : zipCode,
                         'cityID'          : $('#cityID').val()
                     },
                     success: function (response) {
@@ -285,6 +331,9 @@
                                   $('#cityName').val(response.name);
                                   $('#eventCount').val(response.max_hour);
                                   $('#gracePeriod').val(response.grace_period);
+                                  $('#zipCode').val(response.zipCode);
+                                  $('#latitude').val(response.latitude);
+                                  $('#longitude').val(response.longitude);
                                   $('#cityID').val(response.id);
                                   $('#ModalCity').modal('show');
                               }
@@ -293,9 +342,13 @@
                   },"columns":[
                   {"data":"vojName"},
                   {"data":"name"},
+                  {"data":"zip_code"},
+                  {"data":"latitude"},
+                  {"data":"longitude"},
                   {"data":"max_hour"},
                   {"data":"grace_period"},
                   {"data":function (data, type, dataToSet) {
+                            console.log(data);
                           let returnButton = "<button class='button-edit-city btn btn-warning' style='margin: 3px;' data-id="+data.id+">Edycja</button>";
                           if(data.status == 0)
                               returnButton += "<button class='button-status-city btn btn-danger' data-id="+data.id+" data-status=0 >Wyłącz</button>";
