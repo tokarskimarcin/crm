@@ -54,9 +54,18 @@
                         $day_check = 0;
                         $day_bad = 0;
 
+                        $total_rbh_without_weekends = 0;
+                        $total_rbh_weekends = 0;
+
                         $week_day_count = 0;
                         foreach($department_repo['data'] as $value) {
+                            $day_number = date('N', strtotime($value->report_date));
                             $week_rbh += $value->day_time_sum;
+                            if($day_number < 6){
+                                $total_rbh_without_weekends += round($value->day_time_sum,2);
+                            }else{
+                                $total_rbh_weekends += round($value->day_time_sum,2);
+                            }
                             $week_success += $value->success;
                             if($value->day_time_sum != 0){
                                $week_goal += (date('N', strtotime($value->report_date)) < 6) ? $dep->dep_aim : $dep->dep_aim_week ;
@@ -99,7 +108,7 @@
                         @endphp
                         <td style="border:1px solid #231f20;text-align:center;padding:3px">@if($repo !== null) {{ round($repo->day_time_sum, 2) }} @else 0 @endif</td>
                     @endforeach
-                    <td style="background-color: #5eff80;border:1px solid #231f20;text-align:center;padding:3px">{{ $week_rbh }}</td>
+                    <td style="background-color: #5eff80;border:1px solid #231f20;text-align:center;padding:3px">{{ $total_rbh_without_weekends.'/'.$total_rbh_weekends }}</td>
                 </tr>
 
                 <tr>
