@@ -62,7 +62,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="coaches"><span class="trainers" id="trainers">Trenerzy prowadzący coachingi</span></label>
+                                    <label for="coaches"><span class="trainers" id="trainers">Trenerzy prowadzący coachingi(z kogo)</span></label>
                                     <select name="coaches" id="coaches" class="form-control" required>
                                         <option value="0">Wybierz</option>
                                         @foreach($coachingOwners as $coach)
@@ -73,7 +73,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="newCoach"><span class="newCoaches" id="newCoaches2">Dostępni trenerzy</span></label>
+                                    <label for="newCoach"><span class="newCoaches" id="newCoaches2">Dostępni trenerzy(na kogo)</span></label>
                                     <select name="newCoach" id="newCoach" class="form-control" required>
                                         <option value="0">Wybierz</option>
                                         @foreach($allTrainers as $coach)
