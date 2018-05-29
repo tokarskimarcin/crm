@@ -5,16 +5,21 @@ namespace App\Http\Controllers;
 use App\AuditCriterions;
 use App\AuditHeaders;
 use App\Cities;
+use App\Clients;
+use App\ClientRoute;
+use App\ClientRouteInfo;
 use App\Department_info;
 use App\Hotel;
 use App\Route;
 use App\RouteInfo;
 use App\Voivodes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
 use function MongoDB\BSON\toJSON;
 use Session;
+use Symfony\Component\HttpKernel\Client;
 
 class CrmRouteController extends Controller
 {
@@ -25,17 +30,97 @@ class CrmRouteController extends Controller
         return view('crmRoute.index')->with('departments', $departments)->with('voivodes', $voivodes);
     }
 
+    /**
+     * This method saves new routes connected with client
+     */
     public function indexPost(Request $request) {
+        //Get values from form elements
         $voivode = $request->voivode;
         $city = $request->city;
         $hour = $request->hour;
+        $date = $request->date;
         $clientIdNotTrimmed = $request->clientId;
 
+        //explode values into arrays
         $voivodeArr = explode(',', $voivode);
         $cityArr = explode(',', $city);
         $hourArr = explode(',',$hour);
         $clientId = explode('_',$clientIdNotTrimmed)[1];
+        $dateArr = explode(',',$date);
 
+        $loggedUser = Auth::user();
+
+        //New insertion into ClientRoute table
+        $clientRoute = new ClientRoute();
+        $clientRoute->client_id = $clientId;
+        $clientRoute->user_id = $loggedUser->id;
+        $clientRoute->save();
+
+        //New insertions into ClientRouteInfo table
+        for($i = 0; $i < count($voivodeArr); $i++) {
+            for($j = 1; $j <= $hourArr[$i] ; $j++) { // for example if user type 2 hours, method will insert 2 insertions with given row.
+                $clientRouteInfo = new ClientRouteInfo();
+                $clientRouteInfo->client_route_id = $clientRoute->id;
+                $clientRouteInfo->city_id = $cityArr[$i];
+                $clientRouteInfo->voivode_id = $voivodeArr[$i];
+                $clientRouteInfo->date = $dateArr[$i];
+                $clientRouteInfo->save();
+            }
+        }
+        $request->session()->flash('adnotation', 'Trasa została pomyślnie przypisana dla klienta');
+
+        return Redirect::back();
+
+    }
+
+    public function specificRouteGet($id) {
+        $clientRouteInfo = ClientRouteInfo::where('client_route_id', '=', $id)->get();
+        $clients = Clients::all();
+        $cities = Cities::all();
+        $voivodes = Voivodes::all();
+        $hotels = Hotel::all();
+
+        $clientRouteInfoExtended = array();
+
+        foreach($clientRouteInfo as $info) {
+            $stdClass = new \stdClass();
+
+            foreach($cities as $city) {
+                if($info->city_id == $city->id) {
+                    $stdClass->cityName = $city->name;
+                }
+            }
+
+            foreach($voivodes as $voivode) {
+                if($info->voivode_id == $voivode->id) {
+                    $stdClass->voivodeName = $voivode->name;
+                }
+            }
+
+            foreach($clients as $client) {
+                if($info->client_route_id == $client->id) {
+                    $stdClass->clientName = $client->name;
+                }
+            }
+
+            $stdClass->client_route_id = $info->client_route_id;
+            $stdClass->city_id = $info->city_id;
+            $stdClass->voivode_id = $info->voivode_id;
+            $stdClass->date = $info->date;
+            $stdClass->hotel_id = $info->hotel_id;
+            $stdClass->hour = $info->hour;
+            array_push($clientRouteInfoExtended, $stdClass);
+        }
+        $clientRouteInfo = collect($clientRouteInfoExtended);
+
+        if($clientRouteInfo[0]) {
+            $clientName = $clientRouteInfo[0]->clientName;
+        }
+
+        return view('crmRoute.specificInfo')
+            ->with('clientRouteInfo', $clientRouteInfoExtended)
+            ->with('hotels', $hotels)
+            ->with('clientName', $clientName);
     }
 
     public function getSelectedRoute(Request $request) {
