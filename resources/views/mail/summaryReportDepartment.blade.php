@@ -80,6 +80,12 @@
             $total_sum_call_time = 0;
             $total_sum_call_proc = 0;
 
+            $total_rbh_without_weekends = 0;
+            $total_rbh_weekends = 0;
+
+            $rbh_without_weekends = 0;
+            $rbh_weekends = 0;
+
             $count_weeks = 0;
             $start_day = true;
             $sum_week = false;
@@ -107,7 +113,12 @@
                 $rest_goal = -1 * ($goal - $report->success);
                 //Obliczenie real RBH
                 $real_RBH = round(($report->time_sum_real_RBH / 3600) ,2);
-
+                //zliczanie informacji o ilości rbh na tygodniu i weekendzie
+                if($day_number < 6){
+                     $rbh_without_weekends+= $real_RBH;
+                }else{
+                    $rbh_weekends += $real_RBH;
+                }
                 //Oblicznenie czasu rozmów
                 $phone_time = ($report->call_time > 0) ? round(($real_RBH * $report->call_time) / 100, 2) : 0 ;
 
@@ -253,12 +264,14 @@
                     $total_week_goal_proc = ($total_week_goal != null && $total_week_goal > 0) ? round(($total_week_success / $total_week_goal) * 100, 2) : 0 ;
                     $total_goal_proc = ($total_week_success != null && $total_week_success > 0) ?  : 0 ;
                     $total_week_sum_call_proc = ($real_week_RBH != null && $real_week_RBH > 0) ? round(($real_week_phone_time / $real_week_RBH) * 100, 2) : 0 ;
-
+                    //sumowanie wynikow rbh podział na (z weekendem i bez)
+                    $total_rbh_without_weekends += $rbh_without_weekends;
+                    $total_rbh_weekends += $rbh_weekends;
                 @endphp
                 <tr>
                     <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA</b></td>
                     <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$week_schedule_goal}}</b></td>
-                    <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$real_week_RBH}}</b></td>
+                    <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$rbh_without_weekends.'/'.$rbh_weekends}}</b></td>
                     <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_week_success}}</b></td>
                     <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$real_week_phone_time}}</b></td>
                     <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_week_checked}}</b></td>
@@ -276,7 +289,8 @@
                 </tr>
                 @php
                     $add_week_total = false;
-
+                    $rbh_weekends = 0;
+                    $rbh_without_weekends = 0;
                     $total_week_success = 0;
                     $week_schedule_goal = 0;
                     $real_week_RBH = 0;
@@ -304,7 +318,7 @@
         <tr>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_schedule_goal}}</b></td>
-            <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_real_RBH}}</b></td>
+            <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_rbh_without_weekends.'/'.$total_rbh_weekends}}</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_success}}</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_phone_time}}</b></td>
             <td style="background-color: #efef7f;border:1px solid #231f20;text-align:center;padding:3px"><b>{{$total_checked}}</b></td>

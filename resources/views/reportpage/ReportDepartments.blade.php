@@ -95,7 +95,7 @@
             <div class="alert alert-info"> <strong>Raport Miesięczny Oddziały - zestawienie statystyk dotyczących wybranego oddziału w wybranym miesiącu, podzielonych na tygodnie. </strong></br>
                 <div class="additional_info">
                     RBH Plan = Roboczogodziny w grafiku </br>
-                    RBH Real = Roboczogodziny zaakceptowane </br>
+                    RBH Real = Roboczogodziny zaakceptowane, podsumowanie tygodniowe (godziny w tygodniu / godziny weekendowe) </br>
                     Średnia = Zgody / RBH real </br>
                     % janków = 100% * liczba janków / liczba odsłuchanych </br>
                     % celu = 100% * zgody / cel zgody </br>
