@@ -75,7 +75,12 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-
+                    @if(Session::has('adnotation'))
+                        <div class="alert alert-warning" style="font-size:1.2em;font-weight:bold;text-align:center;">
+                            {{Session::get('adnotation')}}
+                        </div>
+                        {{Session::forget('adnotation')}}
+                     @endif
                     </div>
                     <div class="client-wrapper">
                         <div class="client-container">
@@ -553,16 +558,21 @@
                                             '                    </select>\n' +
                                             '                </div>\n' +
                                             '            </div>\n' +
-                                            '<div class="col-md-4">' +
-                                            '</div>' +
-                                                '<div class="col-md-4">' +
+                                                '<div class="col-md-6">' +
                                                 '<div class="form-group">' +
                                                 '<label class="myLabel">Ilość godzin pokazów</label>' +
                                                 '<input class="form-control show-hours" min="0" type="number" placeholder="Np. 2">' +
                                                 '</div>' +
                                                 '</div>' +
-                                                    '<div class="col-md-4">' +
-                                                    '</div>' +
+                                                '<div class="col-md-6">' +
+                                                '<div class="form-group">' +
+                                                '<label class="myLabel">Data:</label>' +
+                                                '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">' +
+                                                '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">' +
+                                                '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
+                                                '</div>' +
+                                                '</div>' +
+                                                '</div>' +
                                             '\n' +
                                                 '<div class="form-group hour_div">' +
                                                 '</div>' +
@@ -636,15 +646,20 @@
                     '                    </select>\n' +
                     '                </div>\n' +
                     '            </div>\n' +
-                    '<div class="col-md-4">' +
-                    '</div>' +
-                    '<div class="col-md-4">' +
+                    '<div class="col-md-6">' +
                     '<div class="form-group">' +
                     '<label class="myLabel">Ilość godzin pokazów</label>' +
                     '<input class="form-control" min="0" type="number" placeholder="Np. 2">' +
                     '</div>' +
                     '</div>' +
-                    '<div class="col-md-4">' +
+                    '<div class="col-md-6">' +
+                    '<div class="form-group">' +
+                    '<label class="myLabel">Data:</label>' +
+                    '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">' +
+                    '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">' +
+                    '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
+                    '</div>' +
+                    '</div>' +
                     '</div>' +
                     '\n' +
                     '<div class="form-group hour_div">' +
@@ -751,10 +766,14 @@
                     let voivodeElements = Array.from(document.getElementsByClassName('voivodeship'));
                     let cityElements = Array.from(document.getElementsByClassName('city'));
                     let showElements = Array.from(document.getElementsByClassName('show-hours'));
+                    let dateElements = Array.from(document.getElementsByClassName('dateInput'));
+                    console.log(dateElements);
 
                     let voivodeArr = [];
                     let cityArr = [];
                     let hourArr = [];
+                    let dateArr = [];
+
                     voivodeElements.forEach(function(element) {
                         voivodeArr.push(element.options[element.selectedIndex].value);
                     });
@@ -767,6 +786,10 @@
                        hourArr.push(element.value);
                     });
 
+                    dateElements.forEach(function(element) {
+                       dateArr.push(element.value);
+                    });
+
                     if(finalClientId != null && finalClientId != '0') {
                         everythingIsGood = formValidation(voivodeArr, cityArr, hourArr);
                     }
@@ -777,7 +800,7 @@
 
                     if(everythingIsGood == true) {
                         let formContainer = document.createElement('div');
-                        formContainer.innerHTML = '<form method="post" action="{{URL::to('/crmRoute_index')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"></form>';
+                        formContainer.innerHTML = '<form method="post" action="{{URL::to('/crmRoute_index')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"></form>';
                         let place = document.querySelector('.route-here');
                         place.appendChild(formContainer);
                         let userForm = document.getElementById('user_form');
