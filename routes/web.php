@@ -808,6 +808,8 @@ Route::get('/crmRoute_index', 'CrmRouteController@index');
 Route::post('/crmRoute_index', 'CrmRouteController@indexPost');
 Route::post('/crmRoute_index_ajax', 'CrmRouteController@getSelectedRoute')->name('api.getRoute');
 
+Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet');
+
 Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet');
 Route::post('/addNewRoute', 'CrmRouteController@addNewRoutePost');
 Route::post('/addNewRoutes', 'CrmRouteController@addNewRouteAjax')->name('api.getCitiesNames');
