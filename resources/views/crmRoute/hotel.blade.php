@@ -1,9 +1,9 @@
-/*
-*@category: CRM,
-*@info: This view allows user to edit given hotel (DB table: "hotels"),
-*@controller: CrmRouteController,
-*@methods: hotelGet, hotelPost
-*/
+{{--/*--}}
+{{--*@category: CRM,--}}
+{{--*@info: This view allows user to edit given hotel (DB table: "hotels"),--}}
+{{--*@controller: CrmRouteController,--}}
+{{--*@methods: hotelGet, hotelPost--}}
+{{--*/--}}
 
 @extends('layouts.main')
 @section('style')
@@ -193,12 +193,29 @@
 
            function clickEventHandler(e) {
                if(e.target.dataset.element === 'usun') {
-                   let form = document.getElementById('formularz');
-                   let buttonContainer = document.querySelector('.button-container');
-                   let newElement = document.createElement('div');
-                   newElement.innerHTML = '<input type="hidden" value="usun" name="usun">';
-                   buttonContainer.appendChild(newElement);
-                   formularz.submit();
+                   swal({
+                       title: 'Jesteś pewien?',
+                       text: "Po potwierdzeniu, brak możliwości cofnięcia zmian!",
+                       type: 'warning',
+                       showCancelButton: true,
+                       confirmButtonColor: '#3085d6',
+                       cancelButtonColor: '#d33',
+                       confirmButtonText: 'Usuń!'
+                   }).then((result) => {
+                       if (result.value) {
+                           let form = document.getElementById('formularz');
+                           let buttonContainer = document.querySelector('.button-container');
+                           let newElement = document.createElement('div');
+                           newElement.innerHTML = '<input type="hidden" value="usun" name="usun">';
+                           buttonContainer.appendChild(newElement);
+                           formularz.submit();
+                           swal(
+                               'Usunięte!',
+                               'Hotel został usunięty',
+                               'Sukces'
+                           )
+                       }
+                   });
                }
                 else if(e.target.id == 'redir') {
                    console.log(e.target);

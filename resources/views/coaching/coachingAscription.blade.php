@@ -1,10 +1,10 @@
-/*
-*@category: Coachings,
-*@info: This view is responsible for ascripting new coach to "in progress" and "unsettled" coachings managed by another coach,
-*@Database tables: coaching_director, users,
-*@controller: CoachingController,
-*@methods: coachAscriptionGet, coachAscriptionPost
-*/
+{{--/*--}}
+{{--*@category: Coachings,--}}
+{{--*@info: This view is responsible for ascripting new coach to "in progress" and "unsettled" coachings managed by another coach,--}}
+{{--*@Database tables: coaching_director, users,--}}
+{{--*@controller: CoachingController,--}}
+{{--*@methods: coachAscriptionGet, coachAscriptionPost--}}
+{{--*/--}}
 
 @extends('layouts.main')
 @section('content')
@@ -14,6 +14,18 @@
             transition: all 0.8s ease-in-out;
         }
 
+        .alert-danger {
+            animation-name: animacja;
+            animation-duration: 3s;
+            color: white;
+            font-size: 1.1em;
+            animation-iteration-count: infinite;
+        }
+        @keyframes animacja {
+            0% {background-color: red;}
+            50% {background-color: lightcoral;}
+            100% {background-color: red;}
+        }
     </style>
 
     {{--Header page --}}
@@ -40,6 +52,9 @@
                             </div>
                             {{Session::forget('adnotation')}}
                         @endif
+                        <div class="alert alert-danger">
+                            Wprowadzone zmiany są <strong>Ostateczne</strong> i <strong><span style="text-decoration: underline">NIE</span></strong> mogą być cofnięte.
+                        </div>
                         <div class="alert alert-info">
                             Lista <strong><span class="trainers" data-info="first">Trenerzy prowadzący coachingi</span></strong> zawiera trenerów z oddziału zalogowanego użytkownika, którzy prowadzą coachingi <i>"w toku"</i> oraz <i>"nierozliczone"</i>, </br>
                             Lista <strong><span class="newCoaches" data-info="second">Dostępni trenerzy</span></strong> zawiera trenerów, dla których mogą zostać przypisane coachingi.
@@ -47,7 +62,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="coaches"><span class="trainers" id="trainers">Trenerzy prowadzący coachingi</span></label>
+                                    <label for="coaches"><span class="trainers" id="trainers">Trenerzy prowadzący coachingi(z kogo)</span></label>
                                     <select name="coaches" id="coaches" class="form-control" required>
                                         <option value="0">Wybierz</option>
                                         @foreach($coachingOwners as $coach)
@@ -58,7 +73,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="newCoach"><span class="newCoaches" id="newCoaches2">Dostępni trenerzy</span></label>
+                                    <label for="newCoach"><span class="newCoaches" id="newCoaches2">Dostępni trenerzy(na kogo)</span></label>
                                     <select name="newCoach" id="newCoach" class="form-control" required>
                                         <option value="0">Wybierz</option>
                                         @foreach($allTrainers as $coach)
@@ -94,8 +109,27 @@
                    swal('Wybierz trenerów w obu polach');
                }
                else {
-                   thisForm = document.getElementById('formularz');
-                   thisForm.submit();
+
+                   swal({
+                       title: 'Jesteś pewien?',
+                       text: "Po potwierdzeniu, brak możliwości cofnięcia zmian!",
+                       type: 'warning',
+                       showCancelButton: true,
+                       confirmButtonColor: '#3085d6',
+                       cancelButtonColor: '#d33',
+                       confirmButtonText: 'Przypisz!'
+                   }).then((result) => {
+                       if (result.value) {
+                           thisForm = document.getElementById('formularz');
+                           thisForm.submit();
+                           swal(
+                               'Przypisano!',
+                               'Użytkownik został przypisany',
+                               'Sukces'
+                           )
+                       }
+                   });
+
                }
             });
 

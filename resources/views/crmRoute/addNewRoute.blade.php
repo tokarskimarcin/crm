@@ -1,9 +1,9 @@
-/*
-*@category: CRM,
-*@info: This view is responsible for adding new route to DataBase (DB table: "routes, routes_info"),
-*@controller: CrmRouteController,
-*@methods: addNewRouteGet, addNewRoutePost
-*/
+{{--/*--}}
+{{--*@category: CRM,--}}
+{{--*@info: This view is responsible for adding new route to DataBase (DB table: "routes, routes_info"),--}}
+{{--*@controller: CrmRouteController,--}}
+{{--*@methods: addNewRouteGet, addNewRoutePost--}}
+{{--*/--}}
 
 
 @extends('layouts.main')

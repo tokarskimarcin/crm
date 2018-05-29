@@ -25,6 +25,19 @@ class CrmRouteController extends Controller
         return view('crmRoute.index')->with('departments', $departments)->with('voivodes', $voivodes);
     }
 
+    public function indexPost(Request $request) {
+        $voivode = $request->voivode;
+        $city = $request->city;
+        $hour = $request->hour;
+        $clientIdNotTrimmed = $request->clientId;
+
+        $voivodeArr = explode(',', $voivode);
+        $cityArr = explode(',', $city);
+        $hourArr = explode(',',$hour);
+        $clientId = explode('_',$clientIdNotTrimmed)[1];
+
+    }
+
     public function getSelectedRoute(Request $request) {
         $idNotTrimmed = $request->route_id;
         $posOfId = strpos($idNotTrimmed,'_');
@@ -117,7 +130,7 @@ class CrmRouteController extends Controller
 
         $request->session()->flash('adnotation', 'Trasa została dodana pomyślnie!');
 
-        return Redirect::to('/route/' . $newRoute->id);
+        return Redirect::to('/showRoutes');
 
     }
 

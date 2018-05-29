@@ -77,6 +77,16 @@
             </div>
 
             <div class="form-group">
+                <label for="director_hr">Dyrektor HR</label>
+                <select class="form-control" name="director_hr" id="director_hr">
+                    <option value=0>Wybierz</option>
+                    @foreach($hrDirectors as $hrDirector)
+                        <option value="{{$hrDirector->id}}" @if(isset($selected_department->director_hr_id) && $selected_department->director_hr_id == $hrDirector->id) selected @endif>{{$hrDirector->first_name . ' ' . $hrDirector->last_name}}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label for="hrEmployee">Wybierz pracownika HR</label>
                 <select class="form-control" name="hrEmployee" id="hrEmployee">
                     <option value="0">Wybierz</option>
