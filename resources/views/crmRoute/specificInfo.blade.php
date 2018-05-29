@@ -127,13 +127,15 @@
 
             const voivodeeId = null;
             const cityId = null;
-            let numberOfLoops = {{$iterator}};
+            let numberOfLoops = '{{$iterator}}';
+            var tableArray = new Array();
+            var lp = 1;
 
 
             newTable = $('.datatable');
             newTable.each(function() {
 
-                table = $(this).DataTable({
+                tableArray.push($(this).DataTable({
                     "autoWidth": true,
                     "processing": true,
                     "serverSide": true,
@@ -143,21 +145,24 @@
                         $(row).attr('id', "hotelId_" + data.id);
                         return row;
                     },"fnDrawCallback": function(settings) {
-                           $('table tbody tr').on('click', function() {
-
-                               if($(this).hasClass('check')) {
-                                   $(this).removeClass('check');
-                                   $(this).find('.checkbox_info').prop('checked',false);
-                               }
-                               else {
-                                   table.$('tr.check').removeClass('check');
-                                   $.each($('.datatable').find('.checkbox_info'), function (item, val) {
-                                       $(val).prop('checked', false);
-                                   });
-                                   $(this).addClass('check');
-                                   $(this).find('.checkbox_info').prop('checked', true);
-                               }
-                           })
+                        if(lp == 2){
+                            $('table tbody tr').on('click', function() {
+                                test = $(this).closest('table');
+                                if($(this).hasClass('check')) {
+                                    $(this).removeClass('check');
+                                    $(this).find('.checkbox_info').prop('checked',false);
+                                }
+                                else {
+                                    test.find('tr.check').removeClass('check');
+                                    $.each(test.find('.checkbox_info'), function (item, val) {
+                                        $(val).prop('checked', false);
+                                    });
+                                    $(this).addClass('check');
+                                    $(this).find('.checkbox_info').prop('checked', true);
+                                }
+                            })
+                        }
+                            lp++;
                     }, "ajax": {
                         'url': "{{ route('api.showHotelsAjax') }}",
                         'type': 'POST',
@@ -187,7 +192,9 @@
                             },"orderable": false, "searchable": false
                         }
                     ]
-                });
+                })
+                )
+
             });
 
             {{--table = $('.datatable').DataTable({--}}

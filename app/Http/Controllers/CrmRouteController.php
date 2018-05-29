@@ -138,16 +138,16 @@ class CrmRouteController extends Controller
 
         $clientRouteInfo = collect($clientRouteInfoExtended);
 
-        dd($clientRouteInfo);
+//        dd($clientRouteInfo);
 
-        if($clientRouteInfo[0][0]) {
-            $clientName = $clientRouteInfo[0][0]->clientName;
-        }
+//        if($clientRouteInfo[0][0]) {
+//            $clientName = $clientRouteInfo[0][0]->clientName;
+//        }
 //        dd($clientRouteInfo);
         return view('crmRoute.specificInfo')
             ->with('clientRouteInfo', $clientRouteInfoExtended)
-            ->with('hotels', $hotels)
-            ->with('clientName', $clientName);
+            ->with('hotels', $hotels);
+//            ->with('clientName', $clientName);
     }
 
     public function getSelectedRoute(Request $request) {
