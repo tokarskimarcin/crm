@@ -791,7 +791,6 @@ class StatisticsController extends Controller
             ->join('department_info', 'department_info.id', '=', 'pbx_dkj_team.department_info_id')
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-            ->where('department_info.dep_aim','!=',0)
             ->whereIn('pbx_dkj_team.id', function($query) use($date){
                 $query->select(DB::raw(
                     'MAX(pbx_dkj_team.id)'
@@ -800,7 +799,6 @@ class StatisticsController extends Controller
                     ->where('report_date', '=',$date)
                     ->groupBy('department_info_id');
             })
-            ->whereIn('department_info.id_dep_type', [1,2])
             ->groupBy('pbx_dkj_team.department_info_id')
             ->get();
 
@@ -938,7 +936,6 @@ class StatisticsController extends Controller
             ->join('department_info', 'department_info.id', '=', 'pbx_dkj_team.department_info_id')
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-            ->where('department_info.dep_aim','!=',0)
             ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop){
                 $query->select(DB::raw(
                     'MAX(pbx_dkj_team.id)'
@@ -1144,7 +1141,6 @@ class StatisticsController extends Controller
             ->join('department_info', 'department_info.id', '=', 'pbx_dkj_team.department_info_id')
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-            ->where('department_info.dep_aim','!=',0)
             ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop){
                 $query->select(DB::raw(
                     'MAX(pbx_dkj_team.id)'
