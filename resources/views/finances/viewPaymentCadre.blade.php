@@ -84,6 +84,7 @@
                                                                     @if($agency->id == $item)
                                                                         @php
                                                                             $salary_total_all = 0;
+                                                                            $to_account_total_all = 0;
                                                                             $row_number = 1;@endphp
 
                                                                     {{--Typ Umowy--}}
@@ -113,6 +114,7 @@
                                                                                 <th>Kara</th>
                                                                                 <th>Student</th>
                                                                                 <th>Dokument</th>
+                                                                                <th>Max na konto</th>
                                                                                 <th>Wynagrodzenie</th>
                                                                             </tr>
                                                                             </thead>
@@ -131,6 +133,8 @@
                                                                                         $total_one_salary = 0;
                                                                                     $salary_total_all+=$total_one_salary;
                                                                                     $payment_total=+$salary_total_all;
+                                                                                    $toAccount = ($item2->max_transaction == null) ? 0 : $item2->max_transaction;
+                                                                                    $to_account_total_all += $toAccount;
                                                                             @endphp
                                                                             <tr>
                                                                                 <td>{{$row_number++}}</td>
@@ -144,6 +148,7 @@
                                                                                 <td>{{$penatly*(-1)}}</td>
                                                                                 <td>{{$student}}</td>
                                                                                 <td>{{$documents}}</td>
+                                                                                <td>{{$toAccount}}</td>
                                                                                 <td>{{$total_one_salary}}</td>
                                                                             </tr>
                                                                         @endforeach
@@ -159,8 +164,8 @@
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td> Suma:</td>
+                                                                            <td>{{$to_account_total_all}} </td>
                                                                             <td>{{$salary_total_all}}</td>
-
                                                                         </tr>
                                                                             </tbody>
                                                                         </table>

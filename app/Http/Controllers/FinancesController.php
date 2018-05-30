@@ -43,6 +43,7 @@ class FinancesController extends Controller
             ->selectRaw('
             `users`.`id`,
             `users`.`agency_id`,
+            `users`.`max_transaction`,
             `users`.`first_name`,
             `users`.`last_name`,
             `users`.`username`,
