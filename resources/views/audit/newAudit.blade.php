@@ -59,6 +59,7 @@
             <div class="panel-body">
                 <h4>
                     <div class="alert alert-warning"><p><sup>*</sup>Kolumny <strong>Tak/Nie</strong> i <strong>Dlaczego</strong> są obowiązkowe.</p></div>
+                    <div class="alert alert-warning"><p>W każdym wierszu <i>musi</i> zostać dodany przynajmniej jeden plik dźwiękowy lub graficzny</p></div>
                     <div class="alert alert-info"><p>Dla otrzymania lepszego wyglądu formularza zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk "OFF" w górnym lewym rogu strony. </p></div>
                     <div class="alert alert-warning"><p>Zdjęcia mogą być <i>tylko</i> w formatach: <strong>.pdf</strong> <strong>.jpg</strong> <strong>.jpeg</strong> <strong>.png</strong>.</p></div>
                 </h4>
@@ -108,7 +109,7 @@
                             </td>
                             <td>
                                 <div class="form-group">
-                                    <input name="{{$c->id . "_files[]"}}" id="{{$c->id . "_files[]"}}" type="file" multiple="" />
+                                    <input class="files-inputs" name="{{$c->id . "_files[]"}}" id="{{$c->id . "_files[]"}}" type="file" multiple="" />
                                 </div>
                             </td>
                         </tr>
@@ -185,9 +186,36 @@
                     }
                 }
 
+                if(everythingIsOk == true) {
+                    const filesInputs = Array.from(document.querySelectorAll('.files-inputs'));
+                    const extensionArr = ['.jpeg', '.jpg', '.png', '.pdf', '.mp3', '.m4a', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota'];
+                    //First step of validation - check if file array > 0;
+                    filesInputs.forEach(input => {
+                        everythingIsOk = input.files.length == 0 ? false : true;
+                    });
+                    //Second step of validation - check if file extension is apropriate;
+                    if(everythingIsOk == true) {
+                        filesInputs.forEach(input => {
+                            for(let i = 0; i < input.files.length; i++) {
+                                let nameOfFile = input.files[i].name;
+                                let extensionPos = nameOfFile.lastIndexOf('.');
+                                let extension = nameOfFile.slice(extensionPos);
+                                let lowerCaseExtension = extension.toLowerCase();
+                                let extFlag = false;
+                                extensionArr.forEach(ext => {
+                                    if(lowerCaseExtension == ext) {
+                                        extFlag = true;
+                                    }
+                                });
+                                everythingIsOk = extFlag == true ? true : false;
+                            }
+                        });
+                    }
+                }
+
                 //Validation of required inputs
                 if(everythingIsOk != true) {
-                    swal('Wypełnij wszystkie pola w kolumnach "Tak/Nie" i "Dlaczego"');
+                    swal('Wypełnij wszystkie pola w kolumnach "Tak/Nie" i "Dlaczego", do każdego wiersza należy dołączyć przynajmniej jeden plik');
                 }
 
                 if(everythingIsOk == true) {
