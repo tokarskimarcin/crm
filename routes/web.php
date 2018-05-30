@@ -809,6 +809,7 @@ Route::post('/crmRoute_index', 'CrmRouteController@indexPost');
 Route::post('/crmRoute_index_ajax', 'CrmRouteController@getSelectedRoute')->name('api.getRoute');
 
 Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet');
+Route::post('/specificRoute', 'CrmRouteController@specificRoutePost')->name('api.getJSONRoute');
 
 Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet');
 Route::post('/addNewRoute', 'CrmRouteController@addNewRoutePost');

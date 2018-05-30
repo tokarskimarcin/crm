@@ -154,6 +154,28 @@ class CrmRouteController extends Controller
             ->with('clientName', $clientName);
     }
 
+    public function specificRoutePost(Request $request) {
+        $all_data = json_decode($request->JSONData); //we obtain 2 dimensional array
+        foreach($all_data as $city) {
+            $clientRouteInfo = ClientRouteInfo::where([
+                ['city_id', '=', $city->cityId],
+                ['voivode_id', '=', $city->voivodeId],
+                ['client_route_id', '=', $city->clientRouteId]
+            ])
+                ->get();
+            $numberOfRecords = count($clientRouteInfo);
+            $iterator = 0;
+            foreach($clientRouteInfo as $item) {
+                $item->hour = $city->timeArr[$iterator] . ':00';
+                $item->hotel_id = $city->hotelId;
+                $item->save();
+                $iterator++;
+            }
+        }
+
+        return $all_data;
+    }
+
     public function getSelectedRoute(Request $request) {
         $idNotTrimmed = $request->route_id;
         $posOfId = strpos($idNotTrimmed,'_');
