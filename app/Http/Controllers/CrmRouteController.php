@@ -74,7 +74,6 @@ class CrmRouteController extends Controller
     }
 
     public function specificRouteGet($id) {
-        //Przy ostatmi obrocie foreach nie zapisuje do tablicy
         $clientRouteInfo = ClientRouteInfo::where('client_route_id', '=', $id)->get();
         $clients = Clients::all();
         $cities = Cities::all();
@@ -85,7 +84,9 @@ class CrmRouteController extends Controller
         $insideArr = array();
         $cityId = null;
         $flag = 0; //indices whether $insideArr push into $clientRouteInfoExtended 1 - push, 0 - don't push
-        $iterator = 0;
+        $iterator = 0; //It count loops of foreach
+        $iteratorFinish = count($clientRouteInfo); // indices when condition inside foreach should push array into $clientRouteInfoExtended array.
+        $clientName = null;
 
         foreach($clientRouteInfo as $info) {
             if($cityId == null) {
@@ -101,6 +102,11 @@ class CrmRouteController extends Controller
                 $insideArr = [];
                 $flag = 1;
                 $cityId = $info->city_id;
+            }
+
+            if($clientName == null) {
+                $clientRId = ClientRoute::find($info->client_route_id)->client_id;
+                $clientName = Clients::find($clientRId)->name;
             }
 
             $stdClass = new \stdClass();
@@ -134,20 +140,18 @@ class CrmRouteController extends Controller
             if($flag == 1) {
                 $flag = 0;
             }
+            if($iterator == ($iteratorFinish - 1)) {
+                array_push($clientRouteInfoExtended, $insideArr);
+            }
+            $iterator++;
         }
 
         $clientRouteInfo = collect($clientRouteInfoExtended);
 
-//        dd($clientRouteInfo);
-
-//        if($clientRouteInfo[0][0]) {
-//            $clientName = $clientRouteInfo[0][0]->clientName;
-//        }
-//        dd($clientRouteInfo);
         return view('crmRoute.specificInfo')
             ->with('clientRouteInfo', $clientRouteInfoExtended)
-            ->with('hotels', $hotels);
-//            ->with('clientName', $clientName);
+            ->with('hotels', $hotels)
+            ->with('clientName', $clientName);
     }
 
     public function getSelectedRoute(Request $request) {
