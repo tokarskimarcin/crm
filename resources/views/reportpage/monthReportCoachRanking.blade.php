@@ -42,8 +42,9 @@
     </form>
     <div class="row">
         <div class="col-md-12">
-            <div class="alert alert-info"> <strong>Podsumowanie Trenerów - Raport Miesięczny/Tygodniowy -  zestawienie statystyk dla wszystkich trenerów z danego oddziału w wybranym miesiącu, podzielonych na tygodnie. </strong></br>
-                <div class="additional_info">Średnia = liczba godzin / umówienia </br>
+            <div class="alert alert-info"> <strong>Ranking Trenerów - Raport Miesięczny -  zestawienie statystyk dla wszystkich trenerów z danego oddziału lub typu w wybranym miesiącu. </strong></br>
+                <div class="additional_info">
+                    Średnia = liczba godzin / umówienia </br>
                     % janków = 100% * ilość janków / wszystkie sprawdzone rozmowy </br>
                     % ilość um/poł = 100% * umówienia / ilość połączeń</div>
             </div>
