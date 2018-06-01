@@ -14,6 +14,7 @@ use App\Route;
 use App\RouteInfo;
 use App\Voivodes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
@@ -211,6 +212,55 @@ class CrmRouteController extends Controller
 
         $routeExt = collect($routeExtendedArr);
         return $routeExt;
+    }
+
+    public function showClientRoutesGet() {
+
+        return view('crmRoute.showClientRoutes');
+    }
+
+    public function showClientRoutesAjax(Request $request) {
+        $clients = Clients::all();
+        $client_route_info = DB::table('client_route_info')
+            ->select(DB::raw('
+                client.id as id,
+                client.name as name
+            '))
+            ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
+            ->join('client', 'client.id', '=', 'client_route.client_id')
+            ->groupBy('client.name')
+            ->get();
+
+        return datatables($client_route_info)->make(true);
+    }
+
+    public function showClientRoutesInfoAjax(Request $request) {
+        $allDataArr = array();
+        $cities = Cities::all();
+        $hotels = Hotel::all();
+        $client_route = ClientRoute::where('client_id', '=', $request->id)->pluck('id')->toArray();
+        $client_route_info = ClientRouteInfo::whereIn('client_route_info', $client_route)->get();
+
+        $data2 = $client_route_info->map(function($item) use($hotels, $cities) {
+            foreach($cities as $city) {
+                if($city->id == $item->city_id) {
+                    $item->cityName = $city->name;
+                }
+            }
+            foreach($hotels as $hotel) {
+                if(isset($item->hotel_id)) {
+                    if($hotel->id == $item->hotel_id) {
+                        $item->hotelName = $hotel->name;
+                    }
+                }
+                else {
+                    $item->hotelName = "Brak przypisanego hotelu";
+                }
+            }
+            return $item;
+        });
+
+        return datatables($data2)->make(true);
     }
 
 

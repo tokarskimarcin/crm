@@ -46,6 +46,10 @@
             background: #B0BED9 !important;
         }
 
+        .invisible {
+            display:none;
+        }
+
     </style>
 
 
@@ -59,6 +63,25 @@
     </div>
 
     <div class="client-wrapper">
+
+        <div class="client-container addnotation-container">
+            <script>
+                const addnotation = sessionStorage.getItem('addnotation');
+                const addnotationContainer = document.querySelector('.addnotation-container');
+                if(addnotation != null) {
+                    let infoContainer = document.createElement('div');
+                    infoContainer.classList.add('alert');
+                    infoContainer.classList.add('alert-info');
+                    infoContainer.textContent = addnotation;
+                    addnotationContainer.appendChild(infoContainer);
+                    sessionStorage.clear();
+                }
+                else {
+                    addnotationContainer.classList.add('invisible');
+                }
+            </script>
+        </div>
+
         <div class="client-container">
             <section>
                 @foreach($clientRouteInfo as $info)
@@ -68,21 +91,9 @@
                     <div class="client-container cities-container">
                         @foreach($info as $item)
                         @if ($loop->first)
-                        {{--<div class="form-group">--}}
-                            {{--<label>Miasto</label>--}}
-                            {{--<select class="form-control">--}}
-                                {{--<option value="{{$item->city_id}}">{{$item->cityName}}</option>--}}
-                            {{--</select>--}}
-                        {{--</div>--}}
                                 <input type="hidden" value="{{$item->client_route_id}}" class="idOfClientRoute">
                             <h2 class="voivode_info" data-identificator="{{$item->voivode_id}}">Województwo: {{$item->voivodeName}}</h2>
                             <h2 class="city_info" data-identificator="{{$item->city_id}}">Miasto: {{$item->cityName}}</h2>
-                        {{--<div class="form-group">--}}
-                            {{--<label>Województwo</label>--}}
-                            {{--<select class="form-control">--}}
-                                {{--<option value="{{$item->voivode_id}}">{{$item->voivodeName}}</option>--}}
-                            {{--</select>--}}
-                        {{--</div>--}}
                         <label>Wybierz hotel:</label>
                         <table id="datatable_@php echo $iterator @endphp" class="thead-inverse table table-striped table-bordered datatable" data-typ="datatable" cellspacing="0" width="100%">
                             <thead>
@@ -90,7 +101,7 @@
                                 <th>Nazwa</th>
                                 <th>Wojewodztwo</th>
                                 <th>Miasto</th>
-                                <th>Akcja</th>
+                                <th>Wybierz</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -99,7 +110,7 @@
                             @endif
                         <div class="form-group">
                             <label>Godzina pokazu nr. @php echo $i; @endphp</label>
-                            <input type="time" class="form-control time-input">
+                            <input type="time" class="form-control time-input" @if(isset($item->hour)) value="{{$item->hour}}" @endif>
                         </div>
                         @php
                             $i++;
@@ -130,6 +141,30 @@
     <script>
         document.addEventListener('DOMContentLoaded',function(event) {
 
+            let hotelIdArr = []; //here we collect id's of each city's hotel;
+                    @foreach($clientRouteInfo as $info)
+                        @foreach($info as $item)
+                            @if($loop->first)
+                                @if(isset($item->hotel_id))
+                                    var hotelObj = {
+                                            hotel_id: {{$item->hotel_id}},
+                                            city_id: {{$item->city_id}}
+                                        };
+                                    hotelIdArr.push(hotelObj);
+                                @else
+                                    var hotelObj = {
+                                            hotel_id: "0",
+                                            city_id: {{$item->city_id}}
+                                        };
+                                    hotelIdArr.push(hotelObj);
+                                @endif
+                            @endif
+                        @endforeach
+                    @endforeach
+                console.log(hotelIdArr);
+
+
+
             const voivodeeId = null;
             const cityId = null;
             let numberOfLoops = '{{$iterator}}';
@@ -139,6 +174,8 @@
 
             newTable = $('.datatable');
             newTable.each(function() {
+                var cityElementOfGivenContainer = $(this).siblings('.city_info').attr('data-identificator');
+                console.log(cityElementOfGivenContainer);
 
                 tableArray.push($(this).DataTable({
                     "autoWidth": true,
@@ -150,7 +187,7 @@
                         $(row).attr('id', "hotelId_" + data.id);
                         return row;
                     },"fnDrawCallback": function(settings) {
-                        if(lp == 2){
+                        if(lp == hotelIdArr.length){
                             $('table tbody tr').on('click', function() {
                                 test = $(this).closest('table');
                                 if($(this).hasClass('check')) {
@@ -168,6 +205,11 @@
                             })
                         }
                             lp++;
+                        checkedInput = $(this).closest('table').find('input[type="checkbox"]:checked');
+                        closestTr = checkedInput.closest('tr');
+                        closestTr.addClass('check');
+
+
                     }, "ajax": {
                         'url': "{{ route('api.showHotelsAjax') }}",
                         'type': 'POST',
@@ -193,7 +235,16 @@
                             },"name":"cityName", "orderable": false
                         },
                         {"data":function (data, type, dataToSet) {
-                                return '<input class="checkbox_info" type="checkbox" value="' + data.id + '" style="display:inline-block;">';
+                                var cityId = cityElementOfGivenContainer;
+                                        for(var i = 0; i<hotelIdArr.length;i++){
+                                            if(hotelIdArr[i].city_id == cityId){
+                                                if(data.id == hotelIdArr[i].hotel_id) {
+                                                    return '<input class="checkbox_info" type="checkbox" value="' + data.id + '" style="display:inline-block;" checked>';
+                                                }
+                                            }
+                                        }
+                                       {{--return '<input class="checkbox_info" type="checkbox" value="' + data.id + '" style="display:inline-block;" @foreach($clientRouteInfo as $info) @foreach($info as $item) @if($loop->first) @if(isset($item->hotel_id)) @if($item->hotel_id == data.id) checked @endif @endif @endif @endforeach @endforeach>';--}}
+                                       return '<input class="checkbox_info" type="checkbox" value="' + data.id + '" style="display:inline-block;">';
                             },"orderable": false, "searchable": false
                         }
                     ]
@@ -202,6 +253,7 @@
 
             });
 
+            //This object will store every info about given city.
             function CityObject(voivode_id, city_id, time_arr, client_route_id, hotel_id) {
                 this.voivodeId = voivode_id;
                 this.cityId = city_id;
@@ -217,7 +269,7 @@
                 };
                 this.validate = function() {
                     let isOkFlag = true;
-                    if(this.voivodeId != undefined && this.voivodeId != '' && this.cityId != undefined && this.timeArr != '' && this.timeArr.length > 0 && this.clientRouteId != '' && this.clientRouteId != undefined && this.hotelId != null && this.hotelId != '') {
+                    if(this.voivodeId != undefined && this.voivodeId != '' && this.voivodeId != null && this.cityId != undefined && this.cityId != null && this.cityId != '' && this.timeArr != '' && this.timeArr.length > 0 && this.clientRouteId != '' && this.clientRouteId != undefined && this.clientRouteId != null && this.hotelId != null && this.hotelId != '') {
                         this.timeArr.forEach(time => {
                            if(time == null || time == '') {
                               isOkFlag = false;
@@ -250,6 +302,7 @@
 
             let cityInfoArray = []; //Here will be all data about given cities filled by user.
 
+            //this function collect data from forms and validate it.
             function submitHandler(e) {
                 let isOk = null;
                 cityInfoArray = []; //every time user click submit button, we collect data from scratch
@@ -290,13 +343,6 @@
             }
 
             function submitForm() {
-                let formContainer = document.createElement('div');
-                let input = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="form_data" value="' + cityInfoArray + '">';
-
-                formContainer.innerHTML = '<form method="post" action="{{URL::to("/specificRoute")}}" id="formularz">' + input + '</form>';
-                const placeToAppendForm = document.querySelector('.placeToAppendForm');
-                placeToAppendForm.appendChild(formContainer);
-                var formularz = $('#formularz');
                 let JSONData = JSON.stringify(cityInfoArray);
                 $.ajax({
                     type: "POST",
@@ -308,7 +354,8 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        console.log(response);
+                        sessionStorage.setItem('addnotation', 'Zmiany zostały zapisane!');
+                        window.location.reload();
                     }
                 });
 
