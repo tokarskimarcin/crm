@@ -4273,6 +4273,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $toDay = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
         $data = $this::setDataReportDepartmentsRanking($toDay);
        // $user = User::where('id','=',1364)->get();
+        dd($data);
         //if($data['weekLastDay'] == $toDay){
             $title = 'Raport Tygodniowy Filii '.$data['week'].' - '.$data['weekLastDay'];
             $this->sendMailByVerona('weekReportDepartmentsRanking', $data, $title);

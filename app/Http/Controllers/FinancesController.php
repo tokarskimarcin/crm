@@ -521,9 +521,6 @@ class FinancesController extends Controller
             `h`.`janki`,
             `salary_to_account`')->get();
             $result = $r->map(function($item) use($month) {
-                /**
-                 * Pobranie info o konkretnym konsultancie
-                 */
                 $user_empl_status = UserEmploymentStatus::
                     where( function ($querry) use ($item) {
                     $querry = $querry->orwhere('pbx_id', '=', $item->login_phone)
@@ -533,10 +530,7 @@ class FinancesController extends Controller
                     ->where('pbx_id', '!=', 0)
                     ->where('pbx_id', '!=', null)
                     ->get();
-                // Pobieranie informacji o wskazanym uzytkowniku z tabeli user_empl_status
-                // ograniczenie do jego id wyłuskanie pbx_id
                 $user_empl_status = $user_empl_status->where('user_id','=',$item->id);
-                //Gdy konsultant ma lub miał tylko jeden numer kolejki
                 if(count($user_empl_status) == 0 || count($user_empl_status) == 1) {
 
                     $reports = DB::table('pbx_report_extension')
@@ -544,44 +538,23 @@ class FinancesController extends Controller
                             'SUM(`all_checked_talks`) as sum_all_checked_talks,
                             SUM(`all_bad_talks`) as sum_all_bad_talks,
                             SUM(success) as sum_success
-                            '));
-                        // gdy pracuje od wskazanego miesiąca
-                        if(count($user_empl_status) == 1){
-                            $reports = $reports->where('pbx_report_extension.pbx_id','=', $user_empl_status->first()->pbx_id);
-                        }else{
-                            // gdy pracyje dlugo i nie ma info o zmianie pbx
-                            $reports = $reports->where('pbx_report_extension.pbx_id','=', $item->login_phone);
-                        }
-
-                    $reports = $reports->whereIn('pbx_report_extension.id', function($query) use($month,$user_empl_status ){
+                            '))
+                        ->where('pbx_report_extension.pbx_id','=', $item->login_phone)
+                        ->whereIn('pbx_report_extension.id', function($query) use($month){
                             $query->select(DB::raw(
                                 'MAX(pbx_report_extension.id)'
                             ))
                                 ->from('pbx_report_extension')
-                                ->where('report_date', 'like', $month);
-                            if(count($user_empl_status) == 1)
-                            {
-                                $oneInfoUser = $user_empl_status->first();
-                                if($oneInfoUser->pbx_id_remove_date == null || $oneInfoUser->pbx_id_remove_date == '0000-00-00'){
-                                    $query->whereBetween('report_date',[$oneInfoUser->pbx_id_add_date,substr($month,0,7).'-31']);
-                                }
-                                else if($oneInfoUser->pbx_id_remove_date == $oneInfoUser->pbx_id_add_date){
-                                    $query->whereBetween('report_date',[substr($month,0,7).'-01',$oneInfoUser->pbx_id_remove_date]);
-                                }
-                                else //gdy numer pbx jest zmieniony
-                                    $query->whereBetween('report_date',[$oneInfoUser->pbx_id_add_date,$oneInfoUser->pbx_id_remove_date]);
-
-                            }
-                             $query = $query->groupBy('report_date', 'pbx_id');
+                                ->where('report_date', 'like', $month)
+                                ->groupBy('report_date', 'pbx_id');
                         })
                         ->first();
                     $item->ods = $reports->sum_all_checked_talks;
                     $item->janki = $reports->sum_all_bad_talks;
                     $item->pbx_success = $reports->sum_success;
-                }//Konsultant ma przypisane wiecej niż jeden numer pbx
+                }
                 else if (count($user_empl_status) > 1) {
                     $sum_janki = $sum_success = $sum_ods = 0;
-                    //Iteracja po pbx_id
                     foreach($user_empl_status as $user_status) {
 
                         $reports = DB::table('pbx_report_extension')
@@ -589,24 +562,18 @@ class FinancesController extends Controller
                                 'SUM(`all_checked_talks`) as sum_all_checked_talks,
                             SUM(`all_bad_talks`) as sum_all_bad_talks,
                             SUM(success) as sum_success
-                            '))//Znajdz konsultanta po numerze pbx
+                            '))
                             ->where('pbx_report_extension.pbx_id','=', $user_status->pbx_id)
-                            //Wyszukanie po maksymalnej dacie z dnia
                             ->whereIn('pbx_report_extension.id', function($query) use($user_status,$month){
                                 $query->select(DB::raw(
                                     'MAX(pbx_report_extension.id)'
                                 ))
                                     ->from('pbx_report_extension');
-                                //gdy numer pbx jest przypisany bez zmiany
                                 if($user_status->pbx_id_remove_date == null || $user_status->pbx_id_remove_date == '0000-00-00'){
-                                    $query->whereBetween('report_date',[$user_status->pbx_id_add_date,substr($month,0,7).'-31']);
-                                }
-                                else if($user_status->pbx_id_remove_date == $user_status->pbx_id_add_date){
+                                    $query->whereBetween('report_date',[$user_status->pbx_id_add_date,substr($month,0,7).'-31',]);
+                                }else
                                     $query->whereBetween('report_date',[substr($month,0,7).'-01',$user_status->pbx_id_remove_date]);
-                                }
-                                else //gdy numer pbx jest zmieniony
-                                    $query->whereBetween('report_date',[$user_status->pbx_id_add_date,$user_status->pbx_id_remove_date]);
-                                $query->groupBy('report_date', 'pbx_id');
+                                 $query->groupBy('report_date', 'pbx_id');
                             })
                             ->first();
                         $sum_ods += $reports->sum_all_checked_talks;
