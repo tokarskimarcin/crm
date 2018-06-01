@@ -96,6 +96,9 @@ class DatabaseURLController extends Controller
         $data['overall_result'] = $obj->overall_result;
         $data['departments_statistic'] =  $obj->departments_statistic;
         $data['employee_statistic'] =  $obj->employee_statistic;
+
+        $data['departamentship'] =  $obj->departamentship;
+        $data['employeeship'] =  $obj->employeeship;
         return $data;
     }
 
@@ -111,7 +114,9 @@ class DatabaseURLController extends Controller
         return view('reportpage.DayReportDatabaseUse')
             ->with('overall_result',$data['overall_result'])
             ->with('departments_statistic',$data['departments_statistic'] )
-            ->with('employee_statistic',$data['employee_statistic']);
+            ->with('employee_statistic',$data['employee_statistic'])
+            ->with('departamentship',$data['departamentship'] )
+            ->with('employeeship',$data['employeeship']);
     }
     //Tygodniowy
     public function MailWeekRaportDatabaseUse(){
@@ -126,7 +131,9 @@ class DatabaseURLController extends Controller
         return view('reportpage.WeekReportDatabaseUse')
             ->with('overall_result',$data['overall_result'])
             ->with('departments_statistic',$data['departments_statistic'] )
-            ->with('employee_statistic',$data['employee_statistic']);
+            ->with('employee_statistic',$data['employee_statistic'])
+            ->with('departamentship',$data['departamentship'] )
+            ->with('employeeship',$data['employeeship']);
     }
     //Miesięczny
     public function MailMonthRaportDatabaseUse(){
@@ -145,6 +152,8 @@ class DatabaseURLController extends Controller
             ->with('overall_result',$data['overall_result'])
             ->with('departments_statistic',$data['departments_statistic'] )
             ->with('employee_statistic',$data['employee_statistic'])
+            ->with('departamentship',$data['departamentship'] )
+            ->with('employeeship',$data['employeeship'])
             ->with('month',$month_name);
     }
 
