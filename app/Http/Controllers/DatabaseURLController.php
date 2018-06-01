@@ -180,7 +180,19 @@ class DatabaseURLController extends Controller
             }else if($id_base == 19)
             {
                 $exito_count += $count_record;
-            }else{
+            }else if($id_base == 1 ||
+                $id_base == 2 ||
+                $id_base == 3 ||
+                $id_base == 4 ||
+                $id_base == 7 ||
+                $id_base == 10 ||
+                $id_base == 11 ||
+                $id_base == 12 ||
+                $id_base == 13 ||
+                $id_base == 14 ||
+                $id_base == 15 ||
+                $id_base == 16 ||
+                $id_base == 18){
                 $rest_count += $count_record;
             }
         }
