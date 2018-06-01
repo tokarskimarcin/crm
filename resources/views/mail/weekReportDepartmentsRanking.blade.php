@@ -15,8 +15,10 @@
     @php
         $bonus = 150;
         $lp = 0;
+        $in_ranking = $data->where('janky_proc','<=',5);
+        $outOfRankign = $data->where('janky_proc','>',5);
     @endphp
-@foreach($data->where('janky_proc','<=',5) as $item)
+@foreach($in_ranking as $item)
                 <tr>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item->department_name }}</b></td>
                     <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item->week_goal_proc }}</b></td>
@@ -28,7 +30,7 @@
                     @endphp
                 </tr>
 @endforeach
-    @foreach($data->where('janky_proc','>',5) as $item)
+    @foreach($outOfRankign as $item)
         <tr style="background: rgb(244,204,204) ">
             <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item->department_name }}</b></td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $item->week_goal_proc }}</b></td>
