@@ -815,6 +815,11 @@ Route::post('/crmRoute_index', 'CrmRouteController@indexPost');
 Route::post('/crmRoute_index_ajax', 'CrmRouteController@getSelectedRoute')->name('api.getRoute');
 
 Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet');
+Route::post('/specificRoute', 'CrmRouteController@specificRoutePost')->name('api.getJSONRoute');
+
+Route::get('/showClientRoutes', 'CrmRouteController@showClientRoutesGet');
+Route::post('/showClientRoutesAjax', 'CrmRouteController@showClientRoutesAjax')->name('api.getClientRoutes');
+Route::post('/showClientRoutesInfoAjax', 'CrmRouteController@showClientRoutesInfoAjax')->name('api.getClientRouteInfo');
 
 Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet');
 Route::post('/addNewRoute', 'CrmRouteController@addNewRoutePost');

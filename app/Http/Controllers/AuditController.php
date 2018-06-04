@@ -401,6 +401,12 @@ class AuditController extends Controller
      */
     public function delete_picture(Request $request){
         if(AuditFiles::where('id','=',$request->id_picture)->delete()){
+
+            $log = [
+                "ID usuniętego pliku" => $request->id_picture
+            ];
+            new ActivityRecorder(10, $log);
+
             return 1;
         }else return 0;
     }
