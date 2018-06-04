@@ -9,6 +9,7 @@ use App\Pbx_report_extension;
 use App\PBXDKJTeam;
 use App\RecruitmentStory;
 use App\ReportCampaign;
+use App\UserEmploymentStatus;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -3329,162 +3330,129 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $date_stop = date('Y-') . $request->month_selected . date('-t', strtotime(date('Y-') . $request->month_selected));
         //Ustalenie coach_id
         $leader = User::find($request->coach_id);
-        //Ustalenie departamentu trenera
-        $pbx_department_id = $leader->department_info->pbx_id;
-        //Pobranie grupy konsultantów należących do trenera, wyodrębiając login_phone konsultantów
-        $ids = $leader->trainerConsultants->pluck('login_phone')->toArray();
-        //Pobranie id ostatniego rekordu z dnia dla danego numeru pbx_id
-        $max_from_day = DB::table('pbx_report_extension')
-            ->select(DB::raw('
-                MAX(id) as id
-            '))
-            ->whereBetween('report_date', [$date_start, $date_stop])
-            ->whereIn('pbx_id', $ids);
-            if($date_start > '2018-05-31') {
-                $max_from_day = $max_from_day->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
-            }
-            $max_from_day = $max_from_day->groupBy('report_date')
-            ->groupBy('pbx_id')
-            ->get();
-        //Pobranie infrmacji o konsultantach, w zależności od ich numeru pbx (maksymalne id dnia do login_phone)
-        $pbx_data = Pbx_report_extension::whereBetween('report_date', [$date_start, $date_stop])
-            ->whereIn('pbx_id', $ids)
-            ->whereIn('id', $max_from_day->pluck('id')->toArray())
-            ->get();
-        // Grupowanie po pbx_id(login-phone
-        $total_data = $pbx_data->groupBy('pbx_id');
-        // Zliczenie ilości dni w miesiącu
-        $days_in_month = intval(date('t', strtotime($date_start)));
-        /**
-         * Mapowanie wyników
-         *
-         */
-        $terefere = $total_data->map(function($item, $key) use ($days_in_month, $date_start,$leader) {
-            $user_sum = [];
-            // Odszukanie konsultanta po login_phone
-            $consultant = User::where('login_phone', '=', $item->first()->pbx_id)
-                ->where('coach_id','=',$leader->id)
-                ->get();
-            // Zerowanie informacji
-            for ($y = 1; $y <= 4; $y++) {
-                $user_sum[$y]['average'] = 0;
-
-                $user_sum[$y]['all_checked'] = 0;
-                $user_sum[$y]['all_bad'] = 0;
-
-                $user_sum[$y]['janky_proc'] = 0;
-                $user_sum[$y]['count_calls'] = 0;
-                $user_sum[$y]['success'] = 0;
-                $user_sum[$y]['proc_call_success'] = 0;
-                $user_sum[$y]['pause_time'] = 0;
-                $user_sum[$y]['received_calls'] = 0;
-                $user_sum[$y]['login_time'] = 0;
-                $user_sum[$y]['proc_received_calls'] = 0;
-
-                $user_sum[$y]['first_name'] = $consultant->first()->first_name;
-                $user_sum[$y]['last_name'] = $consultant->first()->last_name;
-
-                $user_sum[$y]['real_login_start_time'] = 0;
-                $user_sum[$y]['real_login_end_time'] = 0;
-                $user_sum[$y]['real_login_time'] = 0;
-
-                $user_sum[$y]['week_num'] = $y;
-                $user_sum[$y]['total_week_yanky'] = 0;
-                $user_sum[$y]['first_week_day'] = null;
-                $user_sum[$y]['last_week_day'] = null;
-            }
-            // który tydzień
-            $week_num = 1;
-            // ??
-            $week_yanky = 0;
-            $add_week_sum = true;
-            //pierwszy dzien w tygodniu
-            $start_day = true;
-            $miss_first_week = false;
-
-            for ($i = 1; $i <= $days_in_month; $i++) {
-                //Naprawa day, z 1 zrobic 01-02-2018
-                $i_fixed = ($i < 10) ? '0' . $i : $i ;
-                $actual_loop_day = date('Y-m-', strtotime($date_start)) . $i_fixed;
-                //Jaki dzien tygodznia
-                $week_day = date('N', strtotime($actual_loop_day));
-                //Wpisanie informacji o pierwszym tygodniu, jeśli jest pusty
-                if ($user_sum[$week_num]['first_week_day'] == null) {
-                    $user_sum[$week_num]['first_week_day'] = $actual_loop_day;
-                }
-                // gdzy infromacje o konultacie zawarte są w konkretnym dniu
-                if ($item->where('report_date', '=', $actual_loop_day)->count() > 0) {
-                    //Wyłuskanie informacji o konsultancie
-                    $report = $item->where('report_date', '=', $actual_loop_day)->first();
-                    $work_time_array = explode(":", $report->login_time);
-                    $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]) / 3600, 2);
-                    $user_sum[$week_num]['success'] += $report->success;
-                    $user_sum[$week_num]['all_checked'] += $report->all_checked_talks;
-                    $user_sum[$week_num]['all_bad'] += $report->all_bad_talks;
-                    $user_sum[$week_num]['login_time'] += $work_time;
-                    $user_sum[$week_num]['pause_time'] += $report->time_pause;
-                    $user_sum[$week_num]['received_calls'] += $report->received_calls;
-                }
-                // Gdy jest niedziela i nie pierwszy dzien w tygodniu i
-                if ($week_day == 7 && $start_day == false && $miss_first_week == false) {
-                    $add_week_sum = true;
-                }
-                // Gdy jest to pierwszy dzien w tygodniu i jest to pierwszy weekend
-                if ($start_day == true && $week_day == 1) {
-                    $add_week_sum = true;
-                    $start_day = false;
-                } else if ($start_day == true && $week_day != 1) { //pierwszy dzien w tygodniu i nie pierwszy tydzień
-                    $add_week_sum = false;
-                    $miss_first_week = true;
-                    $start_day = false;
-                }
-
-                if ($week_num == 4 && $week_day == 7 && $i < $days_in_month) {
-                    $add_week_sum = false;
-                }
-
-                if (($week_day == 7 || $i == $days_in_month) &&  $add_week_sum == true && $miss_first_week == false) {
-                    $user_sum[$week_num]['last_week_day'] = $actual_loop_day;
-
-                    if($user_sum[$week_num]['all_checked'] != 0 ){
-                        $user_sum[$week_num]['total_week_yanky'] = ($user_sum[$week_num]['all_bad']*100)/$user_sum[$week_num]['all_checked'];
-                    }else
-                        $user_sum[$week_num]['total_week_yanky'] =0;
-                    $user_sum[$week_num]['average'] = ($user_sum[$week_num]['login_time']) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['login_time']), 2) : 0 ;
-                    $user_sum[$week_num]['proc_received_calls'] = ($user_sum[$week_num]['received_calls'] > 0) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['received_calls']) * 100 , 2) : 0 ;
-                    $week_num++;
-                    $week_yanky = 0;
-                    $add_week_sum = true;
-                }
-
-                if  ($miss_first_week == true && $week_day == 7) {
-                    $miss_first_week = false;
-                }
-                if ($week_num == 4 && $week_day == 7 && $i < $days_in_month) {
-                    $add_week_sum = true;
-                }
-
-            }
-            return $user_sum;
-        });
+        $monthData = self::getWeekMonthCoachData($date_start, $date_stop, $request->coach_id);
         $coaches = User::whereIn('user_type_id', [4,12])
             ->where('status_work', '=', 1)
             ->get();
-
         if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
             $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
-
         return view('reportpage.MonthReportCoach')
             ->with([
                 'coaches' => $coaches,
                 'date_start' => $date_start,
                 'date_stop' => $date_stop,
-                'coachData' => $terefere,
+                'coachData' => $monthData,
                 'leader' => $leader,
                 'months'    => self::getMonthsNames(),
                 'month_selected' => $request->month_selected
             ]);
     }
+    /**
+     *                   NOWA zmieniony sposób przypisaywania wyników konmsultantów NieUzywane
+     * Metoda pobierająca dane na temat wynikow tydogniowych- miesięcznych dla danego trenera
+     */
+//    private function getWeekMonthCoachDataNew($date_start, $date_stop, $coach_id) {
+//        $date_start = '2018-04-01';
+//        $date_stop = '2018-04-31';
+////        $month = ?;
+//        // Wyszukanie trenera
+//        $leader = User::find($coach_id);
+//        //pobranie pbx_id dla oddziału z którego pochodzi trener
+//        $pbx_department_id = $leader->department_info->pbx_id;
+//        //pobranie konsltantów dla danego trenera którzy logowali się po dzacie raportu
+//        $coachConsultant = $leader->trainerConsultants->where('last_login','>=',$date_start);
+//
+//        $allConsultant = collect();
+//        foreach ($coachConsultant as $item) {
+//            /**
+//             * Pobranie info o konkretnym konsultancie
+//             */
+//            $user_empl_status = UserEmploymentStatus::
+//            where(function ($querry) use ($item, $date_start) {
+//                $querry = $querry->orwhere('pbx_id', '=', $item->login_phone)
+//                    ->orWhere('user_id', '=', $item->id);
+//            })
+//                ->where('pbx_id_add_date', '>=', $date_start)
+//                ->where('pbx_id', '!=', 0)
+//                ->where('pbx_id', '!=', null)
+//                ->get();
+//            // Pobieranie informacji o wskazanym uzytkowniku z tabeli user_empl_status
+//            // ograniczenie do jego id wyłuskanie pbx_id
+//            $user_empl_status = $user_empl_status->where('user_id', '=', $item->id);
+//            //Gdy konsultant ma lub miał tylko jeden numer kolejki
+//            if (count($user_empl_status) == 0 || count($user_empl_status) == 1) {
+//
+//                $reports = DB::table('pbx_report_extension');
+//                // gdy pracuje od wskazanego miesiąca
+//                if (count($user_empl_status) == 1) {
+//                    $reports = $reports->where('pbx_report_extension.pbx_id', '=', $user_empl_status->first()->pbx_id);
+//                } else {
+//                    // gdy pracyje dlugo i nie ma info o zmianie pbx
+//                    $reports = $reports->where('pbx_report_extension.pbx_id', '=', $item->login_phone);
+//                }
+//                //Pobranie statystyk konsultanta
+//
+//                $reports = $reports->whereIn('pbx_report_extension.id', function ($query) use ($date_start, $date_stop, $user_empl_status) {
+//                    $query->select(DB::raw(
+//                        'MAX(pbx_report_extension.id)'
+//                    ))
+//                        ->from('pbx_report_extension')
+//                        ->whereBetween('report_date', [$date_start, $date_stop]);
+//                    if (count($user_empl_status) == 1) // konsultant ma tylko jedne numer pbx
+//                    {
+//                        $oneInfoUser = $user_empl_status->first();
+//                        if ($oneInfoUser->pbx_id_remove_date == null || $oneInfoUser->pbx_id_remove_date == '0000-00-00') {
+//                            $query->whereBetween('report_date', [$oneInfoUser->pbx_id_add_date, $date_stop]);
+//                        } else if ($oneInfoUser->pbx_id_remove_date == $oneInfoUser->pbx_id_add_date) {
+//                            $query->whereBetween('report_date', [$date_start, $oneInfoUser->pbx_id_remove_date]);
+//                        } else //gdy numer pbx jest zmieniony
+//                            $query->whereBetween('report_date', [$oneInfoUser->pbx_id_add_date, $oneInfoUser->pbx_id_remove_date]);
+//
+//                    }
+//                    $query = $query->groupBy('report_date', 'pbx_id');
+//                })
+//                    ->groupBy('report_date')
+//                    ->get();
+//                $reports->map(function ($reportItem) use ($item) {
+//                    $reportItem->first_name = $item->first_name;
+//                    $reportItem->last_name = $item->last_name;
+//                    return $reportItem;
+//                });
+//                $allConsultant->push($reports);
+//            }//Konsultant ma przypisane wiecej niż jeden numer pbx
+//            else if (count($user_empl_status) > 1) {
+//                foreach ($user_empl_status as $user_status) {
+//                    $reports = DB::table('pbx_report_extension')//Znajdz konsultanta po numerze pbx
+//                    ->where('pbx_report_extension.pbx_id', '=', $user_status->pbx_id)
+//                        //Wyszukanie po maksymalnej dacie z dnia
+//                        ->whereIn('pbx_report_extension.id', function ($query) use ($user_status, $date_start, $date_stop) {
+//                            $query->select(DB::raw(
+//                                'MAX(pbx_report_extension.id)'
+//                            ))
+//                                ->from('pbx_report_extension');
+//                            //gdy numer pbx jest przypisany bez zmiany
+//                            if ($user_status->pbx_id_remove_date == null || $user_status->pbx_id_remove_date == '0000-00-00') {
+//                                $query->whereBetween('report_date', [$user_status->pbx_id_add_date, $date_stop]);
+//                            } else if ($user_status->pbx_id_remove_date == $user_status->pbx_id_add_date) {
+//                                $query->whereBetween('report_date', [$date_start, $user_status->pbx_id_remove_date]);
+//                            } else //gdy numer pbx jest zmieniony
+//                                $query->whereBetween('report_date', [$user_status->pbx_id_add_date, $user_status->pbx_id_remove_date]);
+//                            $query->groupBy('report_date', 'pbx_id');
+//                        })
+//                        ->groupBy('report_date')
+//                        ->get();
+//                    $reports->map(function ($reportItem) use ($item) {
+//                        $reportItem->first_name = $item->first_name;
+//                        $reportItem->last_name = $item->last_name;
+//                        return $reportItem;
+//                    });
+//                    $allConsultant->push($reports->toArray());
+//                }
+//            }
+//        }
+//        return $allConsultant;
+//    }
+
 
     /**
      * Metoda pobierająca dane na temat wynikow tydogniowych- miesięcznych dla danego trenera
@@ -3493,133 +3461,173 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $leader = User::find($coach_id);
         $pbx_department_id = $leader->department_info->pbx_id;
 
-        $ids = $leader->trainerConsultants->pluck('login_phone')->toArray();
+        $coachConsultants = $leader->trainerConsultants;
+        $consultantsId = $coachConsultants->pluck('id')->toArray();
+        $consultantsLoginPhone = $coachConsultants->pluck('login_phone')->toArray();
 
         $max_from_day = DB::table('pbx_report_extension')
             ->select(DB::raw('
                 MAX(id) as id
             '))
-            ->whereBetween('report_date', [$date_start, $date_stop])
-            ->whereIn('pbx_id', $ids);
+            ->whereBetween('report_date', [$date_start, $date_stop]);
+            //Wyszukaj po id_user i department_info_id
             if($date_start > '2018-05-31') {
-                $max_from_day = $max_from_day->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
+                $max_from_day = $max_from_day
+                            ->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id)
+                            ->whereIn('user_id', $consultantsId);
+            }else{
+                //Niedokładnie po pbx_id
+                $max_from_day = $max_from_day->whereIn('pbx_id', $consultantsLoginPhone);
             }
             $max_from_day = $max_from_day->groupBy('report_date')
-            ->groupBy('pbx_id')
+            ->groupBy('pbx_id','user_id')
             ->get();
 
         $pbx_data = Pbx_report_extension::whereBetween('report_date', [$date_start, $date_stop])
-            ->whereIn('pbx_id', $ids)
-            ->whereIn('id', $max_from_day->pluck('id')->toArray())
-            ->get();
+            ->whereIn('id', $max_from_day->pluck('id')->toArray());
+             if($date_start < '2018-05-31') {
+                 $pbx_data = $pbx_data->whereIn('pbx_id', $consultantsLoginPhone);
+            }else{
+                 $pbx_data = $pbx_data->whereIn('user_id', $consultantsId);
+             }
+        $pbx_data = $pbx_data->get();
 
         $total_data = $pbx_data->groupBy('pbx_id');
 
         $days_in_month = intval(date('t', strtotime($date_start)));
 
         $terefere = $total_data->map(function($item, $key) use ($days_in_month, $date_start, $leader) {
-            $user_sum = [];
-
-            $consultant = User::where('login_phone', '=', $item->first()->pbx_id)
-//                ->join('work_hours', 'users.id', 'work_hours.id_user')
-                    ->where('coach_id', '=', $leader->id)
-                ->get();
-
-            for ($y = 1; $y <= 4; $y++) {
-                $user_sum[$y]['average'] = 0;
-
-                $user_sum[$y]['all_checked'] = 0;
-                $user_sum[$y]['all_bad'] = 0;
-
-                $user_sum[$y]['janky_proc'] = 0;
-                $user_sum[$y]['count_calls'] = 0;
-                $user_sum[$y]['success'] = 0;
-                $user_sum[$y]['proc_call_success'] = 0;
-                $user_sum[$y]['pause_time'] = 0;
-                $user_sum[$y]['received_calls'] = 0;
-                $user_sum[$y]['login_time'] = 0;
-                $user_sum[$y]['proc_received_calls'] = 0;
-
-                $user_sum[$y]['first_name'] = $consultant->first()->first_name;
-                $user_sum[$y]['last_name'] = $consultant->first()->last_name;
-                $user_sum[$y]['week_num'] = $y;
-                $user_sum[$y]['total_week_yanky'] = 0;
-                $user_sum[$y]['first_week_day'] = null;
-                $user_sum[$y]['last_week_day'] = null;
+            $allUniceUserId = array();
+            //Wysłuskanie wszystkich user_id
+            if($date_start < '2018-05-31'){
+                array_push($allUniceUserId,0);
+            }else{
+                foreach ($item as $value){
+                    if(!in_array($value->user_id,$allUniceUserId) && $value->user_id != null)
+                        array_push($allUniceUserId,$value->user_id);
+                }
             }
-            $week_num = 1;
-            $week_yanky = 0;
-            $add_week_sum = true;
-            $start_day = true;
-            $miss_first_week = false;
+            $saveCollect = collect();
+            foreach ($allUniceUserId as $user) {
+                $user_sum = [];
 
-            for ($i = 1; $i <= $days_in_month; $i++) {
-                $i_fixed = ($i < 10) ? '0' . $i : $i ;
-                $actual_loop_day = date('Y-m-', strtotime($date_start)) . $i_fixed;
-                $week_day = date('N', strtotime($actual_loop_day));
-
-                if ($user_sum[$week_num]['first_week_day'] == null) {
-                    $user_sum[$week_num]['first_week_day'] = $actual_loop_day;
+                if ($date_start < '2018-05-31') {
+                    $consultant = User::where('login_phone', '=', $item->first()->pbx_id)
+                        ->where('coach_id', '=', $leader->id)
+                        ->get();
+                } else {
+                    $consultant = User::where('id', '=', $user)
+                        ->where('coach_id', '=', $leader->id)
+                        ->get();
                 }
 
-                if ($item->where('report_date', '=', $actual_loop_day)->count() > 0) {
-                    $report = $item->where('report_date', '=', $actual_loop_day)->first();
+                for ($y = 1; $y <= 4; $y++) {
+                    $user_sum[$y]['average'] = 0;
 
-                    $work_time_array = explode(":", $report->login_time);
-                    $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]) / 3600, 2);
+                    $user_sum[$y]['all_checked'] = 0;
+                    $user_sum[$y]['all_bad'] = 0;
 
-                    $user_sum[$week_num]['success'] += $report->success;
-                    $user_sum[$week_num]['all_checked'] += $report->all_checked_talks;
-                    $user_sum[$week_num]['all_bad'] += $report->all_bad_talks;
-                    $user_sum[$week_num]['login_time'] += $work_time;
-                    $user_sum[$week_num]['pause_time'] += $report->time_pause;
-                    $user_sum[$week_num]['received_calls'] += $report->received_calls;
+                    $user_sum[$y]['janky_proc'] = 0;
+                    $user_sum[$y]['count_calls'] = 0;
+                    $user_sum[$y]['success'] = 0;
+                    $user_sum[$y]['proc_call_success'] = 0;
+                    $user_sum[$y]['pause_time'] = 0;
+                    $user_sum[$y]['received_calls'] = 0;
+                    $user_sum[$y]['login_time'] = 0;
+                    $user_sum[$y]['proc_received_calls'] = 0;
+
+                    $user_sum[$y]['first_name'] = $consultant->first()->first_name;
+                    $user_sum[$y]['last_name'] = $consultant->first()->last_name;
+                    $user_sum[$y]['week_num'] = $y;
+                    $user_sum[$y]['total_week_yanky'] = 0;
+                    $user_sum[$y]['first_week_day'] = null;
+                    $user_sum[$y]['last_week_day'] = null;
+                }
+                $week_num = 1;
+                $week_yanky = 0;
+                $add_week_sum = true;
+                $start_day = true;
+                $miss_first_week = false;
+
+                for ($i = 1; $i <= $days_in_month; $i++) {
+                    $i_fixed = ($i < 10) ? '0' . $i : $i;
+                    $actual_loop_day = date('Y-m-', strtotime($date_start)) . $i_fixed;
+                    $week_day = date('N', strtotime($actual_loop_day));
+
+                    if ($user_sum[$week_num]['first_week_day'] == null) {
+                        $user_sum[$week_num]['first_week_day'] = $actual_loop_day;
+                    }
+                    if($date_start < '2018-05-31') {
+                        $question = $item->where('report_date', '=', $actual_loop_day)
+                            ->count();
+                    }else{
+                        $question = $item->where('report_date', '=', $actual_loop_day)
+                            ->where('user_id','=',$user)->count();
+                    }
+                    if ($question > 0) {
+                        //Wyłuskanie informacji o konsultancie
+                        if($date_start < '2018-05-31') {
+                            $report = $item->where('report_date', '=', $actual_loop_day)->first();
+                        }else{
+                            $report = $item->where('report_date', '=', $actual_loop_day)
+                                ->where('user_id','=',$user)->first();
+                        }
+                        $work_time_array = explode(":", $report->login_time);
+                        $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]) / 3600, 2);
+
+                        $user_sum[$week_num]['success'] += $report->success;
+                        $user_sum[$week_num]['all_checked'] += $report->all_checked_talks;
+                        $user_sum[$week_num]['all_bad'] += $report->all_bad_talks;
+                        $user_sum[$week_num]['login_time'] += $work_time;
+                        $user_sum[$week_num]['pause_time'] += $report->time_pause;
+                        $user_sum[$week_num]['received_calls'] += $report->received_calls;
 
 //                    $week_yanky += ($report->success * ($report->dkj_proc / 100));
+                    }
+
+                    if ($week_day == 7 && $start_day == false && $miss_first_week == false) {
+                        $add_week_sum = true;
+                    }
+
+                    if ($start_day == true && $week_day == 1) {
+                        $add_week_sum = true;
+                        $start_day = false;
+                    } else if ($start_day == true && $week_day != 1) {
+                        $add_week_sum = false;
+                        $miss_first_week = true;
+                        $start_day = false;
+                    }
+
+                    if ($week_num == 4 && $week_day == 7 && $i < $days_in_month) {
+                        $add_week_sum = false;
+                    }
+
+                    if (($week_day == 7 || $i == $days_in_month) && $add_week_sum == true && $miss_first_week == false) {
+                        $user_sum[$week_num]['last_week_day'] = $actual_loop_day;
+
+                        if ($user_sum[$week_num]['all_checked'] != 0) {
+                            $user_sum[$week_num]['total_week_yanky'] = ($user_sum[$week_num]['all_bad'] * 100) / $user_sum[$week_num]['all_checked'];
+                        } else
+                            $user_sum[$week_num]['total_week_yanky'] = 0;
+
+                        $user_sum[$week_num]['janky_proc'] = ($user_sum[$week_num]['success'] > 0) ? round(($week_yanky / $user_sum[$week_num]['success']) * 100, 2) : 0;
+                        $user_sum[$week_num]['average'] = ($user_sum[$week_num]['login_time']) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['login_time']), 2) : 0;
+                        $user_sum[$week_num]['proc_received_calls'] = ($user_sum[$week_num]['received_calls'] > 0) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['received_calls']) * 100, 2) : 0;
+                        $week_num++;
+                        $week_yanky = 0;
+                        $add_week_sum = true;
+                    }
+
+                    if ($miss_first_week == true && $week_day == 7) {
+                        $miss_first_week = false;
+                    }
+                    if ($week_num == 4 && $week_day == 7 && $i < $days_in_month) {
+                        $add_week_sum = true;
+                    }
                 }
-
-                if ($week_day == 7 && $start_day == false && $miss_first_week == false) {
-                    $add_week_sum = true;
-                }
-
-                if ($start_day == true && $week_day == 1) {
-                    $add_week_sum = true;
-                    $start_day = false;
-                } else if ($start_day == true && $week_day != 1) {
-                    $add_week_sum = false;
-                    $miss_first_week = true;
-                    $start_day = false;
-                }
-
-                if ($week_num == 4 && $week_day == 7 && $i < $days_in_month) {
-                    $add_week_sum = false;
-                }
-
-                if (($week_day == 7 || $i == $days_in_month) &&  $add_week_sum == true && $miss_first_week == false) {
-                    $user_sum[$week_num]['last_week_day'] = $actual_loop_day;
-
-                    if($user_sum[$week_num]['all_checked'] != 0 ){
-                        $user_sum[$week_num]['total_week_yanky'] = ($user_sum[$week_num]['all_bad']*100)/$user_sum[$week_num]['all_checked'];
-                    }else
-                        $user_sum[$week_num]['total_week_yanky'] =0;
-
-                    $user_sum[$week_num]['janky_proc'] = ($user_sum[$week_num]['success'] > 0) ? round(($week_yanky / $user_sum[$week_num]['success']) * 100, 2) : 0 ;
-                    $user_sum[$week_num]['average'] = ($user_sum[$week_num]['login_time']) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['login_time']), 2) : 0 ;
-                    $user_sum[$week_num]['proc_received_calls'] = ($user_sum[$week_num]['received_calls'] > 0) ? round(($user_sum[$week_num]['success'] / $user_sum[$week_num]['received_calls']) * 100 , 2) : 0 ;
-                    $week_num++;
-                    $week_yanky = 0;
-                    $add_week_sum = true;
-                }
-
-                if  ($miss_first_week == true && $week_day == 7) {
-                    $miss_first_week = false;
-                }
-                if ($week_num == 4 && $week_day == 7 && $i < $days_in_month) {
-                    $add_week_sum = true;
-                }
-
+                $saveCollect->push($user_sum);
             }
-            return $user_sum;
+            return $saveCollect;
         });
         return $terefere;
     }
@@ -3655,6 +3663,51 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $title = 'Miesięczny Raport Oddziały';
         $this->sendMailByVerona('summaryReportDepartment', $data, $title);
     }
+
+
+
+
+
+
+    /**
+     * Wyświetlanie rankingu miesięcznego trenerów filtrowalny
+     */
+    public function pageMonthReportCoachRankingOrderableGet() {
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $coaches = User::whereIn('user_type_id', [4, 12])
+            ->where('status_work', '=', 1)
+            ->get();
+        $data = [];
+
+        foreach ($coaches as $coach) {
+            $data[$coach->id]['trainer_data'] = self::getWeekMonthCoachDataNew(date('Y-m'.'-01'), date('Y-m-t'), $coach->id);
+            $data[$coach->id]['trainer'] = $coach;
+            $data[$coach->id]['date'] = [date('Y-m'.'-01'), date('Y-m-t')];
+        }
+        dd($data);
+        return view('reportpage.monthReportCoachRankingOrder')
+            ->with([
+                'months'        => self::getMonthsNames(),
+                'month'         => date('m'),
+                'departments'   => $departments,
+                'dep_id'        => 0,
+                'data'          => $data
+            ]);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Wyświetlanie rankingu miesięcznego trenerów
@@ -3918,9 +3971,13 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                 pbx_report_extension.*,
                 users.last_name as user_last_name,
                 users.first_name as user_first_name
-            '))
-            ->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id')
-            ->where('users.coach_id', '=', $request->coach_id)
+            '));
+            if($request->day_select < '2018-05-31') {
+                $data = $data ->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id');
+            }else{
+                $data = $data->join('users', 'users.id', 'pbx_report_extension.user_id');
+            }
+            $data = $data->where('users.coach_id', '=', $request->coach_id)
             ->where('report_date', '=', $request->day_select);
             if($request->day_select > '2018-05-09') {
                 $data = $data->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
@@ -3928,7 +3985,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             $data = $data->where('report_hour', '=', $request->hour_select)
             ->orderBy('pbx_report_extension.average', 'desc')
             ->get();
-
 
         return view('reportpage.dayReportCoaches')
             ->with([
@@ -4017,10 +4073,14 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             $ids = DB::table('pbx_report_extension')
                 ->select(DB::raw('
                     MAX(pbx_report_extension.id) as id
-                '))
-                ->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id')
-                ->where('users.coach_id', '=', $coach->id);
-                if($report_date > '2018-05-09') {
+                '));
+            if($report_date < '2018-05-31') {
+                $ids = $ids->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id');
+            }else{
+                $ids = $ids->join('users', 'users.id', 'pbx_report_extension.user_id');
+            }
+            $ids = $ids->where('users.coach_id', '=', $coach->id);
+                if($report_date > '2018-05-31') {
                     $ids = $ids->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
                 }
                 $ids = $ids->groupBy('users.id')
@@ -4034,8 +4094,13 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                     users.first_name as user_first_name,
                     work_hours.accept_start as start_time,
                     work_hours.accept_stop as stop_time
-                '))
-                ->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id')
+                '));
+            if($report_date < '2018-05-31') {
+                $coach_data = $coach_data->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id');
+            }else{
+                $coach_data = $coach_data->join('users', 'users.id', 'pbx_report_extension.user_id');
+            }
+            $coach_data = $coach_data
                 ->join('work_hours', 'work_hours.id_user', 'users.id')
                 ->where('work_hours.date', '=', $report_date)
                 ->where('users.coach_id', '=', $coach->id)
@@ -4043,7 +4108,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                 ->where('report_date', '=', $report_date)
                 ->orderBy('pbx_report_extension.average', 'desc')
                 ->get();
-
             $data[] = $coach_data->merge($coach);
         }
         $total_data = [
@@ -4545,22 +4609,30 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $pbx_department_id = $leader->department_info->pbx_id;
 
         foreach ($consultants as $consultant) {
-            if ($consultant->login_phone > 0) {
                 $max_ids = DB::table('pbx_report_extension')
                     ->select(DB::raw('
                         MAX(id) as id
                     '))
-                    ->where('pbx_id', '=', $consultant->login_phone)
                     ->whereBetween('report_date', [$date_start, $date_stop]);
                     if($date_start > '2018-05-31') {
-                        $max_ids = $max_ids->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
+                        $max_ids = $max_ids
+                            ->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id)
+                            ->where('user_id','=',$consultant->id);
+                    }else{
+                        $max_ids = $max_ids ->where('pbx_id', '=', $consultant->login_phone);
                     }
                     $max_ids = $max_ids->groupBy('report_date')
                     ->get();
 
-                $repos = Pbx_report_extension::where('pbx_id', '=',  $consultant->login_phone)
-                    ->whereIn('id', $max_ids->pluck('id')->toArray())
-                    ->get();
+
+                $repos = Pbx_report_extension::
+                    whereIn('id', $max_ids->pluck('id')->toArray());
+                    if($date_start > '2018-05-31') {
+                        $repos = $repos->where('user_id', '=',  $consultant->id);
+                    }else{
+                        $repos = $repos->where('pbx_id', '=',  $consultant->login_phone);
+                    }
+                    $repos = $repos->get();
 
                 $consultant_data = [];
 
@@ -4590,11 +4662,10 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                 $consultant_data['average'] = ($consultant_data['login_time'] > 0) ? round($consultant_data['success'] / ($consultant_data['login_time'] / 3600), 2) : 0 ;
                 $consultant_data['janky_proc'] = ($consultant_data['success'] > 0) ? ($consultant_data['janky_count'] / $consultant_data['success']) : 0 ;
 
-                if ($consultant_data['login_time'] > 0 && $consultant_data['success'] > 0)
+                if ($consultant_data['login_time'] > 0 && $consultant_data['received_calls'] > 0)
                     $reports[] = $consultant_data;
-            }
-        }
 
+        }
         return collect($reports)->sortByDesc('average');
     }
 
@@ -4754,7 +4825,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                     array_push($allDepArray, $data);
                 }
                 else{
-                    dd("1");
                     // usunięcie 10 przed id dyrektora
                     $dirId = substr($depArr, 2);
                     $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
