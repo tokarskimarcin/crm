@@ -606,6 +606,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageMonthReportCoachRanking', 'StatisticsController@pageMonthReportCoachRankingGet');
     Route::post('/pageMonthReportCoachRanking', 'StatisticsController@pageMonthReportCoachRankingPost');
 
+    Route::get('/pageMonthReportCoachRankingOrderable', 'StatisticsController@pageMonthReportCoachRankingOrderableGet');
+    Route::post('/pageMonthReportCoachRankingOrderable', 'StatisticsController@pageMonthReportCoachRankingOrderablePost');
+
     //Raporty Rekrutacji
 
     //Dzienny
