@@ -616,7 +616,7 @@ class AdminController extends Controller
         $addingCrit = $request->addingCrit;
 
         if($addingCrit == "true") {
-            $newName = mb_strtolower(str_replace(' ', '_', trim($request->newCritName, ' ')), 'UTF-8');
+            $newName = mb_strtolower(str_replace('/','_',str_replace(' ', '_', trim($request->newCritName, ' '))), 'UTF-8');
             $newCriterium = new AuditCriterions();
             $newCriterium->name = $newName;
             $newCriterium->audit_header_id = $request->relatedHeader;
