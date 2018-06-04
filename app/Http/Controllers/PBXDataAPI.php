@@ -224,7 +224,9 @@ class PBXDataAPI extends Controller
                         } else if ($key == 11) {
                             if($save){
                                 $data_to_insert[$temp_key]['pbx_id'] = $rowItem;
-                                if(User::where('login_phone', '=', $rowItem)->first()){
+                                if(User::where('login_phone', '=', $rowItem)
+                                    ->where('status_work','=',1)
+                                    ->first()){
                                     $userWithThisPbxNumber = User::where('login_phone', '=', $rowItem)->first()->id;
                                     $data_to_insert[$temp_key]['user_id'] = $userWithThisPbxNumber;
                                 }
