@@ -190,26 +190,73 @@
                     const filesInputs = Array.from(document.querySelectorAll('.files-inputs'));
                     const extensionArr = ['.jpeg', '.jpg', '.png', '.pdf', '.mp3', '.m4a', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota'];
                     //First step of validation - check if file array > 0;
-                    filesInputs.forEach(input => {
-                        everythingIsOk = input.files.length == 0 ? false : true;
-                    });
+                    for(let i = 0; i < filesInputs.length; i++) {
+                        if(filesInputs[i].files.length == 0) {
+                            everythingIsOk = false;
+                            break;
+                        }
+                        else {
+                            everythingIsOk = true;
+                        }
+                    }
+                    // filesInputs.forEach(input => {
+                    //     if(everythingIsOk == 0) {
+                    //         everythingIsOk = false;
+                    //     }
+                    //     everythingIsOk = input.files.length == 0 ? false : true;
+                    // });
                     //Second step of validation - check if file extension is apropriate;
                     if(everythingIsOk == true) {
-                        filesInputs.forEach(input => {
-                            for(let i = 0; i < input.files.length; i++) {
-                                let nameOfFile = input.files[i].name;
+
+                        for(let j = 0; j < filesInputs.length; j++) {
+                            if(everythingIsOk == false) {
+                                break;
+                            }
+                            for(let k = 0; k < filesInputs[j].files.length; k++) {
+                                let nameOfFile = filesInputs[j].files[k].name;
                                 let extensionPos = nameOfFile.lastIndexOf('.');
                                 let extension = nameOfFile.slice(extensionPos);
                                 let lowerCaseExtension = extension.toLowerCase();
                                 let extFlag = false;
-                                extensionArr.forEach(ext => {
-                                    if(lowerCaseExtension == ext) {
+
+                                //If it find at least once match, extFlag = true
+                                for(let l = 0; l < extensionArr.length; l++) {
+                                    if(lowerCaseExtension == extensionArr[l]) {
                                         extFlag = true;
                                     }
-                                });
-                                everythingIsOk = extFlag == true ? true : false;
+                                }
+
+                                // extensionArr.forEach(ext => {
+                                //     if(lowerCaseExtension == ext) {
+                                //         extFlag = true;
+                                //     }
+                                // });
+                                if(extFlag == true) {
+                                    everythingIsOk = true;
+                                }
+                                else {
+                                    everythingIsOk = false;
+                                    break;
+                                }
+                                // everythingIsOk = extFlag == true ? true : false;
                             }
-                        });
+                        }
+
+                        // filesInputs.forEach(input => {
+                        //     for(let i = 0; i < input.files.length; i++) {
+                        //         let nameOfFile = input.files[i].name;
+                        //         let extensionPos = nameOfFile.lastIndexOf('.');
+                        //         let extension = nameOfFile.slice(extensionPos);
+                        //         let lowerCaseExtension = extension.toLowerCase();
+                        //         let extFlag = false;
+                        //         extensionArr.forEach(ext => {
+                        //             if(lowerCaseExtension == ext) {
+                        //                 extFlag = true;
+                        //             }
+                        //         });
+                        //         everythingIsOk = extFlag == true ? true : false;
+                        //     }
+                        // });
                     }
                 }
 
