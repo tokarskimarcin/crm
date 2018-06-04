@@ -96,6 +96,9 @@ class DatabaseURLController extends Controller
         $data['overall_result'] = $obj->overall_result;
         $data['departments_statistic'] =  $obj->departments_statistic;
         $data['employee_statistic'] =  $obj->employee_statistic;
+
+        $data['departamentship'] =  $obj->departamentship;
+        $data['employeeship'] =  $obj->employeeship;
         return $data;
     }
 
@@ -111,7 +114,9 @@ class DatabaseURLController extends Controller
         return view('reportpage.DayReportDatabaseUse')
             ->with('overall_result',$data['overall_result'])
             ->with('departments_statistic',$data['departments_statistic'] )
-            ->with('employee_statistic',$data['employee_statistic']);
+            ->with('employee_statistic',$data['employee_statistic'])
+            ->with('departamentship',$data['departamentship'] )
+            ->with('employeeship',$data['employeeship']);
     }
     //Tygodniowy
     public function MailWeekRaportDatabaseUse(){
@@ -126,7 +131,9 @@ class DatabaseURLController extends Controller
         return view('reportpage.WeekReportDatabaseUse')
             ->with('overall_result',$data['overall_result'])
             ->with('departments_statistic',$data['departments_statistic'] )
-            ->with('employee_statistic',$data['employee_statistic']);
+            ->with('employee_statistic',$data['employee_statistic'])
+            ->with('departamentship',$data['departamentship'] )
+            ->with('employeeship',$data['employeeship']);
     }
     //Miesięczny
     public function MailMonthRaportDatabaseUse(){
@@ -145,6 +152,8 @@ class DatabaseURLController extends Controller
             ->with('overall_result',$data['overall_result'])
             ->with('departments_statistic',$data['departments_statistic'] )
             ->with('employee_statistic',$data['employee_statistic'])
+            ->with('departamentship',$data['departamentship'] )
+            ->with('employeeship',$data['employeeship'])
             ->with('month',$month_name);
     }
 
@@ -180,7 +189,19 @@ class DatabaseURLController extends Controller
             }else if($id_base == 19)
             {
                 $exito_count += $count_record;
-            }else{
+            }else if($id_base == 1 ||
+                $id_base == 2 ||
+                $id_base == 3 ||
+                $id_base == 4 ||
+                $id_base == 7 ||
+                $id_base == 10 ||
+                $id_base == 11 ||
+                $id_base == 12 ||
+                $id_base == 13 ||
+                $id_base == 14 ||
+                $id_base == 15 ||
+                $id_base == 16 ||
+                $id_base == 18){
                 $rest_count += $count_record;
             }
         }
