@@ -25,6 +25,7 @@
             $total_pause_time = 0;
             $total_login_time = 0;
             $total_janky_count = 0;
+            $total_check_talks = $total_bad_checked_talks = 0;
         @endphp
 
         @foreach($data as $item)
@@ -40,6 +41,9 @@
             </tr>
 
             @php
+                $total_check_talks += $item->all_checked_talks;
+                $total_bad_checked_talks += $item->all_bad_talks;
+
                 $total_received_calls += $item->received_calls;
                 $total_success += $item->success;
                 $total_pause_time += $item->time_pause;
@@ -52,7 +56,7 @@
         @php
             $total_time = $total_login_time / 3600;
             $total_avg = ($total_time > 0) ? round(($total_success / $total_time), 2) : 0 ;
-            $total_janky_proc = ($total_success > 0) ? round(($total_janky_count / $total_success), 2) : 0 ;
+            $total_janky_proc = ($total_check_talks > 0) ? round(($total_bad_checked_talks*100) / $total_check_talks, 2) : 0 ;
         @endphp
 
         <tr>
