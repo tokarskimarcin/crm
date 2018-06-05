@@ -3389,9 +3389,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
 
         $total_data = $pbx_data->groupBy('pbx_id');
 
-        $days_in_month = intval(date('t', strtotime($date_start)));
 
-        $allData = $total_data->map(function($item, $key) use ($days_in_month,$date_stop, $date_start, $leader) {
+        $allData = $total_data->map(function($item, $key) use ($date_stop, $date_start, $leader) {
             $allUniceUserId = array();
             //Wysłuskanie wszystkich user_id
             if($date_start < '2018-05-31'){
@@ -3403,48 +3402,36 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                 }
             }
             $saveCollect = collect();
-            foreach ($allUniceUserId as $user) {
-                $user_sum = collect();
-                if ($date_start < '2018-05-31') {
-                    $consultant = User::where('login_phone', '=', $item->first()->pbx_id)
-                        ->where('coach_id', '=', $leader->id)
-                        ->get();
-                } else {
-                    $consultant = User::where('id', '=', $user)
-                        ->where('coach_id', '=', $leader->id)
-                        ->get();
-                }
-                //Sumowanie wyników grupy trenera
-                    $user_sum->offsetSet('average',0);
-                    $user_sum->offsetSet('all_checked',0);
-                    $user_sum->offsetSet('all_bad',0);
-                    $user_sum->offsetSet('janky_proc',0);
-                    $user_sum->offsetSet('count_calls',0);
-                    $user_sum->offsetSet('success',0);
-                    $user_sum->offsetSet('proc_call_success',0);
-                    $user_sum->offsetSet('pause_time',0);
-                    $user_sum->offsetSet('received_calls',0);
-                    $user_sum->offsetSet('login_time',0);
-                    $user_sum->offsetSet('proc_received_calls',0);
-                    $user_sum->offsetSet('total_week_yanky',0);
-                    $week_yanky = 0;
-
-                //Pobranie wyników konsultanta
-                $question = $item->where('report_date','>=',$date_start)
-                    ->where('report_date','<=',$date_stop)
-                    ->where('user_id','=',$user);
-                foreach ($question as $item){
-                    $work_time_array = explode(":", $item->login_time);
-                    $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]));
-                    $user_sum['login_time'] += $work_time;
-                }
-
-                $user_sum['success'] +=$question->sum('success');
-                $user_sum['all_checked'] += $question->sum('all_checked_talks');
-                $user_sum['all_bad'] += $question->sum('all_bad_talks');
-                $user_sum['pause_time'] += $question->sum('time_pause');
-                $user_sum['received_calls'] += $question->sum('received_calls');
+            //Sumowanie wyników grupy trenera
+            $user_sum = collect();
+            $user_sum->offsetSet('average',0);
+            $user_sum->offsetSet('all_checked',0);
+            $user_sum->offsetSet('all_bad',0);
+            $user_sum->offsetSet('janky_proc',0);
+            $user_sum->offsetSet('count_calls',0);
+            $user_sum->offsetSet('success',0);
+            $user_sum->offsetSet('proc_call_success',0);
+            $user_sum->offsetSet('pause_time',0);
+            $user_sum->offsetSet('received_calls',0);
+            $user_sum->offsetSet('login_time',0);
+            $user_sum->offsetSet('proc_received_calls',0);
+            $user_sum->offsetSet('total_week_yanky',0);
+            $saveItem = $item;
+            //Pobranie wyników konsultanta
+            $question = $saveItem->where('report_date','>=',$date_start)
+                ->where('report_date','<=',$date_stop)
+                ->whereIn('user_id',$allUniceUserId);
+            foreach ($question as $item){
+                $work_time_array = explode(":", $item->login_time);
+                $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]));
+                $user_sum['login_time'] += $work_time;
             }
+            $user_sum['success'] += $question->sum('success');
+            $user_sum['all_checked'] += $question->sum('all_checked_talks');
+            $user_sum['all_bad'] += $question->sum('all_bad_talks');
+            $user_sum['pause_time'] += $question->sum('time_pause');
+            $user_sum['received_calls'] += $question->sum('received_calls');
+
             return $user_sum;
         });
         $returnCollect = collect();
@@ -3876,19 +3863,20 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         }
         $data = [];
 
-        $data_start = date('Y-') . $request->month_selected . '-01';
-        $data_stop = date('Y-') . $request->month_selected . date('-t', strtotime(date('Y-') . $request->month_selected));
+        $dateStart = $request->date_start;
+        $dateStop = $request->date_stop;
 
         foreach ($coaches as $coach) {
-            $data[$coach->id]['trainer_data'] = self::getWeekMonthCoachData($data_start, $data_stop, $coach->id);
+            $data[$coach->id]['trainer_data'] = self::getWeekMonthCoachData($dateStart, $dateStop, $coach->id);
             $data[$coach->id]['trainer'] = $coach;
-            $data[$coach->id]['date'] = [$data_start, $data_stop];
+            $data[$coach->id]['date'] = [$dateStart, $dateStop];
         }
 
         return view('reportpage.monthReportCoachRanking')
             ->with([
                 'months'        => self::getMonthsNames(),
-                'month'         => $request->month_selected,
+                'dateStart'     => $dateStart,
+                'dateStop'      => $dateStop,
                 'departments'   => $departments,
                 'dep_id'        => $request->dep_selected,
                 'data'          => $data
