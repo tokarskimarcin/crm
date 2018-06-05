@@ -68,6 +68,9 @@
                             </table>
                         </div>
                     </div>
+                    <div class="col-md-12">
+                        <button id="addNewHotel" class="btn btn-info">Dodaj nowy hotel</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -77,9 +80,14 @@
 @section('script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script>
-        let voivodeeId = [];
-        let cityId = [];
+
         document.addEventListener('DOMContentLoaded', function(event) {
+            let voivodeeId = [];
+            let cityId = [];
+            const addNewHotelInput = document.querySelector('#addNewHotel');
+            addNewHotelInput.addEventListener('click',(e) => {
+                window.location.href = '{{URL::to('/addNewHotel')}}';
+            });
             table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,

@@ -46,6 +46,9 @@
                             </table>
                         </div>
                     </div>
+                        <div class="col-md-12">
+                            <button id="addNewRoute" class="btn btn-info">Przejdz do dodawania tras</button>
+                        </div>
                 </div>
             </div>
         </div>
@@ -55,6 +58,10 @@
 @section('script')
     <script>
         document.addEventListener('DOMContentLoaded', function(event) {
+            const addNewRouteInput = document.querySelector('#addNewRoute');
+            addNewRouteInput.addEventListener('click',(e) => {
+                window.location.href = '{{URL::to('/addNewRoute')}}';
+            });
             table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,
