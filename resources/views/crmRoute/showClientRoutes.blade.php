@@ -58,11 +58,10 @@
                                 <tr>
                                     <th>Numer tygodnia</th>
                                     <th>Nazwa Klienta</th>
-                                    <th>Miasto</th>
-                                    <th>Hotel</th>
-                                    <th>Data</th>
-                                    <th>Godzina</th>
-                                    <th>Podgląd</th>
+                                    <th>Nazwa trasy</th>
+                                    <th>Przypisany hotel i godziny</th>
+                                    <th>Akceptuj trasę</th>
+                                    <th>Przypisz godziny pokazów i hotele</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -174,6 +173,15 @@
                 "serverSide": true,
                 "fnDrawCallback": function(settings) {
                     objectArr = [];
+                    const buttons = document.querySelectorAll('.action-buttons-0');
+                    buttons.forEach(btn => {
+                        btn.addEventListener('click', actionButtonHandler);
+                    });
+                    const buttons2 = document.querySelectorAll('.action-buttons-1');
+                    buttons2.forEach(btn => {
+                        btn.addEventListener('click', actionButtonHandlerAccepted);
+                    });
+
                 },
                 "rowCallback": function( row, data, index ) {
                     $(row).attr('id', "clientRouteInfoId_" + data.id);
@@ -230,23 +238,38 @@
                         },"name":"clientName"
                     },
                     {"data":function (data, type, dataToSet) {
-                            return data.cityName;
-                        },"name":"cityName"
+                            return data.clientRouteName;
+                        },"name":"clientRouteName"
                     },
                     {"data":function (data, type, dataToSet) {
-                            return data.hotelName;
+                            if(data.hotelName != 'brak' && data.hour != 'nie') {
+                                return 'Tak';
+                            }
+                            else {
+                                return 'Nie';
+                            }
                         },"name":"hotelName"
                     },
                     {"data":function (data, type, dataToSet) {
-                            return data.date;
-                        },"name":"date"
+                        if(data.status == 0) {
+                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-warning action-buttons-0">Akceptuj</button>';
+                        }
+                        else {
+                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-success action-buttons-1">Trasa nie gotowa</button>';
+                        }
+
+                        },"name":"acceptRoute"
                     },
+                    {{--{"data":function (data, type, dataToSet) {--}}
+                            {{--return data.date;--}}
+                        {{--},"name":"date"--}}
+                    {{--},--}}
+                    // {"data":function (data, type, dataToSet) {
+                    //         return data.hour;
+                    //     },"name":"hour"
+                    // },
                     {"data":function (data, type, dataToSet) {
-                            return data.hour;
-                        },"name":"hour"
-                    },
-                    {"data":function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '">Podgląd</a>';
+                            return '<a href="{{URL::to("/specificRoute")}}/' + data.clientRouteId + '">Akcja</a>';
                         },"name":"link"
                     }
                 ]
@@ -289,9 +312,53 @@
                 table2.ajax.reload();
             }
 
+            function actionButtonHandler(e) {
+                const clientRouteId = e.target.dataset.clientrouteid;
+                const url =`{{URL::to('/showClientRoutesStatus')}}`;
+                const ourHeaders = new Headers();
+                ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                ourHeaders.set('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                const formData = new FormData();
+                formData.append('clientRouteId', clientRouteId);
+                formData.append('delete', '0');
+
+                fetch(url, {
+                    method: 'post',
+                    headers: ourHeaders,
+                    credentials: "same-origin",
+                    body: formData
+                }).then(resp => resp.json())
+                    .then(resp => {
+                        table2.ajax.reload();
+                    })
+
+            }
+
+            function actionButtonHandlerAccepted(e) {
+                const clientRouteId = e.target.dataset.clientrouteid;
+                const url =`{{URL::to('/showClientRoutesStatus')}}`;
+                const ourHeaders = new Headers();
+                ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                ourHeaders.set('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                const formData = new FormData();
+                formData.append('clientRouteId', clientRouteId);
+                formData.append('delete', '1');
+
+                fetch(url, {
+                    method: 'post',
+                    headers: ourHeaders,
+                    credentials: "same-origin",
+                    body: formData
+                }).then(resp => resp.json())
+                    .then(resp => {
+                        table2.ajax.reload();
+                    })
+            }
+
             showAllClientsInput.addEventListener('change', showAllClientsInputHandler);
             showOnlyAssignedInput.addEventListener('change', showOnlyAssignedHandler);
             selectedWeekInput.addEventListener('change', selectedWeekHandler);
+
         });
     </script>
 @endsection

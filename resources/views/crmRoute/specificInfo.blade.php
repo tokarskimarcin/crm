@@ -269,7 +269,7 @@
                 };
                 this.validate = function() {
                     let isOkFlag = true;
-                    if(this.voivodeId != undefined && this.voivodeId != '' && this.voivodeId != null && this.cityId != undefined && this.cityId != null && this.cityId != '' && this.timeArr != '' && this.timeArr.length > 0 && this.clientRouteId != '' && this.clientRouteId != undefined && this.clientRouteId != null && this.hotelId != null && this.hotelId != '') {
+                    if(this.voivodeId != undefined && this.voivodeId != '' && this.voivodeId != null && this.cityId != undefined && this.cityId != null && this.cityId != '' && this.timeArr != '' && this.timeArr.length > 0 && this.clientRouteId != '' && this.clientRouteId != undefined && this.clientRouteId != null) {
                         this.timeArr.forEach(time => {
                            if(time == null || time == '') {
                               isOkFlag = false;
@@ -358,8 +358,6 @@
                         window.location.reload();
                     }
                 });
-
-
             }
 
             const submitButton = document.querySelector('#submit-button');
