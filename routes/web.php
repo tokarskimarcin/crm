@@ -843,6 +843,9 @@ Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
 
 Route::get('/cityPanel', 'CrmRouteController@cityPanel');
 Route::post('/getCity', 'CrmRouteController@getCity')->name('api.getCity');
+
+Route::post('/getVoivodeshipRound', 'CrmRouteController@getVoivodeshipRound')->name('api.getVoivodeshipRound');
+
 Route::post('/findCity', 'CrmRouteController@findCity')->name('api.findCity');
 Route::POST('/saveNewCity','CrmRouteController@saveNewCity')->name('api.saveNewCity');
 Route::POST('/changeStatusCity','CrmRouteController@changeStatusCity')->name('api.changeStatusCity');
