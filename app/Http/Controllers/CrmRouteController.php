@@ -60,6 +60,7 @@ class CrmRouteController extends Controller
         $clientRoute = new ClientRoute();
         $clientRoute->client_id = $clientId;
         $clientRoute->user_id = $loggedUser->id;
+        $clientRoute->status = 0;
         $clientRoute->save();
 
         //New insertions into ClientRouteInfo table
@@ -197,6 +198,10 @@ class CrmRouteController extends Controller
         return $all_data;
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Support\Collection
+     */
     public function getSelectedRoute(Request $request) {
         $idNotTrimmed = $request->route_id;
         $posOfId = strpos($idNotTrimmed,'_');
@@ -444,7 +449,7 @@ class CrmRouteController extends Controller
         }
 
 
-        $data2 = $client_route_info->map(function($item) use($hotels, $cities, $clients) {
+        $client_route_info_extended = $client_route_info->map(function($item) use($hotels, $cities, $clients) {
             foreach($cities as $city) {
                 if($city->id == $item->city_id) {
                     $item->cityName = $city->name;
@@ -457,33 +462,170 @@ class CrmRouteController extends Controller
                     }
                 }
                 else {
-                    $item->hotelName = "Brak przypisanego hotelu";
+                    $item->hotelName = 'brak';
                 }
             }
             $clientName = DB::table('client_route_info')->select(DB::raw('
-                client.name as clientName
+                client.name as clientName,
+                client_route.status as status
             '))
                 ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
                 ->join('client', 'client.id', '=', 'client_route.client_id')
                 ->where('client_route_info.client_route_id', '=', $item->client_route_id)
                 ->distinct()
-                ->pluck('clientName');
+                ->first();
 
-            $item->clientName = $clientName;
-
-//            $day = substr($item->date,8,2);
-//            $month = substr($item->date,5,2);
-//            $year = substr($item->date, 0,4);
-//            $date = mktime(0, 0, 0, $month, $day, $year);
-//
-//            $item->weekNumber = date('W',$date);
+            $item->clientName = $clientName->clientName;
+            $item->status = $clientName->status;
 
             return $item;
         });
 
-        return datatables($data2)->make(true);
+        $fullInfoArr = array(); // array of arrays of objects. Each array represent one client_route and objects represent all client_route_info of this client_route
+        $fullNameArr = array(); // array of objects. Each object represents all client_route_info of this client_route
+        $clientRouteName = '';
+        $dateFlag = null;
+        $cityFlag = null;
+        $iterator = 0;
+        $separator = '';
+        $client_route_indicator = null;
+        $lp = 0; // simple iterator
+        foreach($client_route_info_extended as $extendedInfo) {
+//            $dateFlag = null; // true - the same day, false - other day
+//            $cityFlag = null;
+//            if($extendedInfo === reset($client_route_info_extended)) { // We are adding first city name to string and first insertions into arrays.
+//                array_push($cityAArr,$extendedInfo->cityName);
+//                array_push($dateArr, $extendedInfo->date);
+//                $clientRouteName .= $extendedInfo->cityName;dddd($extendedInfo);$lp++;
+            $lp++;
+            if($lp == 1) {
+                $client_route_indicator = $extendedInfo->client_route_id; // przypisujemy do zmiennej wartosc pierwsego client_route_id
+            }
+            if($extendedInfo->client_route_id == $client_route_indicator) {
+                $helpObject = new \stdClass();
+                $helpObject->cityName = $extendedInfo->cityName;
+                $helpObject->date = $extendedInfo->date;
+                $helpObject->clientName = $extendedInfo->clientName;
+                $helpObject->clientRouteId = $extendedInfo->client_route_id;
+                $helpObject->weekOfYear = $extendedInfo->weekOfYear;
+                $helpObject->hotelName = $extendedInfo->hotelName;
+                $helpObject->hour = $extendedInfo->hour;
+                $helpObject->status = $extendedInfo->status;
+                array_push($fullNameArr, $helpObject);
+            }
+            else {
+                array_push($fullInfoArr, $fullNameArr); //dodaje do fullInfoArr wszystkie dane o poszczególej trasie
+                $fullNameArr = array(); // czyścimy zawartosc tej tablicy
+                $helpObject = new \stdClass();
+                $helpObject->cityName = $extendedInfo->cityName;
+                $helpObject->date = $extendedInfo->date;
+                $helpObject->clientName = $extendedInfo->clientName;
+                $helpObject->clientRouteId = $extendedInfo->client_route_id;
+                $helpObject->weekOfYear = $extendedInfo->weekOfYear;
+                $helpObject->hotelName = $extendedInfo->hotelName;
+                $helpObject->hour = $extendedInfo->hour;
+                $helpObject->status = $extendedInfo->status;
+                array_push($fullNameArr, $helpObject);
+                $client_route_indicator = $extendedInfo->client_route_id;
+            }
+
+
+            if($lp == count($client_route_info_extended)) {
+                array_push($fullInfoArr, $fullNameArr);
+            }
+        }
+//
+//        dd($fullInfoArr);
+        $helpClientNameVariable = '';
+        $helpClientWeekVariable = '';
+        $helpHourVariable = 0;
+        $fullInfoArrExtended = array();
+        $iterator2 = 0;
+        foreach($fullInfoArr as $eachClientRoute) {
+            $iterator2++;
+            $lp = 0;
+            $iterator = 0;
+            $helpClientNameVariable = '';
+            $clientRouteName = '';
+            $separator = '';
+            $helpClientWeekVariable = '';
+            $helpHourVariable = 0;
+            foreach($eachClientRoute as $item) {
+                if($item->hour != null && $item->hour != '00:00:00') {
+                    $helpHourVariable++;
+                }
+                $lp++;
+                $dateFlag = null; // true - the same day
+                $cityFlag = null;
+                if($lp == 1) {
+                    $clientRouteName .= $item->cityName;
+                    $iterator++;
+                    $helpClientNameVariable = $item->clientName;
+                    $helpClientWeekVariable = $item->weekOfYear;
+                }
+                else {
+                    for($i = 0; $i < $iterator; $i++) {
+                        if ($item->date == $eachClientRoute[$i]->date) {
+
+                            $dateFlag = true;
+                        }
+                    }
+                    if ($dateFlag == true) {
+                        for ($i = 0; $i < $iterator; $i++) {
+                            if ($item->cityName == $eachClientRoute[$i]->cityName) {
+                                $cityFlag = true;
+                            }
+                        }
+                    }
+                    if($dateFlag == true && $cityFlag != true) {
+                        $separator = '+';
+                        $clientRouteName .= $separator . $item->cityName;
+                    }
+                    else if($dateFlag != true && $cityFlag != true) {
+                        $separator = ' | ';
+                        $clientRouteName .= $separator . $item->cityName;
+                    }
+                    $iterator++;
+                }
+
+                if($lp == count($eachClientRoute)) {
+                    $helpObject2 = new \stdClass();
+                    $helpObject2->clientRouteName = $clientRouteName;
+                    $helpObject2->clientName = $helpClientNameVariable;
+                    $helpObject2->clientRouteId = $item->clientRouteId;
+                    $helpObject2->weekOfYear = $helpClientWeekVariable;
+                    $helpObject2->hotelName = $item->hotelName;
+                    $helpObject2->status = $item->status;
+                    if($helpHourVariable > 0) {
+                        $helpObject2->hour = "tak";
+                    }
+                    else {
+                        $helpObject2->hour = "nie";
+                    }
+                    array_push($fullInfoArrExtended, $helpObject2);
+                }
+            }
+        }
+        $infoCollection = collect($fullInfoArrExtended);
+
+        return datatables($infoCollection)->make(true);
     }
 
+    public function showClientRoutesStatus(Request $request) {
+        $clientRouteId = $request->clientRouteId;
+        $toDelete = $request->delete; // 0,1 - actual values
+        if($clientRouteId && $toDelete == '0') {
+            $clientRoute = ClientRoute::find($clientRouteId);
+            $clientRoute->status = 1;
+            $clientRoute->save();
+        }
+        else if($clientRouteId && $toDelete == '1') {
+            $clientRoute = ClientRoute::find($clientRouteId);
+            $clientRoute->status = 0;
+            $clientRoute->save();
+        }
+        return $toDelete;
+    }
 
     /**
      * @return $this method returns view addNewRoute with data about all voivodes
