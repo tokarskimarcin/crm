@@ -56,12 +56,12 @@
                             <table id="datatable2" class="thead-inverse table table-bordered" cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
-                                    <th>Numer tygodnia</th>
-                                    <th>Nazwa Klienta</th>
-                                    <th>Nazwa trasy</th>
+                                    <th>Tydzień</th>
+                                    <th>Klient</th>
+                                    <th>Trasa</th>
                                     <th>Przypisany hotel i godziny</th>
                                     <th>Akceptuj trasę</th>
-                                    <th>Przypisz godziny pokazów i hotele</th>
+                                    <th>Edycja</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -184,6 +184,12 @@
 
                 },
                 "rowCallback": function( row, data, index ) {
+                    if(row.cells[3].textContent == "Nie") {
+                        row.style.backgroundColor = "#ffc6c6";
+                    }
+                    else {
+                        row.style.backgroundColor = "#d1fcd7";
+                    }
                     $(row).attr('id', "clientRouteInfoId_" + data.id);
                     // if(data.client_route_id != rowIterator) {
                     //     rowIterator = data.client_route_id;
@@ -252,10 +258,10 @@
                     },
                     {"data":function (data, type, dataToSet) {
                         if(data.status == 0) {
-                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-warning action-buttons-0">Akceptuj</button>';
+                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-warning action-buttons-0" style="width:100%">Akceptuj</button>';
                         }
                         else {
-                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-success action-buttons-1">Trasa nie gotowa</button>';
+                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-success action-buttons-1" style="width:100%">Trasa nie gotowa</button>';
                         }
 
                         },"name":"acceptRoute"
@@ -269,7 +275,7 @@
                     //     },"name":"hour"
                     // },
                     {"data":function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("/specificRoute")}}/' + data.clientRouteId + '">Akcja</a>';
+                            return '<a href="{{URL::to("/specificRoute")}}/' + data.clientRouteId + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
                         },"name":"link"
                     }
                 ]
@@ -351,6 +357,9 @@
                     body: formData
                 }).then(resp => resp.json())
                     .then(resp => {
+                        if(resp == 0) {
+                            console.log("Operacja się nie powiodła");
+                        }
                         table2.ajax.reload();
                     })
             }
