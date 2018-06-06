@@ -139,6 +139,20 @@
                                     <label id="client_choice_type"></label>
                                 </div>
                             </div>
+                            <div class="col-md-12">
+                                <div class="form-group" style="margin-top:1em;">
+                                    <label for="weekNumber">Wybierz tydzień</label>
+                                    <select id="weekNumber" class="form-control"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="myLabel">Data:</label>
+                                    <div class="input-group date form_date col-md-5" data-date-calendarWeeks="true" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                        <input class="form-control" name="date" id="date" type="text" value="{{date("Y-m-d")}}">
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
 
@@ -245,7 +259,8 @@
         $('.form_date').datetimepicker({
             language:  'pl',
             autoclose: 1,
-            minView : 2,
+            minView: 2,
+            calendarWeeks: 'true',
             pickTime: false
         });
 
@@ -298,6 +313,16 @@
 
 
         $(document).ready(function() {
+
+            const lastWeekOfYear ={{$lastWeek}};
+            console.log(lastWeekOfYear);
+            const weekSelect = document.querySelector('#weekNumber');
+            for(var i = 1; i <= lastWeekOfYear ; i++) {
+                let optionElement = document.createElement('option');
+                optionElement.value = i;
+                optionElement.innerHTML = `${i}`;
+                weekSelect.appendChild(optionElement);
+            }
 
 
             Element.prototype.appendAfter = function (element) {
@@ -586,7 +611,8 @@
                                             $('.form_date').datetimepicker({
                                                 language:  'pl',
                                                 autoclose: 1,
-                                                minView : 2,
+                                                minView: 2,
+                                                calendarWeeks: 'true',
                                                 pickTime: false
                                             });
 
@@ -713,11 +739,11 @@
                         });
 
                     });
-
                     $('.form_date').datetimepicker({
                         language:  'pl',
                         autoclose: 1,
-                        minView : 2,
+                        minView: 2,
+                        calendarWeeks: 'true',
                         pickTime: false
                     });
                 }
@@ -767,7 +793,6 @@
                     let cityElements = Array.from(document.getElementsByClassName('city'));
                     let showElements = Array.from(document.getElementsByClassName('show-hours'));
                     let dateElements = Array.from(document.getElementsByClassName('dateInput'));
-                    console.log(dateElements);
 
                     let voivodeArr = [];
                     let cityArr = [];
@@ -882,7 +907,8 @@
                 $('.form_date').datetimepicker({
                     language:  'pl',
                     autoclose: 1,
-                    minView : 2,
+                    minView: 2,
+                    calendarWeeks: 'true',
                     pickTime: false
                 });
             }
