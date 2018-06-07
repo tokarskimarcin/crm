@@ -23,17 +23,26 @@
                     </select>
                 </div>
             </div>
+
             <div class="col-md-4">
                 <div class="form-group">
-                    <label>Miesiąc:</label>
-                    <select class="form-control" name="month_selected">
-                        @foreach($months as $key => $value)
-                            <option @if($month == $key) selected @endif value="{{$key}}">{{ $value }}</option>
-                        @endforeach
-                    </select>
+                    <label for="date" class="myLabel">Data początkowa:</label>
+                    <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" >
+                        <input class="form-control" name="date_start" id="date" type="text" value=@if(isset($dateStart)) {{$dateStart}} @else {{date("Y-m").'-01'}} @endif>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                    </div>
                 </div>
             </div>
             <div class="col-md-4">
+                <div class="form-group">
+                    <label for="date_stop" class="myLabel">Data końcowa:</label>
+                    <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak">
+                        <input class="form-control" name="date_stop" id="date_stop" type="text" value=@if(isset($dateStop)) {{$dateStop}} @else {{date("Y-m-d")}} @endif>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
                 <div class="form-group">
                     <input style="margin-top: 25px; width: 100%" type="submit" class="btn btn-info" value="Generuj raport">
                 </div>
@@ -71,6 +80,14 @@
 
 @section('script')
     <script>
-
+        var todayDate = new Date(2018,5,1).getDate();
+        var endD= new Date(new Date().setDate(todayDate));
+        $('.form_date').datetimepicker({
+            language:  'pl',
+            startDate : endD,
+            autoclose: 1,
+            minView : 2,
+            pickTime: false,
+        });
     </script>
 @endsection

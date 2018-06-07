@@ -41,6 +41,16 @@
         cursor: pointer;
     }
 
+    .glyphicon-refresh {
+        font-size: 2em;
+        transition: all 1.8s ease-in-out;
+        color: #0f10ff;
+    }
+    .glyphicon-refresh:hover {
+        transform: scale(1.2) rotate(360deg);
+        cursor: pointer;
+    }
+
     .header {
         text-align: center;
         font-size: 2em;
