@@ -315,7 +315,6 @@
         $(document).ready(function() {
 
             const lastWeekOfYear ={{$lastWeek}};
-            console.log(lastWeekOfYear);
             const weekSelect = document.querySelector('#weekNumber');
             for(var i = 1; i <= lastWeekOfYear ; i++) {
                 let optionElement = document.createElement('option');
@@ -364,6 +363,7 @@
                 document.getElementById('client_choice_type').textContent = "";
             }
 
+            let currentDate = null;
 
             table_client = $('#table_client').DataTable({
                 "autoWidth": true,
@@ -506,6 +506,10 @@
 
 //*********************END CLIENT SECTON***************************
 
+
+            let addNewRouteButton = document.getElementById('add-new-route');
+
+
             table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,
@@ -516,7 +520,7 @@
                     'url': "{{ route('api.showRoutesAjax') }}",
                     'type': 'POST',
                     'data': function (d) {
-                        // d.date_start = $('#date_start').val();
+                        d.date = currentDate;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -641,7 +645,6 @@
                 ]
             });
 
-            let addNewRouteButton = document.getElementById('add-new-route');
 
             function createNewShow() {
                 newElement = document.createElement('div');
@@ -920,7 +923,16 @@
                 }
             }
 
+
+
             document.addEventListener('click', buttonHandler);
+            $('.form_date').on('change.dp', function(e) {
+                currentDate = e.target.value;
+                table.ajax.reload();
+            });
+
+
+
 
         });
 
