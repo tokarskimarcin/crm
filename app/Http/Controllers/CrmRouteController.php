@@ -980,6 +980,42 @@ class CrmRouteController extends Controller
         }
     }
 
+
+
+
+    public function findCityByDistance($city){
+        $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id,
+            ( 3959 * acos ( cos ( radians('.$city->latitude.') ) * cos( radians( `latitude` ) )
+             * cos( radians( `longitude` ) - radians('.$city->longitude.') ) + sin ( radians('.$city->latitude.') )
+              * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
+            ->join('voivodeship','voivodeship.id','city.voivodeship_id')
+            ->having('distance', '<', '100')
+            ->get();
+        return $voievodeshipRound;
+    }
+
+    /**
+     *  Return Round Voievodeship and city
+     */
+    public function getVoivodeshipRound(Request $request){
+        if($request->ajax()) {
+            $cityId = $request->cityId;
+            $city = Cities::where('id', '=', $cityId)->first();
+            $voievodeshipRound = $this::findCityByDistance($city);
+            $voievodeshipRound = $voievodeshipRound->groupBy('id');
+            $voievodeshipDistinc = array();
+            foreach ($voievodeshipRound as $item){
+                array_push($voievodeshipDistinc,$item->first());
+            }
+            $responseArray['voievodeInfo'] = $voievodeshipDistinc;
+            $responseArray['cityInfo'] = $voievodeshipRound;
+            return $responseArray;
+        }
+    }
+
+
+
+
     /**
      * Save new/edit city
      * @param Request $request
