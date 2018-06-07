@@ -37,6 +37,21 @@
 
     }
 
+    .glyphicon-remove:hover {
+        transform: scale(1.2) rotate(180deg);
+        cursor: pointer;
+    }
+
+    .glyphicon-refresh {
+        font-size: 2em;
+        transition: all 1.8s ease-in-out;
+        color: #0f10ff;
+    }
+    .glyphicon-refresh:hover {
+        transform: scale(1.2) rotate(360deg);
+        cursor: pointer;
+    }
+
     .glyphicon-remove {
         font-size: 2em;
         transition: all 0.8s ease-in-out;
@@ -425,9 +440,7 @@
                             }})
                     });
 
-                    /**
-                     * Educja coachingu
-                     */
+
                     $('.button-edit-client').on('click',function () {
                         clientId = $(this).data('id');
                         $.ajax({
@@ -556,31 +569,64 @@
                                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                     },
                                     success: function(response) {
-
+                                        var voievodes = @json($voivodes);
                                         for(var i = 0; i < response.length; i++) {
+                                            var city;
+                                            $.ajax({
+                                                type: "POST",
+                                                async:false,
+                                                url: '{{ route('api.getCitiesNames') }}',
+                                                data: {
+                                                    "id": response[i].voivodeship_id,
+                                                },
+                                                headers: {
+                                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                                },
+                                                success: function(response) {
+                                                    city = response;
+                                                }
+                                            });
                                             let routeContainer = document.createElement('div');
                                             routeContainer.className = 'routes-container';
-                                            routeContainer.innerHTML += '<div class="row">\n' +
-                                            '<div class="button_section">' +
-                                                '<span class="glyphicon glyphicon-remove" data-remove="show"></span>' +
-                                            '</div>' +
-                                            '        <header>Pokaz </header>\n' +
+
+                                            let stringAppend = '<div class="row">\n' +
+                                            '<div class="button_section">';
+                                            if(i != 0)
+                                                stringAppend += '<span class="glyphicon glyphicon-remove" data-remove="show"></span>';
+                                            stringAppend += '</div>' +
+                                            '        <header>Pokaz </header>\n';
+                                            if(i != 0)
+                                                stringAppend +='<div class=colmd-12 style="text-align: center">' +
+                                            '   <span class="glyphicon glyphicon-refresh" data-refresh="refresh" style="font-size: 30px"></span>' +
+                                                '</div>';
+                                            stringAppend +=
                                             '\n' +
                                             '            <div class="col-md-6">\n' +
                                             '                <div class="form-group">\n' +
                                             '                    <label>Województwo</label>\n' +
-                                            '                    <select class="form-control voivodeship" data-type="voivode">\n' +
-                                                '<option value ="' + response[i].voivodeship_id + '">' + response[i].voivode_name + '</option>' +
-                                                '                    </select>\n' +
+                                            '                    <select class="form-control voivodeship" data-type="voivode">\n';
+                                                    for(var j = 0; j<voievodes.length; j++){
+                                                        if(response[i].voivodeship_id == voievodes[j].id)
+                                                            stringAppend +=  '<option value ="' + response[i].voivodeship_id + ' " selected>' + response[i].voivode_name + '</option>';
+                                                        else
+                                                            stringAppend +=  '<option value ="' + voievodes[j].id + '">' + voievodes[j].name + '</option>';
+                                                         }
+                                            stringAppend += '                    </select>\n' +
                                             '                </div>\n' +
                                             '            </div>\n' +
                                             '\n' +
                                             '            <div class="col-md-6">\n' +
                                             '                <div class="form-group">\n' +
                                             '                    <label for="city">Miasto</label>\n' +
-                                            '                    <select class="form-control city">\n' +
-                                            '                        <option value="' + response[i].city_id + '">' + response[i].city_name + '</option>\n' +
-                                            '                    </select>\n' +
+                                            '                    <select class="form-control city">\n';
+                                            for(var j = 0; j<city.length; j++) {
+                                                if (response[i].city_id == city[j].id){
+                                                    stringAppend += '<option value="' + response[i].city_id + '" selected>' + response[i].city_name + '</option>\n';
+                                                }else{
+                                                    stringAppend += '<option value="' + city[j].id + '" >' + city[j].name + '</option>\n';
+                                                }
+                                            }
+                                            stringAppend +='                    </select>\n' +
                                             '                </div>\n' +
                                             '            </div>\n' +
                                                 '<div class="col-md-6">' +
@@ -605,8 +651,45 @@
                                                 '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
                                                 '            </div>\n' +
                                             '        </div>';
-
+                                            routeContainer.innerHTML = stringAppend;
                                             placeToAppend.appendChild(routeContainer);
+                                            $('.city').select2();
+                                            $('.voivodeship').select2();
+                                            $('.voivodeship').off('select2:select'); //remove previous event listeners
+                                            if ( i == 0){
+
+                                            }
+                                            $('.voivodeship').on('select2:select', function (e) {
+                                                let container = e.target.parentElement.parentElement.parentElement.parentElement;
+                                                let headerId = e.params.data.id;
+                                                $.ajax({
+                                                    type: "POST",
+                                                    url: '{{ route('api.getCitiesNames') }}',
+                                                    data: {
+                                                        "id": headerId
+                                                    },
+                                                    headers: {
+                                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                                    },
+                                                    success: function(response) {
+                                                        console.log(response);
+                                                        let placeToAppend2 = container.getElementsByClassName('city')[0];
+                                                        placeToAppend2.innerHTML = '';
+                                                        let basicOption = document.createElement('option');
+                                                        basicOption.value = '0';
+                                                        basicOption.textContent = 'Wybierz';
+                                                        placeToAppend2.appendChild(basicOption);
+                                                        for(var i = 0; i < response.length; i++) {
+                                                            let responseOption = document.createElement('option');
+                                                            responseOption.value = response[i].id;
+                                                            responseOption.textContent = response[i].name;
+                                                            placeToAppend2.appendChild(responseOption);
+                                                        }
+
+                                                    }
+                                                });
+
+                                            });
 
                                             $('.form_date').datetimepicker({
                                                 language:  'pl',
@@ -615,7 +698,6 @@
                                                 calendarWeeks: 'true',
                                                 pickTime: false
                                             });
-
                                         }
                                         //This part is responsible for button showing on given route
                                         const allNewShowSections = Array.from(document.querySelectorAll('.routes-container .button_new_show_section'));
@@ -643,24 +725,27 @@
 
             let addNewRouteButton = document.getElementById('add-new-route');
 
-            function createNewShow() {
+            function createNewShow(voivodes) {
                 newElement = document.createElement('div');
                 newElement.className = 'routes-container';
-                newElement.innerHTML = '        <div class="row">\n' +
+                let stringAppend ='        <div class="row">\n' +
                     '<div class="button_section button_section_gl_nr">' +
                     '<span class="glyphicon glyphicon-remove" data-remove="show"></span>' +
                     '</div>' +
                     '        <header>Pokaz </header>\n' +
+                    '<div class=colmd-12 style="text-align: center">' +
+                    '   <span class="glyphicon glyphicon-refresh" data-refresh="refresh" style="font-size: 30px"></span>' +
+                    '</div>' +
                     '\n' +
                     '            <div class="col-md-6">\n' +
                     '                <div class="form-group">\n' +
                     '                    <label>Województwo</label>\n' +
                     '                    <select class="form-control voivodeship" data-type="voivode">\n' +
-                    '                        <option value="0">Wybierz</option>\n' +
-                        @foreach($voivodes as $voivode)
-                            '<option value ="{{$voivode->id}}">{{$voivode->name}}</option>' +
-                        @endforeach
-                            '                    </select>\n' +
+                    '                        <option value="0">Wybierz</option>\n';
+                                                for(let i = 0; i < voivodes.length ; i++){
+                                                    stringAppend += '<option value ='+voivodes[i]['id']+'>'+voivodes[i]['name']+'</option>';
+                                                }
+                stringAppend += '                    </select>\n' +
                     '                </div>\n' +
                     '            </div>\n' +
                     '\n' +
@@ -694,18 +779,15 @@
                     '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
                     '            </div>\n' +
                     '        </div>';
+                newElement.innerHTML = stringAppend;
                 return newElement;
             }
             function buttonHandler(e) {
                 if(e.target.id == 'add-new-route') {
-
-                    let newShow = createNewShow(); //otrzymujemy nowy formularz z pokazem.
                     let appendPlace = document.querySelector('.route-here');
-                    appendPlace.innerHTML = ''; //czyści container
-                    let newRouteContainer = document.createElement('div');
-                    newRouteContainer.classList.add('routes-container');
-                    appendPlace.appendChild(newShow);
-
+                    appendPlace.innerHTML = "";
+                    let newShow = addNewShow(0,0); //otrzymujemy nowy formularz z pokazem.
+                    removeGlyInFirstShow();
                     $('.city').select2();
                     $('.voivodeship').select2();
                     $('.voivodeship').off('select2:select'); //remove previous event listeners
@@ -722,6 +804,7 @@
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
                             success: function(response) {
+                                console.log(response);
                                 let placeToAppend2 = container.getElementsByClassName('city')[0];
                                 placeToAppend2.innerHTML = '';
                                 let basicOption = document.createElement('option');
@@ -737,7 +820,6 @@
 
                             }
                         });
-
                     });
                     $('.form_date').datetimepicker({
                         language:  'pl',
@@ -748,44 +830,149 @@
                     });
                 }
                 else if(e.target.id == 'add_new_show') {
-                    addNewShow();
-                    $('.city').select2();
-                    $('.voivodeship').select2(); //attach select2 look
-                    $('.voivodeship').off('select2:select'); //remove previous event listeners
-                    $('.voivodeship').on('select2:select', function (e) {
-                        let container = e.target.parentElement.parentElement.parentElement.parentElement;
-                        let headerId = e.params.data.id;
-                        $.ajax({
-                            type: "POST",
-                            url: '{{ route('api.getCitiesNames') }}',
-                            data: {
-                                "id": headerId
-                            },
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function(response) {
-                                let placeToAppend2 = container.getElementsByClassName('city')[0];
-                                placeToAppend2.innerHTML = '';
+                    //Get lest child of voievoidship
+                    let AllVoievoidship = document.getElementsByClassName('voivodeship');
+                    let countAllVoievoidship = AllVoievoidship.length;
+                    //Get lest child of City
+                    let AllCitySelect = document.getElementsByClassName('city');
+                    let countAllCitySelect = AllCitySelect.length;
+                    let cityId = 0;
+                    let voievodeshipId = 0;
+
+
+                    // Walidacja wybrania
+                    if(countAllVoievoidship != 0 && countAllCitySelect != 0){
+                        voievodeshipId  = AllVoievoidship[countAllVoievoidship-1].value;
+                        cityId = AllCitySelect[countAllCitySelect-1].value;
+                    }
+                    else{
+                        voievodeshipId = AllVoievoidship[countAllVoievoidship].value;
+                        cityId = AllCitySelect[countAllCitySelect].value;
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: '{{ route('api.getVoivodeshipRound') }}',
+                        data: {
+                            "voievodeshipId" : voievodeshipId,
+                            "cityId"         : cityId
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            addNewShow(response['voievodeInfo'],1);
+                            $('.city').select2();
+                            $('.voivodeship').select2(); //attach select2 look
+                            $('.voivodeship').off('select2:select'); //remove previous event listeners
+                            $('.voivodeship').on('select2:select', function (e) {
+                                let container = e.target.parentElement.parentElement.parentElement.parentElement;
+                                let headerId = e.params.data.id;
+                                let placeToAppend = container.getElementsByClassName('city')[0];
+                                placeToAppend.innerHTML = '';
                                 let basicOption = document.createElement('option');
                                 basicOption.value = '0';
                                 basicOption.textContent = 'Wybierz';
-                                placeToAppend2.appendChild(basicOption);
-                                for(var i = 0; i < response.length; i++) {
-                                    let responseOption = document.createElement('option');
-                                    responseOption.value = response[i].id;
-                                    responseOption.textContent = response[i].name;
-                                    placeToAppend2.appendChild(responseOption);
+                                placeToAppend.appendChild(basicOption);
+                                var cityInfo = response['cityInfo'][headerId];
+                                if(typeof cityInfo !== 'undefined'){
+                                    //zmiana ręczna województwa
+                                    for(var i = 0; i < cityInfo.length; i++) {
+                                        if(cityInfo[i].id == headerId){
+                                            let responseOption = document.createElement('option');
+                                            responseOption.value = cityInfo[i].city_id;
+                                            responseOption.textContent = cityInfo[i].city_name;
+                                            placeToAppend.appendChild(responseOption);
+                                        }
+                                    }
+                                }else{
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '{{ route('api.getCitiesNames') }}',
+                                        data: {
+                                            "id": headerId
+                                        },
+                                        headers: {
+                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                        },
+                                        success: function(response) {
+                                            let placeToAppend = container.getElementsByClassName('city')[0];
+                                            placeToAppend.innerHTML = '';
+                                            let basicOption = document.createElement('option');
+                                            basicOption.value = '0';
+                                            basicOption.textContent = 'Wybierz';
+                                            placeToAppend.appendChild(basicOption);
+                                            for(var i = 0; i < response.length; i++) {
+                                                let responseOption = document.createElement('option');
+                                                responseOption.value = response[i].id;
+                                                responseOption.textContent = response[i].name;
+                                                placeToAppend.appendChild(responseOption);
+                                            }
+
+                                        }
+                                    });
                                 }
-
-                            }
-                        });
-
+                            });
+                        }
                     });
                 }
                 else if(e.target.dataset.remove == 'show') { // click on X glyphicon
                     let showContainer = e.target.parentElement.parentElement.parentElement;
                     removeGivenShow(showContainer);
+                }
+                else if(e.target.dataset.refresh == 'refresh') { // click on X glyphicon
+                    //get contener with select (actual and previous)
+                    var actualContener = e.target.parentNode.parentNode;
+                    var previousContener = e.target.parentNode.parentNode.parentNode.previousElementSibling;
+                    var actualSelectCity = actualContener.getElementsByClassName('city')[0];
+                    var actualSelectVoievode = actualContener.getElementsByClassName('voivodeship')[0];
+                    if(previousContener != null) {
+                        var previousSelectCityVal = previousContener.getElementsByClassName('city')[0].value;
+                        var previousSelectVoievodeVal = previousContener.getElementsByClassName('voivodeship')[0].value;
+                        $.ajax({
+                            type: "POST",
+                            url: '{{ route('api.getVoivodeshipRound') }}',
+                            data: {
+                                "voievodeshipId": previousSelectVoievodeVal,
+                                "cityId": previousSelectCityVal
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function (response) {
+                                $(actualSelectVoievode).off('select2:select');
+
+                                var stringAppend = '<option value=0>Wybierz</option>';
+                                for (let i = 0; i < response['voievodeInfo'].length; i++) {
+                                    stringAppend += '<option value =' + response['voievodeInfo'][i]['id'] + '>' + response['voievodeInfo'][i]['name'] + '</option>';
+                                }
+                                actualSelectVoievode.innerHTML = stringAppend;
+                                stringAppend = '<option value=0>Wybierz</option>';
+                                actualSelectCity.innerHTML = stringAppend;
+
+                                $(actualSelectVoievode).on('select2:select', function (e) {
+                                    let container = e.target.parentElement.parentElement.parentElement.parentElement;
+                                    let headerId = e.params.data.id;
+
+                                            let placeToAppend2 = container.getElementsByClassName('city')[0];
+                                            placeToAppend2.innerHTML = '';
+                                            let basicOption = document.createElement('option');
+                                            basicOption.value = '0';
+                                            basicOption.textContent = 'Wybierz';
+                                            placeToAppend2.appendChild(basicOption);
+                                            let responseObject = response['cityInfo'];
+                                            console.log(responseObject[headerId]);
+                                            for(var i = 0; i < responseObject[headerId].length; i++) {
+
+
+                                                let responseOption = document.createElement('option');
+                                                responseOption.value = responseObject[headerId][i].city_id;
+                                                responseOption.textContent = responseObject[headerId][i].city_name;
+                                                placeToAppend2.appendChild(responseOption);
+                                            }
+                                    });
+                            }
+                        });
+                    }
                 }
                 else if(e.target.id == "save") {
                     let everythingIsGood = undefined;
@@ -845,6 +1032,18 @@
 
             }
 
+
+            /*
+            This function removes "X" button from first show container
+             */
+            function removeGlyInFirstShow() {
+                let firstShow = document.getElementsByClassName('routes-container')[0];
+                let removeGlyphicon = firstShow.getElementsByClassName('glyphicon-remove')[0];
+                let removeGlyphiconRefresh = firstShow.getElementsByClassName('glyphicon-refresh')[0];
+                removeGlyphicon.parentNode.removeChild(removeGlyphicon);
+                removeGlyphiconRefresh.parentNode.removeChild(removeGlyphiconRefresh);
+            }
+
             /**
              * This function clear given arrays;
              */
@@ -898,10 +1097,16 @@
                 buttonsElement.appendAfter(placeInPreviousContainer);
             }
 
-            function addNewShow() {
+            function addNewShow(ajaxResponse,type) {
                 removeButtonsFromLastShow();
                 let routePlace = document.querySelector('.route-here');
-                let newShow = createNewShow(); //otrzymujemy nowy formularz z pokazem.
+                if(type == 0){
+                    var voievodes = @json($voivodes);
+                    var newShow = createNewShow(voievodes); //otrzymujemy nowy formularz z pokazem.
+                }
+                else{
+                    var newShow = createNewShow(ajaxResponse); //otrzymujemy nowy formularz z pokazem.
+                }
                 routePlace.appendChild(newShow);
 
                 $('.form_date').datetimepicker({
