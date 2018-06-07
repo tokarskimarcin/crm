@@ -75,6 +75,9 @@
                     '<span class="glyphicon glyphicon-remove" data-remove="show"></span>' +
                     '</div>' +
                     '        <header>Pokaz </header>\n' +
+                    '<div class=colmd-12 style="text-align: center">' +
+                        '<span class="glyphicon glyphicon-refresh" data-refresh="refresh" style="font-size: 30px"></span>' +
+                    '</div>' +
                     '\n' +
                     '            <div class="col-md-6">\n' +
                     '                <div class="form-group">\n' +
@@ -151,7 +154,9 @@
             function removeGlyInFirstShow() {
                 let firstShow = document.getElementsByClassName('routes-container')[0];
                 let removeGlyphicon = firstShow.getElementsByClassName('glyphicon-remove')[0];
+                let removeGlyphiconRefresh = firstShow.getElementsByClassName('glyphicon-refresh')[0];
                 removeGlyphicon.parentNode.removeChild(removeGlyphicon);
+                removeGlyphiconRefresh.parentNode.removeChild(removeGlyphiconRefresh);
             }
 
             /*
@@ -277,70 +282,6 @@
                             },
                             success: function(response) {
                                 addNewShow(response['voievodeInfo'],1);
-
-                                $('.city').select2();
-                                $('.voivodeship').select2(); //attach select2 look
-                                $('.voivodeship').off('select2:open'); //remove previous event listeners
-                                $('.voivodeship').on('select2:open', function (e) {
-                                    let parentDiv = e.currentTarget.parentNode.parentNode.parentNode.parentNode.previousElementSibling;
-                                    if(parentDiv.className != 'header') {
-                                        //Get lest child of voievoidship
-                                        let currentTarget = e.currentTarget.parentNode.parentNode.parentNode;
-                                        let saveCityId = currentTarget.getElementsByClassName('city')[0].value;
-                                        let saveVoivodeshipId = currentTarget.getElementsByClassName('voivodeship')[0].value;
-
-                                        let AllVoievoidship = parentDiv.getElementsByClassName('voivodeship');
-                                        let countAllVoievoidship = AllVoievoidship.length;
-                                        //Get lest child of City
-                                        let AllCitySelect = parentDiv.getElementsByClassName('city');
-                                        let countAllCitySelect = AllCitySelect.length;
-                                        let cityId = 0;
-                                        let voievodeshipId = 0;
-                                        if (countAllVoievoidship != 0 && countAllCitySelect != 0) {
-                                            voievodeshipId = AllVoievoidship[countAllVoievoidship - 1].value;
-                                            cityId = AllCitySelect[countAllCitySelect - 1].value;
-                                        }
-                                        else {
-                                            voievodeshipId = AllVoievoidship[countAllVoievoidship].value;
-                                            cityId = AllCitySelect[countAllCitySelect].value;
-                                        }
-                                        $.ajax({
-                                            type: "POST",
-                                            url: '{{ route('api.getVoivodeshipRound') }}',
-                                            data: {
-                                                "voievodeshipId": voievodeshipId,
-                                                "cityId": cityId
-                                            },
-                                            headers: {
-                                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                            },
-                                            success: function (response) {
-                                                e.currentTarget.innerHTML = '';
-                                                var stringAppend = '';
-
-                                                for(let i = 0; i < response['voievodeInfo'].length ; i++){
-                                                    if(saveVoivodeshipId == response['voievodeInfo'][i]['id']){
-                                                        stringAppend += '<option value ='+response['voievodeInfo'][i]['id']+' selected >'+response['voievodeInfo'][i]['name']+'</option>';
-                                                        console.log(saveVoivodeshipId);
-                                                        console.log(response['voievodeInfo']);
-                                                    }
-                                                    else
-                                                        stringAppend += '<option value ='+response['voievodeInfo'][i]['id']+'>'+response['voievodeInfo'][i]['name']+'</option>';
-                                                }
-                                                e.currentTarget.innerHTML = stringAppend;
-                                                let parentDiv = e.currentTarget.parentNode.parentNode.parentNode;
-                                                parentDiv.getElementsByClassName('city')[0].innerHTML = '';
-                                                stringAppend = '';
-                                                for(let i = 0; i < response['cityInfo'][voievodeshipId].length ; i++){
-                                                    stringAppend += '<option value ='+response['cityInfo'][voievodeshipId][i]['city_id']+'>'+response['cityInfo'][voievodeshipId][i]['city_name']+'</option>';
-                                                }
-                                                parentDiv.getElementsByClassName('city')[0].innerHTML = stringAppend;
-                                                console.log(voievodeshipId);
-                                            }
-                                        });
-                                    }
-                                });
-
                                 $('.city').select2();
                                 $('.voivodeship').select2(); //attach select2 look
                                 $('.voivodeship').off('select2:select'); //remove previous event listeners
@@ -358,6 +299,7 @@
                                         //zmiana ręczna województwa
                                         for(var i = 0; i < cityInfo.length; i++) {
                                             if(cityInfo[i].id == headerId){
+                                                console.log(cityInfo);
                                                 let responseOption = document.createElement('option');
                                                 responseOption.value = cityInfo[i].city_id;
                                                 responseOption.textContent = cityInfo[i].city_name;
@@ -398,6 +340,35 @@
                 else if(e.target.dataset.remove == 'show') { // click on X glyphicon
                     let showContainer = e.target.parentElement.parentElement.parentElement;
                     removeGivenShow(showContainer);
+                }else if(e.target.dataset.refresh == 'refresh') { // click on refresh glyphicon
+                    //get contener with select (actual and previous)
+                    var actualContener = e.target.parentNode.parentNode;
+                    var previousContener = e.target.parentNode.parentNode.parentNode.previousElementSibling;
+                    var actualSelectCity = actualContener.getElementsByClassName('city')[0];
+                    var actualSelectVoievode = actualContener.getElementsByClassName('voivodeship')[0];
+                    var previousSelectCityVal = previousContener.getElementsByClassName('city')[0].value;
+                    var previousSelectVoievodeVal = previousContener.getElementsByClassName('voivodeship')[0].value;
+
+                    $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.getVoivodeshipRound') }}',
+                    data: {
+                    "voievodeshipId": previousSelectVoievodeVal,
+                    "cityId": previousSelectCityVal
+                    },
+                    headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                        success: function (response) {
+                            var stringAppend = '<option value=0>Wybierz</option>';
+                            for (let i = 0; i < response['voievodeInfo'].length; i++) {
+                                    stringAppend += '<option value =' + response['voievodeInfo'][i]['id'] + '>' + response['voievodeInfo'][i]['name'] + '</option>';
+                            }
+                            actualSelectVoievode.innerHTML = stringAppend;
+                            stringAppend = '<option value=0>Wybierz</option>';
+                            actualSelectCity.innerHTML = stringAppend;
+                        }
+                    });
                 }
                 else if(e.target.id == 'save_route') {
                     saveRoute();
