@@ -184,40 +184,14 @@
 
                 },
                 "rowCallback": function( row, data, index ) {
-                    if(row.cells[3].textContent == "Nie") {
+                    console.log(row);
+                    if(row.cells[4].firstChild.classList[2] == "action-buttons-0") {
                         row.style.backgroundColor = "#ffc6c6";
                     }
                     else {
                         row.style.backgroundColor = "#d1fcd7";
                     }
                     $(row).attr('id', "clientRouteInfoId_" + data.id);
-                    // if(data.client_route_id != rowIterator) {
-                    //     rowIterator = data.client_route_id;
-                    //     colorIterator++;
-                    // }
-                    // if(colorIterator == colorArr.length) {
-                    //     colorIterator = 0;
-                    // }
-                    //
-                    // let clientObj = {
-                    //     clientRouteId: rowIterator,
-                    //     color: colorIterator
-                    // };
-                    // let flag = false;
-                    // objectArr.forEach(obj => {
-                    //     if(obj.clientRouteId == rowIterator) {
-                    //         $(row).css( "background-color",colorArr[obj.color]);
-                    //         flag = true;
-                    //         console.log('clientRouteId: ' + obj.clientRouteId + ' color: ' + obj.color);
-                    //         console.log(objectArr);
-                    //     }
-                    // });
-                    //
-                    // if(flag == false) {
-                    //     $(row).css( "background-color",colorArr[colorIterator]);
-                    // }
-                    // objectArr.push(clientObj);
-
                     return row;
                 },
                 "ajax": {
@@ -249,31 +223,23 @@
                     },
                     {"data":function (data, type, dataToSet) {
                             if(data.hotelName != 'brak' && data.hour != 'nie') {
-                                return 'Tak';
+                                return '<span style="color: darkgreen;">Tak</span>';
                             }
                             else {
-                                return 'Nie';
+                                return '<span style="color: red;">Nie</span>';
                             }
                         },"name":"hotelName"
                     },
                     {"data":function (data, type, dataToSet) {
                         if(data.status == 0) {
-                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-warning action-buttons-0" style="width:100%">Akceptuj</button>';
+                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-success action-buttons-0" style="width:100%">Akceptuj</button>';
                         }
                         else {
-                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-success action-buttons-1" style="width:100%">Trasa nie gotowa</button>';
+                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-warning action-buttons-1" style="width:100%">Trasa nie gotowa</button>';
                         }
 
                         },"name":"acceptRoute"
                     },
-                    {{--{"data":function (data, type, dataToSet) {--}}
-                            {{--return data.date;--}}
-                        {{--},"name":"date"--}}
-                    {{--},--}}
-                    // {"data":function (data, type, dataToSet) {
-                    //         return data.hour;
-                    //     },"name":"hour"
-                    // },
                     {"data":function (data, type, dataToSet) {
                             return '<a href="{{URL::to("/specificRoute")}}/' + data.clientRouteId + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
                         },"name":"link"
@@ -345,7 +311,7 @@
                 const url =`{{URL::to('/showClientRoutesStatus')}}`;
                 const ourHeaders = new Headers();
                 ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
-                ourHeaders.set('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                // ourHeaders.set('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
                 const formData = new FormData();
                 formData.append('clientRouteId', clientRouteId);
                 formData.append('delete', '1');

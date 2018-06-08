@@ -27,13 +27,16 @@ class CrmRouteController extends Controller
     public function index()
     {
         $departments = Department_info::all();
+        $today = date('Y-m-d');
+        $today .= '';
         $voivodes = Voivodes::all();
         $year = date('Y',strtotime("this year"));
         $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
         return view('crmRoute.index')
             ->with('departments', $departments)
             ->with('voivodes', $voivodes)
-            ->with('lastWeek', $numberOfLastYearsWeek);
+            ->with('lastWeek', $numberOfLastYearsWeek)
+            ->with('today', $today);
     }
 
     /**
@@ -56,6 +59,7 @@ class CrmRouteController extends Controller
 
         $loggedUser = Auth::user();
 
+//        dd($hourArr);
         //New insertion into ClientRoute table
         $clientRoute = new ClientRoute();
         $clientRoute->client_id = $clientId;
@@ -88,7 +92,6 @@ class CrmRouteController extends Controller
         return Redirect::back();
 
     }
-
     /**
      * This method shows specific route
      */
@@ -788,7 +791,71 @@ class CrmRouteController extends Controller
      * @return This method sends data about all routes to datatable in showRoutes view
      */
     public function showRoutesAjax(Request $request) {
-        $routes = Route::where('status', '=', 1)->get();
+        $date = $request->date;
+        if($date) {
+            $properDate = date_create($date);
+
+            //lista miast we wszystkich trasach.
+            $citiesAvailable = DB::table('routes_info')->select(DB::raw('
+            city_id as cityId
+            '))
+                ->pluck('cityId')
+                ->toArray();
+
+            //Rekordy clientRoutesInfo w których były użyte miasta
+            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->whereIn('city_id', $citiesAvailable)->get();
+            $checkedCities = array(); //In this array we indices cities that should not be in route
+            foreach($clientRoutesInfoWithUsedCities as $item) {
+                //wartość karencji dla danego miasta
+                $gracePeriod = Cities::find($item->city_id)->grace_period;
+//            $day = substr($item->date,8,2);
+//            $month = substr($item->date,5,2);
+//            $year = substr($item->date, 0,4);
+//            $dateInProperFormat = mktime(0, 0, 0, $month, $day, $year);
+//            $dateInProperFormat = date('Y-m-d', $dateInProperFormat);
+//
+//            $day2 = substr($date,8,2);
+//            $month2 = substr($date,5,2);
+//            $year2 = substr($date, 0,4);
+//            $dateInProperFormat2 = mktime(0, 0, 0, $month2, $day2, $year2);
+//            $dateInProperFormat2 = date('Y-m-d', $dateInProperFormat2);
+                $goodDate = date_create($item->date);
+                $dateDifference = date_diff($properDate,$goodDate, true);
+                $dateDifference = $dateDifference->format('%a');
+//            if($item->city_id == 75) {
+//                dd($dateDifference);
+//            }
+
+                $arrayFlag = false;
+                if($dateDifference <= $gracePeriod) {
+                    foreach($checkedCities as $cities) {
+                        if($item->city_id == $cities) {
+                            $arrayFlag = true;
+                        }
+                    }
+                    if($arrayFlag == false) {
+                        array_push($checkedCities, $item->city_id);
+                    }
+                }
+
+            }
+
+            $rout = RouteInfo::select('routes_id')->whereIn('city_id', $checkedCities)->where('status', '=', 1)->groupBy('routes_id')->pluck('routes_id')->toArray();
+            $routesFiltered = Route::select('id', 'name')->whereNotIn('id', $rout)->where('status', '=', 1)->get();
+            $routes = Route::where('status', '=', 1)->get();
+            $routes->map(function($item) use($routesFiltered){
+                $item->changeColor = 0;
+
+                if(!$routesFiltered->where('id','=',$item->id)->isEmpty()){
+                    $item->changeColor = 1;
+                }
+
+                return $item;
+            });
+        }
+        else {
+            $routes = Route::where('status', '=', 1)->get();
+        }
 
         return datatables($routes)->make(true);
     }
