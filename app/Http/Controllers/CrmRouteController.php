@@ -27,13 +27,16 @@ class CrmRouteController extends Controller
     public function index()
     {
         $departments = Department_info::all();
+        $today = date('Y-m-d');
+        $today .= '';
         $voivodes = Voivodes::all();
         $year = date('Y',strtotime("this year"));
         $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
         return view('crmRoute.index')
             ->with('departments', $departments)
             ->with('voivodes', $voivodes)
-            ->with('lastWeek', $numberOfLastYearsWeek);
+            ->with('lastWeek', $numberOfLastYearsWeek)
+            ->with('today', $today);
     }
 
     /**
@@ -56,6 +59,7 @@ class CrmRouteController extends Controller
 
         $loggedUser = Auth::user();
 
+//        dd($hourArr);
         //New insertion into ClientRoute table
         $clientRoute = new ClientRoute();
         $clientRoute->client_id = $clientId;
@@ -88,11 +92,6 @@ class CrmRouteController extends Controller
         return Redirect::back();
 
     }
-
-    public function crmRouteIndexGracePeriod(Request $request) {
-
-    }
-
     /**
      * This method shows specific route
      */
@@ -798,14 +797,14 @@ class CrmRouteController extends Controller
 
             //lista miast we wszystkich trasach.
             $citiesAvailable = DB::table('routes_info')->select(DB::raw('
-        city_id as cityId
+            city_id as cityId
             '))
                 ->pluck('cityId')
                 ->toArray();
 
             //Rekordy clientRoutesInfo w których były użyte miasta
             $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->whereIn('city_id', $citiesAvailable)->get();
-            $checkedCities = array();
+            $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
                 //wartość karencji dla danego miasta
                 $gracePeriod = Cities::find($item->city_id)->grace_period;
@@ -828,7 +827,7 @@ class CrmRouteController extends Controller
 //            }
 
                 $arrayFlag = false;
-                if($dateDifference < $gracePeriod) {
+                if($dateDifference <= $gracePeriod) {
                     foreach($checkedCities as $cities) {
                         if($item->city_id == $cities) {
                             $arrayFlag = true;
@@ -841,16 +840,18 @@ class CrmRouteController extends Controller
 
             }
 
-            $routes = DB::table('routes')->select(DB::raw('
-                routes.id as id,
-                routes.name as name
-            '))
-                ->join('routes_info', 'routes.id', '=', 'routes_info.routes_id')
-                ->whereNotIn('routes_info.city_id', $checkedCities)
-                ->where('routes.status', '=', 1)
-                ->distinct()
-                ->get();
-//            $routes = Route::where('status', '=', 1)->get();
+            $rout = RouteInfo::select('routes_id')->whereIn('city_id', $checkedCities)->where('status', '=', 1)->groupBy('routes_id')->pluck('routes_id')->toArray();
+            $routesFiltered = Route::select('id', 'name')->whereNotIn('id', $rout)->where('status', '=', 1)->get();
+            $routes = Route::where('status', '=', 1)->get();
+            $routes->map(function($item) use($routesFiltered){
+                $item->changeColor = 0;
+
+                if(!$routesFiltered->where('id','=',$item->id)->isEmpty()){
+                    $item->changeColor = 1;
+                }
+
+                return $item;
+            });
         }
         else {
             $routes = Route::where('status', '=', 1)->get();

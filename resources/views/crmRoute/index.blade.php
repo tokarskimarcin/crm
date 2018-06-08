@@ -155,10 +155,10 @@
                                 </div>
                             </div>
                             <div class="col-md-12">
-                                <div class="form-group" style="margin-top:1em;">
-                                    <label for="weekNumber">Wybierz tydzień</label>
-                                    <select id="weekNumber" class="form-control"></select>
-                                </div>
+                                {{--<div class="form-group" style="margin-top:1em;">--}}
+                                    {{--<label for="weekNumber">Wybierz tydzień</label>--}}
+                                    {{--<select id="weekNumber" class="form-control"></select>--}}
+                                {{--</div>--}}
                                 <div class="form-group">
                                     <label class="myLabel">Data:</label>
                                     <div class="input-group date form_date col-md-5" data-date-calendarWeeks="true" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
@@ -331,12 +331,15 @@
 
             const lastWeekOfYear ={{$lastWeek}};
             const weekSelect = document.querySelector('#weekNumber');
-            for(var i = 1; i <= lastWeekOfYear ; i++) {
-                let optionElement = document.createElement('option');
-                optionElement.value = i;
-                optionElement.innerHTML = `${i}`;
-                weekSelect.appendChild(optionElement);
+            if(weekSelect) {
+                for(var i = 1; i <= lastWeekOfYear ; i++) {
+                    let optionElement = document.createElement('option');
+                    optionElement.value = i;
+                    optionElement.innerHTML = `${i}`;
+                    weekSelect.appendChild(optionElement);
+                }
             }
+
 
 
             Element.prototype.appendAfter = function (element) {
@@ -378,7 +381,9 @@
                 document.getElementById('client_choice_type').textContent = "";
             }
 
-            let currentDate = null;
+
+            {{--let currentDate ={{$today}};--}}
+                let currentDate = null;
 
             table_client = $('#table_client').DataTable({
                 "autoWidth": true,
@@ -541,6 +546,9 @@
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },"rowCallback": function( row, data, index ) {
                     $(row).attr('id', 'route_' + data.id);
+                    if(data.changeColor == '0') {
+                        $(row).css('background','#c500002e');
+                    }
                     return row;
                 },"fnDrawCallback": function(settings){
                     $('#datatable tbody tr').on('click', function() {
@@ -763,7 +771,7 @@
                     '<div class="col-md-6">' +
                     '<div class="form-group">' +
                     '<label class="myLabel">Ilość godzin pokazów</label>' +
-                    '<input class="form-control" min="0" type="number" placeholder="Np. 2">' +
+                    '<input class="form-control show-hours" min="0" type="number" placeholder="Np. 2">' +
                     '</div>' +
                     '</div>' +
                     '<div class="col-md-6">' +
@@ -983,6 +991,11 @@
                     let cityElements = Array.from(document.getElementsByClassName('city'));
                     let showElements = Array.from(document.getElementsByClassName('show-hours'));
                     let dateElements = Array.from(document.getElementsByClassName('dateInput'));
+
+                    console.log(voivodeElements);
+                    console.log(cityElements);
+                    console.log(showElements);
+                    console.log(dateElements);
 
                     let voivodeArr = [];
                     let cityArr = [];
