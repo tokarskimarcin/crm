@@ -102,16 +102,16 @@
             <td colspan=3 style="border:1px solid #231f20;text-align:center;padding:3px;"><b>Ogół</b></td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round(($overall_result[1]->bisnode*100)/$overall_result[1]->suma)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round(($overall_result[1]->bisnodeZgody*100)/$overall_result[1]->suma)}} %</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round((($overall_result[1]->bisnodeZgody + $overall_result[1]->bisnode)*100)/$overall_result[0]->suma)}} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round((($overall_result[1]->bisnodeZgody + $overall_result[1]->bisnode)*100)/$overall_result[1]->suma)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round(($overall_result[1]->zgody*100)/$overall_result[1]->suma)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round(($overall_result[1]->zgodyZgody*100)/$overall_result[1]->suma)}} %</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round((($overall_result[1]->zgodyZgody + $overall_result[1]->zgody)*100)/$overall_result[0]->suma)}} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round((($overall_result[1]->zgodyZgody + $overall_result[1]->zgody)*100)/$overall_result[1]->suma)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round(($overall_result[1]->event*100)/$overall_result[1]->suma)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round(($overall_result[1]->eventZgody*100)/$overall_result[1]->suma)}} %</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round((($overall_result[1]->eventZgody + $overall_result[1]->event)*100)/$overall_result[0]->suma)}} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round((($overall_result[1]->eventZgody + $overall_result[1]->event)*100)/$overall_result[1]->suma)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round(($overall_result[1]->reszta*100)/$overall_result[1]->suma)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round(($overall_result[1]->resztaZgody*100)/$overall_result[1]->suma)}} %</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round((($overall_result[1]->resztaZgody + $overall_result[1]->reszta)*100)/$overall_result[0]->suma)}} %</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{round((($overall_result[1]->resztaZgody + $overall_result[1]->reszta)*100)/$overall_result[1]->suma)}} %</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{$overall_result[1]->suma}}</td>
         </tr>
         @foreach($departamentship as $item)
