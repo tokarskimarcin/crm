@@ -271,13 +271,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
-        $('.form_date').datetimepicker({
-            language:  'pl',
-            autoclose: 1,
-            minView: 2,
-            calendarWeeks: 'true',
-            pickTime: false
-        });
+
+
+    function activateDatepicker() {
+      $('.form_date').datetimepicker({
+          language:  'pl',
+          autoclose: 1,
+          minView: 2,
+          calendarWeeks: 'true',
+          pickTime: false
+      });
+    }
+
+    activateDatepicker();
 
         //Clear Client modal
         function clearModal() {
@@ -329,6 +335,16 @@
 
         $(document).ready(function() {
 
+          //Ta funkcja działa analogicznie jak jQuerry .appendAfter();
+          Element.prototype.appendAfter = function (element) {
+              element.parentNode.insertBefore(this, element.nextSibling);
+          },false;
+
+          //Ta funkcja działa analogicznie jak jQuerry .appendBefore();
+          Element.prototype.appendBefore = function (element) {
+              element.parentNode.insertBefore(this, element);
+          },false;
+
             const lastWeekOfYear ={{$lastWeek}};
             const weekSelect = document.querySelector('#weekNumber');
             if(weekSelect) {
@@ -340,15 +356,6 @@
                 }
             }
 
-
-
-            Element.prototype.appendAfter = function (element) {
-                element.parentNode.insertBefore(this, element.nextSibling);
-            },false;
-
-            Element.prototype.appendBefore = function (element) {
-                element.parentNode.insertBefore(this, element);
-            },false;
 
             let iterator = 1;
             let mainContainer = document.querySelector('.routes-wrapper'); //zaznaczamy główny container
@@ -381,6 +388,137 @@
                 document.getElementById('client_choice_type').textContent = "";
             }
 
+
+
+
+
+            function getCitiesNamesByVoievodeship(voivodeship_id) {
+                let city;
+                $.ajax({
+                    type: "POST",
+                    async: false,
+                    url: '{{ route('api.getCitiesNames') }}',
+                    data: {
+                        "id": voivodeship_id,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (response) {
+                        city = response;
+                    }
+                });
+                return city;
+            }
+
+            //Pobranie miast do wojew. bez ograniczenia do 100 KM
+            function getCitiesNameFromAjax(e){
+              let container = e.target.parentElement.parentElement.parentElement.parentElement;
+              let headerId = e.params.data.id;
+              $.ajax({
+                  type: "POST",
+                  url: '{{ route('api.getCitiesNames') }}',
+                  data: {
+                      "id": headerId
+                  },
+                  headers: {
+                      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                  },
+                  success: function(response) {
+                      //Funkcja ta tworzy select wraz z miastami i wkleja w odpowiednie miejsce
+                      let placeToAppend2 = container.getElementsByClassName('city')[0];
+                      placeToAppend2.innerHTML = '';
+                      let basicOption = document.createElement('option');
+                      basicOption.value = '0';
+                      basicOption.textContent = 'Wybierz';
+                      placeToAppend2.appendChild(basicOption);
+                      for(var i = 0; i < response.length; i++) {
+                          let responseOption = document.createElement('option');
+                          responseOption.value = response[i].id;
+                          responseOption.textContent = response[i].name;
+                          placeToAppend2.appendChild(responseOption);
+                      }
+                  }
+              });
+            }
+
+            function generateRouteDiv(showRemove,showRefresh,showNewRoute,responseIterator,city,voievodes,placeToAppend){
+              let routeContainer = document.createElement('div');
+              routeContainer.className = 'routes-container';
+
+              let stringAppend =
+               '<div class="row">\n' +
+                     '<div class="button_section">';
+                     if(showRemove)
+                         stringAppend += '<span class="glyphicon glyphicon-remove" data-remove="show"></span>';
+                     stringAppend += '</div>' +
+                        '<header>Pokaz </header>\n';
+                     if(showRefresh)
+                         stringAppend +='<div class=colmd-12 style="text-align: center">' +
+                     '<span class="glyphicon glyphicon-refresh" data-refresh="refresh" style="font-size: 30px"></span>' +
+               '</div>';
+
+               stringAppend +=
+               '\n' +
+               '            <div class="col-md-6">\n' +
+               '                <div class="form-group">\n' +
+               '                    <label>Województwo</label>\n' +
+               '                    <select class="form-control voivodeship" data-type="voivode">\n';
+                       for(var j = 0; j<voievodes.length; j++){
+                           if(responseIterator.voivodeship_id == voievodes[j].id)
+                               stringAppend +=  '<option value ="' + responseIterator.voivodeship_id + ' " selected>' + responseIterator.voivode_name + '</option>';
+                           else
+                               stringAppend +=  '<option value ="' + voievodes[j].id + '">' + voievodes[j].name + '</option>';
+                            }
+               stringAppend += '                    </select>\n' +
+               '                </div>\n' +
+               '            </div>\n' +
+               '\n' +
+               '            <div class="col-md-6">\n' +
+               '                <div class="form-group">\n' +
+               '                    <label for="city">Miasto</label>\n' +
+               '                    <select class="form-control city">\n';
+               for(var j = 0; j<city.length; j++) {
+                   if (responseIterator.city_id == city[j].id){
+                       stringAppend += '<option value="' + responseIterator.city_id + '" selected>' + responseIterator.city_name + '</option>\n';
+                   }else{
+                       stringAppend += '<option value="' + city[j].id + '" >' + city[j].name + '</option>\n';
+                   }
+               }
+               stringAppend +='                    </select>\n' +
+               '                </div>\n' +
+               '            </div>\n' +
+                   '<div class="col-md-6">' +
+                   '<div class="form-group">' +
+                   '<label class="myLabel">Ilość godzin pokazów</label>' +
+                   '<input class="form-control show-hours" min="0" type="number" placeholder="Np. 2">' +
+                   '</div>' +
+                   '</div>' +
+                   '<div class="col-md-6">' +
+                   '<div class="form-group">' +
+                   '<label class="myLabel">Data:</label>' +
+                   '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">' +
+                   '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">' +
+                   '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
+                   '</div>' +
+                   '</div>' +
+                   '</div>' +
+               '\n' +
+                   '<div class="form-group hour_div">' +
+                   '</div>';
+
+
+                   if(showNewRoute)
+                     stringAppend +=
+                     '<div class="col-lg-12 button_section button_new_show_section">\n' +
+                              '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
+                     '</div>\n';
+                   stringAppend +='</div>';
+
+               routeContainer.innerHTML = stringAppend;
+               placeToAppend.appendChild(routeContainer);
+
+            }
 
             {{--let currentDate ={{$today}};--}}
                 let currentDate = null;
@@ -524,10 +662,10 @@
 
 //*********************END CLIENT SECTON***************************
 
+//*********************START ROUTE(ROUND) SECTON***************************
 
             let addNewRouteButton = document.getElementById('add-new-route');
-
-
+            // Tabela zawierająca szablony tras
             table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,
@@ -547,19 +685,20 @@
                 },"rowCallback": function( row, data, index ) {
                     $(row).attr('id', 'route_' + data.id);
                     if(data.changeColor == '0') {
+                      //Gdy trasa jest zajęta
                         $(row).css('background','#c500002e');
                     }
                     return row;
                 },"fnDrawCallback": function(settings){
                     $('#datatable tbody tr').on('click', function() {
-
+                      // klikamy  na zaznaczony checkboxa trasy, oddzacz i usuń trase
                         if($(this).hasClass('check')) {
                             $(this).removeClass('check');
                             $(this).find('.route_check').prop('checked',false);
                             route_id = 0; // przypisuje route_id = 0 gdy odznaczamy checkboxa
                             let placeToAppend = document.querySelector('.route-here');
                             placeToAppend.innerHTML = '';
-                        }
+                        }// klikamy  na odznaczony checkboxa trasy, zaznacz i dodaj trase
                         else {
                             table.$('tr.check').removeClass('check');
                             $.each($('#datatable').find('.route_check'), function (item,val) {
@@ -571,6 +710,7 @@
                             let placeToAppend = document.querySelector('.route-here');
                             placeToAppend.innerHTML = '';
 
+                            // Pobranie informacji o zaznaczonej trasie
                                 $.ajax({
                                     type: "POST",
                                     url: '{{ route('api.getRoute') }}',
@@ -582,144 +722,29 @@
                                     },
                                     success: function(response) {
                                         var voievodes = @json($voivodes);
+                                        //Dla wybranego wojew.. z trasy, pobierz wszystkie
+                                        //miasta
                                         for(var i = 0; i < response.length; i++) {
-                                            var city;
-                                            $.ajax({
-                                                type: "POST",
-                                                async:false,
-                                                url: '{{ route('api.getCitiesNames') }}',
-                                                data: {
-                                                    "id": response[i].voivodeship_id,
-                                                },
-                                                headers: {
-                                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                                },
-                                                success: function(response) {
-                                                    city = response;
-                                                }
-                                            });
-                                            let routeContainer = document.createElement('div');
-                                            routeContainer.className = 'routes-container';
+                                          //Pobranie miast dla danego wojew
+                                            var city = getCitiesNamesByVoievodeship(response[i].voivodeship_id);
+                                            //Generowanie Div'a
+                                            if(i == 0)
+                                              generateRouteDiv(false,false,false,response[i],city,voievodes,placeToAppend);
+                                            if(i+1 == response.length)
+                                              generateRouteDiv(true,true,true,response[i],city,voievodes,placeToAppend);
+                                            else
+                                              generateRouteDiv(true,true,false,response[i],city,voievodes,placeToAppend);
 
-                                            let stringAppend = '<div class="row">\n' +
-                                            '<div class="button_section">';
-                                            if(i != 0)
-                                                stringAppend += '<span class="glyphicon glyphicon-remove" data-remove="show"></span>';
-                                            stringAppend += '</div>' +
-                                            '        <header>Pokaz </header>\n';
-                                            if(i != 0)
-                                                stringAppend +='<div class=colmd-12 style="text-align: center">' +
-                                            '   <span class="glyphicon glyphicon-refresh" data-refresh="refresh" style="font-size: 30px"></span>' +
-                                                '</div>';
-                                            stringAppend +=
-                                            '\n' +
-                                            '            <div class="col-md-6">\n' +
-                                            '                <div class="form-group">\n' +
-                                            '                    <label>Województwo</label>\n' +
-                                            '                    <select class="form-control voivodeship" data-type="voivode">\n';
-                                                    for(var j = 0; j<voievodes.length; j++){
-                                                        if(response[i].voivodeship_id == voievodes[j].id)
-                                                            stringAppend +=  '<option value ="' + response[i].voivodeship_id + ' " selected>' + response[i].voivode_name + '</option>';
-                                                        else
-                                                            stringAppend +=  '<option value ="' + voievodes[j].id + '">' + voievodes[j].name + '</option>';
-                                                         }
-                                            stringAppend += '                    </select>\n' +
-                                            '                </div>\n' +
-                                            '            </div>\n' +
-                                            '\n' +
-                                            '            <div class="col-md-6">\n' +
-                                            '                <div class="form-group">\n' +
-                                            '                    <label for="city">Miasto</label>\n' +
-                                            '                    <select class="form-control city">\n';
-                                            for(var j = 0; j<city.length; j++) {
-                                                if (response[i].city_id == city[j].id){
-                                                    stringAppend += '<option value="' + response[i].city_id + '" selected>' + response[i].city_name + '</option>\n';
-                                                }else{
-                                                    stringAppend += '<option value="' + city[j].id + '" >' + city[j].name + '</option>\n';
-                                                }
-                                            }
-                                            stringAppend +='                    </select>\n' +
-                                            '                </div>\n' +
-                                            '            </div>\n' +
-                                                '<div class="col-md-6">' +
-                                                '<div class="form-group">' +
-                                                '<label class="myLabel">Ilość godzin pokazów</label>' +
-                                                '<input class="form-control show-hours" min="0" type="number" placeholder="Np. 2">' +
-                                                '</div>' +
-                                                '</div>' +
-                                                '<div class="col-md-6">' +
-                                                '<div class="form-group">' +
-                                                '<label class="myLabel">Data:</label>' +
-                                                '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">' +
-                                                '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">' +
-                                                '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
-                                                '</div>' +
-                                                '</div>' +
-                                                '</div>' +
-                                            '\n' +
-                                                '<div class="form-group hour_div">' +
-                                                '</div>' +
-                                                '            <div class="col-lg-12 button_section button_new_show_section">\n' +
-                                                '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
-                                                '            </div>\n' +
-                                            '        </div>';
-                                            routeContainer.innerHTML = stringAppend;
-                                            placeToAppend.appendChild(routeContainer);
                                             $('.city').select2();
                                             $('.voivodeship').select2();
                                             $('.voivodeship').off('select2:select'); //remove previous event listeners
-                                            if ( i == 0){
-
-                                            }
                                             $('.voivodeship').on('select2:select', function (e) {
-                                                let container = e.target.parentElement.parentElement.parentElement.parentElement;
-                                                let headerId = e.params.data.id;
-                                                $.ajax({
-                                                    type: "POST",
-                                                    url: '{{ route('api.getCitiesNames') }}',
-                                                    data: {
-                                                        "id": headerId
-                                                    },
-                                                    headers: {
-                                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                                    },
-                                                    success: function(response) {
-                                                        console.log(response);
-                                                        let placeToAppend2 = container.getElementsByClassName('city')[0];
-                                                        placeToAppend2.innerHTML = '';
-                                                        let basicOption = document.createElement('option');
-                                                        basicOption.value = '0';
-                                                        basicOption.textContent = 'Wybierz';
-                                                        placeToAppend2.appendChild(basicOption);
-                                                        for(var i = 0; i < response.length; i++) {
-                                                            let responseOption = document.createElement('option');
-                                                            responseOption.value = response[i].id;
-                                                            responseOption.textContent = response[i].name;
-                                                            placeToAppend2.appendChild(responseOption);
-                                                        }
-
-                                                    }
-                                                });
-
+                                                getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
                                             });
-
-                                            $('.form_date').datetimepicker({
-                                                language:  'pl',
-                                                autoclose: 1,
-                                                minView: 2,
-                                                calendarWeeks: 'true',
-                                                pickTime: false
-                                            });
-                                        }
-                                        //This part is responsible for button showing on given route
-                                        const allNewShowSections = Array.from(document.querySelectorAll('.routes-container .button_new_show_section'));
-                                        for(let i = allNewShowSections.length - 2; i >= 0; i--) {
-                                            allNewShowSections[i].parentNode.removeChild(allNewShowSections[i]);
+                                            activateDatepicker();
                                         }
                                     }
                                 });
-
-
                         }
                     });
                 },
@@ -735,7 +760,7 @@
                 ]
             });
 
-
+            //tworzenie nowego diva z opcją ograniczenia 100KM
             function createNewShow(voivodes) {
                 newElement = document.createElement('div');
                 newElement.className = 'routes-container';
@@ -793,6 +818,8 @@
                 newElement.innerHTML = stringAppend;
                 return newElement;
             }
+
+            //Ta funkcja jest globalnym event listenerem na click
             function buttonHandler(e) {
                 if(e.target.id == 'add-new-route') {
                     let appendPlace = document.querySelector('.route-here');
@@ -803,42 +830,10 @@
                     $('.voivodeship').select2();
                     $('.voivodeship').off('select2:select'); //remove previous event listeners
                     $('.voivodeship').on('select2:select', function (e) {
-                        let container = e.target.parentElement.parentElement.parentElement.parentElement;
-                        let headerId = e.params.data.id;
-                        $.ajax({
-                            type: "POST",
-                            url: '{{ route('api.getCitiesNames') }}',
-                            data: {
-                                "id": headerId
-                            },
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function(response) {
-                                console.log(response);
-                                let placeToAppend2 = container.getElementsByClassName('city')[0];
-                                placeToAppend2.innerHTML = '';
-                                let basicOption = document.createElement('option');
-                                basicOption.value = '0';
-                                basicOption.textContent = 'Wybierz';
-                                placeToAppend2.appendChild(basicOption);
-                                for(var i = 0; i < response.length; i++) {
-                                    let responseOption = document.createElement('option');
-                                    responseOption.value = response[i].id;
-                                    responseOption.textContent = response[i].name;
-                                    placeToAppend2.appendChild(responseOption);
-                                }
+                      getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
+                    });
+                    activateDatepicker();
 
-                            }
-                        });
-                    });
-                    $('.form_date').datetimepicker({
-                        language:  'pl',
-                        autoclose: 1,
-                        minView: 2,
-                        calendarWeeks: 'true',
-                        pickTime: false
-                    });
                 }
                 else if(e.target.id == 'add_new_show') {
                     //Get lest child of voievoidship
@@ -849,8 +844,6 @@
                     let countAllCitySelect = AllCitySelect.length;
                     let cityId = 0;
                     let voievodeshipId = 0;
-
-
                     // Walidacja wybrania
                     if(countAllVoievoidship != 0 && countAllCitySelect != 0){
                         voievodeshipId  = AllVoievoidship[countAllVoievoidship-1].value;
@@ -860,6 +853,7 @@
                         voievodeshipId = AllVoievoidship[countAllVoievoidship].value;
                         cityId = AllCitySelect[countAllCitySelect].value;
                     }
+
                     $.ajax({
                         type: "POST",
                         url: '{{ route('api.getVoivodeshipRound') }}',
@@ -896,31 +890,7 @@
                                         }
                                     }
                                 }else{
-                                    $.ajax({
-                                        type: "POST",
-                                        url: '{{ route('api.getCitiesNames') }}',
-                                        data: {
-                                            "id": headerId
-                                        },
-                                        headers: {
-                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                        },
-                                        success: function(response) {
-                                            let placeToAppend = container.getElementsByClassName('city')[0];
-                                            placeToAppend.innerHTML = '';
-                                            let basicOption = document.createElement('option');
-                                            basicOption.value = '0';
-                                            basicOption.textContent = 'Wybierz';
-                                            placeToAppend.appendChild(basicOption);
-                                            for(var i = 0; i < response.length; i++) {
-                                                let responseOption = document.createElement('option');
-                                                responseOption.value = response[i].id;
-                                                responseOption.textContent = response[i].name;
-                                                placeToAppend.appendChild(responseOption);
-                                            }
-
-                                        }
-                                    });
+                                    getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
                                 }
                             });
                         }
@@ -952,7 +922,7 @@
                             success: function (response) {
                                 $(actualSelectVoievode).off('select2:select');
 
-                                var stringAppend = '<option value=0>Wybierz</option>';
+                                let stringAppend = '<option value=0>Wybierz</option>';
                                 for (let i = 0; i < response['voievodeInfo'].length; i++) {
                                     stringAppend += '<option value =' + response['voievodeInfo'][i]['id'] + '>' + response['voievodeInfo'][i]['name'] + '</option>';
                                 }
@@ -987,21 +957,19 @@
                 }
                 else if(e.target.id == "save") {
                     let everythingIsGood = undefined;
+                    //Zaznaczenie wszystkich niezbędnych inputów
                     let voivodeElements = Array.from(document.getElementsByClassName('voivodeship'));
                     let cityElements = Array.from(document.getElementsByClassName('city'));
                     let showElements = Array.from(document.getElementsByClassName('show-hours'));
                     let dateElements = Array.from(document.getElementsByClassName('dateInput'));
 
-                    console.log(voivodeElements);
-                    console.log(cityElements);
-                    console.log(showElements);
-                    console.log(dateElements);
-
+                    //Deklaracja tablic które będą przechowywały wartości inputów
                     let voivodeArr = [];
                     let cityArr = [];
                     let hourArr = [];
                     let dateArr = [];
 
+                    //Wypełnianie powyższych tablic wartościami z inputów
                     voivodeElements.forEach(function(element) {
                         voivodeArr.push(element.options[element.selectedIndex].value);
                     });
@@ -1018,13 +986,7 @@
                        dateArr.push(element.value);
                     });
 
-                    if(finalClientId != null && finalClientId != '0') {
-                        everythingIsGood = formValidation(voivodeArr, cityArr, hourArr);
-                    }
-                    else {
-                        everythingIsGood = false;
-                    }
-
+                    everythingIsGood = finalClientId != null && finalClientId != '0' ? formValidation(voivodeArr, cityArr, hourArr) : false;
 
                     if(everythingIsGood == true) {
                         let formContainer = document.createElement('div');
@@ -1091,6 +1053,9 @@
                 return flag;
             }
 
+            /**
+            * This function remove whole route container while user click on red cross button
+            */
             function removeGivenShow(container) {
                 let allShows = document.getElementsByClassName('routes-container');
                 let lastShowContainer = allShows[allShows.length - 1];
@@ -1103,6 +1068,9 @@
                 }
             }
 
+            /**
+            * This method is reposnosible for adding cross button and dodaj nowy pokaz buttons on previous container.
+            */
             function addButtonsToPreviousContainer(container) {
                 let previousContainer = container.previousElementSibling;
                 let placeInPreviousContainer = previousContainer.getElementsByClassName('hour_div')[0];
@@ -1125,13 +1093,7 @@
                 }
                 routePlace.appendChild(newShow);
 
-                $('.form_date').datetimepicker({
-                    language:  'pl',
-                    autoclose: 1,
-                    minView: 2,
-                    calendarWeeks: 'true',
-                    pickTime: false
-                });
+                activateDatepicker();
             }
 
             function removeButtonsFromLastShow() {
@@ -1141,15 +1103,11 @@
                 }
             }
 
-
-
             document.addEventListener('click', buttonHandler);
             $('.form_date').on('change.dp', function(e) {
                 currentDate = e.target.value;
                 table.ajax.reload();
             });
-
-
 
 
         });
