@@ -71,6 +71,7 @@
     .check{
     background: #B0BED9 !important;
     }
+
     </style>
 
 {{--Header page --}}
@@ -400,6 +401,7 @@
                     url: '{{ route('api.getCitiesNames') }}',
                     data: {
                         "id": voivodeship_id,
+                        "currentDate": currentDate
                     },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -419,7 +421,8 @@
                   type: "POST",
                   url: '{{ route('api.getCitiesNames') }}',
                   data: {
-                      "id": headerId
+                      "id": headerId,
+                      "currentDate": currentDate
                   },
                   headers: {
                       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -435,7 +438,13 @@
                       for(var i = 0; i < response.length; i++) {
                           let responseOption = document.createElement('option');
                           responseOption.value = response[i].id;
-                          responseOption.textContent = response[i].name;
+                          if(response[i].block == 1) {
+                              responseOption.textContent = response[i].name + " (KARENCJA do " + response[i].available_date + ")";
+                          }
+                          else {
+                              responseOption.textContent = response[i].name;
+                          }
+
                           placeToAppend2.appendChild(responseOption);
                       }
                   }
@@ -480,9 +489,22 @@
                '                    <select class="form-control city">\n';
                for(var j = 0; j<city.length; j++) {
                    if (responseIterator.city_id == city[j].id){
-                       stringAppend += '<option value="' + responseIterator.city_id + '" selected>' + responseIterator.city_name + '</option>\n';
+                       // console.log(responseIterator);
+                       if(city[j].block == 1) {
+                           stringAppend += '<option value="' + responseIterator.city_id + '" selected>' + responseIterator.city_name + ' (KARENCJA do ' + city[j].available_date + '</option>\n';
+                       }
+                       else {
+                           stringAppend += '<option value="' + responseIterator.city_id + '" selected>' + responseIterator.city_name + '</option>\n';
+                       }
+
                    }else{
-                       stringAppend += '<option value="' + city[j].id + '" >' + city[j].name + '</option>\n';
+                       if(city[j].block == 1) {
+                           stringAppend += '<option value="' + city[j].id + '" >' + city[j].name + '(KARENCJA do ' + city[j].available_date + ')</option>\n';
+                       }
+                       else {
+                           stringAppend += '<option value="' + city[j].id + '" >' + city[j].name + '</option>\n';
+                       }
+
                    }
                }
                stringAppend +='                    </select>\n' +
@@ -730,7 +752,7 @@
                                             //Generowanie Div'a
                                             if(i == 0)
                                               generateRouteDiv(false,false,false,response[i],city,voievodes,placeToAppend);
-                                            if(i+1 == response.length)
+                                            else if(i+1 == response.length)
                                               generateRouteDiv(true,true,true,response[i],city,voievodes,placeToAppend);
                                             else
                                               generateRouteDiv(true,true,false,response[i],city,voievodes,placeToAppend);
@@ -859,7 +881,8 @@
                         url: '{{ route('api.getVoivodeshipRound') }}',
                         data: {
                             "voievodeshipId" : voievodeshipId,
-                            "cityId"         : cityId
+                            "cityId"         : cityId,
+                            "currentDate": currentDate //This variable is required for grace period
                         },
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -885,7 +908,12 @@
                                         if(cityInfo[i].id == headerId){
                                             let responseOption = document.createElement('option');
                                             responseOption.value = cityInfo[i].city_id;
-                                            responseOption.textContent = cityInfo[i].city_name;
+                                            if(cityInfo[i].block == 1) { //here we distinct cities with grace period
+                                                responseOption.textContent = cityInfo[i].city_name + " (KARENCJA do " + cityInfo[i].available_date + ")";
+                                            }
+                                            else {
+                                                responseOption.textContent = cityInfo[i].city_name;
+                                            }
                                             placeToAppend.appendChild(responseOption);
                                         }
                                     }
@@ -909,12 +937,15 @@
                     if(previousContener != null) {
                         var previousSelectCityVal = previousContener.getElementsByClassName('city')[0].value;
                         var previousSelectVoievodeVal = previousContener.getElementsByClassName('voivodeship')[0].value;
+                        let dateInput = previousContener.querySelector('.dateInput');
+                        currentDate = dateInput.value; //we are appending new "current date" for grace period purposes based on previous container's date.
                         $.ajax({
                             type: "POST",
                             url: '{{ route('api.getVoivodeshipRound') }}',
                             data: {
                                 "voievodeshipId": previousSelectVoievodeVal,
-                                "cityId": previousSelectCityVal
+                                "cityId": previousSelectCityVal,
+                                "currentDate": currentDate //This variable is required for grace period
                             },
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -941,13 +972,17 @@
                                             basicOption.textContent = 'Wybierz';
                                             placeToAppend2.appendChild(basicOption);
                                             let responseObject = response['cityInfo'];
-                                            console.log(responseObject[headerId]);
                                             for(var i = 0; i < responseObject[headerId].length; i++) {
 
 
                                                 let responseOption = document.createElement('option');
                                                 responseOption.value = responseObject[headerId][i].city_id;
-                                                responseOption.textContent = responseObject[headerId][i].city_name;
+                                                if(cityInfo[i].block == 1) { //here we distinct cities with grace period
+                                                    responseOption.textContent = cityInfo[i].city_name + " (KARENCJA do " + cityInfo[i].available_date + ")";
+                                                }
+                                                else {
+                                                    responseOption.textContent = cityInfo[i].city_name;
+                                                }
                                                 placeToAppend2.appendChild(responseOption);
                                             }
                                     });

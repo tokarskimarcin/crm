@@ -862,5 +862,3 @@ Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table
 
 
 
-
-
