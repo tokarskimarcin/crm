@@ -844,6 +844,7 @@
                     let countAllCitySelect = AllCitySelect.length;
                     let cityId = 0;
                     let voievodeshipId = 0;
+                    let validation = true;
                     // Walidacja wybrania
                     if(countAllVoievoidship != 0 && countAllCitySelect != 0){
                         voievodeshipId  = AllVoievoidship[countAllVoievoidship-1].value;
@@ -853,48 +854,56 @@
                         voievodeshipId = AllVoievoidship[countAllVoievoidship].value;
                         cityId = AllCitySelect[countAllCitySelect].value;
                     }
-
-                    $.ajax({
-                        type: "POST",
-                        url: '{{ route('api.getVoivodeshipRound') }}',
-                        data: {
-                            "voievodeshipId" : voievodeshipId,
-                            "cityId"         : cityId
-                        },
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            addNewShow(response['voievodeInfo'],1);
-                            $('.city').select2();
-                            $('.voivodeship').select2(); //attach select2 look
-                            $('.voivodeship').off('select2:select'); //remove previous event listeners
-                            $('.voivodeship').on('select2:select', function (e) {
-                                let container = e.target.parentElement.parentElement.parentElement.parentElement;
-                                let headerId = e.params.data.id;
-                                let placeToAppend = container.getElementsByClassName('city')[0];
-                                placeToAppend.innerHTML = '';
-                                let basicOption = document.createElement('option');
-                                basicOption.value = '0';
-                                basicOption.textContent = 'Wybierz';
-                                placeToAppend.appendChild(basicOption);
-                                var cityInfo = response['cityInfo'][headerId];
-                                if(typeof cityInfo !== 'undefined'){
-                                    //zmiana ręczna województwa
-                                    for(var i = 0; i < cityInfo.length; i++) {
-                                        if(cityInfo[i].id == headerId){
-                                            let responseOption = document.createElement('option');
-                                            responseOption.value = cityInfo[i].city_id;
-                                            responseOption.textContent = cityInfo[i].city_name;
-                                            placeToAppend.appendChild(responseOption);
+                    if(voievodeshipId == 0){
+                        swal("Przed dodaniem nowego pokazu, uprzednio wybierz Województwo");
+                        validation = false;
+                    }else if(cityId == 0){
+                        swal("Przed dodaniem nowego pokazu, uprzednio wybierz Miasto");
+                        validation = false;
+                    }
+                    if(validation){
+                        $.ajax({
+                            type: "POST",
+                            url: '{{ route('api.getVoivodeshipRound') }}',
+                            data: {
+                                "voievodeshipId" : voievodeshipId,
+                                "cityId"         : cityId
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                addNewShow(response['voievodeInfo'],1);
+                                $('.city').select2();
+                                $('.voivodeship').select2(); //attach select2 look
+                                $('.voivodeship').off('select2:select'); //remove previous event listeners
+                                $('.voivodeship').on('select2:select', function (e) {
+                                    let container = e.target.parentElement.parentElement.parentElement.parentElement;
+                                    let headerId = e.params.data.id;
+                                    let placeToAppend = container.getElementsByClassName('city')[0];
+                                    placeToAppend.innerHTML = '';
+                                    let basicOption = document.createElement('option');
+                                    basicOption.value = '0';
+                                    basicOption.textContent = 'Wybierz';
+                                    placeToAppend.appendChild(basicOption);
+                                    var cityInfo = response['cityInfo'][headerId];
+                                    if(typeof cityInfo !== 'undefined'){
+                                        //zmiana ręczna województwa
+                                        for(var i = 0; i < cityInfo.length; i++) {
+                                            if(cityInfo[i].id == headerId){
+                                                let responseOption = document.createElement('option');
+                                                responseOption.value = cityInfo[i].city_id;
+                                                responseOption.textContent = cityInfo[i].city_name;
+                                                placeToAppend.appendChild(responseOption);
+                                            }
                                         }
+                                    }else{
+                                        getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
                                     }
-                                }else{
-                                    getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
-                                }
-                            });
-                        }
-                    });
+                                });
+                            }
+                        });
+                    }
                 }
                 else if(e.target.dataset.remove == 'show') { // click on X glyphicon
                     let showContainer = e.target.parentElement.parentElement.parentElement;
@@ -909,50 +918,61 @@
                     if(previousContener != null) {
                         var previousSelectCityVal = previousContener.getElementsByClassName('city')[0].value;
                         var previousSelectVoievodeVal = previousContener.getElementsByClassName('voivodeship')[0].value;
-                        $.ajax({
-                            type: "POST",
-                            url: '{{ route('api.getVoivodeshipRound') }}',
-                            data: {
-                                "voievodeshipId": previousSelectVoievodeVal,
-                                "cityId": previousSelectCityVal
-                            },
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function (response) {
-                                $(actualSelectVoievode).off('select2:select');
 
-                                let stringAppend = '<option value=0>Wybierz</option>';
-                                for (let i = 0; i < response['voievodeInfo'].length; i++) {
-                                    stringAppend += '<option value =' + response['voievodeInfo'][i]['id'] + '>' + response['voievodeInfo'][i]['name'] + '</option>';
-                                }
-                                actualSelectVoievode.innerHTML = stringAppend;
-                                stringAppend = '<option value=0>Wybierz</option>';
-                                actualSelectCity.innerHTML = stringAppend;
+                        let validation = true;
+                        if(previousSelectVoievodeVal == 0){
+                            swal("Przed synchronizacją nowego pokazu, uprzednio wybierz Województwo");
+                            validation = false;
+                        }else if(previousSelectCityVal == 0){
+                            swal("Przed synchronizacją nowego pokazu, uprzednio wybierz Miasto");
+                            validation = false;
+                        }
+                        if(validation){
+                            $.ajax({
+                                type: "POST",
+                                url: '{{ route('api.getVoivodeshipRound') }}',
+                                data: {
+                                    "voievodeshipId": previousSelectVoievodeVal,
+                                    "cityId": previousSelectCityVal
+                                },
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                success: function (response) {
+                                    $(actualSelectVoievode).off('select2:select');
 
-                                $(actualSelectVoievode).on('select2:select', function (e) {
-                                    let container = e.target.parentElement.parentElement.parentElement.parentElement;
-                                    let headerId = e.params.data.id;
+                                    let stringAppend = '<option value=0>Wybierz</option>';
+                                    for (let i = 0; i < response['voievodeInfo'].length; i++) {
+                                        stringAppend += '<option value =' + response['voievodeInfo'][i]['id'] + '>' + response['voievodeInfo'][i]['name'] + '</option>';
+                                    }
+                                    actualSelectVoievode.innerHTML = stringAppend;
+                                    stringAppend = '<option value=0>Wybierz</option>';
+                                    actualSelectCity.innerHTML = stringAppend;
 
-                                            let placeToAppend2 = container.getElementsByClassName('city')[0];
-                                            placeToAppend2.innerHTML = '';
-                                            let basicOption = document.createElement('option');
-                                            basicOption.value = '0';
-                                            basicOption.textContent = 'Wybierz';
-                                            placeToAppend2.appendChild(basicOption);
-                                            let responseObject = response['cityInfo'];
-                                            console.log(responseObject[headerId]);
-                                            for(var i = 0; i < responseObject[headerId].length; i++) {
+                                    $(actualSelectVoievode).on('select2:select', function (e) {
+                                        let container = e.target.parentElement.parentElement.parentElement.parentElement;
+                                        let headerId = e.params.data.id;
+
+                                        let placeToAppend2 = container.getElementsByClassName('city')[0];
+                                        placeToAppend2.innerHTML = '';
+                                        let basicOption = document.createElement('option');
+                                        basicOption.value = '0';
+                                        basicOption.textContent = 'Wybierz';
+                                        placeToAppend2.appendChild(basicOption);
+                                        let responseObject = response['cityInfo'];
+                                        console.log(responseObject[headerId]);
+                                        for(var i = 0; i < responseObject[headerId].length; i++) {
 
 
-                                                let responseOption = document.createElement('option');
-                                                responseOption.value = responseObject[headerId][i].city_id;
-                                                responseOption.textContent = responseObject[headerId][i].city_name;
-                                                placeToAppend2.appendChild(responseOption);
-                                            }
+                                            let responseOption = document.createElement('option');
+                                            responseOption.value = responseObject[headerId][i].city_id;
+                                            responseOption.textContent = responseObject[headerId][i].city_name;
+                                            placeToAppend2.appendChild(responseOption);
+                                        }
                                     });
-                            }
-                        });
+                                }
+                            });
+                        }
                     }
                 }
                 else if(e.target.id == "save") {

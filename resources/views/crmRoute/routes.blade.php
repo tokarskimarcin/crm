@@ -84,18 +84,27 @@
         @endif
             </div>
 
-
+@php
+ $lp = 1;
+@endphp
 
     @if(isset($routeInfo))
         @foreach($routeInfo as $routeInf)
             <div class="routes-container">
                 <div class="row">
+
+                @if($lp != 1)
                 <div class="button_section button_section_gl_nr">
                     <span class="glyphicon glyphicon-remove" data-remove="show"></span>
                 </div>
+                @endif
                 <header>Pokaz </header>
-
-                <div class="col-md-6">
+                @if($lp != 1)
+                    <div class=colmd-12 style="text-align: center">
+                        <span class="glyphicon glyphicon-refresh" data-refresh="refresh" style="font-size: 30px"></span>
+                    </div>
+                @endif
+                    <div class="col-md-6">
                     <div class="form-group">
                         <label>Województwo</label>
                         <select class="form-control voivodeship" data-type="voivode" data-element="voivode">
@@ -125,6 +134,9 @@
                 </div>
                 </div>
             </div>
+            @php
+                $lp++;
+            @endphp
             @endforeach
         @endif
 </div>
