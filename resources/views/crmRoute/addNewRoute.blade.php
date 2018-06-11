@@ -251,15 +251,15 @@
              */
             function buttonHandler(e) {
                 if(e.target.id == 'add_new_show') { // click on add new show button
-                    //Get lest child of voievoidship
+                    //Get last child of voievoidship
                     let AllVoievoidship = document.getElementsByClassName('voivodeship');
                     let countAllVoievoidship = AllVoievoidship.length;
-                    //Get lest child of City
+                    //Get last child of City
                     let AllCitySelect = document.getElementsByClassName('city');
                     let countAllCitySelect = AllCitySelect.length;
                     let cityId = 0;
                     let voievodeshipId = 0;
-
+                    let validation = true;
 
                     // Walidacja wybrania
                     if(countAllVoievoidship != 0 && countAllCitySelect != 0){
@@ -270,7 +270,15 @@
                         voievodeshipId = AllVoievoidship[countAllVoievoidship].value;
                         cityId = AllCitySelect[countAllCitySelect].value;
                     }
-                    $.ajax({
+                    if(voievodeshipId == 0){
+                        swal("Przed dodaniem nowego pokazu, uprzednio wybierz Województwo");
+                        validation = false;
+                    }else if(cityId == 0){
+                        swal("Przed dodaniem nowego pokazu, uprzednio wybierz Miasto");
+                        validation = false;
+                    }
+                    if(validation){
+                        $.ajax({
                             type: "POST",
                             url: '{{ route('api.getVoivodeshipRound') }}',
                             data: {
@@ -336,6 +344,7 @@
                                 });
                             }
                         });
+                    }
                 }
                 else if(e.target.dataset.remove == 'show') { // click on X glyphicon
                     let showContainer = e.target.parentElement.parentElement.parentElement;
@@ -348,27 +357,36 @@
                     var actualSelectVoievode = actualContener.getElementsByClassName('voivodeship')[0];
                     var previousSelectCityVal = previousContener.getElementsByClassName('city')[0].value;
                     var previousSelectVoievodeVal = previousContener.getElementsByClassName('voivodeship')[0].value;
-
-                    $.ajax({
-                    type: "POST",
-                    url: '{{ route('api.getVoivodeshipRound') }}',
-                    data: {
-                    "voievodeshipId": previousSelectVoievodeVal,
-                    "cityId": previousSelectCityVal
-                    },
-                    headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                        success: function (response) {
-                            var stringAppend = '<option value=0>Wybierz</option>';
-                            for (let i = 0; i < response['voievodeInfo'].length; i++) {
+                    let validation = true;
+                    if(previousSelectVoievodeVal == 0){
+                        swal("Przed synchronizacją nowego pokazu, uprzednio wybierz Województwo");
+                        validation = false;
+                    }else if(previousSelectCityVal == 0){
+                        swal("Przed synchronizacją nowego pokazu, uprzednio wybierz Miasto");
+                        validation = false;
+                    }
+                    if(validation){
+                        $.ajax({
+                            type: "POST",
+                            url: '{{ route('api.getVoivodeshipRound') }}',
+                            data: {
+                                "voievodeshipId": previousSelectVoievodeVal,
+                                "cityId": previousSelectCityVal
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function (response) {
+                                var stringAppend = '<option value=0>Wybierz</option>';
+                                for (let i = 0; i < response['voievodeInfo'].length; i++) {
                                     stringAppend += '<option value =' + response['voievodeInfo'][i]['id'] + '>' + response['voievodeInfo'][i]['name'] + '</option>';
+                                }
+                                actualSelectVoievode.innerHTML = stringAppend;
+                                stringAppend = '<option value=0>Wybierz</option>';
+                                actualSelectCity.innerHTML = stringAppend;
                             }
-                            actualSelectVoievode.innerHTML = stringAppend;
-                            stringAppend = '<option value=0>Wybierz</option>';
-                            actualSelectCity.innerHTML = stringAppend;
-                        }
-                    });
+                        });
+                    }
                 }
                 else if(e.target.id == 'save_route') {
                     saveRoute();
