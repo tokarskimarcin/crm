@@ -288,7 +288,7 @@
                     let countAllCitySelect = AllCitySelect.length;
                     let cityId = 0;
                     let voievodeshipId = 0;
-
+                    let validation = true;
                     // Walidacja wybrania
                     if(countAllVoievoidship != 0 && countAllCitySelect != 0){
                         voievodeshipId  = AllVoievoidship[countAllVoievoidship-1].value;
@@ -298,73 +298,81 @@
                         voievodeshipId = AllVoievoidship[countAllVoievoidship].value;
                         cityId = AllCitySelect[countAllCitySelect].value;
                     }
-
-                    $.ajax({
-                        type: "POST",
-                        url: '{{ route('api.getVoivodeshipRound') }}',
-                        data: {
-                            "voievodeshipId" : voievodeshipId,
-                            "cityId"         : cityId
-                        },
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            addNewShow(response['voievodeInfo'],1);
-                            $('.city').select2();
-                            $('.voivodeship').select2(); //attach select2 look
-                            $('.voivodeship').off('select2:select'); //remove previous event listeners
-                            $('.voivodeship').on('select2:select', function (e) {
-                                let container = e.target.parentElement.parentElement.parentElement.parentElement;
-                                let headerId = e.params.data.id;
-                                let placeToAppend = container.getElementsByClassName('city')[0];
-                                placeToAppend.innerHTML = '';
-                                let basicOption = document.createElement('option');
-                                basicOption.value = '0';
-                                basicOption.textContent = 'Wybierz';
-                                placeToAppend.appendChild(basicOption);
-                                var cityInfo = response['cityInfo'][headerId];
-                                if(typeof cityInfo !== 'undefined'){
-                                    //zmiana ręczna województwa
-                                    for(var i = 0; i < cityInfo.length; i++) {
-                                        if(cityInfo[i].id == headerId){
-                                            console.log(cityInfo);
-                                            let responseOption = document.createElement('option');
-                                            responseOption.value = cityInfo[i].city_id;
-                                            responseOption.textContent = cityInfo[i].city_name;
-                                            placeToAppend.appendChild(responseOption);
-                                        }
-                                    }
-                                }else{
-                                    $.ajax({
-                                        type: "POST",
-                                        url: '{{ route('api.getCitiesNames') }}',
-                                        data: {
-                                            "id": headerId
-                                        },
-                                        headers: {
-                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                        },
-                                        success: function(response) {
-                                            let placeToAppend = container.getElementsByClassName('city')[0];
-                                            placeToAppend.innerHTML = '';
-                                            let basicOption = document.createElement('option');
-                                            basicOption.value = '0';
-                                            basicOption.textContent = 'Wybierz';
-                                            placeToAppend.appendChild(basicOption);
-                                            for(var i = 0; i < response.length; i++) {
+                    if(voievodeshipId == 0){
+                        swal("Przed dodaniem nowego pokazu, uprzednio wybierz Województwo");
+                        validation = false;
+                    }else if(cityId == 0){
+                        swal("Przed dodaniem nowego pokazu, uprzednio wybierz Miasto");
+                        validation = false;
+                    }
+                    if(validation){
+                        $.ajax({
+                            type: "POST",
+                            url: '{{ route('api.getVoivodeshipRound') }}',
+                            data: {
+                                "voievodeshipId" : voievodeshipId,
+                                "cityId"         : cityId
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                addNewShow(response['voievodeInfo'],1);
+                                $('.city').select2();
+                                $('.voivodeship').select2(); //attach select2 look
+                                $('.voivodeship').off('select2:select'); //remove previous event listeners
+                                $('.voivodeship').on('select2:select', function (e) {
+                                    let container = e.target.parentElement.parentElement.parentElement.parentElement;
+                                    let headerId = e.params.data.id;
+                                    let placeToAppend = container.getElementsByClassName('city')[0];
+                                    placeToAppend.innerHTML = '';
+                                    let basicOption = document.createElement('option');
+                                    basicOption.value = '0';
+                                    basicOption.textContent = 'Wybierz';
+                                    placeToAppend.appendChild(basicOption);
+                                    var cityInfo = response['cityInfo'][headerId];
+                                    if(typeof cityInfo !== 'undefined'){
+                                        //zmiana ręczna województwa
+                                        for(var i = 0; i < cityInfo.length; i++) {
+                                            if(cityInfo[i].id == headerId){
+                                                console.log(cityInfo);
                                                 let responseOption = document.createElement('option');
-                                                responseOption.value = response[i].id;
-                                                responseOption.textContent = response[i].name;
+                                                responseOption.value = cityInfo[i].city_id;
+                                                responseOption.textContent = cityInfo[i].city_name;
                                                 placeToAppend.appendChild(responseOption);
                                             }
-
                                         }
-                                    });
-                                }
-                            });
-                        }
-                    });
+                                    }else{
+                                        $.ajax({
+                                            type: "POST",
+                                            url: '{{ route('api.getCitiesNames') }}',
+                                            data: {
+                                                "id": headerId
+                                            },
+                                            headers: {
+                                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                            },
+                                            success: function(response) {
+                                                let placeToAppend = container.getElementsByClassName('city')[0];
+                                                placeToAppend.innerHTML = '';
+                                                let basicOption = document.createElement('option');
+                                                basicOption.value = '0';
+                                                basicOption.textContent = 'Wybierz';
+                                                placeToAppend.appendChild(basicOption);
+                                                for(var i = 0; i < response.length; i++) {
+                                                    let responseOption = document.createElement('option');
+                                                    responseOption.value = response[i].id;
+                                                    responseOption.textContent = response[i].name;
+                                                    placeToAppend.appendChild(responseOption);
+                                                }
+
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
                 }else if(e.target.dataset.refresh == 'refresh') { // click on refresh glyphicon
                     //get contener with select (actual and previous)
                     var actualContener = e.target.parentNode.parentNode;
@@ -373,27 +381,36 @@
                     var actualSelectVoievode = actualContener.getElementsByClassName('voivodeship')[0];
                     var previousSelectCityVal = previousContener.getElementsByClassName('city')[0].value;
                     var previousSelectVoievodeVal = previousContener.getElementsByClassName('voivodeship')[0].value;
-
-                    $.ajax({
-                        type: "POST",
-                        url: '{{ route('api.getVoivodeshipRound') }}',
-                        data: {
-                            "voievodeshipId": previousSelectVoievodeVal,
-                            "cityId": previousSelectCityVal
-                        },
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function (response) {
-                            var stringAppend = '<option value=0>Wybierz</option>';
-                            for (let i = 0; i < response['voievodeInfo'].length; i++) {
-                                stringAppend += '<option value =' + response['voievodeInfo'][i]['id'] + '>' + response['voievodeInfo'][i]['name'] + '</option>';
+                    let validation = true;
+                    if(previousSelectVoievodeVal == 0){
+                        swal("Przed synchronizacją miast, uprzednio wybierz Województwo");
+                        validation = false;
+                    }else if(previousSelectCityVal == 0){
+                        swal("Przed synchronizacją miast, uprzednio wybierz Miasto");
+                        validation = false;
+                    }
+                    if(validation){
+                        $.ajax({
+                            type: "POST",
+                            url: '{{ route('api.getVoivodeshipRound') }}',
+                            data: {
+                                "voievodeshipId": previousSelectVoievodeVal,
+                                "cityId": previousSelectCityVal
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function (response) {
+                                var stringAppend = '<option value=0>Wybierz</option>';
+                                for (let i = 0; i < response['voievodeInfo'].length; i++) {
+                                    stringAppend += '<option value =' + response['voievodeInfo'][i]['id'] + '>' + response['voievodeInfo'][i]['name'] + '</option>';
+                                }
+                                actualSelectVoievode.innerHTML = stringAppend;
+                                stringAppend = '<option value=0>Wybierz</option>';
+                                actualSelectCity.innerHTML = stringAppend;
                             }
-                            actualSelectVoievode.innerHTML = stringAppend;
-                            stringAppend = '<option value=0>Wybierz</option>';
-                            actualSelectCity.innerHTML = stringAppend;
-                        }
-                    });
+                        });
+                    }
                 }
                 else if(e.target.dataset.remove == 'show') { // click on X glyphicon
                     let showContainer = e.target.parentElement.parentElement.parentElement;
