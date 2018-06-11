@@ -817,6 +817,8 @@ Route::post('/crmRoute_index_ajax', 'CrmRouteController@getSelectedRoute')->name
 Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet');
 Route::post('/specificRoute', 'CrmRouteController@specificRoutePost')->name('api.getJSONRoute');
 
+Route::get('/specificRouteEdit/{id}', 'CrmRouteController@specificRouteEditGet');
+
 Route::get('/showClientRoutes', 'CrmRouteController@showClientRoutesGet');
 Route::post('/showClientRoutesAjax', 'CrmRouteController@showClientRoutesAjax')->name('api.getClientRoutes');
 Route::post('/showClientRoutesInfoAjax', 'CrmRouteController@showClientRoutesInfoAjax')->name('api.getClientRouteInfo');
@@ -857,8 +859,12 @@ Route::post('/findClient', 'ClientController@findClient')->name('api.findClient'
 Route::POST('/changeStatusClient','ClientController@changeStatusClient')->name('api.changeStatusClient');
 Route::POST('/saveClient','ClientController@saveClient')->name('api.saveClient');
 
-Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
 
+Route::POST('/EditClient','ClientController@EditClient')->name('api.saveClient');
+
+
+Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
+Route::post('/crmRoute_indexEdit', 'CrmRouteController@indexEditPost');
 
 
 
