@@ -71,7 +71,6 @@
     .check{
     background: #B0BED9 !important;
     }
-
     </style>
 
 {{--Header page --}}
@@ -163,7 +162,7 @@
                                 <div class="form-group">
                                     <label class="myLabel">Data:</label>
                                     <div class="input-group date form_date col-md-5" data-date-calendarWeeks="true" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                        <input class="form-control" name="date" id="date" type="text" value="{{date("Y-m-d")}}">
+                                        <input class="form-control" name="date" id="date" type="text" value="{{date($clientRouteInfo->first()[0]->date)}}">
                                         <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                     </div>
                                 </div>
@@ -253,8 +252,73 @@
                                 </table>
                             </div>
                             <div class="client-container route-here" id="jump-here">
-
+                                @php
+                                    $lp = 0;
+                                @endphp
+                                @foreach($clientRouteInfo as $item)
+                                <div class="routes-container">
+                                    <div class="row">
+                                        @if($lp != 0)
+                                            <div class="button_section">
+                                                <span class="glyphicon glyphicon-remove" data-remove="show"></span>
+                                            </div>
+                                        @endif
+                                        <header>Pokaz</header>
+                                        @if($lp != 0)
+                                            <div class=colmd-12 style="text-align: center">
+                                                <span class="glyphicon glyphicon-refresh" data-refresh="refresh" style="font-size: 30px"></span>
+                                            </div>
+                                        @endif
+                                        @php
+                                            $lp++;
+                                        @endphp
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Województwo</label>
+                                                    <select class="form-control voivodeship" data-type="voivode">
+                                                        @foreach($voivodes as $voivode)
+                                                        @if($voivode->id == $item[0]->voivode_id)
+                                                            <option value ={{$voivode->id}} selected>{{$voivode->name}}</option>
+                                                        @else
+                                                            <option value ={{$voivode->id}}>{{$voivode->name}}</option>
+                                                        @endif
+                                                    @endforeach
+                                                    </select>
+                                            </div>
+                                        </div>
+                                      <div class="col-md-6">
+                                            <div class="form-group">
+                                               <label for="city">Miasto</label>
+                                               <select class="form-control city">
+                                                   <option value={{$item[0]->city_id}} >{{$item[0]->cityName}}</option>
+                                               </select>
+                                            </div>
+                                      </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="myLabel">Ilość godzin pokazów</label>
+                                                <input class="form-control show-hours" min="0" type="number" placeholder="Np. 2" value={{count($item)}}>
+                                                </div>
+                                            </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="myLabel">Data:</label>
+                                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                                    <input class="form-control dateInput" type="text" value="{{date($item[0]->date)}}">
+                                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <div class="form-group hour_div">
+                                        </div>
+                                        @if($lp == count($clientRouteInfo))
+                                            <div class="col-lg-12 button_section button_new_show_section">
+                                                <input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">
+                                            </div>
+                                        @endif
+                                </div>
                             </div>
+                            @endforeach
                         </div>
                         <div class="client-wrapper">
                             <div class="client-container">
@@ -265,6 +329,10 @@
                 </div>
             </div>
         </div>
+
+
+
+
 
 @endsection
 
@@ -332,10 +400,8 @@
                 })
             }
         }
-
-
         $(document).ready(function() {
-
+            $('.voivodeship').select2();
           //Ta funkcja działa analogicznie jak jQuerry .appendAfter();
           Element.prototype.appendAfter = function (element) {
               element.parentNode.insertBefore(this, element.nextSibling);
@@ -401,7 +467,6 @@
                     url: '{{ route('api.getCitiesNames') }}',
                     data: {
                         "id": voivodeship_id,
-                        "currentDate": currentDate
                     },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -421,8 +486,7 @@
                   type: "POST",
                   url: '{{ route('api.getCitiesNames') }}',
                   data: {
-                      "id": headerId,
-                      "currentDate": currentDate
+                      "id": headerId
                   },
                   headers: {
                       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -438,13 +502,7 @@
                       for(var i = 0; i < response.length; i++) {
                           let responseOption = document.createElement('option');
                           responseOption.value = response[i].id;
-                          if(response[i].block == 1) {
-                              responseOption.textContent = response[i].name + " (KARENCJA do " + response[i].available_date + ")";
-                          }
-                          else {
-                              responseOption.textContent = response[i].name;
-                          }
-
+                          responseOption.textContent = response[i].name;
                           placeToAppend2.appendChild(responseOption);
                       }
                   }
@@ -489,22 +547,9 @@
                '                    <select class="form-control city">\n';
                for(var j = 0; j<city.length; j++) {
                    if (responseIterator.city_id == city[j].id){
-                       // console.log(responseIterator);
-                       if(city[j].block == 1) {
-                           stringAppend += '<option value="' + responseIterator.city_id + '" selected>' + responseIterator.city_name + ' (KARENCJA do ' + city[j].available_date + '</option>\n';
-                       }
-                       else {
-                           stringAppend += '<option value="' + responseIterator.city_id + '" selected>' + responseIterator.city_name + '</option>\n';
-                       }
-
+                       stringAppend += '<option value="' + responseIterator.city_id + '" selected>' + responseIterator.city_name + '</option>\n';
                    }else{
-                       if(city[j].block == 1) {
-                           stringAppend += '<option value="' + city[j].id + '" >' + city[j].name + '(KARENCJA do ' + city[j].available_date + ')</option>\n';
-                       }
-                       else {
-                           stringAppend += '<option value="' + city[j].id + '" >' + city[j].name + '</option>\n';
-                       }
-
+                       stringAppend += '<option value="' + city[j].id + '" >' + city[j].name + '</option>\n';
                    }
                }
                stringAppend +='                    </select>\n' +
@@ -629,6 +674,7 @@
                     });
                     //Zaznaczenie kolumny
                     $('#table_client tbody tr').on('click',function () {
+                        console.log(1);
                         if ( $(this).hasClass('check') ) {
                             $(this).removeClass('check');
                             $(this).find('.client_check').prop('checked',false);
@@ -648,6 +694,10 @@
                             writeCheckedClientInfo();
                         }
                     });
+
+                }, // Click select client
+                "initComplete": function(settings, json) {
+                    $("#clientId_"+'{{$clientRId}}').trigger("click");
 
                 },"columns":[
                     {"data":"name","className": "client_name"},
@@ -680,6 +730,7 @@
             });
 
 
+// ** in clomplite render client table
 
 
 //*********************END CLIENT SECTON***************************
@@ -752,7 +803,7 @@
                                             //Generowanie Div'a
                                             if(i == 0)
                                               generateRouteDiv(false,false,false,response[i],city,voievodes,placeToAppend);
-                                            else if(i+1 == response.length)
+                                            if(i+1 == response.length)
                                               generateRouteDiv(true,true,true,response[i],city,voievodes,placeToAppend);
                                             else
                                               generateRouteDiv(true,true,false,response[i],city,voievodes,placeToAppend);
@@ -975,26 +1026,22 @@
                                         let container = e.target.parentElement.parentElement.parentElement.parentElement;
                                         let headerId = e.params.data.id;
 
-                                            let placeToAppend2 = container.getElementsByClassName('city')[0];
-                                            placeToAppend2.innerHTML = '';
-                                            let basicOption = document.createElement('option');
-                                            basicOption.value = '0';
-                                            basicOption.textContent = 'Wybierz';
-                                            placeToAppend2.appendChild(basicOption);
-                                            let responseObject = response['cityInfo'];
-                                            for(var i = 0; i < responseObject[headerId].length; i++) {
+                                        let placeToAppend2 = container.getElementsByClassName('city')[0];
+                                        placeToAppend2.innerHTML = '';
+                                        let basicOption = document.createElement('option');
+                                        basicOption.value = '0';
+                                        basicOption.textContent = 'Wybierz';
+                                        placeToAppend2.appendChild(basicOption);
+                                        let responseObject = response['cityInfo'];
+                                        console.log(responseObject[headerId]);
+                                        for(var i = 0; i < responseObject[headerId].length; i++) {
 
 
-                                                let responseOption = document.createElement('option');
-                                                responseOption.value = responseObject[headerId][i].city_id;
-                                                if(cityInfo[i].block == 1) { //here we distinct cities with grace period
-                                                    responseOption.textContent = cityInfo[i].city_name + " (KARENCJA do " + cityInfo[i].available_date + ")";
-                                                }
-                                                else {
-                                                    responseOption.textContent = cityInfo[i].city_name;
-                                                }
-                                                placeToAppend2.appendChild(responseOption);
-                                            }
+                                            let responseOption = document.createElement('option');
+                                            responseOption.value = responseObject[headerId][i].city_id;
+                                            responseOption.textContent = responseObject[headerId][i].city_name;
+                                            placeToAppend2.appendChild(responseOption);
+                                        }
                                     });
                                 }
                             });
@@ -1036,7 +1083,8 @@
 
                     if(everythingIsGood == true) {
                         let formContainer = document.createElement('div');
-                        formContainer.innerHTML = '<form method="post" action="{{URL::to('/crmRoute_index')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"></form>';
+                        formContainer.innerHTML = '' +
+                            '<form method="post" action="{{URL::to('/crmRoute_indexEdit')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"><input type="hidden" name="route_id" value="'+ {{$routeId}} +'"></form>';
                         let place = document.querySelector('.route-here');
                         place.appendChild(formContainer);
                         let userForm = document.getElementById('user_form');

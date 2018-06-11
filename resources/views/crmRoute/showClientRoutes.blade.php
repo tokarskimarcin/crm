@@ -61,7 +61,8 @@
                                     <th>Trasa</th>
                                     <th>Przypisany hotel i godziny</th>
                                     <th>Akceptuj trasę</th>
-                                    <th>Edycja</th>
+                                    <th>Edycja (Hoteli)</th>
+                                    <th>Edycja (Trasy)</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -242,6 +243,10 @@
                     },
                     {"data":function (data, type, dataToSet) {
                             return '<a href="{{URL::to("/specificRoute")}}/' + data.clientRouteId + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
+                        },"name":"link"
+                    },
+                    {"data":function (data, type, dataToSet) {
+                            return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.clientRouteId + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
                         },"name":"link"
                     }
                 ]

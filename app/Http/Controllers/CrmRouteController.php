@@ -92,6 +92,64 @@ class CrmRouteController extends Controller
         return Redirect::back();
 
     }
+
+
+    /**
+     * This method saves new routes connected with client
+     */
+    public function indexEditPost(Request $request) {
+//        dd($request);
+        //Get values from form elements
+        $voivode = $request->voivode;
+        $city = $request->city;
+        $hour = $request->hour;
+        $date = $request->date;
+        $clientIdNotTrimmed = $request->clientId;
+
+        //explode values into arrays
+        $voivodeArr = explode(',', $voivode);
+        $cityArr = explode(',', $city);
+        $hourArr = explode(',',$hour);
+        $clientId = explode('_',$clientIdNotTrimmed)[1];
+        $dateArr = explode(',',$date);
+
+        $loggedUser = Auth::user();
+
+//        dd($hourArr);
+        //New insertion into ClientRoute table
+        $clientRoute = ClientRoute::find($request->route_id);
+        $clientRoute->client_id = $clientId;
+        $clientRoute->user_id = $loggedUser->id;
+        $clientRoute->status = 0;
+        $clientRoute->save();
+
+        ClientRouteInfo::where('client_route_id','=',$request->route_id)->delete();
+        //New insertions into ClientRouteInfo table
+        for($i = 0; $i < count($voivodeArr); $i++) {
+            for($j = 1; $j <= $hourArr[$i] ; $j++) { // for example if user type 2 hours, method will insert 2 insertions with given row.
+                $clientRouteInfo = new ClientRouteInfo();
+                $clientRouteInfo->client_route_id = $clientRoute->id;
+                $clientRouteInfo->city_id = $cityArr[$i];
+                $clientRouteInfo->voivode_id = $voivodeArr[$i];
+                $clientRouteInfo->date = $dateArr[$i];
+                $day = substr($dateArr[$i],8,2);
+
+                $month = substr($dateArr[$i],5,2);
+
+                $year = substr($dateArr[$i], 0,4);
+
+                $date = mktime(0, 0, 0, $month, $day, $year);
+                $weekOfYear = date('W',$date);
+                $clientRouteInfo->weekOfYear = $weekOfYear;
+                $clientRouteInfo->save();
+            }
+        }
+        $request->session()->flash('adnotation', 'Trasa została pomyślnie przypisana dla klienta');
+
+        return Redirect::back();
+
+    }
+
     /**
      * This method shows specific route
      */
@@ -175,6 +233,107 @@ class CrmRouteController extends Controller
             ->with('hotels', $hotels)
             ->with('clientName', $clientName);
     }
+
+    /**
+     * This method shows specific route
+     */
+    public function specificRouteEditGet($id) {
+        $clientRouteInfo = ClientRouteInfo::where('client_route_id', '=', $id)->get();
+        $clients = Clients::all();
+        $cities = Cities::all();
+        $voivodes = Voivodes::all();
+        $hotels = Hotel::all();
+
+        $clientRouteInfoExtended = array();
+        $insideArr = array();
+        $cityId = null;
+        $flag = 0; //indices whether $insideArr push into $clientRouteInfoExtended 1 - push, 0 - don't push
+        $iterator = 0; //It count loops of foreach
+        $iteratorFinish = count($clientRouteInfo); // indices when condition inside foreach should push array into $clientRouteInfoExtended array.
+        $clientName = null;
+
+        foreach($clientRouteInfo as $info) {
+            if($cityId == null) {
+                $flag = 0;
+                $cityId = $info->city_id;
+            }
+            else if($info->city_id == $cityId) {
+                $flag = 0;
+                $cityId = $info->city_id;
+            }
+            else {
+                array_push($clientRouteInfoExtended, $insideArr);
+                $insideArr = [];
+                $flag = 1;
+                $cityId = $info->city_id;
+            }
+
+            if($clientName == null) {
+                $clientRId = ClientRoute::find($info->client_route_id)->client_id;
+                $clientName = Clients::find($clientRId)->name;
+            }
+
+            $stdClass = new \stdClass();
+
+            foreach($cities as $city) {
+                if($info->city_id == $city->id) {
+                    $stdClass->cityName = $city->name;
+                }
+            }
+
+            foreach($voivodes as $voivode) {
+                if($info->voivode_id == $voivode->id) {
+                    $stdClass->voivodeName = $voivode->name;
+                }
+            }
+
+            foreach($clients as $client) {
+                if($info->client_route_id == $client->id) {
+                    $stdClass->clientName = $client->name;
+                }
+            }
+
+            $stdClass->client_route_id = $info->client_route_id;
+            $stdClass->city_id = $info->city_id;
+            $stdClass->voivode_id = $info->voivode_id;
+            $stdClass->date = $info->date;
+            $stdClass->hotel_id = $info->hotel_id;
+            $stdClass->hour = $info->hour;
+
+            array_push($insideArr, $stdClass);
+            if($flag == 1) {
+                $flag = 0;
+            }
+            if($iterator == ($iteratorFinish - 1)) {
+                array_push($clientRouteInfoExtended, $insideArr);
+            }
+            $iterator++;
+        }
+
+        $clientRouteInfo = collect($clientRouteInfoExtended);
+
+
+
+
+
+        $departments = Department_info::all();
+        $today = date('Y-m-d');
+        $today .= '';
+        $voivodes = Voivodes::all();
+        $year = date('Y',strtotime("this year"));
+        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
+
+        $clientRouteInfo = $clientRouteInfo->sortByDesc('date');
+        return view('crmRoute.editSpecificRoute')
+            ->with('departments', $departments)
+            ->with('voivodes', $voivodes)
+            ->with('lastWeek', $numberOfLastYearsWeek)
+            ->with('today', $today)
+            ->with('clientRouteInfo',$clientRouteInfo)
+            ->with('clientRId', $clientRId)
+            ->with('routeId',$id);
+    }
+
 
     /**
      * This method saves changes about specific route
