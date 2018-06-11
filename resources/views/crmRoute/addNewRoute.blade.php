@@ -251,10 +251,10 @@
              */
             function buttonHandler(e) {
                 if(e.target.id == 'add_new_show') { // click on add new show button
-                    //Get lest child of voievoidship
+                    //Get last child of voievoidship
                     let AllVoievoidship = document.getElementsByClassName('voivodeship');
                     let countAllVoievoidship = AllVoievoidship.length;
-                    //Get lest child of City
+                    //Get last child of City
                     let AllCitySelect = document.getElementsByClassName('city');
                     let countAllCitySelect = AllCitySelect.length;
                     let cityId = 0;
