@@ -71,6 +71,11 @@
     .check{
     background: #B0BED9 !important;
     }
+
+        .first-show-date {
+            margin-top: 1em;
+        }
+
     </style>
 
 {{--Header page --}}
@@ -159,8 +164,8 @@
                                     {{--<label for="weekNumber">Wybierz tydzień</label>--}}
                                     {{--<select id="weekNumber" class="form-control"></select>--}}
                                 {{--</div>--}}
-                                <div class="form-group">
-                                    <label class="myLabel">Data:</label>
+                                <div class="form-group first-show-date">
+                                    <label class="myLabel">Data pierwszego pokazu:</label>
                                     <div class="input-group date form_date col-md-5" data-date-calendarWeeks="true" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
                                         <input class="form-control" name="date" id="date" type="text" value="{{date("Y-m-d")}}">
                                         <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
@@ -400,6 +405,7 @@
                     url: '{{ route('api.getCitiesNames') }}',
                     data: {
                         "id": voivodeship_id,
+                        "currentDate": currentDate
                     },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -419,7 +425,8 @@
                   type: "POST",
                   url: '{{ route('api.getCitiesNames') }}',
                   data: {
-                      "id": headerId
+                      "id": headerId,
+                      "currentDate": currentDate
                   },
                   headers: {
                       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -435,7 +442,13 @@
                       for(var i = 0; i < response.length; i++) {
                           let responseOption = document.createElement('option');
                           responseOption.value = response[i].id;
-                          responseOption.textContent = response[i].name;
+                          if(response[i].block == 1) {
+                              responseOption.textContent = response[i].name + " (KARENCJA do " + response[i].available_date + ")";
+                          }
+                          else {
+                              responseOption.textContent = response[i].name;
+                          }
+
                           placeToAppend2.appendChild(responseOption);
                       }
                   }
@@ -480,9 +493,21 @@
                '                    <select class="form-control city">\n';
                for(var j = 0; j<city.length; j++) {
                    if (responseIterator.city_id == city[j].id){
-                       stringAppend += '<option value="' + responseIterator.city_id + '" selected>' + responseIterator.city_name + '</option>\n';
+                       if(city[j].block == 1) {
+                           stringAppend += '<option value="' + responseIterator.city_id + '" selected>' + responseIterator.city_name + ' (KARENCJA do ' + city[j].available_date + ')</option>\n';
+                       }
+                       else {
+                           stringAppend += '<option value="' + responseIterator.city_id + '" selected>' + responseIterator.city_name + '</option>\n';
+                       }
+
                    }else{
-                       stringAppend += '<option value="' + city[j].id + '" >' + city[j].name + '</option>\n';
+                       if(city[j].block == 1) {
+                           stringAppend += '<option value="' + city[j].id + '" >' + city[j].name + '(KARENCJA do ' + city[j].available_date + ')</option>\n';
+                       }
+                       else {
+                           stringAppend += '<option value="' + city[j].id + '" >' + city[j].name + '</option>\n';
+                       }
+
                    }
                }
                stringAppend +='                    </select>\n' +
@@ -497,9 +522,15 @@
                    '<div class="col-md-6">' +
                    '<div class="form-group">' +
                    '<label class="myLabel">Data:</label>' +
-                   '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">' +
-                   '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">' +
-                   '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
+                   '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">';
+                    if(currentDate != '0') {
+                        stringAppend += '<input class="form-control dateInput" type="text" value="' + currentDate + '">';
+                    }
+                    else {
+                     stringAppend += '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">';
+                    }
+
+                    stringAppend += '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
                    '</div>' +
                    '</div>' +
                    '</div>' +
@@ -521,7 +552,7 @@
             }
 
             {{--let currentDate ={{$today}};--}}
-                let currentDate = null;
+                let currentDate = '0';
 
             table_client = $('#table_client').DataTable({
                 "autoWidth": true,
@@ -730,7 +761,7 @@
                                             //Generowanie Div'a
                                             if(i == 0)
                                               generateRouteDiv(false,false,false,response[i],city,voievodes,placeToAppend);
-                                            if(i+1 == response.length)
+                                            else if(i+1 == response.length)
                                               generateRouteDiv(true,true,true,response[i],city,voievodes,placeToAppend);
                                             else
                                               generateRouteDiv(true,true,false,response[i],city,voievodes,placeToAppend);
@@ -802,9 +833,14 @@
                     '<div class="col-md-6">' +
                     '<div class="form-group">' +
                     '<label class="myLabel">Data:</label>' +
-                    '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">' +
-                    '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">' +
-                    '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
+                    '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">';
+                        if(currentDate != '0') {
+                            stringAppend += '<input class="form-control dateInput" type="text" value="' + currentDate + '">';
+                        }
+                        else {
+                            stringAppend += '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">';
+                        }
+                    stringAppend += '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
                     '</div>' +
                     '</div>' +
                     '</div>' +
@@ -844,6 +880,11 @@
                     let countAllCitySelect = AllCitySelect.length;
                     let cityId = 0;
                     let voievodeshipId = 0;
+
+                    let thisContainer = e.target.parentNode.parentNode.parentNode;
+                    let dateInput = thisContainer.querySelector('.dateInput'); //we select date input and append its value to currentDate variable
+                    currentDate = dateInput.value;
+
                     let validation = true;
                     // Walidacja wybrania
                     if(countAllVoievoidship != 0 && countAllCitySelect != 0){
@@ -867,7 +908,8 @@
                             url: '{{ route('api.getVoivodeshipRound') }}',
                             data: {
                                 "voievodeshipId" : voievodeshipId,
-                                "cityId"         : cityId
+                                "cityId"         : cityId,
+                                "currentDate": currentDate
                             },
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -893,7 +935,12 @@
                                             if(cityInfo[i].id == headerId){
                                                 let responseOption = document.createElement('option');
                                                 responseOption.value = cityInfo[i].city_id;
-                                                responseOption.textContent = cityInfo[i].city_name;
+                                                if(cityInfo[i].block == 1) { //here we distinct cities with grace period
+                                                    responseOption.textContent = cityInfo[i].city_name + " (KARENCJA do " + cityInfo[i].available_date + ")";
+                                                }
+                                                else {
+                                                    responseOption.textContent = cityInfo[i].city_name;
+                                                }
                                                 placeToAppend.appendChild(responseOption);
                                             }
                                         }
@@ -918,6 +965,8 @@
                     if(previousContener != null) {
                         var previousSelectCityVal = previousContener.getElementsByClassName('city')[0].value;
                         var previousSelectVoievodeVal = previousContener.getElementsByClassName('voivodeship')[0].value;
+                        let dateFromPreviousContainer = previousContener.querySelector('.dateInput').value; //we are selecting date value from previous contener and assing it into currentDate variable
+                        currentDate = dateFromPreviousContainer;
 
                         let validation = true;
                         if(previousSelectVoievodeVal == 0){
@@ -933,7 +982,8 @@
                                 url: '{{ route('api.getVoivodeshipRound') }}',
                                 data: {
                                     "voievodeshipId": previousSelectVoievodeVal,
-                                    "cityId": previousSelectCityVal
+                                    "cityId": previousSelectCityVal,
+                                    "currentDate": currentDate
                                 },
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -953,22 +1003,26 @@
                                         let container = e.target.parentElement.parentElement.parentElement.parentElement;
                                         let headerId = e.params.data.id;
 
-                                        let placeToAppend2 = container.getElementsByClassName('city')[0];
-                                        placeToAppend2.innerHTML = '';
-                                        let basicOption = document.createElement('option');
-                                        basicOption.value = '0';
-                                        basicOption.textContent = 'Wybierz';
-                                        placeToAppend2.appendChild(basicOption);
-                                        let responseObject = response['cityInfo'];
-                                        console.log(responseObject[headerId]);
-                                        for(var i = 0; i < responseObject[headerId].length; i++) {
+                                            let placeToAppend2 = container.getElementsByClassName('city')[0];
+                                            placeToAppend2.innerHTML = '';
+                                            let basicOption = document.createElement('option');
+                                            basicOption.value = '0';
+                                            basicOption.textContent = 'Wybierz';
+                                            placeToAppend2.appendChild(basicOption);
+                                            let responseObject = response['cityInfo'];
+                                            for(var i = 0; i < responseObject[headerId].length; i++) {
 
 
-                                            let responseOption = document.createElement('option');
-                                            responseOption.value = responseObject[headerId][i].city_id;
-                                            responseOption.textContent = responseObject[headerId][i].city_name;
-                                            placeToAppend2.appendChild(responseOption);
-                                        }
+                                                let responseOption = document.createElement('option');
+                                                responseOption.value = responseObject[headerId][i].city_id;
+                                                if(responseObject[headerId][i].block == 1) { //here we distinct cities with grace period
+                                                    responseOption.textContent = responseObject[headerId][i].city_name + " (KARENCJA do " + responseObject[headerId][i].available_date + ")";
+                                                }
+                                                else {
+                                                    responseOption.textContent = responseObject[headerId][i].city_name;
+                                                }
+                                                placeToAppend2.appendChild(responseOption);
+                                            }
                                     });
                                 }
                             });
@@ -1077,6 +1131,18 @@
             * This function remove whole route container while user click on red cross button
             */
             function removeGivenShow(container) {
+
+                //while removing show, we are appending currentDate value equal to last container's date value.
+                let previousContainer = container.previousElementSibling;
+                if(previousContainer) {
+                    let dateInput = previousContainer.querySelector('.dateInput');
+                    currentDate = dateInput.value;
+                }
+                else {
+                    let basisDate = document.querySelector('.first-show-date').value;
+                    currentDate = basisDate;
+                }
+
                 let allShows = document.getElementsByClassName('routes-container');
                 let lastShowContainer = allShows[allShows.length - 1];
                 if(container == lastShowContainer) {

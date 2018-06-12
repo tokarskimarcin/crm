@@ -933,8 +933,82 @@ class CrmRouteController extends Controller
      * @return list of cities in each voivode
      */
     public function addNewRouteAjax(Request $request) {
-        $cityId = $request->id;
-        $all_cities = Cities::where('voivodeship_id', '=', $cityId)->get();
+        $voivodeId = $request->id;
+        $currentDate = $request->currentDate;
+        if($currentDate != 0) {
+            $all_cities = Cities::where('voivodeship_id', '=', $voivodeId)->get();
+            $properDate = date_create($currentDate);
+
+            //lista miast we wszystkich trasach.
+            $citiesAvailable = DB::table('routes_info')->select(DB::raw('
+            city_id as cityId
+            '))
+                ->pluck('cityId')
+                ->toArray();
+
+            //Rekordy clientRoutesInfo w których były użyte miasta
+            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->whereIn('city_id', $citiesAvailable)->get();
+            $checkedCities = array(); //In this array we indices cities that should not be in route
+            foreach($clientRoutesInfoWithUsedCities as $item) {
+                $properDate = date_create($currentDate);
+                //wartość karencji dla danego miasta
+                $gracePeriod = Cities::find($item->city_id)->grace_period;
+//            $day = substr($item->date,8,2);
+//            $month = substr($item->date,5,2);
+//            $year = substr($item->date, 0,4);
+//            $dateInProperFormat = mktime(0, 0, 0, $month, $day, $year);
+//            $dateInProperFormat = date('Y-m-d', $dateInProperFormat);
+//
+//            $day2 = substr($date,8,2);
+//            $month2 = substr($date,5,2);
+//            $year2 = substr($date, 0,4);
+//            $dateInProperFormat2 = mktime(0, 0, 0, $month2, $day2, $year2);
+//            $dateInProperFormat2 = date('Y-m-d', $dateInProperFormat2);
+                $goodDate = date_create($item->date);
+                $dateDifference = date_diff($properDate,$goodDate, true);
+                $dateDifference = $dateDifference->format('%a');
+                $dateString = $dateDifference . " days";
+                $availableAtDate = date_add($properDate,date_interval_create_from_date_string($dateString));
+                $availableAtDate = date_format($availableAtDate, "Y-m-d");
+
+                $arrayFlag = false;
+                if($dateDifference <= $gracePeriod) {
+                    foreach($checkedCities as $cities) {
+                        if($item->city_id == $cities->city_id) {
+                            $arrayFlag = true;
+                        }
+                    }
+                    if($arrayFlag == false) {
+                        $cityInfoObject = new \stdClass();
+                        $cityInfoObject->city_id = $item->city_id;
+                        $cityInfoObject->available_date = $availableAtDate;
+                        array_push($checkedCities, $cityInfoObject);
+                    }
+                }
+
+            }
+            $all_cities->map(function($item) use($checkedCities){
+                $blockFlag = false;
+                foreach($checkedCities as $blockedCity) {
+                    if($blockedCity->city_id == $item->id) {
+                        $blockFlag = true;
+                        $item->block = 1;
+                        $item->available_date = $blockedCity->available_date;
+                    }
+                }
+
+                if($blockFlag == false) {
+                    $item->block = 0;
+                    $item->available_date = 0;
+                }
+
+                return $item;
+            });
+        }
+        else {
+            $all_cities = Cities::where('voivodeship_id', '=', $voivodeId)->get();
+        }
+//        $all_cities = Cities::where('voivodeship_id', '=', $voivodeId)->get();
         return $all_cities;
     }
 
@@ -1209,7 +1283,7 @@ class CrmRouteController extends Controller
 
 
 
-    public function findCityByDistance($city){
+    public function findCityByDistance($city, $currentDate){
         $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id,
             ( 3959 * acos ( cos ( radians('.$city->latitude.') ) * cos( radians( `latitude` ) )
              * cos( radians( `longitude` ) - radians('.$city->longitude.') ) + sin ( radians('.$city->latitude.') )
@@ -1217,6 +1291,68 @@ class CrmRouteController extends Controller
             ->join('voivodeship','voivodeship.id','city.voivodeship_id')
             ->having('distance', '<', '100')
             ->get();
+
+        //part responsible for grace period
+        if($currentDate != 0) {
+            $properDate = date_create($currentDate);
+
+            //lista miast we wszystkich trasach.
+            $citiesAvailable = DB::table('routes_info')->select(DB::raw('
+            city_id as cityId
+            '))
+                ->pluck('cityId')
+                ->toArray();
+
+            //Rekordy clientRoutesInfo w których były użyte miasta
+            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->whereIn('city_id', $citiesAvailable)->get();
+            $checkedCities = array(); //In this array we indices cities that should not be in route
+            foreach($clientRoutesInfoWithUsedCities as $item) {
+                $properDate = date_create($currentDate); //function date_add, changes $properDate variable, so in each loop it has to be reassigned
+                //wartość karencji dla danego miasta
+                $gracePeriod = Cities::find($item->city_id)->grace_period;
+                $goodDate = date_create($item->date);
+                $dateDifference = date_diff($properDate,$goodDate, true);
+                $dateDifference = $dateDifference->format('%a');
+                $dateString = $dateDifference . " days";
+                $availableAtDate = date_add($properDate,date_interval_create_from_date_string($dateString));
+                $availableAtDate = date_format($availableAtDate, "Y-m-d");
+
+                $arrayFlag = false;
+                if($dateDifference <= $gracePeriod) {
+                    foreach($checkedCities as $cities) {
+                        if($item->city_id == $cities->city_id) {
+                            $arrayFlag = true;
+                        }
+                    }
+                    if($arrayFlag == false) {
+                        $cityInfoObject = new \stdClass();
+                        $cityInfoObject->city_id = $item->city_id;
+                        $cityInfoObject->available_date = $availableAtDate;
+                        array_push($checkedCities, $cityInfoObject);
+                    }
+                }
+
+            }
+            $voievodeshipRound->map(function($item) use($checkedCities){
+                $blockFlag = false;
+                foreach($checkedCities as $blockedCity) {
+                    if($blockedCity->city_id == $item->city_id) {
+                        $blockFlag = true;
+                        $item->block = 1;
+                        $item->available_date = $blockedCity->available_date;
+                    }
+                }
+
+                if($blockFlag == false) {
+                    $item->block = 0;
+                    $item->available_date = 0;
+                }
+
+                return $item;
+            });
+
+        }
+
         return $voievodeshipRound;
     }
 
@@ -1226,8 +1362,11 @@ class CrmRouteController extends Controller
     public function getVoivodeshipRound(Request $request){
         if($request->ajax()) {
             $cityId = $request->cityId;
+            $currentDate = $request->currentDate;
             $city = Cities::where('id', '=', $cityId)->first();
-            $voievodeshipRound = $this::findCityByDistance($city);
+            //part responsible for grace period
+            $voievodeshipRound = $this::findCityByDistance($city, $currentDate);
+
             $voievodeshipRound = $voievodeshipRound->groupBy('id');
             $voievodeshipDistinc = array();
             foreach ($voievodeshipRound as $item){
