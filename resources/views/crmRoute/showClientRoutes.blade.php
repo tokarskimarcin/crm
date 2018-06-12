@@ -106,10 +106,10 @@
             let id = null; //after user click on 1st table row, it assing clientRouteId to this variable
             let selectedWeek = null;
             let rowIterator = null;
-            let colorIterator = 0;
+            // let colorIterator = 0;
             let showAllClients = null; //this variable indices whether checkbox "Pokaż wszystkich klientó" is checked
             let showOnlyAssigned = null; //This variable indices whether checkbox "Pokaż tylko trasy bez przypisanego hotelu lub godziny" is checked
-            let colorArr = ['#e1e4ea', '#81a3ef', '#5a87ed', '#b2f4b8', '#6ee578', '#e1acef', '#c54ae8'];
+            // let colorArr = ['#e1e4ea', '#81a3ef', '#5a87ed', '#b2f4b8', '#6ee578', '#e1acef', '#c54ae8'];
             let objectArr = [];
 
             table = $('#datatable').DataTable({
@@ -143,7 +143,7 @@
                                 id = id.substr(indexOfUnderscore + 1);
                             }
                             rowIterator = null;
-                            colorIterator = 0;
+                            // colorIterator = 0;
                             objectArr = [];
                             // showAllClients = null; //remove effect of show all clients checkbox
                             table2.ajax.reload();
@@ -185,7 +185,6 @@
 
                 },
                 "rowCallback": function( row, data, index ) {
-                    console.log(row);
                     if(row.cells[4].firstChild.classList[2] == "action-buttons-0") {
                         row.style.backgroundColor = "#ffc6c6";
                     }
@@ -223,7 +222,7 @@
                         },"name":"clientRouteName"
                     },
                     {"data":function (data, type, dataToSet) {
-                            if(data.hotelName != 'brak' && data.hour != 'nie') {
+                            if(data.haveHotel != '0' && data.hour != 'nie') {
                                 return '<span style="color: darkgreen;">Tak</span>';
                             }
                             else {

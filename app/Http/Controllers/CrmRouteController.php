@@ -610,23 +610,38 @@ class CrmRouteController extends Controller
 
         }
 
+        $client_route_info_extended = $client_route_info->map(function ($item) use ($hotels, $cities, $clients) {
 
-        $client_route_info_extended = $client_route_info->map(function($item) use($hotels, $cities, $clients) {
-            foreach($cities as $city) {
-                if($city->id == $item->city_id) {
+            $hotelIterator = 0; //this variable counts hotels for each clientRoute
+            $thisClientRouteData = ClientRouteInfo::where('client_route_id', '=', $item->client_route_id)->get(); //all insertions for given ClientRoute
+            foreach($thisClientRouteData as $clientData) {
+                if(isset($clientData->hotel_id)) {
+                    $hotelIterator++;
+                }
+            }
+
+            if($hotelIterator > 0) {
+                $item->haveHotel = "1";
+            }
+            else {
+                $item->haveHotel = "0";
+            }
+
+            foreach ($cities as $city) {
+                if ($city->id == $item->city_id) {
                     $item->cityName = $city->name;
                 }
             }
-            foreach($hotels as $hotel) {
-                if(isset($item->hotel_id)) {
-                    if($hotel->id == $item->hotel_id) {
+            foreach ($hotels as $hotel) {
+                if (isset($item->hotel_id)) {
+                    if ($hotel->id == $item->hotel_id) {
                         $item->hotelName = $hotel->name;
                     }
-                }
-                else {
+                } else {
                     $item->hotelName = 'brak';
                 }
             }
+
             $clientName = DB::table('client_route_info')->select(DB::raw('
                 client.name as clientName,
                 client_route.status as status
@@ -652,7 +667,7 @@ class CrmRouteController extends Controller
         $separator = '';
         $client_route_indicator = null;
         $lp = 0; // simple iterator
-        foreach($client_route_info_extended as $extendedInfo) {
+        foreach ($client_route_info_extended as $extendedInfo) {
 //            $dateFlag = null; // true - the same day, false - other day
 //            $cityFlag = null;
 //            if($extendedInfo === reset($client_route_info_extended)) { // We are adding first city name to string and first insertions into arrays.
@@ -660,10 +675,10 @@ class CrmRouteController extends Controller
 //                array_push($dateArr, $extendedInfo->date);
 //                $clientRouteName .= $extendedInfo->cityName;dddd($extendedInfo);$lp++;
             $lp++;
-            if($lp == 1) {
+            if ($lp == 1) {
                 $client_route_indicator = $extendedInfo->client_route_id; // przypisujemy do zmiennej wartosc pierwsego client_route_id
             }
-            if($extendedInfo->client_route_id == $client_route_indicator) {
+            if ($extendedInfo->client_route_id == $client_route_indicator) {
                 $helpObject = new \stdClass();
                 $helpObject->cityName = $extendedInfo->cityName;
                 $helpObject->date = $extendedInfo->date;
@@ -673,9 +688,9 @@ class CrmRouteController extends Controller
                 $helpObject->hotelName = $extendedInfo->hotelName;
                 $helpObject->hour = $extendedInfo->hour;
                 $helpObject->status = $extendedInfo->status;
+                $helpObject->haveHotel = $extendedInfo->haveHotel;
                 array_push($fullNameArr, $helpObject);
-            }
-            else {
+            } else {
                 array_push($fullInfoArr, $fullNameArr); //dodaje do fullInfoArr wszystkie dane o poszczególej trasie
                 $fullNameArr = array(); // czyścimy zawartosc tej tablicy
                 $helpObject = new \stdClass();
@@ -687,23 +702,23 @@ class CrmRouteController extends Controller
                 $helpObject->hotelName = $extendedInfo->hotelName;
                 $helpObject->hour = $extendedInfo->hour;
                 $helpObject->status = $extendedInfo->status;
+                $helpObject->haveHotel = $extendedInfo->haveHotel;
                 array_push($fullNameArr, $helpObject);
                 $client_route_indicator = $extendedInfo->client_route_id;
             }
 
 
-            if($lp == count($client_route_info_extended)) {
+            if ($lp == count($client_route_info_extended)) {
                 array_push($fullInfoArr, $fullNameArr);
             }
         }
-//
 //        dd($fullInfoArr);
         $helpClientNameVariable = '';
         $helpClientWeekVariable = '';
         $helpHourVariable = 0;
         $fullInfoArrExtended = array();
         $iterator2 = 0;
-        foreach($fullInfoArr as $eachClientRoute) {
+        foreach ($fullInfoArr as $eachClientRoute) {
             $iterator2++;
             $lp = 0;
             $iterator = 0;
@@ -712,21 +727,20 @@ class CrmRouteController extends Controller
             $separator = '';
             $helpClientWeekVariable = '';
             $helpHourVariable = 0;
-            foreach($eachClientRoute as $item) {
-                if($item->hour != null && $item->hour != '00:00:00') {
+            foreach ($eachClientRoute as $item) {
+                if ($item->hour != null && $item->hour != '00:00:00') {
                     $helpHourVariable++;
                 }
                 $lp++;
                 $dateFlag = null; // true - the same day
                 $cityFlag = null;
-                if($lp == 1) {
+                if ($lp == 1) {
                     $clientRouteName .= $item->cityName;
                     $iterator++;
                     $helpClientNameVariable = $item->clientName;
                     $helpClientWeekVariable = $item->weekOfYear;
-                }
-                else {
-                    for($i = 0; $i < $iterator; $i++) {
+                } else {
+                    for ($i = 0; $i < $iterator; $i++) {
                         if ($item->date == $eachClientRoute[$i]->date) {
 
                             $dateFlag = true;
@@ -739,18 +753,17 @@ class CrmRouteController extends Controller
                             }
                         }
                     }
-                    if($dateFlag == true && $cityFlag != true) {
+                    if ($dateFlag == true && $cityFlag != true) {
                         $separator = '+';
                         $clientRouteName .= $separator . $item->cityName;
-                    }
-                    else if($dateFlag != true && $cityFlag != true) {
+                    } else if ($dateFlag != true && $cityFlag != true) {
                         $separator = ' | ';
                         $clientRouteName .= $separator . $item->cityName;
                     }
                     $iterator++;
                 }
 
-                if($lp == count($eachClientRoute)) {
+                if ($lp == count($eachClientRoute)) {
                     $helpObject2 = new \stdClass();
                     $helpObject2->clientRouteName = $clientRouteName;
                     $helpObject2->clientName = $helpClientNameVariable;
@@ -758,10 +771,10 @@ class CrmRouteController extends Controller
                     $helpObject2->weekOfYear = $helpClientWeekVariable;
                     $helpObject2->hotelName = $item->hotelName;
                     $helpObject2->status = $item->status;
-                    if($helpHourVariable > 0) {
+                    $helpObject2->haveHotel = $item->haveHotel;
+                    if ($helpHourVariable > 0) {
                         $helpObject2->hour = "tak";
-                    }
-                    else {
+                    } else {
                         $helpObject2->hour = "nie";
                     }
                     array_push($fullInfoArrExtended, $helpObject2);
