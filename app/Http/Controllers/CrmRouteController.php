@@ -1102,6 +1102,11 @@ class CrmRouteController extends Controller
             ['routes_id', '=', $id],
             ['status', '=', 1]
         ])->get();
+        $routeInfo->map(function ($item){
+            $city = Cities::find($item->city_id);
+            $item->cities = $this::findCityByDistance($city,'2000-01-01');
+            return $item;
+        });
         $voivodes = Voivodes::all();
         $route = Route::where('id', '=', $id)->first();
         $editFlag = true;

@@ -115,13 +115,18 @@
                         </select>
                     </div>
                 </div>
-
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="city">Miasto</label>
                         <select class="form-control city">
                             <option value="0">Wybierz</option>
-                            <option value="{{$routeInf->city_id}}" selected>{{$routeInf->city->name}}</option>
+                            @foreach($routeInf->cities as $city)
+                            @if($city->city_id == $routeInf->city_id)
+                                    <option value="{{$routeInf->city_id}}" selected>{{$routeInf->city->name}}</option>
+                                @elseif ($routeInf->voivodeship_id == $city->id)
+                                    <option value="{{$city->city_id}}">{{$city->city_name}}</option>
+                                @endif
+                            @endforeach
                         </select>
                     </div>
                 </div>
