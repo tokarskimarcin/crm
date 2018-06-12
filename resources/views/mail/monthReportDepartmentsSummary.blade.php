@@ -30,57 +30,119 @@
 
 
             // Zliczanie ilości rbh  bez weekendów
-            $week_one_time_sum_without_weekend = $department[0]['data']->map(function($item) {
+            $week_one_count_without_weekend = 0;
+            $week_one_time_sum_without_weekend = $department[0]['data']->map(function($item) use (&$week_one_count_without_weekend) {
                     $day_number = date('N', strtotime($item->report_date));
-                    return ($day_number < 6) ? $item->day_time_sum : 0;
+                    if($day_number < 6){
+                        if($item->day_time_sum > 0){
+                            $week_one_count_without_weekend++;
+                        }
+                        return $item->day_time_sum;
+                    }else
+                        return 0;
               });
-            $week_one_time_sum_without_weekend = round($week_one_time_sum_without_weekend->sum(),2);
+            $week_one_time_sum_without_weekend_AVG = $week_one_count_without_weekend > 0 ? round($week_one_time_sum_without_weekend->sum()/$week_one_count_without_weekend,2) : 0;
+            $week_one_time_sum_without_weekend = $week_one_time_sum_without_weekend->sum();
 
-            $week_two_time_sum_without_weekend = $department[1]['data']->map(function($item) {
+            $week_two_count_without_weekend = 0;
+            $week_two_time_sum_without_weekend = $department[1]['data']->map(function($item) use (&$week_two_count_without_weekend) {
                     $day_number = date('N', strtotime($item->report_date));
-                    return ($day_number < 6) ? $item->day_time_sum : 0;
+                    if($day_number < 6){
+                        if($item->day_time_sum > 0){
+                            $week_two_count_without_weekend++;
+                        }
+                        return $item->day_time_sum;
+                    }else
+                        return 0;
              });
-            $week_two_time_sum_without_weekend = round($week_two_time_sum_without_weekend->sum(),2);
+            $week_two_time_sum_without_weekend_AVG = $week_two_count_without_weekend > 0 ? round($week_two_time_sum_without_weekend->sum()/$week_two_count_without_weekend,2) : 0;
+            $week_two_time_sum_without_weekend = $week_two_time_sum_without_weekend->sum();
 
-            $week_three_time_sum_without_weekend = $department[2]['data']->map(function($item) {
+            $week_three_count_without_weekend = 0;
+            $week_three_time_sum_without_weekend = $department[2]['data']->map(function($item) use (&$week_three_count_without_weekend){
                     $day_number = date('N', strtotime($item->report_date));
-                    return ($day_number < 6) ? $item->day_time_sum : 0;
+                    if($day_number < 6){
+                        if($item->day_time_sum > 0){
+                            $week_three_count_without_weekend++;
+                        }
+                        return $item->day_time_sum;
+                    }else
+                        return 0;
              });
-            $week_three_time_sum_without_weekend = round($week_three_time_sum_without_weekend->sum(),2);
+            $week_three_time_sum_without_weekend_AVG = $week_three_count_without_weekend > 0 ? round($week_three_time_sum_without_weekend->sum()/$week_three_count_without_weekend,2) : 0;
+            $week_three_time_sum_without_weekend = $week_three_time_sum_without_weekend->sum();
 
-            $week_four_time_sum_without_weekend = $department[3]['data']->map(function($item) {
+            $week_four_count_without_weekend = 0;
+            $week_four_time_sum_without_weekend = $department[3]['data']->map(function($item) use (&$week_four_count_without_weekend){
                     $day_number = date('N', strtotime($item->report_date));
-                    return ($day_number < 6) ? $item->day_time_sum : 0;
+                    $day_number = date('N', strtotime($item->report_date));
+                    if($day_number < 6){
+                        if($item->day_time_sum > 0){
+                            $week_four_count_without_weekend++;
+                        }
+                        return $item->day_time_sum;
+                    }else
+                        return 0;
              });
-            $week_four_time_sum_without_weekend = round($week_four_time_sum_without_weekend->sum(),2);
-
-
+            $week_four_time_sum_without_weekend_AVG = $week_four_count_without_weekend > 0 ? round($week_four_time_sum_without_weekend->sum()/$week_four_count_without_weekend,2) : 0;
+            $week_four_time_sum_without_weekend = $week_four_time_sum_without_weekend->sum();
 
             // Zliczanie ilości rbh  weekendów
-            $week_one_time_sum_weekend = $department[0]['data']->map(function($item) {
+            $week_one_count_weekend = 0;
+            $week_one_time_sum_weekend = $department[0]['data']->map(function($item) use (&$week_one_count_weekend) {
                 $day_number = date('N', strtotime($item->report_date));
-                return ($day_number >= 6) ? $item->day_time_sum : 0;
+                if($day_number >= 6){
+                        if($item->day_time_sum > 0){
+                            $week_one_count_weekend++;
+                        }
+                        return $item->day_time_sum;
+                    }else
+                        return 0;
              });
-            $week_one_time_sum_weekend = round($week_one_time_sum_weekend->sum(),2);
+            $week_one_time_sum_weekend_AVG = $week_one_count_weekend > 0 ? round($week_one_time_sum_weekend->sum()/$week_one_count_weekend,2) : 0;
+            $week_one_time_sum_weekend = $week_one_time_sum_weekend->sum();
 
-            $week_two_time_sum_weekend = $department[1]['data']->map(function($item) {
+            $week_two_count_weekend = 0;
+            $week_two_time_sum_weekend = $department[1]['data']->map(function($item) use (&$week_two_count_weekend){
                 $day_number = date('N', strtotime($item->report_date));
-                return ($day_number >= 6) ? $item->day_time_sum : 0;
+                if($day_number >= 6){
+                        if($item->day_time_sum > 0){
+                            $week_two_count_weekend++;
+                        }
+                        return $item->day_time_sum;
+                    }else
+                        return 0;
              });
-            $week_two_time_sum_weekend = round($week_two_time_sum_weekend->sum(),2);
+            $week_two_time_sum_weekend_AVG = $week_two_count_weekend > 0 ? round($week_two_time_sum_weekend->sum()/$week_two_count_weekend,2) : 0;
+            $week_two_time_sum_weekend = $week_two_time_sum_weekend->sum();
 
-            $week_three_time_sum_weekend = $department[2]['data']->map(function($item) {
+            $week_three_count_weekend = 0;
+            $week_three_time_sum_weekend = $department[2]['data']->map(function($item) use (&$week_three_count_weekend){
                 $day_number = date('N', strtotime($item->report_date));
-                return ($day_number >= 6) ? $item->day_time_sum : 0;
+                 if($day_number >= 6){
+                        if($item->day_time_sum > 0){
+                            $week_three_count_weekend++;
+                        }
+                        return $item->day_time_sum;
+                    }else
+                        return 0;
             });
-            $week_three_time_sum_weekend = round($week_three_time_sum_weekend->sum(),2);
+            $week_three_time_sum_weekend_AVG = $week_three_count_weekend > 0 ? round($week_three_time_sum_weekend->sum()/$week_three_count_weekend,2) : 0;
+            $week_three_time_sum_weekend = $week_three_time_sum_weekend->sum();
 
-            $week_four_time_sum_weekend = $department[3]['data']->map(function($item) {
+            $week_four_count_weekend = 0;
+            $week_four_time_sum_weekend = $department[3]['data']->map(function($item) use (&$week_four_count_weekend){
                 $day_number = date('N', strtotime($item->report_date));
-                return ($day_number >= 6) ? $item->day_time_sum : 0;
+                 if($day_number >= 6){
+                        if($item->day_time_sum > 0){
+                            $week_four_count_weekend++;
+                        }
+                        return $item->day_time_sum;
+                    }else
+                        return 0;
             });
-            $week_four_time_sum_weekend = round($week_four_time_sum_weekend->sum(),2);
-
+            $week_four_time_sum_weekend_AVG = $week_four_count_weekend > 0 ? round($week_four_time_sum_weekend->sum()/$week_four_count_weekend,2) : 0;
+            $week_four_time_sum_weekend = $week_four_time_sum_weekend->sum();
 
             /**
             Usunięcie zerowych wartości
@@ -134,6 +196,9 @@
             $week_four_avg = ($week_four_time_sum->avg() > 0) ? round(($week_four_success_sum->sum() / $week_four_time_sum->sum()), 2) : 0 ;
 
 
+            $sum_week_count_without_weekend = $week_one_count_without_weekend + $week_two_count_without_weekend + $week_three_count_without_weekend + $week_four_count_without_weekend;
+            $sum_week_count_weekend = $week_one_count_weekend + $week_two_count_weekend + $week_three_count_weekend + $week_four_count_weekend;
+
 
             $week_one_time_call_avg = ($week_one_time_sum->sum() > 0) ? round(($week_one_call_time->sum() / $week_one_time_sum->sum() * 100), 2) : 0 ;
 
@@ -144,18 +209,16 @@
             $month_sum_rbh = $week_one_time_sum->merge($week_two_time_sum);
             $month_sum_rbh = $month_sum_rbh->merge($week_three_time_sum);
             $month_sum_rbh = $month_sum_rbh->merge($week_four_time_sum);
-
             //sumowanie tygodniowe rbh bez weekendow
             $month_sum_without_weekend = $week_one_time_sum_without_weekend + $week_two_time_sum_without_weekend;
             $month_sum_without_weekend = $month_sum_without_weekend + ($week_three_time_sum_without_weekend);
             $month_sum_without_weekend = $month_sum_without_weekend + ($week_four_time_sum_without_weekend);
-
+            $month_sum_without_weekend_TOTAL = $sum_week_count_without_weekend > 0 ? round($month_sum_without_weekend/$sum_week_count_without_weekend,2) : 0;
 
             $month_sum_weekend = $week_one_time_sum_weekend + ($week_two_time_sum_weekend);
             $month_sum_weekend = $month_sum_weekend+($week_three_time_sum_weekend);
             $month_sum_weekend = $month_sum_weekend+($week_four_time_sum_weekend);
-
-
+            $month_sum_weekend_TOTAL = $sum_week_count_weekend > 0 ? round($month_sum_weekend/$sum_week_count_weekend,2) : 0;
             $month_sum_success = $week_one_success_sum->merge($week_two_success_sum);
             $month_sum_success = $month_sum_success->merge($week_three_success_sum);
             $month_sum_success = $month_sum_success->merge($week_four_success_sum);
@@ -215,11 +278,11 @@
 
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px"><b>RBH</b></td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_one_time_sum_without_weekend.'/'.$week_one_time_sum_weekend}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_two_time_sum_without_weekend.'/'.$week_two_time_sum_weekend}}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_three_time_sum_without_weekend.'/'.$week_three_time_sum_weekend }}</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_four_time_sum_without_weekend.'/'.$week_four_time_sum_weekend }}</td>
-            <td style="background-color: #5eff80;border:1px solid #231f20;text-align:center;padding:3px">{{ $month_sum_without_weekend.'/'.$month_sum_weekend }}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_one_time_sum_without_weekend_AVG.'/'.$week_one_time_sum_weekend_AVG}}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_two_time_sum_without_weekend_AVG.'/'.$week_two_time_sum_weekend_AVG}}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_three_time_sum_without_weekend_AVG.'/'.$week_three_time_sum_weekend_AVG }}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $week_four_time_sum_without_weekend_AVG.'/'.$week_four_time_sum_weekend }}</td>
+            <td style="background-color: #5eff80;border:1px solid #231f20;text-align:center;padding:3px">{{ $month_sum_without_weekend_TOTAL.'/'.$month_sum_weekend_TOTAL }}</td>
         </tr>
 
         <tr>
