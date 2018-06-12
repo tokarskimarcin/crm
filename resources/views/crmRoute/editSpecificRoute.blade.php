@@ -322,6 +322,7 @@
                         </div>
                         <div class="client-wrapper">
                             <div class="client-container">
+                                <button class="btn btn-info" style="margin-top:1em;font-size:1.1em;font-weight:bold;" id="redirect">Powrót</button>
                                 <button class="btn btn-success" style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;" id="save">Zapisz</button>
                             </div>
                         </div>
@@ -1100,6 +1101,9 @@
                         }
 
                     }
+                }
+                else if(e.target.id == 'redirect') {
+                    location.href="{{URL::to('/showClientRoutes')}}";
                 }
 
             }
