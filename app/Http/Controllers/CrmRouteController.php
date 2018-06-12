@@ -935,7 +935,7 @@ class CrmRouteController extends Controller
     public function addNewRouteAjax(Request $request) {
         $voivodeId = $request->id;
         $currentDate = $request->currentDate;
-        if($currentDate) {
+        if($currentDate != 0) {
             $all_cities = Cities::where('voivodeship_id', '=', $voivodeId)->get();
             $properDate = date_create($currentDate);
 
@@ -950,6 +950,7 @@ class CrmRouteController extends Controller
             $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->whereIn('city_id', $citiesAvailable)->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
+                $properDate = date_create($currentDate);
                 //wartość karencji dla danego miasta
                 $gracePeriod = Cities::find($item->city_id)->grace_period;
 //            $day = substr($item->date,8,2);
@@ -1292,7 +1293,7 @@ class CrmRouteController extends Controller
             ->get();
 
         //part responsible for grace period
-        if($currentDate) {
+        if($currentDate != 0) {
             $properDate = date_create($currentDate);
 
             //lista miast we wszystkich trasach.
@@ -1306,28 +1307,15 @@ class CrmRouteController extends Controller
             $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->whereIn('city_id', $citiesAvailable)->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
+                $properDate = date_create($currentDate); //function date_add, changes $properDate variable, so in each loop it has to be reassigned
                 //wartość karencji dla danego miasta
                 $gracePeriod = Cities::find($item->city_id)->grace_period;
-//            $day = substr($item->date,8,2);
-//            $month = substr($item->date,5,2);
-//            $year = substr($item->date, 0,4);
-//            $dateInProperFormat = mktime(0, 0, 0, $month, $day, $year);
-//            $dateInProperFormat = date('Y-m-d', $dateInProperFormat);
-//
-//            $day2 = substr($date,8,2);
-//            $month2 = substr($date,5,2);
-//            $year2 = substr($date, 0,4);
-//            $dateInProperFormat2 = mktime(0, 0, 0, $month2, $day2, $year2);
-//            $dateInProperFormat2 = date('Y-m-d', $dateInProperFormat2);
                 $goodDate = date_create($item->date);
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
                 $dateString = $dateDifference . " days";
                 $availableAtDate = date_add($properDate,date_interval_create_from_date_string($dateString));
                 $availableAtDate = date_format($availableAtDate, "Y-m-d");
-//            if($item->city_id == 75) {
-//                dd($dateDifference);
-//            }
 
                 $arrayFlag = false;
                 if($dateDifference <= $gracePeriod) {
@@ -1376,12 +1364,8 @@ class CrmRouteController extends Controller
             $cityId = $request->cityId;
             $currentDate = $request->currentDate;
             $city = Cities::where('id', '=', $cityId)->first();
-            if($currentDate) { //part responsible for grace period
-                $voievodeshipRound = $this::findCityByDistance($city, $currentDate);
-            }
-            else {
-                $voievodeshipRound = $this::findCityByDistance($city);
-            }
+            //part responsible for grace period
+            $voievodeshipRound = $this::findCityByDistance($city, $currentDate);
 
             $voievodeshipRound = $voievodeshipRound->groupBy('id');
             $voievodeshipDistinc = array();
