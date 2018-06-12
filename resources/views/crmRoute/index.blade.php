@@ -167,7 +167,7 @@
                                 <div class="form-group first-show-date">
                                     <label class="myLabel">Data pierwszego pokazu:</label>
                                     <div class="input-group date form_date col-md-5" data-date-calendarWeeks="true" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                        <input class="form-control" name="date" id="date" type="text" value="{{date("Y-m-d")}}">
+                                        <input class="form-control first-show-date-input" name="date" id="date" type="text" value="{{date("Y-m-d")}}">
                                         <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                     </div>
                                 </div>
@@ -339,6 +339,23 @@
 
 
         $(document).ready(function() {
+
+            let today = new Date();
+            let dd = today.getDate();
+            let mm = today.getMonth()+1; //January is 0!
+
+            let yyyy = today.getFullYear();
+            if(dd<10){
+                dd='0'+dd;
+            }
+            if(mm<10){
+                mm='0'+mm;
+            }
+            today = yyyy+'-'+mm+'-'+dd;
+            console.log(today);
+
+            let currentDate = today;
+
 
           //Ta funkcja działa analogicznie jak jQuerry .appendAfter();
           Element.prototype.appendAfter = function (element) {
@@ -552,7 +569,7 @@
             }
 
             {{--let currentDate ={{$today}};--}}
-                let currentDate = '0';
+
 
             table_client = $('#table_client').DataTable({
                 "autoWidth": true,
@@ -858,6 +875,8 @@
             //Ta funkcja jest globalnym event listenerem na click
             function buttonHandler(e) {
                 if(e.target.id == 'add-new-route') {
+                    let basicDate = document.querySelector('.first-show-date-input');
+                    currentDate = basicDate.value; //every time user clicks on manual show creation, date resets
                     let appendPlace = document.querySelector('.route-here');
                     appendPlace.innerHTML = "";
                     let newShow = addNewShow(0,0); //otrzymujemy nowy formularz z pokazem.
@@ -1139,7 +1158,7 @@
                     currentDate = dateInput.value;
                 }
                 else {
-                    let basisDate = document.querySelector('.first-show-date').value;
+                    let basisDate = document.querySelector('.first-show-date-input').value;
                     currentDate = basisDate;
                 }
 
