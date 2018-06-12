@@ -32,7 +32,7 @@
         <div class="col-md-12">
             <div class="alert alert-info"> <strong>Podsumowanie oddziałów - zestawienie statystyk dotyczących wszystkich oddziałów w wybranym miesiącu, podzielonych na tygodnie. </strong></br>
                 <div class="additional_info">
-                    RBH = Roboczogodziny (godziny w tygodniu / godziny weekendowe)</br>
+                    RBH = Średnia roboczogodzin (średnia godzin w tygodniu / średnia godzin w weekendzie)</br>
                     Średnia = Zgody / RBH </br>
                     % celu = 100% * Zgody / Cel zgód </br>
                     % janków = 100% * liczba janków / liczba odsłuchanych rozmów </br>
