@@ -153,7 +153,7 @@ class CrmRouteController extends Controller
     /**
      * This method shows specific route
      */
-    public function specificRouteGet($id) {
+    public function specificRouteGet($id, $onlyResult = null) {
         $clientRouteInfo = ClientRouteInfo::where('client_route_id', '=', $id)->get();
         $clients = Clients::all();
         $cities = Cities::all();
@@ -227,11 +227,13 @@ class CrmRouteController extends Controller
         }
 
         $clientRouteInfo = collect($clientRouteInfoExtended);
-
-        return view('crmRoute.specificInfo')
-            ->with('clientRouteInfo', $clientRouteInfoExtended)
-            ->with('hotels', $hotels)
-            ->with('clientName', $clientName);
+        if($onlyResult == null)
+            return view('crmRoute.specificInfo')
+                ->with('clientRouteInfo', $clientRouteInfoExtended)
+                ->with('hotels', $hotels)
+                ->with('clientName', $clientName);
+        else
+            return $clientRouteInfoExtended;
     }
 
     /**
@@ -359,6 +361,16 @@ class CrmRouteController extends Controller
 
         return $all_data;
     }
+
+    /**
+     * Return ready route with info
+     * @param Request $request
+     */
+    public function getReadyRoute(Request $request){
+        $data = $this::specificRouteGet($request->route_id,true);
+        return $data;
+    }
+
 
     /**
      * @param Request $request
@@ -631,7 +643,7 @@ class CrmRouteController extends Controller
                 client.name as clientName,
                 client_route.status as status
             '))
-                ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
+                ->join('client_route', 'client_route.id', 'client_route_info.client_route_id')
                 ->join('client', 'client.id', '=', 'client_route.client_id')
                 ->where('client_route_info.client_route_id', '=', $item->client_route_id)
                 ->distinct()
@@ -769,6 +781,8 @@ class CrmRouteController extends Controller
             }
         }
         $infoCollection = collect($fullInfoArrExtended);
+        if(isset($request->onlyAccept))
+            $infoCollection = $infoCollection->where('status','=',1);
 
         return datatables($infoCollection)->make(true);
     }

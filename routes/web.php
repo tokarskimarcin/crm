@@ -814,6 +814,9 @@ Route::get('/crmRoute_index', 'CrmRouteController@index');
 Route::post('/crmRoute_index', 'CrmRouteController@indexPost');
 Route::post('/crmRoute_index_ajax', 'CrmRouteController@getSelectedRoute')->name('api.getRoute');
 
+Route::post('/getReadyRoute', 'CrmRouteController@getReadyRoute')->name('api.getReadyRoute');
+
+
 Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet');
 Route::post('/specificRoute', 'CrmRouteController@specificRoutePost')->name('api.getJSONRoute');
 
@@ -868,3 +871,7 @@ Route::post('/crmRoute_indexEdit', 'CrmRouteController@indexEditPost');
 
 
 
+
+
+Route::get('/addNewCampaigns', 'CampaignsController@addNewCampaignsGet');
+Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
