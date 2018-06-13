@@ -212,10 +212,12 @@ class StatisticsController extends Controller
             ->groupBy('department_info.id')
             ->get();
 
-        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data) {
+        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data,$work_hours) {
             $info_with_janky = $pbx_dkj_data->where('id', '=', $item->id)->first();
             $item->janki = $info_with_janky != null ? $info_with_janky->janky_proc : 0;
-           return $item;
+            $info_with_work_hours= $work_hours->where('id', '=', $item->id)->first();
+            $item->avg_average = $info_with_work_hours->realRBH != 0 ? round($item->sum_success/$info_with_work_hours->realRBH,2) : 0;
+            return $item;
         });
 
         $data = [
@@ -335,9 +337,11 @@ class StatisticsController extends Controller
             ->groupBy('department_info.id')
             ->get();
 
-        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data) {
+        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data,$work_hours) {
             $info_with_janky = $pbx_dkj_data->where('id', '=', $item->id)->first();
             $item->janki = $info_with_janky != null ? $info_with_janky->janky_proc : 0;
+            $info_with_work_hours= $work_hours->where('id', '=', $item->id)->first();
+            $item->avg_average = $info_with_work_hours->realRBH != 0 ? round($item->sum_success/$info_with_work_hours->realRBH,2) : 0;
             return $item;
         });
 
@@ -541,7 +545,9 @@ class StatisticsController extends Controller
             ->groupBy('department_info.id')
             ->get();
 
-        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data) {
+        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data,$work_hours) {
+            $info_with_work_hours= $work_hours->where('id', '=', $item->id)->first();
+            $item->avg_average = $info_with_work_hours->realRBH != 0 ? round($item->success/$info_with_work_hours->realRBH,2) : 0;
             $info_with_janky = $pbx_dkj_data->where('id', '=', $item->id)->first();
             $item->janki = $info_with_janky != null ? $info_with_janky->janky_proc : 0;
             return $item;
