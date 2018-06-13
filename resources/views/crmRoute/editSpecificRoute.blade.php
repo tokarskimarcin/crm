@@ -594,7 +594,7 @@
                    '<div class="form-group">' +
                    '<label class="myLabel">Data:</label>' +
                    '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">';
-                    if(currentDate != null) {
+                    if(currentDate != "0") {
                         stringAppend += '<input class="form-control dateInput" type="text" value="' + currentDate + '">';
                     }
                     else {
@@ -622,7 +622,7 @@
             }
 
             {{--let currentDate ={{$today}};--}}
-                let currentDate = null;
+                let currentDate = "0";
 
             table_client = $('#table_client').DataTable({
                 "autoWidth": true,
@@ -909,7 +909,7 @@
                     '<div class="form-group">' +
                     '<label class="myLabel">Data:</label>' +
                     '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">';
-                        if(currentDate != null) {
+                        if(currentDate != "0") {
                             stringAppend += '<input class="form-control dateInput" type="text" value="' + currentDate + '">';
                         }
                         else {

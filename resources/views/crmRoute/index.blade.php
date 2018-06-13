@@ -468,10 +468,20 @@
                           let responseOption = document.createElement('option');
                           responseOption.value = response[i].id;
                           if(response[i].block == 1) {
-                              responseOption.textContent = response[i].name + " (KARENCJA do " + response[i].available_date + ")";
+                              if(response[i].exceeded == 0) { //When city is still available
+                                  responseOption.textContent = response[i].name + " [dostępne jeszcze " + response[i].used_hours + " godzin]";
+                                  responseOption.setAttribute('data-max_hours', response[i].used_hours); //needed for auto setting hours
+                              }
+                              else { //when city is not available
+                                  responseOption.textContent = response[i].name + " (KARENCJA do " + response[i].available_date + ") [przekroczono o " + response[i].used_hours + " godzin]";
+                                  responseOption.setAttribute('data-max_hours', 0); //needed for auto setting hours
+                              }
                           }
                           else {
                               responseOption.textContent = response[i].name;
+                              if(response[i].max_hour > 0) {
+                                  responseOption.setAttribute('data-max_hours', response[i].max_hour); //needed for auto setting hours
+                              }
                           }
 
                           placeToAppend2.appendChild(responseOption);
@@ -519,18 +529,30 @@
                for(var j = 0; j<city.length; j++) {
                    if (responseIterator.city_id == city[j].id){
                        if(city[j].block == 1) {
-                           stringAppend += '<option value="' + responseIterator.city_id + '" selected>' + responseIterator.city_name + ' (KARENCJA do ' + city[j].available_date + ')</option>\n';
+                           if(city[j].exceeded == 0) { //When city is still available
+                               stringAppend += '<option value="' + city[j].id + '" data-max_hours="' + city[j].used_hours + '"  selected>' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
+                           }
+                           else {
+                               stringAppend += '<option value="' + city[j].id + '"  data-max_hours="0" selected>' + city[j].name + '(KARENCJA do ' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
+                           }
+
                        }
                        else {
-                           stringAppend += '<option value="' + responseIterator.city_id + '" selected>' + responseIterator.city_name + '</option>\n';
+                           stringAppend += '<option value="' + city[j].city_id + '"  data-max_hours="' + city[j].max_hour + '" selected>' + city[j].name +'</option>\n';
                        }
 
                    }else{
                        if(city[j].block == 1) {
-                           stringAppend += '<option value="' + city[j].id + '" >' + city[j].name + '(KARENCJA do ' + city[j].available_date + ')</option>\n';
+                           if(city[j].exceeded == 0) { //When city is still available
+                               stringAppend += '<option value="' + city[j].city_id + '" data-max_hours="' + city[j].used_hours + '">' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
+                           }
+                           else {
+                               stringAppend += '<option value="' + city[j].city_id + '"  data-max_hours="0">' + city[j].name + '(KARENCJA' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
+                           }
+
                        }
                        else {
-                           stringAppend += '<option value="' + city[j].id + '" >' + city[j].name + '</option>\n';
+                           stringAppend += '<option value="' + city[j].city_id + '"  data-max_hours="' + city[j].max_hour + '">' + city[j].name +'</option>\n';
                        }
 
                    }
@@ -548,7 +570,7 @@
                    '<div class="form-group">' +
                    '<label class="myLabel">Data:</label>' +
                    '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">';
-                    if(currentDate != null) {
+                    if(currentDate != "0") {
                         stringAppend += '<input class="form-control dateInput" type="text" value="' + currentDate + '">';
                     }
                     else {
@@ -783,6 +805,7 @@
                                         for(var i = 0; i < response.length; i++) {
                                           //Pobranie miast dla danego wojew
                                             var city = getCitiesNamesByVoievodeship(response[i].voivodeship_id);
+                                            console.log(response[i]);
                                             //Generowanie Div'a
                                             if(i == 0)
                                               generateRouteDiv(false,false,false,response[i],city,voievodes,placeToAppend);
@@ -799,6 +822,9 @@
                                             });
                                             activateDatepicker();
                                         }
+                                        $('.city').on('select2:select', function (e) {
+                                            setHoursValue(e);
+                                        });
                                     }
                                 });
                         }
@@ -859,7 +885,7 @@
                     '<div class="form-group">' +
                     '<label class="myLabel">Data:</label>' +
                     '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">';
-                        if(currentDate != null) {
+                        if(currentDate != "0") {
                             stringAppend += '<input class="form-control dateInput" type="text" value="' + currentDate + '">';
                         }
                         else {
@@ -892,9 +918,14 @@
                     $('.city').select2();
                     $('.voivodeship').select2();
                     $('.voivodeship').off('select2:select'); //remove previous event listeners
+                    $('.city').off('select2:select'); //remove previous event listeners
                     $('.voivodeship').on('select2:select', function (e) {
                       getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
                     });
+                    $('.city').on('select2:select', function (e) {
+                        setHoursValue(e);
+                    });
+
                     activateDatepicker();
 
                 }
@@ -946,6 +977,7 @@
                                 $('.city').select2();
                                 $('.voivodeship').select2(); //attach select2 look
                                 $('.voivodeship').off('select2:select'); //remove previous event listeners
+                                $('.city').off('select2:select'); //remove previous event listeners
                                 $('.voivodeship').on('select2:select', function (e) {
                                     let container = e.target.parentElement.parentElement.parentElement.parentElement;
                                     let headerId = e.params.data.id;
@@ -962,11 +994,21 @@
                                             if(cityInfo[i].id == headerId){
                                                 let responseOption = document.createElement('option');
                                                 responseOption.value = cityInfo[i].city_id;
-                                                if(cityInfo[i].block == 1) { //here we distinct cities with grace period
-                                                    responseOption.textContent = cityInfo[i].city_name + " (KARENCJA do " + cityInfo[i].available_date + ")";
+                                                if(cityInfo[i].block == 1) {
+                                                    if(cityInfo[i].exceeded == 0) { //When city is still available
+                                                        responseOption.textContent = cityInfo[i].city_name + " [dostępne jeszcze " + cityInfo[i].used_hours + " godzin]";
+                                                        responseOption.setAttribute('data-max_hours', cityInfo[i].used_hours); //needed for auto setting hours
+                                                    }
+                                                    else { //when city is not available
+                                                        responseOption.textContent = cityInfo[i].city_name + " (KARENCJA do " + cityInfo[i].available_date + ") [przekroczono o " + cityInfo[i].used_hours + " godzin]";
+                                                        responseOption.setAttribute('data-max_hours', 0); //needed for auto setting hours
+                                                    }
                                                 }
                                                 else {
                                                     responseOption.textContent = cityInfo[i].city_name;
+                                                    if(cityInfo[i].max_hour > 0) {
+                                                        responseOption.setAttribute('data-max_hours', cityInfo[i].max_hour); //needed for auto setting hours
+                                                    }
                                                 }
                                                 placeToAppend.appendChild(responseOption);
                                             }
@@ -974,6 +1016,9 @@
                                     }else{
                                         getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
                                     }
+                                });
+                                $('.city').on('select2:select', function (e) {
+                                    setHoursValue(e);
                                 });
                             }
                         });
@@ -1017,6 +1062,7 @@
                                 },
                                 success: function (response) {
                                     $(actualSelectVoievode).off('select2:select');
+                                    $('.city').off('select2:select'); //remove previous event listeners
 
                                     let stringAppend = '<option value=0>Wybierz</option>';
                                     for (let i = 0; i < response['voievodeInfo'].length; i++) {
@@ -1038,18 +1084,34 @@
                                             placeToAppend2.appendChild(basicOption);
                                             let responseObject = response['cityInfo'];
                                             for(var i = 0; i < responseObject[headerId].length; i++) {
+                                                console.log(responseObject[headerId][i]);
 
 
                                                 let responseOption = document.createElement('option');
                                                 responseOption.value = responseObject[headerId][i].city_id;
-                                                if(responseObject[headerId][i].block == 1) { //here we distinct cities with grace period
-                                                    responseOption.textContent = responseObject[headerId][i].city_name + " (KARENCJA do " + responseObject[headerId][i].available_date + ")";
+
+                                                if(responseObject[headerId][i].block == 1) {
+                                                    if(responseObject[headerId][i].exceeded == 0) { //When city is still available
+                                                        responseOption.textContent = responseObject[headerId][i].city_name + " [dostępne jeszcze " + responseObject[headerId][i].used_hours + " godzin]";
+                                                        responseOption.setAttribute('data-max_hours', responseObject[headerId][i].used_hours); //needed for auto setting hours
+                                                    }
+                                                    else { //when city is not available
+                                                        responseOption.textContent = responseObject[headerId][i].city_name + " (KARENCJA do " + responseObject[headerId][i].available_date + ") [przekroczono o " + responseObject[headerId][i].used_hours + " godzin]";
+                                                        responseOption.setAttribute('data-max_hours', 0); //needed for auto setting hours
+                                                    }
                                                 }
                                                 else {
                                                     responseOption.textContent = responseObject[headerId][i].city_name;
+                                                    if(responseObject[headerId][i].max_hour > 0) {
+                                                        responseOption.setAttribute('data-max_hours', responseObject[headerId][i].max_hour); //needed for auto setting hours
+                                                    }
                                                 }
+
                                                 placeToAppend2.appendChild(responseOption);
                                             }
+                                    });
+                                    $('.city').on('select2:select', function (e) {
+                                        setHoursValue(e);
                                     });
                                 }
                             });
@@ -1114,6 +1176,17 @@
 
             }
 
+
+            /**
+             * Parameters: e - select2 event after selecting of city
+             * Result: This function automatically sets value of hours input basing on attribute data-max_hours in option element.
+             */
+            function setHoursValue(e) {
+                const maxHours = e.target.selectedOptions[0].dataset.max_hours; // maximum hours we that we can use for given city.
+                const entireRow = e.target.parentNode.parentNode.parentNode;
+                const hoursInput = entireRow.querySelector('.show-hours'); // selecting hoursInput of given show
+                hoursInput.value = maxHours;
+            }
 
             /*
             This function removes "X" button from first show container

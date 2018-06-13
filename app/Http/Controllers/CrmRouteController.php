@@ -973,17 +973,7 @@ class CrmRouteController extends Controller
                 $properDate = date_create($currentDate);
                 //wartość karencji dla danego miasta
                 $gracePeriod = Cities::find($item->city_id)->grace_period;
-//            $day = substr($item->date,8,2);
-//            $month = substr($item->date,5,2);
-//            $year = substr($item->date, 0,4);
-//            $dateInProperFormat = mktime(0, 0, 0, $month, $day, $year);
-//            $dateInProperFormat = date('Y-m-d', $dateInProperFormat);
-//
-//            $day2 = substr($date,8,2);
-//            $month2 = substr($date,5,2);
-//            $year2 = substr($date, 0,4);
-//            $dateInProperFormat2 = mktime(0, 0, 0, $month2, $day2, $year2);
-//            $dateInProperFormat2 = date('Y-m-d', $dateInProperFormat2);
+
                 $goodDate = date_create($item->date);
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
@@ -993,11 +983,11 @@ class CrmRouteController extends Controller
 
                 $arrayFlag = false;
                 if($dateDifference <= $gracePeriod) {
-                    foreach($checkedCities as $cities) {
-                        if($item->city_id == $cities->city_id) {
-                            $arrayFlag = true;
-                        }
-                    }
+//                    foreach($checkedCities as $cities) {
+//                        if($item->city_id == $cities->city_id) {
+//                            $arrayFlag = true;
+//                        }
+//                    }
                     if($arrayFlag == false) {
                         $cityInfoObject = new \stdClass();
                         $cityInfoObject->city_id = $item->city_id;
@@ -1008,18 +998,39 @@ class CrmRouteController extends Controller
 
             }
             $all_cities->map(function($item) use($checkedCities){
+                $hourNumber = 0; //This variable counts how many times city was used in grace period
+                foreach($checkedCities as $cityRecords) {
+                    if ($cityRecords->city_id == $item->id) {
+                        $hourNumber++;
+                    }
+                }
+
                 $blockFlag = false;
                 foreach($checkedCities as $blockedCity) {
                     if($blockedCity->city_id == $item->id) {
                         $blockFlag = true;
                         $item->block = 1;
                         $item->available_date = $blockedCity->available_date;
+                        if($item->max_hour > $hourNumber) { // limit of hours isn't exceeded
+                            $hourDifference = $item->max_hour - $hourNumber;
+                            $item->exceeded = 0; // indices that this city is still available for couple of hours
+                            $item->used_hours = $hourDifference;
+//                            $item->used_hours = $hourNumber;
+                        }
+                        else {
+                            $hourDifference = $hourNumber - $item->max_hour;
+                            $item->used_hours = $hourDifference;
+                            $item->exceeded = 1; // indices that this city is not available.
+                        }
+
                     }
                 }
 
                 if($blockFlag == false) {
                     $item->block = 0;
                     $item->available_date = 0;
+                    $item->used_hours = 0;
+                    $item->exceeded = 0;
                 }
 
                 return $item;
@@ -1309,7 +1320,7 @@ class CrmRouteController extends Controller
 
 
     public function findCityByDistance($city, $currentDate){
-        $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id,
+        $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
             ( 3959 * acos ( cos ( radians('.$city->latitude.') ) * cos( radians( `latitude` ) )
              * cos( radians( `longitude` ) - radians('.$city->longitude.') ) + sin ( radians('.$city->latitude.') )
               * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
@@ -1344,11 +1355,11 @@ class CrmRouteController extends Controller
 
                 $arrayFlag = false;
                 if($dateDifference <= $gracePeriod) {
-                    foreach($checkedCities as $cities) {
-                        if($item->city_id == $cities->city_id) {
-                            $arrayFlag = true;
-                        }
-                    }
+//                    foreach($checkedCities as $cities) {
+//                        if($item->city_id == $cities->city_id) {
+//                            $arrayFlag = true;
+//                        }
+//                    }
                     if($arrayFlag == false) {
                         $cityInfoObject = new \stdClass();
                         $cityInfoObject->city_id = $item->city_id;
@@ -1359,18 +1370,37 @@ class CrmRouteController extends Controller
 
             }
             $voievodeshipRound->map(function($item) use($checkedCities){
+                $hourNumber = 0; //This variable counts how many times city was used in grace period
+                foreach($checkedCities as $cityRecords) {
+                    if ($cityRecords->city_id == $item->city_id) {
+                        $hourNumber++;
+                    }
+                }
                 $blockFlag = false;
                 foreach($checkedCities as $blockedCity) {
                     if($blockedCity->city_id == $item->city_id) {
                         $blockFlag = true;
                         $item->block = 1;
                         $item->available_date = $blockedCity->available_date;
+                        if($item->max_hour > $hourNumber) { // limit of hours isn't exceeded
+                            $hourDifference = $item->max_hour - $hourNumber;
+                            $item->exceeded = 0; // indices that this city is still available for couple of hours
+                            $item->used_hours = $hourDifference;
+//                            $item->used_hours = $hourNumber;
+                        }
+                        else {
+                            $hourDifference = $hourNumber - $item->max_hour;
+                            $item->used_hours = $hourDifference;
+                            $item->exceeded = 1; // indices that this city is not available.
+                        }
                     }
                 }
 
                 if($blockFlag == false) {
                     $item->block = 0;
                     $item->available_date = 0;
+                    $item->used_hours = 0;
+                    $item->exceeded = 0;
                 }
 
                 return $item;
