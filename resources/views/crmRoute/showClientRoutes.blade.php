@@ -61,7 +61,7 @@
                                     <th>Trasa</th>
                                     <th>Przypisany hotel i godziny</th>
                                     <th>Akceptuj trasę</th>
-                                    <th>Edycja (Hoteli)</th>
+                                    <th>Edycja (Hoteli i godzin)</th>
                                     <th>Edycja (Trasy)</th>
                                 </tr>
                                 </thead>
