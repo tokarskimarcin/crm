@@ -324,6 +324,11 @@ class CrmRouteController extends Controller
         $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
 
         $clientRouteInfo = $clientRouteInfo->sortByDesc('date');
+        $clientRouteInfo->map(function($item) {
+            $cityObject = Cities::find($item[0]->city_id);
+            $item[0]->cities = $this::findCityByDistance($cityObject, '2000-01-01');
+            return $item;
+        });
         return view('crmRoute.editSpecificRoute')
             ->with('departments', $departments)
             ->with('voivodes', $voivodes)
@@ -352,6 +357,8 @@ class CrmRouteController extends Controller
             foreach($clientRouteInfo as $item) {
                 $item->hour = $city->timeArr[$iterator] . ':00';
                 $item->hotel_id = $city->hotelId;
+                $item->limits = 0; //At this point nobody choose it's value
+                $item->department_info_id = null; //At this point nobody choose it's value, can't be 0 because
                 $item->save();
                 $iterator++;
             }

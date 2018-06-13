@@ -340,7 +340,12 @@
 
 
         $(document).ready(function() {
-
+            $('.city').select2();
+            $('.voivodeship').select2();
+            $('.voivodeship').off('select2:select'); //remove previous event listeners
+            $('.voivodeship').on('select2:select', function (e) {
+                getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
+            });
 
 
             let today = new Date();
@@ -543,7 +548,7 @@
                    '<div class="form-group">' +
                    '<label class="myLabel">Data:</label>' +
                    '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">';
-                    if(currentDate != '0') {
+                    if(currentDate != null) {
                         stringAppend += '<input class="form-control dateInput" type="text" value="' + currentDate + '">';
                     }
                     else {
@@ -854,7 +859,7 @@
                     '<div class="form-group">' +
                     '<label class="myLabel">Data:</label>' +
                     '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">';
-                        if(currentDate != '0') {
+                        if(currentDate != null) {
                             stringAppend += '<input class="form-control dateInput" type="text" value="' + currentDate + '">';
                         }
                         else {
