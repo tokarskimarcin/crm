@@ -201,7 +201,7 @@ class StatisticsController extends Controller
             //tu był zmiana z godzin na liczbę
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
-                'sum(time_to_sec(register_stop) - time_to_sec(register_start))/3600 as realRBH,
+                'sum(time_to_sec(accept_stop) - time_to_sec(accept_start))/3600 as realRBH,
                 department_info.id
             '))
             ->join('users', 'users.id', '=', 'work_hours.id_user')
@@ -325,8 +325,8 @@ class StatisticsController extends Controller
 
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
-                'sum(time_to_sec(register_stop) - time_to_sec(register_start))/3600 as realRBH,
-                 department_info.id
+                 'sum(case when time_to_sec(accept_stop) is not null then (time_to_sec(accept_stop) - time_to_sec(accept_start))/3600 else  (time_to_sec(register_stop) - time_to_sec(register_start))/3600 end) as realRBH,
+                  department_info.id
             '))
             ->join('users', 'users.id', '=', 'work_hours.id_user')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
@@ -531,7 +531,7 @@ class StatisticsController extends Controller
         //pobieranie sumy godzin pracy dla poszczególnych oddziałów
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
-                'sum(time_to_sec(register_stop) - time_to_sec(register_start))/3600 as realRBH,
+                'sum(time_to_sec(accept_stop) - time_to_sec(accept_start))/3600 as realRBH,
                   department_info.id
                   '))
             ->join('users', 'users.id', '=', 'work_hours.id_user')
