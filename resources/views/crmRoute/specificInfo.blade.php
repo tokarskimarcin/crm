@@ -126,7 +126,8 @@
         </div>
 
         <div class="client-container placeToAppendForm">
-            <button id="submit-button" class="btn btn-success" type="button">Zapisz</button>
+            <button class="btn btn-info" style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;" id="redirect">Powrót</button>
+            <button id="submit-button" class="btn btn-success" type="button" style="font-weight:bold;">Zapisz</button>
         </div>
     </div>
 
@@ -161,7 +162,6 @@
                             @endif
                         @endforeach
                     @endforeach
-                console.log(hotelIdArr);
 
 
 
@@ -175,7 +175,6 @@
             newTable = $('.datatable');
             newTable.each(function() {
                 var cityElementOfGivenContainer = $(this).siblings('.city_info').attr('data-identificator');
-                console.log(cityElementOfGivenContainer);
 
                 tableArray.push($(this).DataTable({
                     "autoWidth": true,
@@ -360,7 +359,13 @@
                 });
             }
 
+            function redirectHandler(e) {
+                location.href="{{URL::to('/showClientRoutes')}}";
+            }
+
             const submitButton = document.querySelector('#submit-button');
+            const redirectButton = document.querySelector('#redirect');
+            redirectButton.addEventListener('click', redirectHandler);
             submitButton.addEventListener('click', submitHandler);
 
         })
