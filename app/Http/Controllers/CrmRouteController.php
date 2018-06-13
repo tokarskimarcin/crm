@@ -326,6 +326,11 @@ class CrmRouteController extends Controller
         $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
 
         $clientRouteInfo = $clientRouteInfo->sortByDesc('date');
+        $clientRouteInfo->map(function($item) {
+            $cityObject = Cities::find($item[0]->city_id);
+            $item[0]->cities = $this::findCityByDistance($cityObject, '2000-01-01');
+            return $item;
+        });
         return view('crmRoute.editSpecificRoute')
             ->with('departments', $departments)
             ->with('voivodes', $voivodes)
@@ -354,6 +359,8 @@ class CrmRouteController extends Controller
             foreach($clientRouteInfo as $item) {
                 $item->hour = $city->timeArr[$iterator] . ':00';
                 $item->hotel_id = $city->hotelId;
+                $item->limits = 0; //At this point nobody choose it's value
+                $item->department_info_id = null; //At this point nobody choose it's value, can't be 0 because
                 $item->save();
                 $iterator++;
             }
@@ -622,23 +629,38 @@ class CrmRouteController extends Controller
 
         }
 
+        $client_route_info_extended = $client_route_info->map(function ($item) use ($hotels, $cities, $clients) {
 
-        $client_route_info_extended = $client_route_info->map(function($item) use($hotels, $cities, $clients) {
-            foreach($cities as $city) {
-                if($city->id == $item->city_id) {
+            $hotelIterator = 0; //this variable counts hotels for each clientRoute
+            $thisClientRouteData = ClientRouteInfo::where('client_route_id', '=', $item->client_route_id)->get(); //all insertions for given ClientRoute
+            foreach($thisClientRouteData as $clientData) {
+                if(isset($clientData->hotel_id)) {
+                    $hotelIterator++;
+                }
+            }
+
+            if($hotelIterator > 0) {
+                $item->haveHotel = "1";
+            }
+            else {
+                $item->haveHotel = "0";
+            }
+
+            foreach ($cities as $city) {
+                if ($city->id == $item->city_id) {
                     $item->cityName = $city->name;
                 }
             }
-            foreach($hotels as $hotel) {
-                if(isset($item->hotel_id)) {
-                    if($hotel->id == $item->hotel_id) {
+            foreach ($hotels as $hotel) {
+                if (isset($item->hotel_id)) {
+                    if ($hotel->id == $item->hotel_id) {
                         $item->hotelName = $hotel->name;
                     }
-                }
-                else {
+                } else {
                     $item->hotelName = 'brak';
                 }
             }
+
             $clientName = DB::table('client_route_info')->select(DB::raw('
                 client.name as clientName,
                 client_route.status as status
@@ -664,7 +686,7 @@ class CrmRouteController extends Controller
         $separator = '';
         $client_route_indicator = null;
         $lp = 0; // simple iterator
-        foreach($client_route_info_extended as $extendedInfo) {
+        foreach ($client_route_info_extended as $extendedInfo) {
 //            $dateFlag = null; // true - the same day, false - other day
 //            $cityFlag = null;
 //            if($extendedInfo === reset($client_route_info_extended)) { // We are adding first city name to string and first insertions into arrays.
@@ -672,10 +694,10 @@ class CrmRouteController extends Controller
 //                array_push($dateArr, $extendedInfo->date);
 //                $clientRouteName .= $extendedInfo->cityName;dddd($extendedInfo);$lp++;
             $lp++;
-            if($lp == 1) {
+            if ($lp == 1) {
                 $client_route_indicator = $extendedInfo->client_route_id; // przypisujemy do zmiennej wartosc pierwsego client_route_id
             }
-            if($extendedInfo->client_route_id == $client_route_indicator) {
+            if ($extendedInfo->client_route_id == $client_route_indicator) {
                 $helpObject = new \stdClass();
                 $helpObject->cityName = $extendedInfo->cityName;
                 $helpObject->date = $extendedInfo->date;
@@ -685,9 +707,9 @@ class CrmRouteController extends Controller
                 $helpObject->hotelName = $extendedInfo->hotelName;
                 $helpObject->hour = $extendedInfo->hour;
                 $helpObject->status = $extendedInfo->status;
+                $helpObject->haveHotel = $extendedInfo->haveHotel;
                 array_push($fullNameArr, $helpObject);
-            }
-            else {
+            } else {
                 array_push($fullInfoArr, $fullNameArr); //dodaje do fullInfoArr wszystkie dane o poszczególej trasie
                 $fullNameArr = array(); // czyścimy zawartosc tej tablicy
                 $helpObject = new \stdClass();
@@ -699,23 +721,23 @@ class CrmRouteController extends Controller
                 $helpObject->hotelName = $extendedInfo->hotelName;
                 $helpObject->hour = $extendedInfo->hour;
                 $helpObject->status = $extendedInfo->status;
+                $helpObject->haveHotel = $extendedInfo->haveHotel;
                 array_push($fullNameArr, $helpObject);
                 $client_route_indicator = $extendedInfo->client_route_id;
             }
 
 
-            if($lp == count($client_route_info_extended)) {
+            if ($lp == count($client_route_info_extended)) {
                 array_push($fullInfoArr, $fullNameArr);
             }
         }
-//
 //        dd($fullInfoArr);
         $helpClientNameVariable = '';
         $helpClientWeekVariable = '';
         $helpHourVariable = 0;
         $fullInfoArrExtended = array();
         $iterator2 = 0;
-        foreach($fullInfoArr as $eachClientRoute) {
+        foreach ($fullInfoArr as $eachClientRoute) {
             $iterator2++;
             $lp = 0;
             $iterator = 0;
@@ -724,21 +746,20 @@ class CrmRouteController extends Controller
             $separator = '';
             $helpClientWeekVariable = '';
             $helpHourVariable = 0;
-            foreach($eachClientRoute as $item) {
-                if($item->hour != null && $item->hour != '00:00:00') {
+            foreach ($eachClientRoute as $item) {
+                if ($item->hour != null && $item->hour != '00:00:00') {
                     $helpHourVariable++;
                 }
                 $lp++;
                 $dateFlag = null; // true - the same day
                 $cityFlag = null;
-                if($lp == 1) {
+                if ($lp == 1) {
                     $clientRouteName .= $item->cityName;
                     $iterator++;
                     $helpClientNameVariable = $item->clientName;
                     $helpClientWeekVariable = $item->weekOfYear;
-                }
-                else {
-                    for($i = 0; $i < $iterator; $i++) {
+                } else {
+                    for ($i = 0; $i < $iterator; $i++) {
                         if ($item->date == $eachClientRoute[$i]->date) {
 
                             $dateFlag = true;
@@ -751,18 +772,17 @@ class CrmRouteController extends Controller
                             }
                         }
                     }
-                    if($dateFlag == true && $cityFlag != true) {
+                    if ($dateFlag == true && $cityFlag != true) {
                         $separator = '+';
                         $clientRouteName .= $separator . $item->cityName;
-                    }
-                    else if($dateFlag != true && $cityFlag != true) {
+                    } else if ($dateFlag != true && $cityFlag != true) {
                         $separator = ' | ';
                         $clientRouteName .= $separator . $item->cityName;
                     }
                     $iterator++;
                 }
 
-                if($lp == count($eachClientRoute)) {
+                if ($lp == count($eachClientRoute)) {
                     $helpObject2 = new \stdClass();
                     $helpObject2->clientRouteName = $clientRouteName;
                     $helpObject2->clientName = $helpClientNameVariable;
@@ -770,10 +790,10 @@ class CrmRouteController extends Controller
                     $helpObject2->weekOfYear = $helpClientWeekVariable;
                     $helpObject2->hotelName = $item->hotelName;
                     $helpObject2->status = $item->status;
-                    if($helpHourVariable > 0) {
+                    $helpObject2->haveHotel = $item->haveHotel;
+                    if ($helpHourVariable > 0) {
                         $helpObject2->hour = "tak";
-                    }
-                    else {
+                    } else {
                         $helpObject2->hour = "nie";
                     }
                     array_push($fullInfoArrExtended, $helpObject2);
@@ -967,17 +987,7 @@ class CrmRouteController extends Controller
                 $properDate = date_create($currentDate);
                 //wartość karencji dla danego miasta
                 $gracePeriod = Cities::find($item->city_id)->grace_period;
-//            $day = substr($item->date,8,2);
-//            $month = substr($item->date,5,2);
-//            $year = substr($item->date, 0,4);
-//            $dateInProperFormat = mktime(0, 0, 0, $month, $day, $year);
-//            $dateInProperFormat = date('Y-m-d', $dateInProperFormat);
-//
-//            $day2 = substr($date,8,2);
-//            $month2 = substr($date,5,2);
-//            $year2 = substr($date, 0,4);
-//            $dateInProperFormat2 = mktime(0, 0, 0, $month2, $day2, $year2);
-//            $dateInProperFormat2 = date('Y-m-d', $dateInProperFormat2);
+
                 $goodDate = date_create($item->date);
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
@@ -987,11 +997,11 @@ class CrmRouteController extends Controller
 
                 $arrayFlag = false;
                 if($dateDifference <= $gracePeriod) {
-                    foreach($checkedCities as $cities) {
-                        if($item->city_id == $cities->city_id) {
-                            $arrayFlag = true;
-                        }
-                    }
+//                    foreach($checkedCities as $cities) {
+//                        if($item->city_id == $cities->city_id) {
+//                            $arrayFlag = true;
+//                        }
+//                    }
                     if($arrayFlag == false) {
                         $cityInfoObject = new \stdClass();
                         $cityInfoObject->city_id = $item->city_id;
@@ -1002,18 +1012,39 @@ class CrmRouteController extends Controller
 
             }
             $all_cities->map(function($item) use($checkedCities){
+                $hourNumber = 0; //This variable counts how many times city was used in grace period
+                foreach($checkedCities as $cityRecords) {
+                    if ($cityRecords->city_id == $item->id) {
+                        $hourNumber++;
+                    }
+                }
+
                 $blockFlag = false;
                 foreach($checkedCities as $blockedCity) {
                     if($blockedCity->city_id == $item->id) {
                         $blockFlag = true;
                         $item->block = 1;
                         $item->available_date = $blockedCity->available_date;
+                        if($item->max_hour > $hourNumber) { // limit of hours isn't exceeded
+                            $hourDifference = $item->max_hour - $hourNumber;
+                            $item->exceeded = 0; // indices that this city is still available for couple of hours
+                            $item->used_hours = $hourDifference;
+//                            $item->used_hours = $hourNumber;
+                        }
+                        else {
+                            $hourDifference = $hourNumber - $item->max_hour;
+                            $item->used_hours = $hourDifference;
+                            $item->exceeded = 1; // indices that this city is not available.
+                        }
+
                     }
                 }
 
                 if($blockFlag == false) {
                     $item->block = 0;
                     $item->available_date = 0;
+                    $item->used_hours = 0;
+                    $item->exceeded = 0;
                 }
 
                 return $item;
@@ -1303,7 +1334,7 @@ class CrmRouteController extends Controller
 
 
     public function findCityByDistance($city, $currentDate){
-        $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id,
+        $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
             ( 3959 * acos ( cos ( radians('.$city->latitude.') ) * cos( radians( `latitude` ) )
              * cos( radians( `longitude` ) - radians('.$city->longitude.') ) + sin ( radians('.$city->latitude.') )
               * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
@@ -1338,11 +1369,11 @@ class CrmRouteController extends Controller
 
                 $arrayFlag = false;
                 if($dateDifference <= $gracePeriod) {
-                    foreach($checkedCities as $cities) {
-                        if($item->city_id == $cities->city_id) {
-                            $arrayFlag = true;
-                        }
-                    }
+//                    foreach($checkedCities as $cities) {
+//                        if($item->city_id == $cities->city_id) {
+//                            $arrayFlag = true;
+//                        }
+//                    }
                     if($arrayFlag == false) {
                         $cityInfoObject = new \stdClass();
                         $cityInfoObject->city_id = $item->city_id;
@@ -1353,18 +1384,37 @@ class CrmRouteController extends Controller
 
             }
             $voievodeshipRound->map(function($item) use($checkedCities){
+                $hourNumber = 0; //This variable counts how many times city was used in grace period
+                foreach($checkedCities as $cityRecords) {
+                    if ($cityRecords->city_id == $item->city_id) {
+                        $hourNumber++;
+                    }
+                }
                 $blockFlag = false;
                 foreach($checkedCities as $blockedCity) {
                     if($blockedCity->city_id == $item->city_id) {
                         $blockFlag = true;
                         $item->block = 1;
                         $item->available_date = $blockedCity->available_date;
+                        if($item->max_hour > $hourNumber) { // limit of hours isn't exceeded
+                            $hourDifference = $item->max_hour - $hourNumber;
+                            $item->exceeded = 0; // indices that this city is still available for couple of hours
+                            $item->used_hours = $hourDifference;
+//                            $item->used_hours = $hourNumber;
+                        }
+                        else {
+                            $hourDifference = $hourNumber - $item->max_hour;
+                            $item->used_hours = $hourDifference;
+                            $item->exceeded = 1; // indices that this city is not available.
+                        }
                     }
                 }
 
                 if($blockFlag == false) {
                     $item->block = 0;
                     $item->available_date = 0;
+                    $item->used_hours = 0;
+                    $item->exceeded = 0;
                 }
 
                 return $item;
