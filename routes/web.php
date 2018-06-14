@@ -823,6 +823,7 @@ Route::get('/showClientRoutes', 'CrmRouteController@showClientRoutesGet');
 Route::post('/showClientRoutesAjax', 'CrmRouteController@showClientRoutesAjax')->name('api.getClientRoutes');
 Route::post('/showClientRoutesInfoAjax', 'CrmRouteController@showClientRoutesInfoAjax')->name('api.getClientRouteInfo');
 Route::post('/showClientRoutesStatus', 'CrmRouteController@showClientRoutesStatus')->name('api.showClientRoutesStatus');
+Route::post('/getYearWeeksAjax', 'CrmRouteController@getYearWeeksAjax')->name('api.getWeeks');
 
 Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet');
 Route::post('/addNewRoute', 'CrmRouteController@addNewRoutePost');
@@ -865,6 +866,3 @@ Route::POST('/EditClient','ClientController@EditClient')->name('api.saveClient')
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
 Route::post('/crmRoute_indexEdit', 'CrmRouteController@indexEditPost');
-
-
-

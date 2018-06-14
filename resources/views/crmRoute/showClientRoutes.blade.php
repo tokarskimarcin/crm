@@ -47,6 +47,15 @@
                                 <label for="showOnlyAssigned">Pokaż tylko trasy bez przypisanego hotelu lub godziny</label>
                                 <input type="checkbox" style="display:inline-block" id="showOnlyAssigned">
                             </div>
+
+                            <div class="form-group" style="margin-top:1em;">
+                                <label for="year">Wybierz rok</label>
+                                <select id="year" class="form-control">
+                                    <option value="0">Wybierz</option>
+                                    <option value="2017">2017</option>
+                                    <option value="2018">2018</option>
+                                </select>
+                            </div>
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="weekNumber">Wybierz tydzień</label>
                                 <select id="weekNumber" class="form-control">
@@ -83,6 +92,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function(event) {
 
+            let yearInput = document.querySelector('#year');
+
             //This part is responsible for listing every week number into select
             const lastWeekOfYear ={{$lastWeek}};
             const weekSelect = document.querySelector('#weekNumber');
@@ -104,7 +115,7 @@
             const showAllClientsInput = document.querySelector('#showAllClients');
             const selectedWeekInput = document.querySelector('#weekNumber');
             let id = null; //after user click on 1st table row, it assing clientRouteId to this variable
-            let selectedWeek = null;
+            let selectedWeek = 0;
             let rowIterator = null;
             // let colorIterator = 0;
             let showAllClients = null; //this variable indices whether checkbox "Pokaż wszystkich klientó" is checked
@@ -202,6 +213,7 @@
                         d.showAllClients = showAllClients;
                         d.showOnlyAssigned = showOnlyAssigned;
                         d.selectedWeek = selectedWeek;
+                        d.year = yearInput.value;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -279,12 +291,7 @@
             }
 
             function selectedWeekHandler(e) {
-                if(e.target.value != 0) {
                     selectedWeek = e.target.value;
-                }
-                else {
-                    selectedWeek = 0;
-                }
                 table2.ajax.reload();
             }
 
@@ -334,9 +341,57 @@
                     })
             }
 
+            /**
+             * @param e
+             * This method append list of weeks in selected year to weekInput
+             */
+            function yearHandler(e) {
+                const selectedYear = e.target.value;
+
+                if(selectedYear > 0) {
+                    //part responsible for sending to server info about selected year
+                    const header = new Headers();
+                    header.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+
+                    let data = new FormData();
+                    data.append('year', selectedYear);
+
+                    const url = '{{route('api.getWeeks')}}';
+
+                    fetch(url, {
+                        method: 'post',
+                        headers: header,
+                        credentials: "same-origin",
+                        body: data
+                    })
+                        .then(response => response.json())
+                        .then(response => {
+                            const weeksInYear = response;
+                            selectedWeekInput.innerHTML = '';
+                            const basicOptionElement = document.createElement('option');
+                            basicOptionElement.value = 0;
+                            basicOptionElement.textContent = 'Wybierz';
+                            selectedWeekInput.appendChild(basicOptionElement);
+                            for(let i = 1; i <= weeksInYear; i++) {
+                                const optionElement = document.createElement('option');
+                                optionElement.value = i;
+                                optionElement.textContent = i;
+                                selectedWeekInput.appendChild(optionElement);
+                            }
+                        })
+                        .catch(err => console.log(err));
+                    table2.ajax.reload();
+                }
+
+            }
+
+
+
             showAllClientsInput.addEventListener('change', showAllClientsInputHandler);
             showOnlyAssignedInput.addEventListener('change', showOnlyAssignedHandler);
             selectedWeekInput.addEventListener('change', selectedWeekHandler);
+
+            yearInput.addEventListener('change', yearHandler);
 
         });
     </script>
