@@ -787,6 +787,7 @@ class CrmRouteController extends Controller
             $separator = '';
             $helpClientWeekVariable = '';
             $helpHourVariable = 0;
+            $minDate = 0; // this variable have value of earliest date from given clientRoute
             foreach ($eachClientRoute as $item) {
                 if ($item->hour != null && $item->hour != '00:00:00') {
                     $helpHourVariable++;
@@ -795,11 +796,16 @@ class CrmRouteController extends Controller
                 $dateFlag = null; // true - the same day
                 $cityFlag = null;
                 if ($lp == 1) {
+                    $minDate = $item->date;
                     $clientRouteName .= $item->cityName;
                     $iterator++;
                     $helpClientNameVariable = $item->clientName;
                     $helpClientWeekVariable = $item->weekOfYear;
                 } else {
+                    if($item->date < $minDate) {
+                        $minDate = $item->date;
+                    }
+
                     for ($i = 0; $i < $iterator; $i++) {
                         if ($item->date == $eachClientRoute[$i]->date) {
 
@@ -832,6 +838,7 @@ class CrmRouteController extends Controller
                     $helpObject2->hotelName = $item->hotelName;
                     $helpObject2->status = $item->status;
                     $helpObject2->haveHotel = $item->haveHotel;
+                    $helpObject2->minDate = $minDate; //lowest date of each clientRoute.
                     if ($helpHourVariable > 0) {
                         $helpObject2->hour = "tak";
                     } else {
