@@ -826,6 +826,7 @@ Route::get('/showClientRoutes', 'CrmRouteController@showClientRoutesGet');
 Route::post('/showClientRoutesAjax', 'CrmRouteController@showClientRoutesAjax')->name('api.getClientRoutes');
 Route::post('/showClientRoutesInfoAjax', 'CrmRouteController@showClientRoutesInfoAjax')->name('api.getClientRouteInfo');
 Route::post('/showClientRoutesStatus', 'CrmRouteController@showClientRoutesStatus')->name('api.showClientRoutesStatus');
+Route::post('/getYearWeeksAjax', 'CrmRouteController@getYearWeeksAjax')->name('api.getWeeks');
 
 Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet');
 Route::post('/addNewRoute', 'CrmRouteController@addNewRoutePost');

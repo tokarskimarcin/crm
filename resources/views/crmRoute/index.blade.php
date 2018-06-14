@@ -155,8 +155,14 @@
                                     <label id="client_choice_priority"></label>
                                 </div>
                                 <div class="col-md-4">
-                                    <label>Typ:</label>
-                                    <label id="client_choice_type"></label>
+                                    <div class="form-group">
+                                        <label for="client_choice_type">Typ:</label>
+                                        <select id="client_choice_type" class="form-control">
+                                            <option value="0">Wybierz</option>
+                                            <option value="1">Badania</option>
+                                            <option value="2">Wysyłka</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -340,6 +346,7 @@
 
 
         $(document).ready(function() {
+            $('#client_choice_type').attr('disabled', true).val(0);
             $('.city').select2();
             $('.voivodeship').select2();
             $('.voivodeship').off('select2:select'); //remove previous event listeners
@@ -360,7 +367,6 @@
                 mm='0'+mm;
             }
             today = yyyy+'-'+mm+'-'+dd;
-            console.log(today);
 
             let currentDate = today;
 
@@ -409,18 +415,24 @@
                 var tr_line_type = tr_line.getElementsByClassName('client_type')[0].textContent;
                 document.getElementById('client_choice_name').textContent = tr_line_name;
                 document.getElementById('client_choice_priority').textContent = tr_line_phone;
-                document.getElementById('client_choice_type').textContent = tr_line_type;
+
+                $('#client_choice_type').attr('disabled', false);
+                if(tr_line_type == 'Badania') {
+                    $('#client_choice_type').val(1);
+                }
+                else  if(tr_line_type == 'Wysyłka'){
+                    $('#client_choice_type').val(2);
+                }else{
+                    $('#client_choice_type').val(0);
+                }
             }
 
             function clearCheckedClientInfo(){
                 document.getElementById('client_choice_name').textContent = "";
                 document.getElementById('client_choice_priority').textContent = "";
-                document.getElementById('client_choice_type').textContent = "";
+                $('#client_choice_type').attr('disabled', true).val(0);
+
             }
-
-
-
-
 
             function getCitiesNamesByVoievodeship(voivodeship_id) {
                 let city;
@@ -538,21 +550,21 @@
 
                        }
                        else {
-                           stringAppend += '<option value="' + city[j].city_id + '"  data-max_hours="' + city[j].max_hour + '" selected>' + city[j].name +'</option>\n';
+                           stringAppend += '<option value="' + city[j].id + '"  data-max_hours="' + city[j].max_hour + '" selected>' + city[j].name +'</option>\n';
                        }
 
                    }else{
                        if(city[j].block == 1) {
                            if(city[j].exceeded == 0) { //When city is still available
-                               stringAppend += '<option value="' + city[j].city_id + '" data-max_hours="' + city[j].used_hours + '">' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
+                               stringAppend += '<option value="' + city[j].id + '" data-max_hours="' + city[j].used_hours + '">' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
                            }
                            else {
-                               stringAppend += '<option value="' + city[j].city_id + '"  data-max_hours="0">' + city[j].name + '(KARENCJA' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
+                               stringAppend += '<option value="' + city[j].id + '"  data-max_hours="0">' + city[j].name + '(KARENCJA' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
                            }
 
                        }
                        else {
-                           stringAppend += '<option value="' + city[j].city_id + '"  data-max_hours="' + city[j].max_hour + '">' + city[j].name +'</option>\n';
+                           stringAppend += '<option value="' + city[j].id + '"  data-max_hours="' + city[j].max_hour + '">' + city[j].name +'</option>\n';
                        }
 
                    }
@@ -805,7 +817,7 @@
                                         for(var i = 0; i < response.length; i++) {
                                           //Pobranie miast dla danego wojew
                                             var city = getCitiesNamesByVoievodeship(response[i].voivodeship_id);
-                                            console.log(response[i]);
+                                            console.log(city);
                                             //Generowanie Div'a
                                             if(i == 0)
                                               generateRouteDiv(false,false,false,response[i],city,voievodes,placeToAppend);
@@ -1084,7 +1096,6 @@
                                             placeToAppend2.appendChild(basicOption);
                                             let responseObject = response['cityInfo'];
                                             for(var i = 0; i < responseObject[headerId].length; i++) {
-                                                console.log(responseObject[headerId][i]);
 
 
                                                 let responseOption = document.createElement('option');
@@ -1152,12 +1163,19 @@
                     everythingIsGood = finalClientId != null && finalClientId != '0' ? formValidation(voivodeArr, cityArr, hourArr) : false;
 
                     if(everythingIsGood == true) {
-                        let formContainer = document.createElement('div');
-                        formContainer.innerHTML = '<form method="post" action="{{URL::to('/crmRoute_index')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"></form>';
-                        let place = document.querySelector('.route-here');
-                        place.appendChild(formContainer);
-                        let userForm = document.getElementById('user_form');
-                        userForm.submit();
+                        const clientTypeValue = $('#client_choice_type option:selected').val();
+                        if(clientTypeValue != '0') {
+                            let formContainer = document.createElement('div');
+                            formContainer.innerHTML = '<form method="post" action="{{URL::to('/crmRoute_index')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"><input type="hidden" name="clientType" value="' + clientTypeValue + '"></form>';
+                            let place = document.querySelector('.route-here');
+                            place.appendChild(formContainer);
+                            let userForm = document.getElementById('user_form');
+                            userForm.submit();
+                        }
+                        else {
+                            swal('Wybierz typ klienta (badania/wysyłka)');
+                        }
+
                     }
                     else {
                         clearArrays(voivodeArr, cityArr, hourArr);
