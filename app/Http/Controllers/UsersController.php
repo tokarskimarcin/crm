@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Agencies;
+use App\CoachChange;
+use App\CoachHistory;
 use App\Department_info;
 use App\Departments;
 use App\DisableAccountInfo;
@@ -30,56 +32,56 @@ class UsersController extends Controller
     {
         $agencies = Agencies::all();
         $user = User::find(Auth::user()->id);
-        $workingUsers = User::where('status_work', '=', 1) //są zatrudnieni
-        ->whereIn('user_type_id', [1,2])
-            ->where('department_info_id', '=', Auth::user()->department_info_id) // wybiera dział aktualnie zalogowanego użytkownika
+        $workingUsers = User::where('status_work', '=', 1)//są zatrudnieni
+        ->whereIn('user_type_id', [1, 2])
+            ->where('department_info_id', '=', Auth::user()->department_info_id)// wybiera dział aktualnie zalogowanego użytkownika
             ->get();
 
-        $workingTreners = User::whereIn('user_type_id', [4,12])
+        $workingTreners = User::whereIn('user_type_id', [4, 12])
             ->where('status_work', '=', 1)
             ->where('department_info_id', '=', Auth::user()->department_info_id)
             ->get();
 
         return view('hr.addNewUser')
-            ->with('agencies',$agencies)
-            ->with('send_type',$user->department_info->type)
+            ->with('agencies', $agencies)
+            ->with('send_type', $user->department_info->type)
             ->with('type', 1)
             ->with('recomendingPeople', $workingUsers)
             ->with('workingTreners', $workingTreners);
 
     }
+
     public function add_CadreGet()
     {
         $agencies = Agencies::all();
         $user_types = UserTypes::all();
         $department_info = Department_info::all();
         return view('hr.addNewUser')
-            ->with('agencies',$agencies)
-            ->with('department_info',$department_info)
-            ->with('user_types',$user_types)
+            ->with('agencies', $agencies)
+            ->with('department_info', $department_info)
+            ->with('user_types', $user_types)
             ->with('type', 2);
 
     }
+
     public function uniqueUsername(Request $request)
     {
-        if($request->ajax())
-        {
-            $user = User::where('username', '=',$request->username)->count();
+        if ($request->ajax()) {
+            $user = User::where('username', '=', $request->username)->count();
 
-            return ($user > 0) ? 1 : 0 ;
+            return ($user > 0) ? 1 : 0;
         }
     }
 
     public function uniqueEmail(Request $request)
     {
-       if($request->ajax())
-       {
-          $user = User::where('email_off',$request->email)->get();
-       }
-       if($user->isEmpty())
+        if ($request->ajax()) {
+            $user = User::where('email_off', $request->email)->get();
+        }
+        if ($user->isEmpty())
             echo 0;
-       else
-           echo 1;
+        else
+            echo 1;
     }
 
     public function add_userPOST(Request $request)
@@ -92,7 +94,6 @@ class UsersController extends Controller
         $userEmployment = new UserEmploymentStatus;
 
 
-
         $user->max_transaction = $request->maxTransaction;
         $user->username = $request->username;
         $user->first_name = $request->first_name;
@@ -103,16 +104,14 @@ class UsersController extends Controller
             $user->email_off = $request->email;
         }
         $user->password = bcrypt($request->password);
-        if($request->coach_id != 0) {
+        if ($request->coach_id != 0) {
             $user->coach_id = $request->coach_id;
-        }
-        else {
+        } else {
             $user->coach_id = null;
         }
-        if($request->recommended_by != 0) {
+        if ($request->recommended_by != 0) {
             $user->recommended_by = $request->recommended_by;
-        }
-        else {
+        } else {
             $user->recommended_by = null;
         }
         $user->salary = $request->salary;
@@ -120,20 +119,18 @@ class UsersController extends Controller
         $user->created_at = date("Y-m-d H:i:s");
         $user->updated_at = date("Y-m-d H:i:s");
         $user->password_date = date("Y-m-d");
-        if($request->phone == null) {
+        if ($request->phone == null) {
             $request->phone = 0;
         }
 
         $user->guid = base64_encode($request->password);
 
-        if(isset($request->department_info) && isset($request->user_type))
-        {
+        if (isset($request->department_info) && isset($request->user_type)) {
             $redirect = 1;
             $user->user_type_id = $request->user_type;
             $user->department_info_id = $request->department_info;
             $user->main_department_id = $request->department_info;
-        }else
-        {
+        } else {
             if (Auth::user()->user_type_id == 13) {
                 $user->user_type_id = 2;
             } else {
@@ -142,8 +139,8 @@ class UsersController extends Controller
             $user->department_info_id = Auth::user()->department_info_id;
             $user->main_department_id = Auth::user()->department_info_id;
         }
-        $user->dating_type = ($request->dating_type != null)? $request->dating_type : 0 ;
-        $user->candidate_id = ($request->candidate_id != null) ? $request->candidate_id : null ;
+        $user->dating_type = ($request->dating_type != null) ? $request->dating_type : 0;
+        $user->candidate_id = ($request->candidate_id != null) ? $request->candidate_id : null;
         $user->start_work = $request->start_date;
         $user->status_work = 1;
         $user->phone = $request->phone;
@@ -152,8 +149,8 @@ class UsersController extends Controller
         $user->student = $request->student;
         $user->salary_to_account = $request->salary_to_account;
         $user->agency_id = $request->agency_id;
-        $user->login_phone = ($request->login_phone != null) ? $request->login_phone : 0 ;
-        if($request->rate == 'Nie dotyczy')
+        $user->login_phone = ($request->login_phone != null) ? $request->login_phone : 0;
+        if ($request->rate == 'Nie dotyczy')
             $request->rate = 0;
         $user->rate = $request->rate;
         $user->id_manager = Auth::id();
@@ -194,10 +191,12 @@ class UsersController extends Controller
     {
         return view('hr.employeeManagement');
     }
+
     public function cadre_managementGet()
     {
         return view('hr.cadreManagement');
     }
+
     public function edit_consultantGet($id)
     {
         $agencies = Agencies::all();
@@ -217,32 +216,33 @@ class UsersController extends Controller
         *Wyszukuję użytkowników którzy pracują
         */
         //pobranie wszystkich użytkowników z danego działu
-        $workingUsers = User::where('status_work', '=', 1) //są zatrudnieni
-        ->whereIn('user_type_id', [1,2])
-        ->where('department_info_id', '=', Auth::user()->department_info_id) // wybiera dział aktualnie zalogowanego użytkownika
-        ->get();
+        $workingUsers = User::where('status_work', '=', 1)//są zatrudnieni
+        ->whereIn('user_type_id', [1, 2])
+            ->where('department_info_id', '=', Auth::user()->department_info_id)// wybiera dział aktualnie zalogowanego użytkownika
+            ->get();
 
-        $workingTreners = User::whereIn('user_type_id', [4,12])
+        $workingTreners = User::whereIn('user_type_id', [4, 12])
             ->where('status_work', '=', 1)
             ->where('department_info_id', '=', Auth::user()->department_info_id)
             ->get();
 
-        return view('hr.editUser')->with('agencies',$agencies)
-          ->with('user',$user)
-          ->with('department_info', $department_info)
-          ->with('userTypes', $userTypes)
-          ->with('type', 1)
-          ->with('recomendingPeople', $workingUsers)
+        return view('hr.editUser')->with('agencies', $agencies)
+            ->with('user', $user)
+            ->with('department_info', $department_info)
+            ->with('userTypes', $userTypes)
+            ->with('type', 1)
+            ->with('recomendingPeople', $workingUsers)
             ->with('workingTreners', $workingTreners);
 
     }
 
-    public function edit_cadreGet($id, Request $request) {
+    public function edit_cadreGet($id, Request $request)
+    {
         $flag = $request->session()->get('flag');
         $request->session()->forget('flag');
         $user = User::find($id);
 
-        if(Auth::user()->user_type->all_departments == 1) {
+        if (Auth::user()->user_type->all_departments == 1) {
 
             $user = User::find($id);
             $agencies = Agencies::all();
@@ -292,19 +292,18 @@ class UsersController extends Controller
                 ->with('month', $months)
                 ->with('department_info', $department_info)
                 ->with('type', 2);
-        }
-        else if($flag == "true") {
-            return Redirect::to('edit_cadre/'.$user->id);
-        }
-        else{
+        } else if ($flag == "true") {
+            return Redirect::to('edit_cadre/' . $user->id);
+        } else {
             return Redirect::back();
         }
     }
 
-    public function edit_cadrePOST($id, Request $request) {
+    public function edit_cadrePOST($id, Request $request)
+    {
 
         $manager_id = Auth::user()->id;
-        $url_array = explode('/',URL::previous());
+        $url_array = explode('/', URL::previous());
         $urlValidation = end($url_array);
         if ($urlValidation != $id) {
             return view('errors.404');
@@ -314,37 +313,34 @@ class UsersController extends Controller
         $loggedUser = Auth::user();
         $userEmployment = UserEmploymentStatus::
         where('pbx_id', '=', $user->login_phone)
-            -> where('user_id', '=', $user->id)
+            ->where('user_id', '=', $user->id)
             ->orderBy('id', 'desc')
             ->first();
         $date = date("Y-m-d"); // actual date
 
-        if($user->user_type_id == 1 || $user->user_type_id == 2) { //users are only consultants
+        if ($user->user_type_id == 1 || $user->user_type_id == 2) { //users are only consultants
             if ($request->status_work == "1") { //editing working employee
-                if($user->status_work == "1") {
-                    if($user->login_phone != $request->login_phone) { //user changes pbx_id
-                        if($userEmployment) { //user has history in user_employment_status
+                if ($user->status_work == "1") {
+                    if ($user->login_phone != $request->login_phone) { //user changes pbx_id
+                        if ($userEmployment) { //user has history in user_employment_status
                             $userEmployment->pbx_id_remove_date = $date;
                             $userEmployment->save();
                             $user->login_phone = $request->login_phone;
                             $userEmployment1 = new UserEmploymentStatus();
-                            if($request->login_phone == 0) {
+                            if ($request->login_phone == 0) {
                                 $userEmployment1->pbx_id = null;
-                            }
-                            else {
+                            } else {
                                 $userEmployment1->pbx_id = $request->login_phone;
                             }
                             $userEmployment1->pbx_id_add_date = $date;
                             $userEmployment1->user_id = $user->id;
                             $userEmployment1->save();
 
-                        }
-                        else { //user has no history in user_employment_status and we add new insertion
+                        } else { //user has no history in user_employment_status and we add new insertion
                             $userEmployment4 = new UserEmploymentStatus(); //insertion with old pbx_id
-                            if($user->login_phone == 0) {
+                            if ($user->login_phone == 0) {
                                 $userEmployment4->pbx_id = 0;
-                            }
-                            else {
+                            } else {
                                 $userEmployment4->pbx_id = $user->login_phone;
                             }
 
@@ -353,10 +349,9 @@ class UsersController extends Controller
                             $userEmployment4->pbx_id_remove_date = $date;
                             $userEmployment4->save();
                             $userEmployment1 = new UserEmploymentStatus(); //insertion with new pbx_id
-                            if($request->login_phone == 0) {
+                            if ($request->login_phone == 0) {
                                 $userEmployment1->pbx_id = null;
-                            }
-                            else {
+                            } else {
                                 $userEmployment1->pbx_id = $request->login_phone;
                             }
 
@@ -370,8 +365,6 @@ class UsersController extends Controller
                 }
             }
         }
-
-
 
 
         if ($user == null) {
@@ -395,17 +388,15 @@ class UsersController extends Controller
         $user->last_name = $request->last_name;
         $user->updated_at = date("Y-m-d H:i:s");
         $user->phone = $request->phone;
-        if($request->coach_id != 0) {
+        if ($request->coach_id != 0) {
             $user->coach_id = $request->coach_id;
-        }
-        else {
+        } else {
             $user->coach_id = null;
         }
 
-        if($request->recommended_by != 0) {
+        if ($request->recommended_by != 0) {
             $user->recommended_by = $request->recommended_by;
-        }
-        else {
+        } else {
             $user->recommended_by = null;
         }
         $user->email_off = $request->email;
@@ -414,13 +405,13 @@ class UsersController extends Controller
         $user->student = $request->student;
         $user->salary_to_account = $request->salary_to_account;
         $user->agency_id = $request->agency_id;
-        if($user->user_type_id == 1 || $user->user_type_id == 2) {
-            if($user->status_work != "0") {
-                $user->login_phone = ($request->login_phone != null) ? $request->login_phone : 0 ;
+        if ($user->user_type_id == 1 || $user->user_type_id == 2) {
+            if ($user->status_work != "0") {
+                $user->login_phone = ($request->login_phone != null) ? $request->login_phone : 0;
             }
         }
 
-        if($user->user_type_id == 1 || $user->user_type_id == 2) {
+        if ($user->user_type_id == 1 || $user->user_type_id == 2) {
             if ($request->status_work == 0) { //firing employee
                 if ($user->status_work == 1) {
                     if ($userEmployment) { //user has history in user_employment_status
@@ -430,10 +421,9 @@ class UsersController extends Controller
                     } else { // user has no history in user_employment_status
                         $user->login_phone = null;
                         $userEmployment2 = new UserEmploymentStatus();
-                        if($request->login_phone == 0) {
+                        if ($request->login_phone == 0) {
                             $userEmployment2->pbx_id = null;
-                        }
-                        else {
+                        } else {
                             $userEmployment2->pbx_id = $request->login_phone;
                         }
                         $userEmployment2->user_id = $user->id;
@@ -445,14 +435,13 @@ class UsersController extends Controller
             }
         }
 
-        if($user->user_type_id == 1 || $user->user_type_id == 2) {
+        if ($user->user_type_id == 1 || $user->user_type_id == 2) {
             if ($request->status_work == 1) { //re-hiring employee
                 if ($user->status_work == 0) {
                     $userEmployment3 = new UserEmploymentStatus(); //adding new insertion
-                    if($request->login_phone == 0) {
+                    if ($request->login_phone == 0) {
                         $userEmployment3->pbx_id = null;
-                    }
-                    else {
+                    } else {
                         $userEmployment3->pbx_id = $request->login_phone;
                         $user->login_phone = $request->login_phone;
                         $user->save();
@@ -474,7 +463,7 @@ class UsersController extends Controller
         $user->status_work = $request->status_work;
         $user->dating_type = $request->dating_type;
         $user->start_work = $request->start_date;
-        if($request->candidate_id != null)
+        if ($request->candidate_id != null)
             $user->candidate_id = $request->candidate_id;
         if ($request->department_info_id != null) {
             $check_department = Department_info::find($request->department_info_id);
@@ -486,20 +475,18 @@ class UsersController extends Controller
         }
         $type_redirect = 0; // 0 - brak zaminay, 1 - przekierowanie do konsultanta, 2 - do kadry
         if ($request->user_type != null && $request->user_type != 0) {
-            if($user->user_type_id == 1 || $user->user_type_id == 2){
-                if($request->user_type > 2){ // AWANS
-                    if($userEmployment) { //gdy mamy historie w bazie danych
+            if ($user->user_type_id == 1 || $user->user_type_id == 2) {
+                if ($request->user_type > 2) { // AWANS
+                    if ($userEmployment) { //gdy mamy historie w bazie danych
                         $user->login_phone = null;
                         $userEmployment->pbx_id_remove_date = $date;
                         $userEmployment->save();
-                    }
-                    else { //gdy nie mamy historii w bazie danych
+                    } else { //gdy nie mamy historii w bazie danych
                         $userEmployment5 = new UserEmploymentStatus();
                         $userEmployment5->user_id = $user->id;
-                        if($user->login_phone == 0) {
+                        if ($user->login_phone == 0) {
                             $userEmployment5->pbx_id = null;
-                        }
-                        else {
+                        } else {
                             $userEmployment5->pbx_id = $user->login_phone;
                         }
 
@@ -512,13 +499,13 @@ class UsersController extends Controller
                     $type_redirect = 2;
                 }
                 $user->user_type_id = $request->user_type;
-            }else if($user->user_type_id > 2){
-                    if($request->user_type < 3){
-                        //Degradacja
-                        $user->login_phone = null;
-                        $user->degradation_date = date('Y-m-d');
-                        $type_redirect = 1;
-                    }
+            } else if ($user->user_type_id > 2) {
+                if ($request->user_type < 3) {
+                    //Degradacja
+                    $user->login_phone = null;
+                    $user->degradation_date = date('Y-m-d');
+                    $type_redirect = 1;
+                }
                 $user->user_type_id = $request->user_type;
             }
         }
@@ -527,8 +514,7 @@ class UsersController extends Controller
         } else {
             $user->end_work = $request->stop_date;
         }
-        if($request->password != '')
-        {
+        if ($request->password != '') {
             $user->password = bcrypt($request->password);
             $user->guid = base64_encode($request->password);
         };
@@ -574,65 +560,65 @@ class UsersController extends Controller
 
         $redirectFlag = false; //false = brak uprawnien, true = posiada uprawnienia
         $userPrivilage = Auth::user()->user_type->all_departments;
-        if($userPrivilage == 1){
+        if ($userPrivilage == 1) {
             $redirectFlag = true;
         }
         Session::flash('message_edit', "Dane zostały zaktualizowane!");
 
-        if($redirectFlag) {
+        if ($redirectFlag) {
             $request->session()->put('flag', 'true');
         }
         Session::flash('adnotation', "Pracownik został edytowany! Brak możliwości dalszej edycji pracownika (brak uprawnień)."); //sesja wykorzystywana w /employee_management
 
-        if($type_redirect == 0){
+        if ($type_redirect == 0) {
             return Redirect::back();
-        }else if($type_redirect == 1){
-            return Redirect::to('edit_consultant/'.$user->id);
-        }else if($redirectFlag == false){
+        } else if ($type_redirect == 1) {
+            return Redirect::to('edit_consultant/' . $user->id);
+        } else if ($redirectFlag == false) {
             return Redirect::to('/employee_management');
-        }
-        else{
-            return Redirect::to('edit_cadre/'.$user->id);
+        } else {
+            return Redirect::to('edit_cadre/' . $user->id);
         }
     }
 
     public function datatableEmployeeManagement(Request $request)
     {
-        if($request->ajax()) {
+        if ($request->ajax()) {
             $query = DB::table('users')
                 ->select(DB::raw('
                 users.*,
                 (CASE WHEN users.coach_id is null THEN null else coach.first_name end) as coach_first_name,
                 (CASE WHEN users.coach_id is null THEN null else coach.last_name end) as coach_last_name'))
-                ->leftjoin('users as coach','coach.id','users.coach_id')
-                ->whereIn('users.user_type_id', [1,2])
+                ->leftjoin('users as coach', 'coach.id', 'users.coach_id')
+                ->whereIn('users.user_type_id', [1, 2])
                 ->where('users.department_info_id', Auth::user()->department_info_id);
         }
         return datatables($query)
-            ->filterColumn('student', function($query, $keyword) {
+            ->filterColumn('student', function ($query, $keyword) {
                 $sql = "users.student = ?";
-                if(strtolower($keyword) == 'tak')
+                if (strtolower($keyword) == 'tak')
                     $query->whereRaw($sql, ["1"]);
-                else if(strtolower($keyword) == 'nie')
+                else if (strtolower($keyword) == 'nie')
                     $query->whereRaw($sql, ["0"]);
-            })->filterColumn('status_work', function($query, $keyword) {
+            })->filterColumn('status_work', function ($query, $keyword) {
                 $sql = "users.status_work = ?";
-                if(mb_strtolower($keyword) == 'pracujący')
+                if (mb_strtolower($keyword) == 'pracujący')
                     $query->whereRaw($sql, ["1"]);
-                else if(mb_strtolower($keyword) == "niepracujący")
+                else if (mb_strtolower($keyword) == "niepracujący")
                     $query->whereRaw($sql, ["0"]);
-            })->filterColumn('documents', function($query, $keyword) {
+            })->filterColumn('documents', function ($query, $keyword) {
                 $sql = "users.documents = ?";
-                if(mb_strtolower($keyword) == 'posiada')
+                if (mb_strtolower($keyword) == 'posiada')
                     $query->whereRaw($sql, ["1"]);
-                else if(mb_strtolower($keyword) == "brak")
+                else if (mb_strtolower($keyword) == "brak")
                     $query->whereRaw($sql, ["0"]);
             })->
             make(true);
     }
+
     public function datatableCadreManagement(Request $request)
     {
-        if($request->ajax()) {
+        if ($request->ajax()) {
             $query = DB::table('users')
                 ->join('department_info', 'department_info.id', '=', 'users.main_department_id')
                 ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
@@ -644,16 +630,16 @@ class UsersController extends Controller
                 departments.name as department_name,
                 user_types.name as user_type_name
                 '))
-                ->where('users.user_type_id','!=',1)
-                ->where('users.user_type_id','!=',2)
-                ->where('users.status_work','=',1);
+                ->where('users.user_type_id', '!=', 1)
+                ->where('users.user_type_id', '!=', 2)
+                ->where('users.status_work', '=', 1);
             return datatables($query)->make(true);
         }
     }
 
     public function datatableCadreManagementFire(Request $request)
     {
-        if($request->ajax()) {
+        if ($request->ajax()) {
             $query = DB::table('users')
                 ->join('department_info', 'department_info.id', '=', 'users.department_info_id')
                 ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
@@ -665,19 +651,21 @@ class UsersController extends Controller
                 departments.name as department_name,
                 user_types.name as user_type_name
                 '))
-                ->where('users.user_type_id','!=',1)
-                ->where('users.user_type_id','!=',2)
-                ->where('users.status_work','=',0)
-            ->orderBY('end_work','desc');
+                ->where('users.user_type_id', '!=', 1)
+                ->where('users.user_type_id', '!=', 2)
+                ->where('users.status_work', '=', 0)
+                ->orderBY('end_work', 'desc');
             return datatables($query)->make(true);
         }
     }
 
-    public function passwordChangeGet(){
+    public function passwordChangeGet()
+    {
         return view('home.passChange');
     }
 
-    public function passwordChangePost(Request $request){
+    public function passwordChangePost(Request $request)
+    {
         $old_password = base64_decode(Auth::user()->guid);
         if ($request->old_pass == $old_password) {
             $user = User::find(Auth::user()->id);
@@ -695,11 +683,13 @@ class UsersController extends Controller
         }
     }
 
-    public function cadreHRGet() {
+    public function cadreHRGet()
+    {
         return view('hr.cadreHR');
     }
 
-    public function datatableCadreHR(Request $request) {
+    public function datatableCadreHR(Request $request)
+    {
         $data = DB::table('users')
             ->select(DB::raw('
                 users.*,
@@ -718,19 +708,21 @@ class UsersController extends Controller
     /**
      * Sprawdzenie czy numer kolejki pbx jest unikalny
      */
-    public function uniquePBX(Request $request) {
+    public function uniquePBX(Request $request)
+    {
         if ($request->ajax()) {
             $user = User::where('login_phone', '=', $request->login_phone)
-                ->where('status_work','=','1')->count();
+                ->where('status_work', '=', '1')->count();
 
-            return ($user > 0) ? 1 : 0 ;
+            return ($user > 0) ? 1 : 0;
         }
     }
 
     /**
      * Sprawdzenie czy email jest unikalny edycja
      */
-    public function uniquerEmailEdit(Request $request) {
+    public function uniquerEmailEdit(Request $request)
+    {
         if ($request->ajax()) {
             $email = $request->email;
             $id = $request->user_id;
@@ -750,7 +742,8 @@ class UsersController extends Controller
     /**
      * Funkcja dodająca pakiety medyczne dla nowych pracowników
      */
-    public function addMedicalPackage(Request $request, $id) {
+    public function addMedicalPackage(Request $request, $id)
+    {
 
         /**
          * Dodanie pliku
@@ -769,27 +762,27 @@ class UsersController extends Controller
         for ($i = 0; $i < $sum; $i++) {
             $medicalPackage = new MedicalPackage();
 
-            $medicalPackage->user_id            = $id;
-            $medicalPackage->pesel              = $request->pesel[$i];
-            $medicalPackage->user_first_name    = $request->user_first_name[$i];
-            $medicalPackage->user_last_name     = $request->user_last_name[$i];
-            $medicalPackage->birth_date         = $request->birth_date[$i];
-            $medicalPackage->postal_code        = $request->postal_code[$i];
-            $medicalPackage->city               = $request->city[$i];
-            $medicalPackage->street             = $request->street[$i];
-            $medicalPackage->house_number       = $request->house_number[$i];
-            $medicalPackage->flat_number        = $request->flat_number[$i];
-            $medicalPackage->phone_number       = $request->phone_number[$i];
-            $medicalPackage->family_member      = ($i > 0) ? 1 : null ;
-            $medicalPackage->deleted            = 0;
-            $medicalPackage->package_name       = $request->package_name;
-            $medicalPackage->package_variable   = $request->package_variable;
-            $medicalPackage->cadre_id           = Auth::user()->id;
-            $medicalPackage->package_scope      = ($i > 0) ? 'R-OM' : 'P-OM' ;
-            $medicalPackage->scan_path          = $store_name;
-            $medicalPackage->month_start        = $request->medical_start;
-            $medicalPackage->created_at         = date('Y-m-d H:i:s');
-            $medicalPackage->updated_at         = null;
+            $medicalPackage->user_id = $id;
+            $medicalPackage->pesel = $request->pesel[$i];
+            $medicalPackage->user_first_name = $request->user_first_name[$i];
+            $medicalPackage->user_last_name = $request->user_last_name[$i];
+            $medicalPackage->birth_date = $request->birth_date[$i];
+            $medicalPackage->postal_code = $request->postal_code[$i];
+            $medicalPackage->city = $request->city[$i];
+            $medicalPackage->street = $request->street[$i];
+            $medicalPackage->house_number = $request->house_number[$i];
+            $medicalPackage->flat_number = $request->flat_number[$i];
+            $medicalPackage->phone_number = $request->phone_number[$i];
+            $medicalPackage->family_member = ($i > 0) ? 1 : null;
+            $medicalPackage->deleted = 0;
+            $medicalPackage->package_name = $request->package_name;
+            $medicalPackage->package_variable = $request->package_variable;
+            $medicalPackage->cadre_id = Auth::user()->id;
+            $medicalPackage->package_scope = ($i > 0) ? 'R-OM' : 'P-OM';
+            $medicalPackage->scan_path = $store_name;
+            $medicalPackage->month_start = $request->medical_start;
+            $medicalPackage->created_at = date('Y-m-d H:i:s');
+            $medicalPackage->updated_at = null;
 
             $medicalPackage->save();
         }
@@ -798,7 +791,8 @@ class UsersController extends Controller
     /**
      * Edycja pakietu medycznego
      */
-    private function changeMedicalPackage(Request $request, User $user) { //dd($request);
+    private function changeMedicalPackage(Request $request, User $user)
+    { //dd($request);
         $old_medical_ids = $user->medicalPackages->where('deleted', '=', 0);
         $old_medical_ids = $old_medical_ids->pluck('id')->toArray();
 
@@ -851,25 +845,25 @@ class UsersController extends Controller
                  */
                 $medicalPackage = new MedicalPackage();
 
-                $medicalPackage->user_id            = $user->id;
-                $medicalPackage->pesel              = $request->pesel[$i];
-                $medicalPackage->user_first_name    = $request->user_first_name[$i];
-                $medicalPackage->user_last_name     = $request->user_last_name[$i];
-                $medicalPackage->birth_date         = $request->birth_date[$i];
-                $medicalPackage->postal_code        = $request->postal_code[$i];
-                $medicalPackage->city               = $request->city[$i];
-                $medicalPackage->street             = $request->street[$i];
-                $medicalPackage->house_number       = $request->house_number[$i];
-                $medicalPackage->flat_number        = $request->flat_number[$i];
-                $medicalPackage->phone_number       = $request->phone_number[$i];
-                $medicalPackage->family_member      = ($i > 0) ? 1 : null ;
-                $medicalPackage->deleted            = 0;
-                $medicalPackage->package_name       = $request->package_name;
-                $medicalPackage->package_variable   = $request->package_variable;
-                $medicalPackage->cadre_id           = Auth::user()->id;
-                $medicalPackage->package_scope      = ($i > 0) ? 'R-OM' : 'P-OM' ;
-                $medicalPackage->scan_path          = $scan_path;
-                $medicalPackage->month_start        = $request->medical_start;
+                $medicalPackage->user_id = $user->id;
+                $medicalPackage->pesel = $request->pesel[$i];
+                $medicalPackage->user_first_name = $request->user_first_name[$i];
+                $medicalPackage->user_last_name = $request->user_last_name[$i];
+                $medicalPackage->birth_date = $request->birth_date[$i];
+                $medicalPackage->postal_code = $request->postal_code[$i];
+                $medicalPackage->city = $request->city[$i];
+                $medicalPackage->street = $request->street[$i];
+                $medicalPackage->house_number = $request->house_number[$i];
+                $medicalPackage->flat_number = $request->flat_number[$i];
+                $medicalPackage->phone_number = $request->phone_number[$i];
+                $medicalPackage->family_member = ($i > 0) ? 1 : null;
+                $medicalPackage->deleted = 0;
+                $medicalPackage->package_name = $request->package_name;
+                $medicalPackage->package_variable = $request->package_variable;
+                $medicalPackage->cadre_id = Auth::user()->id;
+                $medicalPackage->package_scope = ($i > 0) ? 'R-OM' : 'P-OM';
+                $medicalPackage->scan_path = $scan_path;
+                $medicalPackage->month_start = $request->medical_start;
 
                 $medicalPackage->save();
             } else {
@@ -878,24 +872,24 @@ class UsersController extends Controller
                  */
                 $medicalPackage = MedicalPackage::find(intval($request->medical_id[$i]));
 
-                $medicalPackage->pesel              = $request->pesel[$i];
-                $medicalPackage->user_first_name    = $request->user_first_name[$i];
-                $medicalPackage->user_last_name     = $request->user_last_name[$i];
-                $medicalPackage->birth_date         = $request->birth_date[$i];
-                $medicalPackage->postal_code        = $request->postal_code[$i];
-                $medicalPackage->city               = $request->city[$i];
-                $medicalPackage->street             = $request->street[$i];
-                $medicalPackage->house_number       = $request->house_number[$i];
-                $medicalPackage->flat_number        = $request->flat_number[$i];
-                $medicalPackage->phone_number       = $request->phone_number[$i];
-                $medicalPackage->family_member      = ($i > 0) ? 1 : null ;
-                $medicalPackage->deleted            = 0;
-                $medicalPackage->package_name       = $request->package_name;
-                $medicalPackage->package_variable   = $request->package_variable;
-                $medicalPackage->scan_path          = $scan_path;
-                $medicalPackage->month_start        = $request->medical_start;
-                $medicalPackage->updated_by         = Auth::user()->id;
-                $medicalPackage->updated_at         = date('Y-m-d H:i:s');
+                $medicalPackage->pesel = $request->pesel[$i];
+                $medicalPackage->user_first_name = $request->user_first_name[$i];
+                $medicalPackage->user_last_name = $request->user_last_name[$i];
+                $medicalPackage->birth_date = $request->birth_date[$i];
+                $medicalPackage->postal_code = $request->postal_code[$i];
+                $medicalPackage->city = $request->city[$i];
+                $medicalPackage->street = $request->street[$i];
+                $medicalPackage->house_number = $request->house_number[$i];
+                $medicalPackage->flat_number = $request->flat_number[$i];
+                $medicalPackage->phone_number = $request->phone_number[$i];
+                $medicalPackage->family_member = ($i > 0) ? 1 : null;
+                $medicalPackage->deleted = 0;
+                $medicalPackage->package_name = $request->package_name;
+                $medicalPackage->package_variable = $request->package_variable;
+                $medicalPackage->scan_path = $scan_path;
+                $medicalPackage->month_start = $request->medical_start;
+                $medicalPackage->updated_by = Auth::user()->id;
+                $medicalPackage->updated_at = date('Y-m-d H:i:s');
 
                 $medicalPackage->save();
             }
@@ -905,7 +899,8 @@ class UsersController extends Controller
     /**
      * Funkcja usuwająca całkowicie pakiet medyczny
      */
-    public function deleteMedicalPackage(Request $request) {
+    public function deleteMedicalPackage(Request $request)
+    {
         if ($request->ajax()) {
 
             /**
@@ -931,21 +926,24 @@ class UsersController extends Controller
     /**
      * Dane na temat pakietów medycznych (domyślnie)
      */
-    public function medicalPackagesAllGet() {
+    public function medicalPackagesAllGet()
+    {
         return $this->getMedicalPackagesData(date('Y'), date('m'));
     }
 
     /**
      * Dane na temat pakietów medycznych (wybór)
      */
-    public function medicalPackagesAllPost(Request $request) {
+    public function medicalPackagesAllPost(Request $request)
+    {
         return $this->getMedicalPackagesData($request->medical_year, $request->medical_month);
     }
 
     /**
      * Metoda pobierająca dane na temat
      */
-    private function getMedicalPackagesData($year, $selectedMonth) {
+    private function getMedicalPackagesData($year, $selectedMonth)
+    {
         $month = $year . '-' . $selectedMonth . '%';
         $monthLimit = $year . '-' . $selectedMonth . '-01';
         $prevMonth = $this->getPreviousMonth($year, $selectedMonth);
@@ -953,7 +951,7 @@ class UsersController extends Controller
          * Pobranie pakietow ktore sa nie edytowane i starsze niz miesiac
          */
         $packagesOldNotEdited = MedicalPackage::where('deleted', '=', 0)
-            ->where(function($query) use ($month) {
+            ->where(function ($query) use ($month) {
                 $query->where('updated_at', 'not like', $month)
                     ->orWhere('updated_at', '=', null);
             })
@@ -986,22 +984,22 @@ class UsersController extends Controller
             ->where('hard_deleted', '=', null)
             ->get();
 
-        $packagesOldNotEdited = $packagesOldNotEdited->map(function($item) {
+        $packagesOldNotEdited = $packagesOldNotEdited->map(function ($item) {
             $item['flag'] = 0;
             return $item;
         });
 
-        $packagesOldEdited = $packagesOldEdited->map(function($item) {
+        $packagesOldEdited = $packagesOldEdited->map(function ($item) {
             $item['flag'] = 1;
             return $item;
         });
 
-        $packagesNewMonth = $packagesNewMonth->map(function($item) {
+        $packagesNewMonth = $packagesNewMonth->map(function ($item) {
             $item['flag'] = 2;
             return $item;
         });
 
-        $packagedDeletedThisMonth = $packagedDeletedThisMonth->map(function($item) {
+        $packagedDeletedThisMonth = $packagedDeletedThisMonth->map(function ($item) {
             $item['flag'] = 3;
             return $item;
         });
@@ -1038,7 +1036,8 @@ class UsersController extends Controller
     /**
      * Pobranie danych poprzedniego miesiąca
      */
-    private function getPreviousMonth($year, $month) {
+    private function getPreviousMonth($year, $month)
+    {
         $month = intval($month);
         $month -= 1;
         if ($month <= 0) {
@@ -1054,7 +1053,8 @@ class UsersController extends Controller
     /**
      * Rozszerzony raport pakietów medycznych
      */
-    public function medicalPackagesRaportExtendedGet() {
+    public function medicalPackagesRaportExtendedGet()
+    {
         $data = $this->getMedicalPackagesExtendedData(date('Y-m'));
 
         return view('admin.medicalReportExtended')
@@ -1067,7 +1067,8 @@ class UsersController extends Controller
     /**
      * Rozszerzony raport pakeitów medycznych (wybór)
      */
-    public function medicalPackagesRaportExtendedPost(Request $request) {
+    public function medicalPackagesRaportExtendedPost(Request $request)
+    {
         $data = $this->getMedicalPackagesExtendedData($request->year . '-' . $request->month);
 
         return view('admin.medicalReportExtended')
@@ -1080,7 +1081,8 @@ class UsersController extends Controller
     /**
      * Pobranie danych na temat pakietów medycznych
      */
-    private function getMedicalPackagesExtendedData($month) {
+    private function getMedicalPackagesExtendedData($month)
+    {
         /**
          * Tablica z miesiącami
          */
@@ -1121,7 +1123,7 @@ class UsersController extends Controller
             ->join('departments', 'department_info.id_dep', 'departments.id')
             ->join('department_type', 'department_info.id_dep_type', 'department_type.id')
             ->where('medical_packages.month_start', '<=', $last_day_of_month)
-            ->where(function($query) use ($last_day_of_month) {
+            ->where(function ($query) use ($last_day_of_month) {
                 $query->where('medical_packages.month_stop', '<=', $last_day_of_month)
                     ->orWhere('medical_packages.month_stop', '=', null);
             })
@@ -1139,34 +1141,131 @@ class UsersController extends Controller
 
 
     //Wyłączenie użytkowników którzy nie logowali się od 14 dni
-    public function DisableUnusedAccount(){
+    public function DisableUnusedAccount()
+    {
         $today = date("Y-m-d");
-        $date_disable = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-14,date("Y")));
+        $date_disable = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d") - 14, date("Y")));
         //Pobranie użytkowników do zakończenia umowy
         $users_disable = User::
-        where('last_login','<',$date_disable)
-            ->whereIn('users.user_type_id',[1,2])
-            ->where('status_work','=',1)
+        where('last_login', '<', $date_disable)
+            ->whereIn('users.user_type_id', [1, 2])
+            ->where('status_work', '=', 1)
             ->get();
 
-        foreach ($users_disable as $iteam){
+        foreach ($users_disable as $iteam) {
             /**
              * automatyczne rozwiązanie pakietu medycznego w przypadku zakończenia pracy
              */
             $user = $iteam;
-                $month_to_end = date('Y-m-t', strtotime($today));
-                MedicalPackage::where('user_id', '=', $user->id)
-                    ->where('deleted', '=', 0)
-                    ->where('month_stop', '=', null)
-                    ->update(['deleted' => 1, 'month_stop' => $month_to_end]);
-            $user -> end_work = $today;
-            $user -> status_work = 0;
-            $user -> save();
+            $month_to_end = date('Y-m-t', strtotime($today));
+            MedicalPackage::where('user_id', '=', $user->id)
+                ->where('deleted', '=', 0)
+                ->where('month_stop', '=', null)
+                ->update(['deleted' => 1, 'month_stop' => $month_to_end]);
+            $user->end_work = $today;
+            $user->status_work = 0;
+            $user->save();
             $disable_account_info = new DisableAccountInfo();
-            $disable_account_info -> user_id = $user->id;
-            $disable_account_info -> department_info_id = $user->department_info_id;
-            $disable_account_info -> disable_date = $today;
-            $disable_account_info -> save();
+            $disable_account_info->user_id = $user->id;
+            $disable_account_info->department_info_id = $user->department_info_id;
+            $disable_account_info->disable_date = $today;
+            $disable_account_info->save();
         }
+    }
+
+    public function coachChangeGet()
+    {
+        $user_type_id = 3;
+
+        $coaches = User::where('department_info_id', '=', Auth::user()->department_info_id)
+            ->whereIn('id', User::where('coach_id', '<>', null)
+                ->pluck('coach_id')
+                ->unique())
+            ->get();
+        //where('department_info_id','=',Auth::user()->department_info_id)
+        $newCoaches = User::where([
+            ['user_type_id', '=', 4],
+            ['status_work', '=', 1],
+            ['department_info_id', '=', Auth::user()->department_info_id]
+        ])->get();
+
+        if (Auth::user()->user_type_id == $user_type_id)
+            $coachChanges = DB::table('coach_change as c')
+                ->select('c.id',
+                    'u1.first_name as c_first_name', 'u1.last_name as c_last_name',
+                    'u2.first_name as pc_first_name', 'u2.last_name as pc_last_name',
+                    'c.created_at')
+                ->leftJoin('users as u1', 'c.coach_id', '=', 'u1.id')
+                ->leftJoin('users as u2', 'c.prev_coach_id', '=', 'u2.id')
+                ->where('c.status','=',0)
+                ->orderBy('c.id', 'desc')
+                ->get();
+
+        //dd($newcoaches);
+        return view('hr.coachChange')
+            ->with('coaches', $coaches)
+            ->with('newCoaches', $newCoaches)
+            ->with('user_type_id', $user_type_id)
+            ->with('coachChanges', $coachChanges);
+    }
+
+    public function coachChangePost(Request $request)
+    {
+        if ($request->coach_id && $request->newCoach_id) {
+            $newCoachId = $request->newCoach_id;
+            $coachId = $request->coach_id;
+
+            $consultantsWithPrevCoach = User::where([
+                ['coach_id', '=', $coachId],
+                ['status_work', '=', 1]
+            ])->get();
+
+            $this->coachChange($coachId, $newCoachId, $consultantsWithPrevCoach);
+
+            Session::flash('message_ok', 'Pomyślna zmiana trenera grupy');
+        }
+
+        //return 'ok';
+        return Redirect::back();
+    }
+
+    public function coachChange($coachId, $newCoachId, $consultantsWithPrevCoach)
+    {
+        CoachChange::create([
+            'coach_id' => $newCoachId,
+            'prev_coach_id' => $coachId,
+            'editor_id' => Auth::user()->id
+        ]);
+
+        $coachChangeId = CoachChange::max('id');
+        foreach ($consultantsWithPrevCoach as $consultant) {
+            CoachHistory::create([
+                'user_id' => $consultant->id,
+                'coach_change_id' => $coachChangeId
+            ]);
+            $consultant->coach_id = $newCoachId;
+            $consultant->save();
+        }
+    }
+
+    public function coachChangeRevertPost(Request $request)
+    {
+        $coachChangeId = $request->revertbtn;
+        $coachChange = CoachChange::where('id', $coachChangeId)->get()->first();
+
+        $allConsultantsIdsWithSelectedCoachingChange = CoachHistory::where('coach_change_id', $coachChangeId)
+            ->pluck('user_id')->toArray();
+        //dd($allCoachesIdWithSelectedCoachingChange);
+
+        $allConsultantsBeforeChange = User::whereIn('id', $allConsultantsIdsWithSelectedCoachingChange)->get();
+        //dd($allCoachingsBeforeAscription);
+
+        $this->coachChange($coachChange->coach_id,
+            $coachChange->prev_coach_id,
+            $allConsultantsBeforeChange);
+        $coachChange->status = 1;
+        $coachChange->save();
+
+        return Redirect::back();
     }
 }

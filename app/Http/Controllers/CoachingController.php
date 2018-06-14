@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\ActivityRecorder;
+use App\CoachDirectorChange;
+use App\CoachDirectorHistory;
 use App\Coaching;
 use App\CoachingDirector;
 use App\Department_info;
@@ -1090,7 +1092,10 @@ class CoachingController extends Controller
     /**
      * This method return view coachingAscription with necessary data
      */
-    public function coachAscriptionGet() {
+    public function coachAscriptionGet()
+    {
+        $user_type_id = 3;
+
         $departmentOfLoggedUser = Auth::user()->department_info_id;
 
         $coachingOwners = DB::table('coaching_director')
@@ -1114,34 +1119,89 @@ class CoachingController extends Controller
             ['user_type_id', '=', 4],
             ['department_info_id', '=', $departmentOfLoggedUser]
         ])
-        ->get();
+            ->get();
+
+        if (Auth::user()->user_type_id == $user_type_id)
+            $coachDirectorChanges = DB::table('coach_director_change as c')
+                ->select('c.id',
+                    'u1.first_name as c_first_name', 'u1.last_name as c_last_name',
+                    'u2.first_name as pc_first_name', 'u2.last_name as pc_last_name',
+                    'c.created_at')
+                ->leftJoin('users as u1', 'c.coach_director_id', '=', 'u1.id')
+                ->leftJoin('users as u2', 'c.prev_coach_director_id', '=', 'u2.id')
+                ->where('c.status','=',0)
+                ->orderBy('c.id', 'desc')
+                ->get();
 
         return view('coaching.coachingAscription')
             ->with('coachingOwners', $coachingOwners)
-            ->with('allTrainers', $allTrenersFromUserDepartment);
+            ->with('allTrainers', $allTrenersFromUserDepartment)
+            ->with('user_type_id', $user_type_id)
+            ->with('coachDirectorChanges', $coachDirectorChanges);
     }
 
     /**
      * This method save to database info about changing coach
      */
-    public function coachAscriptionPost(Request $request) {
-        $previousCoach = $request->coaches;
-        $newCoach = $request->newCoach;
+    public function coachAscriptionPost(Request $request)
+    {
+        $previousCoachDirector_id = $request->coaches;
+        $newCoachDirector_id = $request->newCoach;
 
         $allCoachingsOfPreviousCoach = CoachingDirector::where([
-            ['manager_id', '=', $previousCoach],
-            ['status', '=', 0],
+            ['manager_id', '=', $previousCoachDirector_id],
             ['coaching_level', '=', 1]
-        ])->get();
-
-        foreach($allCoachingsOfPreviousCoach as $oldCoach) {
-            $oldCoach->manager_id = $newCoach;
-            $oldCoach->save();
-        }
-
-        new ActivityRecorder('11','Przepisanie coachingu z ' . $previousCoach . ' na '. $newCoach);
+        ])
+            ->whereIn('status', [0, 1])
+            ->get();
+        $this->coachDirectorAscription($previousCoachDirector_id, $newCoachDirector_id, $allCoachingsOfPreviousCoach);
 
         $request->session()->flash('adnotation', 'Coachingi zostały przypisane do nowego trenera');
+        return Redirect::back();
+    }
+
+    public function coachDirectorAscription($previousCoachDirector_id, $newCoachDirector_id, $allCoachingsToChange)
+    {
+        CoachDirectorChange::create([
+            'coach_director_id' => $newCoachDirector_id,
+            'prev_coach_director_id' => $previousCoachDirector_id,
+            'editor_id' => Auth::user()->id,
+            'status' => 0
+        ]);
+
+        $coachDirectorChangeId = CoachDirectorChange::max('id');
+
+        //dd($allCoachingsToChange);
+        foreach ($allCoachingsToChange as $oldCoach) {
+            CoachDirectorHistory::create([
+                'coaching_id' => $oldCoach->id,
+                'coach_director_change_id' => $coachDirectorChangeId
+            ]);
+            $oldCoach->manager_id = $newCoachDirector_id;
+            $oldCoach->save();
+        }
+        new ActivityRecorder('11', 'Przepisanie coachingu z ' . $previousCoachDirector_id . ' na ' . $newCoachDirector_id);
+    }
+
+    public function coachAscriptionRevertPost(Request $request)
+    {
+        $coachDirectorChangeId = $request->revertbtn;
+        //dd($coachDirectorChangeId);
+        $coachDirectorChange = CoachDirectorChange::where('id', $coachDirectorChangeId)->get()->first();
+
+        $allCoachesIdWithSelectedCoachingChange = CoachDirectorHistory::where('coach_director_change_id', $coachDirectorChangeId)
+            ->pluck('coaching_id')->toArray();
+        //dd($allCoachesIdWithSelectedCoachingChange);
+
+        $allCoachingsBeforeAscription = CoachingDirector::whereIn('id', $allCoachesIdWithSelectedCoachingChange)->get();
+        //dd($allCoachingsBeforeAscription);
+
+        $this->coachDirectorAscription($coachDirectorChange->coach_director_id,
+            $coachDirectorChange->prev_coach_director_id,
+            $allCoachingsBeforeAscription);
+        $coachDirectorChange->status = 1;
+        $coachDirectorChange->save();
+
         return Redirect::back();
     }
 
