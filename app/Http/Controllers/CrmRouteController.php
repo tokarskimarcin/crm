@@ -356,8 +356,8 @@ class CrmRouteController extends Controller
             $numberOfRecords = count($clientRouteInfo);
             $iterator = 0;
             foreach($clientRouteInfo as $item) {
-                $item->hour = $city->timeArr[$iterator] . ':00';
-                $item->hotel_id = $city->hotelId;
+                $item->hour = $city->timeHotelArr[$iterator]->time . ':00';
+                $item->hotel_id = $city->timeHotelArr[$iterator]->hotelId;
                 $item->limits = 0; //At this point nobody choose it's value
                 $item->department_info_id = null; //At this point nobody choose it's value, can't be 0 because
                 $item->save();

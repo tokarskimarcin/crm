@@ -94,6 +94,7 @@
                                 <input type="hidden" value="{{$item->client_route_id}}" class="idOfClientRoute">
                             <h2 class="voivode_info" data-identificator="{{$item->voivode_id}}">Województwo: {{$item->voivodeName}}</h2>
                             <h2 class="city_info" data-identificator="{{$item->city_id}}">Miasto: {{$item->cityName}}</h2>
+                            @endif
                         <label>Wybierz hotel:</label>
                         <table id="datatable_@php echo $iterator @endphp" class="thead-inverse table table-striped table-bordered datatable" data-typ="datatable" cellspacing="0" width="100%">
                             <thead>
@@ -107,11 +108,13 @@
                             <tbody>
                             </tbody>
                         </table>
-                            @endif
                         <div class="form-group">
                             <label>Godzina pokazu nr. @php echo $i; @endphp</label>
                             <input type="time" class="form-control time-input" @if(isset($item->hour)) value="{{$item->hour}}" @endif>
                         </div>
+                        @if(!$loop->last)
+                            <div style="width: 100%; height:2px; border-top:3px dashed black; margin-top:1em; margin-bottom:1em;"></div>
+                        @endif
                         @php
                             $i++;
                         @endphp
@@ -142,10 +145,13 @@
     <script>
         document.addEventListener('DOMContentLoaded',function(event) {
 
+            const tableNumber = document.querySelectorAll('table').length;
+
             let hotelIdArr = []; //here we collect id's of each city's hotel;
+            {{--{{dd($clientRouteInfo)}}--}}
                     @foreach($clientRouteInfo as $info)
                         @foreach($info as $item)
-                            @if($loop->first)
+                            {{--@if($loop->first)--}}
                                 @if(isset($item->hotel_id))
                                     var hotelObj = {
                                             hotel_id: {{$item->hotel_id}},
@@ -159,10 +165,10 @@
                                         };
                                     hotelIdArr.push(hotelObj);
                                 @endif
-                            @endif
+                            {{--@endif--}}
                         @endforeach
                     @endforeach
-
+console.log(hotelIdArr);
 
 
             const voivodeeId = null;
@@ -175,6 +181,8 @@
             newTable = $('.datatable');
             newTable.each(function() {
                 var cityElementOfGivenContainer = $(this).siblings('.city_info').attr('data-identificator');
+                let cityFlag = null;
+                let helpFlag = 0;
 
                 tableArray.push($(this).DataTable({
                     "autoWidth": true,
@@ -186,7 +194,7 @@
                         $(row).attr('id', "hotelId_" + data.id);
                         return row;
                     },"fnDrawCallback": function(settings) {
-                        if(lp == hotelIdArr.length){
+                        if(lp == tableNumber){
                             $('table tbody tr').on('click', function() {
                                 test = $(this).closest('table');
                                 if($(this).hasClass('check')) {
@@ -234,14 +242,28 @@
                             },"name":"cityName", "orderable": false
                         },
                         {"data":function (data, type, dataToSet) {
+                            console.log(hotelIdArr);
+
                                 var cityId = cityElementOfGivenContainer;
-                                        for(var i = 0; i<hotelIdArr.length;i++){
-                                            if(hotelIdArr[i].city_id == cityId){
-                                                if(data.id == hotelIdArr[i].hotel_id) {
-                                                    return '<input class="checkbox_info" type="checkbox" value="' + data.id + '" style="display:inline-block;" checked>';
+                                let newarray = new Array();
+                                if(helpFlag == 0) {
+                                    for(var i = 0; i<hotelIdArr.length;i++){
+                                        if(hotelIdArr[i].city_id == cityId){
+                                            if(data.id == hotelIdArr[i].hotel_id) {
+                                                for(var j = 0; j<hotelIdArr.length;j++){
+                                                    if(i != j){
+                                                        newarray.push(hotelIdArr[j]);
+                                                    }
                                                 }
+                                                hotelIdArr = newarray;
+                                                helpFlag++;
+                                                return '<input class="checkbox_info" type="checkbox" value="' + data.id + '" style="display:inline-block;" checked>';
                                             }
+
                                         }
+                                    }
+                                }
+
                                        {{--return '<input class="checkbox_info" type="checkbox" value="' + data.id + '" style="display:inline-block;" @foreach($clientRouteInfo as $info) @foreach($info as $item) @if($loop->first) @if(isset($item->hotel_id)) @if($item->hotel_id == data.id) checked @endif @endif @endif @endforeach @endforeach>';--}}
                                        return '<input class="checkbox_info" type="checkbox" value="' + data.id + '" style="display:inline-block;">';
                             },"orderable": false, "searchable": false
@@ -253,12 +275,11 @@
             });
 
             //This object will store every info about given city.
-            function CityObject(voivode_id, city_id, time_arr, client_route_id, hotel_id) {
+            function CityObject(voivode_id, city_id, time_hotel_arr, client_route_id) {
                 this.voivodeId = voivode_id;
                 this.cityId = city_id;
-                this.timeArr = time_arr;
                 this.clientRouteId = client_route_id;
-                this.hotelId = hotel_id;
+                this.timeHotelArr = time_hotel_arr;
                 this.showValues = function() {
                     console.log("voivodeId: " + voivode_id);
                     console.log("cityId: " + city_id);
@@ -268,12 +289,12 @@
                 };
                 this.validate = function() {
                     let isOkFlag = true;
-                    if(this.voivodeId != undefined && this.voivodeId != '' && this.voivodeId != null && this.cityId != undefined && this.cityId != null && this.cityId != '' && this.timeArr != '' && this.timeArr.length > 0 && this.clientRouteId != '' && this.clientRouteId != undefined && this.clientRouteId != null) {
-                        this.timeArr.forEach(time => {
-                           if(time == null || time == '') {
-                              isOkFlag = false;
-                           }
-                        });
+                    if(this.voivodeId != undefined && this.voivodeId != '' && this.voivodeId != null && this.cityId != undefined && this.cityId != null && this.cityId != '' && this.clientRouteId != '' && this.clientRouteId != undefined && this.clientRouteId != null) {
+                        // this.timeArr.forEach(time => {
+                        //    if(time == null || time == '') {
+                        //       isOkFlag = false;
+                        //    }
+                        // });
 
                         if(isOkFlag == true) {
                             return true;
@@ -290,14 +311,31 @@
                     let obj = {
                         voivodeId: this.voivodeId,
                         cityId: this.cityId,
-                        timeArr: this.timeArr,
+                        timeHotelArr: this.timeHotelArr,
                         clientRouteId: this.clientRouteId,
-                        hotelId: this.hotelId
                     };
                     cityInfoArray.push(obj);
 
                 }
             }
+
+            function createTimeHotelArrayOfObjects(cityContainer) {
+                const allHotels = cityContainer.querySelectorAll('table');
+                const allTimes = cityContainer.querySelectorAll('.time-input');
+                let timeHotelArr = [];
+                for(let i = 0; i < allHotels.length; i++) { //number of hotels = number of times
+                    const hotelId = allHotels[i].querySelector('input[type="checkbox"]:checked') == null ? null : allHotels[i].querySelector('input[type="checkbox"]:checked').value; //null or id
+                    const time = allTimes[i].value;
+                    const timeHotelObject = {
+                        hotelId: hotelId,
+                        time: time
+                    };
+                    timeHotelArr.push(timeHotelObject);
+                }
+                return timeHotelArr;
+
+            }
+
 
             let cityInfoArray = []; //Here will be all data about given cities filled by user.
 
@@ -310,20 +348,13 @@
                 citiesContainers.forEach(cityContainer => {
                     const voivodeElement = cityContainer.querySelector('.voivode_info'); //voivode element
                     const cityElement = cityContainer.querySelector('.city_info'); //city element
-                    const timeElements = cityContainer.querySelectorAll('.time-input'); //time elements
                     const clientRouteId = cityContainer.querySelector('.idOfClientRoute').value;
-                    const hotelId = cityContainer.querySelector('input[type="checkbox"]:checked') == null ? null : cityContainer.querySelector('input[type="checkbox"]:checked').value;
-
-                    let timeArr = []; //in this array we will have all hours from given city
+                    const timeHotelArr = createTimeHotelArrayOfObjects(cityContainer);
 
                     const voivodeId = voivodeElement.dataset.identificator;
                     const cityId = cityElement.dataset.identificator;
 
-                    timeElements.forEach(timeElement => {
-                        timeArr.push(timeElement.value);
-                    });
-
-                    const cityObject = new CityObject(voivodeId, cityId, timeArr, clientRouteId, hotelId);
+                    const cityObject = new CityObject(voivodeId, cityId, timeHotelArr, clientRouteId);
                     if(isOk != false) {
                         isOk = cityObject.validate();
                     }
