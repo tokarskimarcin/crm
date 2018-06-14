@@ -550,21 +550,21 @@
 
                        }
                        else {
-                           stringAppend += '<option value="' + city[j].city_id + '"  data-max_hours="' + city[j].max_hour + '" selected>' + city[j].name +'</option>\n';
+                           stringAppend += '<option value="' + city[j].id + '"  data-max_hours="' + city[j].max_hour + '" selected>' + city[j].name +'</option>\n';
                        }
 
                    }else{
                        if(city[j].block == 1) {
                            if(city[j].exceeded == 0) { //When city is still available
-                               stringAppend += '<option value="' + city[j].city_id + '" data-max_hours="' + city[j].used_hours + '">' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
+                               stringAppend += '<option value="' + city[j].id + '" data-max_hours="' + city[j].used_hours + '">' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
                            }
                            else {
-                               stringAppend += '<option value="' + city[j].city_id + '"  data-max_hours="0">' + city[j].name + '(KARENCJA' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
+                               stringAppend += '<option value="' + city[j].id + '"  data-max_hours="0">' + city[j].name + '(KARENCJA' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
                            }
 
                        }
                        else {
-                           stringAppend += '<option value="' + city[j].city_id + '"  data-max_hours="' + city[j].max_hour + '">' + city[j].name +'</option>\n';
+                           stringAppend += '<option value="' + city[j].id + '"  data-max_hours="' + city[j].max_hour + '">' + city[j].name +'</option>\n';
                        }
 
                    }
@@ -817,6 +817,7 @@
                                         for(var i = 0; i < response.length; i++) {
                                           //Pobranie miast dla danego wojew
                                             var city = getCitiesNamesByVoievodeship(response[i].voivodeship_id);
+                                            console.log(city);
                                             //Generowanie Div'a
                                             if(i == 0)
                                               generateRouteDiv(false,false,false,response[i],city,voievodes,placeToAppend);
@@ -1164,12 +1165,18 @@
                     if(everythingIsGood == true) {
                         const clientTypeValue = $('#client_choice_type option:selected').val();
                         if(clientTypeValue != '0') {
+                            console.log(voivodeArr);
+                            console.log(cityArr);
+                            console.log(hourArr);
+                            console.log(dateArr);
+                            console.log(clientTypeValue);
+                            console.log(finalClientId);
                             let formContainer = document.createElement('div');
                             formContainer.innerHTML = '<form method="post" action="{{URL::to('/crmRoute_index')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"><input type="hidden" name="clientType" value="' + clientTypeValue + '"></form>';
                             let place = document.querySelector('.route-here');
                             place.appendChild(formContainer);
                             let userForm = document.getElementById('user_form');
-                            userForm.submit();
+                            // userForm.submit();
                         }
                         else {
                             swal('Wybierz typ klienta (badania/wysyłka)');
