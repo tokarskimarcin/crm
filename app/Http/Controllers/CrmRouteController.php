@@ -48,6 +48,7 @@ class CrmRouteController extends Controller
         $city = $request->city;
         $hour = $request->hour;
         $date = $request->date;
+        $clientType = $request->clientType; // 1 - badania, 2 - wysyłka
         $clientIdNotTrimmed = $request->clientId;
 
         //explode values into arrays
@@ -59,12 +60,12 @@ class CrmRouteController extends Controller
 
         $loggedUser = Auth::user();
 
-//        dd($hourArr);
         //New insertion into ClientRoute table
         $clientRoute = new ClientRoute();
         $clientRoute->client_id = $clientId;
         $clientRoute->user_id = $loggedUser->id;
         $clientRoute->status = 0;
+        $clientRoute->type = $clientType; // 1 - badania, 2 - wysyłka
         $clientRoute->save();
 
         //New insertions into ClientRouteInfo table
