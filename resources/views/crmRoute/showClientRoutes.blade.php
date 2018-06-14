@@ -63,6 +63,7 @@
                                     <th>Akceptuj trasę</th>
                                     <th>Edycja (Hoteli i godzin)</th>
                                     <th>Edycja (Trasy)</th>
+                                    <th>Edycja parametrów (Kampanii)</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -74,6 +75,43 @@
                         <button id="addNewClientRoute" class="btn btn-info">Przejdź do przypisywania tras klientom</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+        Open modal
+    </button>
+    <!-- The Modal -->
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Parametry Kampani</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="routes-container">
+                        <div id="insertModalHere">
+
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+
+                    <div class="col-md-12">
+                        <button type="button" class="btn btn-success"  style="width: 100%" id="saveCampaingOption">Zapisz</button>
+                    </div>
+                    <br>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Zamknij</button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -111,7 +149,70 @@
             let showOnlyAssigned = null; //This variable indices whether checkbox "Pokaż tylko trasy bez przypisanego hotelu lub godziny" is checked
             // let colorArr = ['#e1e4ea', '#81a3ef', '#5a87ed', '#b2f4b8', '#6ee578', '#e1acef', '#c54ae8'];
             let objectArr = [];
+            function createModalContent(response,placeToAppend){
+                let departmentsJson = @json($departments);
+                let routeContainer = document.createElement('div');
+                routeContainer.className = 'campain-container';
+                var content = '';
+                console.log(response);
+                for(var i = 0; i < response.length; i++){
+                    content += '<div class="row">\n' +
+                        '                            <div class="col-lg-12">\n' +
+                        '                                <div class="panel panel-default">\n' +
+                        '                                    <div class="panel-heading">\n' +
+                        '                                        Pokaz Dzień : ' +response[i][0].date +
+                        '                                    </div>\n' +
+                        '                                    <div class="panel-body">\n' +
+                        '                                        <div class="row">\n' +
+                        '                                            <table class="table table-striped thead-inverse table-bordered">\n' +
+                        '                                                <thead>\n' +
+                        '                                                <th>Tydzień</th>\n' +
+                        '                                                <th>Data</th>\n' +
+                        '                                                <th>Godzina</th>\n' +
+                        '                                                <th>Województwo</th>\n' +
+                        '                                                <th>Miasto</th>\n' +
+                        '                                                <th>Hotel</th>\n' +
+                        '                                                <th>Oddział</th>\n' +
+                        '                                                <th style="width: 10%">Limit</th>\n' +
+                        '                                                <tbody>\n';
 
+                    for(var j = 0; j < response[i].length; j++){
+                        let hotel_name = "Brak";
+                        if(response[i][j].hotel_info != null){
+                            hotel_name = response[i][j].hotel_info.name;
+                        }
+                content += '                                                <tr class="campainsOption" id="routeInfoId_'+response[i][j].id+'">\n' +
+                            '                                                    <td>'+response[i][j].weekNumber+'</td>\n' +
+                            '                                                    <td>'+response[i][j].date+'</td>\n' +
+                            '                                                    <td>'+response[i][j].hour+'</td>\n' +
+                            '                                                    <td>'+response[i][j].voivodeName+'</td>\n' +
+                            '                                                    <td>'+response[i][j].cityName+'</td>\n' +
+                            '                                                    <td>'+hotel_name +'</td>\n' +
+                            '                                                    <td class="optionDepartment">\n' +
+                            '                                                        <select class="form-control">\n';
+                                                                                        for(var item in departmentsJson){
+                                                                                            content += '<option>'+departmentsJson[item].department_name+' '+departmentsJson[item].type_name+'</option>\n';
+                                                                                        }
+                                                                                content +=' </select>\n' +
+                            '                                                    </td>\n' +
+                            '                                                    <td class="optionLimit"><input class="form-control" type="number"></td>\n' +
+                            '                                                </tr>\n';
+                    }
+                    content += '                                                </tbody>\n' +
+                        '                                            </table>\n' +
+                        '                                        </div>\n' +
+                        '                                    </div>\n' +
+                        '                                </div>\n' +
+                        '                            </div>\n' +
+                        '                        </div>';
+                }
+
+
+
+
+                routeContainer.innerHTML = content;
+                placeToAppend.appendChild(routeContainer);
+            }
             table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,
@@ -182,7 +283,28 @@
                     buttons2.forEach(btn => {
                         btn.addEventListener('click', actionButtonHandlerAccepted);
                     });
-
+                    $('.show-modal-with-data').on('click',function (e) {
+                        let selectTR = e.currentTarget.parentNode.parentNode;
+                        let routeId = $(selectTR).closest('tr').prop('id');
+                        routeId = routeId.split('_');
+                        routeId = routeId[1];
+                        $.ajax({
+                            type: "POST",
+                            url: '{{ route('api.getReadyRoute') }}',
+                            data: {
+                                "route_id": routeId
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                let placeToAppend = document.querySelector('#insertModalHere');
+                                placeToAppend.innerHTML = '';
+                                createModalContent(response,placeToAppend);
+                                $('#myModal').modal('show');
+                            }
+                        });
+                    });
                 },
                 "rowCallback": function( row, data, index ) {
                     if(row.cells[4].firstChild.classList[2] == "action-buttons-0") {
@@ -191,7 +313,7 @@
                     else {
                         row.style.backgroundColor = "#d1fcd7";
                     }
-                    $(row).attr('id', "clientRouteInfoId_" + data.id);
+                    $(row).attr('id', "clientRouteInfoId_" + data.clientRouteId);
                     return row;
                 },
                 "ajax": {
@@ -247,6 +369,11 @@
                     {"data":function (data, type, dataToSet) {
                             return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.clientRouteId + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
                         },"name":"link"
+                    },
+                    {"data":function (data, type, dataToSet) {
+                            return '<span style="font-size: 2.1em;" class="glyphicon glyphicon-edit show-modal-with-data" data-route_id ="'+data.clientRouteId+'" ></span>';
+                        },"name":"link"
+
                     }
                 ]
             });

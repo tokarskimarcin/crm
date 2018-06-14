@@ -208,14 +208,15 @@ class CrmRouteController extends Controller
                     $stdClass->clientName = $client->name;
                 }
             }
-
+            $stdClass->id = $info->id;
             $stdClass->client_route_id = $info->client_route_id;
             $stdClass->city_id = $info->city_id;
             $stdClass->voivode_id = $info->voivode_id;
             $stdClass->date = $info->date;
             $stdClass->hotel_id = $info->hotel_id;
+            $stdClass->hotel_info = Hotel::find($info->hotel_id);
             $stdClass->hour = $info->hour;
-
+            $stdClass->weekNumber = date("W",strtotime($info->date));
             array_push($insideArr, $stdClass);
             if($flag == 1) {
                 $flag = 0;
@@ -233,7 +234,7 @@ class CrmRouteController extends Controller
                 ->with('hotels', $hotels)
                 ->with('clientName', $clientName);
         else
-            return $clientRouteInfoExtended;
+            return $clientRouteInfo->sortByDesc('date');
     }
 
     /**
@@ -421,10 +422,13 @@ class CrmRouteController extends Controller
     }
 
     public function showClientRoutesGet() {
+        $departments = Department_info::getAllInfoAboutDepartment()
+        ->whereIn('id_dep_type',[2]);
         $year = date('Y',strtotime("this year"));
         $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
         return view('crmRoute.showClientRoutes')
-            ->with('lastWeek', $numberOfLastYearsWeek);
+            ->with('lastWeek', $numberOfLastYearsWeek)
+            ->with('departments', $departments);
     }
 
     public function showClientRoutesAjax(Request $request) {
