@@ -242,8 +242,6 @@ console.log(hotelIdArr);
                             },"name":"cityName", "orderable": false
                         },
                         {"data":function (data, type, dataToSet) {
-                            console.log(hotelIdArr);
-
                                 var cityId = cityElementOfGivenContainer;
                                 let newarray = new Array();
                                 if(helpFlag == 0) {
