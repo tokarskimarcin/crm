@@ -67,6 +67,7 @@
                                 <tr>
                                     <th>Tydzień</th>
                                     <th>Klient</th>
+                                    <th>Data &Iukcy; pokazu</th>
                                     <th>Trasa</th>
                                     <th>Przypisany hotel i godziny</th>
                                     <th>Akceptuj trasę</th>
@@ -196,7 +197,7 @@
 
                 },
                 "rowCallback": function( row, data, index ) {
-                    if(row.cells[4].firstChild.classList[2] == "action-buttons-0") {
+                    if(row.cells[5].firstChild.classList[2] == "action-buttons-0") {
                         row.style.backgroundColor = "#ffc6c6";
                     }
                     else {
@@ -228,6 +229,10 @@
                     {"data":function (data, type, dataToSet) {
                             return data.clientName;
                         },"name":"clientName"
+                    },
+                    {"data":function (data, type, dataToSet) {
+                            return data.minDate;
+                        },"name":"minDate"
                     },
                     {"data":function (data, type, dataToSet) {
                             return data.clientRouteName;
