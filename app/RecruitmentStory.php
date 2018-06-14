@@ -219,7 +219,6 @@ class RecruitmentStory extends Model
      *  Przygotowanie danych do raportu nowych kont
      */
     public static function getReportNewAccountData($date_start, $date_stop){
-
         $all_hr = User::where('user_type_id','=','5')
                 ->select('users.id','users.first_name','users.last_name','departments.name','department_type.name as dep_type')
                 ->join('department_info','department_info.id','users.department_info_id')
@@ -227,15 +226,24 @@ class RecruitmentStory extends Model
                 ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
                 ->where('status_work','=',1)
                 ->get();
-        $all_hr->map(function ($item) use ($date_start, $date_stop) {
+        $all_hr_from_departments = Department_info::
+            select('users.id','users.first_name','users.last_name','departments.name','department_type.name as dep_type','department_info.id as departmentInfoId')
+            ->join('users','users.id','department_info.hr_id')
+            ->join('departments','departments.id','department_info.id_dep')
+            ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
+            ->where('status_work','=',1)
+            ->get();
+        $all_hr_from_departments->map(function ($item) use ($date_start, $date_stop) {
 
         $all_candidate = Candidate::where('cadre_id','=',$item->id)
             ->get();
         $all_hire_candidate_new = User::whereIn('candidate_id',$all_candidate->pluck('id')->toArray())
                     ->whereBetween('start_work',[$date_start,$date_stop])
+                    ->where('department_info_id','=',$item->departmentInfoId)
                     ->count();
         $all_hire_candidate_reactive = User::whereIn('id',$all_candidate->pluck('id_user')->toArray())
             ->whereBetween('start_work',[$date_start,$date_stop])
+            ->where('department_info_id','=',$item->departmentInfoId)
             ->count();
             $item->add_user = $all_hire_candidate_new;
             $item->add_candidate = $all_hire_candidate_reactive;
@@ -259,6 +267,6 @@ class RecruitmentStory extends Model
 //            ->having('add_user','!=',0)
 //            ->orderBy('add_user','desc')
 //            ->get();
-        return $all_hr;
+        return $all_hr_from_departments;
     }
 }
