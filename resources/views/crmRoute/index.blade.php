@@ -346,6 +346,7 @@
 
 
         $(document).ready(function() {
+            $('#client_choice_type').attr('disabled', true).val(0);
             $('.city').select2();
             $('.voivodeship').select2();
             $('.voivodeship').off('select2:select'); //remove previous event listeners
@@ -415,25 +416,21 @@
                 document.getElementById('client_choice_name').textContent = tr_line_name;
                 document.getElementById('client_choice_priority').textContent = tr_line_phone;
 
+                $('#client_choice_type').attr('disabled', false);
                 if(tr_line_type == 'Badania') {
                     $('#client_choice_type').val(1);
-                    // $('#client_choice_type').children('option[value="2"]').attr("selected", false);
-                    // $('#client_choice_type').children('option[value="1"]').attr("selected", true);
                 }
                 else  if(tr_line_type == 'Wysyłka'){
                     $('#client_choice_type').val(2);
-                    // $('#client_choice_type').children('option[value="1"]').attr("selected", false);
-                    // $('#client_choice_type').children('option[value="2"]').attr("selected", true);
                 }else{
                     $('#client_choice_type').val(0);
                 }
-                // if(tr_line_type == clientTypeSelect)
             }
 
             function clearCheckedClientInfo(){
                 document.getElementById('client_choice_name').textContent = "";
                 document.getElementById('client_choice_priority').textContent = "";
-                $('#client_choice_type').val(0);
+                $('#client_choice_type').attr('disabled', true).val(0);
 
             }
 
@@ -1166,12 +1163,18 @@
 
                     if(everythingIsGood == true) {
                         const clientTypeValue = $('#client_choice_type option:selected').val();
-                        let formContainer = document.createElement('div');
-                        formContainer.innerHTML = '<form method="post" action="{{URL::to('/crmRoute_index')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"><input type="hidden" name="clientType" value="' + clientTypeValue + '"></form>';
-                        let place = document.querySelector('.route-here');
-                        place.appendChild(formContainer);
-                        let userForm = document.getElementById('user_form');
-                        userForm.submit();
+                        if(clientTypeValue != '0') {
+                            let formContainer = document.createElement('div');
+                            formContainer.innerHTML = '<form method="post" action="{{URL::to('/crmRoute_index')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"><input type="hidden" name="clientType" value="' + clientTypeValue + '"></form>';
+                            let place = document.querySelector('.route-here');
+                            place.appendChild(formContainer);
+                            let userForm = document.getElementById('user_form');
+                            userForm.submit();
+                        }
+                        else {
+                            swal('Wybierz typ klienta (badania/wysyłka)');
+                        }
+
                     }
                     else {
                         clearArrays(voivodeArr, cityArr, hourArr);
