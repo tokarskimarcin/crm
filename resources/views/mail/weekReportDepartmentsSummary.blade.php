@@ -55,6 +55,8 @@
                         $day_bad = 0;
 
                         $total_rbh_without_weekends = 0;
+                        $number_day_weekends = 0;
+                        $number_day_without_weekends = 0;
                         $total_rbh_weekends = 0;
 
                         $week_day_count = 0;
@@ -63,8 +65,14 @@
                             $week_rbh += $value->day_time_sum;
                             if($day_number < 6){
                                 $total_rbh_without_weekends += round($value->day_time_sum,2);
+                                if(round($value->day_time_sum,2) > 0){
+                                    $number_day_without_weekends++;
+                                }
                             }else{
                                 $total_rbh_weekends += round($value->day_time_sum,2);
+                                if(round($value->day_time_sum,2) > 0){
+                                    $number_day_weekends++;
+                                }
                             }
                             $week_success += $value->success;
                             if($value->day_time_sum != 0){
@@ -76,6 +84,9 @@
                             $day_check+=    $value->janky_count_all_check;
                             $day_bad+=  $value->count_bad_check;
                         }
+
+                        $total_rbh_without_weekends = $number_day_without_weekends > 0 ? round($total_rbh_without_weekends/$number_day_without_weekends,2) : 0;
+                        $total_rbh_weekends = $number_day_weekends > 0 ? round($total_rbh_weekends/$number_day_weekends,2) : 0;
 
                         $week_avg = ($week_rbh > 0) ? round($week_success / $week_rbh, 2) : 0 ;
                         $week_hour_time_use = ($week_rbh > 0) ? round($week_hour_time_use / $week_rbh * 100, 2) : 0 ;

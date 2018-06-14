@@ -71,11 +71,6 @@
     .check{
     background: #B0BED9 !important;
     }
-
-        .first-show-date {
-            margin-top: 1em;
-        }
-
     </style>
 
 {{--Header page --}}
@@ -155,14 +150,8 @@
                                     <label id="client_choice_priority"></label>
                                 </div>
                                 <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="client_choice_type">Typ:</label>
-                                        <select id="client_choice_type" class="form-control">
-                                            <option value="0">Wybierz</option>
-                                            <option value="1">Badania</option>
-                                            <option value="2">Wysyłka</option>
-                                        </select>
-                                    </div>
+                                    <label>Typ:</label>
+                                    <label id="client_choice_type"></label>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -170,10 +159,10 @@
                                     {{--<label for="weekNumber">Wybierz tydzień</label>--}}
                                     {{--<select id="weekNumber" class="form-control"></select>--}}
                                 {{--</div>--}}
-                                <div class="form-group first-show-date">
-                                    <label class="myLabel">Data pierwszego pokazu:</label>
+                                <div class="form-group">
+                                    <label class="myLabel">Data:</label>
                                     <div class="input-group date form_date col-md-5" data-date-calendarWeeks="true" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                        <input class="form-control first-show-date-input" name="date" id="date" type="text" value="{{date("Y-m-d")}}">
+                                        <input class="form-control first-show-date-input" name="date" id="date" type="text" value="{{date($clientRouteInfo->first()[0]->date)}}">
                                         <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                     </div>
                                 </div>
@@ -263,8 +252,82 @@
                                 </table>
                             </div>
                             <div class="client-container route-here" id="jump-here">
-
+                                @php
+                                    $lp = 0;
+                                @endphp
+                                @foreach($clientRouteInfo as $item)
+                                <div class="routes-container">
+                                    <div class="row">
+                                        @if($lp != 0)
+                                            <div class="button_section">
+                                                <span class="glyphicon glyphicon-remove" data-remove="show"></span>
+                                            </div>
+                                        @endif
+                                        <header>Pokaz</header>
+                                        @if($lp != 0)
+                                            <div class=colmd-12 style="text-align: center">
+                                                <span class="glyphicon glyphicon-refresh" data-refresh="refresh" style="font-size: 30px"></span>
+                                            </div>
+                                        @endif
+                                        @php
+                                            $lp++;
+                                        @endphp
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Województwo</label>
+                                                    <select class="form-control voivodeship" data-type="voivode">
+                                                        @foreach($voivodes as $voivode)
+                                                        @if($voivode->id == $item[0]->voivode_id)
+                                                            <option value ={{$voivode->id}} selected>{{$voivode->name}}</option>
+                                                        @else
+                                                            <option value ={{$voivode->id}}>{{$voivode->name}}</option>
+                                                        @endif
+                                                    @endforeach
+                                                    </select>
+                                            </div>
+                                        </div>
+                                            {{--{{dd($item[0])}}--}}
+                                      <div class="col-md-6">
+                                            <div class="form-group">
+                                               <label for="city">Miasto</label>
+                                               <select class="form-control city">
+                                                    @foreach($item[0]->cities as $localCities)
+                                                        @if($item[0]->voivode_id == $localCities->id)
+                                                            @if($item[0]->city_id == $localCities->city_id)
+                                                                <option value={{$localCities->city_id}} selected>{{$localCities->city_name}}</option>
+                                                            @else
+                                                               <option value={{$localCities->city_id}}>{{$localCities->city_name}}</option>
+                                                            @endif
+                                                       @endif
+                                                    @endforeach
+                                               </select>
+                                            </div>
+                                      </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="myLabel">Ilość godzin pokazów</label>
+                                                <input class="form-control show-hours" min="0" type="number" placeholder="Np. 2" value={{count($item)}}>
+                                                </div>
+                                            </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="myLabel">Data:</label>
+                                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                                    <input class="form-control dateInput" type="text" value="{{date($item[0]->date)}}">
+                                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <div class="form-group hour_div">
+                                        </div>
+                                        @if($lp == count($clientRouteInfo))
+                                            <div class="col-lg-12 button_section button_new_show_section">
+                                                <input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">
+                                            </div>
+                                        @endif
+                                </div>
                             </div>
+                            @endforeach
                         </div>
                         <div class="client-wrapper">
                             <div class="client-container">
@@ -276,6 +339,10 @@
                 </div>
             </div>
         </div>
+
+
+
+
 
 @endsection
 
@@ -343,34 +410,8 @@
                 })
             }
         }
-
-
         $(document).ready(function() {
-            $('#client_choice_type').attr('disabled', true).val(0);
-            $('.city').select2();
             $('.voivodeship').select2();
-            $('.voivodeship').off('select2:select'); //remove previous event listeners
-            $('.voivodeship').on('select2:select', function (e) {
-                getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
-            });
-
-
-            let today = new Date();
-            let dd = today.getDate();
-            let mm = today.getMonth()+1; //January is 0!
-
-            let yyyy = today.getFullYear();
-            if(dd<10){
-                dd='0'+dd;
-            }
-            if(mm<10){
-                mm='0'+mm;
-            }
-            today = yyyy+'-'+mm+'-'+dd;
-
-            let currentDate = today;
-
-
           //Ta funkcja działa analogicznie jak jQuerry .appendAfter();
           Element.prototype.appendAfter = function (element) {
               element.parentNode.insertBefore(this, element.nextSibling);
@@ -415,24 +456,18 @@
                 var tr_line_type = tr_line.getElementsByClassName('client_type')[0].textContent;
                 document.getElementById('client_choice_name').textContent = tr_line_name;
                 document.getElementById('client_choice_priority').textContent = tr_line_phone;
-
-                $('#client_choice_type').attr('disabled', false);
-                if(tr_line_type == 'Badania') {
-                    $('#client_choice_type').val(1);
-                }
-                else  if(tr_line_type == 'Wysyłka'){
-                    $('#client_choice_type').val(2);
-                }else{
-                    $('#client_choice_type').val(0);
-                }
+                document.getElementById('client_choice_type').textContent = tr_line_type;
             }
 
             function clearCheckedClientInfo(){
                 document.getElementById('client_choice_name').textContent = "";
                 document.getElementById('client_choice_priority').textContent = "";
-                $('#client_choice_type').attr('disabled', true).val(0);
-
+                document.getElementById('client_choice_type').textContent = "";
             }
+
+
+
+
 
             function getCitiesNamesByVoievodeship(voivodeship_id) {
                 let city;
@@ -495,7 +530,6 @@
                                   responseOption.setAttribute('data-max_hours', response[i].max_hour); //needed for auto setting hours
                               }
                           }
-
                           placeToAppend2.appendChild(responseOption);
                       }
                   }
@@ -586,9 +620,8 @@
                         stringAppend += '<input class="form-control dateInput" type="text" value="' + currentDate + '">';
                     }
                     else {
-                     stringAppend += '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">';
+                        stringAppend += '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">';
                     }
-
                     stringAppend += '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
                    '</div>' +
                    '</div>' +
@@ -611,7 +644,7 @@
             }
 
             {{--let currentDate ={{$today}};--}}
-
+                let currentDate = "0";
 
             table_client = $('#table_client').DataTable({
                 "autoWidth": true,
@@ -717,6 +750,10 @@
                         }
                     });
 
+                }, // Click select client
+                "initComplete": function(settings, json) {
+                    $("#clientId_"+'{{$clientRId}}').trigger("click");
+
                 },"columns":[
                     {"data":"name","className": "client_name"},
                     {
@@ -748,6 +785,7 @@
             });
 
 
+// ** in clomplite render client table
 
 
 //*********************END CLIENT SECTON***************************
@@ -820,7 +858,7 @@
                                             //Generowanie Div'a
                                             if(i == 0)
                                               generateRouteDiv(false,false,false,response[i],city,voievodes,placeToAppend);
-                                            else if(i+1 == response.length)
+                                            if(i+1 == response.length)
                                               generateRouteDiv(true,true,true,response[i],city,voievodes,placeToAppend);
                                             else
                                               generateRouteDiv(true,true,false,response[i],city,voievodes,placeToAppend);
@@ -936,7 +974,6 @@
                     $('.city').on('select2:select', function (e) {
                         setHoursValue(e);
                     });
-
                     activateDatepicker();
 
                 }
@@ -1087,38 +1124,34 @@
                                         let container = e.target.parentElement.parentElement.parentElement.parentElement;
                                         let headerId = e.params.data.id;
 
-                                            let placeToAppend2 = container.getElementsByClassName('city')[0];
-                                            placeToAppend2.innerHTML = '';
-                                            let basicOption = document.createElement('option');
-                                            basicOption.value = '0';
-                                            basicOption.textContent = 'Wybierz';
-                                            placeToAppend2.appendChild(basicOption);
-                                            let responseObject = response['cityInfo'];
-                                            for(var i = 0; i < responseObject[headerId].length; i++) {
-
-
-                                                let responseOption = document.createElement('option');
-                                                responseOption.value = responseObject[headerId][i].city_id;
-
-                                                if(responseObject[headerId][i].block == 1) {
-                                                    if(responseObject[headerId][i].exceeded == 0) { //When city is still available
-                                                        responseOption.textContent = responseObject[headerId][i].city_name + " [dostępne jeszcze " + responseObject[headerId][i].used_hours + " godzin]";
-                                                        responseOption.setAttribute('data-max_hours', responseObject[headerId][i].used_hours); //needed for auto setting hours
-                                                    }
-                                                    else { //when city is not available
-                                                        responseOption.textContent = responseObject[headerId][i].city_name + " (KARENCJA do " + responseObject[headerId][i].available_date + ") [przekroczono o " + responseObject[headerId][i].used_hours + " godzin]";
-                                                        responseOption.setAttribute('data-max_hours', 0); //needed for auto setting hours
-                                                    }
+                                        let placeToAppend2 = container.getElementsByClassName('city')[0];
+                                        placeToAppend2.innerHTML = '';
+                                        let basicOption = document.createElement('option');
+                                        basicOption.value = '0';
+                                        basicOption.textContent = 'Wybierz';
+                                        placeToAppend2.appendChild(basicOption);
+                                        let responseObject = response['cityInfo'];
+                                        for(var i = 0; i < responseObject[headerId].length; i++) {
+                                            let responseOption = document.createElement('option');
+                                            responseOption.value = responseObject[headerId][i].city_id;
+                                            if(responseObject[headerId][i].block == 1) {
+                                                if(responseObject[headerId][i].exceeded == 0) { //When city is still available
+                                                    responseOption.textContent = responseObject[headerId][i].city_name + " [dostępne jeszcze " + responseObject[headerId][i].used_hours + " godzin]";
+                                                    responseOption.setAttribute('data-max_hours', responseObject[headerId][i].used_hours); //needed for auto setting hours
                                                 }
-                                                else {
-                                                    responseOption.textContent = responseObject[headerId][i].city_name;
-                                                    if(responseObject[headerId][i].max_hour > 0) {
-                                                        responseOption.setAttribute('data-max_hours', responseObject[headerId][i].max_hour); //needed for auto setting hours
-                                                    }
+                                                else { //when city is not available
+                                                    responseOption.textContent = responseObject[headerId][i].city_name + " (KARENCJA do " + responseObject[headerId][i].available_date + ") [przekroczono o " + responseObject[headerId][i].used_hours + " godzin]";
+                                                    responseOption.setAttribute('data-max_hours', 0); //needed for auto setting hours
                                                 }
-
-                                                placeToAppend2.appendChild(responseOption);
                                             }
+                                            else {
+                                                responseOption.textContent = responseObject[headerId][i].city_name;
+                                                if(responseObject[headerId][i].max_hour > 0) {
+                                                    responseOption.setAttribute('data-max_hours', responseObject[headerId][i].max_hour); //needed for auto setting hours
+                                                }
+                                            }
+                                            placeToAppend2.appendChild(responseOption);
+                                        }
                                     });
                                     $('.city').on('select2:select', function (e) {
                                         setHoursValue(e);
@@ -1162,19 +1195,13 @@
                     everythingIsGood = finalClientId != null && finalClientId != '0' ? formValidation(voivodeArr, cityArr, hourArr) : false;
 
                     if(everythingIsGood == true) {
-                        const clientTypeValue = $('#client_choice_type option:selected').val();
-                        if(clientTypeValue != '0') {
-                            let formContainer = document.createElement('div');
-                            formContainer.innerHTML = '<form method="post" action="{{URL::to('/crmRoute_index')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"><input type="hidden" name="clientType" value="' + clientTypeValue + '"></form>';
-                            let place = document.querySelector('.route-here');
-                            place.appendChild(formContainer);
-                            let userForm = document.getElementById('user_form');
-                            userForm.submit();
-                        }
-                        else {
-                            swal('Wybierz typ klienta (badania/wysyłka)');
-                        }
-
+                        let formContainer = document.createElement('div');
+                        formContainer.innerHTML = '' +
+                            '<form method="post" action="{{URL::to('/crmRoute_indexEdit')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"><input type="hidden" name="route_id" value="'+ {{$routeId}} +'"></form>';
+                        let place = document.querySelector('.route-here');
+                        place.appendChild(formContainer);
+                        let userForm = document.getElementById('user_form');
+                        userForm.submit();
                     }
                     else {
                         clearArrays(voivodeArr, cityArr, hourArr);
@@ -1193,17 +1220,6 @@
 
             }
 
-
-            /**
-             * Parameters: e - select2 event after selecting of city
-             * Result: This function automatically sets value of hours input basing on attribute data-max_hours in option element.
-             */
-            function setHoursValue(e) {
-                const maxHours = e.target.selectedOptions[0].dataset.max_hours; // maximum hours we that we can use for given city.
-                const entireRow = e.target.parentNode.parentNode.parentNode;
-                const hoursInput = entireRow.querySelector('.show-hours'); // selecting hoursInput of given show
-                hoursInput.value = maxHours;
-            }
 
             /*
             This function removes "X" button from first show container
@@ -1248,6 +1264,17 @@
             }
 
             /**
+             * Parameters: e - select2 event after selecting of city
+             * Result: This function automatically sets value of hours input basing on attribute data-max_hours in option element.
+             */
+            function setHoursValue(e) {
+                const maxHours = e.target.selectedOptions[0].dataset.max_hours; // maximum hours we that we can use for given city.
+                const entireRow = e.target.parentNode.parentNode.parentNode;
+                const hoursInput = entireRow.querySelector('.show-hours'); // selecting hoursInput of given show
+                hoursInput.value = maxHours;
+            }
+
+            /**
             * This function remove whole route container while user click on red cross button
             */
             function removeGivenShow(container) {
@@ -1262,7 +1289,6 @@
                     let basisDate = document.querySelector('.first-show-date-input').value;
                     currentDate = basisDate;
                 }
-
                 let allShows = document.getElementsByClassName('routes-container');
                 let lastShowContainer = allShows[allShows.length - 1];
                 if(container == lastShowContainer) {
@@ -1315,6 +1341,12 @@
                 table.ajax.reload();
             });
 
+            //activate event listener just after loading data
+            $('.voivodeship').on('select2:select', function (e) {
+                getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
+            });
+
+            $('.city').select2();
 
         });
 

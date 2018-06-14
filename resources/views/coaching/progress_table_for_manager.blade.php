@@ -477,10 +477,11 @@
                                 if(coaching_manager_goal_janky > proc_manager_goal_min_jank){
                                     validation = false;
                                     swal('Minimalna jakość musi być mniejsza niż 10% aktualnej jakości')
-                                } else if(coaching_manager_goal_janky < proc_manager_goal_max_jank){
-                                    validation = false;
-                                    swal('Minimalna jakoś nie może być mniejsza niż 30% aktualnej jakości')
                                 }
+                                // else if(coaching_manager_goal_janky < proc_manager_goal_max_jank){
+                                //     validation = false;
+                                //     swal('Minimalna jakoś nie może być mniejsza niż 30% aktualnej jakości')
+                                // }
                             }
                         }else if(coaching_type == 3){
                             if(manager_actual_rbh.trim('').length == 0 || isNaN(manager_actual_rbh) ){

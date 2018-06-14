@@ -201,7 +201,7 @@ class StatisticsController extends Controller
             //tu był zmiana z godzin na liczbę
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
-                'sum(time_to_sec(register_stop) - time_to_sec(register_start))/3600 as realRBH,
+                'sum(time_to_sec(accept_stop) - time_to_sec(accept_start))/3600 as realRBH,
                 department_info.id
             '))
             ->join('users', 'users.id', '=', 'work_hours.id_user')
@@ -212,10 +212,12 @@ class StatisticsController extends Controller
             ->groupBy('department_info.id')
             ->get();
 
-        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data) {
+        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data,$work_hours) {
             $info_with_janky = $pbx_dkj_data->where('id', '=', $item->id)->first();
             $item->janki = $info_with_janky != null ? $info_with_janky->janky_proc : 0;
-           return $item;
+            $info_with_work_hours= $work_hours->where('id', '=', $item->id)->first();
+            $item->avg_average = $info_with_work_hours->realRBH != 0 ? round($item->sum_success/$info_with_work_hours->realRBH,2) : 0;
+            return $item;
         });
 
         $data = [
@@ -325,8 +327,8 @@ class StatisticsController extends Controller
 
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
-                'sum(time_to_sec(register_stop) - time_to_sec(register_start))/3600 as realRBH,
-                 department_info.id
+                 'sum(case when time_to_sec(accept_stop) is not null then (time_to_sec(accept_stop) - time_to_sec(accept_start))/3600 else  (time_to_sec(register_stop) - time_to_sec(register_start))/3600 end) as realRBH,
+                  department_info.id
             '))
             ->join('users', 'users.id', '=', 'work_hours.id_user')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
@@ -335,9 +337,11 @@ class StatisticsController extends Controller
             ->groupBy('department_info.id')
             ->get();
 
-        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data) {
+        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data,$work_hours) {
             $info_with_janky = $pbx_dkj_data->where('id', '=', $item->id)->first();
             $item->janki = $info_with_janky != null ? $info_with_janky->janky_proc : 0;
+            $info_with_work_hours= $work_hours->where('id', '=', $item->id)->first();
+            $item->avg_average = $info_with_work_hours->realRBH != 0 ? round($item->sum_success/$info_with_work_hours->realRBH,2) : 0;
             return $item;
         });
 
@@ -531,7 +535,7 @@ class StatisticsController extends Controller
         //pobieranie sumy godzin pracy dla poszczególnych oddziałów
         $work_hours = DB::table('work_hours')
             ->select(DB::raw(
-                'sum(time_to_sec(register_stop) - time_to_sec(register_start))/3600 as realRBH,
+                'sum(time_to_sec(accept_stop) - time_to_sec(accept_start))/3600 as realRBH,
                   department_info.id
                   '))
             ->join('users', 'users.id', '=', 'work_hours.id_user')
@@ -541,7 +545,9 @@ class StatisticsController extends Controller
             ->groupBy('department_info.id')
             ->get();
 
-        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data) {
+        $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data,$work_hours) {
+            $info_with_work_hours= $work_hours->where('id', '=', $item->id)->first();
+            $item->avg_average = $info_with_work_hours->realRBH != 0 ? round($item->success/$info_with_work_hours->realRBH,2) : 0;
             $info_with_janky = $pbx_dkj_data->where('id', '=', $item->id)->first();
             $item->janki = $info_with_janky != null ? $info_with_janky->janky_proc : 0;
             return $item;
