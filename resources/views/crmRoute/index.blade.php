@@ -155,8 +155,14 @@
                                     <label id="client_choice_priority"></label>
                                 </div>
                                 <div class="col-md-4">
-                                    <label>Typ:</label>
-                                    <label id="client_choice_type"></label>
+                                    <div class="form-group">
+                                        <label for="client_choice_type">Typ:</label>
+                                        <select id="client_choice_type" class="form-control">
+                                            <option value="0">Wybierz</option>
+                                            <option value="1">Badania</option>
+                                            <option value="2">Wysyłka</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -360,7 +366,6 @@
                 mm='0'+mm;
             }
             today = yyyy+'-'+mm+'-'+dd;
-            console.log(today);
 
             let currentDate = today;
 
@@ -409,18 +414,28 @@
                 var tr_line_type = tr_line.getElementsByClassName('client_type')[0].textContent;
                 document.getElementById('client_choice_name').textContent = tr_line_name;
                 document.getElementById('client_choice_priority').textContent = tr_line_phone;
-                document.getElementById('client_choice_type').textContent = tr_line_type;
+
+                if(tr_line_type == 'Badania') {
+                    $('#client_choice_type').val(1);
+                    // $('#client_choice_type').children('option[value="2"]').attr("selected", false);
+                    // $('#client_choice_type').children('option[value="1"]').attr("selected", true);
+                }
+                else  if(tr_line_type == 'Wysyłka'){
+                    $('#client_choice_type').val(2);
+                    // $('#client_choice_type').children('option[value="1"]').attr("selected", false);
+                    // $('#client_choice_type').children('option[value="2"]').attr("selected", true);
+                }else{
+                    $('#client_choice_type').val(0);
+                }
+                // if(tr_line_type == clientTypeSelect)
             }
 
             function clearCheckedClientInfo(){
                 document.getElementById('client_choice_name').textContent = "";
                 document.getElementById('client_choice_priority').textContent = "";
-                document.getElementById('client_choice_type').textContent = "";
+                $('#client_choice_type').val(0);
+
             }
-
-
-
-
 
             function getCitiesNamesByVoievodeship(voivodeship_id) {
                 let city;
@@ -1150,8 +1165,9 @@
                     everythingIsGood = finalClientId != null && finalClientId != '0' ? formValidation(voivodeArr, cityArr, hourArr) : false;
 
                     if(everythingIsGood == true) {
+                        const clientTypeValue = $('#client_choice_type option:selected').val();
                         let formContainer = document.createElement('div');
-                        formContainer.innerHTML = '<form method="post" action="{{URL::to('/crmRoute_index')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"></form>';
+                        formContainer.innerHTML = '<form method="post" action="{{URL::to('/crmRoute_index')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"><input type="hidden" name="clientType" value="' + clientTypeValue + '"></form>';
                         let place = document.querySelector('.route-here');
                         place.appendChild(formContainer);
                         let userForm = document.getElementById('user_form');
