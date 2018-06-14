@@ -1165,18 +1165,12 @@
                     if(everythingIsGood == true) {
                         const clientTypeValue = $('#client_choice_type option:selected').val();
                         if(clientTypeValue != '0') {
-                            console.log(voivodeArr);
-                            console.log(cityArr);
-                            console.log(hourArr);
-                            console.log(dateArr);
-                            console.log(clientTypeValue);
-                            console.log(finalClientId);
                             let formContainer = document.createElement('div');
                             formContainer.innerHTML = '<form method="post" action="{{URL::to('/crmRoute_index')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"><input type="hidden" name="clientType" value="' + clientTypeValue + '"></form>';
                             let place = document.querySelector('.route-here');
                             place.appendChild(formContainer);
                             let userForm = document.getElementById('user_form');
-                            // userForm.submit();
+                            userForm.submit();
                         }
                         else {
                             swal('Wybierz typ klienta (badania/wysyłka)');
