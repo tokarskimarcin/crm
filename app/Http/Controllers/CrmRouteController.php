@@ -408,11 +408,24 @@ class CrmRouteController extends Controller
         return $routeExt;
     }
 
+    /**
+     * @return $this method sends to server view showClientRoutes with data about weeks in given year.
+     */
     public function showClientRoutesGet() {
         $year = date('Y',strtotime("this year"));
-        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
+        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
         return view('crmRoute.showClientRoutes')
             ->with('lastWeek', $numberOfLastYearsWeek);
+    }
+
+    /**
+     * @param year
+     * @return Number of Weeks in given year
+     */
+    public function getYearWeeksAjax(Request $request) {
+        $year = $request->year;
+        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
+        return $numberOfLastYearsWeek;
     }
 
     public function showClientRoutesAjax(Request $request) {
@@ -434,13 +447,20 @@ class CrmRouteController extends Controller
     }
 
     /**
+     * @param showAllClients(true/false/null), showOnlyAssigned(true/false/null), id(number/null), selectedWeek(number), year(number)
      * This method return data about all client routes to datatable in showClientRoutes
      */
     public function showClientRoutesInfoAjax(Request $request) {
-        $showAllClients = $request->showAllClients; //true or false or null(after loading page)
-        $showOnlyAssigned = $request->showOnlyAssigned; //true or false or null(after loading page)
+        $showAllClients = $request->showAllClients;
+        $showOnlyAssigned = $request->showOnlyAssigned;
         $clientId = $request->id; //number or null
         $selectedWeek = $request->selectedWeek;
+        if($request->year > 0) {
+            $year = $request->year;
+        }
+        else {
+            $year = date('Y',strtotime("this year"));
+        }
 
         $allDataArr = array();
         $cities = Cities::all();
@@ -460,11 +480,16 @@ class CrmRouteController extends Controller
         Wyświetlają się wszyscy klienci */
         if($showAllClients == 'true' && ($showOnlyAssigned == null || $showOnlyAssigned == 'false') && $clientId == null) {
             $client_route = ClientRoute::all()->pluck('id')->toArray();
-            if($selectedWeek != null && $selectedWeek != '0') {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)->where('weekOfYear', '=', $selectedWeek)->get();
+            if($selectedWeek != '0') {
+                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->where('date', 'like', $year . '%')
+                    ->where('weekOfYear', '=', $selectedWeek)
+                    ->get();
             }
             else {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)->get();
+                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->where('date', 'like', $year . '%')
+                    ->get();
             }
 
         }
@@ -475,11 +500,16 @@ class CrmRouteController extends Controller
         Wyświetlają się wszyscy klienci */
         else if($showAllClients == 'true' && $showOnlyAssigned == 'true' && $clientId != null) {
             $client_route = ClientRoute::all()->pluck('id')->toArray();
-            if($selectedWeek != null && $selectedWeek != '0') {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)->where('weekOfYear', '=', $selectedWeek)->get();
+            if($selectedWeek != '0') {
+                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->where('date', 'like', $year . '%')
+                    ->where('weekOfYear', '=', $selectedWeek)
+                    ->get();
             }
             else {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)->get();
+                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->where('date', 'like', $year . '%')
+                    ->get();
             }
 
         }
@@ -490,11 +520,16 @@ class CrmRouteController extends Controller
         Wyświetlają się wszyscy klienci */
         else if($showAllClients == 'true' && $clientId != null && ($showOnlyAssigned == null || $showOnlyAssigned == 'false')) {
             $client_route = ClientRoute::all()->pluck('id')->toArray();
-            if($selectedWeek != null && $selectedWeek != '0') {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)->where('weekOfYear', '=', $selectedWeek)->get();
+            if($selectedWeek != '0') {
+                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->where('date', 'like', $year . '%')
+                    ->where('weekOfYear', '=', $selectedWeek)
+                    ->get();
             }
             else {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)->get();
+                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->where('date', 'like', $year . '%')
+                    ->get();
             }
 
         }
@@ -505,9 +540,10 @@ class CrmRouteController extends Controller
         Wyświetlają się wszyscy klienci, którzy mają trasy bez przypisanego hotelu... */
         else if($showAllClients == 'true' && $showOnlyAssigned == 'true' && $clientId == null) {
             $client_route = ClientRoute::all()->pluck('id')->toArray();
-            if($selectedWeek != null && $selectedWeek != '0') {
+            if($selectedWeek != '0') {
                 $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
                     ->where('weekOfYear', '=', $selectedWeek)
+                    ->where('date', 'like', $year . '%')
                     ->where(function ($query) {
                         $query->where('hotel_id', '=', null)->orWhere('hour', '=', null);
                     })
@@ -515,6 +551,7 @@ class CrmRouteController extends Controller
             }
             else {
                 $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->where('date', 'like', $year . '%')
                     ->where(function ($query) {
                         $query->where('hotel_id', '=', null)->orWhere('hour', '=', null);
                     })
@@ -530,9 +567,10 @@ class CrmRouteController extends Controller
         Wyświetlają się wszyscy klienci */
         else if(($showAllClients == null || $showAllClients == 'false') && $showOnlyAssigned == 'true' && $clientId == null) {
             $client_route = ClientRoute::all()->pluck('id')->toArray();
-            if($selectedWeek != null && $selectedWeek != '0') {
+            if($selectedWeek != '0') {
                 $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
                     ->where('weekOfYear', '=', $selectedWeek)
+                    ->where('date', 'like', $year . '%')
                     ->where(function ($query) {
                         $query->where('hotel_id', '=', null)->orWhere('hour', '=', null);
                     })
@@ -540,6 +578,7 @@ class CrmRouteController extends Controller
             }
             else {
                 $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->where('date', 'like', $year . '%')
                     ->where(function ($query) {
                         $query->where('hotel_id', '=', null)->orWhere('hour', '=', null);
                     })
@@ -555,11 +594,16 @@ class CrmRouteController extends Controller
         Wyświetlają się wszyscy klienci */
         else if(($showAllClients == null || $showAllClients == 'false') && ($showOnlyAssigned == null || $showOnlyAssigned == 'false') && $clientId == null) {
             $client_route = ClientRoute::all()->pluck('id')->toArray();
-            if($selectedWeek != null && $selectedWeek != '0') {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)->where('weekOfYear', '=', $selectedWeek)->get();
+            if($selectedWeek != '0') {
+                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->where('date', 'like', $year . '%')
+                    ->where('weekOfYear', '=', $selectedWeek)
+                    ->get();
             }
             else {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)->get();
+                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->where('date', 'like', $year . '%')
+                    ->get();
             }
 
 
@@ -571,9 +615,10 @@ class CrmRouteController extends Controller
         Tylko trasy bez przypisanego hotelu dla danego klienta */
         else if(($showAllClients == null || $showAllClients == 'false') && $showOnlyAssigned == 'true' && $clientId != null) {
             $client_route = ClientRoute::where('client_id', '=', $clientId)->pluck('id')->toArray();
-            if($selectedWeek != null && $selectedWeek != '0') {
+            if($selectedWeek != '0') {
                 $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
                     ->where('weekOfYear', '=', $selectedWeek)
+                    ->where('date', 'like', $year . '%')
                     ->where(function ($query) {
                         $query->where('hotel_id', '=', null)->orWhere('hour', '=', null);
                     })
@@ -581,6 +626,7 @@ class CrmRouteController extends Controller
             }
             else {
                 $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->where('date', 'like', $year . '%')
                     ->where(function ($query) {
                         $query->where('hotel_id', '=', null)->orWhere('hour', '=', null);
                     })
@@ -596,22 +642,29 @@ class CrmRouteController extends Controller
         Wszystkie trasy danego klienta */
         else if(($showAllClients == null || $showAllClients == 'false') && ($showOnlyAssigned == null || $showOnlyAssigned == 'false') && $clientId != null) {
             $client_route = ClientRoute::where('client_id', '=', $clientId)->pluck('id')->toArray();
-            if($selectedWeek != null && $selectedWeek != '0') {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)->where('weekOfYear', '=', $selectedWeek)->get();
+            if($selectedWeek != '0') {
+                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->where('weekOfYear', '=', $selectedWeek)
+                    ->where('date', 'like', $year . '%')
+                    ->get();
             }
             else {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)->get();
+                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->where('date', 'like', $year . '%')
+                    ->get();
             }
 
 
         }
         else { // wszyscy klienci
             $client_route = ClientRoute::all()->pluck('id')->toArray();
-            if($selectedWeek != null && $selectedWeek != '0') {
+            if($selectedWeek != '0') {
                 $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)->get();
             }
             else {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)->get();
+                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->where('date', 'like', $year . '%')
+                    ->get();
             }
 
 
