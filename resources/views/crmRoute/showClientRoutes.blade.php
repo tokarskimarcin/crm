@@ -366,13 +366,14 @@
                     })
                         .then(response => response.json())
                         .then(response => {
+                            console.log(response);
                             const weeksInYear = response;
                             selectedWeekInput.innerHTML = '';
                             const basicOptionElement = document.createElement('option');
                             basicOptionElement.value = 0;
                             basicOptionElement.textContent = 'Wybierz';
                             selectedWeekInput.appendChild(basicOptionElement);
-                            for(let i = 1; i <= weeksInYear; i++) {
+                            for(let i = 1; i <= weeksInYear + 1; i++) { //we are iterating to weeksInYear+1 because we are getting week number for 30.12, and in 31.12 can be monday(additional week)
                                 const optionElement = document.createElement('option');
                                 optionElement.value = i;
                                 optionElement.textContent = i;
