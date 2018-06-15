@@ -366,6 +366,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/create_link', 'AdminController@createLinkGet');
     Route::Post('/create_link', 'AdminController@createLinkPost');
 
+    Route::Post('/addGroup', 'AdminController@addGroup');
+    Route::Post('/removeGroup', 'AdminController@removeGroup');
 
     Route::get('/firewall_ip', 'AdminController@firewallGet');
     Route::POST('/firewall_ip', 'AdminController@firewallPost');
@@ -835,28 +837,16 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     /** KONIEC CRM **/
 
 });
-//////////////////////Testing ORM///////////////
-///
-///
-//LINK GROUP
-Route::Post('/addGroup', 'AdminController@addGroup');
-Route::Post('/removeGroup', 'AdminController@removeGroup');
-//END LINK GROUP
+/**OUT OF FIREWALL **/
+
 //CHARTS
 Route::get('/charts', 'ScreensController@showScreensGet');
 //ENDCHARTS
-//COACHINGS
-Route::get('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryGet');
-Route::post('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryPost');
-Route::get('/ReportCoachingSummary', 'StatisticsController@MailReportCoachingSummary');
 
-Route::get('/ReportCoaching', 'StatisticsController@MailpageReportCoaching');
-Route::get('/MailToDirectors', 'StatisticsController@MailToEveryDirector');
-//END COACHINGS
+//SCREENS
 Route::get('/dept/{id}', 'ScreensController@monitorMethod');
 Route::get('/screen_table', 'ScreensController@screenMethod');
-//pobieranie danych po oddziałach godzinny
-Route::get('/testorm', 'TestORM@test');
+//END SCREENS
 
 //Pobieranie danych dla PBX_REPORT_EXTENSION
 Route::get('/pbx_report_ext', 'PBXDataAPI@PBXReportExtension');
@@ -869,6 +859,23 @@ Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
 
 //campaign reports mothod for database
 Route::get('/report_campaign', 'PBXDataAPI@report_campaign');
+/**END OUT OF FIREWALL**/
+
+
+//////////////////////Testing ORM///////////////
+///
+///
+//COACHINGS
+Route::get('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryGet'); //do usunięcia, stary
+Route::post('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryPost');//do usunięcia, stary
+Route::get('/ReportCoachingSummary', 'StatisticsController@MailReportCoachingSummary'); //do usunięcia, stary
+
+Route::get('/ReportCoaching', 'StatisticsController@MailpageReportCoaching');
+Route::get('/MailToDirectors', 'StatisticsController@MailToEveryDirector');
+//END COACHINGS
+
+//pobieranie danych po oddziałach godzinny
+Route::get('/testorm', 'TestORM@test');
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
 
