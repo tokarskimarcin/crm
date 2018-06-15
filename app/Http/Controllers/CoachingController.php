@@ -1153,7 +1153,7 @@ class CoachingController extends Controller
             ['manager_id', '=', $previousCoachDirector_id],
             ['coaching_level', '=', 1]
         ])
-            ->whereIn('status', [0, 1])
+            ->whereIn('status', [0])
             ->get();
         $this->coachDirectorAscription($previousCoachDirector_id, $newCoachDirector_id, $allCoachingsOfPreviousCoach);
 
