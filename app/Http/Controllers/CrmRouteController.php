@@ -1686,4 +1686,27 @@ class CrmRouteController extends Controller
     }
 
 
+    /**
+     * CampaignsInfo
+     */
+
+    public function CampaignsInfo(){
+        $campaignsInfo = ClientRouteInfo::select(DB::raw('
+        client_route_info.date as date,
+        client_route_info.limits as limit,
+        0 as pbxSuccess,
+        0 as sms,
+        (limit - pbx_success) as loseSuccess,
+        0 as countHour,
+        client.name as clientName,
+        department.name as DepartmentName,
+        client_route_info.comment as comment
+        '))
+        ->join('client_route','client_route.id','client_route_info.client_route_id')
+        ->join('client','client.id','client_route.client_id')
+        ->join('department_info','department_info.id','client_route_info.department_info_id')
+        ->join('departments','departments.id','department_info.id_dep');
+        ->where('');
+    }
+
 }
