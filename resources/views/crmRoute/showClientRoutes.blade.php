@@ -8,6 +8,13 @@
         .check {
             background: #B0BED9 !important;
         }
+
+        .glyphicon-edit {
+            color: #477ab7;
+        }
+        .glyphicon-edit:hover {
+            cursor: pointer;
+        }
     </style>
 
 {{--Header page --}}

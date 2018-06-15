@@ -361,8 +361,8 @@ class CrmRouteController extends Controller
             $numberOfRecords = count($clientRouteInfo);
             $iterator = 0;
             foreach($clientRouteInfo as $item) {
-                $item->hour = $city->timeArr[$iterator] . ':00';
-                $item->hotel_id = $city->hotelId;
+                $item->hour = $city->timeHotelArr[$iterator]->time . ':00';
+                $item->hotel_id = $city->timeHotelArr[$iterator]->hotelId;
                 $item->limits = 0; //At this point nobody choose it's value
                 $item->department_info_id = null; //At this point nobody choose it's value, can't be 0 because
                 $item->save();
@@ -1683,6 +1683,33 @@ class CrmRouteController extends Controller
             $city = Cities::find($request->cityId);
             return $city;
         }
+    }
+
+    /**
+     * This method returns view showRoutesDetailed
+     */
+    public function showRoutesDetailedGet() {
+
+
+        return view('crmRoute.showRoutesDetailed');
+    }
+
+    /**
+     * @param
+     * @return This method send to datatable info about client_route_info records.
+     */
+    public function showRoutesDetailedAjax(Request $request) {
+        $detailedInfo = ClientRouteInfo::all();
+        $cities = Cities::all();
+
+        $detailedInfo->map(function($item) {
+
+
+
+            return $item;
+        });
+
+        return datatables($detailedInfo)->make(true);
     }
 
 

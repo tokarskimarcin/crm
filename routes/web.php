@@ -12,7 +12,7 @@
 */
 Route::POST('/startWork', 'HomeController@startWork');
 Route::POST('/stopWork', 'HomeController@stopWork');
-Route::POST('/register_hour','WorkHoursController@registerHour');
+Route::POST('/register_hour', 'WorkHoursController@registerHour');
 
 //********************AJAX*********************** */
 Route::post('/userPrivilage', 'AdminController@userPrivilagesAjax')->name('api.privilageAjax');
@@ -24,134 +24,134 @@ Route::post('auditScoreAjax', 'AuditController@auditScoreAjax')->name('api.score
 Route::post('/showAudits', 'AuditController@showAuditsPost')->name('api.auditTable');
 Route::post('/editAudit', 'AdminController@editAuditPost')->name('api.editAudit');
 
-Route::POST('/datatableAcceptHour','WorkHoursController@datatableAcceptHour')->name('api.acceptHour');
-Route::POST('/datatableAcceptHourCadre','WorkHoursController@datatableAcceptHourCadre')->name('api.acceptHourCadre');
-Route::POST('/datatableCheckList','WorkHoursController@datatableCheckList')->name('api.checkList');
-Route::POST('/saveAcceptHour','WorkHoursController@saveAcceptHour')->name('api.saveAcceptHour');
-Route::POST('/deleteAcceptHour','WorkHoursController@deleteAcceptHour')->name('api.deleteAcceptHour');
-Route::POST('/editAcceptHour','WorkHoursController@editAcceptHour')->name('api.editAcceptHour');
-Route::POST('/addAcceptHour','WorkHoursController@addAcceptHour')->name('api.addAcceptHour');
+Route::POST('/datatableAcceptHour', 'WorkHoursController@datatableAcceptHour')->name('api.acceptHour');
+Route::POST('/datatableAcceptHourCadre', 'WorkHoursController@datatableAcceptHourCadre')->name('api.acceptHourCadre');
+Route::POST('/datatableCheckList', 'WorkHoursController@datatableCheckList')->name('api.checkList');
+Route::POST('/saveAcceptHour', 'WorkHoursController@saveAcceptHour')->name('api.saveAcceptHour');
+Route::POST('/deleteAcceptHour', 'WorkHoursController@deleteAcceptHour')->name('api.deleteAcceptHour');
+Route::POST('/editAcceptHour', 'WorkHoursController@editAcceptHour')->name('api.editAcceptHour');
+Route::POST('/addAcceptHour', 'WorkHoursController@addAcceptHour')->name('api.addAcceptHour');
 
 
-Route::POST('/uniqueUsername','UsersController@uniqueUsername')->name('api.uniqueUsername');
-Route::POST('/uniquerEmail','UsersController@uniqueEmail')->name('api.uniqueEmail');
-Route::POST('/uniquerEmailEdit','UsersController@uniquerEmailEdit')->name('api.uniquerEmailEdit');
-Route::POST('/uniquePBX','UsersController@uniquePBX')->name('api.uniquePBX');
-Route::POST('/datatableEmployeeManagement','UsersController@datatableEmployeeManagement')->name('api.datatableEmployeeManagement');
+Route::POST('/uniqueUsername', 'UsersController@uniqueUsername')->name('api.uniqueUsername');
+Route::POST('/uniquerEmail', 'UsersController@uniqueEmail')->name('api.uniqueEmail');
+Route::POST('/uniquerEmailEdit', 'UsersController@uniquerEmailEdit')->name('api.uniquerEmailEdit');
+Route::POST('/uniquePBX', 'UsersController@uniquePBX')->name('api.uniquePBX');
+Route::POST('/datatableEmployeeManagement', 'UsersController@datatableEmployeeManagement')->name('api.datatableEmployeeManagement');
 
-Route::POST('/datatableCadreManagement','UsersController@datatableCadreManagement')->name('api.datatableCadreManagement');
-Route::POST('/datatableCadreManagementFire','UsersController@datatableCadreManagementFire')->name('api.datatableCadreManagementFire');
+Route::POST('/datatableCadreManagement', 'UsersController@datatableCadreManagement')->name('api.datatableCadreManagement');
+Route::POST('/datatableCadreManagementFire', 'UsersController@datatableCadreManagementFire')->name('api.datatableCadreManagementFire');
 
 
-Route::POST('/datatableDkjRaport','DkjController@datatableDkjRaport')->name('api.datatableDkjRaport');
-Route::POST('/getUser','DkjController@getUser')->name('api.getUser');
-Route::POST('/dkjRaportSave','DkjController@dkjRaportSave')->name('api.dkjRaportSave');
+Route::POST('/datatableDkjRaport', 'DkjController@datatableDkjRaport')->name('api.datatableDkjRaport');
+Route::POST('/getUser', 'DkjController@getUser')->name('api.getUser');
+Route::POST('/dkjRaportSave', 'DkjController@dkjRaportSave')->name('api.dkjRaportSave');
 
-Route::POST('/datatableDkjVerification','DkjController@datatableDkjVerification')->name('api.datatableDkjVerification');
-Route::POST('/saveDkjVerification','DkjController@saveDkjVerification')->name('api.saveDkjVerification');
-Route::POST('/datatableShowDkjVerification','DkjController@datatableShowDkjVerification')->name('api.datatableShowDkjVerification');
-Route::POST('/datatableDkjShowEmployee','DkjController@datatableDkjShowEmployee')->name('api.datatableDkjShowEmployee');
+Route::POST('/datatableDkjVerification', 'DkjController@datatableDkjVerification')->name('api.datatableDkjVerification');
+Route::POST('/saveDkjVerification', 'DkjController@saveDkjVerification')->name('api.saveDkjVerification');
+Route::POST('/datatableShowDkjVerification', 'DkjController@datatableShowDkjVerification')->name('api.datatableShowDkjVerification');
+Route::POST('/datatableDkjShowEmployee', 'DkjController@datatableDkjShowEmployee')->name('api.datatableDkjShowEmployee');
 
-Route::POST('/datatableCadreHR','UsersController@datatableCadreHR')->name('api.datatableCadreHR');
-Route::POST('/datatableMyNotifications','NotificationController@datatableMyNotifications')->name('api.datatableMyNotifications');
+Route::POST('/datatableCadreHR', 'UsersController@datatableCadreHR')->name('api.datatableCadreHR');
+Route::POST('/datatableMyNotifications', 'NotificationController@datatableMyNotifications')->name('api.datatableMyNotifications');
 
 /* Equipment start */
-Route::POST('/datatableShowLaptop','EquipmentsController@datatableShowLaptop')->name('api.datatableShowLaptop');
-Route::POST('/datatableShowTablet','EquipmentsController@datatableShowTablet')->name('api.datatableShowTablet');
-Route::POST('/datatableShowPhone','EquipmentsController@datatableShowPhone')->name('api.datatableShowPhone');
-Route::POST('/datatableShowSimCard','EquipmentsController@datatableShowSimCard')->name('api.datatableShowSimCard');
-Route::POST('/datatableShowMonitor','EquipmentsController@datatableShowMonitor')->name('api.datatableShowMonitor');
-Route::POST('/datatableShowPrinter','EquipmentsController@datatableShowPrinter')->name('api.datatableShowPrinter');
+Route::POST('/datatableShowLaptop', 'EquipmentsController@datatableShowLaptop')->name('api.datatableShowLaptop');
+Route::POST('/datatableShowTablet', 'EquipmentsController@datatableShowTablet')->name('api.datatableShowTablet');
+Route::POST('/datatableShowPhone', 'EquipmentsController@datatableShowPhone')->name('api.datatableShowPhone');
+Route::POST('/datatableShowSimCard', 'EquipmentsController@datatableShowSimCard')->name('api.datatableShowSimCard');
+Route::POST('/datatableShowMonitor', 'EquipmentsController@datatableShowMonitor')->name('api.datatableShowMonitor');
+Route::POST('/datatableShowPrinter', 'EquipmentsController@datatableShowPrinter')->name('api.datatableShowPrinter');
 /* Equipment stop */
 
-Route::POST('/datatableShowUserSchedule','ScheduleController@datatableShowUserSchedule')->name('api.datatableShowUserSchedule');
-Route::POST('/saveSchedule','ScheduleController@saveSchedule')->name('api.saveSchedule');
+Route::POST('/datatableShowUserSchedule', 'ScheduleController@datatableShowUserSchedule')->name('api.datatableShowUserSchedule');
+Route::POST('/saveSchedule', 'ScheduleController@saveSchedule')->name('api.saveSchedule');
 
 
-Route::POST('/saveSummaryPayment','FinancesController@saveSummaryPayment')->name('api.summary_payment_save');
-Route::POST('/editPenaltyBonus','FinancesController@editPenaltyBonus')->name('api.editPenaltyBonus');
+Route::POST('/saveSummaryPayment', 'FinancesController@saveSummaryPayment')->name('api.summary_payment_save');
+Route::POST('/editPenaltyBonus', 'FinancesController@editPenaltyBonus')->name('api.editPenaltyBonus');
 
-Route::POST('/deletePenaltyBonus','FinancesController@deletePenaltyBonus')->name('api.deletePenaltyBonus');
+Route::POST('/deletePenaltyBonus', 'FinancesController@deletePenaltyBonus')->name('api.deletePenaltyBonus');
 
-Route::POST('/getUserDepartmentInfo','DkjController@getUserDepartmentInfo')->name('api.getUserDepartmentInfo');
+Route::POST('/getUserDepartmentInfo', 'DkjController@getUserDepartmentInfo')->name('api.getUserDepartmentInfo');
 
-Route::POST('/deleteMedicalPackage','UsersController@deleteMedicalPackage')->name('api.deleteMedicalPackage');
+Route::POST('/deleteMedicalPackage', 'UsersController@deleteMedicalPackage')->name('api.deleteMedicalPackage');
 
-Route::POST('/editInterviewDateTime','CandidateController@editInterviewDateTime')->name('api.editInterviewDateTime');
+Route::POST('/editInterviewDateTime', 'CandidateController@editInterviewDateTime')->name('api.editInterviewDateTime');
 
-Route::POST('/get_stats','DkjController@getStats')->name('api.getStats');
-Route::POST('/get_stats_dkj','DkjController@getStatsDkjMaster')->name('api.getStatsDkj');
-Route::POST('/get_users','DkjController@getUsers')->name('api.getUsers');
+Route::POST('/get_stats', 'DkjController@getStats')->name('api.getStats');
+Route::POST('/get_stats_dkj', 'DkjController@getStatsDkjMaster')->name('api.getStatsDkj');
+Route::POST('/get_users', 'DkjController@getUsers')->name('api.getUsers');
 
 
-Route::POST('/change_department','HomeController@changeDepartment')->name('api.changeDepartment');
+Route::POST('/change_department', 'HomeController@changeDepartment')->name('api.changeDepartment');
 
-Route::POST('/it_support','HomeController@itSupport')->name('api.itSupport');
-Route::POST('/count_notifications','HomeController@itCountNotifications')->name('api.itCountNotifications');
-Route::POST('/datatableShowNewNotifications','NotificationController@datatableShowNewNotifications')->name('api.datatableShowNewNotifications'); //tu zmienic z ORM
-Route::POST('/datatableShowInProgressNotifications','NotificationController@datatableShowInProgressNotifications')->name('api.datatableShowInProgressNotifications'); //tu zmienic z ORM
-Route::POST('/datatableShowFinishedNotifications','NotificationController@datatableShowFinishedNotifications')->name('api.datatableShowFinishedNotifications'); //tu zmienic z ORM
+Route::POST('/it_support', 'HomeController@itSupport')->name('api.itSupport');
+Route::POST('/count_notifications', 'HomeController@itCountNotifications')->name('api.itCountNotifications');
+Route::POST('/datatableShowNewNotifications', 'NotificationController@datatableShowNewNotifications')->name('api.datatableShowNewNotifications'); //tu zmienic z ORM
+Route::POST('/datatableShowInProgressNotifications', 'NotificationController@datatableShowInProgressNotifications')->name('api.datatableShowInProgressNotifications'); //tu zmienic z ORM
+Route::POST('/datatableShowFinishedNotifications', 'NotificationController@datatableShowFinishedNotifications')->name('api.datatableShowFinishedNotifications'); //tu zmienic z ORM
 
 //locker / Multiple departments
-Route::POST('/locker','AdminController@lockerPost')->name('api.locker');
+Route::POST('/locker', 'AdminController@lockerPost')->name('api.locker');
 
 //firewall delete users
-Route::POST('/firewallDeleteUser','AdminController@firewallDeleteUser')->name('api.firewallDeleteUser');
+Route::POST('/firewallDeleteUser', 'AdminController@firewallDeleteUser')->name('api.firewallDeleteUser');
 
 //notifications moving
-Route::POST('/getNotficationsJanky','NotificationController@getNotficationsJanky')->name('api.getNotficationsJanky');
+Route::POST('/getNotficationsJanky', 'NotificationController@getNotficationsJanky')->name('api.getNotficationsJanky');
 
 /* TEST AJAX ROUTES START */
 
-Route::POST('/addTestQuestion','TestsController@addTestQuestion')->name('api.addTestQuestion');
-Route::POST('/saveCategoryName','TestsController@saveCategoryName')->name('api.saveCategoryName');
-Route::POST('/categoryStatusChange','TestsController@categoryStatusChange')->name('api.categoryStatusChange');
-Route::POST('/showCategoryQuestions','TestsController@showCategoryQuestions')->name('api.showCategoryQuestions');
+Route::POST('/addTestQuestion', 'TestsController@addTestQuestion')->name('api.addTestQuestion');
+Route::POST('/saveCategoryName', 'TestsController@saveCategoryName')->name('api.saveCategoryName');
+Route::POST('/categoryStatusChange', 'TestsController@categoryStatusChange')->name('api.categoryStatusChange');
+Route::POST('/showCategoryQuestions', 'TestsController@showCategoryQuestions')->name('api.showCategoryQuestions');
 
-Route::POST('/editTestQuestion','TestsController@editTestQuestion')->name('api.editTestQuestion');
-Route::POST('/deleteTestQuestion','TestsController@deleteTestQuestion')->name('api.deleteTestQuestion');
-Route::POST('/mainTableCounter','TestsController@mainTableCounter')->name('api.mainTableCounter');
+Route::POST('/editTestQuestion', 'TestsController@editTestQuestion')->name('api.editTestQuestion');
+Route::POST('/deleteTestQuestion', 'TestsController@deleteTestQuestion')->name('api.deleteTestQuestion');
+Route::POST('/mainTableCounter', 'TestsController@mainTableCounter')->name('api.mainTableCounter');
 
-Route::POST('/showQuestionDatatable','TestsController@showQuestionDatatable')->name('api.showQuestionDatatable');
-Route::POST('/saveTestWithUser','TestsController@saveTestWithUser')->name('api.saveTestWithUser');
-Route::POST('/editTestWithUser','TestsController@editTestWithUser')->name('api.editTestWithUser');
+Route::POST('/showQuestionDatatable', 'TestsController@showQuestionDatatable')->name('api.showQuestionDatatable');
+Route::POST('/saveTestWithUser', 'TestsController@saveTestWithUser')->name('api.saveTestWithUser');
+Route::POST('/editTestWithUser', 'TestsController@editTestWithUser')->name('api.editTestWithUser');
 
-Route::POST('/datatableShowCheckedTests','TestsController@datatableShowCheckedTests')->name('api.datatableShowCheckedTests');
-Route::POST('/datatableShowUncheckedTests','TestsController@datatableShowUncheckedTests')->name('api.datatableShowUncheckedTests');
+Route::POST('/datatableShowCheckedTests', 'TestsController@datatableShowCheckedTests')->name('api.datatableShowCheckedTests');
+Route::POST('/datatableShowUncheckedTests', 'TestsController@datatableShowUncheckedTests')->name('api.datatableShowUncheckedTests');
 
-Route::POST('/activateTest','TestsController@activateTest')->name('api.activateTest');
+Route::POST('/activateTest', 'TestsController@activateTest')->name('api.activateTest');
 
-Route::POST('/deactivateTest','TestsController@deactivateTest')->name('api.deactivateTest');
+Route::POST('/deactivateTest', 'TestsController@deactivateTest')->name('api.deactivateTest');
 
-Route::POST('/testAttempt','TestsController@testAttempt')->name('api.testAttempt');
+Route::POST('/testAttempt', 'TestsController@testAttempt')->name('api.testAttempt');
 
-Route::POST('/getRepeatQuestion','TestsController@getRepeatQuestion')->name('api.getRepeatQuestion'); //tu zmienic z ORM
-Route::POST('/saveTestTemplate','TestsController@saveTestTemplate')->name('api.saveTestTemplate'); //tu zmienic z ORM
+Route::POST('/getRepeatQuestion', 'TestsController@getRepeatQuestion')->name('api.getRepeatQuestion'); //tu zmienic z ORM
+Route::POST('/saveTestTemplate', 'TestsController@saveTestTemplate')->name('api.saveTestTemplate'); //tu zmienic z ORM
 
-Route::POST('/getTemplateQuestion','TestsController@getTemplateQuestion')->name('api.getTemplateQuestion'); //tu zmienic z ORM
+Route::POST('/getTemplateQuestion', 'TestsController@getTemplateQuestion')->name('api.getTemplateQuestion'); //tu zmienic z ORM
 
-Route::POST('/saveEditTemplate','TestsController@saveEditTemplate')->name('api.saveEditTemplate');
+Route::POST('/saveEditTemplate', 'TestsController@saveEditTemplate')->name('api.saveEditTemplate');
 
-Route::POST('/deleteTester','TestsController@deleteTester')->name('api.deleteTester');
+Route::POST('/deleteTester', 'TestsController@deleteTester')->name('api.deleteTester');
 
-Route::POST('/datatableAllTests','AdminController@datatableAllTests')->name('api.datatableAllTests');
+Route::POST('/datatableAllTests', 'AdminController@datatableAllTests')->name('api.datatableAllTests');
 
-Route::POST('/paymentStory','FinancesController@paymentStory')->name('api.paymentStory');
+Route::POST('/paymentStory', 'FinancesController@paymentStory')->name('api.paymentStory');
 
-Route::POST('/saveCoaching','CoachingController@saveCoaching')->name('api.saveCoaching');
-Route::POST('/deleteCoaching','CoachingController@deleteCoaching')->name('api.deleteCoaching');
-Route::POST('/getCoaching','CoachingController@getCoaching')->name('api.getCoaching');
-Route::POST('/getcoach_list','CoachingController@getcoach_list')->name('api.getcoach_list');
+Route::POST('/saveCoaching', 'CoachingController@saveCoaching')->name('api.saveCoaching');
+Route::POST('/deleteCoaching', 'CoachingController@deleteCoaching')->name('api.deleteCoaching');
+Route::POST('/getCoaching', 'CoachingController@getCoaching')->name('api.getCoaching');
+Route::POST('/getcoach_list', 'CoachingController@getcoach_list')->name('api.getcoach_list');
 
 
 // Dla Dyrektora
-Route::POST('/saveCoachingDirector','CoachingController@saveCoachingDirector')->name('api.saveCoachingDirector');
-Route::POST('/datatableCoachingTableDirector','CoachingController@datatableCoachingTableDirector')->name('api.datatableCoachingTableDirector');
-Route::POST('/deleteCoachingTableDirector','CoachingController@deleteCoachingTableDirector')->name('api.deleteCoachingTableDirector');
-Route::POST('/getCoachingDirector','CoachingController@getCoachingDirector')->name('api.getCoachingDirector');
-Route::POST('/acceptCoachingDirector','CoachingController@acceptCoachingDirector')->name('api.acceptCoachingDirector');
+Route::POST('/saveCoachingDirector', 'CoachingController@saveCoachingDirector')->name('api.saveCoachingDirector');
+Route::POST('/datatableCoachingTableDirector', 'CoachingController@datatableCoachingTableDirector')->name('api.datatableCoachingTableDirector');
+Route::POST('/deleteCoachingTableDirector', 'CoachingController@deleteCoachingTableDirector')->name('api.deleteCoachingTableDirector');
+Route::POST('/getCoachingDirector', 'CoachingController@getCoachingDirector')->name('api.getCoachingDirector');
+Route::POST('/acceptCoachingDirector', 'CoachingController@acceptCoachingDirector')->name('api.acceptCoachingDirector');
 
-Route::POST('/getManagerId','CoachingController@getManagerId')->name('api.getManagerId');
+Route::POST('/getManagerId', 'CoachingController@getManagerId')->name('api.getManagerId');
 
 
 /* TEST AJAX ROUTES STOP */
@@ -166,11 +166,11 @@ Route::POST('/EndGroupTrainingForCandidate', 'GroupTrainingController@EndGroupTr
 
 Route::post('editTrainingDate', 'GroupTrainingController@editTrainingDate')->name('api.editTrainingDate');
 
-Route::POST('/getCandidateForGroupTrainingInfo','GroupTrainingController@getCandidateForGroupTrainingInfo')->name('api.getCandidateForGroupTrainingInfo');
-Route::POST('/datatableTrainingGroupList','GroupTrainingController@datatableTrainingGroupList')->name('api.datatableTrainingGroupList');
-Route::POST('/getGroupTrainingInfo','GroupTrainingController@getGroupTrainingInfo')->name('api.getGroupTrainingInfo');
+Route::POST('/getCandidateForGroupTrainingInfo', 'GroupTrainingController@getCandidateForGroupTrainingInfo')->name('api.getCandidateForGroupTrainingInfo');
+Route::POST('/datatableTrainingGroupList', 'GroupTrainingController@datatableTrainingGroupList')->name('api.datatableTrainingGroupList');
+Route::POST('/getGroupTrainingInfo', 'GroupTrainingController@getGroupTrainingInfo')->name('api.getGroupTrainingInfo');
 
-Route::POST('/datatableRecruitmentStatisticsLeader','RecruitmentAttemptController@datatableRecruitmentStatisticsLeader')->name('api.datatableRecruitmentStatisticsLeader');
+Route::POST('/datatableRecruitmentStatisticsLeader', 'RecruitmentAttemptController@datatableRecruitmentStatisticsLeader')->name('api.datatableRecruitmentStatisticsLeader');
 
 
 Route::POST('/getCandidateSource', 'RecruitmentAttemptController@getCandidateSource')->name('api.getCandidateSource');
@@ -214,8 +214,7 @@ Route::POST('/saveMedicalPackageData', 'AdminController@saveMedicalPackageData')
 Route::POST('/getDaysInMonth', 'StatisticsController@getDaysInMonth')->name('api.getDaysInMonth');
 
 
-Route::POST('/datatableCoachingTable','CoachingController@datatableCoachingTable')->name('api.datatableCoachingTable');
-
+Route::POST('/datatableCoachingTable', 'CoachingController@datatableCoachingTable')->name('api.datatableCoachingTable');
 
 
 //Route::POST('/datatableCoachingTableDirector','CoachingController@datatableCoachingTableDirector')->name('api.datatableCoachingTableDirector');
@@ -245,7 +244,6 @@ Route::get('/hourReportTelemarketingGniezno', 'OtherCompanyStatisticsController@
 Route::get('/weekReportTelemarketingGniezno', 'OtherCompanyStatisticsController@MailweekReportTelemarketing'); // ok
 Route::get('/monthReportTelemarketingGniezno', 'OtherCompanyStatisticsController@MailmonthReportTelemarketing'); // ok
 Route::get('/dayReportTelemarketingGniezno', 'OtherCompanyStatisticsController@MailDayReportTelemarketing'); // tutaj dodac
-
 
 
 Route::get('/weekReportJanky', 'StatisticsController@MailweekReportJanky');
@@ -314,7 +312,7 @@ Route::get('/mailMonthReportCampaign', 'StatisticsController@mailMonthReportCamp
 
 //Maila dotyczące wyłączonych kont
 //Raport Usunietych kont
-Route::get('/weekReportUnuserdAccount','StatisticsController@MailWeekReportUnuserdAccount');
+Route::get('/weekReportUnuserdAccount', 'StatisticsController@MailWeekReportUnuserdAccount');
 
 //wyłączenie danych użytkowników którzy nie logowali się już 14 dni i więcej
 Route::GET('/disableUnusedAccount', 'UsersController@DisableUnusedAccount');
@@ -325,24 +323,24 @@ Auth::routes();
 Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/', 'HomeController@index');
     // Admin_Panel --Start--
-    Route::get('/admin_privilage','AdminController@admin_privilage');
+    Route::get('/admin_privilage', 'AdminController@admin_privilage');
 
-    Route::get('/admin_privilage_show/{id}','AdminController@admin_privilage_show');
-    Route::Post('/admin_privilage_edit/{id}','AdminController@admin_privilage_edit');
+    Route::get('/admin_privilage_show/{id}', 'AdminController@admin_privilage_show');
+    Route::Post('/admin_privilage_edit/{id}', 'AdminController@admin_privilage_edit');
 
-    Route::get('/locker','AdminController@lockerGet');
+    Route::get('/locker', 'AdminController@lockerGet');
 
-    Route::get('/add_department','AdminController@addDepartmentGet');
-    Route::Post('/add_department','AdminController@addDepartmentPost');
+    Route::get('/add_department', 'AdminController@addDepartmentGet');
+    Route::Post('/add_department', 'AdminController@addDepartmentPost');
 
-    Route::get('/edit_department','AdminController@editDepartmentGet');
-    Route::Post('/edit_department','AdminController@editDepartmentPost');
+    Route::get('/edit_department', 'AdminController@editDepartmentGet');
+    Route::Post('/edit_department', 'AdminController@editDepartmentPost');
 
-    Route::get('/set_multiple_department','AdminController@multipleDepartmentGet');
-    Route::Post('/set_multiple_department','AdminController@multipleDepartmentPost');
+    Route::get('/set_multiple_department', 'AdminController@multipleDepartmentGet');
+    Route::Post('/set_multiple_department', 'AdminController@multipleDepartmentPost');
 
-    Route::get('/create_link','AdminController@createLinkGet');
-    Route::Post('/create_link','AdminController@createLinkPost');
+    Route::get('/create_link', 'AdminController@createLinkGet');
+    Route::Post('/create_link', 'AdminController@createLinkPost');
 
 
     Route::get('/firewall_ip', 'AdminController@firewallGet');
@@ -365,38 +363,44 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     // Password change --STOP--
     // Work_hours --Start--
-    Route::get('/accept_hour','WorkHoursController@acceptHour');
-    Route::get('/add_hour','WorkHoursController@addHour');
-    Route::get('/view_hour','WorkHoursController@viewHourGet');
-    Route::Post('/view_hour','WorkHoursController@viewHourPost');
+    Route::get('/accept_hour', 'WorkHoursController@acceptHour');
+    Route::get('/add_hour', 'WorkHoursController@addHour');
+    Route::get('/view_hour', 'WorkHoursController@viewHourGet');
+    Route::Post('/view_hour', 'WorkHoursController@viewHourPost');
 
-    Route::get('/accept_hour_cadre','WorkHoursController@acceptHourCadre');
+    Route::get('/accept_hour_cadre', 'WorkHoursController@acceptHourCadre');
 
-    Route::get('/view_hour_cadre','WorkHoursController@viewHourGetCadre');
-    Route::Post('/view_hour_cadre','WorkHoursController@viewHourPostCadre');
+    Route::get('/view_hour_cadre', 'WorkHoursController@viewHourGetCadre');
+    Route::Post('/view_hour_cadre', 'WorkHoursController@viewHourPostCadre');
 
-    Route::get('/check_list_cadre','WorkHoursController@checkListCadre');
+    Route::get('/check_list_cadre', 'WorkHoursController@checkListCadre');
 
-    Route::get('/users_live','WorkHoursController@usersLive');
+    Route::get('/users_live', 'WorkHoursController@usersLive');
     // Work_hours --end--
 
     // Users --Start--
-    Route::get('/add_consultant','UsersController@add_consultantGet');
-    Route::POST('/add_consultant','UsersController@add_userPOST');
+    Route::get('/add_consultant', 'UsersController@add_consultantGet');
+    Route::POST('/add_consultant', 'UsersController@add_userPOST');
 
-    Route::get('/edit_consultant/{id}','UsersController@edit_consultantGet');
+    //Changing coach groups
+    Route::get('/coachChange', 'UsersController@coachChangeGet');
+    Route::post('/coachChange', 'UsersController@coachChangePost');
+    Route::post('/coachChangeRevert', 'UsersController@coachChangeRevertPost');
+
+    Route::get('/edit_consultant/{id}', 'UsersController@edit_consultantGet');
     //Route::POST('/edit_consultant/{id}','UsersController@edit_consultantPOST');
 
-    Route::get('/edit_cadre/{id}','UsersController@edit_cadreGet');
-    Route::POST('/edit_cadre/{id}','UsersController@edit_cadrePOST');
+    Route::get('/edit_cadre/{id}', 'UsersController@edit_cadreGet');
+    Route::POST('/edit_cadre/{id}', 'UsersController@edit_cadrePOST');
 
-    Route::get('/employee_management','UsersController@employee_managementGet');
+    Route::get('/employee_management', 'UsersController@employee_managementGet');
+    Route::post('/employeeSearch', 'UsersController@employeeSearchPost');
 
-    Route::get('/cadre_management','UsersController@cadre_managementGet');
-    Route::get('/cadre_management_fire','UsersController@cadre_management_fireGet');
+    Route::get('/cadre_management', 'UsersController@cadre_managementGet');
+    Route::get('/cadre_management_fire', 'UsersController@cadre_management_fireGet');
 
-    Route::get('/add_cadre','UsersController@add_cadreGet');
-    Route::POST('/add_cadre','UsersController@add_userPOST');
+    Route::get('/add_cadre', 'UsersController@add_cadreGet');
+    Route::POST('/add_cadre', 'UsersController@add_userPOST');
 
     Route::get('/cadre_hr', 'UsersController@cadreHRGet');
 
@@ -406,35 +410,35 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 
     // DKJ --START--
-    Route::get('/dkjRaport','DkjController@dkjRaportGet');
-    Route::POST('/dkjRaport','DkjController@dkjRaportPOST');
+    Route::get('/dkjRaport', 'DkjController@dkjRaportGet');
+    Route::POST('/dkjRaport', 'DkjController@dkjRaportPOST');
 
-    Route::get('/dkjVerification','DkjController@dkjVerificationGet');
+    Route::get('/dkjVerification', 'DkjController@dkjVerificationGet');
 
-    Route::get('/jankyVerification','DkjController@jankyVerificationGet');
-    Route::POST('/jankyVerification','DkjController@jankyVerificationPOST');
+    Route::get('/jankyVerification', 'DkjController@jankyVerificationGet');
+    Route::POST('/jankyVerification', 'DkjController@jankyVerificationPOST');
 
-    Route::get('/jankyStatistics','DkjController@jankyStatistics');
+    Route::get('/jankyStatistics', 'DkjController@jankyStatistics');
 
-    Route::get('/departmentStatistics','DkjController@departmentStatisticsGet');
-    Route::POST('/departmentStatistics','DkjController@departmentStatisticsPOST');
+    Route::get('/departmentStatistics', 'DkjController@departmentStatisticsGet');
+    Route::POST('/departmentStatistics', 'DkjController@departmentStatisticsPOST');
 
-    Route::get('/departmentsStatistics','DkjController@departmentsStatisticsGet');
-    Route::POST('/departmentsStatistics','DkjController@departmentsStatisticsPOST');
+    Route::get('/departmentsStatistics', 'DkjController@departmentsStatisticsGet');
+    Route::POST('/departmentsStatistics', 'DkjController@departmentsStatisticsPOST');
 
-    Route::get('/consultantStatistics','DkjController@consultantStatisticsGet');
-    Route::POST('/consultantStatistics','DkjController@consultantStatisticsPOST');
+    Route::get('/consultantStatistics', 'DkjController@consultantStatisticsGet');
+    Route::POST('/consultantStatistics', 'DkjController@consultantStatisticsPOST');
 
-    Route::get('/showDkjEmployee','DkjController@showDkjEmployeeGet');
-    Route::POST('/showDkjEmployee','DkjController@showDkjEmployeePOST');
+    Route::get('/showDkjEmployee', 'DkjController@showDkjEmployeeGet');
+    Route::POST('/showDkjEmployee', 'DkjController@showDkjEmployeePOST');
     // DKJ -- STOP--
 
     // Schedule -- START --
-    Route::get('/set_schedule','ScheduleController@setScheduleGet');
-    Route::Post('/set_schedule','ScheduleController@setSchedulePOST');
+    Route::get('/set_schedule', 'ScheduleController@setScheduleGet');
+    Route::Post('/set_schedule', 'ScheduleController@setSchedulePOST');
 
-    Route::get('/view_schedule','ScheduleController@viewScheduleGet');
-    Route::Post('/view_schedule','ScheduleController@viewSchedulePOST');
+    Route::get('/view_schedule', 'ScheduleController@viewScheduleGet');
+    Route::Post('/view_schedule', 'ScheduleController@viewSchedulePOST');
 
 
     Route::get('/timesheet', 'ScheduleController@timesheetGet');
@@ -445,35 +449,35 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     // schedule -- STOP --
 
     // Finances -- START --
-    Route::get('/view_payment','FinancesController@viewPaymentGet');
-    Route::Post('/view_payment','FinancesController@viewPaymentPOST');
+    Route::get('/view_payment', 'FinancesController@viewPaymentGet');
+    Route::Post('/view_payment', 'FinancesController@viewPaymentPOST');
 
-    Route::get('/view_payment_cadre','FinancesController@viewPaymentCadreGet');
-    Route::Post('/view_payment_cadre','FinancesController@viewPaymentCadrePOST');
+    Route::get('/view_payment_cadre', 'FinancesController@viewPaymentCadreGet');
+    Route::Post('/view_payment_cadre', 'FinancesController@viewPaymentCadrePOST');
 
 
-    Route::get('/view_penalty_bonus','FinancesController@viewPenaltyBonusGet');
-    Route::Post('/view_penalty_bonus','FinancesController@viewPenaltyBonusPOST');
+    Route::get('/view_penalty_bonus', 'FinancesController@viewPenaltyBonusGet');
+    Route::Post('/view_penalty_bonus', 'FinancesController@viewPenaltyBonusPOST');
 
-    Route::Post('/create_penalty_bonus','FinancesController@createPenaltyBonusPOST');
+    Route::Post('/create_penalty_bonus', 'FinancesController@createPenaltyBonusPOST');
 
-    Route::Post('/view_penalty_bonus_edit','FinancesController@viewPenaltyBonusPostEdit');
+    Route::Post('/view_penalty_bonus_edit', 'FinancesController@viewPenaltyBonusPostEdit');
 
-    Route::get('/view_summary_payment','FinancesController@viewSummaryPaymentGet');
-    Route::Post('/view_summary_payment','FinancesController@viewSummaryPaymentPOST');
+    Route::get('/view_summary_payment', 'FinancesController@viewSummaryPaymentGet');
+    Route::Post('/view_summary_payment', 'FinancesController@viewSummaryPaymentPOST');
 
-    Route::get('/medicalPackagesRaportExtended','UsersController@medicalPackagesRaportExtendedGet');
-    Route::post('/medicalPackagesRaportExtended','UsersController@medicalPackagesRaportExtendedPost');
+    Route::get('/medicalPackagesRaportExtended', 'UsersController@medicalPackagesRaportExtendedGet');
+    Route::post('/medicalPackagesRaportExtended', 'UsersController@medicalPackagesRaportExtendedPost');
     // Finances -- STOP --
 
     // Equipment -- START --
-    Route::get('/show_equipment','EquipmentsController@showEquipment');
+    Route::get('/show_equipment', 'EquipmentsController@showEquipment');
 
-    Route::get('/edit_equipment/{id}','EquipmentsController@editEquipmentGet');
-    Route::Post('/edit_equipment/{id}','EquipmentsController@editEquipmentPost');
+    Route::get('/edit_equipment/{id}', 'EquipmentsController@editEquipmentGet');
+    Route::Post('/edit_equipment/{id}', 'EquipmentsController@editEquipmentPost');
 
-    Route::get('/add_equipment/{type}','EquipmentsController@addEquipmentGet');
-    Route::Post('/add_equipment','EquipmentsController@addEquipmentPost');
+    Route::get('/add_equipment/{type}', 'EquipmentsController@addEquipmentGet');
+    Route::Post('/add_equipment', 'EquipmentsController@addEquipmentPost');
     // Equipment -- STOP --
 
     //Notification Start
@@ -487,12 +491,12 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/show_all_notifications', 'NotificationController@showAllNotificationsGet');
 
-    Route::get('/my_notifications','NotificationController@myNotifications');
+    Route::get('/my_notifications', 'NotificationController@myNotifications');
 
-    Route::get('/judge_notification/{id}','NotificationController@judgeNotificationGet');
-    Route::Post('/judge_notification','NotificationController@judgeNotificationPost');
+    Route::get('/judge_notification/{id}', 'NotificationController@judgeNotificationGet');
+    Route::Post('/judge_notification', 'NotificationController@judgeNotificationPost');
 
-    Route::get('/it_cadre','NotificationController@ITCadreGet');
+    Route::get('/it_cadre', 'NotificationController@ITCadreGet');
 
     Route::get('/it_worker/{id}', 'NotificationController@ITWorkerGet');
 
@@ -542,7 +546,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageDayReportDKJGniezno', 'OtherCompanyStatisticsController@pageDayReportDKJ');
     Route::get('/pageWeekReportDKJGniezno', 'OtherCompanyStatisticsController@pageWeekReportDKJ');
     Route::get('/pageMonthReportDKJGniezno', 'OtherCompanyStatisticsController@pageMonthReportDKJ');
-     //Gniezno   END
+    //Gniezno   END
 
     Route::get('/pageHourReportDKJ', 'StatisticsController@pageHourReportDKJ');
     Route::get('/pageDayReportDKJ', 'StatisticsController@pageDayReportDKJ');
@@ -612,36 +616,36 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     //Raporty Rekrutacji
 
     //Dzienny
-    Route::get('/pageDayReportRecruitmentFlow','StatisticsController@pageDayReportRecruitmentFlow');
-    Route::post('/pageDayReportRecruitmentFlow','StatisticsController@pageDayReportRecruitmentFlowPost');
-    Route::get('/pageDayReportRecruitmentTrainingGroup','StatisticsController@pageDayReportTrainingGroup');
-    Route::post('/pageDayReportRecruitmentTrainingGroup','StatisticsController@pageDayReportTrainingGroupPost');
-    Route::get('/pageDayReportInterviews','StatisticsController@pageDayReportInterviews');
-    Route::post('/pageDayReportInterviews','StatisticsController@pageDayReportInterviewsPost');
-    Route::get('/pageDayReportHireCandidate','StatisticsController@pageDayReportHireCandidate');
-    Route::post('/pageDayReportHireCandidate','StatisticsController@pageDayReportHireCandidatePost');
+    Route::get('/pageDayReportRecruitmentFlow', 'StatisticsController@pageDayReportRecruitmentFlow');
+    Route::post('/pageDayReportRecruitmentFlow', 'StatisticsController@pageDayReportRecruitmentFlowPost');
+    Route::get('/pageDayReportRecruitmentTrainingGroup', 'StatisticsController@pageDayReportTrainingGroup');
+    Route::post('/pageDayReportRecruitmentTrainingGroup', 'StatisticsController@pageDayReportTrainingGroupPost');
+    Route::get('/pageDayReportInterviews', 'StatisticsController@pageDayReportInterviews');
+    Route::post('/pageDayReportInterviews', 'StatisticsController@pageDayReportInterviewsPost');
+    Route::get('/pageDayReportHireCandidate', 'StatisticsController@pageDayReportHireCandidate');
+    Route::post('/pageDayReportHireCandidate', 'StatisticsController@pageDayReportHireCandidatePost');
     //Tygodniowy
-    Route::get('/pageWeekReportRecruitmentFlow','StatisticsController@pageWeekReportRecruitmentFlow');
-    Route::post('/pageWeekReportRecruitmentFlow','StatisticsController@pageWeekReportRecruitmentFlowPost');
-    Route::get('/pageWeekReportTrainingGroup','StatisticsController@pageWeekReportTrainingGroup');
-    Route::post('/pageWeekReportTrainingGroup','StatisticsController@pageWeekReportTrainingGroupPost');
-    Route::get('/pageWeekReportInterviews','StatisticsController@pageWeekReportInterviews');
-    Route::post('/pageWeekReportInterviews','StatisticsController@pageWeekReportInterviewsPost');
-    Route::get('/pageWeekReportHireCandidate','StatisticsController@pageWeekReportHireCandidate');
-    Route::post('/pageWeekReportHireCandidate','StatisticsController@pageWeekReportHireCandidatePost');
+    Route::get('/pageWeekReportRecruitmentFlow', 'StatisticsController@pageWeekReportRecruitmentFlow');
+    Route::post('/pageWeekReportRecruitmentFlow', 'StatisticsController@pageWeekReportRecruitmentFlowPost');
+    Route::get('/pageWeekReportTrainingGroup', 'StatisticsController@pageWeekReportTrainingGroup');
+    Route::post('/pageWeekReportTrainingGroup', 'StatisticsController@pageWeekReportTrainingGroupPost');
+    Route::get('/pageWeekReportInterviews', 'StatisticsController@pageWeekReportInterviews');
+    Route::post('/pageWeekReportInterviews', 'StatisticsController@pageWeekReportInterviewsPost');
+    Route::get('/pageWeekReportHireCandidate', 'StatisticsController@pageWeekReportHireCandidate');
+    Route::post('/pageWeekReportHireCandidate', 'StatisticsController@pageWeekReportHireCandidatePost');
     //Miesięczny
-    Route::get('/pageMonthReportRecruitmentFlow','StatisticsController@pageMonthReportRecruitmentFlow');
-    Route::post('/pageMonthReportRecruitmentFlow','StatisticsController@pageMonthReportRecruitmentFlowPost');
-    Route::get('/pageMonthReportTrainingGroup','StatisticsController@pageMonthReportTrainingGroup');
-    Route::post('/pageMonthReportTrainingGroup','StatisticsController@pageMonthReportTrainingGroupPost');
-    Route::get('/pageMonthReportInterviews','StatisticsController@pageMonthReportInterviews');
-    Route::post('/pageMonthReportInterviews','StatisticsController@pageMonthReportInterviewsPost');
-    Route::get('/pageMonthReportHireCandidate','StatisticsController@pageMonthReportHireCandidate');
-    Route::post('/pageMonthReportHireCandidate','StatisticsController@pageMonthReportHireCandidatePost');
+    Route::get('/pageMonthReportRecruitmentFlow', 'StatisticsController@pageMonthReportRecruitmentFlow');
+    Route::post('/pageMonthReportRecruitmentFlow', 'StatisticsController@pageMonthReportRecruitmentFlowPost');
+    Route::get('/pageMonthReportTrainingGroup', 'StatisticsController@pageMonthReportTrainingGroup');
+    Route::post('/pageMonthReportTrainingGroup', 'StatisticsController@pageMonthReportTrainingGroupPost');
+    Route::get('/pageMonthReportInterviews', 'StatisticsController@pageMonthReportInterviews');
+    Route::post('/pageMonthReportInterviews', 'StatisticsController@pageMonthReportInterviewsPost');
+    Route::get('/pageMonthReportHireCandidate', 'StatisticsController@pageMonthReportHireCandidate');
+    Route::post('/pageMonthReportHireCandidate', 'StatisticsController@pageMonthReportHireCandidatePost');
 
 
     //Raport Usunietych kont
-    Route::get('/pageWeekReportUnuserdAccount','StatisticsController@pageWeekReportUnuserdAccount');
+    Route::get('/pageWeekReportUnuserdAccount', 'StatisticsController@pageWeekReportUnuserdAccount');
     //Report Page STOP
 
     //TESTS START //
@@ -755,6 +759,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/coachAscription', 'CoachingController@coachAscriptionGet');
     Route::post('/coachAscription', 'CoachingController@coachAscriptionPost');
+    Route::post('/coachAscriptionRevert', 'CoachingController@coachAscriptionRevertPost');
 
     /** AUDYTY **/
     Route::get('/addAudit', 'AuditController@auditMethodGet');
@@ -792,19 +797,19 @@ Route::get('/ReportCoachingSummary', 'StatisticsController@MailReportCoachingSum
 Route::get('/ReportCoaching', 'StatisticsController@MailpageReportCoaching');
 Route::get('/MailToDirectors', 'StatisticsController@MailToEveryDirector');
 //END COACHINGS
-Route::get('/dept/{id}','ScreensController@monitorMethod');
-Route::get('/screen_table','ScreensController@screenMethod');
+Route::get('/dept/{id}', 'ScreensController@monitorMethod');
+Route::get('/screen_table', 'ScreensController@screenMethod');
 //pobieranie danych po oddziałach godzinny
-  Route::get('/testorm', 'TestORM@test');
+Route::get('/testorm', 'TestORM@test');
 
-  //Pobieranie danych dla PBX_REPORT_EXTENSION
-  Route::get('/pbx_report_ext', 'PBXDataAPI@PBXReportExtension');
-  Route::get('/temp_pbx_report_ext', 'PBXDataAPI@tempPBXReportExtension');
+//Pobieranie danych dla PBX_REPORT_EXTENSION
+Route::get('/pbx_report_ext', 'PBXDataAPI@PBXReportExtension');
+Route::get('/temp_pbx_report_ext', 'PBXDataAPI@tempPBXReportExtension');
 
-    //Dane DKJ dla oddziałów
-    Route::get('/TeamDKJHourData', 'PBXDataAPI@TeamDKJHourData');
-    //Dane Czasu na rekord
-    Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
+//Dane DKJ dla oddziałów
+Route::get('/TeamDKJHourData', 'PBXDataAPI@TeamDKJHourData');
+//Dane Czasu na rekord
+Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
 
 //campaign reports mothod for database
 Route::get('/report_campaign', 'PBXDataAPI@report_campaign');
@@ -854,21 +859,23 @@ Route::post('/getCity', 'CrmRouteController@getCity')->name('api.getCity');
 Route::post('/getVoivodeshipRound', 'CrmRouteController@getVoivodeshipRound')->name('api.getVoivodeshipRound');
 
 Route::post('/findCity', 'CrmRouteController@findCity')->name('api.findCity');
-Route::POST('/saveNewCity','CrmRouteController@saveNewCity')->name('api.saveNewCity');
-Route::POST('/changeStatusCity','CrmRouteController@changeStatusCity')->name('api.changeStatusCity');
+Route::POST('/saveNewCity', 'CrmRouteController@saveNewCity')->name('api.saveNewCity');
+Route::POST('/changeStatusCity', 'CrmRouteController@changeStatusCity')->name('api.changeStatusCity');
 
 Route::get('/clientPanel', 'ClientController@clientPanel');
 Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
 Route::post('/findClient', 'ClientController@findClient')->name('api.findClient');
-Route::POST('/changeStatusClient','ClientController@changeStatusClient')->name('api.changeStatusClient');
-Route::POST('/saveClient','ClientController@saveClient')->name('api.saveClient');
+Route::POST('/changeStatusClient', 'ClientController@changeStatusClient')->name('api.changeStatusClient');
+Route::POST('/saveClient', 'ClientController@saveClient')->name('api.saveClient');
 
 
 Route::POST('/EditClient','ClientController@EditClient')->name('api.saveClient');
 
-
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
 Route::post('/crmRoute_indexEdit', 'CrmRouteController@indexEditPost');
+
+Route::get('/showRoutesDetailed', 'CrmRouteController@showRoutesDetailedGet');
+Route::post('/showRoutesDetailedAjax', 'CrmRouteController@showRoutesDetailedAjax')->name('api.getDetailedInfo');
 
 
 

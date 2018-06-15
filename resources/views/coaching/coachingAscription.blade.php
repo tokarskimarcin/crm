@@ -91,7 +91,44 @@
             </div>
         </div>
     </div>
-
+    @if(Auth::user()->user_type_id == $user_type_id)
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Cofnij przepisanie
+                    </div>
+                    <div class="panel-body">
+                        <form action="{{URL::to('/coachAscriptionRevert')}}" method="post" id="formularz">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <table class="table">
+                                <tr>
+                                    <th>Trener prowadzący</th>
+                                    <th>Poprzedni trener</th>
+                                    <th>Data zmiany</th>
+                                    <th>Cofnięcie</th>
+                                </tr>
+                                @foreach($coachDirectorChanges as $coachDirectorChange)
+                                    <tr>
+                                        <td>{{$coachDirectorChange->c_first_name." ".$coachDirectorChange->c_last_name}}</td>
+                                        <td>{{$coachDirectorChange->pc_first_name." ".$coachDirectorChange->pc_last_name}}</td>
+                                        <td>{{$coachDirectorChange->created_at}}</td>
+                                        <td>
+                                            <button type="submit" class="btn btn-info"
+                                                    id="revertbtn_{{$coachDirectorChange->id}}" name="revertbtn"
+                                                    value="{{$coachDirectorChange->id}}">
+                                                Cofnij
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection
 
 @section('script')
