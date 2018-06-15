@@ -806,31 +806,31 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::post('/userPrivilages', 'AdminController@userPrivilagesPOST');
 
     /** CRM **/
-    Route::get('/crmRoute_index', 'CrmRouteController@index'); //
+    Route::get('/crmRoute_index', 'CrmRouteController@index');
     Route::post('/crmRoute_index', 'CrmRouteController@indexPost');
-    Route::post('/crmRoute_indexEdit', 'CrmRouteController@indexEditPost'); //
+    Route::post('/crmRoute_indexEdit', 'CrmRouteController@indexEditPost');
 
-    Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet'); //
-    Route::get('/specificRouteEdit/{id}', 'CrmRouteController@specificRouteEditGet'); //
+    Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet');
+    Route::get('/specificRouteEdit/{id}', 'CrmRouteController@specificRouteEditGet');
 
-    Route::get('/showClientRoutes', 'CrmRouteController@showClientRoutesGet'); //
+    Route::get('/showClientRoutes', 'CrmRouteController@showClientRoutesGet');
 
-    Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet'); //
+    Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet');
     Route::post('/addNewRoute', 'CrmRouteController@addNewRoutePost');
 
-    Route::post('/editRoute', 'CrmRouteController@editRoute'); //
-    Route::get('/route/{id}', 'CrmRouteController@routeGet'); //
+    Route::post('/editRoute', 'CrmRouteController@editRoute');
+    Route::get('/route/{id}', 'CrmRouteController@routeGet');
 
-    Route::get('/showRoutes', 'CrmRouteController@showRoutesGet'); //
+    Route::get('/showRoutes', 'CrmRouteController@showRoutesGet');
 
-    Route::get('/addNewHotel', 'CrmRouteController@addNewHotelGet'); //
+    Route::get('/addNewHotel', 'CrmRouteController@addNewHotelGet');
     Route::post('/addNewHotel', 'CrmRouteController@addNewHotelPost');
-    Route::get('/showHotels', 'CrmRouteController@showHotelsGet'); //
-    Route::get('/hotel/{id}', 'CrmRouteController@hotelGet'); //
+    Route::get('/showHotels', 'CrmRouteController@showHotelsGet');
+    Route::get('/hotel/{id}', 'CrmRouteController@hotelGet');
     Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
 
-    Route::get('/cityPanel', 'CrmRouteController@cityPanel'); //
-    Route::get('/clientPanel', 'ClientController@clientPanel'); //
+    Route::get('/cityPanel', 'CrmRouteController@cityPanel');
+    Route::get('/clientPanel', 'ClientController@clientPanel');
 
     Route::get('/showRoutesDetailed', 'CrmRouteController@showRoutesDetailedGet'); //
 
