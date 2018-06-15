@@ -47,6 +47,10 @@
                 </div>
 
                 <div class="panel-body">
+                <div class="alert alert-info">
+                    Lista <strong>Trenerzy</strong> zawiera trenerów z oddziału zalogowanego użytkownika, którzy posiadają konsultantów w swojej grupie trenerskiej.<br/>
+                    Lista <strong>Dostępni trenerzy</strong> zawiera trenerów, do których można dopisać konsultantów.
+                </div>
                     <form action="{{URL::to('/coachChange')}}" method="post" id="formularz">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
@@ -56,19 +60,10 @@
                         </div>
                         {{Session::forget('adnotation')}}
                         @endif--}}
-                        {{--@if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                        @endif--}}
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="coach"><span class="trainers" id="trainers">Trenerzy prowadzący coachingi(z kogo)</span></label>
+                                    <label for="coach"><span class="trainers" id="trainers">Trenerzy (z kogo)</span></label>
                                     <select name="coach_id" id="coach" class="form-control" required>
                                         <option value="0">Wybierz</option>
                                         @foreach($coaches as $coach)
