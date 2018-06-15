@@ -1121,6 +1121,7 @@ class CoachingController extends Controller
         ])
             ->get();
 
+        $coachDirectorChanges = null;
         if (Auth::user()->user_type_id == $user_type_id)
             $coachDirectorChanges = DB::table('coach_director_change as c')
                 ->select('c.id',

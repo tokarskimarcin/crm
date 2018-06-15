@@ -1189,6 +1189,7 @@ class UsersController extends Controller
             ['department_info_id', '=', Auth::user()->department_info_id]
         ])->get();
 
+        $coachChanges = null;
         if (Auth::user()->user_type_id == $user_type_id)
             $coachChanges = DB::table('coach_change as c')
                 ->select('c.id',
