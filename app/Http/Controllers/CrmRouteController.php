@@ -1665,5 +1665,32 @@ class CrmRouteController extends Controller
         }
     }
 
+    /**
+     * This method returns view showRoutesDetailed
+     */
+    public function showRoutesDetailedGet() {
+
+
+        return view('crmRoute.showRoutesDetailed');
+    }
+
+    /**
+     * @param
+     * @return This method send to datatable info about client_route_info records.
+     */
+    public function showRoutesDetailedAjax(Request $request) {
+        $detailedInfo = ClientRouteInfo::all();
+        $cities = Cities::all();
+
+        $detailedInfo->map(function($item) {
+
+
+
+            return $item;
+        });
+
+        return datatables($detailedInfo)->make(true);
+    }
+
 
 }
