@@ -217,6 +217,8 @@ class CrmRouteController extends Controller
             $stdClass->hotel_id = $info->hotel_id;
             $stdClass->hotel_info = Hotel::find($info->hotel_id);
             $stdClass->hour = $info->hour;
+            $stdClass->limit = $info->limits == null ? 0 : $info->limits;
+            $stdClass->department_info_id = $info->department_info_id;
             $stdClass->weekNumber = date("W",strtotime($info->date));
             array_push($insideArr, $stdClass);
             if($flag == 1) {
@@ -378,6 +380,24 @@ class CrmRouteController extends Controller
     public function getReadyRoute(Request $request){
         $data = $this::specificRouteGet($request->route_id,true);
         return $data;
+    }
+
+    /**
+     * Save Campaign Option (department's and limit)
+     * @param Request $request
+     */
+    public function saveCampaignOption(Request $request){
+        if($request->ajax()){
+            $objectOfChange = $request->objectOfChange;
+            foreach ($objectOfChange as $item){
+                $clientRoadInfo = ClientRouteInfo::find($item['id']);
+                $clientRoadInfo->limits = $item['limit'];
+                $clientRoadInfo->department_info_id = $item['department_info_id'];
+                $clientRoadInfo->save();
+            }
+            return 200;
+        }else
+            return 500;
     }
 
 

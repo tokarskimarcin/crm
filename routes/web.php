@@ -879,3 +879,5 @@ Route::post('/showRoutesDetailedAjax', 'CrmRouteController@showRoutesDetailedAja
 
 Route::get('/addNewCampaigns', 'CampaignsController@addNewCampaignsGet');
 Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
+
+Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
