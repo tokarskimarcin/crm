@@ -1740,14 +1740,12 @@ class CrmRouteController extends Controller
         0 as totalScore
         '))
         ->join('client_route','client_route.id','client_route_info.client_route_id')
-        ->join('client','client.id','client_route.client_id')
-        ->join('city','city.id','client_route_info.city_id')
-        ->join('department_info','department_info.id','client_route_info.department_info_id')
-        ->join('departments','departments.id','department_info.id_dep')
+        ->leftjoin('client','client.id','client_route.client_id')
+        ->leftjoin('city','city.id','client_route_info.city_id')
+        ->leftjoin('department_info','department_info.id','client_route_info.department_info_id')
+        ->leftjoin('departments','departments.id','department_info.id_dep')
         ->whereIn('client_route.status',[1,2])
-        ->orderBy('city.name','client_route_info.date','client_route_info.hour')
         ->get();
-
         return datatables($campaignsInfo)->make(true);
     }
 

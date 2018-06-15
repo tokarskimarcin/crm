@@ -136,6 +136,7 @@
                            .reduce( function (a, b) {
                                return a + b*1;
                            }, 0);
+                       var sumAllCampaings = rows.data().count();
                        var sumAllLimit =
                            rows
                                .data()
@@ -152,11 +153,12 @@
                                }, 0);
 
                        return $('<tr/>')
-                           .append('<td colspan="4">Podsumowanie Dnia: ' + group + '</td>')
+                           .append('<td colspan="2">Podsumowanie Dnia: ' + group + '</td>')
+                           .append('<td>' + sumAllCampaings + '</td>')
                            .append('<td>' + sumAllSuccess + '</td>')
                            .append('<td>' + sumAllLimit + '</td>')
                            .append('<td>' + sumAllLose + '</td>')
-                           .append('<td colspan="3"></td>')
+                           .append('<td colspan="4"></td>')
 
                    },
                },
