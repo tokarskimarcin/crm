@@ -25,7 +25,7 @@
 
                 </div>
                 <div class="panel-body">
-                        <table id="datatable">
+                        <table id="datatable" class="thead-inverse table table-striped table-bordered">
                             <thead>
                             <tr>
                                 <th>Tydzien</th>
@@ -58,7 +58,7 @@
        document.addEventListener('DOMContentLoaded', function(mainEvent) {
 
            table = $('#datatable').DataTable({
-               "autoWidth": true,
+               "autoWidth": false,
                "processing": true,
                "serverSide": true,
                order: [[1, 'asc']],
