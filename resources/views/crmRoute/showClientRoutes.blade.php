@@ -110,14 +110,13 @@
                         <div id="insertModalHere">
 
                         </div>
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-success"  style="width: 100%" id="saveCampaingOption" onclick="saveOptions(this)">Zapisz</button>
+                        </div>
                     </div>
                 </div>
                 <!-- Modal footer -->
                 <div class="modal-footer">
-
-                    <div class="col-md-12">
-                        <button type="button" class="btn btn-success"  style="width: 100%" id="saveCampaingOption">Zapisz</button>
-                    </div>
                     <br>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Zamknij</button>
                 </div>
@@ -129,6 +128,54 @@
 
 @section('script')
     <script>
+        function saveOptions(e){
+            let allRow = document.getElementsByClassName('campainsOption');
+            let arrayOfObject = new Array();
+            let validation = true;
+            for(var i = 0; i< allRow.length; i++){
+                let id = allRow[i].getAttribute('id');
+                id = id.split('_');
+                id = id[1];
+                let department_info_id = 0;
+                let departmentInfoSelect = allRow[i].querySelector('.optionDepartment').querySelector('.form-control');
+                department_info_id = departmentInfoSelect.options[departmentInfoSelect.selectedIndex].value;
+                if(department_info_id == 0){
+                    validation = false;
+                    swal('Wybierz oddział')
+                    break;
+                }
+                let limit = allRow[i].querySelector('.optionLimit').querySelector('.form-control').value;
+                if(limit == ''){
+                    validation = false;
+                    swal('Brak Limitów')
+                    break;
+                }
+                var obj = {id: id,department_info_id: department_info_id,limit: limit};
+                arrayOfObject.push(obj);
+            }
+            //Save campain option
+            if(validation){
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.saveCampaignOption') }}',
+                    data: {
+                        "objectOfChange": arrayOfObject
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if(response == 200){
+                            swal("Opcje Kampanii zostały zapisane pomyślnie")
+                            $('#myModal').modal('hide');
+                        }else{
+                            swal("Wystąpił błąd podczas zapisu, spróbuj ponownie.")
+                        }
+
+                    }
+                });
+            }
+        }
         document.addEventListener('DOMContentLoaded', function(event) {
 
             let yearInput = document.querySelector('#year');
@@ -201,13 +248,17 @@
                             '                                                    <td>'+response[i][j].cityName+'</td>\n' +
                             '                                                    <td>'+hotel_name +'</td>\n' +
                             '                                                    <td class="optionDepartment">\n' +
-                            '                                                        <select class="form-control">\n';
+                            '                                                        <select class="form-control">\n' +
+                                                                                        '<option value=0> Wybierz </option>';
                                                                                         for(var item in departmentsJson){
-                                                                                            content += '<option>'+departmentsJson[item].department_name+' '+departmentsJson[item].type_name+'</option>\n';
+                                                                                            content += '<option value="'+departmentsJson[item].id+'"';
+                                                                                            if(response[i][j].department_info_id == departmentsJson[item].id)
+                                                                                                content +='selected';
+                                                                                            content +='>'+departmentsJson[item].department_name+' '+departmentsJson[item].type_name+'</option>\n';
                                                                                         }
                                                                                 content +=' </select>\n' +
                             '                                                    </td>\n' +
-                            '                                                    <td class="optionLimit"><input class="form-control" type="number"></td>\n' +
+                            '                                                    <td class="optionLimit"><input class="form-control" type="number" value="'+response[i][j].limit+'"></td>\n' +
                             '                                                </tr>\n';
                     }
                     content += '                                                </tbody>\n' +
