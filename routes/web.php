@@ -226,6 +226,30 @@ Route::post('getBootstrapNotifications', 'HomeController@getBootstrapNotificatio
 
 //bootstrap notifications end //
 
+/* CRM-ROUTES AJAX */
+Route::post('/crmRoute_index_ajax', 'CrmRouteController@getSelectedRoute')->name('api.getRoute');
+Route::post('/getReadyRoute', 'CrmRouteController@getReadyRoute')->name('api.getReadyRoute');
+Route::post('/specificRoute', 'CrmRouteController@specificRoutePost')->name('api.getJSONRoute');
+Route::post('/showClientRoutesAjax', 'CrmRouteController@showClientRoutesAjax')->name('api.getClientRoutes');
+Route::post('/showClientRoutesInfoAjax', 'CrmRouteController@showClientRoutesInfoAjax')->name('api.getClientRouteInfo');
+Route::post('/showClientRoutesStatus', 'CrmRouteController@showClientRoutesStatus')->name('api.showClientRoutesStatus');
+Route::post('/getYearWeeksAjax', 'CrmRouteController@getYearWeeksAjax')->name('api.getWeeks');
+Route::post('/addNewRoutes', 'CrmRouteController@addNewRouteAjax')->name('api.getCitiesNames');
+Route::post('/showRoutesAjax', 'CrmRouteController@showRoutesAjax')->name('api.showRoutesAjax');
+Route::post('/showHotelsAjax', 'CrmRouteController@showHotelsAjax')->name('api.showHotelsAjax');
+Route::post('/getVoivodeshipRound', 'CrmRouteController@getVoivodeshipRound')->name('api.getVoivodeshipRound');
+Route::POST('/changeStatusCity','CrmRouteController@changeStatusCity')->name('api.changeStatusCity');
+Route::post('/getCity', 'CrmRouteController@getCity')->name('api.getCity');
+Route::post('/findCity', 'CrmRouteController@findCity')->name('api.findCity');
+Route::POST('/saveNewCity','CrmRouteController@saveNewCity')->name('api.saveNewCity');
+Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
+Route::post('/findClient', 'ClientController@findClient')->name('api.findClient');
+Route::POST('/changeStatusClient','ClientController@changeStatusClient')->name('api.changeStatusClient');
+Route::POST('/saveClient','ClientController@saveClient')->name('api.saveClient');
+Route::POST('/EditClient','ClientController@EditClient')->name('api.saveClient');
+Route::post('/showRoutesDetailedAjax', 'CrmRouteController@showRoutesDetailedAjax')->name('api.getDetailedInfo');
+Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
+/* END CRM-ROUTES AJAX */
 
 /** */
 
@@ -342,6 +366,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/create_link', 'AdminController@createLinkGet');
     Route::Post('/create_link', 'AdminController@createLinkPost');
 
+    Route::Post('/addGroup', 'AdminController@addGroup');
+    Route::Post('/removeGroup', 'AdminController@removeGroup');
 
     Route::get('/firewall_ip', 'AdminController@firewallGet');
     Route::POST('/firewall_ip', 'AdminController@firewallPost');
@@ -773,34 +799,54 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/editAudit/{id}', 'AdminController@editAuditGet');
     Route::post('/editAuditPage', 'AdminController@editDatabasePost');
 
+    /** KONIEC AUDYTY **/
+
     //dodawanie usuwanie przywilejów dla użytkowników
     Route::get('/userPrivilages', 'AdminController@userPrivilagesGET');
     Route::post('/userPrivilages', 'AdminController@userPrivilagesPOST');
 
+    /** CRM **/
+    Route::get('/crmRoute_index', 'CrmRouteController@index'); //
+    Route::post('/crmRoute_index', 'CrmRouteController@indexPost');
+    Route::post('/crmRoute_indexEdit', 'CrmRouteController@indexEditPost'); //
+
+    Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet'); //
+    Route::get('/specificRouteEdit/{id}', 'CrmRouteController@specificRouteEditGet'); //
+
+    Route::get('/showClientRoutes', 'CrmRouteController@showClientRoutesGet'); //
+
+    Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet'); //
+    Route::post('/addNewRoute', 'CrmRouteController@addNewRoutePost');
+
+    Route::post('/editRoute', 'CrmRouteController@editRoute'); //
+    Route::get('/route/{id}', 'CrmRouteController@routeGet'); //
+
+    Route::get('/showRoutes', 'CrmRouteController@showRoutesGet'); //
+
+    Route::get('/addNewHotel', 'CrmRouteController@addNewHotelGet'); //
+    Route::post('/addNewHotel', 'CrmRouteController@addNewHotelPost');
+    Route::get('/showHotels', 'CrmRouteController@showHotelsGet'); //
+    Route::get('/hotel/{id}', 'CrmRouteController@hotelGet'); //
+    Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
+
+    Route::get('/cityPanel', 'CrmRouteController@cityPanel'); //
+    Route::get('/clientPanel', 'ClientController@clientPanel'); //
+
+    Route::get('/showRoutesDetailed', 'CrmRouteController@showRoutesDetailedGet'); //
+
+    /** KONIEC CRM **/
 
 });
-//////////////////////Testing ORM///////////////
-///
-///
-//LINK GROUP
-Route::Post('/addGroup', 'AdminController@addGroup');
-Route::Post('/removeGroup', 'AdminController@removeGroup');
-//END LINK GROUP
+/**OUT OF FIREWALL **/
+
 //CHARTS
 Route::get('/charts', 'ScreensController@showScreensGet');
 //ENDCHARTS
-//COACHINGS
-Route::get('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryGet');
-Route::post('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryPost');
-Route::get('/ReportCoachingSummary', 'StatisticsController@MailReportCoachingSummary');
 
-Route::get('/ReportCoaching', 'StatisticsController@MailpageReportCoaching');
-Route::get('/MailToDirectors', 'StatisticsController@MailToEveryDirector');
-//END COACHINGS
+//SCREENS
 Route::get('/dept/{id}', 'ScreensController@monitorMethod');
 Route::get('/screen_table', 'ScreensController@screenMethod');
-//pobieranie danych po oddziałach godzinny
-Route::get('/testorm', 'TestORM@test');
+//END SCREENS
 
 //Pobieranie danych dla PBX_REPORT_EXTENSION
 Route::get('/pbx_report_ext', 'PBXDataAPI@PBXReportExtension');
@@ -813,73 +859,25 @@ Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
 
 //campaign reports mothod for database
 Route::get('/report_campaign', 'PBXDataAPI@report_campaign');
-
-//Routes
-Route::get('/crmRoute_index', 'CrmRouteController@index');
-Route::post('/crmRoute_index', 'CrmRouteController@indexPost');
-Route::post('/crmRoute_index_ajax', 'CrmRouteController@getSelectedRoute')->name('api.getRoute');
-
-Route::post('/getReadyRoute', 'CrmRouteController@getReadyRoute')->name('api.getReadyRoute');
+/**END OUT OF FIREWALL**/
 
 
-Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet');
-Route::post('/specificRoute', 'CrmRouteController@specificRoutePost')->name('api.getJSONRoute');
+//////////////////////Testing ORM///////////////
+///
+///
+//COACHINGS
+Route::get('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryGet'); //do usunięcia, stary
+Route::post('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryPost');//do usunięcia, stary
+Route::get('/ReportCoachingSummary', 'StatisticsController@MailReportCoachingSummary'); //do usunięcia, stary
 
-Route::get('/specificRouteEdit/{id}', 'CrmRouteController@specificRouteEditGet');
+Route::get('/ReportCoaching', 'StatisticsController@MailpageReportCoaching');
+Route::get('/MailToDirectors', 'StatisticsController@MailToEveryDirector');
+//END COACHINGS
 
-Route::get('/showClientRoutes', 'CrmRouteController@showClientRoutesGet');
-Route::post('/showClientRoutesAjax', 'CrmRouteController@showClientRoutesAjax')->name('api.getClientRoutes');
-Route::post('/showClientRoutesInfoAjax', 'CrmRouteController@showClientRoutesInfoAjax')->name('api.getClientRouteInfo');
-Route::post('/showClientRoutesStatus', 'CrmRouteController@showClientRoutesStatus')->name('api.showClientRoutesStatus');
-Route::post('/getYearWeeksAjax', 'CrmRouteController@getYearWeeksAjax')->name('api.getWeeks');
-
-Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet');
-Route::post('/addNewRoute', 'CrmRouteController@addNewRoutePost');
-Route::post('/addNewRoutes', 'CrmRouteController@addNewRouteAjax')->name('api.getCitiesNames');
-Route::post('/editRoute', 'CrmRouteController@editRoute');
-
-Route::get('/showRoutes', 'CrmRouteController@showRoutesGet');
-Route::post('/showRoutesAjax', 'CrmRouteController@showRoutesAjax')->name('api.showRoutesAjax');
-
-Route::get('/route/{id}', 'CrmRouteController@routeGet');
-
-Route::get('/addNewHotel', 'CrmRouteController@addNewHotelGet');
-Route::post('/addNewHotel', 'CrmRouteController@addNewHotelPost');
-
-Route::get('/showHotels', 'CrmRouteController@showHotelsGet');
-Route::post('/showHotelsAjax', 'CrmRouteController@showHotelsAjax')->name('api.showHotelsAjax');
-
-Route::get('/hotel/{id}', 'CrmRouteController@hotelGet');
-Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
-
-
-Route::get('/cityPanel', 'CrmRouteController@cityPanel');
-Route::post('/getCity', 'CrmRouteController@getCity')->name('api.getCity');
-
-Route::post('/getVoivodeshipRound', 'CrmRouteController@getVoivodeshipRound')->name('api.getVoivodeshipRound');
-
-Route::post('/findCity', 'CrmRouteController@findCity')->name('api.findCity');
-Route::POST('/saveNewCity', 'CrmRouteController@saveNewCity')->name('api.saveNewCity');
-Route::POST('/changeStatusCity', 'CrmRouteController@changeStatusCity')->name('api.changeStatusCity');
-
-Route::get('/clientPanel', 'ClientController@clientPanel');
-Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
-Route::post('/findClient', 'ClientController@findClient')->name('api.findClient');
-Route::POST('/changeStatusClient', 'ClientController@changeStatusClient')->name('api.changeStatusClient');
-Route::POST('/saveClient', 'ClientController@saveClient')->name('api.saveClient');
-
-
-Route::POST('/EditClient','ClientController@EditClient')->name('api.saveClient');
+//pobieranie danych po oddziałach godzinny
+Route::get('/testorm', 'TestORM@test');
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
-Route::post('/crmRoute_indexEdit', 'CrmRouteController@indexEditPost');
-
-Route::get('/showRoutesDetailed', 'CrmRouteController@showRoutesDetailedGet');
-Route::post('/showRoutesDetailedAjax', 'CrmRouteController@showRoutesDetailedAjax')->name('api.getDetailedInfo');
-
-
-
-
 
 Route::get('/addNewCampaigns', 'CampaignsController@addNewCampaignsGet');
 Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');

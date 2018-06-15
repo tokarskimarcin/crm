@@ -75,13 +75,11 @@
                 @endif
                 <div id="firstheading" class="panel-heading" data-toggle="collapse"
                      data-target="#collapseBody">
-                    Wyszukiwanie
+                    Wyszukiwanie konsultanta po numerze kolejki PBX
                 </div>
                 <div id="collapseBody" class="panel-collapse collapse {{$in}}">
                     <div class="panel-body">
                         <div class="col-lg-12">
-                            <div class="alert alert-info">Wyszukaj konsultanta po jego <strong>numerze kolejki
-                                    PBX</strong></div>
                             @if ($errors->any())
                                 <div class="alert alert-danger">
                                     <ul>

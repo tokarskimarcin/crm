@@ -52,8 +52,9 @@
 
 @section('script')
         <script src="https://cdn.datatables.net/rowgroup/1.0.3/js/dataTables.rowGroup.min.js"></script>
+        <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
 
-   <script>
+    <script>
        document.addEventListener('DOMContentLoaded', function(mainEvent) {
 
            table = $('#datatable').DataTable({

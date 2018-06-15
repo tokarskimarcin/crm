@@ -396,12 +396,15 @@
                 var allTableRows = document.querySelectorAll('.tableRow');
 
                 allTableRows.forEach(function(element) {
-                    var firstInputInside = element.cells[1].firstElementChild.firstElementChild.value;
-                    // var secondInputInside = element.cells[2].firstElementChild.firstElementChild.value;
-                    if(firstInputInside == 1) {
-                        auditScore += 1;
+                    let komentarzDodatkowy = element.cells[0].textContent;
+                    if(komentarzDodatkowy != "Komentarz Dodatkowy") {
+                        var firstInputInside = element.cells[1].firstElementChild.firstElementChild.value;
+                        // var secondInputInside = element.cells[2].firstElementChild.firstElementChild.value;
+                        if (firstInputInside == 1) {
+                            auditScore += 1;
+                        }
+                        numberOfRows += 1;
                     }
-                    numberOfRows += 1;
                 });
                 percentAuditScore = 100 * auditScore / numberOfRows;
                 $('.last-row').after('<input type="hidden" name="score" value="' + percentAuditScore + '">');
@@ -425,12 +428,16 @@
         var allTableRows = document.querySelectorAll('.tableRow');
 
         allTableRows.forEach(function(element) {
-        var firstInputInside = element.cells[1].firstElementChild.firstElementChild.value;
-        // var secondInputInside = element.cells[2].firstElementChild.firstElementChild.value;
-        if(firstInputInside == 1) {
-            auditScore += 1;
-        }
-        numberOfRows += 1;
+            let komentarzDodatkowy = element.cells[0].textContent;
+            if(komentarzDodatkowy != "Komentarz Dodatkowy") {
+                var firstInputInside = element.cells[1].firstElementChild.firstElementChild.value;
+                // var secondInputInside = element.cells[2].firstElementChild.firstElementChild.value;
+                if(firstInputInside == 1) {
+                    auditScore += 1;
+                }
+                numberOfRows += 1;
+            }
+
          });
 
         $('.final-alert').append('<strong>' + auditScore + '</strong>' + '/' + numberOfRows + ' (' + (Math.round((100 * auditScore)/numberOfRows *100) / 100)+ '%)');

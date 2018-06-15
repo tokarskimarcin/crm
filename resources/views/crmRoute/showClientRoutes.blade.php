@@ -15,13 +15,17 @@
         .glyphicon-edit:hover {
             cursor: pointer;
         }
+
+        .alert-info {
+            font-size: 1.5em;
+        }
     </style>
 
 {{--Header page --}}
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="alert gray-nav ">Podgląd Tras</div>
+            <div class="alert gray-nav ">Podgląd Kampanii</div>
         </div>
     </div>
 </div>
@@ -30,15 +34,27 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                   Wybierz trasę
+                   Wybierz kampanie
                 </div>
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="showAllClients">Pokaż wszystkich klientów</label>
-                                <input type="checkbox" style="display:inline-block" id="showAllClients">
+                            <div class="alert alert-info">
+                                Moduł podgląd tras pozwala na podgląd kampanii oraz zarządzanie nimi. Tabelę z kampaniami można filtrować dostępnymi polami jak również wyszukiwać poszczególnych fraz w polu "Szukaj". Kampanie dzielą się na: </br>
+                                <strong>Nie gotowe</strong>, oznaczone kolorem <span style="background: #ffc6c6;"> Czerwonym</span> </br>
+                                <strong>Aktywne</strong>, oznaczone kolorem <span style="background: #c3d6f4;">Niebieskim</span> </br>
+                                <strong>Zakończone</strong>, oznaczone kolorem <span style="background: #b9f7b9;">Zielonym</span>
                             </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button id="addNewClientRoute" class="btn btn-info" style="margin-bottom: 1em; font-weight: bold;">Przejdź do przypisywania tras klientom</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+
                             <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
@@ -48,6 +64,12 @@
                                 <tbody>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="showAllClients">Pokaż wszystkich klientów</label>
+                                <input type="checkbox" style="display:inline-block" id="showAllClients">
+                            </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
@@ -75,7 +97,7 @@
                                     <th>Tydzień</th>
                                     <th>Klient</th>
                                     <th>Data &Iukcy; pokazu</th>
-                                    <th>Trasa</th>
+                                    <th>Status Kampanii</th>
                                     <th>Przypisany hotel i godziny</th>
                                     <th>Akceptuj trasę</th>
                                     <th>Edycja (Hoteli i godzin)</th>
@@ -87,9 +109,6 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-                    <div class="col-md-12">
-                        <button id="addNewClientRoute" class="btn btn-info">Przejdź do przypisywania tras klientom</button>
                     </div>
                 </div>
             </div>
@@ -353,6 +372,10 @@
                     buttons2.forEach(btn => {
                         btn.addEventListener('click', actionButtonHandlerAccepted);
                     });
+                    const buttons3 = document.querySelectorAll('.action-buttons-2');
+                    buttons3.forEach(btn => {
+                        btn.addEventListener('click', actionButtonHandlerFinished);
+                    });
                     $('.show-modal-with-data').on('click',function (e) {
                         let selectTR = e.currentTarget.parentNode.parentNode;
                         let routeId = $(selectTR).closest('tr').prop('id');
@@ -380,8 +403,11 @@
                     if(row.cells[5].firstChild.classList[2] == "action-buttons-0") {
                         row.style.backgroundColor = "#ffc6c6";
                     }
+                    else if(row.cells[5].firstChild.classList[2] == "action-buttons-2") {
+                        row.style.backgroundColor = "#b9f7b9";
+                    }
                     else {
-                        row.style.backgroundColor = "#d1fcd7";
+                        row.style.backgroundColor = "#c3d6f4";
                     }
                     $(row).attr('id', "clientRouteInfoId_" + data.clientRouteId);
                     return row;
@@ -429,10 +455,13 @@
                     },
                     {"data":function (data, type, dataToSet) {
                         if(data.status == 0) {
-                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-success action-buttons-0" style="width:100%">Akceptuj</button>';
+                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-success action-buttons-0" style="width:100%">Aktywuj kampanie</button>';
+                        }
+                        else if(data.status == 2) {
+                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-primary action-buttons-2" style="width:100%">Trasa nie gotowa</button>';
                         }
                         else {
-                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-warning action-buttons-1" style="width:100%">Trasa nie gotowa</button>';
+                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-warning action-buttons-1" style="width:100%">Zakończ kampanie</button>';
                         }
 
                         },"name":"acceptRoute"
@@ -512,10 +541,32 @@
                 const url =`{{URL::to('/showClientRoutesStatus')}}`;
                 const ourHeaders = new Headers();
                 ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
-                // ourHeaders.set('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
                 const formData = new FormData();
                 formData.append('clientRouteId', clientRouteId);
                 formData.append('delete', '1');
+
+                fetch(url, {
+                    method: 'post',
+                    headers: ourHeaders,
+                    credentials: "same-origin",
+                    body: formData
+                }).then(resp => resp.json())
+                    .then(resp => {
+                        if(resp == 0) {
+                            console.log("Operacja się nie powiodła");
+                        }
+                        table2.ajax.reload();
+                    })
+            }
+
+            function actionButtonHandlerFinished(e) {
+                const clientRouteId = e.target.dataset.clientrouteid;
+                const url =`{{URL::to('/showClientRoutesStatus')}}`;
+                const ourHeaders = new Headers();
+                ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                const formData = new FormData();
+                formData.append('clientRouteId', clientRouteId);
+                formData.append('delete', '2');
 
                 fetch(url, {
                     method: 'post',
