@@ -999,12 +999,12 @@ class CrmRouteController extends Controller
     }
 
     /**
-     * @param $clientRouteId, $toDelete(0,1)
+     * @param $clientRouteId, $toDelete(0,1,2)
      * This method changes status of client_route
      */
     public function showClientRoutesStatus(Request $request) {
         $clientRouteId = $request->clientRouteId;
-        $toDelete = $request->delete; // 0,1 - actual values
+        $toDelete = $request->delete; // 0,1,2 - actual values 0 - not ready, 1 - started, 2 - finished
         $success = 0;
         if($clientRouteId && $toDelete == '0') {
             $clientRoute = ClientRoute::find($clientRouteId);
@@ -1013,6 +1013,12 @@ class CrmRouteController extends Controller
             $success = 1;
         }
         else if($clientRouteId && $toDelete == '1') {
+            $clientRoute = ClientRoute::find($clientRouteId);
+            $clientRoute->status = 2;
+            $clientRoute->save();
+            $success = 1;
+        }
+        else if($clientRouteId && $toDelete == '2') {
             $clientRoute = ClientRoute::find($clientRouteId);
             $clientRoute->status = 0;
             $clientRoute->save();
