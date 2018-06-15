@@ -870,6 +870,9 @@ Route::POST('/EditClient','ClientController@EditClient')->name('api.saveClient')
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
 Route::post('/crmRoute_indexEdit', 'CrmRouteController@indexEditPost');
 
+Route::get('/showRoutesDetailed', 'CrmRouteController@showRoutesDetailedGet');
+Route::post('/showRoutesDetailedAjax', 'CrmRouteController@showRoutesDetailedAjax')->name('api.getDetailedInfo');
+
 
 
 
