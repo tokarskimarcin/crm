@@ -819,6 +819,9 @@ Route::get('/crmRoute_index', 'CrmRouteController@index');
 Route::post('/crmRoute_index', 'CrmRouteController@indexPost');
 Route::post('/crmRoute_index_ajax', 'CrmRouteController@getSelectedRoute')->name('api.getRoute');
 
+Route::post('/getReadyRoute', 'CrmRouteController@getReadyRoute')->name('api.getReadyRoute');
+
+
 Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet');
 Route::post('/specificRoute', 'CrmRouteController@specificRoutePost')->name('api.getJSONRoute');
 
@@ -870,3 +873,15 @@ Route::POST('/EditClient','ClientController@EditClient')->name('api.saveClient')
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
 Route::post('/crmRoute_indexEdit', 'CrmRouteController@indexEditPost');
+
+Route::get('/showRoutesDetailed', 'CrmRouteController@showRoutesDetailedGet');
+Route::post('/showRoutesDetailedAjax', 'CrmRouteController@showRoutesDetailedAjax')->name('api.getDetailedInfo');
+
+
+
+
+
+Route::get('/addNewCampaigns', 'CampaignsController@addNewCampaignsGet');
+Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
+
+Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');

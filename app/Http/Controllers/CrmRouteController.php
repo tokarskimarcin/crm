@@ -154,7 +154,7 @@ class CrmRouteController extends Controller
     /**
      * This method shows specific route
      */
-    public function specificRouteGet($id) {
+    public function specificRouteGet($id, $onlyResult = null) {
         $clientRouteInfo = ClientRouteInfo::where('client_route_id', '=', $id)->get();
         $clients = Clients::all();
         $cities = Cities::all();
@@ -209,14 +209,17 @@ class CrmRouteController extends Controller
                     $stdClass->clientName = $client->name;
                 }
             }
-
+            $stdClass->id = $info->id;
             $stdClass->client_route_id = $info->client_route_id;
             $stdClass->city_id = $info->city_id;
             $stdClass->voivode_id = $info->voivode_id;
             $stdClass->date = $info->date;
             $stdClass->hotel_id = $info->hotel_id;
+            $stdClass->hotel_info = Hotel::find($info->hotel_id);
             $stdClass->hour = $info->hour;
-
+            $stdClass->limit = $info->limits == null ? 0 : $info->limits;
+            $stdClass->department_info_id = $info->department_info_id;
+            $stdClass->weekNumber = date("W",strtotime($info->date));
             array_push($insideArr, $stdClass);
             if($flag == 1) {
                 $flag = 0;
@@ -228,11 +231,13 @@ class CrmRouteController extends Controller
         }
 
         $clientRouteInfo = collect($clientRouteInfoExtended);
-
-        return view('crmRoute.specificInfo')
-            ->with('clientRouteInfo', $clientRouteInfoExtended)
-            ->with('hotels', $hotels)
-            ->with('clientName', $clientName);
+        if($onlyResult == null)
+            return view('crmRoute.specificInfo')
+                ->with('clientRouteInfo', $clientRouteInfoExtended)
+                ->with('hotels', $hotels)
+                ->with('clientName', $clientName);
+        else
+            return $clientRouteInfo->sortByDesc('date');
     }
 
     /**
@@ -356,8 +361,8 @@ class CrmRouteController extends Controller
             $numberOfRecords = count($clientRouteInfo);
             $iterator = 0;
             foreach($clientRouteInfo as $item) {
-                $item->hour = $city->timeArr[$iterator] . ':00';
-                $item->hotel_id = $city->hotelId;
+                $item->hour = $city->timeHotelArr[$iterator]->time . ':00';
+                $item->hotel_id = $city->timeHotelArr[$iterator]->hotelId;
                 $item->limits = 0; //At this point nobody choose it's value
                 $item->department_info_id = null; //At this point nobody choose it's value, can't be 0 because
                 $item->save();
@@ -367,6 +372,34 @@ class CrmRouteController extends Controller
 
         return $all_data;
     }
+
+    /**
+     * Return ready route with info
+     * @param Request $request
+     */
+    public function getReadyRoute(Request $request){
+        $data = $this::specificRouteGet($request->route_id,true);
+        return $data;
+    }
+
+    /**
+     * Save Campaign Option (department's and limit)
+     * @param Request $request
+     */
+    public function saveCampaignOption(Request $request){
+        if($request->ajax()){
+            $objectOfChange = $request->objectOfChange;
+            foreach ($objectOfChange as $item){
+                $clientRoadInfo = ClientRouteInfo::find($item['id']);
+                $clientRoadInfo->limits = $item['limit'];
+                $clientRoadInfo->department_info_id = $item['department_info_id'];
+                $clientRoadInfo->save();
+            }
+            return 200;
+        }else
+            return 500;
+    }
+
 
     /**
      * @param Request $request
@@ -413,10 +446,13 @@ class CrmRouteController extends Controller
      * @return $this method sends to server view showClientRoutes with data about weeks in given year.
      */
     public function showClientRoutesGet() {
+        $departments = Department_info::getAllInfoAboutDepartment()
+        ->whereIn('id_dep_type',[2]);
         $year = date('Y',strtotime("this year"));
         $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
         return view('crmRoute.showClientRoutes')
-            ->with('lastWeek', $numberOfLastYearsWeek);
+            ->with('lastWeek', $numberOfLastYearsWeek)
+            ->with('departments', $departments);
     }
 
     /**
@@ -778,7 +814,7 @@ class CrmRouteController extends Controller
                 client.name as clientName,
                 client_route.status as status
             '))
-                ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
+                ->join('client_route', 'client_route.id', 'client_route_info.client_route_id')
                 ->join('client', 'client.id', '=', 'client_route.client_id')
                 ->where('client_route_info.client_route_id', '=', $item->client_route_id)
                 ->distinct()
@@ -921,6 +957,8 @@ class CrmRouteController extends Controller
             }
         }
         $infoCollection = collect($fullInfoArrExtended);
+        if(isset($request->onlyAccept))
+            $infoCollection = $infoCollection->where('status','=',1);
 
         return datatables($infoCollection)->make(true);
     }
@@ -1645,6 +1683,33 @@ class CrmRouteController extends Controller
             $city = Cities::find($request->cityId);
             return $city;
         }
+    }
+
+    /**
+     * This method returns view showRoutesDetailed
+     */
+    public function showRoutesDetailedGet() {
+
+
+        return view('crmRoute.showRoutesDetailed');
+    }
+
+    /**
+     * @param
+     * @return This method send to datatable info about client_route_info records.
+     */
+    public function showRoutesDetailedAjax(Request $request) {
+        $detailedInfo = ClientRouteInfo::all();
+        $cities = Cities::all();
+
+        $detailedInfo->map(function($item) {
+
+
+
+            return $item;
+        });
+
+        return datatables($detailedInfo)->make(true);
     }
 
 

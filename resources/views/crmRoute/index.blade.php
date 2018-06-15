@@ -550,21 +550,21 @@
 
                        }
                        else {
-                           stringAppend += '<option value="' + city[j].city_id + '"  data-max_hours="' + city[j].max_hour + '" selected>' + city[j].name +'</option>\n';
+                           stringAppend += '<option value="' + city[j].id + '"  data-max_hours="' + city[j].max_hour + '" selected>' + city[j].name +'</option>\n';
                        }
 
                    }else{
                        if(city[j].block == 1) {
                            if(city[j].exceeded == 0) { //When city is still available
-                               stringAppend += '<option value="' + city[j].city_id + '" data-max_hours="' + city[j].used_hours + '">' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
+                               stringAppend += '<option value="' + city[j].id + '" data-max_hours="' + city[j].used_hours + '">' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
                            }
                            else {
-                               stringAppend += '<option value="' + city[j].city_id + '"  data-max_hours="0">' + city[j].name + '(KARENCJA' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
+                               stringAppend += '<option value="' + city[j].id + '"  data-max_hours="0">' + city[j].name + '(KARENCJA' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
                            }
 
                        }
                        else {
-                           stringAppend += '<option value="' + city[j].city_id + '"  data-max_hours="' + city[j].max_hour + '">' + city[j].name +'</option>\n';
+                           stringAppend += '<option value="' + city[j].id + '"  data-max_hours="' + city[j].max_hour + '">' + city[j].name +'</option>\n';
                        }
 
                    }
@@ -817,6 +817,7 @@
                                         for(var i = 0; i < response.length; i++) {
                                           //Pobranie miast dla danego wojew
                                             var city = getCitiesNamesByVoievodeship(response[i].voivodeship_id);
+                                            console.log(city);
                                             //Generowanie Div'a
                                             if(i == 0)
                                               generateRouteDiv(false,false,false,response[i],city,voievodes,placeToAppend);

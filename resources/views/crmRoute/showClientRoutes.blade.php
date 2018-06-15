@@ -8,6 +8,13 @@
         .check {
             background: #B0BED9 !important;
         }
+
+        .glyphicon-edit {
+            color: #477ab7;
+        }
+        .glyphicon-edit:hover {
+            cursor: pointer;
+        }
     </style>
 
 {{--Header page --}}
@@ -73,6 +80,7 @@
                                     <th>Akceptuj trasę</th>
                                     <th>Edycja (Hoteli i godzin)</th>
                                     <th>Edycja (Trasy)</th>
+                                    <th>Edycja parametrów (Kampanii)</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -87,10 +95,94 @@
             </div>
         </div>
     </div>
+
+
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+        Open modal
+    </button>
+    <!-- The Modal -->
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Parametry Kampani</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="routes-container">
+                        <div id="insertModalHere">
+
+                        </div>
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-success"  style="width: 100%" id="saveCampaingOption" onclick="saveOptions(this)">Zapisz</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <br>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Zamknij</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('script')
     <script>
+        function saveOptions(e){
+            let allRow = document.getElementsByClassName('campainsOption');
+            let arrayOfObject = new Array();
+            let validation = true;
+            for(var i = 0; i< allRow.length; i++){
+                let id = allRow[i].getAttribute('id');
+                id = id.split('_');
+                id = id[1];
+                let department_info_id = 0;
+                let departmentInfoSelect = allRow[i].querySelector('.optionDepartment').querySelector('.form-control');
+                department_info_id = departmentInfoSelect.options[departmentInfoSelect.selectedIndex].value;
+                if(department_info_id == 0){
+                    validation = false;
+                    swal('Wybierz oddział')
+                    break;
+                }
+                let limit = allRow[i].querySelector('.optionLimit').querySelector('.form-control').value;
+                if(limit == ''){
+                    validation = false;
+                    swal('Brak Limitów')
+                    break;
+                }
+                var obj = {id: id,department_info_id: department_info_id,limit: limit};
+                arrayOfObject.push(obj);
+            }
+            //Save campain option
+            if(validation){
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.saveCampaignOption') }}',
+                    data: {
+                        "objectOfChange": arrayOfObject
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if(response == 200){
+                            swal("Opcje Kampanii zostały zapisane pomyślnie")
+                            $('#myModal').modal('hide');
+                        }else{
+                            swal("Wystąpił błąd podczas zapisu, spróbuj ponownie.")
+                        }
+
+                    }
+                });
+            }
+        }
         document.addEventListener('DOMContentLoaded', function(event) {
 
             let yearInput = document.querySelector('#year');
@@ -123,7 +215,74 @@
             let showOnlyAssigned = null; //This variable indices whether checkbox "Pokaż tylko trasy bez przypisanego hotelu lub godziny" is checked
             // let colorArr = ['#e1e4ea', '#81a3ef', '#5a87ed', '#b2f4b8', '#6ee578', '#e1acef', '#c54ae8'];
             let objectArr = [];
+            function createModalContent(response,placeToAppend){
+                let departmentsJson = @json($departments);
+                let routeContainer = document.createElement('div');
+                routeContainer.className = 'campain-container';
+                var content = '';
+                console.log(response);
+                for(var i = 0; i < response.length; i++){
+                    content += '<div class="row">\n' +
+                        '                            <div class="col-lg-12">\n' +
+                        '                                <div class="panel panel-default">\n' +
+                        '                                    <div class="panel-heading">\n' +
+                        '                                        Pokaz Dzień : ' +response[i][0].date +
+                        '                                    </div>\n' +
+                        '                                    <div class="panel-body">\n' +
+                        '                                        <div class="row">\n' +
+                        '                                            <table class="table table-striped thead-inverse table-bordered">\n' +
+                        '                                                <thead>\n' +
+                        '                                                <th>Tydzień</th>\n' +
+                        '                                                <th>Data</th>\n' +
+                        '                                                <th>Godzina</th>\n' +
+                        '                                                <th>Województwo</th>\n' +
+                        '                                                <th>Miasto</th>\n' +
+                        '                                                <th>Hotel</th>\n' +
+                        '                                                <th>Oddział</th>\n' +
+                        '                                                <th style="width: 10%">Limit</th>\n' +
+                        '                                                <tbody>\n';
 
+                    for(var j = 0; j < response[i].length; j++){
+                        let hotel_name = "Brak";
+                        if(response[i][j].hotel_info != null){
+                            hotel_name = response[i][j].hotel_info.name;
+                        }
+                content += '                                                <tr class="campainsOption" id="routeInfoId_'+response[i][j].id+'">\n' +
+                            '                                                    <td>'+response[i][j].weekNumber+'</td>\n' +
+                            '                                                    <td>'+response[i][j].date+'</td>\n' +
+                            '                                                    <td>'+response[i][j].hour+'</td>\n' +
+                            '                                                    <td>'+response[i][j].voivodeName+'</td>\n' +
+                            '                                                    <td>'+response[i][j].cityName+'</td>\n' +
+                            '                                                    <td>'+hotel_name +'</td>\n' +
+                            '                                                    <td class="optionDepartment">\n' +
+                            '                                                        <select class="form-control">\n' +
+                                                                                        '<option value=0> Wybierz </option>';
+                                                                                        for(var item in departmentsJson){
+                                                                                            content += '<option value="'+departmentsJson[item].id+'"';
+                                                                                            if(response[i][j].department_info_id == departmentsJson[item].id)
+                                                                                                content +='selected';
+                                                                                            content +='>'+departmentsJson[item].department_name+' '+departmentsJson[item].type_name+'</option>\n';
+                                                                                        }
+                                                                                content +=' </select>\n' +
+                            '                                                    </td>\n' +
+                            '                                                    <td class="optionLimit"><input class="form-control" type="number" value="'+response[i][j].limit+'"></td>\n' +
+                            '                                                </tr>\n';
+                    }
+                    content += '                                                </tbody>\n' +
+                        '                                            </table>\n' +
+                        '                                        </div>\n' +
+                        '                                    </div>\n' +
+                        '                                </div>\n' +
+                        '                            </div>\n' +
+                        '                        </div>';
+                }
+
+
+
+
+                routeContainer.innerHTML = content;
+                placeToAppend.appendChild(routeContainer);
+            }
             table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,
@@ -194,7 +353,28 @@
                     buttons2.forEach(btn => {
                         btn.addEventListener('click', actionButtonHandlerAccepted);
                     });
-
+                    $('.show-modal-with-data').on('click',function (e) {
+                        let selectTR = e.currentTarget.parentNode.parentNode;
+                        let routeId = $(selectTR).closest('tr').prop('id');
+                        routeId = routeId.split('_');
+                        routeId = routeId[1];
+                        $.ajax({
+                            type: "POST",
+                            url: '{{ route('api.getReadyRoute') }}',
+                            data: {
+                                "route_id": routeId
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                let placeToAppend = document.querySelector('#insertModalHere');
+                                placeToAppend.innerHTML = '';
+                                createModalContent(response,placeToAppend);
+                                $('#myModal').modal('show');
+                            }
+                        });
+                    });
                 },
                 "rowCallback": function( row, data, index ) {
                     if(row.cells[5].firstChild.classList[2] == "action-buttons-0") {
@@ -203,7 +383,7 @@
                     else {
                         row.style.backgroundColor = "#d1fcd7";
                     }
-                    $(row).attr('id', "clientRouteInfoId_" + data.id);
+                    $(row).attr('id', "clientRouteInfoId_" + data.clientRouteId);
                     return row;
                 },
                 "ajax": {
@@ -264,6 +444,11 @@
                     {"data":function (data, type, dataToSet) {
                             return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.clientRouteId + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
                         },"name":"link"
+                    },
+                    {"data":function (data, type, dataToSet) {
+                            return '<span style="font-size: 2.1em;" class="glyphicon glyphicon-edit show-modal-with-data" data-route_id ="'+data.clientRouteId+'" ></span>';
+                        },"name":"link"
+
                     }
                 ]
             });

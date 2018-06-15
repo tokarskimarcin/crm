@@ -53,4 +53,14 @@ class Department_info extends Model
     public function director() {
         return $this->belongsTo('App\User', 'director_id');
     }
+
+    public static function getAllInfoAboutDepartment(){
+        $departments = Department_info::all();
+        $departments->map(function ($item){
+            $item->department_name = $item->departments->name;
+            $item->type_name = $item->department_type->name;
+            return $item;
+        });
+        return $departments;
+    }
 }
