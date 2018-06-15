@@ -6,7 +6,6 @@ use App\Agencies;
 use App\CoachChange;
 use App\CoachHistory;
 use App\Department_info;
-use App\Departments;
 use App\DisableAccountInfo;
 use App\PrivilageRelation;
 use App\User;
@@ -16,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Validator;
 use Session;
 use Illuminate\Support\Facades\Hash;
 use App\ActivityRecorder;
@@ -1197,7 +1197,7 @@ class UsersController extends Controller
                     'c.created_at')
                 ->leftJoin('users as u1', 'c.coach_id', '=', 'u1.id')
                 ->leftJoin('users as u2', 'c.prev_coach_id', '=', 'u2.id')
-                ->where('c.status','=',0)
+                ->where('c.status', '=', 0)
                 ->orderBy('c.id', 'desc')
                 ->get();
 
@@ -1266,6 +1266,40 @@ class UsersController extends Controller
         $coachChange->status = 1;
         $coachChange->save();
 
+        return Redirect::back();
+    }
+
+    public function employeeSearchPost(Request $request)
+    {
+        Validator::make($request->all(),[
+            'login_phone' => 'required|numeric'
+        ],[
+            'required' => 'Pole wyszukiwania jest wymagane',
+            'numeric' =>  'W polu muszą znajdować się tylko cyfry'
+            ])->validate();
+
+        $users = User::where('login_phone', '=', $request->login_phone)->get();
+        if ($users->count() == 1) {
+            $user = $users->first();
+            /*$department_info_id = $user->department_info_id;
+            $department_info = Department_info::where('id','=',$department_info_id)->first();
+            $department_type_name = Department_types::where('id','=',$department_info->id_dep_type)->get();
+            $department_name = Departments::where('id','=',$department_info->id_dep)->get();*/
+            $department_type_name = $user->department_info->department_type->name;
+            $department_name = $user->department_info->departments->name;
+
+            $user_info = ['first_name'=> $user->first_name,
+                'last_name'=> $user->last_name,
+                'department_type_name' => $department_type_name,
+                'department_name' => $department_name];
+
+            //dd($user_info);
+
+            Session::flash('found', true);
+            Session::flash('user_info', $user_info);
+        } else {
+            Session::flash('found', false);
+        }
         return Redirect::back();
     }
 }

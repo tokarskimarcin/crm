@@ -394,6 +394,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::POST('/edit_cadre/{id}', 'UsersController@edit_cadrePOST');
 
     Route::get('/employee_management', 'UsersController@employee_managementGet');
+    Route::post('/employeeSearch', 'UsersController@employeeSearchPost');
 
     Route::get('/cadre_management', 'UsersController@cadre_managementGet');
     Route::get('/cadre_management_fire', 'UsersController@cadre_management_fireGet');
@@ -866,7 +867,6 @@ Route::POST('/saveClient', 'ClientController@saveClient')->name('api.saveClient'
 
 
 Route::POST('/EditClient','ClientController@EditClient')->name('api.saveClient');
-
 
 Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table_managerAllGET');
 Route::post('/crmRoute_indexEdit', 'CrmRouteController@indexEditPost');
