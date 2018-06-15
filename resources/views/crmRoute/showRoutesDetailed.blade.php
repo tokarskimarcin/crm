@@ -1,6 +1,9 @@
 @extends('layouts.main')
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/rowgroup/1.0.3/css/rowGroup.dataTables.min.css" rel="stylesheet" />
+
+
 @endsection
 @section('content')
 
@@ -33,6 +36,7 @@
                                 <th>Limit</th>
                                 <th>Straty</th>
                                 <th>Projekt</th>
+                                <th>Oddział</th>
                                 <th>Uwagi</th>
                             </tr>
                             </thead>
@@ -47,6 +51,8 @@
 @endsection
 
 @section('script')
+        <script src="https://cdn.datatables.net/rowgroup/1.0.3/js/dataTables.rowGroup.min.js"></script>
+
    <script>
        document.addEventListener('DOMContentLoaded', function(mainEvent) {
 
@@ -54,6 +60,7 @@
                "autoWidth": true,
                "processing": true,
                "serverSide": true,
+               order: [[1, 'asc']],
                "drawCallback": function( settings ) {
 
                },
@@ -64,7 +71,7 @@
 
 
                },"ajax": {
-                   'url': "{{route('api.getDetailedInfo')}}",
+                   'url': "{{route('api.campaignsInfo')}}",
                    'type': 'POST',
                    'data': function (d) {
 
@@ -84,34 +91,74 @@
                        },"name":"date"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return 1;
-                       },"name":"name3"
+                           return data.cityName;
+                       },"name":"cityName"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return 1;
-                       },"name":"name4"
+                           return data.pbxSuccess;
+                       },"name":"pbxSuccess"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return 1;
-                       },"name":"name5"
+                           return data.pbxSuccess;
+                       },"name":"pbxSuccess"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return 1;
-                       },"name":"name6"
+                           return data.limits;
+                       },"name":"limits"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return 1;
-                       },"name":"name7"
+                           return data.loseSuccess;
+                       },"name":"loseSuccess"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return 1;
-                       },"name":"name8"
+                           return data.clientName;
+                       },"name":"clientName"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return 1;
-                       },"name":"name9"
+                           return data.departmentName;
+                       },"name":"departmentName"
+                   },
+                   {"data":function (data, type, dataToSet) {
+                           return data.comment;
+                       },"name":"comment"
                    }
-               ]
+               ],
+               rowGroup: {
+                   dataSrc: 'date',
+                   startRender: null,
+                   endRender: function (rows, group) {
+                       var sumAllSuccess = 0;
+                       sumAllSuccess =
+                           rows
+                           .data()
+                           .pluck('pbxSuccess')
+                           .reduce( function (a, b) {
+                               return a + b*1;
+                           }, 0);
+                       var sumAllLimit =
+                           rows
+                               .data()
+                               .pluck('limits')
+                               .reduce( function (a, b) {
+                                   return a + b*1;
+                               }, 0);
+                       var sumAllLose =
+                           rows
+                               .data()
+                               .pluck('loseSuccess')
+                               .reduce( function (a, b) {
+                                   return a + b*1;
+                               }, 0);
+
+                       return $('<tr/>')
+                           .append('<td colspan="4">Podsumowanie Dnia: ' + group + '</td>')
+                           .append('<td>' + sumAllSuccess + '</td>')
+                           .append('<td>' + sumAllLimit + '</td>')
+                           .append('<td>' + sumAllLose + '</td>')
+                           .append('<td colspan="3"></td>')
+
+                   },
+               },
            });
        });
     </script>

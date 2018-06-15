@@ -1717,23 +1717,32 @@ class CrmRouteController extends Controller
      * CampaignsInfo
      */
 
-    public function CampaignsInfo(){
+    public function campaignsInfo(Request $request){
         $campaignsInfo = ClientRouteInfo::select(DB::raw('
         client_route_info.date as date,
-        client_route_info.limits as limit,
+        client_route_info.hour as hour,
+        client_route_info.weekOfYear as weekOfYear,
+        client_route_info.limits as limits,
         0 as pbxSuccess,
         0 as sms,
-        (limit - pbx_success) as loseSuccess,
+        (0 - 0) as loseSuccess,
         0 as countHour,
         client.name as clientName,
-        department.name as DepartmentName,
-        client_route_info.comment as comment
+        departments.name as departmentName,
+        client_route_info.comment as comment,
+        city.name as cityName,
+        0 as totalScore
         '))
         ->join('client_route','client_route.id','client_route_info.client_route_id')
         ->join('client','client.id','client_route.client_id')
+        ->join('city','city.id','client_route_info.city_id')
         ->join('department_info','department_info.id','client_route_info.department_info_id')
-        ->join('departments','departments.id','department_info.id_dep');
-        ->where('');
+        ->join('departments','departments.id','department_info.id_dep')
+        ->whereIn('client_route.status',[1,2])
+        ->orderBy('city.name','client_route_info.date','client_route_info.hour')
+        ->get();
+
+        return datatables($campaignsInfo)->make(true);
     }
 
 }
