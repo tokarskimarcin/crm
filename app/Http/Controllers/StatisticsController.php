@@ -3560,6 +3560,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                     $user_sum[$y]['pause_time'] = 0;
                     $user_sum[$y]['received_calls'] = 0;
                     $user_sum[$y]['login_time'] = 0;
+                    $user_sum[$y]['login_time_sec'] = 0;
                     $user_sum[$y]['proc_received_calls'] = 0;
 
                     $user_sum[$y]['first_name'] = $consultant->first()->first_name;
@@ -3600,11 +3601,12 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                         }
                         $work_time_array = explode(":", $report->login_time);
                         $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]) / 3600, 2);
-
+                        $work_time_sec = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]));
                         $user_sum[$week_num]['success'] += $report->success;
                         $user_sum[$week_num]['all_checked'] += $report->all_checked_talks;
                         $user_sum[$week_num]['all_bad'] += $report->all_bad_talks;
                         $user_sum[$week_num]['login_time'] += $work_time;
+                        $user_sum[$week_num]['login_time_sec'] += $work_time_sec;
                         $user_sum[$week_num]['pause_time'] += $report->time_pause;
                         $user_sum[$week_num]['received_calls'] += $report->received_calls;
 
