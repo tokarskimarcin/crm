@@ -108,21 +108,6 @@
                 let clientRouteInfoIdArr = []; //array of client_route_info ids
            /*******END OF GLOBAL VARIABLES*********/
 
-           $.ajax({
-               type: "POST",
-               url: '{{ route('test.ajax') }}',
-               data: {
-                   "years": selectedYears,
-                   "weeks": selectedWeeks
-               },
-               headers: {
-                   'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-               },
-               success: function(response) {
-                   console.log(response);
-               }
-           });
-
            /**
             * This function color selected row and add id value to array.
             */
@@ -468,20 +453,6 @@
                else {
                    selectedYears = ["0"];
                }
-               $.ajax({
-                   type: "POST",
-                   url: '{{ route('test.ajax') }}',
-                   data: {
-                       "years": selectedYears,
-                       "weeks": selectedWeeks
-                   },
-                   headers: {
-                       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                   },
-                   success: function(response) {
-                       console.log(response);
-                   }
-               });
                table.ajax.reload();
            });
 
