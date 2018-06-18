@@ -426,9 +426,10 @@
                            .append('<td colspan="2">Podsumowanie Dnia: ' + group + '</td>')
                            .append('<td>' + sumAllCampaings + '</td>')
                            .append('<td>' + sumAllSuccess + '</td>')
+                           .append('<td> 0 </td>')
                            .append('<td>' + sumAllLimit + '</td>')
                            .append('<td>' + sumAllLose + '</td>')
-                           .append('<td colspan="5"></td>')
+                           .append('<td colspan="4"></td>')
                    },
                },
            });
