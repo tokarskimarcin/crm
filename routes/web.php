@@ -885,5 +885,7 @@ Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
 Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
 
 
-Route::POST('/campaignsInfo', 'CrmRouteController@campaignsInfo')->name('api.campaignsInfo');;
+Route::post('/campaignsInfo', 'CrmRouteController@campaignsInfo')->name('api.campaignsInfo');
+
+Route::post('/showRoutesDetailedUpdateAjax', 'CrmRouteController@showRoutesDetailedUpdateAjax')->name('api.updateClientRouteInfoRecords');
 
