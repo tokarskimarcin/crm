@@ -1171,14 +1171,14 @@ class CrmRouteController extends Controller
             $properDate = date_create($currentDate);
 
             //lista miast we wszystkich trasach.
-            $citiesAvailable = DB::table('routes_info')->select(DB::raw('
-            city_id as cityId
-            '))
-                ->pluck('cityId')
-                ->toArray();
+//            $citiesAvailable = DB::table('routes_info')->select(DB::raw('
+//            city_id as cityId
+//            '))
+//                ->pluck('cityId')
+//                ->toArray();
 
             //Rekordy clientRoutesInfo w których były użyte miasta
-            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->whereIn('city_id', $citiesAvailable)->get();
+            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
                 $properDate = date_create($currentDate);
@@ -1544,14 +1544,14 @@ class CrmRouteController extends Controller
             $properDate = date_create($currentDate);
 
             //lista miast we wszystkich trasach.
-            $citiesAvailable = DB::table('routes_info')->select(DB::raw('
-            city_id as cityId
-            '))
-                ->pluck('cityId')
-                ->toArray();
+//            $citiesAvailable = DB::table('routes_info')->select(DB::raw('
+//            city_id as cityId
+//            '))
+//                ->pluck('cityId')
+//                ->toArray();
 
             //Rekordy clientRoutesInfo w których były użyte miasta
-            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->whereIn('city_id', $citiesAvailable)->get();
+            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
                 $properDate = date_create($currentDate); //function date_add, changes $properDate variable, so in each loop it has to be reassigned
