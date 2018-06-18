@@ -30,7 +30,6 @@
                $coachData = $item;
                $projectAvgCommision = $leader->department_info()->first()->commission_avg;
                $color = $coachData['avg'] < $projectAvgCommision ? "background-color:#ff000038" : "";
-               $procCalls =  $coachData['received_calls'] !=0 ? $coachData['success']/$coachData['received_calls']*100 : 0;
         @endphp
                 <tr>
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $lp++ }}</b></td>
@@ -40,7 +39,7 @@
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $coachData['jankyProc'] }} %</b></td>
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $coachData['received_calls'] }}</b></td>
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $coachData['success'] }}</b></td>
-                    <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ round($procCalls,2) }} %</b></td>
+                    <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $coachData['proc_received_calls'] }} %</b></td>
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ sprintf('%02d:%02d:%02d', ($coachData['pause_time']/3600),($coachData['pause_time']/60%60), $coachData['pause_time']%60) }}</b></td>
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ sprintf('%02d:%02d:%02d', ($coachData['login_time']/3600),($coachData['login_time']/60%60), $coachData['login_time']%60) }}</b></td>
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $coachData['pasueTimeToLoginTime']}} %</b></td>
