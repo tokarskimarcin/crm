@@ -399,7 +399,7 @@
                    },
                    {"data":function (data, type, dataToSet) {
                            return data.departmentName;
-                       },"name":"departmentName"
+                       },"name":"departmentName", "searchable": "false"
                    },
                    {"data":function (data, type, dataToSet) {
                            return data.comment;
