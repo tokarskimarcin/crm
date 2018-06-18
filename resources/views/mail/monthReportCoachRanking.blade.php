@@ -55,7 +55,7 @@
                             $week_checked += $data['all_checked'];
                             $week_all_bad += $data['all_bad'];
                             $week_pause_time += $data['pause_time'];
-                            $week_login_time += $data['login_time'];
+                            $week_login_time += $data['login_time']*3600;
                             $week_received_calls += $data['received_calls'];
                             $week_janky_count += $data['total_week_yanky'];
 
