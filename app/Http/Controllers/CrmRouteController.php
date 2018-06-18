@@ -1767,9 +1767,7 @@ class CrmRouteController extends Controller
         if($weeks[0] != '0') {
             $campaignsInfo = $campaignsInfo->whereIn('weekOfYear', $weeks);
         }
-
-        $campaignsInfo->get();
-        return datatables($campaignsInfo)->make(true);
+        return datatables($campaignsInfo->get())->make(true);
     }
 
     /**
