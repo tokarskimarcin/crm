@@ -150,6 +150,7 @@
                    editButton.textContent = "Edytuj rekord";
                    editButton.setAttribute('data-toggle', 'modal');
                    editButton.setAttribute('data-target', '#editModal');
+                   editButton.style.marginBottom = '1em';
                    buttonSection.appendChild(editButton);
                    addModalBodyContext();
                }
@@ -166,6 +167,7 @@
                        editButton.textContent = "Edytuj rekordy";
                        editButton.setAttribute('data-toggle', 'modal');
                        editButton.setAttribute('data-target', '#editModal');
+                       editButton.style.marginBottom = '1em';
                        buttonSection.appendChild(editButton);
                    }
 
@@ -230,8 +232,12 @@
            function addModalBodyContext() {
                let modalBody = document.querySelector('.edit-modal-body');
                modalBody.innerHTML = '';
+               let alertElement = document.createElement('div');
+               alertElement.classList.add('alert', 'alert-danger');
+               alertElement.textContent = "Jeśli nie chcesz zmieniać wartości danego pola, pozostaw puste miejsce w okienku.";
+               modalBody.appendChild(alertElement);
 
-               createModalTable(modalBody);
+               createModalTable(modalBody); //table part of modal
 
                let label = document.createElement('label');
                label.setAttribute('for', 'changeLimits');
@@ -246,6 +252,17 @@
                limitInput.classList.add('form-control');
                modalBody.appendChild(limitInput);
 
+               let label2 = document.createElement('label');
+               label2.setAttribute('for', 'changeComments');
+               label2.textContent = 'Treść komentarza';
+               modalBody.appendChild(label2);
+
+               let commentInput = document.createElement('input');
+               commentInput.id = 'changeComments';
+               commentInput.setAttribute('type', 'text');
+               commentInput.classList.add('form-control');
+               modalBody.appendChild(commentInput);
+
                let submitButton = document.createElement('button');
                submitButton.id = 'submitEdition';
                submitButton.classList.add('btn', 'btn-success');
@@ -254,9 +271,12 @@
                submitButton.textContent = 'Zapisz';
                modalBody.appendChild(submitButton);
 
+               /*Event Listener Part*/
                submitButton.addEventListener('click', function(e) {
                    const limitInput = document.querySelector('#changeLimits');
                    const limitValue = limitInput.value;
+                   const commentInput = document.querySelector('#changeComments');
+                   const commentValue = commentInput.value;
 
                    const url = `{{route('api.updateClientRouteInfoRecords')}}`;
                    const header = new Headers();
@@ -264,7 +284,12 @@
                    const data = new FormData();
                    const JSONClientRouteInfoIdArr = JSON.stringify(clientRouteInfoIdArr);
                    data.append('ids', JSONClientRouteInfoIdArr);
-                   data.append('limit', limitValue);
+                   if(limitValue != '') {
+                       data.append('limit', limitValue);
+                   }
+                   if(commentValue != '') {
+                       data.append('comment', commentValue);
+                   }
 
                    fetch(url, {
                        method: "POST",
@@ -503,11 +528,6 @@
            /*Weeks select*/
            $('#weeks').select2();
            $('#year').select2();
-
-
-
-
-
 
        });
     </script>
