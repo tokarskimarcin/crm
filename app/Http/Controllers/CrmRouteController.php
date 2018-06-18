@@ -1790,19 +1790,31 @@ class CrmRouteController extends Controller
     }
 
     /**
-     * @param ids - array, limit - number
+     * @param ids - array, limit - number, comment - text
      * @return adnotation for user
      * This method changes limits for selected by user records.
      */
     public function showRoutesDetailedUpdateAjax(Request $request) {
         $ids = json_decode($request->ids);
-        $limit =$request->limit;
+        $limit = $request->limit;
+        $comment = $request->comment;
 
         $clientRouteInfoRecords = ClientRouteInfo::whereIn('id', $ids)->get();
-        foreach($clientRouteInfoRecords as $record) {
-            $record->limits = $limit;
-            $record->save();
+
+        if($limit != '') {
+            foreach($clientRouteInfoRecords as $record) {
+                $record->limits = $limit;
+                $record->save();
+            }
         }
+
+        if($comment != '') {
+            foreach($clientRouteInfoRecords as $record) {
+                $record->comment = $comment;
+                $record->save();
+            }
+        }
+
 
         if(count($clientRouteInfoRecords) > 1) {
             $adnotation = "Rekordy zostały zmienione";
