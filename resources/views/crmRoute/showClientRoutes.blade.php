@@ -1,3 +1,10 @@
+{{--/*--}}
+{{--*@category: CRM,--}}
+{{--*@info: This view shows list of available campaigns,--}}
+{{--*@controller: CrmRouteController,--}}
+{{--*@methods: showHotelsAjax, showHotelsGet--}}
+{{--*/--}}
+
 @extends('layouts.main')
 @section('style')
 

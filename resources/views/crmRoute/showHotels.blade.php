@@ -1,9 +1,9 @@
-/*
-*@category: CRM,
-*@info: This view shows list of available hotels (DB table: "hotels"),
-*@controller: CrmRouteController,
-*@methods: showHotelsAjax, showHotelsGet
-*/
+{{--/*--}}
+{{--*@category: CRM,--}}
+{{--*@info: This view shows list of available hotels (DB table: "hotels"),--}}
+{{--*@controller: CrmRouteController,--}}
+{{--*@methods: showHotelsAjax, showHotelsGet--}}
+{{--*/--}}
 
 
 @extends('layouts.main')
