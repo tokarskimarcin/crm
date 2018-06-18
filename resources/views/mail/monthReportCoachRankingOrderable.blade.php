@@ -1,7 +1,7 @@
 <table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px">
     <thead style="color:#efd88f">
     <tr>
-        <td colspan="7" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
+        <td colspan="8" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
             <font size="5" face="Calibri">RANKING TRENERZY </font></td>
         <td colspan="3" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20">
             <img src="http://teambox.pl/image/logovc.png" class="CToWUd"></td>
@@ -14,6 +14,7 @@
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">% janków</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Ilość połączeń</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Umówienia</td>
+        <td style="border:1px solid #231f20;padding:3px;background:#231f20;">% ilość um/poł</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Czas przerw</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba godzin</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Czas przerw/Liczba godzin %</td>
@@ -29,6 +30,7 @@
                $coachData = $item;
                $projectAvgCommision = $leader->department_info()->first()->commission_avg;
                $color = $coachData['avg'] < $projectAvgCommision ? "background-color:#ff000038" : "";
+               $procCalls =  $coachData['received_calls'] !=0 ? $coachData['success']/$coachData['received_calls']*100 : 0;
         @endphp
                 <tr>
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $lp++ }}</b></td>
@@ -38,6 +40,7 @@
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $coachData['jankyProc'] }} %</b></td>
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $coachData['received_calls'] }}</b></td>
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $coachData['success'] }}</b></td>
+                    <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ round($procCalls,2) }} %</b></td>
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ sprintf('%02d:%02d:%02d', ($coachData['pause_time']/3600),($coachData['pause_time']/60%60), $coachData['pause_time']%60) }}</b></td>
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ sprintf('%02d:%02d:%02d', ($coachData['login_time']/3600),($coachData['login_time']/60%60), $coachData['login_time']%60) }}</b></td>
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $coachData['pasueTimeToLoginTime']}} %</b></td>

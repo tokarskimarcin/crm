@@ -140,6 +140,7 @@
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">% janków</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Ilość połączeń</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Umówienia</td>
+        <td style="border:1px solid #231f20;padding:3px;background:#231f20;">% ilość um/poł</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Czas przerw</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba godzin</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Czas przerw/Liczba godzin %</td>
@@ -163,7 +164,7 @@
                     @endphp
                     <tr>
                         @if($lp == 1)
-                            <td rowspan = {{count($coachFromDepartment) + 1}} style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{$item->departments->name.' '.$item->department_type->name}}</b></td>
+                            <td rowspan = {{count($coachFromDepartment)}} style="border:1px solid #231f20;text-align:center;padding:3px"><b>{{$item->departments->name.' '.$item->department_type->name}}</b></td>
                             @php
                                 $lp = 1;
                             @endphp
@@ -175,6 +176,7 @@
                         <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $value->total_janky_proc }} %</b></td>
                         <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $value->total_received_calls }}</b></td>
                         <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $value->total_success }}</b></td>
+                        <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $value->total_received_calls_proc }} %</b></td>
                         <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ sprintf('%02d:%02d:%02d', ($value->total_pause_time/3600),($value->total_pause_time/60%60), $value->total_pause_time%60) }}</b></td>
                         <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ sprintf('%02d:%02d:%02d', ($value->total_login_time/3600),($value->total_login_time/60%60), $value->total_login_time%60) }}</b></td>
                         <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $value->pasueTimeToLoginTime }}%</b></td>
@@ -184,7 +186,7 @@
                     @endphp
                 @endforeach
                 <tr>
-                    <td colspan="10" style="background-color: #464a51;border:1px solid #231f20;text-align:center;padding:3px; height: 25px"> </td>
+                    <td colspan="12" style="background-color: #464a51;border:1px solid #231f20;text-align:center;padding:3px; height: 25px"> </td>
                 </tr>
             @endif
         @endforeach
