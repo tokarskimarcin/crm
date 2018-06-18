@@ -7,6 +7,7 @@
             <img src="http://teambox.pl/image/logovc.png" class="CToWUd"></td>
     </tr>
     <tr>
+        <td style="border:1px solid #231f20;padding:3px;background:#231f20;">L.P</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Trener</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Średnia</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">% Realizacji średniej</td>
@@ -19,6 +20,9 @@
     </tr>
     </thead>
     <tbody>
+    @php
+         $lp = 1;
+    @endphp
     @foreach($data as $item)
         @php
                $leader = $item['leader'];
@@ -27,6 +31,7 @@
                $color = $coachData['avg'] < $projectAvgCommision ? "background-color:#ff000038" : "";
         @endphp
                 <tr>
+                    <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $lp++ }}</b></td>
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $leader->first_name.' '.$leader->last_name}}</b></td>
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $coachData['avg'] }}</b></td>
                     <td style="{{$color}};border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $coachData['commissionProc'] }} %</b></td>
