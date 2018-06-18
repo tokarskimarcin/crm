@@ -16,7 +16,7 @@
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Umówienia</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Czas przerw</td>
         <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Liczba godzin</td>
-        <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Czas przerw/Liczba godzin</td>
+        <td style="border:1px solid #231f20;padding:3px;background:#231f20;">Czas przerw/Liczba godzin %</td>
     </tr>
     </thead>
     <tbody>
