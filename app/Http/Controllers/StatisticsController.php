@@ -3420,7 +3420,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             $user_sum->offsetSet('pause_time',0);
             $user_sum->offsetSet('received_calls',0);
             $user_sum->offsetSet('login_time',0);
-            $user_sum->offsetSet('proc_received_calls',0);
             $user_sum->offsetSet('total_week_yanky',0);
             $saveItem = $item;
             //Pobranie wyników konsultanta
@@ -3437,7 +3436,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             $user_sum['all_bad'] += $question->sum('all_bad_talks');
             $user_sum['pause_time'] += $question->sum('time_pause');
             $user_sum['received_calls'] += $question->sum('received_calls');
-
             return $user_sum;
         });
         $returnCollect = collect();
@@ -3451,6 +3449,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         $returnCollect->offsetSet('pause_time',$allData->sum('pause_time'));
         $returnCollect->offsetSet('pasueTimeToLoginTime',0);
         $returnCollect->offsetSet('avg',0);
+        $returnCollect->offsetSet('proc_received_calls',$allData->sum('received_calls') != 0 ? round(($allData->sum('success')/$allData->sum('received_calls'))*100,2) : 0);
         $returnCollect->offsetSet('commissionProc',0);
 
         $jaknyProc = $returnCollect['all_checked'] != 0 ? round(($returnCollect['all_bad']*100)/$returnCollect['all_checked'],2) : 0;
@@ -3709,6 +3708,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             'success' =>'Umówienia',
             'pause_time' => 'Czas przerw',
             'login_time' => 'Liczba godzin',
+            'proc_received_calls' => '% Umówień/Ilość połączeń',
             'pasueTimeToLoginTime' => 'Czas przerw/Liczba godzin'
         ];
         $returnCollect = collect();
@@ -3772,6 +3772,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
             'success' =>'Umówienia',
             'pause_time' => 'Czas przerw',
             'login_time' => 'Liczba godzin',
+            'proc_received_calls' => '% Umówień/Ilość połączeń',
             'pasueTimeToLoginTime' => 'Czas przerw/Liczba godzin'
         ];
 
