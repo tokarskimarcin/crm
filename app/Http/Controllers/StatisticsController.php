@@ -3599,7 +3599,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
                                 ->where('user_id','=',$user)->first();
                         }
                         $work_time_array = explode(":", $report->login_time);
-                        $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]) / 3600, 2);
+                        $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]));
 
                         $user_sum[$week_num]['success'] += $report->success;
                         $user_sum[$week_num]['all_checked'] += $report->all_checked_talks;
