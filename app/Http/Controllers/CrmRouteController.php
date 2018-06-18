@@ -1700,10 +1700,20 @@ class CrmRouteController extends Controller
         $weeksString = date('W', strtotime("this week"));
         $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
 
+        $departmentInfo = DB::table('department_info')->select(DB::raw('
+        department_info.id as id, 
+        department_type.name as name, 
+        departments.name as name2
+        '))
+            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->get();
+
         return view('crmRoute.showRoutesDetailed')
             ->with('lastWeek', $numberOfLastYearsWeek)
             ->with('currentWeek', $weeksString)
-            ->with('currentYear', $year);
+            ->with('currentYear', $year)
+            ->with('departmentInfo', $departmentInfo);
     }
 
     /**
@@ -1734,6 +1744,7 @@ class CrmRouteController extends Controller
     public function campaignsInfo(Request $request){
         $years = $request->years;
         $weeks = $request->weeks;
+        $departments = $request->departments;
 
         $campaignsInfo = ClientRouteInfo::select(DB::raw('
         client_route_info.id as id,
@@ -1759,7 +1770,6 @@ class CrmRouteController extends Controller
         ->leftjoin('departments','departments.id','department_info.id_dep')
         ->whereIn('client_route.status',[1,2]);
 
-
         if($years[0] != '0') {
             $campaignsInfo = $campaignsInfo->whereIn(DB::raw('YEAR(client_route_info.date)'), $years);
         }
@@ -1767,6 +1777,11 @@ class CrmRouteController extends Controller
         if($weeks[0] != '0') {
             $campaignsInfo = $campaignsInfo->whereIn('weekOfYear', $weeks);
         }
+
+        if($departments[0] != '0') {
+            $campaignsInfo = $campaignsInfo->whereIn('client_route_info.department_info_id', $departments);
+        }
+
         return datatables($campaignsInfo->get())->make(true);
     }
 

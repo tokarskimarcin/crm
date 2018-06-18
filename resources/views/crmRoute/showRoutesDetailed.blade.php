@@ -50,6 +50,16 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="departments">Oddział</label>
+                                <select id="departments" class="form-control" multiple="multiple">
+                                    @foreach($departmentInfo as $item)
+                                        <option value="dep_{{$item->id}}">{{$item->name2}} {{$item->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4 buttonSection">
@@ -111,6 +121,7 @@
            /********** GLOBAL VARIABLES ***********/
                 let selectedYears = ["0"]; //this array collect selected by user years
                 let selectedWeeks = ["0"]; //this array collect selected by user weeks
+                let selectedDepartments = ["0"]; //this array collect selected by user departments
                 let clientRouteInfoIdArr = []; //array of client_route_info ids
            /*******END OF GLOBAL VARIABLES*********/
 
@@ -346,6 +357,7 @@
                    'data': function (d) {
                         d.years = selectedYears;
                         d.weeks = selectedWeeks;
+                        d.departments = selectedDepartments;
                    },
                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                },
@@ -528,12 +540,46 @@
                table.ajax.reload();
            });
 
+           $("#departments").on('select2:select', function(e) {
+               let departments = $('#departments').val();
+               if(departments.length > 0) {
+                   let helpArray = [];
+                   departments.forEach(item => {
+                       let tempArray = [];
+                      tempArray = item.split('_');
+                      helpArray.push(tempArray[1]);
+                   });
+                   selectedDepartments = helpArray;
+               }
+               else {
+                   selectedDepartments = ["0"];
+               }
+               table.ajax.reload();
+           });
+
+           $("#departments").on('select2:unselect', function(e) {
+              if($('#departments').val() != null) {
+                  let departments = $('#departments').val();
+                  let helpArray = [];
+                  departments.forEach(item => {
+                      let tempArray = [];
+                      tempArray = item.split('_');
+                      helpArray.push(tempArray[1]);
+                  });
+                  selectedDepartments = helpArray;
+              }
+              else {
+                  selectedDepartments = ["0"];
+              }
+
+              table.ajax.reload();
+           });
            /***************************END OF EVENT LISTENERS FUNCTIONS********************/
 
            /*Activation select2 framework*/
            $('#weeks').select2();
            $('#year').select2();
-
+           $('#departments').select2();
        });
     </script>
 @endsection
