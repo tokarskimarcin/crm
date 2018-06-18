@@ -1,3 +1,10 @@
+{{--/*--}}
+{{--*@category: CRM,--}}
+{{--*@info: This view shows user detailed info about show hours with possibility of edition,--}}
+{{--*@controller: CrmRouteController,--}}
+{{--*@methods: showRoutesDetailedUpdateAjax, campaignsInfo, showRoutesDetailedGet--}}
+{{--*/--}}
+
 @extends('layouts.main')
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
@@ -62,7 +69,6 @@
                                 <th>Projekt</th>
                                 <th>Oddział</th>
                                 <th>Uwagi</th>
-                                {{--<th>Zaznacz</th>--}}
                             </tr>
                             </thead>
                         </table>
@@ -327,7 +333,6 @@
                     });
                },
                "fnDrawCallback": function(settings) {
-
                    $('#datatable tbody tr').on('click', function() {
                         const givenRow = $(this);
                         const clientRouteInfoId = givenRow.attr('data-id');
@@ -424,13 +429,12 @@
                            .append('<td>' + sumAllLimit + '</td>')
                            .append('<td>' + sumAllLose + '</td>')
                            .append('<td colspan="5"></td>')
-
                    },
                },
            });
 
            /**
-            * This function appends week numbers to week select element
+            * This function appends week numbers to week select element and years to year select element
             * IIFE function, execute after page is loaded automaticaly
             */
            (function appendWeeksAndYears() {
@@ -525,7 +529,7 @@
 
            /***************************END OF EVENT LISTENERS FUNCTIONS********************/
 
-           /*Weeks select*/
+           /*Activation select2 framework*/
            $('#weeks').select2();
            $('#year').select2();
 

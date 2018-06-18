@@ -1734,23 +1734,6 @@ class CrmRouteController extends Controller
     public function campaignsInfo(Request $request){
         $years = $request->years;
         $weeks = $request->weeks;
-//        if($years[0] == '0') {
-//            $years = array();
-//            $yearsString = date('Y',strtotime("this year"));
-//            array_push($years, $yearsString);
-//        }
-//        else {
-//            $years = $request->years;
-//        }
-//
-//        if($weeks[0] == '0') {
-//            $weeks = array();
-//            $weeksString = date('W', strtotime("this week"));
-//            array_push($weeks, $weeksString);
-//        }
-//        else {
-//            $weeks = $request->weeks;
-//        }
 
         $campaignsInfo = ClientRouteInfo::select(DB::raw('
         client_route_info.id as id,
