@@ -36,14 +36,14 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <div class="form-group">
                                 <label for="year">Rok</label>
                                 <select id="year" class="form-control" multiple="multiple">
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <div class="form-group">
                                 <label for="weeks">Tygodnie</label>
                                 <select id="weeks" class="form-control" multiple="multiple">
@@ -57,6 +57,15 @@
                                     @foreach($departmentInfo as $item)
                                         <option value="dep_{{$item->id}}">{{$item->name2}} {{$item->name}}</option>
                                     @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="typ" style="display: block;">Typ</label>
+                                <select id="typ" multiple="multiple">
+                                    <option value="1">Wysyłka</option>
+                                    <option value="2">Badania</option>
                                 </select>
                             </div>
                         </div>
@@ -123,6 +132,7 @@
            let selectedWeeks = ["0"]; //this array collect selected by user weeks
            let selectedDepartments = ["0"]; //this array collect selected by user departments
            let clientRouteInfoIdArr = []; //array of client_route_info ids
+           let selectedTypes = ['0']; //array of selected by user types
            /*******END OF GLOBAL VARIABLES*********/
 
            /**
@@ -420,6 +430,7 @@
                         d.years = selectedYears;
                         d.weeks = selectedWeeks;
                         d.departments = selectedDepartments;
+                        d.typ = selectedTypes;
                    },
                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                },
@@ -464,7 +475,14 @@
                        },"name":"loseSuccess"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return data.clientName;
+                       let clientNameVariable = '';
+                       if(data.typ == '2') {
+                           clientNameVariable = data.clientName + ' (B)'
+                       }
+                       else {
+                           clientNameVariable = data.clientName + ' (W)'
+                       }
+                           return clientNameVariable;
                        },"name":"clientName"
                    },
                    {"data":function (data, type, dataToSet) {
@@ -650,12 +668,41 @@
 
               table.ajax.reload();
            });
+
+           /**
+            * This event listener change elements of array selectedTypes while user selects any type
+            */
+           $('#typ').on('select2:select', function(e) {
+               let types = $('#typ').val();
+               if(types.length > 0) {
+                   selectedTypes = types;
+               }
+               else {
+                   selectedTypes = ['0'];
+               }
+               table.ajax.reload();
+           });
+
+           /**
+            * This event listener change elements of array selectedTypes while user unselects any type
+            */
+           $('#typ').on('select2:unselect', function(e) {
+               if($('#typ').val() != null) {
+                   let types = $('#typ').val();
+                   selectedTypes = types;
+               }
+               else {
+                   selectedTypes = ['0'];
+               }
+               table.ajax.reload();
+           });
            /***************************END OF EVENT LISTENERS FUNCTIONS********************/
 
            /*Activation select2 framework*/
            $('#weeks').select2();
            $('#year').select2();
            $('#departments').select2();
+           $('#typ').select2();
        });
     </script>
 @endsection
