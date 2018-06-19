@@ -1326,6 +1326,8 @@
                 routePlace.appendChild(newShow);
 
                 activateDatepicker();
+
+                $("html, body").animate({ scrollTop: $(document).height() }, "slow");
             }
 
             function removeButtonsFromLastShow() {

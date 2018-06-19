@@ -36,6 +36,18 @@
 
     {{--Header page --}}
 
+
+    @if(Session::has('found'))
+        @php
+            $found= Session::get('found');
+            $in = 'in';
+        @endphp
+    @else
+        @php
+            $in = '';
+        @endphp
+    @endif
+
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">
@@ -59,20 +71,9 @@
             zmodyfikowane!
         </div>
     @endif
-
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
-                @if(Session::has('found'))
-                    @php
-                        $found= Session::get('found');
-                        $in = 'in';
-                    @endphp
-                @else
-                    @php
-                        $in = '';
-                    @endphp
-                @endif
                 <div id="firstheading" class="panel-heading" data-toggle="collapse"
                      data-target="#collapseBody">
                     Wyszukiwanie konsultanta po numerze kolejki PBX
@@ -109,7 +110,6 @@
                                     @php
                                         $user_info = Session::get('user_info');
                                     @endphp
-
                                     <table class="table" style="margin-top: 1em">
                                         <tr>
                                             <td>
