@@ -696,13 +696,17 @@
                }
                table.ajax.reload();
            });
+
            /***************************END OF EVENT LISTENERS FUNCTIONS********************/
 
            /*Activation select2 framework*/
-           $('#weeks').select2();
-           $('#year').select2();
-           $('#departments').select2();
-           $('#typ').select2();
+           (function initial() {
+               $('#weeks').select2();
+               $('#year').select2();
+               $('#departments').select2();
+               $('#typ').select2();
+           })();
+
        });
     </script>
 @endsection
