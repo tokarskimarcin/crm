@@ -72,8 +72,8 @@
                                 <th>Tydzien</th>
                                 <th>Data</th>
                                 <th>Kampania</th>
-                                <th>PBX</th>
-                                <th>Zaproszenia</th>
+                                <th>SMS</th>
+                                <th>Zaproszenia Live</th>
                                 <th>Limit</th>
                                 <th>Straty</th>
                                 <th>Projekt</th>
@@ -119,10 +119,10 @@
     <script>
        document.addEventListener('DOMContentLoaded', function(mainEvent) {
            /********** GLOBAL VARIABLES ***********/
-                let selectedYears = ["0"]; //this array collect selected by user years
-                let selectedWeeks = ["0"]; //this array collect selected by user weeks
-                let selectedDepartments = ["0"]; //this array collect selected by user departments
-                let clientRouteInfoIdArr = []; //array of client_route_info ids
+           let selectedYears = ["0"]; //this array collect selected by user years
+           let selectedWeeks = ["0"]; //this array collect selected by user weeks
+           let selectedDepartments = ["0"]; //this array collect selected by user departments
+           let clientRouteInfoIdArr = []; //array of client_route_info ids
            /*******END OF GLOBAL VARIABLES*********/
 
            /**
@@ -133,15 +133,15 @@
                let idArr = [];
                let iterator = 0; //in this variable we will store position of id in array, that has been found.
                clientRouteInfoIdArr.forEach(stringId => {
-                  if(id === stringId) {
-                      flag = true; //true - this row is already checked
-                  }
-                  if(!flag) {
-                      iterator++;
-                  }
+                   if (id === stringId) {
+                       flag = true; //true - this row is already checked
+                   }
+                   if (!flag) {
+                       iterator++;
+                   }
                });
 
-               if(flag) {
+               if (flag) {
                    clientRouteInfoIdArr.splice(iterator, 1);
                    row.removeClass('colorRow');
                }
@@ -155,8 +155,8 @@
             * This function append modify button with proper name and remove it if necessary
             */
            function showModifyButton() {
-               if(clientRouteInfoIdArr.length == 1) {
-                   if(document.querySelector('#editMultipleRecords')) { //if "edytuj rekordy" button exists, remove it
+               if (clientRouteInfoIdArr.length == 1) {
+                   if (document.querySelector('#editMultipleRecords')) { //if "edytuj rekordy" button exists, remove it
                        const previousButton = document.querySelector('#editMultipleRecords');
                        previousButton.parentNode.removeChild(previousButton);
                    }
@@ -171,12 +171,12 @@
                    buttonSection.appendChild(editButton);
                    addModalBodyContext();
                }
-               else if(clientRouteInfoIdArr.length > 1) {
-                   if(document.querySelector('#editOneRecord')) { //inf "edytuj rekord" button exists, remove it
+               else if (clientRouteInfoIdArr.length > 1) {
+                   if (document.querySelector('#editOneRecord')) { //inf "edytuj rekord" button exists, remove it
                        const previousButton = document.querySelector('#editOneRecord');
                        previousButton.parentNode.removeChild(previousButton);
                    }
-                   if(!document.querySelector('#editMultipleRecords')) {
+                   if (!document.querySelector('#editMultipleRecords')) {
                        const buttonSection = document.querySelector('.buttonSection');
                        let editButton = document.createElement('button');
                        editButton.id = 'editMultipleRecords';
@@ -190,10 +190,78 @@
 
                    addModalBodyContext();
                }
-               else if(clientRouteInfoIdArr.length == 0){ //remove button if no row is selected
+               else if (clientRouteInfoIdArr.length == 0) { //remove button if no row is selected
                    const buttonToRemove = document.querySelector('#editOneRecord');
                    buttonToRemove.parentNode.removeChild(buttonToRemove);
                }
+           }
+
+           /*****************MODAL FUNCTIONS**********************/
+
+           /**
+            * This function fill modal body and attach event listener to submit button.
+            */
+           function addModalBodyContext() {
+               let modalBody = document.querySelector('.edit-modal-body');
+               modalBody.innerHTML = ''; //clear modal body
+
+               appendModalAlert(modalBody);
+               createModalTable(modalBody); //table part of modal
+               appendLimitInput(modalBody);
+               appendCommentInput(modalBody);
+               appendSmsSelect(modalBody);
+
+               let submitButton = document.createElement('button');
+               submitButton.id = 'submitEdition';
+               submitButton.classList.add('btn', 'btn-success');
+               submitButton.style.marginTop = '1em';
+               submitButton.style.marginBottom = '1em';
+               submitButton.textContent = 'Zapisz';
+               modalBody.appendChild(submitButton);
+
+               /*Event Listener Part*/
+               submitButton.addEventListener('click', function(e) {
+                   const limitInput = document.querySelector('#changeLimits');
+                   const limitValue = limitInput.value;
+                   const commentInput = document.querySelector('#changeComments');
+                   const commentValue = commentInput.value;
+                   const smsInput = document.querySelector('#changeSms');
+                   const smsValue = smsInput.options[smsInput.selectedIndex].value;
+                   console.log(smsValue);
+
+                   const url = `{{route('api.updateClientRouteInfoRecords')}}`;
+                   const header = new Headers();
+                   header.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                   const data = new FormData();
+                   const JSONClientRouteInfoIdArr = JSON.stringify(clientRouteInfoIdArr);
+                   data.append('ids', JSONClientRouteInfoIdArr);
+                   if(limitValue != '') {
+                       data.append('limit', limitValue);
+                   }
+                   if(commentValue != '') {
+                       data.append('comment', commentValue);
+                   }
+                   if(smsValue != -1) {
+                       data.append('sms', smsValue);
+                   }
+
+                   fetch(url, {
+                       method: "POST",
+                       headers: header,
+                       body: data,
+                       credentials: "same-origin"
+                   })
+                       .then(response => response.text())
+                       .then(response => {
+                           let infoBox = document.createElement('div');
+                           infoBox.classList.add('alert', 'alert-info');
+                           infoBox.textContent = response;
+                           modalBody.appendChild(infoBox);
+                           table.ajax.reload();
+
+                       })
+                       .catch(error => console.log("Błąd :", error))
+               });
            }
 
            /**
@@ -227,16 +295,16 @@
                    givenRowKampania = givenRow.cells[2].textContent;
                    givenRowProjekt = givenRow.cells[7].textContent;
                    let tr = document.createElement('tr');
-                  let td1 = document.createElement('td');
-                  td1.textContent = givenRowData;
-                  tr.appendChild(td1);
-                  let td2 = document.createElement('td');
-                  td2.textContent = givenRowKampania;
-                  tr.appendChild(td2);
-                  let td3 = document.createElement('td');
-                  td3.textContent = givenRowProjekt;
-                  tr.appendChild(td3);
-                  tbodyElement.appendChild(tr);
+                   let td1 = document.createElement('td');
+                   td1.textContent = givenRowData;
+                   tr.appendChild(td1);
+                   let td2 = document.createElement('td');
+                   td2.textContent = givenRowKampania;
+                   tr.appendChild(td2);
+                   let td3 = document.createElement('td');
+                   td3.textContent = givenRowProjekt;
+                   tr.appendChild(td3);
+                   tbodyElement.appendChild(tr);
                });
 
                infoTable.appendChild(tbodyElement);
@@ -244,22 +312,43 @@
            }
 
            /**
-            * This function fill modal body and attach event listener to submit button.
+            * This function append to modal sms input
             */
-           function addModalBodyContext() {
-               let modalBody = document.querySelector('.edit-modal-body');
-               modalBody.innerHTML = '';
-               let alertElement = document.createElement('div');
-               alertElement.classList.add('alert', 'alert-danger');
-               alertElement.textContent = "Jeśli nie chcesz zmieniać wartości danego pola, pozostaw puste miejsce w okienku.";
-               modalBody.appendChild(alertElement);
+           function appendSmsSelect(placeToAppend) {
+               let label3 = document.createElement('label');
+               label3.setAttribute('for', 'changeSms');
+               label3.textContent = "Czy sms został ustalony?";
+               placeToAppend.appendChild(label3);
 
-               createModalTable(modalBody); //table part of modal
+               let smsSelect = document.createElement('select');
+               smsSelect.classList.add('form-control');
+               smsSelect.id = 'changeSms';
 
+               let option1 = document.createElement('option');
+               option1.value = '-1';
+               option1.textContent = "Wybierz";
+
+               let option2 = document.createElement('option');
+               option2.value = '0';
+               option2.textContent = "Nie";
+
+               let option3 = document.createElement('option');
+               option3.value = '1';
+               option3.textContent = "Tak";
+               smsSelect.appendChild(option1);
+               smsSelect.appendChild(option2);
+               smsSelect.appendChild(option3);
+               placeToAppend.appendChild(smsSelect);
+           }
+
+           /**
+            * This function append to modal limit input
+            */
+           function appendLimitInput(placeToAppend) {
                let label = document.createElement('label');
                label.setAttribute('for', 'changeLimits');
                label.textContent = 'Podaj wartość limitu';
-               modalBody.appendChild(label);
+               placeToAppend.appendChild(label);
 
                let limitInput = document.createElement('input');
                limitInput.id = 'changeLimits';
@@ -267,65 +356,36 @@
                limitInput.setAttribute('step', '1');
                limitInput.setAttribute('min', '0');
                limitInput.classList.add('form-control');
-               modalBody.appendChild(limitInput);
+               placeToAppend.appendChild(limitInput);
+           }
 
+           /**
+            * This function append to modal comment input
+            */
+           function appendCommentInput(placeToAppend) {
                let label2 = document.createElement('label');
                label2.setAttribute('for', 'changeComments');
                label2.textContent = 'Treść komentarza';
-               modalBody.appendChild(label2);
+               placeToAppend.appendChild(label2);
 
                let commentInput = document.createElement('input');
                commentInput.id = 'changeComments';
                commentInput.setAttribute('type', 'text');
                commentInput.classList.add('form-control');
-               modalBody.appendChild(commentInput);
-
-               let submitButton = document.createElement('button');
-               submitButton.id = 'submitEdition';
-               submitButton.classList.add('btn', 'btn-success');
-               submitButton.style.marginTop = '1em';
-               submitButton.style.marginBottom = '1em';
-               submitButton.textContent = 'Zapisz';
-               modalBody.appendChild(submitButton);
-
-               /*Event Listener Part*/
-               submitButton.addEventListener('click', function(e) {
-                   const limitInput = document.querySelector('#changeLimits');
-                   const limitValue = limitInput.value;
-                   const commentInput = document.querySelector('#changeComments');
-                   const commentValue = commentInput.value;
-
-                   const url = `{{route('api.updateClientRouteInfoRecords')}}`;
-                   const header = new Headers();
-                   header.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
-                   const data = new FormData();
-                   const JSONClientRouteInfoIdArr = JSON.stringify(clientRouteInfoIdArr);
-                   data.append('ids', JSONClientRouteInfoIdArr);
-                   if(limitValue != '') {
-                       data.append('limit', limitValue);
-                   }
-                   if(commentValue != '') {
-                       data.append('comment', commentValue);
-                   }
-
-                   fetch(url, {
-                       method: "POST",
-                       headers: header,
-                       body: data,
-                       credentials: "same-origin"
-                   })
-                       .then(response => response.text())
-                       .then(response => {
-                           let infoBox = document.createElement('div');
-                           infoBox.classList.add('alert', 'alert-info');
-                           infoBox.textContent = response;
-                           modalBody.appendChild(infoBox);
-                           table.ajax.reload();
-
-                       })
-                       .catch(error => console.log("Błąd :", error))
-               });
+               placeToAppend.appendChild(commentInput);
            }
+
+           /**
+            * This function append to modal alert info
+            */
+           function appendModalAlert(placeToAppend) {
+               let alertElement = document.createElement('div');
+               alertElement.classList.add('alert', 'alert-danger');
+               alertElement.textContent = "Jeśli nie chcesz zmieniać wartości danego pola, pozostaw puste miejsce w okienku.";
+               placeToAppend.appendChild(alertElement);
+           }
+
+           /****************END OF MODAL FUNCTIONS********************/
 
            table = $('#datatable').DataTable({
                "autoWidth": false,
@@ -344,11 +404,13 @@
                     });
                },
                "fnDrawCallback": function(settings) {
-                   $('#datatable tbody tr').on('click', function() {
-                        const givenRow = $(this);
-                        const clientRouteInfoId = givenRow.attr('data-id');
-                        colorRowAndAddIdToArray(clientRouteInfoId, givenRow);
-                        showModifyButton();
+                   $('#datatable tbody tr').on('click', function(e) {
+                        if(e.target.dataset.type != "noAction") {
+                            const givenRow = $(this);
+                            const clientRouteInfoId = givenRow.attr('data-id');
+                            colorRowAndAddIdToArray(clientRouteInfoId, givenRow);
+                            showModifyButton();
+                        }
                    });
 
                },"ajax": {
@@ -378,8 +440,16 @@
                        },"name":"cityName"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return data.pbxSuccess;
-                       },"name":"pbxSuccess"
+                       let smsInfo;
+                       if(data.sms == '1') {
+                           smsInfo = 'TAK';
+                           // return '<select class="form-control" style="width:100%;" data-id="' + data.id + '" data-type="noAction"><option value="0" data-type="noAction" selected>Nie</option><option value="1" data-type="noAction">Tak</option></select>';
+                       }
+                       else {
+                           smsInfo = 'NIE'; // return '<select class="form-control" style="width:100%;" data-id="' + data.id + '" data-type="noAction"><option value="0" data-type="noAction">Nie</option><option data-type="noAction" value="1" selected>Tak</option></select>';
+                       }
+                           return smsInfo;
+                       },"name":"sms"
                    },
                    {"data":function (data, type, dataToSet) {
                            return data.pbxSuccess;
@@ -540,6 +610,9 @@
                table.ajax.reload();
            });
 
+           /**
+            * This event listener change elements of array selectedDepartments while user selects a department
+            */
            $("#departments").on('select2:select', function(e) {
                let departments = $('#departments').val();
                if(departments.length > 0) {
@@ -557,6 +630,9 @@
                table.ajax.reload();
            });
 
+           /**
+            * This event listener change elements of array selectedDepartments while user unselects a department
+            */
            $("#departments").on('select2:unselect', function(e) {
               if($('#departments').val() != null) {
                   let departments = $('#departments').val();
