@@ -246,7 +246,7 @@ Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
 Route::post('/findClient', 'ClientController@findClient')->name('api.findClient');
 Route::POST('/changeStatusClient','ClientController@changeStatusClient')->name('api.changeStatusClient');
 Route::POST('/saveClient','ClientController@saveClient')->name('api.saveClient');
-Route::POST('/EditClient','ClientController@EditClient')->name('api.saveClient');
+//Route::POST('/EditClient','ClientController@EditClient')->name('api.saveClient');
 Route::post('/showRoutesDetailedAjax', 'CrmRouteController@showRoutesDetailedAjax')->name('api.getDetailedInfo');
 Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
 /* END CRM-ROUTES AJAX */
