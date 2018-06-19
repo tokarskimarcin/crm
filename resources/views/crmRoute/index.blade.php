@@ -247,9 +247,7 @@
                                     Wybierz szablon trasy z listy. Jeśli nie ma odpowiedniej trasy na liście, stwórz ją naciskając na przycisk <strong>Dodaj trasę ręcznie</strong>
                                 </div>
                                 <div class="col-md-4">
-                                    <a href="#jump-here">
                                         <button class="btn btn-default" id="add-new-route" style="margin-bottom: 14px;"><span class="glyphicon glyphicon-plus"></span>Dodaj trasę ręcznie</button>
-                                    </a>
                                 </div>
                                 <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
                                     <thead>
@@ -1301,6 +1299,8 @@
                 routePlace.appendChild(newShow);
 
                 activateDatepicker();
+
+                $("html, body").animate({ scrollTop: $(document).height() }, "slow");
             }
 
             function removeButtonsFromLastShow() {
