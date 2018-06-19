@@ -98,6 +98,7 @@ class UsersController extends Controller
         $user->username = $request->username;
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
+        $user->created_by = Auth::user()->id;
         if ($request->email == null) {
             $user->email_off = null;
         } else {

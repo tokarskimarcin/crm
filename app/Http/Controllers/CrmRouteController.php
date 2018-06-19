@@ -999,12 +999,12 @@ class CrmRouteController extends Controller
     }
 
     /**
-     * @param $clientRouteId, $toDelete(0,1)
+     * @param $clientRouteId, $toDelete(0,1,2)
      * This method changes status of client_route
      */
     public function showClientRoutesStatus(Request $request) {
         $clientRouteId = $request->clientRouteId;
-        $toDelete = $request->delete; // 0,1 - actual values
+        $toDelete = $request->delete; // 0,1,2 - actual values 0 - not ready, 1 - started, 2 - finished
         $success = 0;
         if($clientRouteId && $toDelete == '0') {
             $clientRoute = ClientRoute::find($clientRouteId);
@@ -1013,6 +1013,12 @@ class CrmRouteController extends Controller
             $success = 1;
         }
         else if($clientRouteId && $toDelete == '1') {
+            $clientRoute = ClientRoute::find($clientRouteId);
+            $clientRoute->status = 2;
+            $clientRoute->save();
+            $success = 1;
+        }
+        else if($clientRouteId && $toDelete == '2') {
             $clientRoute = ClientRoute::find($clientRouteId);
             $clientRoute->status = 0;
             $clientRoute->save();
@@ -1165,14 +1171,14 @@ class CrmRouteController extends Controller
             $properDate = date_create($currentDate);
 
             //lista miast we wszystkich trasach.
-            $citiesAvailable = DB::table('routes_info')->select(DB::raw('
-            city_id as cityId
-            '))
-                ->pluck('cityId')
-                ->toArray();
+//            $citiesAvailable = DB::table('routes_info')->select(DB::raw('
+//            city_id as cityId
+//            '))
+//                ->pluck('cityId')
+//                ->toArray();
 
             //Rekordy clientRoutesInfo w których były użyte miasta
-            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->whereIn('city_id', $citiesAvailable)->get();
+            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
                 $properDate = date_create($currentDate);
@@ -1538,14 +1544,14 @@ class CrmRouteController extends Controller
             $properDate = date_create($currentDate);
 
             //lista miast we wszystkich trasach.
-            $citiesAvailable = DB::table('routes_info')->select(DB::raw('
-            city_id as cityId
-            '))
-                ->pluck('cityId')
-                ->toArray();
+//            $citiesAvailable = DB::table('routes_info')->select(DB::raw('
+//            city_id as cityId
+//            '))
+//                ->pluck('cityId')
+//                ->toArray();
 
             //Rekordy clientRoutesInfo w których były użyte miasta
-            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->whereIn('city_id', $citiesAvailable)->get();
+            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
                 $properDate = date_create($currentDate); //function date_add, changes $properDate variable, so in each loop it has to be reassigned
@@ -1689,9 +1695,25 @@ class CrmRouteController extends Controller
      * This method returns view showRoutesDetailed
      */
     public function showRoutesDetailedGet() {
+        $year = date('Y',strtotime("this year"));
 
+        $weeksString = date('W', strtotime("this week"));
+        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
 
-        return view('crmRoute.showRoutesDetailed');
+        $departmentInfo = DB::table('department_info')->select(DB::raw('
+        department_info.id as id, 
+        department_type.name as name, 
+        departments.name as name2
+        '))
+            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->get();
+
+        return view('crmRoute.showRoutesDetailed')
+            ->with('lastWeek', $numberOfLastYearsWeek)
+            ->with('currentWeek', $weeksString)
+            ->with('currentYear', $year)
+            ->with('departmentInfo', $departmentInfo);
     }
 
     /**
@@ -1712,5 +1734,92 @@ class CrmRouteController extends Controller
         return datatables($detailedInfo)->make(true);
     }
 
+
+    /**
+     * CampaignsInfo
+     * @params: weeks - array, years - array,
+     * This method returns to server data for datatable about all records from ClientRouteInfo table.
+     */
+
+    public function campaignsInfo(Request $request){
+        $years = $request->years;
+        $weeks = $request->weeks;
+        $departments = $request->departments;
+
+        $campaignsInfo = ClientRouteInfo::select(DB::raw('
+        client_route_info.id as id,
+        client_route_info.date as date,
+        client_route_info.hour as hour,
+        client_route_info.weekOfYear as weekOfYear,
+        client_route_info.limits as limits,
+        YEAR(client_route_info.date) as year,
+        0 as pbxSuccess,
+        0 as sms,
+        (0 - 0) as loseSuccess,
+        0 as countHour,
+        client.name as clientName,
+        departments.name as departmentName,
+        client_route_info.comment as comment,
+        city.name as cityName,
+        0 as totalScore
+        '))
+        ->join('client_route','client_route.id','client_route_info.client_route_id')
+        ->leftjoin('client','client.id','client_route.client_id')
+        ->leftjoin('city','city.id','client_route_info.city_id')
+        ->leftjoin('department_info','department_info.id','client_route_info.department_info_id')
+        ->leftjoin('departments','departments.id','department_info.id_dep')
+        ->whereIn('client_route.status',[1,2]);
+
+        if($years[0] != '0') {
+            $campaignsInfo = $campaignsInfo->whereIn(DB::raw('YEAR(client_route_info.date)'), $years);
+        }
+
+        if($weeks[0] != '0') {
+            $campaignsInfo = $campaignsInfo->whereIn('weekOfYear', $weeks);
+        }
+
+        if($departments[0] != '0') {
+            $campaignsInfo = $campaignsInfo->whereIn('client_route_info.department_info_id', $departments);
+        }
+
+        return datatables($campaignsInfo->get())->make(true);
+    }
+
+    /**
+     * @param ids - array, limit - number, comment - text
+     * @return adnotation for user
+     * This method changes limits for selected by user records.
+     */
+    public function showRoutesDetailedUpdateAjax(Request $request) {
+        $ids = json_decode($request->ids);
+        $limit = $request->limit;
+        $comment = $request->comment;
+
+        $clientRouteInfoRecords = ClientRouteInfo::whereIn('id', $ids)->get();
+
+        if($limit != '') {
+            foreach($clientRouteInfoRecords as $record) {
+                $record->limits = $limit;
+                $record->save();
+            }
+        }
+
+        if($comment != '') {
+            foreach($clientRouteInfoRecords as $record) {
+                $record->comment = $comment;
+                $record->save();
+            }
+        }
+
+
+        if(count($clientRouteInfoRecords) > 1) {
+            $adnotation = "Rekordy zostały zmienione";
+        }
+        else {
+            $adnotation = "Rekord został zmieniony";
+        }
+
+        return $adnotation;
+    }
 
 }
