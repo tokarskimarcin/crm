@@ -76,6 +76,7 @@ class CrmRouteController extends Controller
                 $clientRouteInfo->city_id = $cityArr[$i];
                 $clientRouteInfo->voivode_id = $voivodeArr[$i];
                 $clientRouteInfo->date = $dateArr[$i];
+                $clientRouteInfo->sms = 0; // 0 - not set, 1 - set
                 $day = substr($dateArr[$i],8,2);
 
                 $month = substr($dateArr[$i],5,2);
@@ -133,6 +134,7 @@ class CrmRouteController extends Controller
                 $clientRouteInfo->city_id = $cityArr[$i];
                 $clientRouteInfo->voivode_id = $voivodeArr[$i];
                 $clientRouteInfo->date = $dateArr[$i];
+                $clientRouteInfo->sms = 0; // 0 - not set, 1 - set
                 $day = substr($dateArr[$i],8,2);
 
                 $month = substr($dateArr[$i],5,2);
@@ -484,14 +486,17 @@ class CrmRouteController extends Controller
     }
 
     /**
-     * @param showAllClients(true/false/null), showOnlyAssigned(true/false/null), id(number/null), selectedWeek(number), year(number)
+     * @param showAllClients(true/false/null), showOnlyAssigned(true/false/null), id(number/null), selectedWeek(number), year(number), typ(number)
      * This method return data about all client routes to datatable in showClientRoutes
      */
     public function showClientRoutesInfoAjax(Request $request) {
+        $typ = $request->typ;
+        $typ = $typ == '0' ? '%' : $typ;
         $showAllClients = $request->showAllClients;
         $showOnlyAssigned = $request->showOnlyAssigned;
         $clientId = $request->id; //number or null
         $selectedWeek = $request->selectedWeek;
+        $selectedWeek = $selectedWeek == '0' ? '%' : $selectedWeek;
         if($request->year > 0) {
             $year = $request->year;
         }
@@ -509,273 +514,92 @@ class CrmRouteController extends Controller
 	        b)Checkbox "Pokaż tylko trasy bez przypisanego hotelu .."
 	        c)Wybór klienta */
 
-
-/*       1)
+/*  1)
 	        a) - true,
 	        b) - false,
 	        c) - false,
-        Wyświetlają się wszyscy klienci */
-        if($showAllClients == 'true' && ($showOnlyAssigned == null || $showOnlyAssigned == 'false') && $clientId == null) {
-            $client_route = ClientRoute::all()->pluck('id')->toArray();
-            if($selectedWeek != '0') {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->where('weekOfYear', '=', $selectedWeek)
-                    ->get();
-            }
-            else {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->get();
-            }
-
-        }
-        /*      2)
-            a) - true
-            b) - true
-            c) - true
-        Wyświetlają się wszyscy klienci */
-        else if($showAllClients == 'true' && $showOnlyAssigned == 'true' && $clientId != null) {
-            $client_route = ClientRoute::all()->pluck('id')->toArray();
-            if($selectedWeek != '0') {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->where('weekOfYear', '=', $selectedWeek)
-                    ->get();
-
-                //now we are checking if every client_route group has at least one hotel assigned
-                $clientRouteIdArr = $this->getExcludedIds($client_route_info); //here we store all client_route_ids that has at least one hotel
-
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->where('weekOfYear', '=', $selectedWeek)
-                    ->where(function ($query) use($clientRouteIdArr) {
-                        $query->whereNotIn('client_route_id', $clientRouteIdArr)->orWhere('hour', '=', null);
-                    })
-                    ->get();
-
-            }
-            else {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->get();
-
-                //now we are checking if every client_route group has at least one hotel assigned
-                $clientRouteIdArr = $this->getExcludedIds($client_route_info); //here we store all client_route_ids that has at least one hotel
-
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->where(function ($query) use($clientRouteIdArr) {
-                        $query->whereNotIn('client_route_id', $clientRouteIdArr)->orWhere('hour', '=', null);
-                    })
-                    ->get();
-            }
-
-        }
-/*       3)
-	        a) - true,
+    3)
+            a) - true,
             b) - false,
             c) - true,
-        Wyświetlają się wszyscy klienci */
-        else if($showAllClients == 'true' && $clientId != null && ($showOnlyAssigned == null || $showOnlyAssigned == 'false')) {
-            $client_route = ClientRoute::all()->pluck('id')->toArray();
-            if($selectedWeek != '0') {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->where('weekOfYear', '=', $selectedWeek)
-                    ->get();
-            }
-            else {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->get();
-            }
-
-        }
-/*      4)
-            a) - true,
-            b) - true,
-            c) - false
-        Wyświetlają się wszyscy klienci, którzy mają trasy bez przypisanego hotelu... */
-        else if($showAllClients == 'true' && $showOnlyAssigned == 'true' && $clientId == null) {
-            $client_route = ClientRoute::all()->pluck('id')->toArray();
-
-            if($selectedWeek != '0') {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('weekOfYear', '=', $selectedWeek)
-                    ->where('date', 'like', $year . '%')
-                    ->get();
-
-                //now we are checking if every client_route group has at least one hotel assigned
-                $clientRouteIdArr = $this->getExcludedIds($client_route_info); //here we store all client_route_ids that has at least one hotel
-
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('weekOfYear', '=', $selectedWeek)
-                    ->where('date', 'like', $year . '%')
-                    ->where(function ($query) use($clientRouteIdArr) {
-                        $query->whereNotIn('client_route_id', $clientRouteIdArr)->orWhere('hour', '=', null);
-                    })
-                    ->get();
-
-            }
-            else {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->get();
-
-                //now we are checking if every client_route group has at least one hotel assigned
-                $clientRouteIdArr = $this->getExcludedIds($client_route_info); //here we store all client_route_ids that has at least one hotel
-
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->where(function ($query) use($clientRouteIdArr){
-                        $query->whereNotIn('client_route_id', $clientRouteIdArr)->orWhere('hour', '=', null);
-                    })
-                    ->get();
-
-            }
-//            dd($client_route_info);
-
-        }
-/*      5)
-            a) - false,
-            b) - true,
-            c) - false
-        Wyświetlają się wszyscy klienci */
-        else if(($showAllClients == null || $showAllClients == 'false') && $showOnlyAssigned == 'true' && $clientId == null) {
-            $client_route = ClientRoute::all()->pluck('id')->toArray();
-            if($selectedWeek != '0') {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('weekOfYear', '=', $selectedWeek)
-                    ->where('date', 'like', $year . '%')
-                    ->get();
-
-                //now we are checking if every client_route group has at least one hotel assigned
-                $clientRouteIdArr = $this->getExcludedIds($client_route_info); //here we store all client_route_ids that has at least one hotel
-
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('weekOfYear', '=', $selectedWeek)
-                    ->where('date', 'like', $year . '%')
-                    ->where(function ($query) use($clientRouteIdArr){
-                        $query->whereNotIn('client_route_id', $clientRouteIdArr)->orWhere('hour', '=', null);
-                    })
-                    ->get();
-            }
-            else {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->get();
-
-                //now we are checking if every client_route group has at least one hotel assigned
-                $clientRouteIdArr = $this->getExcludedIds($client_route_info); //here we store all client_route_ids that has at least one hotel
-
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->where(function ($query) use($clientRouteIdArr){
-                        $query->whereNotIn('client_route_id', $clientRouteIdArr)->orWhere('hour', '=', null);
-                    })
-                    ->get();
-            }
-
-
-        }
-/*      6)
+    6)
             a) - false
             b) - false
             c) - false
-        Wyświetlają się wszyscy klienci */
-        else if(($showAllClients == null || $showAllClients == 'false') && ($showOnlyAssigned == null || $showOnlyAssigned == 'false') && $clientId == null) {
-            $client_route = ClientRoute::all()->pluck('id')->toArray();
-            if($selectedWeek != '0') {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->where('weekOfYear', '=', $selectedWeek)
-                    ->get();
-            }
-            else {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->get();
-            }
-
-
-        }
-/*      7)
-            a) - false
-            b) - true
-            c) - true
-        Tylko trasy bez przypisanego hotelu dla danego klienta */
-        else if(($showAllClients == null || $showAllClients == 'false') && $showOnlyAssigned == 'true' && $clientId != null) {
-            $client_route = ClientRoute::where('client_id', '=', $clientId)->pluck('id')->toArray();
-            if($selectedWeek != '0') {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('weekOfYear', '=', $selectedWeek)
-                    ->where('date', 'like', $year . '%')
-                    ->get();
-
-                //now we are checking if every client_route group has at least one hotel assigned
-                $clientRouteIdArr = $this->getExcludedIds($client_route_info); //here we store all client_route_ids that has at least one hotel
-
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('weekOfYear', '=', $selectedWeek)
-                    ->where('date', 'like', $year . '%')
-                    ->where(function ($query) use($clientRouteIdArr){
-                        $query->whereNotIn('client_route_id', $clientRouteIdArr)->orWhere('hour', '=', null);
-                    })
-                    ->get();
-
-            }
-            else {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->get();
-
-                //now we are checking if every client_route group has at least one hotel assigned
-                $clientRouteIdArr = $this->getExcludedIds($client_route_info); //here we store all client_route_ids that has at least one hotel
-
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->where(function ($query) use($clientRouteIdArr){
-                        $query->whereNotIn('client_route_id', $clientRouteIdArr)->orWhere('hour', '=', null);
-                    })
-                    ->get();
-            }
-
-
-        }
-/*      8)
+    8)
             a) - false
             b) - false
             c) - true
         Wszystkie trasy danego klienta */
-        else if(($showAllClients == null || $showAllClients == 'false') && ($showOnlyAssigned == null || $showOnlyAssigned == 'false') && $clientId != null) {
-            $client_route = ClientRoute::where('client_id', '=', $clientId)->pluck('id')->toArray();
-            if($selectedWeek != '0') {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('weekOfYear', '=', $selectedWeek)
-                    ->where('date', 'like', $year . '%')
-                    ->get();
+        if(($showAllClients == 'true' && ($showOnlyAssigned == null || $showOnlyAssigned == 'false') && $clientId == null) ||
+            ($showAllClients == 'true' && $clientId != null && ($showOnlyAssigned == null || $showOnlyAssigned == 'false')) ||
+            (($showAllClients == null || $showAllClients == 'false') && ($showOnlyAssigned == null || $showOnlyAssigned == 'false') && $clientId == null) ||
+            (($showAllClients == null || $showAllClients == 'false') && ($showOnlyAssigned == null || $showOnlyAssigned == 'false') && $clientId != null)) {
+
+            if((($showAllClients == null || $showAllClients == 'false') && ($showOnlyAssigned == null || $showOnlyAssigned == 'false') && $clientId != null)) {
+                $client_route = ClientRoute::where('client_id', '=', $clientId)->pluck('id')->toArray();
             }
             else {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->get();
+                $client_route = ClientRoute::all()->pluck('id')->toArray();
             }
 
+                    $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                        ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
+                        ->where('date', 'like', $year . '%')
+                        ->where('weekOfYear', 'like', $selectedWeek)
+                        ->where('client_route.type', 'like', $typ)
+                        ->get();
+        }
+    /*      2)
+        a) - true
+        b) - true
+        c) - true
+            4)
+        a) - true,
+        b) - true,
+        c) - false
+            5)
+        a) - false,
+        b) - true,
+        c) - false
+            7)
+        a) - false
+        b) - true
+        c) - true
+        Wyświetlają się wszyscy klienci, którzy mają trasy bez przypisanego hotelu... */
+        else if(($showAllClients == 'true' && $showOnlyAssigned == 'true' && $clientId != null) ||
+            ($showAllClients == 'true' && $showOnlyAssigned == 'true' && $clientId == null) ||
+            (($showAllClients == null || $showAllClients == 'false') && $showOnlyAssigned == 'true' && $clientId == null) ||
+            (($showAllClients == null || $showAllClients == 'false') && $showOnlyAssigned == 'true' && $clientId != null)) {
 
+            if(($showAllClients == null || $showAllClients == 'false') && $showOnlyAssigned == 'true' && $clientId != null) {
+                $client_route = ClientRoute::where('client_id', '=', $clientId)->pluck('id')->toArray();
+            }
+            else {
+                $client_route = ClientRoute::all()->pluck('id')->toArray();
+            }
+
+                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->where('date', 'like', $year . '%')
+                    ->where('weekOfYear', 'like', $selectedWeek)
+                    ->get();
+
+                //now we are checking if every client_route group has at least one hotel assigned
+                $clientRouteIdArr = $this->getExcludedIds($client_route_info); //here we store all client_route_ids that has at least one hotel
+
+                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
+                    ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
+                    ->where('date', 'like', $year . '%')
+                    ->where('weekOfYear', 'like', $selectedWeek)
+                    ->where('client_route.type', 'like', $typ)
+                    ->where(function ($query) use($clientRouteIdArr) {
+                        $query->whereNotIn('client_route_id', $clientRouteIdArr)->orWhere('hour', '=', null);
+                    })
+                    ->get();
         }
         else { // wszyscy klienci
             $client_route = ClientRoute::all()->pluck('id')->toArray();
-            if($selectedWeek != '0') {
                 $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)->get();
-            }
-            else {
-                $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
-                    ->where('date', 'like', $year . '%')
-                    ->get();
-            }
-
-
         }
 
         $client_route_info_extended = $client_route_info->map(function ($item) use ($hotels, $cities, $clients) {
@@ -812,6 +636,7 @@ class CrmRouteController extends Controller
 
             $clientName = DB::table('client_route_info')->select(DB::raw('
                 client.name as clientName,
+                client_route.type as typ,
                 client_route.status as status
             '))
                 ->join('client_route', 'client_route.id', 'client_route_info.client_route_id')
@@ -821,6 +646,7 @@ class CrmRouteController extends Controller
                 ->first();
 
             $item->clientName = $clientName->clientName;
+            $item->typ = $clientName->typ;
             $item->status = $clientName->status;
 
             return $item;
@@ -857,6 +683,7 @@ class CrmRouteController extends Controller
                 $helpObject->hour = $extendedInfo->hour;
                 $helpObject->status = $extendedInfo->status;
                 $helpObject->haveHotel = $extendedInfo->haveHotel;
+                $helpObject->typ = $extendedInfo->typ;
                 array_push($fullNameArr, $helpObject);
             } else {
                 array_push($fullInfoArr, $fullNameArr); //dodaje do fullInfoArr wszystkie dane o poszczególej trasie
@@ -871,6 +698,7 @@ class CrmRouteController extends Controller
                 $helpObject->hour = $extendedInfo->hour;
                 $helpObject->status = $extendedInfo->status;
                 $helpObject->haveHotel = $extendedInfo->haveHotel;
+                $helpObject->typ = $extendedInfo->typ;
                 array_push($fullNameArr, $helpObject);
                 $client_route_indicator = $extendedInfo->client_route_id;
             }
@@ -947,6 +775,7 @@ class CrmRouteController extends Controller
                     $helpObject2->status = $item->status;
                     $helpObject2->haveHotel = $item->haveHotel;
                     $helpObject2->minDate = $minDate; //lowest date of each clientRoute.
+                    $helpObject2->typ = $item->typ;
                     if ($helpHourVariable > 0) {
                         $helpObject2->hour = "tak";
                     } else {
@@ -1283,23 +1112,9 @@ class CrmRouteController extends Controller
             foreach($clientRoutesInfoWithUsedCities as $item) {
                 //wartość karencji dla danego miasta
                 $gracePeriod = Cities::find($item->city_id)->grace_period;
-//            $day = substr($item->date,8,2);
-//            $month = substr($item->date,5,2);
-//            $year = substr($item->date, 0,4);
-//            $dateInProperFormat = mktime(0, 0, 0, $month, $day, $year);
-//            $dateInProperFormat = date('Y-m-d', $dateInProperFormat);
-//
-//            $day2 = substr($date,8,2);
-//            $month2 = substr($date,5,2);
-//            $year2 = substr($date, 0,4);
-//            $dateInProperFormat2 = mktime(0, 0, 0, $month2, $day2, $year2);
-//            $dateInProperFormat2 = date('Y-m-d', $dateInProperFormat2);
                 $goodDate = date_create($item->date);
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
-//            if($item->city_id == 75) {
-//                dd($dateDifference);
-//            }
 
                 $arrayFlag = false;
                 if($dateDifference <= $gracePeriod) {
@@ -1543,13 +1358,6 @@ class CrmRouteController extends Controller
         if($currentDate != 0) {
             $properDate = date_create($currentDate);
 
-            //lista miast we wszystkich trasach.
-//            $citiesAvailable = DB::table('routes_info')->select(DB::raw('
-//            city_id as cityId
-//            '))
-//                ->pluck('cityId')
-//                ->toArray();
-
             //Rekordy clientRoutesInfo w których były użyte miasta
             $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
@@ -1566,11 +1374,6 @@ class CrmRouteController extends Controller
 
                 $arrayFlag = false;
                 if($dateDifference <= $gracePeriod) {
-//                    foreach($checkedCities as $cities) {
-//                        if($item->city_id == $cities->city_id) {
-//                            $arrayFlag = true;
-//                        }
-//                    }
                     if($arrayFlag == false) {
                         $cityInfoObject = new \stdClass();
                         $cityInfoObject->city_id = $item->city_id;
@@ -1737,7 +1540,7 @@ class CrmRouteController extends Controller
 
     /**
      * CampaignsInfo
-     * @params: weeks - array, years - array,
+     * @params: weeks - array, years - array, departments - array, typ - array
      * This method returns to server data for datatable about all records from ClientRouteInfo table.
      */
 
@@ -1745,23 +1548,25 @@ class CrmRouteController extends Controller
         $years = $request->years;
         $weeks = $request->weeks;
         $departments = $request->departments;
+        $typ = $request->typ;
 
         $campaignsInfo = ClientRouteInfo::select(DB::raw('
         client_route_info.id as id,
         client_route_info.date as date,
         client_route_info.hour as hour,
+        client_route_info.sms as sms,
         client_route_info.weekOfYear as weekOfYear,
         client_route_info.limits as limits,
         YEAR(client_route_info.date) as year,
         0 as pbxSuccess,
-        0 as sms,
         (0 - 0) as loseSuccess,
         0 as countHour,
         client.name as clientName,
         departments.name as departmentName,
         client_route_info.comment as comment,
         city.name as cityName,
-        0 as totalScore
+        0 as totalScore,
+        client_route.type as typ
         '))
         ->join('client_route','client_route.id','client_route_info.client_route_id')
         ->leftjoin('client','client.id','client_route.client_id')
@@ -1782,11 +1587,15 @@ class CrmRouteController extends Controller
             $campaignsInfo = $campaignsInfo->whereIn('client_route_info.department_info_id', $departments);
         }
 
+        if($typ[0] != '0') {
+            $campaignsInfo = $campaignsInfo->whereIn('client_route.type', $typ);
+        }
+
         return datatables($campaignsInfo->get())->make(true);
     }
 
     /**
-     * @param ids - array, limit - number, comment - text
+     * @param ids - array, limit - number, comment - text, sms - number(0,1)
      * @return adnotation for user
      * This method changes limits for selected by user records.
      */
@@ -1794,6 +1603,7 @@ class CrmRouteController extends Controller
         $ids = json_decode($request->ids);
         $limit = $request->limit;
         $comment = $request->comment;
+        $sms = $request->sms;
 
         $clientRouteInfoRecords = ClientRouteInfo::whereIn('id', $ids)->get();
 
@@ -1807,6 +1617,13 @@ class CrmRouteController extends Controller
         if($comment != '') {
             foreach($clientRouteInfoRecords as $record) {
                 $record->comment = $comment;
+                $record->save();
+            }
+        }
+
+        if($sms != '') {
+            foreach($clientRouteInfoRecords as $record) {
+                $record->sms = $sms;
                 $record->save();
             }
         }

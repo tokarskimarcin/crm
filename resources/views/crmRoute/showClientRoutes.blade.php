@@ -98,15 +98,24 @@
                                     <option value="0">Wybierz</option>
                                 </select>
                             </div>
+                            
+                            <div class="form-group">
+                                <label for="type">Typ</label>
+                                <select id="type" class="form-control">
+                                    <option value="0">Wybierz</option>
+                                    <option value="1">Wysyłka</option>
+                                    <option value="2">Badania</option>
+                                </select>
+                            </div>
                             <table id="datatable2" class="thead-inverse table table-bordered" cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
                                     <th>Tydzień</th>
                                     <th>Klient</th>
-                                    <th>Data &Iukcy; pokazu</th>
-                                    <th>Status Kampanii</th>
+                                    <th>Data I pokazu</th>
+                                    <th>Trasa</th>
                                     <th>Przypisany hotel i godziny</th>
-                                    <th>Akceptuj trasę</th>
+                                    <th>Status kampanii</th>
                                     <th>Edycja (Hoteli i godzin)</th>
                                     <th>Edycja (Trasy)</th>
                                     <th>Edycja parametrów (Kampanii)</th>
@@ -212,6 +221,7 @@
         document.addEventListener('DOMContentLoaded', function(event) {
 
             let yearInput = document.querySelector('#year');
+            let typInput = document.querySelector('#type');
 
             //This part is responsible for listing every week number into select
             const lastWeekOfYear ={{$lastWeek}};
@@ -428,6 +438,7 @@
                         d.showOnlyAssigned = showOnlyAssigned;
                         d.selectedWeek = selectedWeek;
                         d.year = yearInput.value;
+                        d.typ = typInput.value;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -448,7 +459,14 @@
                         },"name":"minDate"
                     },
                     {"data":function (data, type, dataToSet) {
-                            return data.clientRouteName;
+                            let finalName = '';
+                            if(data.typ == '1') {
+                                finalName = data.clientRouteName + ' (W)';
+                            }
+                            else {
+                                finalName = data.clientRouteName + ' (B)';
+                            }
+                            return finalName;
                         },"name":"clientRouteName"
                     },
                     {"data":function (data, type, dataToSet) {
@@ -634,6 +652,10 @@
 
             }
 
+            function typHandler(e) {
+                table2.ajax.reload();
+            }
+
 
 
             showAllClientsInput.addEventListener('change', showAllClientsInputHandler);
@@ -641,6 +663,7 @@
             selectedWeekInput.addEventListener('change', selectedWeekHandler);
 
             yearInput.addEventListener('change', yearHandler);
+            typInput.addEventListener('change', typHandler)
 
         });
     </script>
