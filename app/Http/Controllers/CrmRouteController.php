@@ -1540,7 +1540,7 @@ class CrmRouteController extends Controller
 
     /**
      * CampaignsInfo
-     * @params: weeks - array, years - array, departments - array
+     * @params: weeks - array, years - array, departments - array, typ - array
      * This method returns to server data for datatable about all records from ClientRouteInfo table.
      */
 
@@ -1548,6 +1548,7 @@ class CrmRouteController extends Controller
         $years = $request->years;
         $weeks = $request->weeks;
         $departments = $request->departments;
+        $typ = $request->typ;
 
         $campaignsInfo = ClientRouteInfo::select(DB::raw('
         client_route_info.id as id,
@@ -1564,7 +1565,8 @@ class CrmRouteController extends Controller
         departments.name as departmentName,
         client_route_info.comment as comment,
         city.name as cityName,
-        0 as totalScore
+        0 as totalScore,
+        client_route.type as typ
         '))
         ->join('client_route','client_route.id','client_route_info.client_route_id')
         ->leftjoin('client','client.id','client_route.client_id')
@@ -1583,6 +1585,10 @@ class CrmRouteController extends Controller
 
         if($departments[0] != '0') {
             $campaignsInfo = $campaignsInfo->whereIn('client_route_info.department_info_id', $departments);
+        }
+
+        if($typ[0] != '0') {
+            $campaignsInfo = $campaignsInfo->whereIn('client_route.type', $typ);
         }
 
         return datatables($campaignsInfo->get())->make(true);
@@ -1631,6 +1637,54 @@ class CrmRouteController extends Controller
         }
 
         return $adnotation;
+    }
+
+    /**
+     * This method returns view showCitiesStatistics
+     */
+    public function showCitiesStatisticsGet() {
+
+        return view('crmRoute.showCitiesStatistics');
+    }
+
+    /**
+     * @param dateStart, dateStop
+     * This method returns data about cities used in given range of dates
+     */
+    public function showCitiesStatisticsAjax(Request $request) {
+        $dateStart = $request->startDate;
+        $dateStop = $request->stopDate;
+
+        $clientRouteInfo = DB::table('client_route_info')->select(DB::raw('
+            city.name as cityName,
+            city.id as cityId,
+            voivodeship.name as voivodeName,
+            COUNT(client_route_info.city_id) as ilosc
+        '))
+            ->join('city', 'city.id', '=', 'client_route_info.city_id')
+            ->join('voivodeship', 'voivodeship.id', '=', 'city.voivodeship_id')
+            ->whereBetween('client_route_info.date', [$dateStart, $dateStop])
+            ->groupBy('voivodeship.name', 'city.name')
+            ->get();
+        return datatables($clientRouteInfo)->make(true);
+    }
+
+    /**
+     * @param City_id, dateStart, dateStop
+     * This method returns data about clientROuteInfo records from given range of dates.
+     */
+    public function getClientRouteInfoRecords(Request $request) {
+        $cityId = $request->cityId;
+        $dateStart = $request->dateStart;
+        $dateStop = $request->dateStop;
+
+        $clientRouteInfoRecords = ClientRouteInfo::select('city.name as cityName', 'client_route_info.date as date')
+            ->join('city', 'city.id', '=', 'client_route_info.city_id')
+            ->where('city_id', '=', $cityId)
+            ->whereBetween('date', [$dateStart, $dateStop])
+            ->get();
+
+        return $clientRouteInfoRecords;
     }
 
     /**
