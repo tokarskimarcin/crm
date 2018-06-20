@@ -7,7 +7,7 @@
 
 @extends('layouts.main')
 @section('style')
-
+    <link rel="stylesheet" href="{{asset('/css/fixedHeader.dataTables.min.css')}}">
 @endsection
 @section('content')
 
@@ -169,6 +169,7 @@
 @endsection
 
 @section('script')
+    <script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>
     <script>
         function saveOptions(e){
             let allRow = document.getElementsByClassName('campainsOption');
@@ -379,6 +380,7 @@
                 "autoWidth": true,
                 "processing": true,
                 "serverSide": true,
+                "fixedHeader": true,
                 "fnDrawCallback": function(settings) {
                     objectArr = [];
                     const buttons = document.querySelectorAll('.action-buttons-0');
