@@ -612,7 +612,8 @@ class CrmRouteController extends Controller
                 }
             }
 
-            if($hotelIterator > 0) {
+
+            if($hotelIterator == $thisClientRouteData->count()) {
                 $item->haveHotel = "1";
             }
             else {
@@ -662,12 +663,6 @@ class CrmRouteController extends Controller
         $client_route_indicator = null;
         $lp = 0; // simple iterator
         foreach ($client_route_info_extended as $extendedInfo) {
-//            $dateFlag = null; // true - the same day, false - other day
-//            $cityFlag = null;
-//            if($extendedInfo === reset($client_route_info_extended)) { // We are adding first city name to string and first insertions into arrays.
-//                array_push($cityAArr,$extendedInfo->cityName);
-//                array_push($dateArr, $extendedInfo->date);
-//                $clientRouteName .= $extendedInfo->cityName;dddd($extendedInfo);$lp++;
             $lp++;
             if ($lp == 1) {
                 $client_route_indicator = $extendedInfo->client_route_id; // przypisujemy do zmiennej wartosc pierwsego client_route_id
@@ -776,7 +771,7 @@ class CrmRouteController extends Controller
                     $helpObject2->haveHotel = $item->haveHotel;
                     $helpObject2->minDate = $minDate; //lowest date of each clientRoute.
                     $helpObject2->typ = $item->typ;
-                    if ($helpHourVariable > 0) {
+                    if ($helpHourVariable == count($eachClientRoute)) {
                         $helpObject2->hour = "tak";
                     } else {
                         $helpObject2->hour = "nie";

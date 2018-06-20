@@ -293,6 +293,11 @@ console.log(hotelIdArr);
                         //       isOkFlag = false;
                         //    }
                         // });
+                        // this.timeHotelArr.forEach(element => {
+                        //     if(element.hotelId == '' || element.hotelId == null) {
+                        //         isOkFlag = false;
+                        //     }
+                        // });
 
                         if(isOkFlag == true) {
                             return true;

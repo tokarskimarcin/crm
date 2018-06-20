@@ -1,10 +1,10 @@
-/*
-*@category: CRM,
-*@info: This view is responsible for adding new hotel to database
-*@DB table: "hotels",
-*@controller: CrmRouteController,
-*@methods: addNewHotelGet, addNewHotelPost
-*/
+{{--/*--}}
+{{--*@category: CRM,--}}
+{{--*@info: This view is responsible for adding new hotel to database--}}
+{{--*@DB table: "hotels",--}}
+{{--*@controller: CrmRouteController,--}}
+{{--*@methods: addNewHotelGet, addNewHotelPost--}}
+{{--*/--}}
 
 
 @extends('layouts.main')
