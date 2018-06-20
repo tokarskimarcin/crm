@@ -1692,8 +1692,26 @@ class CrmRouteController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function aheadPlanningGet(){
+        $year = date('Y',strtotime("this year"));
 
-        return view('crmRoute.aheadPlanning');
+        $weeksString = date('W', strtotime("this week"));
+        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
+
+        $departmentInfo = DB::table('department_info')->select(DB::raw('
+        department_info.id as id, 
+        department_type.name as name, 
+        departments.name as name2
+        '))
+        ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+        ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+        ->get();
+
+
+        return view('crmRoute.aheadPlanning')
+            ->with('lastWeek', $numberOfLastYearsWeek)
+            ->with('currentWeek', $weeksString)
+            ->with('currentYear', $year)
+            ->with('departmentInfo', $departmentInfo);
     }
 
 }
