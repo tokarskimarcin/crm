@@ -22,6 +22,10 @@
             animation-fill-mode: forwards;
         }
 
+        .page-info {
+            font-size: 1.5em;
+        }
+
         @keyframes example {
             from {backgroud-color: white;}
             to {background-color: #565fff;}
@@ -44,6 +48,9 @@
 
             </div>
             <div class="panel-body">
+                <div class="alert alert-info page-info">
+                    Moduł <span style="font-weight: bold;">Szczegółowe informacje o kampaniach</span> wyświetla informacje o poszczególnych pokazo-godzinach, które mogą być zbiorczo edytowane. Tabela z rekordami może być filtrowana dostępnymi polami wielokrotnego wyboru. W tabeli znajdują się jedynie rekordy <span style="text-decoration: underline;">aktywnych</span> oraz <span style="text-decoration: underline;">zakończonych</span>  kampanii. Aby edytować rekordy, należy je zaznaczyć i nacisnąć przycisk <span style="font-weight: bold;">Edytuj rekord(y)</span>.
+                </div>
                 <div class="row">
                     <div class="col-md-2">
                         <div class="form-group">
