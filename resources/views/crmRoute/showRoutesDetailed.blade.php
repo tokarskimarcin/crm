@@ -15,7 +15,15 @@
 
     <style>
         .colorRow {
-            background-color: #565fff !important;
+            /*background-color: #565fff !important;*/
+            animation-name: example;
+            animation-duration: 1s;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes example {
+            from {backgroud-color: white;}
+            to {background-color: #565fff;}
         }
     </style>
 
@@ -100,7 +108,7 @@
 
     <!-- Modal -->
     <div id="editModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
 
             <!-- Modal content-->
             <div class="modal-content">
@@ -220,6 +228,8 @@
                appendLimitInput(modalBody);
                appendCommentInput(modalBody);
                appendSmsSelect(modalBody);
+               appendInvitationInput(modalBody);
+               appendDepartmentSelect(modalBody);
 
                let submitButton = document.createElement('button');
                submitButton.id = 'submitEdition';
@@ -232,12 +242,16 @@
                /*Event Listener Part*/
                submitButton.addEventListener('click', function(e) {
                    const limitInput = document.querySelector('#changeLimits');
-                   const limitValue = limitInput.value;
                    const commentInput = document.querySelector('#changeComments');
-                   const commentValue = commentInput.value;
                    const smsInput = document.querySelector('#changeSms');
+                   const invitationInput = document.querySelector('#invitations');
+                   const departmentSelect = document.querySelector('#modalDepartment');
+
+                   const limitValue = limitInput.value;
+                   const commentValue = commentInput.value;
                    const smsValue = smsInput.options[smsInput.selectedIndex].value;
-                   console.log(smsValue);
+                   const invitationValue = invitationInput.value;
+                   const departmentValue = departmentSelect.options[departmentSelect.selectedIndex].value;
 
                    const url = `{{route('api.updateClientRouteInfoRecords')}}`;
                    const header = new Headers();
@@ -245,6 +259,7 @@
                    const data = new FormData();
                    const JSONClientRouteInfoIdArr = JSON.stringify(clientRouteInfoIdArr);
                    data.append('ids', JSONClientRouteInfoIdArr);
+
                    if(limitValue != '') {
                        data.append('limit', limitValue);
                    }
@@ -253,6 +268,12 @@
                    }
                    if(smsValue != -1) {
                        data.append('sms', smsValue);
+                   }
+                   if(invitationValue != '') {
+                       data.append('invitation', invitationValue);
+                   }
+                   if(departmentValue != '0') {
+                       data.append('department', departmentValue);
                    }
 
                    fetch(url, {
@@ -395,6 +416,49 @@
                placeToAppend.appendChild(alertElement);
            }
 
+           /**
+            * This function append to modal invitation input
+            */
+           function appendInvitationInput(placeToAppend) {
+               let label = document.createElement('label');
+               label.setAttribute('for', 'invitations');
+               label.textContent = 'Zaproszenia';
+               placeToAppend.appendChild(label);
+
+               let invitationInput = document.createElement('input');
+               invitationInput.id = 'invitations';
+               invitationInput.classList.add('form-control');
+               invitationInput.setAttribute('type', 'number');
+               invitationInput.setAttribute('min', '0');
+               invitationInput.setAttribute('step', '1');
+               placeToAppend.appendChild(invitationInput);
+           }
+
+           function appendDepartmentSelect(placeToAppend) {
+               let label = document.createElement('label');
+               label.setAttribute('for', 'modalDepartment');
+               label.textContent = 'Oddział';
+               placeToAppend.appendChild(label);
+
+               let departmentSelect = document.createElement('select');
+               departmentSelect.id = 'modalDepartment';
+               departmentSelect.classList.add('form-control');
+
+               let basicOption = document.createElement('option');
+               basicOption.value = '0';
+               basicOption.textContent = 'Wybierz';
+               departmentSelect.appendChild(basicOption);
+
+               @foreach($departmentInfo as $department)
+                    var option = document.createElement('option');
+                    option.value = `{{$department->id}}`;
+                    option.textContent = `{{$department->name2}} {{$department->name}}`;
+                    departmentSelect.appendChild(option);
+               @endforeach
+
+               placeToAppend.appendChild(departmentSelect);
+           }
+
            /****************END OF MODAL FUNCTIONS********************/
 
            table = $('#datatable').DataTable({
@@ -486,7 +550,8 @@
                        },"name":"clientName"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return data.departmentName;
+                            let fullDepartmentName = data.departmentName == null ? null : data.departmentName + ' ' + data.departmentName2;
+                           return fullDepartmentName;
                        },"name":"departmentName", "searchable": "false"
                    },
                    {"data":function (data, type, dataToSet) {

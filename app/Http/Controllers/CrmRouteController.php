@@ -1563,6 +1563,7 @@ class CrmRouteController extends Controller
         0 as countHour,
         client.name as clientName,
         departments.name as departmentName,
+        department_type.name as departmentName2,
         client_route_info.comment as comment,
         city.name as cityName,
         0 as totalScore,
@@ -1573,6 +1574,7 @@ class CrmRouteController extends Controller
         ->leftjoin('city','city.id','client_route_info.city_id')
         ->leftjoin('department_info','department_info.id','client_route_info.department_info_id')
         ->leftjoin('departments','departments.id','department_info.id_dep')
+        ->leftjoin('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
         ->whereIn('client_route.status',[1,2]);
 
         if($years[0] != '0') {
@@ -1595,7 +1597,7 @@ class CrmRouteController extends Controller
     }
 
     /**
-     * @param ids - array, limit - number, comment - text, sms - number(0,1)
+     * @param ids - array, limit - number, comment - text, sms - number(0,1), invitation - number, department - number
      * @return adnotation for user
      * This method changes limits for selected by user records.
      */
@@ -1604,6 +1606,8 @@ class CrmRouteController extends Controller
         $limit = $request->limit;
         $comment = $request->comment;
         $sms = $request->sms;
+        $invitation = $request->invitation;
+        $department = $request->department;
 
         $clientRouteInfoRecords = ClientRouteInfo::whereIn('id', $ids)->get();
 
@@ -1624,6 +1628,19 @@ class CrmRouteController extends Controller
         if($sms != '') {
             foreach($clientRouteInfoRecords as $record) {
                 $record->sms = $sms;
+                $record->save();
+            }
+        }
+
+        if($invitation != '') {
+            foreach($clientRouteInfoRecords as $record) {
+
+            }
+        }
+
+        if($department != '') {
+            foreach($clientRouteInfoRecords as $record) {
+                $record->department_info_id = $department;
                 $record->save();
             }
         }
