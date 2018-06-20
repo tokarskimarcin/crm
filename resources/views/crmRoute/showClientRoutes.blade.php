@@ -109,7 +109,7 @@
                             </div>
                             
                             <div class="form-group">
-                                <label for="campaignState">Status Kampnanii</label>
+                                <label for="campaignState">Status Kampanii</label>
                                 <select id="campaignState" class="form-control">
                                     <option value="-1">Wybierz</option>
                                     <option value="0">Nie gotowe</option>
