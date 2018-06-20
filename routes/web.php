@@ -255,6 +255,10 @@ Route::post('/showRoutesDetailedUpdateAjax', 'CrmRouteController@showRoutesDetai
 Route::post('/getClientRouteInfoRecords', 'CrmRouteController@getClientRouteInfoRecords')->name('api.getClientRouteInfoRecords');
 /* END CRM-ROUTES AJAX */
 
+/* HR-ROUTES AJAX */
+Route::post('/coachChange', 'UsersController@coachChangePost')->name('api.coachChange');
+Route::post('/coachChangeRevert', 'UsersController@coachChangeRevertPost')->name('api.coachChangeRevert');
+/* END HR-ROUTES AJAX */
 /** */
 
 //********************AJAX*********************** */
@@ -414,8 +418,6 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     //Changing coach groups
     Route::get('/coachChange', 'UsersController@coachChangeGet');
-    Route::post('/coachChange', 'UsersController@coachChangePost');
-    Route::post('/coachChangeRevert', 'UsersController@coachChangeRevertPost');
 
     Route::get('/edit_consultant/{id}', 'UsersController@edit_consultantGet');
     //Route::POST('/edit_consultant/{id}','UsersController@edit_consultantPOST');
