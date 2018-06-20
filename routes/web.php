@@ -253,8 +253,15 @@ Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->nam
 
 /* HR-ROUTES AJAX */
 Route::post('/coachChange', 'UsersController@coachChangePost')->name('api.coachChange');
+Route::post('/datatableCoachChange', 'UsersController@datatableCoachChange')->name('api.datatableCoachChange');
 Route::post('/coachChangeRevert', 'UsersController@coachChangeRevertPost')->name('api.coachChangeRevert');
 /* END HR-ROUTES AJAX */
+
+/* COACHING ROUTES AJAX*/
+Route::post('/coachAscription', 'CoachingController@coachAscriptionPost')->name('api.coachAscription');
+Route::post('/datatableCoachAscription', 'CoachingController@datatableCoachAscription')->name('api.datatableCoachAscription');
+Route::post('/coachAscriptionRevert', 'CoachingController@coachAscriptionRevertPost')->name('api.coachAscriptionRevert');
+/* END COACHING ROUTES AJAX*/
 /** */
 
 //********************AJAX*********************** */
@@ -786,8 +793,6 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/progress_table_manager', 'CoachingController@progress_table_managerGET');
 
     Route::get('/coachAscription', 'CoachingController@coachAscriptionGet');
-    Route::post('/coachAscription', 'CoachingController@coachAscriptionPost');
-    Route::post('/coachAscriptionRevert', 'CoachingController@coachAscriptionRevertPost');
 
     /** AUDYTY **/
     Route::get('/addAudit', 'AuditController@auditMethodGet');
