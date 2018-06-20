@@ -9,6 +9,7 @@
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.datatables.net/rowgroup/1.0.3/css/rowGroup.dataTables.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{asset('/css/fixedHeader.dataTables.min.css')}}">
 
 @endsection
 @section('content')
@@ -36,96 +37,96 @@
     </div>
 </div>
 
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
 
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="year">Rok</label>
+                            <select id="year" class="form-control" multiple="multiple">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="weeks">Tygodnie</label>
+                            <select id="weeks" class="form-control" multiple="multiple">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="departments">Oddział</label>
+                            <select id="departments" class="form-control" multiple="multiple">
+                                @foreach($departmentInfo as $item)
+                                    <option value="dep_{{$item->id}}">{{$item->name2}} {{$item->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="typ" style="display: block;">Typ</label>
+                            <select id="typ" multiple="multiple">
+                                <option value="1">Wysyłka</option>
+                                <option value="2">Badania</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label for="year">Rok</label>
-                                <select id="year" class="form-control" multiple="multiple">
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label for="weeks">Tygodnie</label>
-                                <select id="weeks" class="form-control" multiple="multiple">
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="departments">Oddział</label>
-                                <select id="departments" class="form-control" multiple="multiple">
-                                    @foreach($departmentInfo as $item)
-                                        <option value="dep_{{$item->id}}">{{$item->name2}} {{$item->name}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="typ" style="display: block;">Typ</label>
-                                <select id="typ" multiple="multiple">
-                                    <option value="1">Wysyłka</option>
-                                    <option value="2">Badania</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4 buttonSection">
+                <div class="row">
+                    <div class="col-md-4 buttonSection" style="min-height: 3.5em;">
 
-                        </div>
                     </div>
-                        <table id="datatable" class="thead-inverse table table-striped table-bordered">
-                            <thead>
-                            <tr>
-                                <th>Tydzien</th>
-                                <th>Data</th>
-                                <th>Kampania</th>
-                                <th>SMS</th>
-                                <th>Zaproszenia Live</th>
-                                <th>Limit</th>
-                                <th>Straty</th>
-                                <th>Projekt</th>
-                                <th>Oddział</th>
-                                <th>Uwagi</th>
-                            </tr>
-                            </thead>
-                        </table>
-                    <div class="row">
-                    </div>
+                </div>
+                    <table id="datatable" class="thead-inverse table table-striped table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Tydzien</th>
+                            <th>Data</th>
+                            <th>Kampania</th>
+                            <th>SMS</th>
+                            <th>Zaproszenia Live</th>
+                            <th>Limit</th>
+                            <th>Straty</th>
+                            <th>Projekt</th>
+                            <th>Oddział</th>
+                            <th>Uwagi</th>
+                        </tr>
+                        </thead>
+                    </table>
+                <div class="row">
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal -->
-    <div id="editModal" class="modal fade" role="dialog">
-        <div class="modal-dialog modal-lg">
+<!-- Modal -->
+<div id="editModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
 
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Edytuj</h4>
-                </div>
-                <div class="modal-body edit-modal-body">
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Edytuj</h4>
             </div>
+            <div class="modal-body edit-modal-body">
 
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij okno</button>
+            </div>
         </div>
+
     </div>
+</div>
 
 @endsection
 
@@ -133,6 +134,7 @@
         <script src="https://cdn.datatables.net/rowgroup/1.0.3/js/dataTables.rowGroup.min.js"></script>
         <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+        <script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>
     <script>
        document.addEventListener('DOMContentLoaded', function(mainEvent) {
            /********** GLOBAL VARIABLES ***********/
@@ -235,7 +237,8 @@
                submitButton.id = 'submitEdition';
                submitButton.classList.add('btn', 'btn-success');
                submitButton.style.marginTop = '1em';
-               submitButton.style.marginBottom = '1em';
+               // submitButton.style.marginBottom = '1em';
+               submitButton.style.marginLeft = '90%';
                submitButton.textContent = 'Zapisz';
                modalBody.appendChild(submitButton);
 
@@ -284,10 +287,14 @@
                    })
                        .then(response => response.text())
                        .then(response => {
-                           let infoBox = document.createElement('div');
-                           infoBox.classList.add('alert', 'alert-info');
-                           infoBox.textContent = response;
-                           modalBody.appendChild(infoBox);
+                           $.notify({
+                               // options
+                               message: 'Rekordy zostały zmienione!'
+                           },{
+                               // settings
+                               type: 'info',
+                               z_index: '100000'
+                           });
                            table.ajax.reload();
 
                        })
@@ -466,6 +473,7 @@
                "processing": true,
                "serverSide": true,
                order: [[1, 'asc']],
+               "fixedHeader": true,
                "drawCallback": function( settings ) {
 
                },
