@@ -79,7 +79,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4 buttonSection">
+                        <div class="col-md-4 buttonSection" style="min-height: 3.5em;">
 
                         </div>
                     </div>
@@ -120,7 +120,7 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij okno</button>
                 </div>
             </div>
 
@@ -235,7 +235,8 @@
                submitButton.id = 'submitEdition';
                submitButton.classList.add('btn', 'btn-success');
                submitButton.style.marginTop = '1em';
-               submitButton.style.marginBottom = '1em';
+               // submitButton.style.marginBottom = '1em';
+               submitButton.style.marginLeft = '90%';
                submitButton.textContent = 'Zapisz';
                modalBody.appendChild(submitButton);
 
@@ -284,10 +285,14 @@
                    })
                        .then(response => response.text())
                        .then(response => {
-                           let infoBox = document.createElement('div');
-                           infoBox.classList.add('alert', 'alert-info');
-                           infoBox.textContent = response;
-                           modalBody.appendChild(infoBox);
+                           $.notify({
+                               // options
+                               message: 'Rekordy zostały zmienione!'
+                           },{
+                               // settings
+                               type: 'info',
+                               z_index: '100000'
+                           });
                            table.ajax.reload();
 
                        })
