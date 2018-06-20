@@ -612,7 +612,8 @@ class CrmRouteController extends Controller
                 }
             }
 
-            if($hotelIterator > 0) {
+
+            if($hotelIterator == $thisClientRouteData->count()) {
                 $item->haveHotel = "1";
             }
             else {
@@ -662,12 +663,6 @@ class CrmRouteController extends Controller
         $client_route_indicator = null;
         $lp = 0; // simple iterator
         foreach ($client_route_info_extended as $extendedInfo) {
-//            $dateFlag = null; // true - the same day, false - other day
-//            $cityFlag = null;
-//            if($extendedInfo === reset($client_route_info_extended)) { // We are adding first city name to string and first insertions into arrays.
-//                array_push($cityAArr,$extendedInfo->cityName);
-//                array_push($dateArr, $extendedInfo->date);
-//                $clientRouteName .= $extendedInfo->cityName;dddd($extendedInfo);$lp++;
             $lp++;
             if ($lp == 1) {
                 $client_route_indicator = $extendedInfo->client_route_id; // przypisujemy do zmiennej wartosc pierwsego client_route_id
@@ -776,7 +771,7 @@ class CrmRouteController extends Controller
                     $helpObject2->haveHotel = $item->haveHotel;
                     $helpObject2->minDate = $minDate; //lowest date of each clientRoute.
                     $helpObject2->typ = $item->typ;
-                    if ($helpHourVariable > 0) {
+                    if ($helpHourVariable == count($eachClientRoute)) {
                         $helpObject2->hour = "tak";
                     } else {
                         $helpObject2->hour = "nie";
@@ -1563,6 +1558,7 @@ class CrmRouteController extends Controller
         0 as countHour,
         client.name as clientName,
         departments.name as departmentName,
+        department_type.name as departmentName2,
         client_route_info.comment as comment,
         city.name as cityName,
         0 as totalScore,
@@ -1573,6 +1569,7 @@ class CrmRouteController extends Controller
         ->leftjoin('city','city.id','client_route_info.city_id')
         ->leftjoin('department_info','department_info.id','client_route_info.department_info_id')
         ->leftjoin('departments','departments.id','department_info.id_dep')
+        ->leftjoin('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
         ->whereIn('client_route.status',[1,2]);
 
         if($years[0] != '0') {
@@ -1595,7 +1592,7 @@ class CrmRouteController extends Controller
     }
 
     /**
-     * @param ids - array, limit - number, comment - text, sms - number(0,1)
+     * @param ids - array, limit - number, comment - text, sms - number(0,1), invitation - number, department - number
      * @return adnotation for user
      * This method changes limits for selected by user records.
      */
@@ -1604,6 +1601,8 @@ class CrmRouteController extends Controller
         $limit = $request->limit;
         $comment = $request->comment;
         $sms = $request->sms;
+        $invitation = $request->invitation;
+        $department = $request->department;
 
         $clientRouteInfoRecords = ClientRouteInfo::whereIn('id', $ids)->get();
 
@@ -1628,6 +1627,19 @@ class CrmRouteController extends Controller
             }
         }
 
+        if($invitation != '') {
+            foreach($clientRouteInfoRecords as $record) {
+
+            }
+        }
+
+        if($department != '') {
+            foreach($clientRouteInfoRecords as $record) {
+                $record->department_info_id = $department;
+                $record->save();
+            }
+        }
+
 
         if(count($clientRouteInfoRecords) > 1) {
             $adnotation = "Rekordy zostały zmienione";
@@ -1637,6 +1649,81 @@ class CrmRouteController extends Controller
         }
 
         return $adnotation;
+    }
+
+    /**
+     * This method returns view showCitiesStatistics
+     */
+    public function showCitiesStatisticsGet() {
+
+        return view('crmRoute.showCitiesStatistics');
+    }
+
+    /**
+     * @param dateStart, dateStop
+     * This method returns data about cities used in given range of dates
+     */
+    public function showCitiesStatisticsAjax(Request $request) {
+        $dateStart = $request->startDate;
+        $dateStop = $request->stopDate;
+
+        $clientRouteInfo = DB::table('client_route_info')->select(DB::raw('
+            city.name as cityName,
+            city.id as cityId,
+            voivodeship.name as voivodeName,
+            COUNT(client_route_info.city_id) as ilosc
+        '))
+            ->join('city', 'city.id', '=', 'client_route_info.city_id')
+            ->join('voivodeship', 'voivodeship.id', '=', 'city.voivodeship_id')
+            ->whereBetween('client_route_info.date', [$dateStart, $dateStop])
+            ->groupBy('voivodeship.name', 'city.name')
+            ->get();
+        return datatables($clientRouteInfo)->make(true);
+    }
+
+    /**
+     * @param City_id, dateStart, dateStop
+     * This method returns data about clientROuteInfo records from given range of dates.
+     */
+    public function getClientRouteInfoRecords(Request $request) {
+        $cityId = $request->cityId;
+        $dateStart = $request->dateStart;
+        $dateStop = $request->dateStop;
+
+        $clientRouteInfoRecords = ClientRouteInfo::select('city.name as cityName', 'client_route_info.date as date')
+            ->join('city', 'city.id', '=', 'client_route_info.city_id')
+            ->where('city_id', '=', $cityId)
+            ->whereBetween('date', [$dateStart, $dateStop])
+            ->get();
+
+        return $clientRouteInfoRecords;
+    }
+
+    /**
+     * Show aheadPlanning view
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function aheadPlanningGet(){
+        $year = date('Y',strtotime("this year"));
+
+        $weeksString = date('W', strtotime("this week"));
+        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
+
+        $departmentInfo = DB::table('department_info')->select(DB::raw('
+        department_info.id as id, 
+        department_type.name as name, 
+        departments.name as name2
+        '))
+        ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+        ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+        ->get();
+
+
+        return view('crmRoute.aheadPlanning')
+            ->with('lastWeek', $numberOfLastYearsWeek)
+            ->with('currentWeek', $weeksString)
+            ->with('currentYear', $year)
+            ->with('departmentInfo', $departmentInfo);
     }
 
 }

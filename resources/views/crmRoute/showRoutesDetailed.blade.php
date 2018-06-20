@@ -9,13 +9,22 @@
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.datatables.net/rowgroup/1.0.3/css/rowGroup.dataTables.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{asset('/css/fixedHeader.dataTables.min.css')}}">
 
 @endsection
 @section('content')
 
     <style>
         .colorRow {
-            background-color: #565fff !important;
+            /*background-color: #565fff !important;*/
+            animation-name: example;
+            animation-duration: 1s;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes example {
+            from {backgroud-color: white;}
+            to {background-color: #565fff;}
         }
     </style>
 
@@ -28,96 +37,96 @@
     </div>
 </div>
 
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
 
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="year">Rok</label>
+                            <select id="year" class="form-control" multiple="multiple">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="weeks">Tygodnie</label>
+                            <select id="weeks" class="form-control" multiple="multiple">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="departments">Oddział</label>
+                            <select id="departments" class="form-control" multiple="multiple">
+                                @foreach($departmentInfo as $item)
+                                    <option value="dep_{{$item->id}}">{{$item->name2}} {{$item->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="typ" style="display: block;">Typ</label>
+                            <select id="typ" multiple="multiple">
+                                <option value="1">Wysyłka</option>
+                                <option value="2">Badania</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label for="year">Rok</label>
-                                <select id="year" class="form-control" multiple="multiple">
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label for="weeks">Tygodnie</label>
-                                <select id="weeks" class="form-control" multiple="multiple">
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="departments">Oddział</label>
-                                <select id="departments" class="form-control" multiple="multiple">
-                                    @foreach($departmentInfo as $item)
-                                        <option value="dep_{{$item->id}}">{{$item->name2}} {{$item->name}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="typ" style="display: block;">Typ</label>
-                                <select id="typ" multiple="multiple">
-                                    <option value="1">Wysyłka</option>
-                                    <option value="2">Badania</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4 buttonSection">
+                <div class="row">
+                    <div class="col-md-4 buttonSection" style="min-height: 3.5em;">
 
-                        </div>
                     </div>
-                        <table id="datatable" class="thead-inverse table table-striped table-bordered">
-                            <thead>
-                            <tr>
-                                <th>Tydzien</th>
-                                <th>Data</th>
-                                <th>Kampania</th>
-                                <th>SMS</th>
-                                <th>Zaproszenia Live</th>
-                                <th>Limit</th>
-                                <th>Straty</th>
-                                <th>Projekt</th>
-                                <th>Oddział</th>
-                                <th>Uwagi</th>
-                            </tr>
-                            </thead>
-                        </table>
-                    <div class="row">
-                    </div>
+                </div>
+                    <table id="datatable" class="thead-inverse table table-striped table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Tydzien</th>
+                            <th>Data</th>
+                            <th>Kampania</th>
+                            <th>SMS</th>
+                            <th>Zaproszenia Live</th>
+                            <th>Limit</th>
+                            <th>Straty</th>
+                            <th>Projekt</th>
+                            <th>Oddział</th>
+                            <th>Uwagi</th>
+                        </tr>
+                        </thead>
+                    </table>
+                <div class="row">
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal -->
-    <div id="editModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
+<!-- Modal -->
+<div id="editModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
 
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Edytuj</h4>
-                </div>
-                <div class="modal-body edit-modal-body">
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Edytuj</h4>
             </div>
+            <div class="modal-body edit-modal-body">
 
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij okno</button>
+            </div>
         </div>
+
     </div>
+</div>
 
 @endsection
 
@@ -125,6 +134,7 @@
         <script src="https://cdn.datatables.net/rowgroup/1.0.3/js/dataTables.rowGroup.min.js"></script>
         <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+        <script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>
     <script>
        document.addEventListener('DOMContentLoaded', function(mainEvent) {
            /********** GLOBAL VARIABLES ***********/
@@ -220,24 +230,31 @@
                appendLimitInput(modalBody);
                appendCommentInput(modalBody);
                appendSmsSelect(modalBody);
+               appendInvitationInput(modalBody);
+               appendDepartmentSelect(modalBody);
 
                let submitButton = document.createElement('button');
                submitButton.id = 'submitEdition';
                submitButton.classList.add('btn', 'btn-success');
                submitButton.style.marginTop = '1em';
-               submitButton.style.marginBottom = '1em';
+               // submitButton.style.marginBottom = '1em';
+               submitButton.style.marginLeft = '90%';
                submitButton.textContent = 'Zapisz';
                modalBody.appendChild(submitButton);
 
                /*Event Listener Part*/
                submitButton.addEventListener('click', function(e) {
                    const limitInput = document.querySelector('#changeLimits');
-                   const limitValue = limitInput.value;
                    const commentInput = document.querySelector('#changeComments');
-                   const commentValue = commentInput.value;
                    const smsInput = document.querySelector('#changeSms');
+                   const invitationInput = document.querySelector('#invitations');
+                   const departmentSelect = document.querySelector('#modalDepartment');
+
+                   const limitValue = limitInput.value;
+                   const commentValue = commentInput.value;
                    const smsValue = smsInput.options[smsInput.selectedIndex].value;
-                   console.log(smsValue);
+                   const invitationValue = invitationInput.value;
+                   const departmentValue = departmentSelect.options[departmentSelect.selectedIndex].value;
 
                    const url = `{{route('api.updateClientRouteInfoRecords')}}`;
                    const header = new Headers();
@@ -245,6 +262,7 @@
                    const data = new FormData();
                    const JSONClientRouteInfoIdArr = JSON.stringify(clientRouteInfoIdArr);
                    data.append('ids', JSONClientRouteInfoIdArr);
+
                    if(limitValue != '') {
                        data.append('limit', limitValue);
                    }
@@ -253,6 +271,12 @@
                    }
                    if(smsValue != -1) {
                        data.append('sms', smsValue);
+                   }
+                   if(invitationValue != '') {
+                       data.append('invitation', invitationValue);
+                   }
+                   if(departmentValue != '0') {
+                       data.append('department', departmentValue);
                    }
 
                    fetch(url, {
@@ -263,10 +287,14 @@
                    })
                        .then(response => response.text())
                        .then(response => {
-                           let infoBox = document.createElement('div');
-                           infoBox.classList.add('alert', 'alert-info');
-                           infoBox.textContent = response;
-                           modalBody.appendChild(infoBox);
+                           $.notify({
+                               // options
+                               message: 'Rekordy zostały zmienione!'
+                           },{
+                               // settings
+                               type: 'info',
+                               z_index: '100000'
+                           });
                            table.ajax.reload();
 
                        })
@@ -395,6 +423,49 @@
                placeToAppend.appendChild(alertElement);
            }
 
+           /**
+            * This function append to modal invitation input
+            */
+           function appendInvitationInput(placeToAppend) {
+               let label = document.createElement('label');
+               label.setAttribute('for', 'invitations');
+               label.textContent = 'Zaproszenia';
+               placeToAppend.appendChild(label);
+
+               let invitationInput = document.createElement('input');
+               invitationInput.id = 'invitations';
+               invitationInput.classList.add('form-control');
+               invitationInput.setAttribute('type', 'number');
+               invitationInput.setAttribute('min', '0');
+               invitationInput.setAttribute('step', '1');
+               placeToAppend.appendChild(invitationInput);
+           }
+
+           function appendDepartmentSelect(placeToAppend) {
+               let label = document.createElement('label');
+               label.setAttribute('for', 'modalDepartment');
+               label.textContent = 'Oddział';
+               placeToAppend.appendChild(label);
+
+               let departmentSelect = document.createElement('select');
+               departmentSelect.id = 'modalDepartment';
+               departmentSelect.classList.add('form-control');
+
+               let basicOption = document.createElement('option');
+               basicOption.value = '0';
+               basicOption.textContent = 'Wybierz';
+               departmentSelect.appendChild(basicOption);
+
+               @foreach($departmentInfo as $department)
+                    var option = document.createElement('option');
+                    option.value = `{{$department->id}}`;
+                    option.textContent = `{{$department->name2}} {{$department->name}}`;
+                    departmentSelect.appendChild(option);
+               @endforeach
+
+               placeToAppend.appendChild(departmentSelect);
+           }
+
            /****************END OF MODAL FUNCTIONS********************/
 
            table = $('#datatable').DataTable({
@@ -402,6 +473,7 @@
                "processing": true,
                "serverSide": true,
                order: [[1, 'asc']],
+               "fixedHeader": true,
                "drawCallback": function( settings ) {
 
                },
@@ -486,7 +558,8 @@
                        },"name":"clientName"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return data.departmentName;
+                            let fullDepartmentName = data.departmentName == null ? null : data.departmentName + ' ' + data.departmentName2;
+                           return fullDepartmentName;
                        },"name":"departmentName", "searchable": "false"
                    },
                    {"data":function (data, type, dataToSet) {
@@ -696,13 +769,17 @@
                }
                table.ajax.reload();
            });
+
            /***************************END OF EVENT LISTENERS FUNCTIONS********************/
 
            /*Activation select2 framework*/
-           $('#weeks').select2();
-           $('#year').select2();
-           $('#departments').select2();
-           $('#typ').select2();
+           (function initial() {
+               $('#weeks').select2();
+               $('#year').select2();
+               $('#departments').select2();
+               $('#typ').select2();
+           })();
+
        });
     </script>
 @endsection

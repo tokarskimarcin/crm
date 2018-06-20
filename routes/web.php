@@ -246,9 +246,13 @@ Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
 Route::post('/findClient', 'ClientController@findClient')->name('api.findClient');
 Route::POST('/changeStatusClient','ClientController@changeStatusClient')->name('api.changeStatusClient');
 Route::POST('/saveClient','ClientController@saveClient')->name('api.saveClient');
-Route::POST('/EditClient','ClientController@EditClient')->name('api.saveClient');
+//Route::POST('/EditClient','ClientController@EditClient')->name('api.saveClient');
 Route::post('/showRoutesDetailedAjax', 'CrmRouteController@showRoutesDetailedAjax')->name('api.getDetailedInfo');
 Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
+Route::post('/showCitiesStatisticsAjax', 'CrmRouteController@showCitiesStatisticsAjax')->name('api.showCitiesStatisticsAjax');
+Route::post('/campaignsInfo', 'CrmRouteController@campaignsInfo')->name('api.campaignsInfo');
+Route::post('/showRoutesDetailedUpdateAjax', 'CrmRouteController@showRoutesDetailedUpdateAjax')->name('api.updateClientRouteInfoRecords');
+Route::post('/getClientRouteInfoRecords', 'CrmRouteController@getClientRouteInfoRecords')->name('api.getClientRouteInfoRecords');
 /* END CRM-ROUTES AJAX */
 
 /* HR-ROUTES AJAX */
@@ -840,6 +844,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/clientPanel', 'ClientController@clientPanel');
 
     Route::get('/showRoutesDetailed', 'CrmRouteController@showRoutesDetailedGet'); //
+    Route::get('/aheadPlanning', 'CrmRouteController@aheadPlanningGet'); //
+
+    Route::get('/showCitiesStatistics', 'CrmRouteController@showCitiesStatisticsGet');
 
     /** KONIEC CRM **/
 
@@ -892,7 +899,9 @@ Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
 Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
 
 
-Route::post('/campaignsInfo', 'CrmRouteController@campaignsInfo')->name('api.campaignsInfo');
 
-Route::post('/showRoutesDetailedUpdateAjax', 'CrmRouteController@showRoutesDetailedUpdateAjax')->name('api.updateClientRouteInfoRecords');
+
+
+
+
 
