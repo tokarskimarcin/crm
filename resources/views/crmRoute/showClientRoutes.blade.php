@@ -539,28 +539,63 @@
                 table2.ajax.reload();
             }
 
+            /**
+             * This function changes campaign status from nto ready to started.
+             */
             function actionButtonHandler(e) {
-                const clientRouteId = e.target.dataset.clientrouteid;
-                const url =`{{URL::to('/showClientRoutesStatus')}}`;
-                const ourHeaders = new Headers();
-                ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
-                ourHeaders.set('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
-                const formData = new FormData();
-                formData.append('clientRouteId', clientRouteId);
-                formData.append('delete', '0');
+                swal({
+                    title: 'Numer Kampanii PBX',
+                    input: 'number',
+                    inputAttributes: {
+                        autocapitalize: 'off'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Aktywuj kampanie',
+                    showLoaderOnConfirm: true,
+                    preConfirm: (login) => {
 
-                fetch(url, {
-                    method: 'post',
-                    headers: ourHeaders,
-                    credentials: "same-origin",
-                    body: formData
-                }).then(resp => resp.json())
-                    .then(resp => {
-                        table2.ajax.reload();
-                    })
+                    },
+                    allowOutsideClick: () => !swal.isLoading()
+                }).then((result) => {
+                    const reg = /^\d+$/;
+                    if (reg.test(result.value) == true) {
+                        const clientRouteId = e.target.dataset.clientrouteid;
+                        const url =`{{URL::to('/showClientRoutesStatus')}}`;
+                        const ourHeaders = new Headers();
+                        ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                        ourHeaders.set('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                        const formData = new FormData();
+                        formData.append('clientRouteId', clientRouteId);
+                        formData.append('delete', '0');
+
+                        fetch(url, {
+                            method: 'post',
+                            headers: ourHeaders,
+                            credentials: "same-origin",
+                            body: formData
+                        }).then(resp => resp.json())
+                            .then(resp => {
+                                swal({
+                                    title: `Kampania została aktywowana`,
+                                });
+                                return table2.ajax.reload();
+                            })
+                    }
+                    else {
+                        swal({
+                            title: `Numer kampanii musi być liczbą całkowitą`,
+                        });
+                    }
+                });
+
+
+
 
             }
 
+            /**
+             * This function changes campaign status from started to finished
+             */
             function actionButtonHandlerAccepted(e) {
                 const clientRouteId = e.target.dataset.clientrouteid;
                 const url =`{{URL::to('/showClientRoutesStatus')}}`;
@@ -584,6 +619,9 @@
                     })
             }
 
+            /**
+             * This function changes campaign status from finished to not ready
+             */
             function actionButtonHandlerFinished(e) {
                 const clientRouteId = e.target.dataset.clientrouteid;
                 const url =`{{URL::to('/showClientRoutesStatus')}}`;
@@ -652,11 +690,12 @@
 
             }
 
+            /**
+             * This function refresh datatable after changing a type.
+             */
             function typHandler(e) {
                 table2.ajax.reload();
             }
-
-
 
             showAllClientsInput.addEventListener('change', showAllClientsInputHandler);
             showOnlyAssignedInput.addEventListener('change', showOnlyAssignedHandler);
