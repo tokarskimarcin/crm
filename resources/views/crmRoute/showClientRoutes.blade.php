@@ -107,6 +107,16 @@
                                     <option value="2">Badania</option>
                                 </select>
                             </div>
+                            
+                            <div class="form-group">
+                                <label for="campaignState">Status Kampnanii</label>
+                                <select id="campaignState" class="form-control">
+                                    <option value="-1">Wybierz</option>
+                                    <option value="0">Nie gotowe</option>
+                                    <option value="1">Aktywne</option>
+                                    <option value="2">Zakończone</option>
+                                </select>
+                            </div>
                             <table id="datatable2" class="thead-inverse table table-bordered" cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
@@ -219,6 +229,7 @@
 
             let yearInput = document.querySelector('#year');
             let typInput = document.querySelector('#type');
+            let stateInput = document.querySelector('#campaignState');
 
             //This part is responsible for listing every week number into select
             const lastWeekOfYear ={{$lastWeek}};
@@ -316,6 +327,7 @@
                 routeContainer.innerHTML = content;
                 placeToAppend.appendChild(routeContainer);
             }
+            
             table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,
@@ -437,6 +449,7 @@
                         d.selectedWeek = selectedWeek;
                         d.year = yearInput.value;
                         d.typ = typInput.value;
+                        d.state = stateInput.options[stateInput.selectedIndex].value;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -696,7 +709,8 @@
             selectedWeekInput.addEventListener('change', selectedWeekHandler);
 
             yearInput.addEventListener('change', yearHandler);
-            typInput.addEventListener('change', typHandler)
+            typInput.addEventListener('change', typHandler);
+            stateInput.addEventListener('change', typHandler);
 
         });
     </script>

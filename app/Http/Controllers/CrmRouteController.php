@@ -486,7 +486,7 @@ class CrmRouteController extends Controller
     }
 
     /**
-     * @param showAllClients(true/false/null), showOnlyAssigned(true/false/null), id(number/null), selectedWeek(number), year(number), typ(number)
+     * @param showAllClients(true/false/null), showOnlyAssigned(true/false/null), id(number/null), selectedWeek(number), year(number), typ(number), state(number)
      * This method return data about all client routes to datatable in showClientRoutes
      */
     public function showClientRoutesInfoAjax(Request $request) {
@@ -503,6 +503,7 @@ class CrmRouteController extends Controller
         else {
             $year = date('Y',strtotime("this year"));
         }
+        $state = $request->state == '-1' ? '%' : $request->state;
 
         $allDataArr = array();
         $cities = Cities::all();
@@ -548,6 +549,7 @@ class CrmRouteController extends Controller
                         ->where('date', 'like', $year . '%')
                         ->where('weekOfYear', 'like', $selectedWeek)
                         ->where('client_route.type', 'like', $typ)
+                        ->where('client_route.status', 'like', $state)
                         ->get();
         }
     /*      2)
@@ -592,6 +594,7 @@ class CrmRouteController extends Controller
                     ->where('date', 'like', $year . '%')
                     ->where('weekOfYear', 'like', $selectedWeek)
                     ->where('client_route.type', 'like', $typ)
+                    ->where('client_route.status', 'like', $state)
                     ->where(function ($query) use($clientRouteIdArr) {
                         $query->whereNotIn('client_route_id', $clientRouteIdArr)->orWhere('hour', '=', null);
                     })
