@@ -833,6 +833,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/clientPanel', 'ClientController@clientPanel');
 
     Route::get('/showRoutesDetailed', 'CrmRouteController@showRoutesDetailedGet'); //
+    Route::get('/aheadPlanning', 'CrmRouteController@aheadPlanningGet'); //
 
     /** KONIEC CRM **/
 
