@@ -1687,4 +1687,13 @@ class CrmRouteController extends Controller
         return $clientRouteInfoRecords;
     }
 
+    /**
+     * Show aheadPlanning view
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function aheadPlanningGet(){
+
+        return view('crmRoute.aheadPlanning');
+    }
+
 }
