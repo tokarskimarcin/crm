@@ -7,6 +7,7 @@ use App\CoachChange;
 use App\CoachHistory;
 use App\Department_info;
 use App\DisableAccountInfo;
+use Exception;
 use App\PrivilageRelation;
 use App\User;
 use App\UserEmploymentStatus;
@@ -1213,72 +1214,114 @@ class UsersController extends Controller
 
     public function coachChangePost(Request $request)
     {
+        $error = false;
         if ($request->coach_id && $request->newCoach_id) {
             $newCoachId = $request->newCoach_id;
             $coachId = $request->coach_id;
+            try {
+                $consultantsWithPrevCoach = User::where([
+                    ['coach_id', '=', $coachId],
+                    ['status_work', '=', 1]
+                ])->get();
+            } catch (Exception $e) {
+                report($e);
+                $error = true;
+            }
 
-            $consultantsWithPrevCoach = User::where([
-                ['coach_id', '=', $coachId],
-                ['status_work', '=', 1]
-            ])->get();
-
-            $this->coachChange($coachId, $newCoachId, $consultantsWithPrevCoach);
-
-            Session::flash('message_ok', 'Pomyślna zmiana trenera grupy');
+        } else {
+            Session::flash('message_warning', 'Wybierz obu trenerów');
+            return Redirect::back();
         }
 
-        //return 'ok';
-        return Redirect::back();
+        $error = !$this->coachChange($coachId, $newCoachId, $consultantsWithPrevCoach);
+
+        if ($request->has('action')) {
+            //ponizszy if nie ma znaczenia, to jest tylko flaga oznaczenia wykonania ajax
+            if ($request->action == "coachChange")
+                return ['type' => 'success', 'msg' => 'Pomyślna zmiana trenera grupy', 'title' => "Udało się!"];
+
+            if ($error)
+                return ['type' => 'warning', 'msg' => 'Coś poszło nie tak, spróbuj później', 'title' => "Nie udało się!"];
+
+            return ['type' => 'success', 'msg' => 'Pomyślna zmiana trenera grupy', 'title' => "Udało się!"];
+        } else {
+            if ($error)
+                Session::flash('message_warning', 'Coś poszło nie tak, spróbuj później');
+            else
+                Session::flash('message_ok', 'Pomyślna zmiana trenera grupy');
+            return Redirect::back();
+        }
     }
 
     public function coachChange($coachId, $newCoachId, $consultantsWithPrevCoach)
     {
-        CoachChange::create([
-            'coach_id' => $newCoachId,
-            'prev_coach_id' => $coachId,
-            'editor_id' => Auth::user()->id
-        ]);
-
-        $coachChangeId = CoachChange::max('id');
-        foreach ($consultantsWithPrevCoach as $consultant) {
-            CoachHistory::create([
-                'user_id' => $consultant->id,
-                'coach_change_id' => $coachChangeId
+        try {
+            CoachChange::create([
+                'coach_id' => $newCoachId,
+                'prev_coach_id' => $coachId,
+                'editor_id' => Auth::user()->id
             ]);
-            $consultant->coach_id = $newCoachId;
-            $consultant->save();
+
+            $coachChangeId = CoachChange::max('id');
+            foreach ($consultantsWithPrevCoach as $consultant) {
+                CoachHistory::create([
+                    'user_id' => $consultant->id,
+                    'coach_change_id' => $coachChangeId
+                ]);
+                $consultant->coach_id = $newCoachId;
+                $consultant->save();
+            }
+        } catch (Exception $e) {
+            report($e);
+
+            return false;
         }
+        return true;
     }
 
     public function coachChangeRevertPost(Request $request)
     {
-        $coachChangeId = $request->revertbtn;
-        $coachChange = CoachChange::where('id', $coachChangeId)->get()->first();
+        $error = false;
+        $coachChangeId = $request->coach_change_id;
 
-        $allConsultantsIdsWithSelectedCoachingChange = CoachHistory::where('coach_change_id', $coachChangeId)
-            ->pluck('user_id')->toArray();
-        //dd($allCoachesIdWithSelectedCoachingChange);
+        try {
+            $coachChange = CoachChange::where('id', $coachChangeId)->get()->first();
+            $allConsultantsIdsWithSelectedCoachingChange = CoachHistory::where('coach_change_id', $coachChangeId)
+                ->pluck('user_id')->toArray();
+            $allConsultantsBeforeChange = User::whereIn('id', $allConsultantsIdsWithSelectedCoachingChange)->get();
+        } catch (Exception $e) {
+            report($e);
+            $error = true;
+        }
 
-        $allConsultantsBeforeChange = User::whereIn('id', $allConsultantsIdsWithSelectedCoachingChange)->get();
-        //dd($allCoachingsBeforeAscription);
-
-        $this->coachChange($coachChange->coach_id,
+        $error = !$this->coachChange($coachChange->coach_id,
             $coachChange->prev_coach_id,
             $allConsultantsBeforeChange);
-        $coachChange->status = 1;
-        $coachChange->save();
-
-        return Redirect::back();
+        if (!$error) {
+            $coachChange->status = 1;
+            $coachChange->save();
+        }
+        if ($request->has('action')) {
+            //ponizszy if nie ma znaczenia, to jest tylko flaga oznaczenia wykonania ajax
+            if ($request->action == "coachChangeRevert") {
+                return ['type' => 'success', 'msg' => 'Pomyślne cofnięcie zmiany', 'title' => "Udało się!"];
+            }
+            if ($error)
+                return ['type' => 'warning', 'msg' => 'Coś poszło nie tak, spróbuj później', 'title' => "Nie udało się!"];
+            return ['type' => 'success', 'msg' => 'Pomyślne cofnięcie zmiany', 'title' => "Udało się!"];
+        } else {
+            return Redirect::back();
+        }
     }
 
     public function employeeSearchPost(Request $request)
     {
-        Validator::make($request->all(),[
+        Validator::make($request->all(), [
             'login_phone' => 'required|numeric'
-        ],[
+        ], [
             'required' => 'Pole wyszukiwania jest wymagane',
-            'numeric' =>  'W polu muszą znajdować się tylko cyfry'
-            ])->validate();
+            'numeric' => 'W polu muszą znajdować się tylko cyfry'
+        ])->validate();
 
         $users = User::where('login_phone', '=', $request->login_phone)->get();
         if ($users->count() == 1) {
@@ -1290,8 +1333,8 @@ class UsersController extends Controller
             $department_type_name = $user->department_info->department_type->name;
             $department_name = $user->department_info->departments->name;
 
-            $user_info = ['first_name'=> $user->first_name,
-                'last_name'=> $user->last_name,
+            $user_info = ['first_name' => $user->first_name,
+                'last_name' => $user->last_name,
                 'department_type_name' => $department_type_name,
                 'department_name' => $department_name];
 

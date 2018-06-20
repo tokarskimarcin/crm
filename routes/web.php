@@ -246,7 +246,7 @@ Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
 Route::post('/findClient', 'ClientController@findClient')->name('api.findClient');
 Route::POST('/changeStatusClient','ClientController@changeStatusClient')->name('api.changeStatusClient');
 Route::POST('/saveClient','ClientController@saveClient')->name('api.saveClient');
-Route::POST('/EditClient','ClientController@EditClient')->name('api.saveClient');
+//Route::POST('/EditClient','ClientController@EditClient')->name('api.saveClient');
 Route::post('/showRoutesDetailedAjax', 'CrmRouteController@showRoutesDetailedAjax')->name('api.getDetailedInfo');
 Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
 Route::post('/showCitiesStatisticsAjax', 'CrmRouteController@showCitiesStatisticsAjax')->name('api.showCitiesStatisticsAjax');
@@ -255,6 +255,10 @@ Route::post('/showRoutesDetailedUpdateAjax', 'CrmRouteController@showRoutesDetai
 Route::post('/getClientRouteInfoRecords', 'CrmRouteController@getClientRouteInfoRecords')->name('api.getClientRouteInfoRecords');
 /* END CRM-ROUTES AJAX */
 
+/* HR-ROUTES AJAX */
+Route::post('/coachChange', 'UsersController@coachChangePost')->name('api.coachChange');
+Route::post('/coachChangeRevert', 'UsersController@coachChangeRevertPost')->name('api.coachChangeRevert');
+/* END HR-ROUTES AJAX */
 /** */
 
 //********************AJAX*********************** */
@@ -414,8 +418,6 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     //Changing coach groups
     Route::get('/coachChange', 'UsersController@coachChangeGet');
-    Route::post('/coachChange', 'UsersController@coachChangePost');
-    Route::post('/coachChangeRevert', 'UsersController@coachChangeRevertPost');
 
     Route::get('/edit_consultant/{id}', 'UsersController@edit_consultantGet');
     //Route::POST('/edit_consultant/{id}','UsersController@edit_consultantPOST');
@@ -837,6 +839,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/clientPanel', 'ClientController@clientPanel');
 
     Route::get('/showRoutesDetailed', 'CrmRouteController@showRoutesDetailedGet'); //
+    Route::get('/aheadPlanning', 'CrmRouteController@aheadPlanningGet'); //
 
     Route::get('/showCitiesStatistics', 'CrmRouteController@showCitiesStatisticsGet');
 
