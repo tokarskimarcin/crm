@@ -164,6 +164,9 @@
                 ]
             });
 
+            /**
+             * This event listener reloads table after changing start or stop date
+             */
             $('#date_start, #date_stop').on('change', function(e) {
                table.ajax.reload();
             });
