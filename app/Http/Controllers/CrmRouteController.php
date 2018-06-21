@@ -1721,6 +1721,10 @@ class CrmRouteController extends Controller
         ->join('departments', 'department_info.id_dep', '=', 'departments.id')
         ->get();
 
+        $startDate = '2018-06-01';
+        $stopDAte = '2018-06-30';
+
+
 
         return view('crmRoute.aheadPlanning')
             ->with('lastWeek', $numberOfLastYearsWeek)

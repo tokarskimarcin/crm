@@ -8,12 +8,14 @@
 @extends('layouts.main')
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-    <link href="{{ asset('/css/fixedColumns.dataTables.min.css')}}" rel="stylesheet">
+<link href="{{ asset('/css/fixedColumns.dataTables.min.css')}}" rel="stylesheet">
+    <link href="{{asset('/css/fixedHeader.dataTables.min.css')}}" rel="stylesheet" >
 
 @endsection
 @section('content')
 
     <style>
+
         #float {
             position: fixed;
             top: 3em;
@@ -85,21 +87,52 @@
 
                         </div>
                     </div>
-                    <table id="datatable" class="display nowrap" >
+                    <table id="datatable" class="table table-striped table-bordered" style="width:100%">
                         <thead>
                         <tr>
+                            <th>Tydzien</th>
+                            <th>Dzień</th>
+                            <th>Data</th>
                         @foreach($departmentInfo as $item)
-                                <th>1123123123123123</th>
-                            @endforeach
+                                <th>{{$item->name2.' '.$item->name}}</th>
+                        @endforeach
+                            <th>Suma</th>
+                            <th>Podział</th>
+                        @foreach($departmentInfo as $item)
+                            <th>CEL {{$item->name2.' '.$item->name}}</th>
+                        @endforeach
                         </tr>
                         </thead>
                         <tbody>
                         @foreach($departmentInfo as $item)
                         <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            @foreach($departmentInfo as $item)
+                                <td>1123123123123123</td>
+                            @endforeach
+                            <td>5</td>
+                            <td>6</td>
                             @foreach($departmentInfo as $item)
                                 <td>1123123123123123</td>
                             @endforeach
                         </tr>
+                        @endforeach
+                        @foreach($departmentInfo as $item)
+                            <tr>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>3</td>
+                                @foreach($departmentInfo as $item)
+                                    <td>1123123123123123</td>
+                                @endforeach
+                                <td>5</td>
+                                <td>6</td>
+                                @foreach($departmentInfo as $item)
+                                    <td>1123123123123123</td>
+                                @endforeach
+                            </tr>
                         @endforeach
                         </tbody>
                     </table>
@@ -115,6 +148,7 @@
 @section('script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script src="{{ asset('/js/fixedColumns.dataTables.min.js')}}"></script>
+    <script src="{{ asset('/js/dataTables.fixedHeader.min.js')}}"></script>
 
 
     <script>
@@ -131,9 +165,14 @@
             /*********************DataTable FUNCTUONS****************************/
 
             table = $('#datatable').DataTable({
+                scrollY: '60vh',
+                scrollX:true,
+                scrollCollapse: true,
+                paging:false,
                 fixedColumns: true,
-                fixedHeader: true,
-                scrollX: true
+                fixedColumns:{
+                    leftColumns: 3
+                }
             });
 
 
