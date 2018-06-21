@@ -431,10 +431,10 @@
                         row.style.backgroundColor = "#ffc6c6";
                     }
                     else if(row.cells[5].firstChild.classList[2] == "action-buttons-2") {
-                        row.style.backgroundColor = "#b9f7b9";
+                        row.style.backgroundColor = "#7cf76c";
                     }
                     else {
-                        row.style.backgroundColor = "#c3d6f4";
+                        row.style.backgroundColor = "#b3c7f4";
                     }
                     $(row).attr('id', "clientRouteInfoId_" + data.clientRouteId);
                     return row;
