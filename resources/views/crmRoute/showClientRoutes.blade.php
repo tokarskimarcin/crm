@@ -94,8 +94,6 @@
                                 <label for="year">Wybierz rok</label>
                                 <select id="year" class="form-control">
                                     <option value="0">Wybierz</option>
-                                    <option value="2017">2017</option>
-                                    <option value="2018">2018</option>
                                 </select>
                             </div>
                         </div>
@@ -195,94 +193,30 @@
 @section('script')
     <script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>
     <script>
-        function saveOptions(e){
-            let allRow = document.getElementsByClassName('campainsOption');
-            let arrayOfObject = new Array();
-            let validation = true;
-            for(var i = 0; i< allRow.length; i++){
-                let id = allRow[i].getAttribute('id');
-                id = id.split('_');
-                id = id[1];
-                let department_info_id = 0;
-                let departmentInfoSelect = allRow[i].querySelector('.optionDepartment').querySelector('.form-control');
-                department_info_id = departmentInfoSelect.options[departmentInfoSelect.selectedIndex].value;
-                if(department_info_id == 0){
-                    validation = false;
-                    swal('Wybierz oddział')
-                    break;
-                }
-                let limit = allRow[i].querySelector('.optionLimit').querySelector('.form-control').value;
-                if(limit == ''){
-                    validation = false;
-                    swal('Brak Limitów')
-                    break;
-                }
-                var obj = {id: id,department_info_id: department_info_id,limit: limit};
-                arrayOfObject.push(obj);
-            }
-            //Save campain option
-            if(validation){
-                $.ajax({
-                    type: "POST",
-                    url: '{{ route('api.saveCampaignOption') }}',
-                    data: {
-                        "objectOfChange": arrayOfObject
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        if(response == 200){
-                            swal("Opcje Kampanii zostały zapisane pomyślnie")
-                            $('#myModal').modal('hide');
-                        }else{
-                            swal("Wystąpił błąd podczas zapisu, spróbuj ponownie.")
-                        }
 
-                    }
-                });
-            }
-        }
         document.addEventListener('DOMContentLoaded', function(event) {
-
+            /********** GLOBAL VARIABLES ***********/
             let yearInput = document.querySelector('#year');
             let typInput = document.querySelector('#type');
             let stateInput = document.querySelector('#campaignState');
-
-            //This part is responsible for listing every week number into select
-            const lastWeekOfYear ={{$lastWeek}};
-            const weekSelect = document.querySelector('#weekNumber');
-            for(var i = 1; i <= lastWeekOfYear ; i++) {
-                let optionElement = document.createElement('option');
-                optionElement.value = i;
-                optionElement.innerHTML = `${i}`;
-                weekSelect.appendChild(optionElement);
-            }
-
-            //this part is responsible for redirect button
             const addNewClientRouteInput = document.querySelector('#addNewClientRoute');
-            addNewClientRouteInput.addEventListener('click',(e) => {
-                window.location.href = '{{URL::to('/crmRoute_index')}}';
-            });
-
-
             const showOnlyAssignedInput = document.querySelector('#showOnlyAssigned');
             const showAllClientsInput = document.querySelector('#showAllClients');
             const selectedWeekInput = document.querySelector('#weekNumber');
+
             let id = null; //after user click on 1st table row, it assing clientRouteId to this variable
             let selectedWeek = 0;
             let rowIterator = null;
-            // let colorIterator = 0;
             let showAllClients = null; //this variable indices whether checkbox "Pokaż wszystkich klientó" is checked
             let showOnlyAssigned = null; //This variable indices whether checkbox "Pokaż tylko trasy bez przypisanego hotelu lub godziny" is checked
-            // let colorArr = ['#e1e4ea', '#81a3ef', '#5a87ed', '#b2f4b8', '#6ee578', '#e1acef', '#c54ae8'];
             let objectArr = [];
+            /*********END OF GLOBAL VARIABLES *********/
+
             function createModalContent(response,placeToAppend){
                 let departmentsJson = @json($departments);
                 let routeContainer = document.createElement('div');
                 routeContainer.className = 'campain-container';
                 var content = '';
-                console.log(response);
                 for(var i = 0; i < response.length; i++){
                     content += '<div class="row">\n' +
                         '                            <div class="col-lg-12">\n' +
@@ -338,9 +272,6 @@
                         '                            </div>\n' +
                         '                        </div>';
                 }
-
-
-
 
                 routeContainer.innerHTML = content;
                 placeToAppend.appendChild(routeContainer);
@@ -536,6 +467,55 @@
                 ]
             });
 
+            function saveOptions(e){
+                let allRow = document.getElementsByClassName('campainsOption');
+                let arrayOfObject = new Array();
+                let validation = true;
+                for(var i = 0; i< allRow.length; i++){
+                    let id = allRow[i].getAttribute('id');
+                    id = id.split('_');
+                    id = id[1];
+                    let department_info_id = 0;
+                    let departmentInfoSelect = allRow[i].querySelector('.optionDepartment').querySelector('.form-control');
+                    department_info_id = departmentInfoSelect.options[departmentInfoSelect.selectedIndex].value;
+                    if(department_info_id == 0){
+                        validation = false;
+                        swal('Wybierz oddział')
+                        break;
+                    }
+                    let limit = allRow[i].querySelector('.optionLimit').querySelector('.form-control').value;
+                    if(limit == ''){
+                        validation = false;
+                        swal('Brak Limitów')
+                        break;
+                    }
+                    var obj = {id: id,department_info_id: department_info_id,limit: limit};
+                    arrayOfObject.push(obj);
+                }
+                //Save campain option
+                if(validation){
+                    $.ajax({
+                        type: "POST",
+                        url: '{{ route('api.saveCampaignOption') }}',
+                        data: {
+                            "objectOfChange": arrayOfObject
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            if(response == 200){
+                                swal("Opcje Kampanii zostały zapisane pomyślnie")
+                                $('#myModal').modal('hide');
+                            }else{
+                                swal("Wystąpił błąd podczas zapisu, spróbuj ponownie.")
+                            }
+
+                        }
+                    });
+                }
+            }
+
             function showAllClientsInputHandler(e) {
                 const checkedRow = document.querySelector('.check');
                 // console.assert(checkedRow, "Brak podswietlonego wiersza");
@@ -567,6 +547,8 @@
                     selectedWeek = e.target.value;
                 table2.ajax.reload();
             }
+
+            //********************CAMPAIGN STATUS BUTTON HANDLERS*****************
 
             /**
              * This function changes campaign status from nto ready to started.
@@ -670,8 +652,18 @@
                     })
             }
 
+            //***************END OF CAMPAIGN STATUS BUTTON HANDLERS*****************
+
             /**
-             * @param e
+             * This function refresh datatable after changing a type or a state.
+             */
+            function typHandler(e) {
+                table2.ajax.reload();
+            }
+
+            //**************FILING SELECT ELEMENTS*****************
+
+            /**
              * This method append list of weeks in selected year to weekInput
              */
             function yearHandler(e) {
@@ -716,11 +708,40 @@
             }
 
             /**
-             * This function refresh datatable after changing a type.
+             * (IIFE function) This function fill year select
              */
-            function typHandler(e) {
-                table2.ajax.reload();
-            }
+            (function fillYearSelect() {
+                const baseYear = 2017;
+                const actualYear = {{$year}};
+
+                for(let i = baseYear; i <= actualYear + 1; i++) {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = i;
+                    optionElement.textContent = i;
+                    yearInput.appendChild(optionElement);
+                }
+            })();
+
+            /**
+             * (IIFE function) This function fill week select
+             */
+            (function fillWeekSelect() {
+                const lastWeekOfYear ={{$lastWeek}};
+                const weekSelect = document.querySelector('#weekNumber');
+                for(var i = 1; i <= lastWeekOfYear ; i++) {
+                    let optionElement = document.createElement('option');
+                    optionElement.value = i;
+                    optionElement.innerHTML = `${i}`;
+                    weekSelect.appendChild(optionElement);
+                }
+            })();
+
+            //************END OF FILING SELECT ELEMENTS***************
+
+            //this part is responsible for redirect button
+            addNewClientRouteInput.addEventListener('click',(e) => {
+                window.location.href = '{{URL::to('/crmRoute_index')}}';
+            });
 
             showAllClientsInput.addEventListener('change', showAllClientsInputHandler);
             showOnlyAssignedInput.addEventListener('change', showOnlyAssignedHandler);
