@@ -262,6 +262,7 @@ Route::post('/coachChangeRevert', 'UsersController@coachChangeRevertPost')->name
 /* END HR-ROUTES AJAX */
 
 /* COACHING ROUTES AJAX*/
+Route::post('/revertSettlement', 'CoachingController@revertSettlementPost')->name('api.revertSettlement');
 Route::post('/coachAscription', 'CoachingController@coachAscriptionPost')->name('api.coachAscription');
 Route::post('/datatableCoachAscription', 'CoachingController@datatableCoachAscription')->name('api.datatableCoachAscription');
 Route::post('/coachAscriptionRevert', 'CoachingController@coachAscriptionRevertPost')->name('api.coachAscriptionRevert');

@@ -27,7 +27,6 @@ class CoachingController extends Controller
      * Status 3 - Usunięty
      */
 
-
     public function progress_table_managerGET()
     {
         $departments = Department_info::whereIn('id_dep_type', [1, 2])->get();
@@ -606,6 +605,28 @@ class CoachingController extends Controller
             return $coaching_director_inprogres;
         }
 
+    }
+
+    //Cofnięcie wybranego rozliczenia
+    public function revertSettlementPost(Request $request)
+    {
+        $coaching_director_id = $request->coaching_director_id;
+        if ($coaching_director_id != null || $coaching_director_id != 0) {
+            $coachingDirector = null;
+            try {
+                $coachingDirector = CoachingDirector::where('id','=', $coaching_director_id)->first();
+            }catch(Exception $e){
+                report($e);
+                return ["type" => "error", "msg" => "Pojawił się problem z bazą danych, skontaktuj się z administratorem", "title" => "Błąd"];
+            }
+            if ($coachingDirector == null) {
+                return ["type" => "warning", "msg" => "To rozliczenie już nie istnieje", "title" => "Błąd"];
+            }
+            $coachingDirector->status = 0;
+            $coachingDirector->save();
+            return ["type" => "success", "msg" => "Rozliczenie zostało cofnięte", "title" => "Sukces"];
+        } else
+            return ["type" => "warning", "msg" => "To rozliczenie już nie istniejes", "title" => "Błąd"];
     }
 
     /*
@@ -1245,9 +1266,10 @@ class CoachingController extends Controller
         }
     }
 
-    public function datatableCoachAscription(Request $request){
+    public function datatableCoachAscription(Request $request)
+    {
         $coachDirectorChanges = null;
-        if($request->ajax())
+        if ($request->ajax())
             if (Auth::user()->user_type_id == 3)
                 $coachDirectorChanges = DB::table('coach_director_change as c')
                     ->select('c.id',

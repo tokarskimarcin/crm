@@ -184,9 +184,9 @@
                     {"data": "created_at"},
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<button class="btn btn-info type="submit" id="revertbtn_' +
+                            return '<button class="btn btn-info" type="submit" id="revertbtn_' +
                                 data.id +
-                                'name="coach_director_change_id" value="' +
+                                '" name="coach_director_change_id" value="' +
                                 data.id +
                                 '" data-type="revert_button">Cofnij</button>';
                         }, "name": "id", "orderable": false, "searchable": false
