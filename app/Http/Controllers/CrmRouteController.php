@@ -1462,6 +1462,9 @@ class CrmRouteController extends Controller
             $newCity->name = $request->cityName;
             $newCity->max_hour = $request->eventCount;
             $newCity->grace_period = $request->gracePeriod;
+            $newCity->latitude = $request->latitude;
+            $newCity->longitude = $request->longitude;
+            $newCity->zip_code = $request->zipCode;
             $newCity->status = 0;
             $newCity->save();
             return 200;
