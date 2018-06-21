@@ -237,7 +237,6 @@
                         'cityID'          : $('#cityID').val()
                     },
                     success: function (response) {
-                        console.log(response);
                         $('#ModalCity').modal('hide');
                     }
                 })
@@ -331,7 +330,7 @@
                                   $('#cityName').val(response.name);
                                   $('#eventCount').val(response.max_hour);
                                   $('#gracePeriod').val(response.grace_period);
-                                  $('#zipCode').val(response.zipCode);
+                                  $('#zipCode').val(response.zip_code);
                                   $('#latitude').val(response.latitude);
                                   $('#longitude').val(response.longitude);
                                   $('#cityID').val(response.id);
@@ -348,7 +347,6 @@
                   {"data":"max_hour"},
                   {"data":"grace_period"},
                   {"data":function (data, type, dataToSet) {
-                            console.log(data);
                           let returnButton = "<button class='button-edit-city btn btn-warning' style='margin: 3px;' data-id="+data.id+">Edycja</button>";
                           if(data.status == 0)
                               returnButton += "<button class='button-status-city btn btn-danger' data-id="+data.id+" data-status=0 >Wyłącz</button>";

@@ -72,6 +72,8 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="showAllClients">Pokaż wszystkich klientów</label>
@@ -83,7 +85,11 @@
                                 <label for="showOnlyAssigned">Pokaż tylko trasy bez przypisanego hotelu lub godziny</label>
                                 <input type="checkbox" style="display:inline-block" id="showOnlyAssigned">
                             </div>
+                        </div>
+                    </div>
+                    <div class="row">
 
+                        <div class="col-md-2">
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="year">Wybierz rok</label>
                                 <select id="year" class="form-control">
@@ -92,14 +98,19 @@
                                     <option value="2018">2018</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <div class="col-md-2">
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="weekNumber">Wybierz tydzień</label>
                                 <select id="weekNumber" class="form-control">
                                     <option value="0">Wybierz</option>
                                 </select>
                             </div>
-                            
-                            <div class="form-group">
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-group" style="margin-top:1em;">
                                 <label for="type">Typ</label>
                                 <select id="type" class="form-control">
                                     <option value="0">Wybierz</option>
@@ -107,6 +118,22 @@
                                     <option value="2">Badania</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group" style="margin-top:1em;">
+                                <label for="campaignState">Status Kampanii</label>
+                                <select id="campaignState" class="form-control">
+                                    <option value="-1">Wybierz</option>
+                                    <option value="0">Nie gotowe</option>
+                                    <option value="1">Aktywne</option>
+                                    <option value="2">Zakończone</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                        <div class="row">
                             <table id="datatable2" class="thead-inverse table table-bordered" cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
@@ -125,16 +152,13 @@
                                 </tbody>
                             </table>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
-        Open modal
-    </button>
     <!-- The Modal -->
     <div class="modal" id="myModal">
         <div class="modal-dialog modal-lg">
@@ -223,6 +247,7 @@
 
             let yearInput = document.querySelector('#year');
             let typInput = document.querySelector('#type');
+            let stateInput = document.querySelector('#campaignState');
 
             //This part is responsible for listing every week number into select
             const lastWeekOfYear ={{$lastWeek}};
@@ -320,6 +345,7 @@
                 routeContainer.innerHTML = content;
                 placeToAppend.appendChild(routeContainer);
             }
+            
             table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,
@@ -423,10 +449,10 @@
                         row.style.backgroundColor = "#ffc6c6";
                     }
                     else if(row.cells[5].firstChild.classList[2] == "action-buttons-2") {
-                        row.style.backgroundColor = "#b9f7b9";
+                        row.style.backgroundColor = "#7cf76c";
                     }
                     else {
-                        row.style.backgroundColor = "#c3d6f4";
+                        row.style.backgroundColor = "#b3c7f4";
                     }
                     $(row).attr('id', "clientRouteInfoId_" + data.clientRouteId);
                     return row;
@@ -441,6 +467,7 @@
                         d.selectedWeek = selectedWeek;
                         d.year = yearInput.value;
                         d.typ = typInput.value;
+                        d.state = stateInput.options[stateInput.selectedIndex].value;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -700,7 +727,8 @@
             selectedWeekInput.addEventListener('change', selectedWeekHandler);
 
             yearInput.addEventListener('change', yearHandler);
-            typInput.addEventListener('change', typHandler)
+            typInput.addEventListener('change', typHandler);
+            stateInput.addEventListener('change', typHandler);
 
         });
     </script>

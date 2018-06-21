@@ -486,7 +486,7 @@ class CrmRouteController extends Controller
     }
 
     /**
-     * @param showAllClients(true/false/null), showOnlyAssigned(true/false/null), id(number/null), selectedWeek(number), year(number), typ(number)
+     * @param showAllClients(true/false/null), showOnlyAssigned(true/false/null), id(number/null), selectedWeek(number), year(number), typ(number), state(number)
      * This method return data about all client routes to datatable in showClientRoutes
      */
     public function showClientRoutesInfoAjax(Request $request) {
@@ -503,6 +503,7 @@ class CrmRouteController extends Controller
         else {
             $year = date('Y',strtotime("this year"));
         }
+        $state = $request->state == '-1' ? '%' : $request->state;
 
         $allDataArr = array();
         $cities = Cities::all();
@@ -548,6 +549,7 @@ class CrmRouteController extends Controller
                         ->where('date', 'like', $year . '%')
                         ->where('weekOfYear', 'like', $selectedWeek)
                         ->where('client_route.type', 'like', $typ)
+                        ->where('client_route.status', 'like', $state)
                         ->get();
         }
     /*      2)
@@ -592,6 +594,7 @@ class CrmRouteController extends Controller
                     ->where('date', 'like', $year . '%')
                     ->where('weekOfYear', 'like', $selectedWeek)
                     ->where('client_route.type', 'like', $typ)
+                    ->where('client_route.status', 'like', $state)
                     ->where(function ($query) use($clientRouteIdArr) {
                         $query->whereNotIn('client_route_id', $clientRouteIdArr)->orWhere('hour', '=', null);
                     })
@@ -1459,6 +1462,9 @@ class CrmRouteController extends Controller
             $newCity->name = $request->cityName;
             $newCity->max_hour = $request->eventCount;
             $newCity->grace_period = $request->gracePeriod;
+            $newCity->latitude = $request->latitude;
+            $newCity->longitude = $request->longitude;
+            $newCity->zip_code = $request->zipCode;
             $newCity->status = 0;
             $newCity->save();
             return 200;
@@ -1717,6 +1723,10 @@ class CrmRouteController extends Controller
         ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
         ->join('departments', 'department_info.id_dep', '=', 'departments.id')
         ->get();
+
+        $startDate = '2018-06-01';
+        $stopDAte = '2018-06-30';
+
 
 
         return view('crmRoute.aheadPlanning')
