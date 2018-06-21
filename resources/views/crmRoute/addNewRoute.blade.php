@@ -163,15 +163,25 @@
             This function is responsible for removing given show container
              */
             function removeGivenShow(container) {
-                let allShows = document.getElementsByClassName('routes-container');
-                let lastShowContainer = allShows[allShows.length - 1];
-                if(container == lastShowContainer) {
-                    addButtonsToPreviousContainer(container);
-                    container.parentNode.removeChild(container);
-                }
-                else {
-                    container.parentNode.removeChild(container);
-                }
+                $(container).slideUp(1000, () => {
+                    $.notify({
+                        // options
+                        icon: 'glyphicon glyphicon-trash',
+                        title: '',
+                        message: 'Pokaz został usunięty'
+                    }, {
+                        // settings
+                    });
+                    let allShows = document.getElementsByClassName('routes-container');
+                    let lastShowContainer = allShows[allShows.length - 1];
+                    if (container == lastShowContainer) {
+                        addButtonsToPreviousContainer(container);
+                        container.parentNode.removeChild(container);
+                    }
+                    else {
+                        container.parentNode.removeChild(container);
+                    }
+                });
             }
 
             /*
@@ -347,8 +357,19 @@
                     }
                 }
                 else if(e.target.dataset.remove == 'show') { // click on X glyphicon
+
+                    swal({
+                        title: "Jesteś pewien?",
+                        type: "warning",
+                        text: "Czy chcesz usunąć pokaz?",
+                        showCancelButton: true,
+                        confirmButtonClass: "btn-danger",
+                        confirmButtonText: "Tak, usuń!",
+                    }).then(() => {
                     let showContainer = e.target.parentElement.parentElement.parentElement;
                     removeGivenShow(showContainer);
+                    });
+
                 }else if(e.target.dataset.refresh == 'refresh') { // click on refresh glyphicon
                     //get contener with select (actual and previous)
                     var actualContener = e.target.parentNode.parentNode;

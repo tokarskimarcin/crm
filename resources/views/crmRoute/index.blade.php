@@ -9,68 +9,71 @@
 
 @extends('layouts.main')
 @section('style')
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet"/>
 @endsection
 @section('content')
     <style>
-    .client-wrapper {
-    display:flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    }
+        .client-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
 
-    .client-container {
-    background-color: white;
-    padding: 2em;
-    box-shadow: 0 1px 15px 1px rgba(39,39,39,.1);
-    border: 0;
-    border-radius: .1875rem;
-    margin: 1em;
+        .client-container {
+            background-color: white;
+            padding: 2em;
+            box-shadow: 0 1px 15px 1px rgba(39, 39, 39, .1);
+            border: 0;
+            border-radius: .1875rem;
+            margin: 1em;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-width: 90%;
-    max-width: 90%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 90%;
+            max-width: 90%;
 
-    }
+        }
 
-    .glyphicon-remove:hover {
-        transform: scale(1.2) rotate(180deg);
-        cursor: pointer;
-    }
+        .glyphicon-remove:hover {
+            transform: scale(1.2) rotate(180deg);
+            cursor: pointer;
+        }
 
-    .glyphicon-refresh {
-        font-size: 2em;
-        transition: all 1.8s ease-in-out;
-        color: #0f10ff;
-    }
-    .glyphicon-refresh:hover {
-        transform: scale(1.2) rotate(360deg);
-        cursor: pointer;
-    }
+        .glyphicon-refresh {
+            font-size: 2em;
+            transition: all 1.8s ease-in-out;
+            color: #0f10ff;
+        }
 
-    .glyphicon-remove {
-        font-size: 2em;
-        transition: all 0.8s ease-in-out;
-        float: right;
-        color:red;
-    }
-    .glyphicon-remove:hover {
-        transform: scale(1.2) rotate(180deg);
-        cursor: pointer;
-    }
+        .glyphicon-refresh:hover {
+            transform: scale(1.2) rotate(360deg);
+            cursor: pointer;
+        }
 
-    header {
-    text-align: center;
-    font-size: 2em;
-    font-weight: bold;
-    }
-    .check{
-    background: #B0BED9 !important;
-    }
+        .glyphicon-remove {
+            font-size: 2em;
+            transition: all 0.8s ease-in-out;
+            float: right;
+            color: red;
+        }
+
+        .glyphicon-remove:hover {
+            transform: scale(1.2) rotate(180deg);
+            cursor: pointer;
+        }
+
+        header {
+            text-align: center;
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .check {
+            background: #B0BED9 !important;
+        }
 
         .first-show-date {
             margin-top: 1em;
@@ -78,14 +81,14 @@
 
     </style>
 
-{{--Header page --}}
-<div class="row">
-    <div class="col-md-12">
-        <div class="page-header">
-            <div class="alert gray-nav ">Tworzenie Tras</div>
+    {{--Header page --}}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="alert gray-nav ">Tworzenie Tras</div>
+            </div>
         </div>
     </div>
-</div>
 
     <div class="row">
         <div class="col-lg-12">
@@ -95,21 +98,25 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                    @if(Session::has('adnotation'))
-                        <div class="alert alert-warning" style="font-size:1.2em;font-weight:bold;text-align:center;">
-                            {{Session::get('adnotation')}}
-                        </div>
-                        {{Session::forget('adnotation')}}
-                     @endif
+                        @if(Session::has('adnotation'))
+                            <div class="alert alert-warning"
+                                 style="font-size:1.2em;font-weight:bold;text-align:center;">
+                                {{Session::get('adnotation')}}
+                            </div>
+                            {{Session::forget('adnotation')}}
+                        @endif
                     </div>
                     <div class="client-wrapper">
                         <div class="client-container">
                             <header>Klient</header>
                             <div class="alert alert-info">
-                                Wybierz klienta z listy. Jeśli nie ma klienta na liście, dodaj go wypełniając formularz, który pojawi się po naciśnięciu przycisku <strong>Dodaj klienta</strong>
+                                Wybierz klienta z listy. Jeśli nie ma klienta na liście, dodaj go wypełniając formularz,
+                                który pojawi się po naciśnięciu przycisku <strong>Dodaj klienta</strong>
                             </div>
                             <div class="col-md-12">
-                                <button data-toggle="modal" class="btn btn-default" id="clietnModal" data-target="#ModalClient" data-id="1" title="Nowy Klient" style="margin-bottom: 14px">
+                                <button data-toggle="modal" class="btn btn-default" id="clietnModal"
+                                        data-target="#ModalClient" data-id="1" title="Nowy Klient"
+                                        style="margin-bottom: 14px">
                                     <span class="glyphicon glyphicon-plus"></span> <span>Dodaj Klienta</span>
                                 </button>
                                 <div class="table-responsive">
@@ -125,16 +132,16 @@
                                         </thead>
                                         <tbody>
                                         {{--<tr id="clientId_1">--}}
-                                            {{--<td class="client_name">Exito - Vigor Life</td>--}}
-                                            {{--<td class="client_phone">798987985</td>--}}
-                                            {{--<td class="client_type">Kamery</td>--}}
-                                            {{--<td>--}}
-                                                {{--<button class="btn btn-info"  data-id=1 onclick = "edit_client(this)" >Edycja</button>--}}
-                                                {{--<button class="btn btn-danger" data-id=1 onclick = "edit_client(this)" >Wyłącz</button>--}}
-                                            {{--</td>--}}
-                                            {{--<td>--}}
-                                                {{--<input style="display: inline-block;" type="checkbox" class="client_check"/>--}}
-                                            {{--</td>--}}
+                                        {{--<td class="client_name">Exito - Vigor Life</td>--}}
+                                        {{--<td class="client_phone">798987985</td>--}}
+                                        {{--<td class="client_type">Kamery</td>--}}
+                                        {{--<td>--}}
+                                        {{--<button class="btn btn-info"  data-id=1 onclick = "edit_client(this)" >Edycja</button>--}}
+                                        {{--<button class="btn btn-danger" data-id=1 onclick = "edit_client(this)" >Wyłącz</button>--}}
+                                        {{--</td>--}}
+                                        {{--<td>--}}
+                                        {{--<input style="display: inline-block;" type="checkbox" class="client_check"/>--}}
+                                        {{--</td>--}}
                                         {{--</tr>--}}
                                         </tbody>
                                     </table>
@@ -167,14 +174,17 @@
                             </div>
                             <div class="col-md-12">
                                 {{--<div class="form-group" style="margin-top:1em;">--}}
-                                    {{--<label for="weekNumber">Wybierz tydzień</label>--}}
-                                    {{--<select id="weekNumber" class="form-control"></select>--}}
+                                {{--<label for="weekNumber">Wybierz tydzień</label>--}}
+                                {{--<select id="weekNumber" class="form-control"></select>--}}
                                 {{--</div>--}}
                                 <div class="form-group first-show-date">
                                     <label class="myLabel">Data pierwszego pokazu:</label>
-                                    <div class="input-group date form_date col-md-5" data-date-calendarWeeks="true" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                        <input class="form-control first-show-date-input" name="date" id="date" type="text" value="{{date("Y-m-d")}}">
-                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                    <div class="input-group date form_date col-md-5" data-date-calendarWeeks="true"
+                                         data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                        <input class="form-control first-show-date-input" name="date" id="date"
+                                               type="text" value="{{date("Y-m-d")}}">
+                                        <span class="input-group-addon"><span
+                                                    class="glyphicon glyphicon-th"></span></span>
                                     </div>
                                 </div>
 
@@ -188,7 +198,8 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                    <h4 class="modal-title" id="modal_title">Dodaj nowego klienta<span id="modal_category"></span></h4>
+                                    <h4 class="modal-title" id="modal_title">Dodaj nowego klienta<span
+                                                id="modal_category"></span></h4>
                                 </div>
                                 <div class="modal-body">
 
@@ -201,7 +212,7 @@
                                                 <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label class="myLabel">Nazwa Klienta</label>
-                                                        <input class="form-control" name="clientName" id="clientName" />
+                                                        <input class="form-control" name="clientName" id="clientName"/>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
@@ -227,7 +238,9 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-12">
-                                                <button class="btn btn-success form-control" id="saveClient" onclick = "saveClient(this)" >Zapisz Klienta</button>
+                                                <button class="btn btn-success form-control" id="saveClient"
+                                                        onclick="saveClient(this)">Zapisz Klienta
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -238,43 +251,51 @@
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" value="0" id="clientID" />
+                    <input type="hidden" value="0" id="clientID"/>
 
 
-                        <div class="client-wrapper">
-                            <div class="client-container">
-                                <div class="alert alert-info">
-                                    Wybierz szablon trasy z listy. Jeśli nie ma odpowiedniej trasy na liście, stwórz ją naciskając na przycisk <strong>Dodaj trasę ręcznie</strong>
-                                </div>
-                                <div class="col-md-4">
-                                        <button class="btn btn-default" id="add-new-route" style="margin-bottom: 14px;"><span class="glyphicon glyphicon-plus"></span>Dodaj trasę ręcznie</button>
-                                </div>
-                                <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
-                                    <thead>
-                                    <tr>
-                                        <th>Nazwa</th>
-                                        <th>Akcja</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
+                    <div class="client-wrapper">
+                        <div class="client-container">
+                            <div class="alert alert-info">
+                                Wybierz szablon trasy z listy. Jeśli nie ma odpowiedniej trasy na liście, stwórz ją
+                                naciskając na przycisk <strong>Dodaj trasę ręcznie</strong>
                             </div>
-                            <div class="client-container route-here" id="jump-here">
-
+                            <div class="col-md-4">
+                                <button class="btn btn-default" id="add-new-route" style="margin-bottom: 14px;"><span
+                                            class="glyphicon glyphicon-plus"></span>Dodaj trasę ręcznie
+                                </button>
                             </div>
+                            <table id="datatable" class="thead-inverse table table-striped table-bordered"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <tr>
+                                    <th>Nazwa</th>
+                                    <th>Akcja</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="client-wrapper">
-                            <div class="client-container">
-                                <button class="btn btn-info" style="margin-top:1em;font-size:1.1em;font-weight:bold;" id="redirect">Powrót</button>
-                                <button class="btn btn-success" style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;" id="save">Zapisz</button>
-                            </div>
+                        <div class="client-container route-here" id="jump-here">
+
+                        </div>
+                    </div>
+                    <div class="client-wrapper">
+                        <div class="client-container">
+                            <button class="btn btn-info" style="margin-top:1em;font-size:1.1em;font-weight:bold;"
+                                    id="redirect">Powrót
+                            </button>
+                            <button class="btn btn-success"
+                                    style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;"
+                                    id="save">Zapisz
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
+    </div>
 @endsection
 
 @section('script')
@@ -283,17 +304,17 @@
     <script>
 
 
-    function activateDatepicker() {
-      $('.form_date').datetimepicker({
-          language:  'pl',
-          autoclose: 1,
-          minView: 2,
-          calendarWeeks: 'true',
-          pickTime: false
-      });
-    }
+        function activateDatepicker() {
+            $('.form_date').datetimepicker({
+                language: 'pl',
+                autoclose: 1,
+                minView: 2,
+                calendarWeeks: 'true',
+                pickTime: false
+            });
+        }
 
-    activateDatepicker();
+        activateDatepicker();
 
         //Clear Client modal
         function clearModal() {
@@ -310,19 +331,19 @@
             let clientType = $('#clientType').val();
             let clientID = $('#clientID').val();
             let validation = true;
-            if(clientName.trim().length == 0){
+            if (clientName.trim().length == 0) {
                 validation = false;
                 swal("Podaj nazwę klienta")
             }
-            if(clientPriority == 0){
+            if (clientPriority == 0) {
                 validation = false;
                 swal("Wybierz priorytet klienta")
             }
-            if(clientType == 0){
+            if (clientType == 0) {
                 validation = false;
                 swal("Wybierz typ klienta")
             }
-            if(validation){
+            if (validation) {
                 $.ajax({
                     type: "POST",
                     url: "{{route('api.saveClient')}}",
@@ -330,10 +351,10 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     data: {
-                        'clientName'    : clientName,
+                        'clientName': clientName,
                         'clientPriority': clientPriority,
-                        'clientType'    : clientType,
-                        'clientID'      : clientID
+                        'clientType': clientType,
+                        'clientID': clientID
                     },
                     success: function (response) {
                         $('#ModalClient').modal('hide');
@@ -343,7 +364,7 @@
         }
 
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#client_choice_type').attr('disabled', true).val(0);
             $('.city').select2();
             $('.voivodeship').select2();
@@ -355,34 +376,34 @@
 
             let today = new Date();
             let dd = today.getDate();
-            let mm = today.getMonth()+1; //January is 0!
+            let mm = today.getMonth() + 1; //January is 0!
 
             let yyyy = today.getFullYear();
-            if(dd<10){
-                dd='0'+dd;
+            if (dd < 10) {
+                dd = '0' + dd;
             }
-            if(mm<10){
-                mm='0'+mm;
+            if (mm < 10) {
+                mm = '0' + mm;
             }
-            today = yyyy+'-'+mm+'-'+dd;
+            today = yyyy + '-' + mm + '-' + dd;
 
             let currentDate = today;
 
 
-          //Ta funkcja działa analogicznie jak jQuerry .appendAfter();
-          Element.prototype.appendAfter = function (element) {
-              element.parentNode.insertBefore(this, element.nextSibling);
-          },false;
+            //Ta funkcja działa analogicznie jak jQuerry .appendAfter();
+            Element.prototype.appendAfter = function (element) {
+                element.parentNode.insertBefore(this, element.nextSibling);
+            }, false;
 
-          //Ta funkcja działa analogicznie jak jQuerry .appendBefore();
-          Element.prototype.appendBefore = function (element) {
-              element.parentNode.insertBefore(this, element);
-          },false;
+            //Ta funkcja działa analogicznie jak jQuerry .appendBefore();
+            Element.prototype.appendBefore = function (element) {
+                element.parentNode.insertBefore(this, element);
+            }, false;
 
             const lastWeekOfYear ={{$lastWeek}};
             const weekSelect = document.querySelector('#weekNumber');
-            if(weekSelect) {
-                for(var i = 1; i <= lastWeekOfYear ; i++) {
+            if (weekSelect) {
+                for (var i = 1; i <= lastWeekOfYear; i++) {
                     let optionElement = document.createElement('option');
                     optionElement.value = i;
                     optionElement.innerHTML = `${i}`;
@@ -400,13 +421,13 @@
 
             let finalClientId = null; //This variable is needed for form submit
 
-            $('#ModalClient').on('hidden.bs.modal',function () {
+            $('#ModalClient').on('hidden.bs.modal', function () {
                 $('#clientID').val("0");
                 clearModal();
                 table_client.ajax.reload();
             });
 
-            function writeCheckedClientInfo(){
+            function writeCheckedClientInfo() {
                 tr_line = document.getElementsByClassName('check')[0];
                 var tr_line_name = tr_line.getElementsByClassName('client_name')[0].textContent;
                 var tr_line_phone = tr_line.getElementsByClassName('client_priority')[0].textContent;
@@ -415,17 +436,17 @@
                 document.getElementById('client_choice_priority').textContent = tr_line_phone;
 
                 $('#client_choice_type').attr('disabled', false);
-                if(tr_line_type == 'Badania') {
+                if (tr_line_type == 'Badania') {
                     $('#client_choice_type').val(1);
                 }
-                else  if(tr_line_type == 'Wysyłka'){
+                else if (tr_line_type == 'Wysyłka') {
                     $('#client_choice_type').val(2);
-                }else{
+                } else {
                     $('#client_choice_type').val(0);
                 }
             }
 
-            function clearCheckedClientInfo(){
+            function clearCheckedClientInfo() {
                 document.getElementById('client_choice_name').textContent = "";
                 document.getElementById('client_choice_priority').textContent = "";
                 $('#client_choice_type').attr('disabled', true).val(0);
@@ -453,169 +474,169 @@
             }
 
             //Pobranie miast do wojew. bez ograniczenia do 100 KM
-            function getCitiesNameFromAjax(e){
-              let container = e.target.parentElement.parentElement.parentElement.parentElement;
-              let headerId = e.params.data.id;
-              $.ajax({
-                  type: "POST",
-                  url: '{{ route('api.getCitiesNames') }}',
-                  data: {
-                      "id": headerId,
-                      "currentDate": currentDate
-                  },
-                  headers: {
-                      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                  },
-                  success: function(response) {
-                      //Funkcja ta tworzy select wraz z miastami i wkleja w odpowiednie miejsce
-                      let placeToAppend2 = container.getElementsByClassName('city')[0];
-                      placeToAppend2.innerHTML = '';
-                      let basicOption = document.createElement('option');
-                      basicOption.value = '0';
-                      basicOption.textContent = 'Wybierz';
-                      placeToAppend2.appendChild(basicOption);
-                      for(var i = 0; i < response.length; i++) {
-                          let responseOption = document.createElement('option');
-                          responseOption.value = response[i].id;
-                          if(response[i].block == 1) {
-                              if(response[i].exceeded == 0) { //When city is still available
-                                  responseOption.textContent = response[i].name + " [dostępne jeszcze " + response[i].used_hours + " godzin]";
-                                  responseOption.setAttribute('data-max_hours', response[i].used_hours); //needed for auto setting hours
-                              }
-                              else { //when city is not available
-                                  responseOption.textContent = response[i].name + " (KARENCJA do " + response[i].available_date + ") [przekroczono o " + response[i].used_hours + " godzin]";
-                                  responseOption.setAttribute('data-max_hours', 0); //needed for auto setting hours
-                              }
-                          }
-                          else {
-                              responseOption.textContent = response[i].name;
-                              if(response[i].max_hour > 0) {
-                                  responseOption.setAttribute('data-max_hours', response[i].max_hour); //needed for auto setting hours
-                              }
-                          }
+            function getCitiesNameFromAjax(e) {
+                let container = e.target.parentElement.parentElement.parentElement.parentElement;
+                let headerId = e.params.data.id;
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.getCitiesNames') }}',
+                    data: {
+                        "id": headerId,
+                        "currentDate": currentDate
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (response) {
+                        //Funkcja ta tworzy select wraz z miastami i wkleja w odpowiednie miejsce
+                        let placeToAppend2 = container.getElementsByClassName('city')[0];
+                        placeToAppend2.innerHTML = '';
+                        let basicOption = document.createElement('option');
+                        basicOption.value = '0';
+                        basicOption.textContent = 'Wybierz';
+                        placeToAppend2.appendChild(basicOption);
+                        for (var i = 0; i < response.length; i++) {
+                            let responseOption = document.createElement('option');
+                            responseOption.value = response[i].id;
+                            if (response[i].block == 1) {
+                                if (response[i].exceeded == 0) { //When city is still available
+                                    responseOption.textContent = response[i].name + " [dostępne jeszcze " + response[i].used_hours + " godzin]";
+                                    responseOption.setAttribute('data-max_hours', response[i].used_hours); //needed for auto setting hours
+                                }
+                                else { //when city is not available
+                                    responseOption.textContent = response[i].name + " (KARENCJA do " + response[i].available_date + ") [przekroczono o " + response[i].used_hours + " godzin]";
+                                    responseOption.setAttribute('data-max_hours', 0); //needed for auto setting hours
+                                }
+                            }
+                            else {
+                                responseOption.textContent = response[i].name;
+                                if (response[i].max_hour > 0) {
+                                    responseOption.setAttribute('data-max_hours', response[i].max_hour); //needed for auto setting hours
+                                }
+                            }
 
-                          placeToAppend2.appendChild(responseOption);
-                      }
-                  }
-              });
+                            placeToAppend2.appendChild(responseOption);
+                        }
+                    }
+                });
             }
 
-            function generateRouteDiv(showRemove,showRefresh,showNewRoute,responseIterator,city,voievodes,placeToAppend){
-              let routeContainer = document.createElement('div');
-              routeContainer.className = 'routes-container';
+            function generateRouteDiv(showRemove, showRefresh, showNewRoute, responseIterator, city, voievodes, placeToAppend) {
+                let routeContainer = document.createElement('div');
+                routeContainer.className = 'routes-container';
 
-              let stringAppend =
-               '<div class="row">\n' +
-                     '<div class="button_section">';
-                     if(showRemove)
-                         stringAppend += '<span class="glyphicon glyphicon-remove" data-remove="show"></span>';
-                     stringAppend += '</div>' +
-                        '<header>Pokaz </header>\n';
-                     if(showRefresh)
-                         stringAppend +='<div class=colmd-12 style="text-align: center">' +
-                     '<span class="glyphicon glyphicon-refresh" data-refresh="refresh" style="font-size: 30px"></span>' +
-               '</div>';
+                let stringAppend =
+                    '<div class="row">\n' +
+                    '<div class="button_section">';
+                if (showRemove)
+                    stringAppend += '<span class="glyphicon glyphicon-remove" data-remove="show"></span>';
+                stringAppend += '</div>' +
+                    '<header>Pokaz </header>\n';
+                if (showRefresh)
+                    stringAppend += '<div class=colmd-12 style="text-align: center">' +
+                        '<span class="glyphicon glyphicon-refresh" data-refresh="refresh" style="font-size: 30px"></span>' +
+                        '</div>';
 
-               stringAppend +=
-               '\n' +
-               '            <div class="col-md-6">\n' +
-               '                <div class="form-group">\n' +
-               '                    <label>Województwo</label>\n' +
-               '                    <select class="form-control voivodeship" data-type="voivode">\n';
-                       for(var j = 0; j<voievodes.length; j++){
-                           if(responseIterator.voivodeship_id == voievodes[j].id)
-                               stringAppend +=  '<option value ="' + responseIterator.voivodeship_id + ' " selected>' + responseIterator.voivode_name + '</option>';
-                           else
-                               stringAppend +=  '<option value ="' + voievodes[j].id + '">' + voievodes[j].name + '</option>';
+                stringAppend +=
+                    '\n' +
+                    '            <div class="col-md-6">\n' +
+                    '                <div class="form-group">\n' +
+                    '                    <label>Województwo</label>\n' +
+                    '                    <select class="form-control voivodeship" data-type="voivode">\n';
+                for (var j = 0; j < voievodes.length; j++) {
+                    if (responseIterator.voivodeship_id == voievodes[j].id)
+                        stringAppend += '<option value ="' + responseIterator.voivodeship_id + ' " selected>' + responseIterator.voivode_name + '</option>';
+                    else
+                        stringAppend += '<option value ="' + voievodes[j].id + '">' + voievodes[j].name + '</option>';
+                }
+                stringAppend += '                    </select>\n' +
+                    '                </div>\n' +
+                    '            </div>\n' +
+                    '\n' +
+                    '            <div class="col-md-6">\n' +
+                    '                <div class="form-group">\n' +
+                    '                    <label for="city">Miasto</label>\n' +
+                    '                    <select class="form-control city">\n';
+                for (var j = 0; j < city.length; j++) {
+                    if (responseIterator.city_id == city[j].id) {
+                        if (city[j].block == 1) {
+                            if (city[j].exceeded == 0) { //When city is still available
+                                stringAppend += '<option value="' + city[j].id + '" data-max_hours="' + city[j].used_hours + '"  selected>' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
                             }
-               stringAppend += '                    </select>\n' +
-               '                </div>\n' +
-               '            </div>\n' +
-               '\n' +
-               '            <div class="col-md-6">\n' +
-               '                <div class="form-group">\n' +
-               '                    <label for="city">Miasto</label>\n' +
-               '                    <select class="form-control city">\n';
-               for(var j = 0; j<city.length; j++) {
-                   if (responseIterator.city_id == city[j].id){
-                       if(city[j].block == 1) {
-                           if(city[j].exceeded == 0) { //When city is still available
-                               stringAppend += '<option value="' + city[j].id + '" data-max_hours="' + city[j].used_hours + '"  selected>' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
-                           }
-                           else {
-                               stringAppend += '<option value="' + city[j].id + '"  data-max_hours="0" selected>' + city[j].name + '(KARENCJA do ' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
-                           }
+                            else {
+                                stringAppend += '<option value="' + city[j].id + '"  data-max_hours="0" selected>' + city[j].name + '(KARENCJA do ' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
+                            }
 
-                       }
-                       else {
-                           stringAppend += '<option value="' + city[j].id + '"  data-max_hours="' + city[j].max_hour + '" selected>' + city[j].name +'</option>\n';
-                       }
+                        }
+                        else {
+                            stringAppend += '<option value="' + city[j].id + '"  data-max_hours="' + city[j].max_hour + '" selected>' + city[j].name + '</option>\n';
+                        }
 
-                   }else{
-                       if(city[j].block == 1) {
-                           if(city[j].exceeded == 0) { //When city is still available
-                               stringAppend += '<option value="' + city[j].id + '" data-max_hours="' + city[j].used_hours + '">' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
-                           }
-                           else {
-                               stringAppend += '<option value="' + city[j].id + '"  data-max_hours="0">' + city[j].name + '(KARENCJA' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
-                           }
+                    } else {
+                        if (city[j].block == 1) {
+                            if (city[j].exceeded == 0) { //When city is still available
+                                stringAppend += '<option value="' + city[j].id + '" data-max_hours="' + city[j].used_hours + '">' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
+                            }
+                            else {
+                                stringAppend += '<option value="' + city[j].id + '"  data-max_hours="0">' + city[j].name + '(KARENCJA' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
+                            }
 
-                       }
-                       else {
-                           stringAppend += '<option value="' + city[j].id + '"  data-max_hours="' + city[j].max_hour + '">' + city[j].name +'</option>\n';
-                       }
+                        }
+                        else {
+                            stringAppend += '<option value="' + city[j].id + '"  data-max_hours="' + city[j].max_hour + '">' + city[j].name + '</option>\n';
+                        }
 
-                   }
-               }
-               stringAppend +='                    </select>\n' +
-               '                </div>\n' +
-               '            </div>\n' +
-                   '<div class="col-md-6">' +
-                   '<div class="form-group">' +
-                   '<label class="myLabel">Ilość godzin pokazów</label>' +
-                   '<input class="form-control show-hours" min="0" type="number" placeholder="Np. 2">' +
-                   '</div>' +
-                   '</div>' +
-                   '<div class="col-md-6">' +
-                   '<div class="form-group">' +
-                   '<label class="myLabel">Data:</label>' +
-                   '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">';
-                    if(currentDate != "0") {
-                        stringAppend += '<input class="form-control dateInput" type="text" value="' + currentDate + '">';
                     }
-                    else {
-                     stringAppend += '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">';
-                    }
+                }
+                stringAppend += '                    </select>\n' +
+                    '                </div>\n' +
+                    '            </div>\n' +
+                    '<div class="col-md-6">' +
+                    '<div class="form-group">' +
+                    '<label class="myLabel">Ilość godzin pokazów</label>' +
+                    '<input class="form-control show-hours" min="0" type="number" placeholder="Np. 2">' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="col-md-6">' +
+                    '<div class="form-group">' +
+                    '<label class="myLabel">Data:</label>' +
+                    '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">';
+                if (currentDate != "0") {
+                    stringAppend += '<input class="form-control dateInput" type="text" value="' + currentDate + '">';
+                }
+                else {
+                    stringAppend += '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">';
+                }
 
-                    stringAppend += '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
-                   '</div>' +
-                   '</div>' +
-                   '</div>' +
-               '\n' +
-                   '<div class="form-group hour_div">' +
-                   '</div>';
+                stringAppend += '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '\n' +
+                    '<div class="form-group hour_div">' +
+                    '</div>';
 
 
-                   if(showNewRoute)
-                     stringAppend +=
-                     '<div class="col-lg-12 button_section button_new_show_section">\n' +
-                              '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
-                     '</div>\n';
-                   stringAppend +='</div>';
+                if (showNewRoute)
+                    stringAppend +=
+                        '<div class="col-lg-12 button_section button_new_show_section">\n' +
+                        '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
+                        '</div>\n';
+                stringAppend += '</div>';
 
-               routeContainer.innerHTML = stringAppend;
-               placeToAppend.appendChild(routeContainer);
+                routeContainer.innerHTML = stringAppend;
+                placeToAppend.appendChild(routeContainer);
 
             }
 
             {{--let currentDate ={{$today}};--}}
 
 
-            table_client = $('#table_client').DataTable({
+                table_client = $('#table_client').DataTable({
                 "autoWidth": true,
                 "processing": true,
                 "serverSide": true,
-                "drawCallback": function( settings ) {
+                "drawCallback": function (settings) {
                 },
                 "ajax": {
                     'url': "{{ route('api.getClient') }}",
@@ -627,21 +648,21 @@
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
-                },"rowCallback": function( row, data, index ) {
+                }, "rowCallback": function (row, data, index) {
                     if (data.status == 1) {
-                        $(row).css('background','#c500002e')
+                        $(row).css('background', '#c500002e')
                     }
-                    $(row).attr('id', "clientId_"+data.id);
+                    $(row).attr('id', "clientId_" + data.id);
                     return row;
-                },"fnDrawCallback": function(settings){
+                }, "fnDrawCallback": function (settings) {
                     /**
                      * Zmiana statusu klienta
                      */
-                    $('.button-status-client').on('click',function () {
+                    $('.button-status-client').on('click', function () {
                         let clientId = $(this).data('id');
                         let clienStatus = $(this).data('status');
                         let nameOfAction = "";
-                        if(clienStatus == 0)
+                        if (clienStatus == 0)
                             nameOfAction = "Tak, wyłącz Klienta";
                         else
                             nameOfAction = "Tak, włącz Klienta";
@@ -662,17 +683,18 @@
                                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                     },
                                     data: {
-                                        'clientId'   : clientId
+                                        'clientId': clientId
                                     },
                                     success: function (response) {
                                         table_client.ajax.reload();
                                     }
                                 });
-                            }})
+                            }
+                        })
                     });
 
 
-                    $('.button-edit-client').on('click',function () {
+                    $('.button-edit-client').on('click', function () {
                         clientId = $(this).data('id');
                         $.ajax({
                             type: "POST",
@@ -681,7 +703,7 @@
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
                             data: {
-                                'clientId'         : clientId
+                                'clientId': clientId
                             },
                             success: function (response) {
                                 clearModal();
@@ -694,58 +716,58 @@
                         });
                     });
                     //Zaznaczenie kolumny
-                    $('#table_client tbody tr').on('click',function () {
-                        if ( $(this).hasClass('check') ) {
+                    $('#table_client tbody tr').on('click', function () {
+                        if ($(this).hasClass('check')) {
                             $(this).removeClass('check');
-                            $(this).find('.client_check').prop('checked',false);
+                            $(this).find('.client_check').prop('checked', false);
                             client_id = 0;
                             finalClientId = 0;
                             clearCheckedClientInfo();
                         }
                         else {
                             table_client.$('tr.check').removeClass('check');
-                            $.each($('#table_client').find('.client_check'), function (item,val) {
-                                $(val).prop('checked',false);
+                            $.each($('#table_client').find('.client_check'), function (item, val) {
+                                $(val).prop('checked', false);
                             });
                             $(this).addClass('check');
-                            $(this).find('.client_check').prop('checked',true);
+                            $(this).find('.client_check').prop('checked', true);
                             client_id = $(this).attr('id');
                             finalClientId = $(this).attr('id');
                             writeCheckedClientInfo();
                         }
                     });
 
-                },"columns":[
-                    {"data":"name","className": "client_name"},
+                }, "columns": [
+                    {"data": "name", "className": "client_name"},
                     {
                         "data": function (data, type, dataToSet) {
-                            if(data.priority == 1){
+                            if (data.priority == 1) {
                                 return "Niski";
-                            }else if(data.priority == 2){
+                            } else if (data.priority == 2) {
                                 return "Średni"
-                            }else{
+                            } else {
                                 return "Wysoki";
                             }
-                        },"name": "priority","className": "client_priority"
+                        }, "name": "priority", "className": "client_priority"
                     },
-                    {"data":"type","className": "client_type"},
-                    {"data":function (data, type, dataToSet) {
-                            let returnButton = "<button class='button-edit-client btn btn-warning' style='margin: 3px;' data-id="+data.id+">Edycja</button>";
-                            if(data.status == 0)
-                                returnButton += "<button class='button-status-client btn btn-danger' data-id="+data.id+" data-status=0 >Wyłącz</button>";
+                    {"data": "type", "className": "client_type"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            let returnButton = "<button class='button-edit-client btn btn-warning' style='margin: 3px;' data-id=" + data.id + ">Edycja</button>";
+                            if (data.status == 0)
+                                returnButton += "<button class='button-status-client btn btn-danger' data-id=" + data.id + " data-status=0 >Wyłącz</button>";
                             else
-                                returnButton += "<button class='button-status-client btn btn-success' data-id="+data.id+" data-status=1 >Włącz</button>";
+                                returnButton += "<button class='button-status-client btn btn-success' data-id=" + data.id + " data-status=1 >Włącz</button>";
                             return returnButton;
-                        },"orderable": false, "searchable": false
+                        }, "orderable": false, "searchable": false
                     },
-                    {"data": function (data, type, dataToSet) {
+                    {
+                        "data": function (data, type, dataToSet) {
                             return ' <input style="display: inline-block;" type="checkbox" class="client_check"/>';
-                        },"orderable": false, "searchable": false
+                        }, "orderable": false, "searchable": false
                     }
                 ],
             });
-
-
 
 
 //*********************END CLIENT SECTON***************************
@@ -758,7 +780,7 @@
                 "autoWidth": true,
                 "processing": true,
                 "serverSide": true,
-                "drawCallback": function( settings ) {
+                "drawCallback": function (settings) {
                 },
                 "ajax": {
                     'url': "{{ route('api.showRoutesAjax') }}",
@@ -770,84 +792,86 @@
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
-                },"rowCallback": function( row, data, index ) {
+                }, "rowCallback": function (row, data, index) {
                     $(row).attr('id', 'route_' + data.id);
-                    if(data.changeColor == '0') {
-                      //Gdy trasa jest zajęta
-                        $(row).css('background','#c500002e');
+                    if (data.changeColor == '0') {
+                        //Gdy trasa jest zajęta
+                        $(row).css('background', '#c500002e');
                     }
                     return row;
-                },"fnDrawCallback": function(settings){
-                    $('#datatable tbody tr').on('click', function() {
-                      // klikamy  na zaznaczony checkboxa trasy, oddzacz i usuń trase
-                        if($(this).hasClass('check')) {
+                }, "fnDrawCallback": function (settings) {
+                    $('#datatable tbody tr').on('click', function () {
+                        // klikamy  na zaznaczony checkboxa trasy, oddzacz i usuń trase
+                        if ($(this).hasClass('check')) {
                             $(this).removeClass('check');
-                            $(this).find('.route_check').prop('checked',false);
+                            $(this).find('.route_check').prop('checked', false);
                             route_id = 0; // przypisuje route_id = 0 gdy odznaczamy checkboxa
                             let placeToAppend = document.querySelector('.route-here');
                             placeToAppend.innerHTML = '';
                         }// klikamy  na odznaczony checkboxa trasy, zaznacz i dodaj trase
                         else {
                             table.$('tr.check').removeClass('check');
-                            $.each($('#datatable').find('.route_check'), function (item,val) {
-                                $(val).prop('checked',false);
+                            $.each($('#datatable').find('.route_check'), function (item, val) {
+                                $(val).prop('checked', false);
                             });
                             $(this).addClass('check');
-                            $(this).find('.route_check').prop('checked',true);
+                            $(this).find('.route_check').prop('checked', true);
                             route_id = $(this).attr('id'); // przypisuje route_id gdy zaznaczamy checkboxa
                             let placeToAppend = document.querySelector('.route-here');
                             placeToAppend.innerHTML = '';
 
                             // Pobranie informacji o zaznaczonej trasie
-                                $.ajax({
-                                    type: "POST",
-                                    url: '{{ route('api.getRoute') }}',
-                                    data: {
-                                        "route_id": route_id
-                                    },
-                                    headers: {
-                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                    },
-                                    success: function(response) {
-                                        var voievodes = @json($voivodes);
-                                        //Dla wybranego wojew.. z trasy, pobierz wszystkie
-                                        //miasta
-                                        for(var i = 0; i < response.length; i++) {
-                                          //Pobranie miast dla danego wojew
-                                            var city = getCitiesNamesByVoievodeship(response[i].voivodeship_id);
-                                            console.log(city);
-                                            //Generowanie Div'a
-                                            if(i == 0)
-                                              generateRouteDiv(false,false,false,response[i],city,voievodes,placeToAppend);
-                                            else if(i+1 == response.length)
-                                              generateRouteDiv(true,true,true,response[i],city,voievodes,placeToAppend);
-                                            else
-                                              generateRouteDiv(true,true,false,response[i],city,voievodes,placeToAppend);
+                            $.ajax({
+                                type: "POST",
+                                url: '{{ route('api.getRoute') }}',
+                                data: {
+                                    "route_id": route_id
+                                },
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                success: function (response) {
+                                    var voievodes = @json($voivodes);
+                                    //Dla wybranego wojew.. z trasy, pobierz wszystkie
+                                    //miasta
+                                    for (var i = 0; i < response.length; i++) {
+                                        //Pobranie miast dla danego wojew
+                                        var city = getCitiesNamesByVoievodeship(response[i].voivodeship_id);
+                                        console.log(city);
+                                        //Generowanie Div'a
+                                        if (i == 0)
+                                            generateRouteDiv(false, false, false, response[i], city, voievodes, placeToAppend);
+                                        else if (i + 1 == response.length)
+                                            generateRouteDiv(true, true, true, response[i], city, voievodes, placeToAppend);
+                                        else
+                                            generateRouteDiv(true, true, false, response[i], city, voievodes, placeToAppend);
 
-                                            $('.city').select2();
-                                            $('.voivodeship').select2();
-                                            $('.voivodeship').off('select2:select'); //remove previous event listeners
-                                            $('.voivodeship').on('select2:select', function (e) {
-                                                getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
-                                            });
-                                            activateDatepicker();
-                                        }
-                                        $('.city').on('select2:select', function (e) {
-                                            setHoursValue(e);
+                                        $('.city').select2();
+                                        $('.voivodeship').select2();
+                                        $('.voivodeship').off('select2:select'); //remove previous event listeners
+                                        $('.voivodeship').on('select2:select', function (e) {
+                                            getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
                                         });
+                                        activateDatepicker();
                                     }
-                                });
+                                    $('.city').on('select2:select', function (e) {
+                                        setHoursValue(e);
+                                    });
+                                }
+                            });
                         }
                     });
                 },
-                "columns":[
-                    {"data":function (data, type, dataToSet) {
+                "columns": [
+                    {
+                        "data": function (data, type, dataToSet) {
                             return '<span id="' + data.id + '">' + data.name + '</span>';
-                        },"name":"name","orderable": true
+                        }, "name": "name", "orderable": true
                     },
-                    {"data":function (data, type, dataToSet) {
+                    {
+                        "data": function (data, type, dataToSet) {
                             return '<input type="checkbox" style="display:inline-block" class="route_check">';
-                        },"orderable": false, "searchable": false
+                        }, "orderable": false, "searchable": false
                     }
                 ]
             });
@@ -856,7 +880,7 @@
             function createNewShow(voivodes) {
                 newElement = document.createElement('div');
                 newElement.className = 'routes-container';
-                let stringAppend ='        <div class="row">\n' +
+                let stringAppend = '        <div class="row">\n' +
                     '<div class="button_section button_section_gl_nr">' +
                     '<span class="glyphicon glyphicon-remove" data-remove="show"></span>' +
                     '</div>' +
@@ -870,9 +894,9 @@
                     '                    <label>Województwo</label>\n' +
                     '                    <select class="form-control voivodeship" data-type="voivode">\n' +
                     '                        <option value="0">Wybierz</option>\n';
-                                                for(let i = 0; i < voivodes.length ; i++){
-                                                    stringAppend += '<option value ='+voivodes[i]['id']+'>'+voivodes[i]['name']+'</option>';
-                                                }
+                for (let i = 0; i < voivodes.length; i++) {
+                    stringAppend += '<option value =' + voivodes[i]['id'] + '>' + voivodes[i]['name'] + '</option>';
+                }
                 stringAppend += '                    </select>\n' +
                     '                </div>\n' +
                     '            </div>\n' +
@@ -895,13 +919,13 @@
                     '<div class="form-group">' +
                     '<label class="myLabel">Data:</label>' +
                     '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">';
-                        if(currentDate != "0") {
-                            stringAppend += '<input class="form-control dateInput" type="text" value="' + currentDate + '">';
-                        }
-                        else {
-                            stringAppend += '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">';
-                        }
-                    stringAppend += '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
+                if (currentDate != "0") {
+                    stringAppend += '<input class="form-control dateInput" type="text" value="' + currentDate + '">';
+                }
+                else {
+                    stringAppend += '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">';
+                }
+                stringAppend += '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
                     '</div>' +
                     '</div>' +
                     '</div>' +
@@ -918,19 +942,19 @@
 
             //Ta funkcja jest globalnym event listenerem na click
             function buttonHandler(e) {
-                if(e.target.id == 'add-new-route') {
+                if (e.target.id == 'add-new-route') {
                     let basicDate = document.querySelector('.first-show-date-input');
                     currentDate = basicDate.value; //every time user clicks on manual show creation, date resets
                     let appendPlace = document.querySelector('.route-here');
                     appendPlace.innerHTML = "";
-                    let newShow = addNewShow(0,0); //otrzymujemy nowy formularz z pokazem.
+                    let newShow = addNewShow(0, 0); //otrzymujemy nowy formularz z pokazem.
                     removeGlyInFirstShow();
                     $('.city').select2();
                     $('.voivodeship').select2();
                     $('.voivodeship').off('select2:select'); //remove previous event listeners
                     $('.city').off('select2:select'); //remove previous event listeners
                     $('.voivodeship').on('select2:select', function (e) {
-                      getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
+                        getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
                     });
                     $('.city').on('select2:select', function (e) {
                         setHoursValue(e);
@@ -939,7 +963,7 @@
                     activateDatepicker();
 
                 }
-                else if(e.target.id == 'add_new_show') {
+                else if (e.target.id == 'add_new_show') {
                     //Get lest child of voievoidship
                     let AllVoievoidship = document.getElementsByClassName('voivodeship');
                     let countAllVoievoidship = AllVoievoidship.length;
@@ -955,35 +979,35 @@
 
                     let validation = true;
                     // Walidacja wybrania
-                    if(countAllVoievoidship != 0 && countAllCitySelect != 0){
-                        voievodeshipId  = AllVoievoidship[countAllVoievoidship-1].value;
-                        cityId = AllCitySelect[countAllCitySelect-1].value;
+                    if (countAllVoievoidship != 0 && countAllCitySelect != 0) {
+                        voievodeshipId = AllVoievoidship[countAllVoievoidship - 1].value;
+                        cityId = AllCitySelect[countAllCitySelect - 1].value;
                     }
-                    else{
+                    else {
                         voievodeshipId = AllVoievoidship[countAllVoievoidship].value;
                         cityId = AllCitySelect[countAllCitySelect].value;
                     }
-                    if(voievodeshipId == 0){
+                    if (voievodeshipId == 0) {
                         swal("Przed dodaniem nowego pokazu, uprzednio wybierz Województwo");
                         validation = false;
-                    }else if(cityId == 0){
+                    } else if (cityId == 0) {
                         swal("Przed dodaniem nowego pokazu, uprzednio wybierz Miasto");
                         validation = false;
                     }
-                    if(validation){
+                    if (validation) {
                         $.ajax({
                             type: "POST",
                             url: '{{ route('api.getVoivodeshipRound') }}',
                             data: {
-                                "voievodeshipId" : voievodeshipId,
-                                "cityId"         : cityId,
+                                "voievodeshipId": voievodeshipId,
+                                "cityId": cityId,
                                 "currentDate": currentDate
                             },
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
-                            success: function(response) {
-                                addNewShow(response['voievodeInfo'],1);
+                            success: function (response) {
+                                addNewShow(response['voievodeInfo'], 1);
                                 $('.city').select2();
                                 $('.voivodeship').select2(); //attach select2 look
                                 $('.voivodeship').off('select2:select'); //remove previous event listeners
@@ -998,14 +1022,14 @@
                                     basicOption.textContent = 'Wybierz';
                                     placeToAppend.appendChild(basicOption);
                                     var cityInfo = response['cityInfo'][headerId];
-                                    if(typeof cityInfo !== 'undefined'){
+                                    if (typeof cityInfo !== 'undefined') {
                                         //zmiana ręczna województwa
-                                        for(var i = 0; i < cityInfo.length; i++) {
-                                            if(cityInfo[i].id == headerId){
+                                        for (var i = 0; i < cityInfo.length; i++) {
+                                            if (cityInfo[i].id == headerId) {
                                                 let responseOption = document.createElement('option');
                                                 responseOption.value = cityInfo[i].city_id;
-                                                if(cityInfo[i].block == 1) {
-                                                    if(cityInfo[i].exceeded == 0) { //When city is still available
+                                                if (cityInfo[i].block == 1) {
+                                                    if (cityInfo[i].exceeded == 0) { //When city is still available
                                                         responseOption.textContent = cityInfo[i].city_name + " [dostępne jeszcze " + cityInfo[i].used_hours + " godzin]";
                                                         responseOption.setAttribute('data-max_hours', cityInfo[i].used_hours); //needed for auto setting hours
                                                     }
@@ -1016,14 +1040,14 @@
                                                 }
                                                 else {
                                                     responseOption.textContent = cityInfo[i].city_name;
-                                                    if(cityInfo[i].max_hour > 0) {
+                                                    if (cityInfo[i].max_hour > 0) {
                                                         responseOption.setAttribute('data-max_hours', cityInfo[i].max_hour); //needed for auto setting hours
                                                     }
                                                 }
                                                 placeToAppend.appendChild(responseOption);
                                             }
                                         }
-                                    }else{
+                                    } else {
                                         getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
                                     }
                                 });
@@ -1034,31 +1058,41 @@
                         });
                     }
                 }
-                else if(e.target.dataset.remove == 'show') { // click on X glyphicon
-                    let showContainer = e.target.parentElement.parentElement.parentElement;
-                    removeGivenShow(showContainer);
+                else if (e.target.dataset.remove == 'show') { // click on X glyphicon
+
+                    swal({
+                        title: "Jesteś pewien?",
+                        type: "warning",
+                        text: "Czy chcesz usunąć pokaz?",
+                        showCancelButton: true,
+                        confirmButtonClass: "btn-danger",
+                        confirmButtonText: "Tak, usuń!",
+                    }).then(() => {
+                        let showContainer = e.target.parentElement.parentElement.parentElement;
+                        removeGivenShow(showContainer);
+                    });
                 }
-                else if(e.target.dataset.refresh == 'refresh') { // click on X glyphicon
+                else if (e.target.dataset.refresh == 'refresh') { // click on X glyphicon
                     //get contener with select (actual and previous)
                     var actualContener = e.target.parentNode.parentNode;
                     var previousContener = e.target.parentNode.parentNode.parentNode.previousElementSibling;
                     var actualSelectCity = actualContener.getElementsByClassName('city')[0];
                     var actualSelectVoievode = actualContener.getElementsByClassName('voivodeship')[0];
-                    if(previousContener != null) {
+                    if (previousContener != null) {
                         var previousSelectCityVal = previousContener.getElementsByClassName('city')[0].value;
                         var previousSelectVoievodeVal = previousContener.getElementsByClassName('voivodeship')[0].value;
                         let dateFromPreviousContainer = previousContener.querySelector('.dateInput').value; //we are selecting date value from previous contener and assing it into currentDate variable
                         currentDate = dateFromPreviousContainer;
 
                         let validation = true;
-                        if(previousSelectVoievodeVal == 0){
+                        if (previousSelectVoievodeVal == 0) {
                             swal("Przed synchronizacją nowego pokazu, uprzednio wybierz Województwo");
                             validation = false;
-                        }else if(previousSelectCityVal == 0){
+                        } else if (previousSelectCityVal == 0) {
                             swal("Przed synchronizacją nowego pokazu, uprzednio wybierz Miasto");
                             validation = false;
                         }
-                        if(validation){
+                        if (validation) {
                             $.ajax({
                                 type: "POST",
                                 url: '{{ route('api.getVoivodeshipRound') }}',
@@ -1086,38 +1120,38 @@
                                         let container = e.target.parentElement.parentElement.parentElement.parentElement;
                                         let headerId = e.params.data.id;
 
-                                            let placeToAppend2 = container.getElementsByClassName('city')[0];
-                                            placeToAppend2.innerHTML = '';
-                                            let basicOption = document.createElement('option');
-                                            basicOption.value = '0';
-                                            basicOption.textContent = 'Wybierz';
-                                            placeToAppend2.appendChild(basicOption);
-                                            let responseObject = response['cityInfo'];
-                                            for(var i = 0; i < responseObject[headerId].length; i++) {
+                                        let placeToAppend2 = container.getElementsByClassName('city')[0];
+                                        placeToAppend2.innerHTML = '';
+                                        let basicOption = document.createElement('option');
+                                        basicOption.value = '0';
+                                        basicOption.textContent = 'Wybierz';
+                                        placeToAppend2.appendChild(basicOption);
+                                        let responseObject = response['cityInfo'];
+                                        for (var i = 0; i < responseObject[headerId].length; i++) {
 
 
-                                                let responseOption = document.createElement('option');
-                                                responseOption.value = responseObject[headerId][i].city_id;
+                                            let responseOption = document.createElement('option');
+                                            responseOption.value = responseObject[headerId][i].city_id;
 
-                                                if(responseObject[headerId][i].block == 1) {
-                                                    if(responseObject[headerId][i].exceeded == 0) { //When city is still available
-                                                        responseOption.textContent = responseObject[headerId][i].city_name + " [dostępne jeszcze " + responseObject[headerId][i].used_hours + " godzin]";
-                                                        responseOption.setAttribute('data-max_hours', responseObject[headerId][i].used_hours); //needed for auto setting hours
-                                                    }
-                                                    else { //when city is not available
-                                                        responseOption.textContent = responseObject[headerId][i].city_name + " (KARENCJA do " + responseObject[headerId][i].available_date + ") [przekroczono o " + responseObject[headerId][i].used_hours + " godzin]";
-                                                        responseOption.setAttribute('data-max_hours', 0); //needed for auto setting hours
-                                                    }
+                                            if (responseObject[headerId][i].block == 1) {
+                                                if (responseObject[headerId][i].exceeded == 0) { //When city is still available
+                                                    responseOption.textContent = responseObject[headerId][i].city_name + " [dostępne jeszcze " + responseObject[headerId][i].used_hours + " godzin]";
+                                                    responseOption.setAttribute('data-max_hours', responseObject[headerId][i].used_hours); //needed for auto setting hours
                                                 }
-                                                else {
-                                                    responseOption.textContent = responseObject[headerId][i].city_name;
-                                                    if(responseObject[headerId][i].max_hour > 0) {
-                                                        responseOption.setAttribute('data-max_hours', responseObject[headerId][i].max_hour); //needed for auto setting hours
-                                                    }
+                                                else { //when city is not available
+                                                    responseOption.textContent = responseObject[headerId][i].city_name + " (KARENCJA do " + responseObject[headerId][i].available_date + ") [przekroczono o " + responseObject[headerId][i].used_hours + " godzin]";
+                                                    responseOption.setAttribute('data-max_hours', 0); //needed for auto setting hours
                                                 }
-
-                                                placeToAppend2.appendChild(responseOption);
                                             }
+                                            else {
+                                                responseOption.textContent = responseObject[headerId][i].city_name;
+                                                if (responseObject[headerId][i].max_hour > 0) {
+                                                    responseOption.setAttribute('data-max_hours', responseObject[headerId][i].max_hour); //needed for auto setting hours
+                                                }
+                                            }
+
+                                            placeToAppend2.appendChild(responseOption);
+                                        }
                                     });
                                     $('.city').on('select2:select', function (e) {
                                         setHoursValue(e);
@@ -1127,7 +1161,7 @@
                         }
                     }
                 }
-                else if(e.target.id == "save") {
+                else if (e.target.id == "save") {
                     let everythingIsGood = undefined;
                     //Zaznaczenie wszystkich niezbędnych inputów
                     let voivodeElements = Array.from(document.getElementsByClassName('voivodeship'));
@@ -1142,27 +1176,27 @@
                     let dateArr = [];
 
                     //Wypełnianie powyższych tablic wartościami z inputów
-                    voivodeElements.forEach(function(element) {
+                    voivodeElements.forEach(function (element) {
                         voivodeArr.push(element.options[element.selectedIndex].value);
                     });
 
-                    cityElements.forEach(function(element) {
+                    cityElements.forEach(function (element) {
                         cityArr.push(element.options[element.selectedIndex].value);
                     });
 
-                    showElements.forEach(function(element) {
-                       hourArr.push(element.value);
+                    showElements.forEach(function (element) {
+                        hourArr.push(element.value);
                     });
 
-                    dateElements.forEach(function(element) {
-                       dateArr.push(element.value);
+                    dateElements.forEach(function (element) {
+                        dateArr.push(element.value);
                     });
 
                     everythingIsGood = finalClientId != null && finalClientId != '0' ? formValidation(voivodeArr, cityArr, hourArr) : false;
 
-                    if(everythingIsGood == true) {
+                    if (everythingIsGood == true) {
                         const clientTypeValue = $('#client_choice_type option:selected').val();
-                        if(clientTypeValue != '0') {
+                        if (clientTypeValue != '0') {
                             let formContainer = document.createElement('div');
                             formContainer.innerHTML = '<form method="post" action="{{URL::to('/crmRoute_index')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"><input type="hidden" name="clientType" value="' + clientTypeValue + '"></form>';
                             let place = document.querySelector('.route-here');
@@ -1177,7 +1211,7 @@
                     }
                     else {
                         clearArrays(voivodeArr, cityArr, hourArr);
-                        if(finalClientId == null || finalClientId == '0') {
+                        if (finalClientId == null || finalClientId == '0') {
                             swal('Wybierz klienta');
                         }
                         else {
@@ -1186,8 +1220,8 @@
 
                     }
                 }
-                else if(e.target.id == 'redirect') {
-                    location.href="{{URL::to('/showClientRoutes')}}";
+                else if (e.target.id == 'redirect') {
+                    location.href = "{{URL::to('/showClientRoutes')}}";
                 }
 
             }
@@ -1220,7 +1254,7 @@
              */
             function clearArrays() {
                 let args = arguments;
-                for(var i = 0; i < args.length; i++) {
+                for (var i = 0; i < args.length; i++) {
                     args[i] = [];
                 }
             }
@@ -1231,10 +1265,10 @@
             function formValidation() {
                 let args = arguments;
                 let flag = true;
-                for(var i = 0; i < args.length; i++) {
-                    if(args[i].length != '0') {
-                        args[i].forEach(function(value) {
-                            if(value == '0' || value == '' || value == null) {
+                for (var i = 0; i < args.length; i++) {
+                    if (args[i].length != '0') {
+                        args[i].forEach(function (value) {
+                            if (value == '0' || value == '' || value == null) {
                                 flag = false;
                             }
                         });
@@ -1247,13 +1281,13 @@
             }
 
             /**
-            * This function remove whole route container while user click on red cross button
-            */
+             * This function remove whole route container while user click on red cross button
+             */
             function removeGivenShow(container) {
 
                 //while removing show, we are appending currentDate value equal to last container's date value.
                 let previousContainer = container.previousElementSibling;
-                if(previousContainer) {
+                if (previousContainer) {
                     let dateInput = previousContainer.querySelector('.dateInput');
                     currentDate = dateInput.value;
                 }
@@ -1262,20 +1296,32 @@
                     currentDate = basisDate;
                 }
 
-                let allShows = document.getElementsByClassName('routes-container');
-                let lastShowContainer = allShows[allShows.length - 1];
-                if(container == lastShowContainer) {
-                    addButtonsToPreviousContainer(container);
-                    container.parentNode.removeChild(container);
-                }
-                else {
-                    container.parentNode.removeChild(container);
-                }
+
+                $(container).slideUp(1000, () => {
+                    $.notify({
+                        // options
+                        icon: 'glyphicon glyphicon-trash',
+                        title: '',
+                        message: 'Pokaz został usunięty'
+                    }, {
+                        // settings
+                    });
+                    let allShows = document.getElementsByClassName('routes-container');
+                    let lastShowContainer = allShows[allShows.length - 1];
+                    if (container == lastShowContainer) {
+                        addButtonsToPreviousContainer(container);
+                        container.parentNode.removeChild(container);
+                    }
+                    else {
+                        container.parentNode.removeChild(container);
+                    }
+                });
+
             }
 
             /**
-            * This method is reposnosible for adding cross button and dodaj nowy pokaz buttons on previous container.
-            */
+             * This method is reposnosible for adding cross button and dodaj nowy pokaz buttons on previous container.
+             */
             function addButtonsToPreviousContainer(container) {
                 let previousContainer = container.previousElementSibling;
                 let placeInPreviousContainer = previousContainer.getElementsByClassName('hour_div')[0];
@@ -1286,32 +1332,32 @@
                 buttonsElement.appendAfter(placeInPreviousContainer);
             }
 
-            function addNewShow(ajaxResponse,type) {
+            function addNewShow(ajaxResponse, type) {
                 removeButtonsFromLastShow();
                 let routePlace = document.querySelector('.route-here');
-                if(type == 0){
+                if (type == 0) {
                     var voievodes = @json($voivodes);
                     var newShow = createNewShow(voievodes); //otrzymujemy nowy formularz z pokazem.
                 }
-                else{
+                else {
                     var newShow = createNewShow(ajaxResponse); //otrzymujemy nowy formularz z pokazem.
                 }
                 routePlace.appendChild(newShow);
 
                 activateDatepicker();
 
-                $("html, body").animate({ scrollTop: $(document).height() }, "slow");
+                $("html, body").animate({scrollTop: $(document).height()}, "slow");
             }
 
             function removeButtonsFromLastShow() {
                 let buttonSection = document.getElementsByClassName('button_section')[document.getElementsByClassName('button_section').length - 1];
-                if(buttonSection != null) {
+                if (buttonSection != null) {
                     buttonSection.parentNode.removeChild(buttonSection);
                 }
             }
 
             document.addEventListener('click', buttonHandler);
-            $('.form_date').on('change.dp', function(e) {
+            $('.form_date').on('change.dp', function (e) {
                 currentDate = e.target.value;
                 table.ajax.reload();
             });
