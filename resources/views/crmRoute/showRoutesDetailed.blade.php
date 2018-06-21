@@ -305,7 +305,7 @@
                            table.ajax.reload();
 
                        })
-                       .catch(error => console.log("Błąd :", error))
+                       .catch(error => console.error("Błąd :", error))
                });
            }
 
@@ -656,7 +656,6 @@
             */
            $('#year').on('select2:select', function (e) {
                let yearArr = $('#year').val();
-               console.log(yearArr);
                if(yearArr.length > 0) { //no values, removed by user
                    selectedYears = yearArr;
                }

@@ -451,10 +451,11 @@ class CrmRouteController extends Controller
         $departments = Department_info::getAllInfoAboutDepartment()
         ->whereIn('id_dep_type',[2]);
         $year = date('Y',strtotime("this year"));
-        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
+        $numberOfThisYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
         return view('crmRoute.showClientRoutes')
-            ->with('lastWeek', $numberOfLastYearsWeek)
-            ->with('departments', $departments);
+            ->with('lastWeek', $numberOfThisYearsWeek)
+            ->with('departments', $departments)
+            ->with('year', $year);
     }
 
     /**
@@ -463,7 +464,7 @@ class CrmRouteController extends Controller
      */
     public function getYearWeeksAjax(Request $request) {
         $year = $request->year;
-        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
+        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 29, $year));
         return $numberOfLastYearsWeek;
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Department_info;
+use App\PBXDetailedCampaign;
 use App\PBXDKJTeam;
 use App\PBXDKJTeamOtherCompany;
 use App\ReportCampaign;
@@ -416,6 +417,81 @@ class PBXDataAPI extends Controller
                 ReportCampaign::insert($data_to_insert);
                     $row++;
                 }
+            fclose($handle);
+        }
+    }
+
+
+
+
+    public function pbx_detailed_campaign_report() {
+        $department_id = null;
+        $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=23&groupType=PRESENTATION";
+
+        if (!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
+        if (($handle = fopen($url, "r")) !== FALSE) {
+            $row = 0;
+            $data_to_insert = [];
+            while (($rowData = fgetcsv($handle, 1000, ";")) !== false) {
+                if ($row > 2) {
+                    $temp_key = 0;
+                    $save = true;
+                    foreach ($rowData as $key => $rowItem) {
+                        $removeData = false;
+                        if ($key == 0) {
+//                            $data_to_insert[$temp_key]['name'] = iconv("iso-8859-2","UTF-8", $rowItem);
+//                            $data_to_insert[$temp_key]['name'] = $this::w1250_to_utf8($rowItem);
+                            $placeOfDelimeter = strrpos($rowItem,"-");
+                            $pbxIdNumber = substr($rowItem,$placeOfDelimeter + 2);
+                            $name = substr($rowItem,0,$placeOfDelimeter);
+                            $data_to_insert[$temp_key]['campaign_pbx_id'] = intval($pbxIdNumber);
+                            $data_to_insert[$temp_key]['name'] = $this::w1250_to_utf8($name);
+                        } else if ($key == 1) {
+                            $data_to_insert[$temp_key]['average'] = floatval($rowItem);
+                        } else if ($key == 2) {
+                            $data_to_insert[$temp_key]['success'] = intval($rowItem);
+                        } else if ($key == 3) {
+                            $privateBreak = trim($rowItem,'%');
+                            $data_to_insert[$temp_key]['break_private'] = floatval($privateBreak);
+                        } else if ($key == 4) {
+                            $trainingBreak = trim($rowItem,'%');
+                            $data_to_insert[$temp_key]['break_training'] = floatval($trainingBreak);
+                        }
+                        else if($key == 5) {
+                            $databaseUse = trim($rowItem,'%');
+                            $data_to_insert[$temp_key]['database_use'] = floatval($databaseUse);
+                        }
+                        else if($key == 6) {
+                            $callTime = trim($rowItem,'%');
+                            $data_to_insert[$temp_key]['call_time'] = floatval($callTime);
+                        }
+                        else if($key == 8) {
+                            $timeExploded = explode(':',$rowItem);
+                            $hours = $timeExploded[0] * 3600;
+                            $minutes = $timeExploded[1] * 60;
+                            $seconds = $timeExploded[2];
+                            $timeInSeconds = $hours + $minutes + $seconds;
+                            $data_to_insert[$temp_key]['login_time'] = intval($timeInSeconds);
+                        }
+                        else if($key == 10) {
+                            $data_to_insert[$temp_key]['received_calls'] = intval($rowItem);
+                        }
+                        else if($key == 12) {
+                            $data_to_insert[$temp_key]['all_checked_call'] = intval($rowItem);
+                        }
+                        else if($key == 13) {
+                            $data_to_insert[$temp_key]['all_bad_call'] = intval($rowItem);
+                        }
+                        else{
+                            $removeData = true;
+                        }
+                        $date = $year = date('Y-m-d',strtotime("today"));
+                        $data_to_insert[$temp_key]['date'] = $date;
+                    }
+                }
+                PBXDetailedCampaign::insert($data_to_insert);
+                $row++;
+            }
             fclose($handle);
         }
     }
