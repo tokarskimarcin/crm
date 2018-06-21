@@ -895,6 +895,10 @@ Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
 
 Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
 
+Route::get('/pbxReportDetailed', 'StatisticsController@pbxReportDetailedGet');
+
+Route::post('/pbxReportDetailedAjax', 'StatisticsController@pbxReportDetailedAjax')->name('api.pbxReportDetailedAjax');
+
 
 
 

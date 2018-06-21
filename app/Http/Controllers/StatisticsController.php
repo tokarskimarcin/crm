@@ -6,6 +6,7 @@ use App\CandidateSource;
 use App\DisableAccountInfo;
 use App\HourReport;
 use App\Pbx_report_extension;
+use App\PBXDetailedCampaign;
 use App\PBXDKJTeam;
 use App\RecruitmentStory;
 use App\ReportCampaign;
@@ -5255,5 +5256,18 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
         }
 
         return $campaign_data->sortByDesc('all_campaigns');
+    }
+
+    public function pbxReportDetailedGet() {
+
+        return view('reportpage.PbxReportDetailed');
+    }
+
+    public function pbxReportDetailedAjax(Request $request) {
+        $dateStart = $request->dateStart;
+        $dateStop = $request->dateStop;
+        $pbxReport = PBXDetailedCampaign::whereBetween('date', [$dateStart,$dateStop])->get();
+
+        return datatables($pbxReport)->make(true);
     }
 }
