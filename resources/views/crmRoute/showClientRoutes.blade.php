@@ -72,6 +72,8 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="showAllClients">Pokaż wszystkich klientów</label>
@@ -83,7 +85,11 @@
                                 <label for="showOnlyAssigned">Pokaż tylko trasy bez przypisanego hotelu lub godziny</label>
                                 <input type="checkbox" style="display:inline-block" id="showOnlyAssigned">
                             </div>
+                        </div>
+                    </div>
+                    <div class="row">
 
+                        <div class="col-md-2">
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="year">Wybierz rok</label>
                                 <select id="year" class="form-control">
@@ -92,14 +98,19 @@
                                     <option value="2018">2018</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <div class="col-md-2">
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="weekNumber">Wybierz tydzień</label>
                                 <select id="weekNumber" class="form-control">
                                     <option value="0">Wybierz</option>
                                 </select>
                             </div>
-                            
-                            <div class="form-group">
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-group" style="margin-top:1em;">
                                 <label for="type">Typ</label>
                                 <select id="type" class="form-control">
                                     <option value="0">Wybierz</option>
@@ -107,8 +118,10 @@
                                     <option value="2">Badania</option>
                                 </select>
                             </div>
-                            
-                            <div class="form-group">
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group" style="margin-top:1em;">
                                 <label for="campaignState">Status Kampanii</label>
                                 <select id="campaignState" class="form-control">
                                     <option value="-1">Wybierz</option>
@@ -117,6 +130,10 @@
                                     <option value="2">Zakończone</option>
                                 </select>
                             </div>
+                        </div>
+                    </div>
+
+                        <div class="row">
                             <table id="datatable2" class="thead-inverse table table-bordered" cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
@@ -135,6 +152,7 @@
                                 </tbody>
                             </table>
                         </div>
+
                     </div>
                 </div>
             </div>
