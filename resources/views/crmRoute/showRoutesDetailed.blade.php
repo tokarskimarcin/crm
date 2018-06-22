@@ -15,6 +15,10 @@
 @section('content')
 
     <style>
+        textarea.baseDivision {
+            resize: none;
+        }
+
         .colorRow {
             /*background-color: #565fff !important;*/
             animation-name: example;
@@ -28,7 +32,7 @@
 
         @keyframes example {
             from {backgroud-color: white;}
-            to {background-color: #565fff;}
+            to {background-color: #565fff ;}
         }
     </style>
 
@@ -97,13 +101,15 @@
                             <th>Tydzien</th>
                             <th>Data</th>
                             <th>Kampania</th>
-                            <th>SMS</th>
-                            <th>Zaproszenia Live</th>
+                            <th>Podział bazy</th>
+                            <th>Sprawdzenie</th>
+                            <th>Zaproszenia </br>Live</th>
                             <th>Limit</th>
                             <th>Straty</th>
                             <th>Projekt</th>
                             <th>Oddział</th>
                             <th>Uwagi</th>
+                            <th>Nr kampanii (PBX)</th>
                         </tr>
                         </thead>
                     </table>
@@ -223,6 +229,14 @@
                }
            }
 
+           function showUncheckButton(){
+               if(clientRouteInfoIdArr>0){
+
+               }else {
+
+               }
+           }
+
            /*****************MODAL FUNCTIONS**********************/
 
            /**
@@ -234,9 +248,11 @@
 
                appendModalAlert(modalBody);
                createModalTable(modalBody); //table part of modal
+               appendNrPBXInput(modalBody);
+               appendBaseDivisionInput(modalBody);
                appendLimitInput(modalBody);
                appendCommentInput(modalBody);
-               appendSmsSelect(modalBody);
+               appendVerificationSelect(modalBody);
                appendInvitationInput(modalBody);
                appendDepartmentSelect(modalBody);
 
@@ -251,15 +267,19 @@
 
                /*Event Listener Part*/
                submitButton.addEventListener('click', function(e) {
+                   const nrPBXInput = document.querySelector('#changeNrPBX');
+                   const baseDivisionInput = document.querySelector('#changeBaseDivision');
                    const limitInput = document.querySelector('#changeLimits');
                    const commentInput = document.querySelector('#changeComments');
-                   const smsInput = document.querySelector('#changeSms');
+                   const verificationInput = document.querySelector('#changeVerification');
                    const invitationInput = document.querySelector('#invitations');
                    const departmentSelect = document.querySelector('#modalDepartment');
 
+                   const nrPBXValue = nrPBXInput.value;
+                   const baseDivisionValue = baseDivisionInput.value;
                    const limitValue = limitInput.value;
                    const commentValue = commentInput.value;
-                   const smsValue = smsInput.options[smsInput.selectedIndex].value;
+                   const verificationValue = verificationInput.options[verificationInput.selectedIndex].value;
                    const invitationValue = invitationInput.value;
                    const departmentValue = departmentSelect.options[departmentSelect.selectedIndex].value;
 
@@ -270,14 +290,21 @@
                    const JSONClientRouteInfoIdArr = JSON.stringify(clientRouteInfoIdArr);
                    data.append('ids', JSONClientRouteInfoIdArr);
 
+                   if(nrPBXValue != ''){
+                       console.log(nrPBXValue+' '+typeof (nrPBXValue));
+                       data.append('nrPBX', nrPBXValue);
+                   }
+                   if(baseDivisionValue != ''){
+                       data.append('baseDivision', baseDivisionValue);
+                   }
                    if(limitValue != '') {
                        data.append('limit', limitValue);
                    }
                    if(commentValue != '') {
                        data.append('comment', commentValue);
                    }
-                   if(smsValue != -1) {
-                       data.append('sms', smsValue);
+                   if(verificationValue != -1) {
+                       data.append('verification', verificationValue);
                    }
                    if(invitationValue != '') {
                        data.append('invitation', invitationValue);
@@ -357,17 +384,17 @@
            }
 
            /**
-            * This function append to modal sms input
+            * This function append to modal verification input
             */
-           function appendSmsSelect(placeToAppend) {
+           function appendVerificationSelect(placeToAppend) {
                let label3 = document.createElement('label');
-               label3.setAttribute('for', 'changeSms');
-               label3.textContent = "Czy sms został ustalony?";
+               label3.setAttribute('for', 'changeVerification');
+               label3.textContent = "Czy kampania została sprawdzona?";
                placeToAppend.appendChild(label3);
 
-               let smsSelect = document.createElement('select');
-               smsSelect.classList.add('form-control');
-               smsSelect.id = 'changeSms';
+               let verificationSelect = document.createElement('select');
+               verificationSelect.classList.add('form-control');
+               verificationSelect.id = 'changeVerification';
 
                let option1 = document.createElement('option');
                option1.value = '-1';
@@ -380,12 +407,43 @@
                let option3 = document.createElement('option');
                option3.value = '1';
                option3.textContent = "Tak";
-               smsSelect.appendChild(option1);
-               smsSelect.appendChild(option2);
-               smsSelect.appendChild(option3);
-               placeToAppend.appendChild(smsSelect);
+               verificationSelect.appendChild(option1);
+               verificationSelect.appendChild(option2);
+               verificationSelect.appendChild(option3);
+               placeToAppend.appendChild(verificationSelect);
            }
+           /**
+            * This function append to modal nr pbx input
+            */
+           function appendNrPBXInput(placeToAppend){
+               let label = document.createElement('label');
+               label.setAttribute('for', 'changeNrPBX');
+               label.textContent = 'Numer kampanii (PBX)';
+               placeToAppend.appendChild(label);
 
+               let NrPBXInput = document.createElement('input');
+               NrPBXInput.id = 'changeNrPBX';
+               NrPBXInput.setAttribute('type', 'number');
+               NrPBXInput.setAttribute('step', '1');
+               NrPBXInput.setAttribute('min', '0');
+               NrPBXInput.classList.add('form-control');
+               placeToAppend.appendChild(NrPBXInput);
+           }
+           /**
+            * This function append to modal division base input
+            */
+           function appendBaseDivisionInput(placeToAppend){
+               let label = document.createElement('label');
+               label.setAttribute('for', 'changeBaseDivision');
+               label.textContent = 'Podział bazy';
+               placeToAppend.appendChild(label);
+
+               let baseDivisionInput = document.createElement('input');
+               baseDivisionInput.id = 'changeBaseDivision';
+               baseDivisionInput.setAttribute('type', 'text');
+               baseDivisionInput.classList.add('form-control');
+               placeToAppend.appendChild(baseDivisionInput);
+           }
            /**
             * This function append to modal limit input
             */
@@ -476,6 +534,8 @@
            /****************END OF MODAL FUNCTIONS********************/
 
            table = $('#datatable').DataTable({
+               "scrollX": true,
+               "scrollY": '55vh',
                "autoWidth": false,
                "processing": true,
                "serverSide": true,
@@ -485,6 +545,9 @@
 
                },
                "rowCallback": function( row, data, index ) {
+                   if(data.comment+'' != 'null' && data.comment !== ''){
+                       $(row).css('background-color', '#fffc8b');
+                   }
                     row.setAttribute('data-id', data.id);
                     clientRouteInfoIdArr.forEach(specificId => { //when someone change table page, we have to reassign classes to rows.
                         if(specificId == data.id) {
@@ -499,6 +562,7 @@
                             const clientRouteInfoId = givenRow.attr('data-id');
                             colorRowAndAddIdToArray(clientRouteInfoId, givenRow);
                             showModifyButton();
+                            showUncheckButton();
                         }
                    });
 
@@ -526,20 +590,33 @@
                        },"name":"date"
                    },
                    {"data":function (data, type, dataToSet) {
+                       if(data.nrPBX != null)
+                           return data.cityName +" ("+data.nrPBX+")";
+                       else
                            return data.cityName;
                        },"name":"cityName"
                    },
+                   {"data": function (data, type, dataToSet) {
+                           if(data.baseDivision != null)
+                               /*return data.baseDivision;
+                           else
+                               return "";*/
+                            return '<textarea class="form-control baseDivision" cols="10" readonly>'+data.baseDivision+'</textarea>';
+                           else
+                               return "";
+                   }
+                   },
                    {"data":function (data, type, dataToSet) {
-                       let smsInfo;
-                       if(data.sms == '1') {
-                           smsInfo = 'TAK';
+                       let verificationInfo;
+                       if(data.verification == '1') {
+                           verificationInfo = 'TAK';
                            // return '<select class="form-control" style="width:100%;" data-id="' + data.id + '" data-type="noAction"><option value="0" data-type="noAction" selected>Nie</option><option value="1" data-type="noAction">Tak</option></select>';
                        }
                        else {
-                           smsInfo = 'NIE'; // return '<select class="form-control" style="width:100%;" data-id="' + data.id + '" data-type="noAction"><option value="0" data-type="noAction">Nie</option><option data-type="noAction" value="1" selected>Tak</option></select>';
+                           verificationInfo = 'NIE'; // return '<select class="form-control" style="width:100%;" data-id="' + data.id + '" data-type="noAction"><option value="0" data-type="noAction">Nie</option><option data-type="noAction" value="1" selected>Tak</option></select>';
                        }
-                           return smsInfo;
-                       },"name":"sms"
+                           return verificationInfo;
+                       },"name":"verification"
                    },
                    {"data":function (data, type, dataToSet) {
                            return data.pbxSuccess;
@@ -565,13 +642,15 @@
                        },"name":"clientName"
                    },
                    {"data":function (data, type, dataToSet) {
-                            let fullDepartmentName = data.departmentName == null ? null : data.departmentName + ' ' + data.departmentName2;
-                           return fullDepartmentName;
+                            //let fullDepartmentName = data.departmentName == null ? null : data.departmentName + ' ' + data.departmentName2;
+                           return data.departmentName;
                        },"name":"departmentName", "searchable": "false"
                    },
                    {"data":function (data, type, dataToSet) {
                            return data.comment;
                        },"name":"comment"
+                   },
+                   {"data":"nrPBX", "visible":false
                    }
                ],
                rowGroup: {
@@ -605,6 +684,7 @@
                        return $('<tr/>')
                            .append('<td colspan="2">Podsumowanie Dnia: ' + group + '</td>')
                            .append('<td>' + sumAllCampaings + '</td>')
+                           .append('<td></td>')
                            .append('<td>' + sumAllSuccess + '</td>')
                            .append('<td> 0 </td>')
                            .append('<td>' + sumAllLimit + '</td>')

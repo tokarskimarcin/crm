@@ -155,7 +155,7 @@
 
 @section('script')
     <script>
-        tableCoachAscription = null;
+        let tableCoachAscription = null;
         $(document).ready(function () {
             tableCoachAscription = $('#tableCoachAscription').DataTable({
                 "autoWidth": true,

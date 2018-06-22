@@ -19,6 +19,7 @@
         .glyphicon-edit {
             color: #477ab7;
         }
+
         .glyphicon-edit:hover {
             cursor: pointer;
         }
@@ -28,26 +29,28 @@
         }
     </style>
 
-{{--Header page --}}
-<div class="row">
-    <div class="col-md-12">
-        <div class="page-header">
-            <div class="alert gray-nav ">Podgląd Kampanii</div>
+    {{--Header page --}}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="alert gray-nav ">Podgląd Kampanii</div>
+            </div>
         </div>
     </div>
-</div>
 
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                   Wybierz kampanie
+                    Wybierz kampanie
                 </div>
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="alert alert-info">
-                                Moduł podgląd tras pozwala na podgląd kampanii oraz zarządzanie nimi. Tabelę z kampaniami można filtrować dostępnymi polami jak również wyszukiwać poszczególnych fraz w polu "Szukaj". Kampanie dzielą się na: </br>
+                                Moduł podgląd tras pozwala na podgląd kampanii oraz zarządzanie nimi. Tabelę z
+                                kampaniami można filtrować dostępnymi polami jak również wyszukiwać poszczególnych fraz
+                                w polu "Szukaj". Kampanie dzielą się na: </br>
                                 <strong>Nie gotowe</strong>, oznaczone kolorem <span style="background: #ffc6c6;"> Czerwonym</span> </br>
                                 <strong>Aktywne</strong>, oznaczone kolorem <span style="background: #c3d6f4;">Niebieskim</span> </br>
                                 <strong>Zakończone</strong>, oznaczone kolorem <span style="background: #b9f7b9;">Zielonym</span>
@@ -56,13 +59,17 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <button id="addNewClientRoute" class="btn btn-info" style="margin-bottom: 1em; font-weight: bold;">Przejdź do przypisywania tras klientom</button>
+                            <button id="addNewClientRoute" class="btn btn-info"
+                                    style="margin-bottom: 1em; font-weight: bold;">Przejdź do przypisywania tras
+                                klientom
+                            </button>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
 
-                            <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
+                            <table id="datatable" class="thead-inverse table table-striped table-bordered"
+                                   cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
                                     <th>Nazwa Klienta</th>
@@ -82,7 +89,8 @@
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="showOnlyAssigned">Pokaż tylko trasy bez przypisanego hotelu lub godziny</label>
+                                <label for="showOnlyAssigned">Pokaż tylko trasy bez przypisanego hotelu lub
+                                    godziny</label>
                                 <input type="checkbox" style="display:inline-block" id="showOnlyAssigned">
                             </div>
                         </div>
@@ -133,30 +141,30 @@
                         </div>
                     </div>
 
-                        <div class="row">
-                            <table id="datatable2" class="thead-inverse table table-bordered" cellspacing="0" width="100%">
-                                <thead>
-                                <tr>
-                                    <th>Tydzień</th>
-                                    <th>Klient</th>
-                                    <th>Data I pokazu</th>
-                                    <th>Trasa</th>
-                                    <th>Przypisany hotel i godziny</th>
-                                    <th>Status kampanii</th>
-                                    <th>Edycja (Hoteli i godzin)</th>
-                                    <th>Edycja (Trasy)</th>
-                                    <th>Edycja parametrów (Kampanii)</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
-
+                    <div class="row">
+                        <table id="datatable2" class="thead-inverse table table-bordered" cellspacing="0" width="100%">
+                            <thead>
+                            <tr>
+                                <th>Tydzień</th>
+                                <th>Klient</th>
+                                <th>Data I pokazu</th>
+                                <th>Trasa</th>
+                                <th>Przypisany hotel i godziny</th>
+                                <th>Status kampanii</th>
+                                <th>Edycja (Hoteli i godzin)</th>
+                                <th>Edycja (Trasy)</th>
+                                <th>Edycja parametrów (Kampanii)</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
                     </div>
+
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- The Modal -->
@@ -177,7 +185,9 @@
 
                         </div>
                         <div class="col-md-12">
-                            <button type="button" class="btn btn-success"  style="width: 100%" id="saveCampaingOption" onclick="saveOptions(this)">Zapisz</button>
+                            <button type="button" class="btn btn-success" style="width: 100%" id="saveCampaingOption"
+                                    onclick="saveOptions(this)">Zapisz
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -195,33 +205,39 @@
 @section('script')
     <script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>
     <script>
-        function saveOptions(e){
+        function saveOptions(e) {
             let allRow = document.getElementsByClassName('campainsOption');
             let arrayOfObject = new Array();
             let validation = true;
-            for(var i = 0; i< allRow.length; i++){
+            for (var i = 0; i < allRow.length; i++) {
                 let id = allRow[i].getAttribute('id');
                 id = id.split('_');
                 id = id[1];
                 let department_info_id = 0;
                 let departmentInfoSelect = allRow[i].querySelector('.optionDepartment').querySelector('.form-control');
                 department_info_id = departmentInfoSelect.options[departmentInfoSelect.selectedIndex].value;
-                if(department_info_id == 0){
+                if (department_info_id == 0) {
                     validation = false;
-                    swal('Wybierz oddział')
+                    swal('Wybierz oddział');
                     break;
                 }
                 let limit = allRow[i].querySelector('.optionLimit').querySelector('.form-control').value;
-                if(limit == ''){
+                if (limit == '') {
                     validation = false;
-                    swal('Brak Limitów')
+                    swal('Brak Limitów');
                     break;
                 }
-                var obj = {id: id,department_info_id: department_info_id,limit: limit};
+                let nrPBX = allRow[i].querySelector('.nrPBX').querySelector('.form-control').value;
+                if (nrPBX == '') {
+                    validation = false;
+                    swal('Brak Nr kampanii PBX');
+                    break;
+                }
+                var obj = {id: id, department_info_id: department_info_id, limit: limit};
                 arrayOfObject.push(obj);
             }
             //Save campain option
-            if(validation){
+            if (validation) {
                 $.ajax({
                     type: "POST",
                     url: '{{ route('api.saveCampaignOption') }}',
@@ -231,11 +247,11 @@
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    success: function(response) {
-                        if(response == 200){
+                    success: function (response) {
+                        if (response == 200) {
                             swal("Opcje Kampanii zostały zapisane pomyślnie")
                             $('#myModal').modal('hide');
-                        }else{
+                        } else {
                             swal("Wystąpił błąd podczas zapisu, spróbuj ponownie.")
                         }
 
@@ -243,7 +259,8 @@
                 });
             }
         }
-        document.addEventListener('DOMContentLoaded', function(event) {
+
+        document.addEventListener('DOMContentLoaded', function (event) {
 
             let yearInput = document.querySelector('#year');
             let typInput = document.querySelector('#type');
@@ -252,7 +269,7 @@
             //This part is responsible for listing every week number into select
             const lastWeekOfYear ={{$lastWeek}};
             const weekSelect = document.querySelector('#weekNumber');
-            for(var i = 1; i <= lastWeekOfYear ; i++) {
+            for (var i = 1; i <= lastWeekOfYear; i++) {
                 let optionElement = document.createElement('option');
                 optionElement.value = i;
                 optionElement.innerHTML = `${i}`;
@@ -261,7 +278,7 @@
 
             //this part is responsible for redirect button
             const addNewClientRouteInput = document.querySelector('#addNewClientRoute');
-            addNewClientRouteInput.addEventListener('click',(e) => {
+            addNewClientRouteInput.addEventListener('click', (e) => {
                 window.location.href = '{{URL::to('/crmRoute_index')}}';
             });
 
@@ -277,22 +294,23 @@
             let showOnlyAssigned = null; //This variable indices whether checkbox "Pokaż tylko trasy bez przypisanego hotelu lub godziny" is checked
             // let colorArr = ['#e1e4ea', '#81a3ef', '#5a87ed', '#b2f4b8', '#6ee578', '#e1acef', '#c54ae8'];
             let objectArr = [];
-            function createModalContent(response,placeToAppend){
+
+            function createModalContent(response, placeToAppend) {
                 let departmentsJson = @json($departments);
                 let routeContainer = document.createElement('div');
                 routeContainer.className = 'campain-container';
                 var content = '';
                 console.log(response);
-                for(var i = 0; i < response.length; i++){
+                for (var i = 0; i < response.length; i++) {
                     content += '<div class="row">\n' +
                         '                            <div class="col-lg-12">\n' +
                         '                                <div class="panel panel-default">\n' +
                         '                                    <div class="panel-heading">\n' +
-                        '                                        Pokaz Dzień : ' +response[i][0].date +
+                        '                                        Pokaz Dzień : ' + response[i][0].date +
                         '                                    </div>\n' +
                         '                                    <div class="panel-body">\n' +
                         '                                        <div class="row">\n' +
-                        '                                            <table class="table table-striped thead-inverse table-bordered">\n' +
+                        '                                            <table class="table table-striped thead-inverse table-bordered table-modal">\n' +
                         '                                                <thead>\n' +
                         '                                                <th>Tydzień</th>\n' +
                         '                                                <th>Data</th>\n' +
@@ -301,33 +319,36 @@
                         '                                                <th>Miasto</th>\n' +
                         '                                                <th>Hotel</th>\n' +
                         '                                                <th>Oddział</th>\n' +
-                        '                                                <th style="width: 10%">Limit</th>\n' +
+                        '                                                <th style="width: 10%">Limit</th>\n' +/*
+                        '                                                <th>Nr kampanii (PBX)</th>\n' +*/
+                            '                                            </thead>'+
                         '                                                <tbody>\n';
 
-                    for(var j = 0; j < response[i].length; j++){
+                    for (var j = 0; j < response[i].length; j++) {
                         let hotel_name = "Brak";
-                        if(response[i][j].hotel_info != null){
+                        if (response[i][j].hotel_info != null) {
                             hotel_name = response[i][j].hotel_info.name;
                         }
-                content += '                                                <tr class="campainsOption" id="routeInfoId_'+response[i][j].id+'">\n' +
-                            '                                                    <td>'+response[i][j].weekNumber+'</td>\n' +
-                            '                                                    <td>'+response[i][j].date+'</td>\n' +
-                            '                                                    <td>'+response[i][j].hour+'</td>\n' +
-                            '                                                    <td>'+response[i][j].voivodeName+'</td>\n' +
-                            '                                                    <td>'+response[i][j].cityName+'</td>\n' +
-                            '                                                    <td>'+hotel_name +'</td>\n' +
+                        content += '                                                <tr class="campainsOption" id="routeInfoId_' + response[i][j].id + '">\n' +
+                            '                                                    <td>' + response[i][j].weekNumber + '</td>\n' +
+                            '                                                    <td>' + response[i][j].date + '</td>\n' +
+                            '                                                    <td>' + response[i][j].hour + '</td>\n' +
+                            '                                                    <td>' + response[i][j].voivodeName + '</td>\n' +
+                            '                                                    <td class="cityName" >' + response[i][j].cityName + '</td>\n' +
+                            '                                                    <td>' + hotel_name + '</td>\n' +
                             '                                                    <td class="optionDepartment">\n' +
                             '                                                        <select class="form-control">\n' +
-                                                                                        '<option value=0> Wybierz </option>';
-                                                                                        for(var item in departmentsJson){
-                                                                                            content += '<option value="'+departmentsJson[item].id+'"';
-                                                                                            if(response[i][j].department_info_id == departmentsJson[item].id)
-                                                                                                content +='selected';
-                                                                                            content +='>'+departmentsJson[item].department_name+' '+departmentsJson[item].type_name+'</option>\n';
-                                                                                        }
-                                                                                content +=' </select>\n' +
+                            '<option value=0> Wybierz </option>';
+                        for (var item in departmentsJson) {
+                            content += '<option value="' + departmentsJson[item].id + '"';
+                            if (response[i][j].department_info_id == departmentsJson[item].id)
+                                content += 'selected';
+                            content += '>' + departmentsJson[item].department_name + ' ' + departmentsJson[item].type_name + '</option>\n';
+                        }
+                        content += ' </select>\n' +
                             '                                                    </td>\n' +
-                            '                                                    <td class="optionLimit"><input class="form-control" type="number" value="'+response[i][j].limit+'"></td>\n' +
+                            '                                                    <td class="optionLimit"><input class="form-control" type="number" value="' + response[i][j].limit + '"></td>\n' +
+                                /*'<td class="nrPBX"><input class="form-control" type="text" value="'+1+'"></td>'+*/
                             '                                                </tr>\n';
                     }
                     content += '                                                </tbody>\n' +
@@ -339,50 +360,74 @@
                         '                        </div>';
                 }
 
-
-
-
                 routeContainer.innerHTML = content;
                 placeToAppend.appendChild(routeContainer);
+
+               /* $('.table-modal td.nrPBX > input')
+                    .change((e)=>{changeRowsValueOfTable(e)})
+                    .blur((e)=>{changeRowsValueOfTable(e)});*/
+                /*$('.table-modal td.nrPBX > input').keyup((e)=>{
+                    if(!$.isNumeric(e.target.value)){
+                        e.target.value = parseInt(e.target.value);
+                    }else
+                        changeRowsValueOfTable(e);
+                });*/
             }
-            
+
+            function changeRowsValueOfTable(e){
+                if(!$.isNumeric(e.target.value) || e.target.value !== "Brak"){
+                    e.target.value = parseInt(e.target.value);
+                    if(e.target.value === "NaN")
+                        e.target.value = "Brak";
+                }
+                let changedInput = $(e.target);
+                let tableChangedRow = changedInput.parent().parent();
+                let cityNameOfChangedRow = tableChangedRow.find(".cityName").text();
+                let tableContainingChangedInput = changedInput.parents().has('table').first().find('table');
+                let tableRowsToChange = tableContainingChangedInput.find('tr[id!='+tableChangedRow.prop("id")+']').has('.cityName:contains('+cityNameOfChangedRow+')');
+                let inputsToChange = tableRowsToChange.find('.nrPBX > input');
+                inputsToChange.each(function (){
+                    $(this).val(e.target.value);
+                });
+            }
+
             table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,
                 "serverSide": true,
-                "drawCallback": function( settings ) {
+                "drawCallback": function (settings) {
                 },
-                "rowCallback": function( row, data, index ) {
+                "rowCallback": function (row, data, index) {
                     $(row).attr('id', "client_" + data.id);
                     return row;
-                },"fnDrawCallback": function(settings) {
-                        $('table tbody tr').on('click', function() {
-                            if(showAllClients === true) { //all clients checkbox = true + selecting one client
-                                showAllClientsInput.checked = false;
-                                showAllClients = false;
-                            }
-                            test = $(this).closest('table');
-                            if($(this).hasClass('check')) {
-                                $(this).removeClass('check');
-                                id = null;
-                            }
-                            else {
-                                test.find('tr.check').removeClass('check');
-                                $.each(test.find('.checkbox_info'), function (item, val) {
-                                    $(val).prop('checked', false);
-                                });
-                                $(this).addClass('check');
-                                id = $(this).attr('id');
-                                indexOfUnderscore = id.lastIndexOf('_');
-                                id = id.substr(indexOfUnderscore + 1);
-                            }
-                            rowIterator = null;
-                            // colorIterator = 0;
-                            objectArr = [];
-                            // showAllClients = null; //remove effect of show all clients checkbox
-                            table2.ajax.reload();
-                        })
-                },"ajax": {
+                }, "fnDrawCallback": function (settings) {
+                    $('table tbody tr').on('click', function () {
+                        if (showAllClients === true) { //all clients checkbox = true + selecting one client
+                            showAllClientsInput.checked = false;
+                            showAllClients = false;
+                        }
+                        test = $(this).closest('table');
+                        if ($(this).hasClass('check')) {
+                            $(this).removeClass('check');
+                            id = null;
+                        }
+                        else {
+                            test.find('tr.check').removeClass('check');
+                            $.each(test.find('.checkbox_info'), function (item, val) {
+                                $(val).prop('checked', false);
+                            });
+                            $(this).addClass('check');
+                            id = $(this).attr('id');
+                            indexOfUnderscore = id.lastIndexOf('_');
+                            id = id.substr(indexOfUnderscore + 1);
+                        }
+                        rowIterator = null;
+                        // colorIterator = 0;
+                        objectArr = [];
+                        // showAllClients = null; //remove effect of show all clients checkbox
+                        table2.ajax.reload();
+                    })
+                }, "ajax": {
                     'url': "{{route('api.getClientRoutes')}}",
                     'type': 'POST',
                     'data': function (d) {
@@ -392,14 +437,14 @@
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },
-                "columns":[
-                    {"data":function (data, type, dataToSet) {
+                "columns": [
+                    {
+                        "data": function (data, type, dataToSet) {
                             return data.name;
-                        },"name":"name"
+                        }, "name": "name"
                     }
                 ]
             });
-
 
 
             table2 = $('#datatable2').DataTable({
@@ -407,7 +452,7 @@
                 "processing": true,
                 "serverSide": true,
                 "fixedHeader": true,
-                "fnDrawCallback": function(settings) {
+                "fnDrawCallback": function (settings) {
                     objectArr = [];
                     const buttons = document.querySelectorAll('.action-buttons-0');
                     buttons.forEach(btn => {
@@ -421,7 +466,7 @@
                     buttons3.forEach(btn => {
                         btn.addEventListener('click', actionButtonHandlerFinished);
                     });
-                    $('.show-modal-with-data').on('click',function (e) {
+                    $('.show-modal-with-data').on('click', function (e) {
                         let selectTR = e.currentTarget.parentNode.parentNode;
                         let routeId = $(selectTR).closest('tr').prop('id');
                         routeId = routeId.split('_');
@@ -435,20 +480,20 @@
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
-                            success: function(response) {
+                            success: function (response) {
                                 let placeToAppend = document.querySelector('#insertModalHere');
                                 placeToAppend.innerHTML = '';
-                                createModalContent(response,placeToAppend);
+                                createModalContent(response, placeToAppend);
                                 $('#myModal').modal('show');
                             }
                         });
                     });
                 },
-                "rowCallback": function( row, data, index ) {
-                    if(row.cells[5].firstChild.classList[2] == "action-buttons-0") {
+                "rowCallback": function (row, data, index) {
+                    if (row.cells[5].firstChild.classList[2] == "action-buttons-0") {
                         row.style.backgroundColor = "#ffc6c6";
                     }
-                    else if(row.cells[5].firstChild.classList[2] == "action-buttons-2") {
+                    else if (row.cells[5].firstChild.classList[2] == "action-buttons-2") {
                         row.style.backgroundColor = "#7cf76c";
                     }
                     else {
@@ -474,63 +519,72 @@
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },
-                "columns":[
-                    {"data":function (data, type, dataToSet) {
+                "columns": [
+                    {
+                        "data": function (data, type, dataToSet) {
                             return data.weekOfYear;
-                        },"name":"weekOfYear"
+                        }, "name": "weekOfYear"
                     },
-                    {"data":function (data, type, dataToSet) {
+                    {
+                        "data": function (data, type, dataToSet) {
                             return data.clientName;
-                        },"name":"clientName"
+                        }, "name": "clientName"
                     },
-                    {"data":function (data, type, dataToSet) {
+                    {
+                        "data": function (data, type, dataToSet) {
                             return data.minDate;
-                        },"name":"minDate"
+                        }, "name": "minDate"
                     },
-                    {"data":function (data, type, dataToSet) {
+                    {
+                        "data": function (data, type, dataToSet) {
                             let finalName = '';
-                            if(data.typ == '1') {
+                            if (data.typ == '1') {
                                 finalName = data.clientRouteName + ' (W)';
                             }
                             else {
                                 finalName = data.clientRouteName + ' (B)';
                             }
                             return finalName;
-                        },"name":"clientRouteName"
+                        }, "name": "clientRouteName"
                     },
-                    {"data":function (data, type, dataToSet) {
-                            if(data.haveHotel != '0' && data.hour != 'nie') {
+                    {
+                        "data": function (data, type, dataToSet) {
+                            if (data.haveHotel != '0' && data.hour != 'nie') {
                                 return '<span style="color: darkgreen;">Tak</span>';
                             }
                             else {
                                 return '<span style="color: red;">Nie</span>';
                             }
-                        },"name":"hotelName"
+                        }, "name": "hotelName"
                     },
-                    {"data":function (data, type, dataToSet) {
-                        if(data.status == 0) {
-                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-success action-buttons-0" style="width:100%">Aktywuj kampanie</button>';
-                        }
-                        else if(data.status == 2) {
-                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-primary action-buttons-2" style="width:100%">Trasa nie gotowa</button>';
-                        }
-                        else {
-                            return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-warning action-buttons-1" style="width:100%">Zakończ kampanie</button>';
-                        }
+                    {
+                        "data": function (data, type, dataToSet) {
+                            if (data.status == 0) {
+                                return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-success action-buttons-0" style="width:100%">Aktywuj kampanie</button>';
+                            }
+                            else if (data.status == 2) {
+                                return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-primary action-buttons-2" style="width:100%">Trasa nie gotowa</button>';
+                            }
+                            else {
+                                return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-warning action-buttons-1" style="width:100%">Zakończ kampanie</button>';
+                            }
 
-                        },"name":"acceptRoute"
+                        }, "name": "acceptRoute"
                     },
-                    {"data":function (data, type, dataToSet) {
+                    {
+                        "data": function (data, type, dataToSet) {
                             return '<a href="{{URL::to("/specificRoute")}}/' + data.clientRouteId + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
-                        },"name":"link"
+                        }, "name": "link"
                     },
-                    {"data":function (data, type, dataToSet) {
+                    {
+                        "data": function (data, type, dataToSet) {
                             return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.clientRouteId + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
-                        },"name":"link"
+                        }, "name": "link"
                     },
-                    {"data":function (data, type, dataToSet) {
-                            return '<span style="font-size: 2.1em;" class="glyphicon glyphicon-edit show-modal-with-data" data-route_id ="'+data.clientRouteId+'" ></span>';
-                        },"name":"link"
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return '<span style="font-size: 2.1em;" class="glyphicon glyphicon-edit show-modal-with-data" data-route_id ="' + data.clientRouteId + '" ></span>';
+                        }, "name": "link"
 
                     }
                 ]
@@ -539,12 +593,12 @@
             function showAllClientsInputHandler(e) {
                 const checkedRow = document.querySelector('.check');
                 // console.assert(checkedRow, "Brak podswietlonego wiersza");
-                if(checkedRow) { //remove row higlight and reset id variable
+                if (checkedRow) { //remove row higlight and reset id variable
                     checkedRow.classList.remove('check');
                     id = null;
                 }
 
-                if(e.target.checked === true) {
+                if (e.target.checked === true) {
                     showAllClients = true;
                 }
                 else {
@@ -554,7 +608,7 @@
             }
 
             function showOnlyAssignedHandler(e) {
-                if(e.target.checked === true) {
+                if (e.target.checked === true) {
                     showOnlyAssigned = true;
                 }
                 else {
@@ -564,7 +618,7 @@
             }
 
             function selectedWeekHandler(e) {
-                    selectedWeek = e.target.value;
+                selectedWeek = e.target.value;
                 table2.ajax.reload();
             }
 
@@ -589,7 +643,7 @@
                     const reg = /^\d+$/;
                     if (reg.test(result.value) == true) {
                         const clientRouteId = e.target.dataset.clientrouteid;
-                        const url =`{{URL::to('/showClientRoutesStatus')}}`;
+                        const url = `{{URL::to('/showClientRoutesStatus')}}`;
                         const ourHeaders = new Headers();
                         ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
                         ourHeaders.set('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
@@ -623,7 +677,7 @@
              */
             function actionButtonHandlerAccepted(e) {
                 const clientRouteId = e.target.dataset.clientrouteid;
-                const url =`{{URL::to('/showClientRoutesStatus')}}`;
+                const url = `{{URL::to('/showClientRoutesStatus')}}`;
                 const ourHeaders = new Headers();
                 ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
                 const formData = new FormData();
@@ -637,7 +691,7 @@
                     body: formData
                 }).then(resp => resp.json())
                     .then(resp => {
-                        if(resp == 0) {
+                        if (resp == 0) {
                             console.log("Operacja się nie powiodła");
                         }
                         table2.ajax.reload();
@@ -649,7 +703,7 @@
              */
             function actionButtonHandlerFinished(e) {
                 const clientRouteId = e.target.dataset.clientrouteid;
-                const url =`{{URL::to('/showClientRoutesStatus')}}`;
+                const url = `{{URL::to('/showClientRoutesStatus')}}`;
                 const ourHeaders = new Headers();
                 ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
                 const formData = new FormData();
@@ -663,7 +717,7 @@
                     body: formData
                 }).then(resp => resp.json())
                     .then(resp => {
-                        if(resp == 0) {
+                        if (resp == 0) {
                             console.log("Operacja się nie powiodła");
                         }
                         table2.ajax.reload();
@@ -677,7 +731,7 @@
             function yearHandler(e) {
                 const selectedYear = e.target.value;
 
-                if(selectedYear > 0) {
+                if (selectedYear > 0) {
                     //part responsible for sending to server info about selected year
                     const header = new Headers();
                     header.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
@@ -702,7 +756,7 @@
                             basicOptionElement.value = 0;
                             basicOptionElement.textContent = 'Wybierz';
                             selectedWeekInput.appendChild(basicOptionElement);
-                            for(let i = 1; i <= weeksInYear + 1; i++) { //we are iterating to weeksInYear+1 because we are getting week number for 30.12, and in 31.12 can be monday(additional week)
+                            for (let i = 1; i <= weeksInYear + 1; i++) { //we are iterating to weeksInYear+1 because we are getting week number for 30.12, and in 31.12 can be monday(additional week)
                                 const optionElement = document.createElement('option');
                                 optionElement.value = i;
                                 optionElement.textContent = i;
