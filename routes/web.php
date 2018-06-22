@@ -906,6 +906,8 @@ Route::get('/pbxReportDetailed', 'StatisticsController@pbxReportDetailedGet');
 Route::post('/pbxReportDetailedAjax', 'StatisticsController@pbxReportDetailedAjax')->name('api.pbxReportDetailedAjax');
 
 
+Route::post('/getaHeadPlanningInfo', 'CrmRouteController@getaHeadPlanningInfo')->name('api.getaHeadPlanningInfo');
+
 
 
 

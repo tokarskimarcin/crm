@@ -98,42 +98,42 @@
                         @endforeach
                             <th>Suma</th>
                             <th>Podział</th>
-                        @foreach($departmentInfo as $item)
-                            <th>CEL {{$item->name2.' '.$item->name}}</th>
-                        @endforeach
+                        {{--@foreach($departmentInfo as $item)--}}
+                            {{--<th>CEL {{$item->name2.' '.$item->name}}</th>--}}
+                        {{--@endforeach--}}
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($departmentInfo as $item)
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            @foreach($departmentInfo as $item)
-                                <td>1123123123123123</td>
-                            @endforeach
-                            <td>5</td>
-                            <td>6</td>
-                            @foreach($departmentInfo as $item)
-                                <td>1123123123123123</td>
-                            @endforeach
-                        </tr>
-                        @endforeach
-                        @foreach($departmentInfo as $item)
-                            <tr>
-                                <td>1</td>
-                                <td>2</td>
-                                <td>3</td>
-                                @foreach($departmentInfo as $item)
-                                    <td>1123123123123123</td>
-                                @endforeach
-                                <td>5</td>
-                                <td>6</td>
-                                @foreach($departmentInfo as $item)
-                                    <td>1123123123123123</td>
-                                @endforeach
-                            </tr>
-                        @endforeach
+                        {{--@foreach($departmentInfo as $item)--}}
+                        {{--<tr>--}}
+                            {{--<td>1</td>--}}
+                            {{--<td>2</td>--}}
+                            {{--<td>3</td>--}}
+                            {{--@foreach($departmentInfo as $item)--}}
+                                {{--<td>1123123123123123</td>--}}
+                            {{--@endforeach--}}
+                            {{--<td>5</td>--}}
+                            {{--<td>6</td>--}}
+                            {{--@foreach($departmentInfo as $item)--}}
+                                {{--<td>1123123123123123</td>--}}
+                            {{--@endforeach--}}
+                        {{--</tr>--}}
+                        {{--@endforeach--}}
+                        {{--@foreach($departmentInfo as $item)--}}
+                            {{--<tr>--}}
+                                {{--<td>1</td>--}}
+                                {{--<td>2</td>--}}
+                                {{--<td>3</td>--}}
+                                {{--@foreach($departmentInfo as $item)--}}
+                                    {{--<td>1123123123123123</td>--}}
+                                {{--@endforeach--}}
+                                {{--<td>5</td>--}}
+                                {{--<td>6</td>--}}
+                                {{--@foreach($departmentInfo as $item)--}}
+                                    {{--<td>1123123123123123</td>--}}
+                                {{--@endforeach--}}
+                            {{--</tr>--}}
+                        {{--@endforeach--}}
                         </tbody>
                     </table>
                     <div class="row">
@@ -165,6 +165,7 @@
             /*********************DataTable FUNCTUONS****************************/
 
             table = $('#datatable').DataTable({
+                serverSide: true,
                 scrollY: '60vh',
                 scrollX:true,
                 scrollCollapse: true,
@@ -172,7 +173,41 @@
                 fixedColumns: true,
                 fixedColumns:{
                     leftColumns: 3
-                }
+                },
+                "ajax": {
+                    'url': "{{ route('api.getaHeadPlanningInfo') }}",
+                    'type': 'POST',
+                    'data': function (d) {
+                        d.startDate = $('#date_start').val();
+                        d.stopDate = $("#date_stop").val();
+                    },
+                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+                },
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+                },"columns":[
+                    {"data":"numberOfWeek"},
+                    {"data":"dayName"},
+                    {"data":"day"},
+                    {"data":"Lublin"},
+                    {"data":"Lublin"},
+                    {"data":"Radom"},
+                    {"data":"Radom"},
+                    {"data":"numberOfWeek"},
+                    {"data":"numberOfWeek"},
+                    {"data":"numberOfWeek"},
+                    {"data":"numberOfWeek"},
+                    {"data":"numberOfWeek"},
+                    {"data":"numberOfWeek"},
+                    {"data":"numberOfWeek"},
+                    {"data":"numberOfWeek"},
+                    {"data":"numberOfWeek"},
+                    {"data":"numberOfWeek"},
+                    {"data":"numberOfWeek"},
+                    {"data":"numberOfWeek"},
+                    {"data":"numberOfWeek"},
+
+                ]
             });
 
 
