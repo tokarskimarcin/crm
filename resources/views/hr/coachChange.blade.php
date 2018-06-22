@@ -1,5 +1,6 @@
 @extends('layouts.main')
 @section('content')
+    <link href="{{ asset('/css/dataTables.bootstrap.min.css')}}" rel="stylesheet">
     <style>
         .trainers, .newCoaches {
             transition: all 0.8s ease-in-out;
@@ -100,25 +101,29 @@
         </div>
     </div>
 
-    @if(Auth::user()->user_type_id == $user_type_id)
+    {{--tabela zmian pojawia sie gdy zalogowany użytkownik jest super adminem--}}
+    @if(Auth::user()->user_type_id == 3)
         <div class="row">
             <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         Cofnij zmiany
                     </div>
-
                     <div id="revertbtns">
                         <div class="panel-body">
-                            <form action="{{URL::to('/coachChangeRevert')}}" method="post" id="formularz">
-                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                <table class="table">
-                                    <tr>
-                                        <th>Trener</th>
-                                        <th>Poprzedni trener</th>
-                                        <th>Data zmiany</th>
-                                        <th>Cofnięcie</th>
-                                    </tr>
+                            <table id='tableCoachChange' class="table table-striped cell-border hover order-column row-border"
+                                   style="width:100%">
+                                <thead>
+                                <tr>
+                                    <th>Trener</th>
+                                    <th>Poprzedni trener</th>
+                                    <th>Data zmiany</th>
+                                    <th>Cofnięcie</th>
+                                </tr>
+                                </thead>
+                                {{--<form action="{{URL::to('/coachChangeRevert')}}" method="post" id="formularz">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <tbody>
                                     @foreach($coachChanges as $coachChange)
                                         <tr>
                                             <td>{{$coachChange->c_first_name." ".$coachChange->c_last_name}}</td>
@@ -128,14 +133,17 @@
                                                 <button class="btn btn-info" type="submit"
                                                         id="revertbtn_{{$coachChange->id}}"
                                                         name="coach_change_id"
-                                                        value="{{$coachChange->id}}" data-type="przycisk_cofnij">
+                                                        value="{{$coachChange->id}}" data-type="revert_button">
                                                     Cofnij
                                                 </button>
                                             </td>
                                         </tr>
                                     @endforeach
-                                </table>
-                            </form>
+                                    </tbody>
+                                </form>--}}
+                                <tbody>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -146,15 +154,59 @@
 @endsection
 @section('script')
     <script>
+        tableCoachChange = null;
+        $(document).ready(function () {
+
+            tableCoachChange = $('#tableCoachChange').DataTable({
+                "autoWidth": true,
+                "processing": true,
+                "serverSide": true,
+                "scrollY": '40vh',
+                "order": [[2, "desc"]],
+                "ajax": {
+                    'url': `{{ route('api.datatableCoachChange') }}`,
+                    'type': 'POST',
+                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+                },
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+                }, "columns": [
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.c_first_name + " " + data.c_last_name;
+                        }, "name": "c_last_name"
+                    },
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.pc_first_name + " " + data.pc_last_name;
+                        }, "name": "pc_last_name"
+                    },
+                    {"data": "created_at"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return '<button class="btn btn-info" type="submit" id="revertbtn_' +
+                                data.id +
+                                '" name="coach_change_id" value="' +
+                                data.id +
+                                '" data-type="revert_button">Cofnij</button>';
+                            /*'<button class="btn btn-info" type="submit" id="revertbtn_'+data.id+
+                            "name=\"coach_change_id"+
+                            "value="+data.id+"data-type=\"revert_button\">Cofnij</button>";*/
+                        }, "name": "id", "orderable": false, "searchable": false
+                    }
+                ]
+            });
+        });
         /* ----------- Variables----------- */
 
         /* ----------- Event Listeners ----------- */
 
+        //zdarzenie nacisniecia przycisku zmiany trenera
         $('#submitButton').click((e) => {
             e.preventDefault();
             var coachId = $('#coach').val();
             var newCoachId = $('#newCoach').val();
-            if (coachId === "0" || newCoachId === "0") {
+            if (coachId === "0" || newCoachId === "0") {    //sprawdzenie czy trenerzy zostali wybrani
                 swal('Wybierz trenerów w obu polach');
             }
             else {
@@ -175,13 +227,15 @@
                     }
                 }).then((response) => {
                     swal(response.value['title'], response.value['msg'], response.value['type']);
+                    if (response.value['type'] === "success")
+                        tableCoachChange.ajax.reload();
                 });
             }
         });
 
         //zdarzenie nacisniecia przycisku cofaniecia zmian
         $('#revertbtns').click(function (e) {
-            if (e.target.dataset.type == "przycisk_cofnij") {
+            if (e.target.dataset.type === "revert_button") {
                 e.preventDefault();
                 swal({
                     title: "Jesteś pewien?",
@@ -200,6 +254,8 @@
                     }
                 }).then((response) => {
                     swal(response.value['title'], response.value['msg'], response.value['type']);
+                    if (response.value['type'] === "success")
+                        tableCoachChange.ajax.reload();
                 });
 
             }
@@ -251,7 +307,7 @@
                 error: function (jqXHR, textStatus, thrownError) {
                     console.log(jqXHR);
                     console.log('textStatus: ' + textStatus);
-                    console.log('hrownError: ' + thrownError);
+                    console.log('thrownError: ' + thrownError);
                     callback({type: 'error', msg: 'Wystąpił błąd: ' + thrownError, title: 'Błąd ' + jqXHR.status});
                 }
             });
