@@ -145,10 +145,17 @@
     <script>
         document.addEventListener('DOMContentLoaded',function(event) {
 
+            /************ GLOBAL VARIABLES *************/
             const tableNumber = document.querySelectorAll('table').length;
-
+            let cityInfoArray = []; //Here will be all data about given cities filled by user.
             let hotelIdArr = []; //here we collect id's of each city's hotel;
-            {{--{{dd($clientRouteInfo)}}--}}
+            const voivodeeId = null;
+            const cityId = null;
+            let numberOfLoops = '{{$iterator}}';
+            var tableArray = new Array();
+            var lp = 1;
+            /**********END OF GLOBAL VARIABLES ***********/
+
                     @foreach($clientRouteInfo as $info)
                         @foreach($info as $item)
                             {{--@if($loop->first)--}}
@@ -168,15 +175,6 @@
                             {{--@endif--}}
                         @endforeach
                     @endforeach
-console.log(hotelIdArr);
-
-
-            const voivodeeId = null;
-            const cityId = null;
-            let numberOfLoops = '{{$iterator}}';
-            var tableArray = new Array();
-            var lp = 1;
-
 
             newTable = $('.datatable');
             newTable.each(function() {
@@ -215,8 +213,6 @@ console.log(hotelIdArr);
                         checkedInput = $(this).closest('table').find('input[type="checkbox"]:checked');
                         closestTr = checkedInput.closest('tr');
                         closestTr.addClass('check');
-
-
                     }, "ajax": {
                         'url': "{{ route('api.showHotelsAjax') }}",
                         'type': 'POST',
@@ -261,8 +257,6 @@ console.log(hotelIdArr);
                                         }
                                     }
                                 }
-
-                                       {{--return '<input class="checkbox_info" type="checkbox" value="' + data.id + '" style="display:inline-block;" @foreach($clientRouteInfo as $info) @foreach($info as $item) @if($loop->first) @if(isset($item->hotel_id)) @if($item->hotel_id == data.id) checked @endif @endif @endif @endforeach @endforeach>';--}}
                                        return '<input class="checkbox_info" type="checkbox" value="' + data.id + '" style="display:inline-block;">';
                             },"orderable": false, "searchable": false
                         }
@@ -338,9 +332,6 @@ console.log(hotelIdArr);
                 return timeHotelArr;
 
             }
-
-
-            let cityInfoArray = []; //Here will be all data about given cities filled by user.
 
             //this function collect data from forms and validate it.
             function submitHandler(e) {

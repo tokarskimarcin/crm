@@ -1,6 +1,7 @@
 @extends('layouts.main')
 @section('style')
     <link href="{{ asset('/css/dataTables.bootstrap.min.css')}}" rel="stylesheet">
+    <link rel="stylesheet" href="{{asset('/css/fixedHeader.dataTables.min.css')}}">
     <style>
         td{
             text-align: center;
@@ -119,7 +120,7 @@
 
 @section('script')
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
-
+    <script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>
     <script>
 
         var table;
@@ -142,6 +143,7 @@
             table = $('#datatable').DataTable({
                 "processing": true,
                 "serverSide": true,
+                "fixedHeader": true,
                 "drawCallback": function( settings ) {
 
                     $('.form_time').datetimepicker({
