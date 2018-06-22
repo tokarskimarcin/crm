@@ -874,6 +874,8 @@ Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
 
 //campaign reports mothod for database
 Route::get('/report_campaign', 'PBXDataAPI@report_campaign');
+
+Route::get('/pbxDetailedReport', 'PBXDataAPI@pbx_detailed_campaign_report');
 /**END OUT OF FIREWALL**/
 
 
@@ -898,6 +900,13 @@ Route::get('/addNewCampaigns', 'CampaignsController@addNewCampaignsGet');
 Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
 
 Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
+
+Route::get('/pbxReportDetailed', 'StatisticsController@pbxReportDetailedGet');
+
+Route::post('/pbxReportDetailedAjax', 'StatisticsController@pbxReportDetailedAjax')->name('api.pbxReportDetailedAjax');
+
+
+Route::post('/getaHeadPlanningInfo', 'CrmRouteController@getaHeadPlanningInfo')->name('api.getaHeadPlanningInfo');
 
 
 

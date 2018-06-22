@@ -10,6 +10,7 @@ use App\ClientRoute;
 use App\ClientRouteInfo;
 use App\Department_info;
 use App\Hotel;
+use App\PbxCrmInfo;
 use App\Route;
 use App\RouteInfo;
 use App\Voivodes;
@@ -451,10 +452,11 @@ class CrmRouteController extends Controller
         $departments = Department_info::getAllInfoAboutDepartment()
         ->whereIn('id_dep_type',[2]);
         $year = date('Y',strtotime("this year"));
-        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
+        $numberOfThisYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
         return view('crmRoute.showClientRoutes')
-            ->with('lastWeek', $numberOfLastYearsWeek)
-            ->with('departments', $departments);
+            ->with('lastWeek', $numberOfThisYearsWeek)
+            ->with('departments', $departments)
+            ->with('year', $year);
     }
 
     /**
@@ -463,7 +465,7 @@ class CrmRouteController extends Controller
      */
     public function getYearWeeksAjax(Request $request) {
         $year = $request->year;
-        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
+        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 29, $year));
         return $numberOfLastYearsWeek;
     }
 
@@ -1744,16 +1746,71 @@ class CrmRouteController extends Controller
         ->join('departments', 'department_info.id_dep', '=', 'departments.id')
         ->get();
 
-        $startDate = '2018-06-01';
-        $stopDAte = '2018-06-30';
-
-
-
         return view('crmRoute.aheadPlanning')
             ->with('lastWeek', $numberOfLastYearsWeek)
             ->with('currentWeek', $weeksString)
             ->with('currentYear', $year)
             ->with('departmentInfo', $departmentInfo);
+    }
+
+    public function getaHeadPlanningInfo(Request $request){
+        $departmentInfo = DB::table('department_info')->select(DB::raw('
+        department_info.id as id, 
+        department_type.name as name, 
+        departments.name as name2
+        '))
+            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->get();
+
+        $startDate  = '2018-05-09';
+        $stopDate   = '2018-06-10';
+        $actualDate = $startDate;
+        $allInfoCollect = collect();
+        while($actualDate != $stopDate){
+            $dayCollect = collect();
+            $dayCollect->offsetSet('numberOfWeek',date('W',strtotime($actualDate)));
+            $dayCollect->offsetSet('dayName',$this::getNameOfWeek($actualDate));
+            $dayCollect->offsetSet('day',$actualDate);
+            $totalScore = 0;
+            $allSet = true;
+            foreach ($departmentInfo as $item){
+                $routeInfo =
+                    ClientRouteInfo::
+                    where('date','=',$actualDate)
+                        ->where('department_info_id','=',$item->id)
+                        ->get();
+                $dayLimit = $routeInfo->sum('limits');
+                $daySuccess = $routeInfo->sum('actual_success');
+                $dayCollect->offsetSet($item->name2,$dayLimit-$daySuccess);
+                $totalScore += 0;
+            }
+            $isSet = ClientRouteInfo::
+            where('date','=',$actualDate)
+                ->where('department_info_id','=',null)
+                ->get()
+                ->count();
+            if($isSet != 0)
+                $allSet = false;
+            $dayCollect->offsetSet('allSet',$allSet);
+            $dayCollect->offsetSet('totalScore',$totalScore);
+            $allInfoCollect->push($dayCollect);
+            $actualDate = date('Y-m-d', strtotime($actualDate. ' + 1 days'));
+        }
+        return datatables($allInfoCollect)->make(true);
+    }
+
+    public function getNameOfWeek($date){
+        $arrayOfWeekName = [
+            '1' => 'Poniedziałek',
+            '2' => 'Wtorek',
+            '3' => 'Środa',
+            '4' => 'Czwartek',
+            '5' => 'Piątek',
+            '6' => 'Sobota',
+            '7' => 'Niedziela'];
+        return $arrayOfWeekName[date('m',strtotime($date))+0];
+
     }
 
 }

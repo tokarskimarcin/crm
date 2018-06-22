@@ -5,6 +5,8 @@
     <link href="{{ asset('/css/buttons.bootstrap.min.css')}}" rel="stylesheet">
     <link href="{{ asset('/css/select.bootstrap.min.css')}}" rel="stylesheet">
     <link href="{{ asset('/css/editor.bootstrap.min.css')}}" rel="stylesheet">
+    <link rel="stylesheet" href="{{asset('/css/fixedHeader.dataTables.min.css')}}">
+
      <style>
         .panel-heading a:after {
             font-family:'Glyphicons Halflings';
@@ -112,12 +114,14 @@
 <script src="{{ asset('/js/dataTables.buttons.min.js')}}"></script>
 <script src="{{ asset('/js/buttons.bootstrap.min.js')}}"></script>
 <script src="{{ asset('/js/dataTables.select.min.js')}}"></script>
+<script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>
 <script>
     $(document).ready(function() {
         table = $('#datatable').DataTable({
             "autoWidth": false,
             "processing": true,
             "serverSide": true,
+            "fixedHeader": true,
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
             },
@@ -173,6 +177,7 @@
             "autoWidth": false,
             "processing": true,
             "serverSide": true,
+            "fixedHeader": true,
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
             },
