@@ -1177,8 +1177,6 @@ class UsersController extends Controller
 
     public function coachChangeGet()
     {
-        $user_type_id = 3;
-
         $coaches = User::where('department_info_id', '=', Auth::user()->department_info_id)
             ->whereIn('id', User::where('coach_id', '<>', null)
                 ->pluck('coach_id')
@@ -1191,33 +1189,18 @@ class UsersController extends Controller
             ['department_info_id', '=', Auth::user()->department_info_id]
         ])->get();
 
-        $coachChanges = null;
-        if (Auth::user()->user_type_id == $user_type_id)
-            $coachChanges = DB::table('coach_change as c')
-                ->select('c.id',
-                    'u1.first_name as c_first_name', 'u1.last_name as c_last_name',
-                    'u2.first_name as pc_first_name', 'u2.last_name as pc_last_name',
-                    'c.created_at')
-                ->leftJoin('users as u1', 'c.coach_id', '=', 'u1.id')
-                ->leftJoin('users as u2', 'c.prev_coach_id', '=', 'u2.id')
-                ->where('c.status', '=', 0)
-                ->orderBy('c.id', 'desc')
-                ->get();
-
         //dd($newcoaches);
         return view('hr.coachChange')
             ->with('coaches', $coaches)
-            ->with('newCoaches', $newCoaches)
-            ->with('user_type_id', $user_type_id)
-            ->with('coachChanges', $coachChanges);
+            ->with('newCoaches', $newCoaches);
     }
 
     public function coachChangePost(Request $request)
     {
         $error = false;
-        if ($request->coach_id && $request->newCoach_id) {
-            $newCoachId = $request->newCoach_id;
-            $coachId = $request->coach_id;
+        $newCoachId = $request->newCoach_id;
+        $coachId = $request->coach_id;
+        if ($coachId && $newCoachId) {
             try {
                 $consultantsWithPrevCoach = User::where([
                     ['coach_id', '=', $coachId],
@@ -1312,6 +1295,25 @@ class UsersController extends Controller
         } else {
             return Redirect::back();
         }
+    }
+
+    public function datatableCoachChange(Request $request)
+    {
+        $coachChanges = null;
+        if ($request->ajax())
+            if (Auth::user()->user_type_id == 3)
+                $coachChanges = DB::table('coach_change as c')
+                    ->select('c.id',
+                        'u1.first_name as c_first_name', 'u1.last_name as c_last_name',
+                        'u2.first_name as pc_first_name', 'u2.last_name as pc_last_name',
+                        'c.created_at')
+                    ->leftJoin('users as u1', 'c.coach_id', '=', 'u1.id')
+                    ->leftJoin('users as u2', 'c.prev_coach_id', '=', 'u2.id')
+                    ->where('c.status', '=', 0)
+                    ->orderBy('c.id', 'desc')
+                    ->get();
+
+        return datatables($coachChanges)->make(true);
     }
 
     public function employeeSearchPost(Request $request)
