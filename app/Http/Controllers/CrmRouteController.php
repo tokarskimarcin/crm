@@ -1635,7 +1635,7 @@ class CrmRouteController extends Controller
     }
 
     /**
-     * @param ids - array, limit - number, comment - text, sms - number(0,1), invitation - number, department - number
+     * @param ids - array, limit - number, comment - text, verification - (0,1), invitation - number, department - number
      * @return adnotation for user
      * This method changes limits for selected by user records.
      */
@@ -1649,9 +1649,9 @@ class CrmRouteController extends Controller
         $baseDivision = $request->baseDivision;
         $limit = $request->limit;
         $comment = $request->comment;
-        $sms = $request->sms;
         $invitation = $request->invitation;
         $department = $request->department;
+        $verification = $request->verification;
 
         $clientRouteInfoRecords = ClientRouteInfo::whereIn('id', $ids)->get();
 
@@ -1681,13 +1681,6 @@ class CrmRouteController extends Controller
             }
         }
 
-        if($sms != '') {
-            foreach($clientRouteInfoRecords as $record) {
-                $record->sms = $sms;
-                $record->save();
-            }
-        }
-
         if($invitation != '') {
             foreach($clientRouteInfoRecords as $record) {
 
@@ -1701,6 +1694,13 @@ class CrmRouteController extends Controller
             }
         }
 
+        if($verification != '') {
+            foreach($clientRouteInfoRecords as $record) {
+                $record->verification = $verification;
+                $record->save();
+            }
+        }
+
 
         if(count($clientRouteInfoRecords) > 1) {
             $adnotation = "Rekordy zostały zmienione";
@@ -1708,6 +1708,13 @@ class CrmRouteController extends Controller
         else {
             $adnotation = "Rekord został zmieniony";
         }
+
+        $log = "ClientRouteInfoIds: ";
+        foreach($clientRouteInfoRecords as $record) {
+            $log .= $record->id . ', ';
+        }
+
+        new ActivityRecorder(12,$log,212,2);
 
         return $adnotation;
     }
