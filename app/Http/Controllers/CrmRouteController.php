@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ActivityRecorder;
 use App\AuditCriterions;
 use App\AuditHeaders;
 use App\Cities;
@@ -77,7 +78,7 @@ class CrmRouteController extends Controller
                 $clientRouteInfo->city_id = $cityArr[$i];
                 $clientRouteInfo->voivode_id = $voivodeArr[$i];
                 $clientRouteInfo->date = $dateArr[$i];
-                $clientRouteInfo->sms = 0; // 0 - not set, 1 - set
+                $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
                 $day = substr($dateArr[$i],8,2);
 
                 $month = substr($dateArr[$i],5,2);
@@ -90,6 +91,8 @@ class CrmRouteController extends Controller
                 $clientRouteInfo->save();
             }
         }
+
+        new ActivityRecorder(12,'ClientRouteId: '. $clientRoute->id,196,1);
         $request->session()->flash('adnotation', 'Trasa została pomyślnie przypisana dla klienta');
 
         return Redirect::back();
@@ -135,7 +138,7 @@ class CrmRouteController extends Controller
                 $clientRouteInfo->city_id = $cityArr[$i];
                 $clientRouteInfo->voivode_id = $voivodeArr[$i];
                 $clientRouteInfo->date = $dateArr[$i];
-                $clientRouteInfo->sms = 0; // 0 - not set, 1 - set
+                $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
                 $day = substr($dateArr[$i],8,2);
 
                 $month = substr($dateArr[$i],5,2);
@@ -149,6 +152,8 @@ class CrmRouteController extends Controller
             }
         }
         $request->session()->flash('adnotation', 'Trasa została pomyślnie przypisana dla klienta');
+
+        new ActivityRecorder(12,'ClientRouteId: '. $request->route_id, 206,2);
 
         return Redirect::back();
 
@@ -321,10 +326,6 @@ class CrmRouteController extends Controller
 
         $clientRouteInfo = collect($clientRouteInfoExtended);
 
-
-
-
-
         $departments = Department_info::all();
         $today = date('Y-m-d');
         $today .= '';
@@ -338,6 +339,7 @@ class CrmRouteController extends Controller
             $item[0]->cities = $this::findCityByDistance($cityObject, '2000-01-01');
             return $item;
         });
+
         return view('crmRoute.editSpecificRoute')
             ->with('departments', $departments)
             ->with('voivodes', $voivodes)
@@ -354,6 +356,7 @@ class CrmRouteController extends Controller
      */
     public function specificRoutePost(Request $request) {
         $all_data = json_decode($request->JSONData); //we obtain 2 dimensional array
+        $clientRouteInfoIds = 'clientRouteInfoIds: ';
         foreach($all_data as $city) {
             $clientRouteInfo = ClientRouteInfo::where([
                 ['city_id', '=', $city->cityId],
@@ -370,8 +373,10 @@ class CrmRouteController extends Controller
                 $item->department_info_id = null; //At this point nobody choose it's value, can't be 0 because
                 $item->save();
                 $iterator++;
+                $clientRouteInfoIds .= $item->id . ', ';
             }
         }
+        new ActivityRecorder(12,$clientRouteInfoIds, 206,2);
 
         return $all_data;
     }
@@ -391,13 +396,17 @@ class CrmRouteController extends Controller
      */
     public function saveCampaignOption(Request $request){
         if($request->ajax()){
+            $clientRouteIds = 'ClientRouteInfoIds: ';
             $objectOfChange = $request->objectOfChange;
             foreach ($objectOfChange as $item){
                 $clientRoadInfo = ClientRouteInfo::find($item['id']);
                 $clientRoadInfo->limits = $item['limit'];
                 $clientRoadInfo->department_info_id = $item['department_info_id'];
                 $clientRoadInfo->save();
+                $clientRouteIds .= $item['id'] .', ';
             }
+            new ActivityRecorder(12,$clientRouteIds,200,2);
+
             return 200;
         }else
             return 500;
@@ -840,19 +849,23 @@ class CrmRouteController extends Controller
             $clientRoute->status = 1;
             $clientRoute->save();
             $success = 1;
+            new ActivityRecorder(12,'Aktywacja kampanii',200,4);
         }
         else if($clientRouteId && $toDelete == '1') {
             $clientRoute = ClientRoute::find($clientRouteId);
             $clientRoute->status = 2;
             $clientRoute->save();
             $success = 1;
+            new ActivityRecorder(12,'Zakończenie kampanii',200,4);
         }
         else if($clientRouteId && $toDelete == '2') {
             $clientRoute = ClientRoute::find($clientRouteId);
             $clientRoute->status = 0;
             $clientRoute->save();
             $success = 1;
+            new ActivityRecorder(12,'Zmiana statusu na "nie gotowa"',200,4);
         }
+
         return $success;
     }
 
@@ -907,6 +920,7 @@ class CrmRouteController extends Controller
             }
 
         }
+        new ActivityRecorder(12, null,185,1);
 
         $request->session()->flash('adnotation', 'Trasa została dodana pomyślnie!');
 
@@ -931,6 +945,8 @@ class CrmRouteController extends Controller
             }
 
             $request->session()->flash('adnotation', 'Trasa została usunięta pomyślnie!');
+
+            new ActivityRecorder(12,'Route_id: ' . $request->route_id,188,3);
 
             return Redirect::to('/showRoutes');
         }
@@ -983,6 +999,9 @@ class CrmRouteController extends Controller
                 }
             }
             $request->session()->flash('adnotation', 'Trasa została edytowana pomyślnie!');
+
+            new ActivityRecorder(12,'Route_id: ' . $request->route_id,188,2);
+
             return Redirect::to('/showRoutes');
         }
 
@@ -1205,6 +1224,8 @@ class CrmRouteController extends Controller
         $newHotel->status = $status;
         $newHotel->save();
 
+        new ActivityRecorder(12,null,188,1);
+
         $request->session()->flash('adnotation', 'Hotel został dodany pomyślnie!');
 
         return Redirect::back();
@@ -1301,6 +1322,8 @@ class CrmRouteController extends Controller
             $hotel = Hotel::find($id);
             $hotel->status = 0; // status 0 - usuniety, status = 1 - aktywny
             $hotel->save();
+            new ActivityRecorder(12,$id, 191,3);
+
             $request->session()->flash('adnotation', 'Hotel został usunięty pomyślnie!');
         }
         else {
@@ -1311,6 +1334,8 @@ class CrmRouteController extends Controller
             $hotel->price = $request->price;
             $hotel->comment = $request->comment;
             $hotel->save();
+            new ActivityRecorder(12,$id, 191,2);
+
             $request->session()->flash('adnotation', 'Hotel został edytowany pomyślnie!');
         }
         return Redirect::to('/hotel/'. $id);
@@ -1469,6 +1494,8 @@ class CrmRouteController extends Controller
             $newCity->zip_code = $request->zipCode;
             $newCity->status = 0;
             $newCity->save();
+            new ActivityRecorder(12,null, 193, 1);
+
             return 200;
         }
     }
@@ -1480,10 +1507,16 @@ class CrmRouteController extends Controller
     public function changeStatusCity(Request $request){
         if($request->ajax()){
             $newCity = Cities::find($request->cityId);
-            if($newCity->status == 0)
+            if($newCity->status == 0) {
                 $newCity->status = 1;
-            else
+                new ActivityRecorder(12,null, 193, 3);
+            }
+
+            else {
                 $newCity->status = 0;
+                new ActivityRecorder(12,null, 193, 4);
+            }
+
             $newCity->save();
         }
     }
@@ -1602,7 +1635,7 @@ class CrmRouteController extends Controller
     }
 
     /**
-     * @param ids - array, limit - number, comment - text, sms - number(0,1), invitation - number, department - number
+     * @param ids - array, limit - number, comment - text, verification - (0,1), invitation - number, department - number
      * @return adnotation for user
      * This method changes limits for selected by user records.
      */
@@ -1616,9 +1649,9 @@ class CrmRouteController extends Controller
         $baseDivision = $request->baseDivision;
         $limit = $request->limit;
         $comment = $request->comment;
-        $sms = $request->sms;
         $invitation = $request->invitation;
         $department = $request->department;
+        $verification = $request->verification;
 
         $clientRouteInfoRecords = ClientRouteInfo::whereIn('id', $ids)->get();
 
@@ -1648,13 +1681,6 @@ class CrmRouteController extends Controller
             }
         }
 
-        if($sms != '') {
-            foreach($clientRouteInfoRecords as $record) {
-                $record->sms = $sms;
-                $record->save();
-            }
-        }
-
         if($invitation != '') {
             foreach($clientRouteInfoRecords as $record) {
 
@@ -1668,6 +1694,13 @@ class CrmRouteController extends Controller
             }
         }
 
+        if($verification != '') {
+            foreach($clientRouteInfoRecords as $record) {
+                $record->verification = $verification;
+                $record->save();
+            }
+        }
+
 
         if(count($clientRouteInfoRecords) > 1) {
             $adnotation = "Rekordy zostały zmienione";
@@ -1675,6 +1708,13 @@ class CrmRouteController extends Controller
         else {
             $adnotation = "Rekord został zmieniony";
         }
+
+        $log = "ClientRouteInfoIds: ";
+        foreach($clientRouteInfoRecords as $record) {
+            $log .= $record->id . ', ';
+        }
+
+        new ActivityRecorder(12,$log,212,2);
 
         return $adnotation;
     }

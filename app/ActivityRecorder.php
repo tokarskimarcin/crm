@@ -49,9 +49,10 @@ class ActivityRecorder extends Model
       8 - recruitment activity
       9 - medical packages
       10 - audits
+      12 - CRM
     */
 
-    public function __construct($type, $action) {
+    public function __construct($type, $action, $link_id = null, $action_id = null) {
         $this->user = Auth::user()->id;
         $this->date = date("Y-m-d H:i:s");
         $this->action = $action;
@@ -66,7 +67,7 @@ class ActivityRecorder extends Model
             $string = $this->action;
         }
 
-        $content = 'ID: [' . $this->user . '] DATE: [' . $this->date . '] ACTION: [' . $string . ']';
+        $content = $string;
 
         switch ($type) {
           case '1':
@@ -155,6 +156,15 @@ class ActivityRecorder extends Model
                 if ($size < 104857600) {
                     Storage::append('coachingActivity.txt', $content);
                 }
+                break;
+
+            case '12':
+                $newLog = new Logs();
+                $newLog->links_id = $link_id;
+                $newLog->user_id = $this->user;
+                $newLog->action_type_id = $action_id;
+                $newLog->comment = $content;
+                $newLog->save();
                 break;
 
           default:
