@@ -1216,6 +1216,8 @@ class CrmRouteController extends Controller
         $newHotel->status = $status;
         $newHotel->save();
 
+        new ActivityRecorder(12,null,188,1);
+
         $request->session()->flash('adnotation', 'Hotel został dodany pomyślnie!');
 
         return Redirect::back();
@@ -1312,6 +1314,8 @@ class CrmRouteController extends Controller
             $hotel = Hotel::find($id);
             $hotel->status = 0; // status 0 - usuniety, status = 1 - aktywny
             $hotel->save();
+            new ActivityRecorder(12,$id, 191,3);
+
             $request->session()->flash('adnotation', 'Hotel został usunięty pomyślnie!');
         }
         else {
@@ -1322,6 +1326,8 @@ class CrmRouteController extends Controller
             $hotel->price = $request->price;
             $hotel->comment = $request->comment;
             $hotel->save();
+            new ActivityRecorder(12,$id, 191,2);
+
             $request->session()->flash('adnotation', 'Hotel został edytowany pomyślnie!');
         }
         return Redirect::to('/hotel/'. $id);
