@@ -349,6 +349,9 @@
                });
            }
 
+           /**
+            * This function create one row of modal table and place it in rows array.
+            */
            function createModalTableRow() {
 
                clientRouteInfoIdArr.forEach(item => {
