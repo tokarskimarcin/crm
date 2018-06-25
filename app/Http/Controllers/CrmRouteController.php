@@ -1557,7 +1557,9 @@ class CrmRouteController extends Controller
         client_route_info.id as id,
         client_route_info.date as date,
         client_route_info.hour as hour,
-        client_route_info.sms as sms,
+        client_route_info.pbx_campaign_id as nrPBX,
+        client_route_info.baseDivision as baseDivision,
+        client_route_info.verification as verification,
         client_route_info.weekOfYear as weekOfYear,
         client_route_info.limits as limits,
         YEAR(client_route_info.date) as year,
@@ -1606,6 +1608,12 @@ class CrmRouteController extends Controller
      */
     public function showRoutesDetailedUpdateAjax(Request $request) {
         $ids = json_decode($request->ids);
+        $nrPBX = $request->nrPBX;
+        if(!is_numeric($nrPBX)){
+            $nrPBX = null;
+        }
+
+        $baseDivision = $request->baseDivision;
         $limit = $request->limit;
         $comment = $request->comment;
         $sms = $request->sms;
@@ -1614,6 +1622,18 @@ class CrmRouteController extends Controller
 
         $clientRouteInfoRecords = ClientRouteInfo::whereIn('id', $ids)->get();
 
+        if($nrPBX !=''){
+            foreach($clientRouteInfoRecords as $record) {
+                $record->pbx_campaign_id = $nrPBX;
+                $record->save();
+            }
+        }
+        if($baseDivision !=''){
+            foreach($clientRouteInfoRecords as $record) {
+                $record->baseDivision = $baseDivision;
+                $record->save();
+            }
+        }
         if($limit != '') {
             foreach($clientRouteInfoRecords as $record) {
                 $record->limits = $limit;
