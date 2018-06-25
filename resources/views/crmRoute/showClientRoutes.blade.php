@@ -626,50 +626,27 @@
              * This function changes campaign status from nto ready to started.
              */
             function actionButtonHandler(e) {
-                swal({
-                    title: 'Numer Kampanii PBX',
-                    input: 'number',
-                    inputAttributes: {
-                        autocapitalize: 'off'
-                    },
-                    showCancelButton: true,
-                    confirmButtonText: 'Aktywuj kampanie',
-                    showLoaderOnConfirm: true,
-                    preConfirm: (login) => {
+                const clientRouteId = e.target.dataset.clientrouteid;
+                const url = `{{URL::to('/showClientRoutesStatus')}}`;
+                const ourHeaders = new Headers();
+                ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                ourHeaders.set('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                const formData = new FormData();
+                formData.append('clientRouteId', clientRouteId);
+                formData.append('delete', '0');
 
-                    },
-                    allowOutsideClick: () => !swal.isLoading()
-                }).then((result) => {
-                    const reg = /^\d+$/;
-                    if (reg.test(result.value) == true) {
-                        const clientRouteId = e.target.dataset.clientrouteid;
-                        const url = `{{URL::to('/showClientRoutesStatus')}}`;
-                        const ourHeaders = new Headers();
-                        ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
-                        ourHeaders.set('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
-                        const formData = new FormData();
-                        formData.append('clientRouteId', clientRouteId);
-                        formData.append('delete', '0');
-
-                        fetch(url, {
-                            method: 'post',
-                            headers: ourHeaders,
-                            credentials: "same-origin",
-                            body: formData
-                        }).then(resp => resp.json())
-                            .then(resp => {
-                                swal({
-                                    title: `Kampania została aktywowana`,
-                                });
-                                return table2.ajax.reload();
-                            })
-                    }
-                    else {
+                fetch(url, {
+                    method: 'post',
+                    headers: ourHeaders,
+                    credentials: "same-origin",
+                    body: formData
+                }).then(resp => resp.json())
+                    .then(resp => {
                         swal({
-                            title: `Numer kampanii musi być liczbą całkowitą`,
+                            title: `Kampania została aktywowana`,
                         });
-                    }
-                });
+                        return table2.ajax.reload();
+                    })
             }
 
             /**
@@ -693,6 +670,11 @@
                     .then(resp => {
                         if (resp == 0) {
                             console.log("Operacja się nie powiodła");
+                        }
+                        else {
+                            swal({
+                                title: `Kampania została zakończona`,
+                            });
                         }
                         table2.ajax.reload();
                     })
@@ -719,6 +701,11 @@
                     .then(resp => {
                         if (resp == 0) {
                             console.log("Operacja się nie powiodła");
+                        }
+                        else {
+                            swal({
+                                title: `Kampania została przeniesiona w stan "nie gotowa"`,
+                            });
                         }
                         table2.ajax.reload();
                     })
