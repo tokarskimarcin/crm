@@ -156,6 +156,7 @@
            let selectedDepartments = ["0"]; //this array collect selected by user departments
            let clientRouteInfoIdArr = []; //array of client_route_info ids
            let selectedTypes = ['0']; //array of selected by user types
+           let arrayOfTableRows = [];
            /*******END OF GLOBAL VARIABLES*********/
 
            /**
@@ -177,6 +178,16 @@
                if (flag) {
                    clientRouteInfoIdArr.splice(iterator, 1);
                    row.removeClass('colorRow');
+
+                   //this part removes object with given id form arrayOfTableRows
+                   iterator = 0;
+                   arrayOfTableRows.forEach(clientId => {
+                       if(id == clientId.id) {
+                           arrayOfTableRows.splice(iterator, 1);
+                       }
+                       iterator++;
+                   });
+
                }
                else {
                    clientRouteInfoIdArr.push(id);
@@ -187,7 +198,7 @@
            /**
             * This function append modify button with proper name and remove it if necessary
             */
-           function showModifyButton() {
+           function showModifyButton(clientRouteInfoId) {
                if (clientRouteInfoIdArr.length == 1) {
                    if (document.querySelector('#editMultipleRecords')) { //if "edytuj rekordy" button exists, remove it
                        const previousButton = document.querySelector('#editMultipleRecords');
@@ -333,13 +344,55 @@
 
                        })
                        .catch(error => console.error("Błąd :", error))
+
+                   $('#editModal').modal('toggle');
                });
+           }
+
+           function createModalTableRow() {
+
+               clientRouteInfoIdArr.forEach(item => {
+                   let addFlag = true;
+                   let idItem = item;
+                   arrayOfTableRows.forEach(clientId => {
+                       if(item == clientId.id) {
+                           addFlag = false;
+                       }
+                   });
+
+                   if(addFlag == true) {
+                       let givenRow = document.querySelector('[data-id="' + idItem + '"]');
+                       givenRowData = givenRow.cells[1].textContent;
+                       givenRowKampania = givenRow.cells[2].textContent;
+                       givenRowProjekt = givenRow.cells[7].textContent;
+                       let tr = document.createElement('tr');
+                       let td1 = document.createElement('td');
+                       td1.textContent = givenRowData;
+                       tr.appendChild(td1);
+                       let td2 = document.createElement('td');
+                       td2.textContent = givenRowKampania;
+                       tr.appendChild(td2);
+                       let td3 = document.createElement('td');
+                       td3.textContent = givenRowProjekt;
+                       tr.appendChild(td3);
+
+                       let rowObject = {
+                           id: idItem,
+                           row: tr
+                       };
+
+                       arrayOfTableRows.push(rowObject);
+                   }
+               });
+               console.log(arrayOfTableRows);
            }
 
            /**
             * This function create on-fly table with basic info about selected rows by user.
             */
            function createModalTable(placeToAppend) {
+               createModalTableRow();
+
                let infoTable = document.createElement('table');
                infoTable.classList.add('table', 'table-stripped');
                let theadElement = document.createElement('thead');
@@ -362,21 +415,12 @@
 
                infoTable.appendChild(theadElement);
                clientRouteInfoIdArr.forEach(item => {
-                   let givenRow = document.querySelector('[data-id="' + item + '"]');
-                   givenRowData = givenRow.cells[1].textContent;
-                   givenRowKampania = givenRow.cells[2].textContent;
-                   givenRowProjekt = givenRow.cells[7].textContent;
-                   let tr = document.createElement('tr');
-                   let td1 = document.createElement('td');
-                   td1.textContent = givenRowData;
-                   tr.appendChild(td1);
-                   let td2 = document.createElement('td');
-                   td2.textContent = givenRowKampania;
-                   tr.appendChild(td2);
-                   let td3 = document.createElement('td');
-                   td3.textContent = givenRowProjekt;
-                   tr.appendChild(td3);
-                   tbodyElement.appendChild(tr);
+                   arrayOfTableRows.forEach(tableRow => {
+                       if(item == tableRow.id){
+                           tbodyElement.appendChild(tableRow.row);
+                       }
+                   })
+
                });
 
                infoTable.appendChild(tbodyElement);
