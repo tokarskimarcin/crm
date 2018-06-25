@@ -227,12 +227,12 @@
                     swal('Brak Limitów');
                     break;
                 }
-                let nrPBX = allRow[i].querySelector('.nrPBX').querySelector('.form-control').value;
-                if (nrPBX == '') {
-                    validation = false;
-                    swal('Brak Nr kampanii PBX');
-                    break;
-                }
+                // let nrPBX = allRow[i].querySelector('.nrPBX').querySelector('.form-control').value;
+                // if (nrPBX == '') {
+                //     validation = false;
+                //     swal('Brak Nr kampanii PBX');
+                //     break;
+                // }
                 var obj = {id: id, department_info_id: department_info_id, limit: limit};
                 arrayOfObject.push(obj);
             }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ActivityRecorder;
 use App\Clients;
 use Illuminate\Http\Request;
 
@@ -29,16 +30,23 @@ class ClientController extends Controller
      * @param Request $request
      */
     public function saveClient(Request $request){
-        if($request->ajax()){
-            if($request->clientID == 0) // new city
-                $client= new Clients();
-            else    // Edit city
+        if($request->ajax()) {
+            if ($request->clientID == 0) {
+                // new city
+                $client = new Clients();
+                new ActivityRecorder(12, '', 194, 1);
+            }
+            else { // Edit city
+                new ActivityRecorder(12, '', 194, 2);
                 $client = Clients::find($request->clientID);
+            }
+
             $client->name = $request->clientName;
             $client->priority = $request->clientPriority;
             $client->type = $request->clientType;
             $client->status = 0;
             $client->save();
+
             return 200;
         }
     }
@@ -55,6 +63,7 @@ class ClientController extends Controller
             else
                 $client->status = 0;
             $client->save();
+            new ActivityRecorder(12, '', 194, 4);
         }
     }
     /**
