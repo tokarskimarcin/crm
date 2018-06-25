@@ -8,7 +8,7 @@
 @extends('layouts.main')
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-<link href="{{ asset('/css/fixedColumns.dataTables.min.css')}}" rel="stylesheet">
+    <link href="{{ asset('/css/fixedColumns.dataTables.min.css')}}" rel="stylesheet">
     <link href="{{asset('/css/fixedHeader.dataTables.min.css')}}" rel="stylesheet" >
 
 @endsection
@@ -169,8 +169,6 @@
                 scrollY: '60vh',
                 scrollX:true,
                 scrollCollapse: true,
-                paging:false,
-                fixedColumns: true,
                 fixedColumns:{
                     leftColumns: 3
                 },

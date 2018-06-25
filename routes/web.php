@@ -253,6 +253,8 @@ Route::post('/showCitiesStatisticsAjax', 'CrmRouteController@showCitiesStatistic
 Route::post('/campaignsInfo', 'CrmRouteController@campaignsInfo')->name('api.campaignsInfo');
 Route::post('/showRoutesDetailedUpdateAjax', 'CrmRouteController@showRoutesDetailedUpdateAjax')->name('api.updateClientRouteInfoRecords');
 Route::post('/getClientRouteInfoRecords', 'CrmRouteController@getClientRouteInfoRecords')->name('api.getClientRouteInfoRecords');
+Route::post('/getaHeadPlanningInfo', 'CrmRouteController@getaHeadPlanningInfo')->name('api.getaHeadPlanningInfo');
+
 /* END CRM-ROUTES AJAX */
 
 /* HR-ROUTES AJAX */
@@ -266,8 +268,16 @@ Route::post('/revertSettlement', 'CoachingController@revertSettlementPost')->nam
 Route::post('/coachAscription', 'CoachingController@coachAscriptionPost')->name('api.coachAscription');
 Route::post('/datatableCoachAscription', 'CoachingController@datatableCoachAscription')->name('api.datatableCoachAscription');
 Route::post('/coachAscriptionRevert', 'CoachingController@coachAscriptionRevertPost')->name('api.coachAscriptionRevert');
+
 /* END COACHING ROUTES AJAX*/
 /** */
+
+/* Report Database ROUTES AJAX*/
+Route::post('/pbxReportDetailedAjax', 'StatisticsController@pbxReportDetailedAjax')->name('api.pbxReportDetailedAjax');
+/* END Report Database AJAX*/
+
+
+
 
 //********************AJAX*********************** */
 
@@ -620,6 +630,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageWeekReportDatabaseUse', 'DatabaseURLController@pageWeekRaportDatabaseUse');
     Route::get('/pageMonthReportDatabaseUse', 'DatabaseURLController@pageMonthRaportDatabaseUse');
 
+    Route::get('/pbxReportDetailed', 'StatisticsController@pbxReportDetailedGet');
 
     Route::get('/pageHourReportTimeOnRecord', 'StatisticsController@pageHourReportTimeOnRecord');
 
@@ -900,13 +911,6 @@ Route::get('/addNewCampaigns', 'CampaignsController@addNewCampaignsGet');
 Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
 
 Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
-
-Route::get('/pbxReportDetailed', 'StatisticsController@pbxReportDetailedGet');
-
-Route::post('/pbxReportDetailedAjax', 'StatisticsController@pbxReportDetailedAjax')->name('api.pbxReportDetailedAjax');
-
-
-Route::post('/getaHeadPlanningInfo', 'CrmRouteController@getaHeadPlanningInfo')->name('api.getaHeadPlanningInfo');
 
 
 
