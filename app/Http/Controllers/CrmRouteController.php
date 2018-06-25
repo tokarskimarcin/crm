@@ -1486,6 +1486,8 @@ class CrmRouteController extends Controller
             $newCity->zip_code = $request->zipCode;
             $newCity->status = 0;
             $newCity->save();
+            new ActivityRecorder(12,null, 193, 1);
+
             return 200;
         }
     }
@@ -1497,10 +1499,16 @@ class CrmRouteController extends Controller
     public function changeStatusCity(Request $request){
         if($request->ajax()){
             $newCity = Cities::find($request->cityId);
-            if($newCity->status == 0)
+            if($newCity->status == 0) {
                 $newCity->status = 1;
-            else
+                new ActivityRecorder(12,null, 193, 3);
+            }
+
+            else {
                 $newCity->status = 0;
+                new ActivityRecorder(12,null, 193, 4);
+            }
+
             $newCity->save();
         }
     }
