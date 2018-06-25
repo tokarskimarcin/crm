@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ActivityRecorder;
 use App\AuditCriterions;
 use App\AuditHeaders;
 use App\Cities;
@@ -840,19 +841,23 @@ class CrmRouteController extends Controller
             $clientRoute->status = 1;
             $clientRoute->save();
             $success = 1;
+            new ActivityRecorder(12,'Aktywacja kampanii',200,4);
         }
         else if($clientRouteId && $toDelete == '1') {
             $clientRoute = ClientRoute::find($clientRouteId);
             $clientRoute->status = 2;
             $clientRoute->save();
             $success = 1;
+            new ActivityRecorder(12,'Zakończenie kampanii',200,4);
         }
         else if($clientRouteId && $toDelete == '2') {
             $clientRoute = ClientRoute::find($clientRouteId);
             $clientRoute->status = 0;
             $clientRoute->save();
             $success = 1;
+            new ActivityRecorder(12,'Zmiana statusu na "nie gotowa"',200,4);
         }
+
         return $success;
     }
 
