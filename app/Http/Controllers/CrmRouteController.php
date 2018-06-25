@@ -912,6 +912,7 @@ class CrmRouteController extends Controller
             }
 
         }
+        new ActivityRecorder(12, null,185,1);
 
         $request->session()->flash('adnotation', 'Trasa została dodana pomyślnie!');
 
@@ -936,6 +937,8 @@ class CrmRouteController extends Controller
             }
 
             $request->session()->flash('adnotation', 'Trasa została usunięta pomyślnie!');
+
+            new ActivityRecorder(12,'Route_id: ' . $request->route_id,188,3);
 
             return Redirect::to('/showRoutes');
         }
@@ -988,6 +991,9 @@ class CrmRouteController extends Controller
                 }
             }
             $request->session()->flash('adnotation', 'Trasa została edytowana pomyślnie!');
+
+            new ActivityRecorder(12,'Route_id: ' . $request->route_id,188,2);
+
             return Redirect::to('/showRoutes');
         }
 
