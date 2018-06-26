@@ -581,8 +581,7 @@
            /****************END OF MODAL FUNCTIONS********************/
 
            table = $('#datatable').DataTable({
-               "scrollX": true,
-               "scrollY": '55vh',
+
                "autoWidth": false,
                "processing": true,
                "serverSide": true,
@@ -666,8 +665,9 @@
                        },"name":"verification"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return data.pbxSuccess;
-                       },"name":"pbxSuccess"
+                        console.log(data);
+                           return data.actual_success;
+                       },"name":"actual_success"
                    },
                    {"data":function (data, type, dataToSet) {
                            return data.limits;
@@ -708,7 +708,7 @@
                        sumAllSuccess =
                            rows
                            .data()
-                           .pluck('pbxSuccess')
+                           .pluck('actual_success')
                            .reduce( function (a, b) {
                                return a + b*1;
                            }, 0);
@@ -732,8 +732,8 @@
                            .append('<td colspan="2">Podsumowanie Dnia: ' + group + '</td>')
                            .append('<td>' + sumAllCampaings + '</td>')
                            .append('<td></td>')
+                           .append('<td></td>')
                            .append('<td>' + sumAllSuccess + '</td>')
-                           .append('<td> 0 </td>')
                            .append('<td>' + sumAllLimit + '</td>')
                            .append('<td>' + sumAllLose + '</td>')
                            .append('<td colspan="4"></td>')
