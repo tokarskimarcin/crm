@@ -645,6 +645,7 @@ class CrmRouteController extends Controller
                     $item->cityName = $city->name;
                 }
             }
+
             foreach ($hotels as $hotel) {
                 if (isset($item->hotel_id)) {
                     if ($hotel->id == $item->hotel_id) {
@@ -717,7 +718,6 @@ class CrmRouteController extends Controller
                 array_push($fullNameArr, $helpObject);
                 $client_route_indicator = $extendedInfo->client_route_id;
             }
-
 
             if ($lp == count($client_route_info_extended)) {
                 array_push($fullInfoArr, $fullNameArr);

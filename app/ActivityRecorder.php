@@ -71,27 +71,30 @@ class ActivityRecorder extends Model
 
         switch ($type) {
             case '1':
-                $contents = Storage::get('hrActivity.txt');
-                $size = File::size(storage_path('app/hrActivity.txt'));
-                if ($size < 104857600) {
-                    Storage::append('hrActivity.txt', $content);
-                }
+                $newLog = new Logs();
+                $newLog->links_id = $link_id;
+                $newLog->user_id = $this->user;
+                $newLog->action_type_id = $action_id;
+                $newLog->comment = $content;
+                $newLog->save();
                 break;
 
             case '2':
-                $contents = Storage::get('financesActivity.txt');
-                $size = File::size(storage_path('app/financesActivity.txt'));
-                if ($size < 104857600) {
-                    Storage::append('financesActivity.txt', $content);
-                }
+                $newLog = new Logs();
+                $newLog->links_id = $link_id;
+                $newLog->user_id = $this->user;
+                $newLog->action_type_id = $action_id;
+                $newLog->comment = $content;
+                $newLog->save();
                 break;
 
             case '3':
-                $contents = Storage::get('adminActivity.txt');
-                $size = File::size(storage_path('app/adminActivity.txt'));
-                if ($size < 104857600) {
-                    Storage::append('adminActivity.txt', $content);
-                }
+                $newLog = new Logs();
+                $newLog->links_id = $link_id;
+                $newLog->user_id = $this->user;
+                $newLog->action_type_id = $action_id;
+                $newLog->comment = $content;
+                $newLog->save();
                 break;
 
             case '4':

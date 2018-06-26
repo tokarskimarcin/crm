@@ -170,7 +170,7 @@ class UsersController extends Controller
             'last_name' => $user->last_name
         );
 
-        new ActivityRecorder(1, 'Dodanie użytkownika: ' . $request->first_name . ' ' . $request->last_name . ', login: ' . $request->login_phone);
+        new ActivityRecorder(1, 'Dodanie użytkownika: ' . $request->first_name . ' ' . $request->last_name . ', login: ' . $request->login_phone,8,1);
 
         /**
          * Dodanie pakietu medycznego
@@ -554,7 +554,7 @@ class UsersController extends Controller
             'guid' => base64_encode($request->password)
         ];
 
-        new ActivityRecorder(1, $data);
+        new ActivityRecorder(1, $data,32,2);
 
         /**
          * Ewentualna zmiana pakietów medycznych
@@ -676,7 +676,7 @@ class UsersController extends Controller
             $user->guid = base64_encode($request->new_pass);
             $user->save();
 
-            new ActivityRecorder(3, 'Zmiana hasła przez użytkownika, nowe hasło: ' . base64_encode($request->new_pass));
+            new ActivityRecorder(3, 'Zmiana hasła przez użytkownika, nowe hasło: ' . base64_encode($request->new_pass),39,4);
             Session::flash('message_ok', "Hasło zmienione pomyślnie!");
             return Redirect::back();
         } else {
