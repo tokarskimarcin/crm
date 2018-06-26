@@ -413,9 +413,9 @@ class GroupTrainingController extends Controller
             $start_hour_training        = $request->start_hour_training;
             $cadre_id                   = $request->cadre_id;
             $comment_about_training     = $request->comment_about_training;
-            $avaible_candidate          = $request->avaible_candidate;
-            $choice_candidate           = $request->choice_candidate;
-            $choice_candidate_absent    = $request->choice_candidate_ansent;
+            $avaible_candidate          = isset($request->avaible_candidate) ? $request->avaible_candidate : array() ;
+            $choice_candidate           = isset($request->choice_candidate) ? $request->choice_candidate : array();
+            $choice_candidate_absent    = isset($request->choice_candidate_ansent)? $request->choice_candidate_ansent : array();
             $saving_type                = $request->saving_type;
 
             // nowe szkolenie lub instniejące

@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="page-header">
-                <div class="alert gray-nav">Tygodniowy raport wykorzystania bazy</div>
+                <div class="alert gray-nav">Rozszerzony Raport Kampanii</div>
             </div>
         </div>
     </div>

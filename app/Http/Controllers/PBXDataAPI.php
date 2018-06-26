@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\ClientRouteInfo;
 use App\Department_info;
+use App\PbxCrmInfo;
 use App\PBXDetailedCampaign;
 use App\PBXDKJTeam;
 use App\PBXDKJTeamOtherCompany;
@@ -106,13 +108,13 @@ class PBXDataAPI extends Controller
                 if ($lp > 2) {
                     $i = 0;
                     foreach ($data1 as $item) {
-                            if ($item == '-' || $item == 'null')
-                                $item = 0;
-                            if ($i == 0 || $i == 1 || $i == 2 || $i == 3 || $i == 7 || $i == 8 || $i == 12 ||  $i == 13 || $i == 14) {
-                                $spreadsheet_data[$lp][$header_array[$i]] = $this::w1250_to_utf8($item);  //utf8_encode($item);
-                            }
-                            $spreadsheet_data[$lp]['hour'] = date('H').":00:00";
-                            $spreadsheet_data[$lp]['report_date'] = date('Y-m-d');
+                        if ($item == '-' || $item == 'null')
+                            $item = 0;
+                        if ($i == 0 || $i == 1 || $i == 2 || $i == 3 || $i == 7 || $i == 8 || $i == 12 ||  $i == 13 || $i == 14) {
+                            $spreadsheet_data[$lp][$header_array[$i]] = $this::w1250_to_utf8($item);  //utf8_encode($item);
+                        }
+                        $spreadsheet_data[$lp]['hour'] = date('H').":00:00";
+                        $spreadsheet_data[$lp]['report_date'] = date('Y-m-d');
                         $i++;
                     }
                 }
@@ -240,17 +242,17 @@ class PBXDataAPI extends Controller
                             $data_to_insert[$temp_key]['report_date'] = date('Y-m-d');
                             $data_to_insert[$temp_key]['report_hour'] = date('H:') . '00:00';
                         }
-                            else if ($key == 12) {
-                                $data_to_insert[$temp_key]['all_checked_talks'] = intval($rowItem);
+                        else if ($key == 12) {
+                            $data_to_insert[$temp_key]['all_checked_talks'] = intval($rowItem);
+                        }
+                        else if ($key == 13) {
+                            $data_to_insert[$temp_key]['all_bad_talks'] = intval($rowItem);
+                        }else if($key == 14){
+                            if(intval($rowItem) != 108)
+                                $data_to_insert[$temp_key]['pbx_department_info'] = intval($rowItem);
+                            else{
+                                $removeData = true;
                             }
-                            else if ($key == 13) {
-                                $data_to_insert[$temp_key]['all_bad_talks'] = intval($rowItem);
-                            }else if($key == 14){
-                                if(intval($rowItem) != 108)
-                                    $data_to_insert[$temp_key]['pbx_department_info'] = intval($rowItem);
-                                else{
-                                    $removeData = true;
-                                }
                             /**
                              * Sumowanie danych
                              */
@@ -401,22 +403,22 @@ class PBXDataAPI extends Controller
                         } else if ($key == 4) {
                             $data_to_insert[$temp_key]['unreceived_campaigns'] = intval($rowItem);
                         }
-                            else{
-                                $removeData = true;
-                            }
-                            $data_to_insert[$temp_key]['date'] = date('Y-m-d');
-                            $data_to_insert[$temp_key]['time'] = date('H:i:sa');
+                        else{
+                            $removeData = true;
+                        }
+                        $data_to_insert[$temp_key]['date'] = date('Y-m-d');
+                        $data_to_insert[$temp_key]['time'] = date('H:i:sa');
 
-                        }
-                        if ($removeData !== null && $removeData === true) {
-                            unset($data_to_insert[$temp_key]);
-                        } else if ($data_to_insert[$temp_key]['name'] == "") { //delete last row with aggregated info
-                            unset($data_to_insert[$temp_key]);
-                        }
                     }
-                ReportCampaign::insert($data_to_insert);
-                    $row++;
+                    if ($removeData !== null && $removeData === true) {
+                        unset($data_to_insert[$temp_key]);
+                    } else if ($data_to_insert[$temp_key]['name'] == "") { //delete last row with aggregated info
+                        unset($data_to_insert[$temp_key]);
+                    }
                 }
+                ReportCampaign::insert($data_to_insert);
+                $row++;
+            }
             fclose($handle);
         }
     }
@@ -488,6 +490,61 @@ class PBXDataAPI extends Controller
                 }
                 if(count($data_to_insert) != 0)
                     PBXDetailedCampaign::insert($data_to_insert);
+                $row++;
+            }
+            fclose($handle);
+        }
+    }
+
+    /**
+     *  Pobranie informacji o aktualnym stanie kampanii  (co godzina)
+     */
+    public function pbx_crm_info() {
+        $department_id = null;
+        $url = "https://vc.e-pbx.pl/callcenter/api/presentation/appointed";
+
+        if (!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
+        if (($handle = fopen($url, "r")) !== FALSE) {
+            $row = 0;
+            $data_to_insert = [];
+            while (($rowData = fgetcsv($handle, 1000, ";")) !== false) {
+                if ($row > 1) {
+                    $temp_key = 0;
+                    $save = true;
+                    $campainId = $campainTime = $campainSuccess = 0;
+                    foreach ($rowData as $key => $rowItem) {
+                        if ($key == 0) {
+                            // pobranie id kampanii
+                            $campainId = $rowItem;
+                            $data_to_insert[$temp_key]['pbx_campaign_id'] = intval($campainId);
+                        } else if ($key == 1) {
+                            $data_to_insert[$temp_key]['name'] = $this::w1250_to_utf8($rowItem);
+                        } else if ($key == 2) {
+                            $campainTime = $rowItem;
+                            $data_to_insert[$temp_key]['report_time'] = $rowItem;
+                        } else if ($key == 3) {
+                            $campainSuccess = $rowItem;
+                            $data_to_insert[$temp_key]['success'] = intval($rowItem);
+                            $date = date('Y-m-d', strtotime("today"));
+                            $data_to_insert[$temp_key]['report_date'] = $date;
+                            if($campainTime == '????' || $campainTime == 0)
+                                unset($data_to_insert[$temp_key]);
+                            else{
+                                //Wgranie aktualnych inforamcji o kampani
+                                $clientRouteInfo = ClientRouteInfo::where('pbx_campaign_id','=',$campainId)
+                                    ->where('hour','=',$campainTime)
+                                    ->first();
+                                if($clientRouteInfo != null){
+                                    $clientRouteInfo->actual_success = $campainSuccess;
+                                    $clientRouteInfo->save();
+                                }
+                            }
+                        }
+                    }
+                }
+                if(count($data_to_insert) != 0){
+                    PbxCrmInfo::insert($data_to_insert);
+                }
                 $row++;
             }
             fclose($handle);

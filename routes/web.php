@@ -890,6 +890,9 @@ Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
 Route::get('/report_campaign', 'PBXDataAPI@report_campaign');
 
 Route::get('/pbxDetailedReport', 'PBXDataAPI@pbx_detailed_campaign_report');
+
+//Dane z Aktuanlnego stanu kampanii
+Route::get('/pbx_crm_info', 'PBXDataAPI@pbx_crm_info');
 /**END OUT OF FIREWALL**/
 
 
