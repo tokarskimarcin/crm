@@ -119,7 +119,7 @@ class AdminController extends Controller
         $data['Link adress'] = $request->link_adress;
         $data['Link group'] = $request->link_goup;
 
-        new ActivityRecorder(3, $data);
+        new ActivityRecorder(3, $data,16,2);
 
         Session::flash('message_ok', "Zmiany zapisano!");
         return Redirect::back();
@@ -219,7 +219,7 @@ class AdminController extends Controller
 
         $department_info->save();
 
-        new ActivityRecorder(3, "Dodano oddział o numerze ID: " . $id_dep);
+        new ActivityRecorder(3, "Dodano oddział o numerze ID: " . $id_dep,51,1);
 
         Session::flash('message_ok', "Oddział został dodany!");
         return Redirect::back();
@@ -310,7 +310,7 @@ class AdminController extends Controller
             'Id oddziału' => $request->selected_department_info_id
         ];
 
-        new ActivityRecorder(3, $data);
+        new ActivityRecorder(3, $data,66,2);
 
         Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
         return Redirect::back();

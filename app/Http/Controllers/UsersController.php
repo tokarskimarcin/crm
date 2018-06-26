@@ -676,7 +676,7 @@ class UsersController extends Controller
             $user->guid = base64_encode($request->new_pass);
             $user->save();
 
-            new ActivityRecorder(3, 'Zmiana hasła przez użytkownika, nowe hasło: ' . base64_encode($request->new_pass));
+            new ActivityRecorder(3, 'Zmiana hasła przez użytkownika, nowe hasło: ' . base64_encode($request->new_pass),39,4);
             Session::flash('message_ok', "Hasło zmienione pomyślnie!");
             return Redirect::back();
         } else {
