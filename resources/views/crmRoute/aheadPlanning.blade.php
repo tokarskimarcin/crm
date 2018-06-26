@@ -11,6 +11,7 @@
     <link href="{{ asset('/css/fixedColumns.dataTables.min.css')}}" rel="stylesheet">
     <link href="{{asset('/css/fixedHeader.dataTables.min.css')}}" rel="stylesheet">
 
+
 @endsection
 @section('content')
 
@@ -190,8 +191,7 @@
                 scrollX: true,
                 scrollCollapse: true,
                 paging: false,
-                fixedColumns: true,
-                fixedColumns: {
+                fixedColumns:{
                     leftColumns: 3
                 },
                 "ajax": {

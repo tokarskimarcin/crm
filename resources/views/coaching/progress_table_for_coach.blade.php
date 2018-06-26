@@ -475,7 +475,7 @@
                                 swal('Błędna docelowa średnia')
                             }
 
-                            if (user_department_typ != 1) {
+                            if (user_department_type != 1) {
                                 if (manager_actual_avg > 0.5) {
                                     if (coaching_manager_goal_avg < proc_manager_goal_min_avg) {
                                         validation = false;
@@ -923,7 +923,7 @@
                                 let is_a_number = true;
                                 end_score = row.find('td:nth-child(7)').text() == null || row.find('td:nth-child(7)').text() == "" ? row.find('td:nth-child(7)').children().val() : row.find('td:nth-child(7)').text();
 
-                                if (user_department_typ == 1)
+                                if (user_department_type == 1)
                                     if (isNumeric(row.find('td:nth-child(7)').children().val()) == false) {
                                         is_a_number = false;
                                     }

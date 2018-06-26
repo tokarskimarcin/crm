@@ -1,9 +1,6 @@
 @extends('layouts.main')
 @section('style')
-
-    <link rel="stylesheet" href="{{asset('/css/fixedHeader.dataTables.min.css')}}">
-
-
+@endsection
 @section('content')
 
     {{--Header page --}}
@@ -41,13 +38,11 @@
                                     <thead>
                                     <tr>
                                         <th>Nazwa</th>
-                                        <th>Data</th>
-                                        <th>Odebrane</th>
-                                        <th>Sprawdzone</th>
-                                        <th>Janki</th>
-                                        <th>Wykorzystanie bazy</th>
-                                        <th>Sukcesy</th>
+                                        <th>Data Ostatniej Aktualizacji</th>
                                         <th>Średnia</th>
+                                        <th>Umówienia</th>
+                                        <th>Wykorzystanie bazy</th>
+                                        <th>Odebrane połączenia</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -66,7 +61,7 @@
 @endsection
 
 @section('script')
-    <script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>
+    <script src="https://cdn.datatables.net/scroller/1.5.0/js/dataTables.scroller.min.js"></script>
     <script>
 
         document.addEventListener('DOMContentLoaded', function(mainEvent) {
@@ -82,7 +77,6 @@
                 "autoWidth": true,
                 "processing": true,
                 "serverSide": true,
-                "fixedHeader": true,
                 "drawCallback": function( settings ) {
 
                 },
@@ -112,28 +106,20 @@
                         },"name":"date"
                     },
                     {"data":function (data, type, dataToSet) {
-                            return data.received_calls;
-                        },"name":"received_calls"
-                    },
-                    {"data":function (data, type, dataToSet) {
-                            return data.all_checked_call;
-                        },"name":"all_checked_call"
-                    },
-                    {"data":function (data, type, dataToSet) {
-                            return data.all_bad_call;
-                        },"name":"all_bad_call"
-                    },
-                    {"data":function (data, type, dataToSet) {
-                            return data.database_use;
-                        },"name":"database_use"
+                            return data.average;
+                        },"name":"average"
                     },
                     {"data":function (data, type, dataToSet) {
                             return data.success;
                         },"name":"success"
                     },
                     {"data":function (data, type, dataToSet) {
-                            return data.average;
-                        },"name":"average"
+                            return data.database_use+" %";
+                        },"name":"database_use"
+                    },
+                    {"data":function (data, type, dataToSet) {
+                            return data.received_calls;
+                        },"name":"received_calls"
                     }
                 ]
             });

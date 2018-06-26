@@ -5259,15 +5259,23 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching){
     }
 
     public function pbxReportDetailedGet() {
-
         return view('reportpage.PbxReportDetailed');
     }
 
     public function pbxReportDetailedAjax(Request $request) {
         $dateStart = $request->dateStart;
         $dateStop = $request->dateStop;
-        $pbxReport = PBXDetailedCampaign::whereBetween('date', [$dateStart,$dateStop])->get();
-
+        $pbxReport = PBXDetailedCampaign::
+        whereIn('id', function($query) use($dateStart, $dateStop){
+            $query->select(DB::raw(
+                'MAX(id)'
+            ))
+                ->from('pbx_detailed_campaign_report')
+                ->whereBetween('date', [$dateStart, $dateStop])
+                ->groupBy('campaign_pbx_id');
+        })
+            ->groupBy('campaign_pbx_id')
+            ->get();
         return datatables($pbxReport)->make(true);
     }
 }
