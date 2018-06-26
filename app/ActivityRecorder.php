@@ -70,69 +70,73 @@ class ActivityRecorder extends Model
         $content = $string;
 
         switch ($type) {
-          case '1':
-            $contents = Storage::get('hrActivity.txt');
-            $size = File::size(storage_path('app/hrActivity.txt'));
-            if ($size < 104857600) {
-                Storage::append('hrActivity.txt', $content);
-            }
-            break;
+            case '1':
+                $contents = Storage::get('hrActivity.txt');
+                $size = File::size(storage_path('app/hrActivity.txt'));
+                if ($size < 104857600) {
+                    Storage::append('hrActivity.txt', $content);
+                }
+                break;
 
-          case '2':
-            $contents = Storage::get('financesActivity.txt');
-            $size = File::size(storage_path('app/financesActivity.txt'));
-            if ($size < 104857600) {
-                Storage::append('financesActivity.txt', $content);
-            }
-            break;
+            case '2':
+                $contents = Storage::get('financesActivity.txt');
+                $size = File::size(storage_path('app/financesActivity.txt'));
+                if ($size < 104857600) {
+                    Storage::append('financesActivity.txt', $content);
+                }
+                break;
 
-          case '3':
-            $contents = Storage::get('adminActivity.txt');
-            $size = File::size(storage_path('app/adminActivity.txt'));
-            if ($size < 104857600) {
-                Storage::append('adminActivity.txt', $content);
-            }
-            break;
+            case '3':
+                $contents = Storage::get('adminActivity.txt');
+                $size = File::size(storage_path('app/adminActivity.txt'));
+                if ($size < 104857600) {
+                    Storage::append('adminActivity.txt', $content);
+                }
+                break;
 
-          case '4':
-            $contents = Storage::get('jankyActivity.txt');
-            $size = File::size(storage_path('app/jankyActivity.txt'));
-            if ($size < 104857600) {
-                Storage::append('jankyActivity.txt', $content);
-            }
-            break;
+            case '4':
+                $newLog = new Logs();
+                $newLog->links_id = $link_id;
+                $newLog->user_id = $this->user;
+                $newLog->action_type_id = $action_id;
+                $newLog->comment = $content;
+                $newLog->save();
+                break;
 
-          case '5':
-            $contents = Storage::get('workHoursActivity.txt');
-            $size = File::size(storage_path('app/workHoursActivity.txt'));
-            if ($size < 104857600) {
-                Storage::append('workHoursActivity.txt', $content);
-            }
-            break;
+            case '5':
+                $newLog = new Logs();
+                $newLog->links_id = $link_id;
+                $newLog->user_id = $this->user;
+                $newLog->action_type_id = $action_id;
+                $newLog->comment = $content;
+                $newLog->save();
+                break;
 
-          case '6':
-            $contents = Storage::get('equipmentActivity.txt');
-            $size = File::size(storage_path('app/equipmentActivity.txt'));
-            if ($size < 104857600) {
-                Storage::append('equipmentActivity.txt', $content);
-            }
-            break;
+            case '6':
+                $newLog = new Logs();
+                $newLog->links_id = $link_id;
+                $newLog->user_id = $this->user;
+                $newLog->action_type_id = $action_id;
+                $newLog->comment = $content;
+                $newLog->save();
+                break;
 
-          case '7':
-            $contents = Storage::get('activity.txt');
-            $size = File::size(storage_path('app/activity.txt'));
-            if ($size < 104857600) {
-                Storage::append('activity.txt', $content);
-            }
-            break;
+            case '7':
+                $contents = Storage::get('activity.txt');
+                $size = File::size(storage_path('app/activity.txt'));
+                if ($size < 104857600) {
+                    Storage::append('activity.txt', $content);
+                }
+                break;
 
-          case '8':
-            $contents = Storage::get('recruitmentActivity.txt');
-            $size = File::size(storage_path('app/recruitmentActivity.txt'));
-            if ($size < 104857600) {
-                Storage::append('recruitmentActivity.txt', $content);
-            }
-            break;
+            case '8':
+                $newLog = new Logs();
+                $newLog->links_id = $link_id;
+                $newLog->user_id = $this->user;
+                $newLog->action_type_id = $action_id;
+                $newLog->comment = $content;
+                $newLog->save();
+                break;
 
             case '9':
                 $contents = Storage::get('medicalPackagesActivity.txt');
@@ -143,19 +147,21 @@ class ActivityRecorder extends Model
                 break;
 
             case '10':
-                $contents = Storage::get('auditActivity.txt');
-                $size = File::size(storage_path('app/auditActivity.txt'));
-                if ($size < 104857600) {
-                    Storage::append('auditActivity.txt', $content);
-                }
+                $newLog = new Logs();
+                $newLog->links_id = $link_id;
+                $newLog->user_id = $this->user;
+                $newLog->action_type_id = $action_id;
+                $newLog->comment = $content;
+                $newLog->save();
                 break;
 
             case '11':
-                $contents = Storage::get('coachingActivity.txt');
-                $size = File::size(storage_path('app/coachingActivity.txt'));
-                if ($size < 104857600) {
-                    Storage::append('coachingActivity.txt', $content);
-                }
+                $newLog = new Logs();
+                $newLog->links_id = $link_id;
+                $newLog->user_id = $this->user;
+                $newLog->action_type_id = $action_id;
+                $newLog->comment = $content;
+                $newLog->save();
                 break;
 
             case '12':
@@ -167,9 +173,9 @@ class ActivityRecorder extends Model
                 $newLog->save();
                 break;
 
-          default:
+            default:
 
-            break;
+                break;
         }
 
 //        // foreach($this->logTypes as $type) {

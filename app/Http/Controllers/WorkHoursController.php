@@ -254,7 +254,7 @@ class WorkHoursController extends Controller
             'succes' => $request->succes
         ];
 
-        new ActivityRecorder(5, $data);
+        new ActivityRecorder(5, $data, 3,1);
     }
     //******************acceptHour****************** Stop
 
@@ -516,7 +516,7 @@ class WorkHoursController extends Controller
                     'accept_stop' => null,
                     'updated_at' => date('Y-m-d H:i:s'),
                     'status' => 6]);
-            new ActivityRecorder(5, 'Usunięcie godzin pracy, wpis id godzin pracy: ' . $id);
+            new ActivityRecorder(5, 'Usunięcie godzin pracy, wpis id godzin pracy: ' . $id,6,3);
             return 1;
         }
     }
@@ -546,7 +546,7 @@ class WorkHoursController extends Controller
                 'accept_stop' => $request->accept_stop,
                 'success' => $request->success
             ];
-            new ActivityRecorder(5, $data);
+            new ActivityRecorder(5, $data,6,2);
             return 1;
         }
     }
@@ -585,7 +585,7 @@ class WorkHoursController extends Controller
                 'id_user' => $date[0],
                 'date' => $date[1]
             ];
-            new ActivityRecorder(5, $data);
+            new ActivityRecorder(5, $data,6,1);
         }
     }
     //******************ViewHour****************** Stop
