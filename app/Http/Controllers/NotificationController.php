@@ -108,7 +108,7 @@ class NotificationController extends Controller
                 'Id problemu' => $notification->id,
                 'status' => $request->status
             ];
-            new ActivityRecorder(7, $data);
+            new ActivityRecorder(7, $data,36,2);
 
             $notification->save();
             $user = User::find($notification->displayed_by);
