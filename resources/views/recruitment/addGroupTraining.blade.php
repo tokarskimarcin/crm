@@ -748,7 +748,6 @@
                     $('#list_candidate_choice_absent a').each(function (key,value) {
                         choice_candidate_ansent.push(value.id);
                     });
-
                     $.ajax({
                         type: "POST",
                         url: '{{ route('api.saveGroupTraining') }}',
@@ -1259,10 +1258,10 @@
                         // liczba osób dosępnych do wybrania
                         let avaible_candidate = row_with_count_info.split("/");
                         avaible_candidate = avaible_candidate[2];
-                        if(parseInt(avaible_candidate) > 0)
-                        {
-                            swal('Aby zakończyć szkolenie musisz określić wszystkich kandydatów')
-                        }else
+                        // if(parseInt(avaible_candidate) > 0)
+                        // {
+                        //     swal('Aby zakończyć szkolenie musisz określić wszystkich kandydatów')
+                        // }else
                         swal({
                             title: 'Jesteś pewien?',
                             text: "Spowoduje to zakończenie szkolenia, bez możliwości cofnięcia zmian!",
