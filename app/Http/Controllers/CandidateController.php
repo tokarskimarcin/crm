@@ -31,6 +31,7 @@ class CandidateController extends Controller
      * Zwraca dane wszystkich kandydatow
      */
     public function datatableShowCandidates(Request $request) {
+
         $data = DB::table('candidate')
             ->select(DB::raw('
                 candidate.*,
@@ -40,6 +41,7 @@ class CandidateController extends Controller
             '))
             ->join('users', 'users.id', 'candidate.cadre_id')
             ->join('attempt_status', 'attempt_status.id', 'candidate.attempt_status_id')
+            ->whereBetween('candidate.created_at', [$request->fromDate, $request->toDate . ' 23:59:59'])
             ->orderBy('candidate.last_name')
             ->get();
 
