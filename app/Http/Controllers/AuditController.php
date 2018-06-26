@@ -403,7 +403,7 @@ class AuditController extends Controller
             $log = [
                 "ID usuniętego pliku" => $request->id_picture
             ];
-            new ActivityRecorder(10, $log);
+            new ActivityRecorder(10, $log,171 ,3);
 
             return 1;
         }else return 0;

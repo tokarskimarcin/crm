@@ -125,11 +125,12 @@ class ActivityRecorder extends Model
                 break;
 
             case '7':
-                $contents = Storage::get('activity.txt');
-                $size = File::size(storage_path('app/activity.txt'));
-                if ($size < 104857600) {
-                    Storage::append('activity.txt', $content);
-                }
+                $newLog = new Logs();
+                $newLog->links_id = $link_id;
+                $newLog->user_id = $this->user;
+                $newLog->action_type_id = $action_id;
+                $newLog->comment = $content;
+                $newLog->save();
                 break;
 
             case '8':
