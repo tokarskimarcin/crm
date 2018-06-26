@@ -379,7 +379,7 @@
                     },
                     success: function(response) {
                         sessionStorage.setItem('addnotation', 'Zmiany zostały zapisane!');
-                        window.location.reload();
+                        window.location.href = `{{URL::to('/showClientRoutes')}}`;
                     }
                 });
             }

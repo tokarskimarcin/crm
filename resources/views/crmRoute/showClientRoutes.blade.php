@@ -46,7 +46,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-12 info-section">
                             <div class="alert alert-info">
                                 Moduł podgląd tras pozwala na podgląd kampanii oraz zarządzanie nimi. Tabelę z
                                 kampaniami można filtrować dostępnymi polami jak również wyszukiwać poszczególnych fraz
@@ -425,8 +425,23 @@
                         // colorIterator = 0;
                         objectArr = [];
                         // showAllClients = null; //remove effect of show all clients checkbox
+
                         table2.ajax.reload();
-                    })
+                    });
+                    if(sessionStorage.getItem('idOfClient')) {
+                        let idOfClient = sessionStorage.getItem('idOfClient');
+                        const allClientsInTable = document.querySelectorAll('#datatable tr');
+                        allClientsInTable.forEach(client => {
+                            if(client.id == idOfClient) {
+                                client.classList.add('check');
+                                const clientIdNotTrimmed = client.id;
+                                indexOfUnderscore = clientIdNotTrimmed.lastIndexOf('_');
+                                id = clientIdNotTrimmed.substr(indexOfUnderscore + 1);
+                                sessionStorage.removeItem('idOfClient');
+                            }
+                        });
+                        table2.ajax.reload();
+                    }
                 }, "ajax": {
                     'url': "{{route('api.getClientRoutes')}}",
                     'type': 'POST',
@@ -490,6 +505,14 @@
                     });
                 },
                 "rowCallback": function (row, data, index) {
+                    if(sessionStorage.getItem('search')) {
+                        let searchBox = document.querySelector('input[type="search"][aria-controls="datatable2"]');
+                        let searchInfo = sessionStorage.getItem('search');
+                        searchBox.value = searchInfo;
+                        sessionStorage.removeItem('search');
+                        table2.ajax.reload();
+                    }
+
                     if (row.cells[5].firstChild.classList[2] == "action-buttons-0") {
                         row.style.backgroundColor = "#ffc6c6";
                     }
@@ -763,6 +786,128 @@
                 table2.ajax.reload();
             }
 
+            /**
+             * This funciton sets values of inputs to session storage on page leave
+             */
+            function setItemsToSeessionStorage() {
+                const yearInput = document.querySelector('#year');
+                const weekNumber = document.querySelector('#weekNumber');
+                const type = document.querySelector('#type');
+                const campaignState = document.querySelector('#campaignState');
+                const showAllClientsCheckbox = document.querySelector('#showAllClients');
+                const showOnlyAssignedCheckbox = document.querySelector('#showOnlyAssigned');
+
+                if(document.querySelector('.check')) {
+                    let idOfClient = document.querySelector('.check').id;
+                    sessionStorage.setItem('idOfClient',idOfClient);
+                }
+
+                const searchBox = document.querySelector('input[type="search"][aria-controls="datatable2"');
+                sessionStorage.setItem('search',searchBox.value);
+
+                sessionStorage.setItem('year', yearInput.options[yearInput.selectedIndex].value);
+                sessionStorage.setItem('weekNumber', weekNumber.options[weekNumber.selectedIndex].value);
+                sessionStorage.setItem('type', type.options[type.selectedIndex].value);
+                sessionStorage.setItem('campaignState', campaignState.options[campaignState.selectedIndex].value);
+                sessionStorage.setItem('showAllClients', showAllClientsCheckbox.checked);
+                sessionStorage.setItem('showOnlyAssigned', showOnlyAssignedCheckbox.checked);
+            }
+
+            /**
+             * This function sets input values from sessionStorage
+             */
+            (function setValuesFromSessionStorage() {
+                if(sessionStorage.getItem('addnotation')) {
+                    const adnotation = sessionStorage.getItem('addnotation');
+
+                    $.notify({
+                        // options
+                        message: adnotation
+                    },{
+                        // settings
+                        type: 'success'
+                    });
+                    sessionStorage.removeItem('addnotation');
+                }
+
+                const yearInput = document.querySelector('#year');
+                if(sessionStorage.getItem('year')) {
+                    const year = sessionStorage.getItem('year');
+                    for(let i = 0; i < yearInput.length; i++) {
+                        if(yearInput[i].value == year) {
+                            yearInput[i].selected = true;
+                        }
+                    }
+                    sessionStorage.removeItem('year');
+                }
+
+
+                const weekNumber = document.querySelector('#weekNumber');
+                if(sessionStorage.getItem('weekNumber')) {
+                    const week = sessionStorage.getItem('weekNumber');
+                    for(let i = 0; i < weekNumber.length; i++) {
+                        if(weekNumber[i].value == week) {
+                            weekNumber[i].selected = true;
+                            selectedWeek = weekNumber[i].value;
+                        }
+                    }
+                    sessionStorage.removeItem('weekNumber');
+                }
+
+                const type = document.querySelector('#type');
+                if(sessionStorage.getItem('type')) {
+                    const typ = sessionStorage.getItem('type');
+                    for(let i = 0; i < type.length; i++) {
+                        if(type[i].value == typ) {
+                            type[i].selected = true;
+                        }
+                    }
+                    sessionStorage.removeItem('type');
+                }
+
+                const campaignState = document.querySelector('#campaignState');
+                if(sessionStorage.getItem('campaignState')) {
+                    const state = sessionStorage.getItem('campaignState');
+                    for(let i = 0; i < campaignState.length; i++) {
+                        if(campaignState[i].value == state) {
+                            campaignState[i].selected = true;
+                        }
+                    }
+                    sessionStorage.removeItem('campaignState');
+                }
+
+                let showAllClientsCheckbox = document.querySelector('#showAllClients');
+                if(sessionStorage.getItem('showAllClients')) {
+                    const isChecked = sessionStorage.getItem('showAllClients');
+                    if(isChecked == 'false') {
+                        showAllClientsCheckbox.checked = false;
+                    }
+                    else {
+                        showAllClientsCheckbox.checked = true;
+                    }
+                    showAllClients = isChecked; //global variable
+                    console.log(showAllClients);
+                    sessionStorage.removeItem('showAllClients');
+                }
+
+                let showOnlyAssignedCheckbox = document.querySelector('#showOnlyAssigned');
+                if(sessionStorage.getItem('showOnlyAssigned')) {
+                    const isChecked = sessionStorage.getItem('showOnlyAssigned');
+                    if(isChecked == 'false') {
+                        showOnlyAssignedCheckbox.checked = false;
+                    }
+                    else {
+                        showOnlyAssignedCheckbox.checked = true;
+                    }
+
+                    showOnlyAssigned = isChecked; //global variable
+                    sessionStorage.removeItem('showOnlyAssigned');
+                }
+
+                table2.ajax.reload();
+            })();
+
+
             showAllClientsInput.addEventListener('change', showAllClientsInputHandler);
             showOnlyAssignedInput.addEventListener('change', showOnlyAssignedHandler);
             selectedWeekInput.addEventListener('change', selectedWeekHandler);
@@ -770,6 +915,8 @@
             yearInput.addEventListener('change', yearHandler);
             typInput.addEventListener('change', typHandler);
             stateInput.addEventListener('change', typHandler);
+
+            window.addEventListener('pagehide', setItemsToSeessionStorage);
 
         });
     </script>

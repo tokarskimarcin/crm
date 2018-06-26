@@ -473,6 +473,7 @@ class DkjController extends Controller
             $dkj->edit_date = date('Y-m-d H:i:s');
             //Activity type
             $activity = 'Edycja janka przez dkj, status: ';
+            new ActivityRecorder(4, 'Edycja janka o id: ' . $request->id,11,2);
         }
         if($request->action == 'create' || $request->action == 'edit')
         {
@@ -498,7 +499,7 @@ class DkjController extends Controller
                 if  ($dkj == null) {
                     die;
                 }
-                new ActivityRecorder(4, 'Usunięce janka o id: ' . $request->id);
+                new ActivityRecorder(4, 'Usunięce janka o id: ' . $request->id,11,3);
                 $dkj->deleted = 1;
                 $dkj->edit_dkj = Auth::user()->id;
                 $dkj->edit_date = date('Y-m-d H:i:s');
@@ -506,7 +507,7 @@ class DkjController extends Controller
         }
 
         if (isset($activity)) {
-          new ActivityRecorder(4, $activity . $request->dkj_status . ', komentarz: ' . $request->comment . ', numer telefonu: ' . $request->phone . ', kampania: ' . $request->campaign);
+          new ActivityRecorder(4, $activity . $request->dkj_status . ', komentarz: ' . $request->comment . ', numer telefonu: ' . $request->phone . ', kampania: ' . $request->campaign, 11,4);
         }
         return 1;
 
