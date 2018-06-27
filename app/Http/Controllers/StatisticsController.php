@@ -2178,7 +2178,7 @@ class StatisticsController extends Controller
         };
         $directors = User::whereIn('id', $directorsIds)->get();
         $dep_id = Auth::user()->department_info_id;
-        $director_id = Department_info::find($dep_id);
+        $director_id = Department_info::where('director_id','!=','null')->first();
         $director_departments = Department_info::select('id')->where('director_id', '=', $director_id->director_id)->get();
         $month = date('m');
         $year = date('Y');
@@ -2188,11 +2188,12 @@ class StatisticsController extends Controller
             ->with([
                 'departments'       => $departments,
                 'directors'         => $directors,
-                'wiev_type'         => 'department',
+                'wiev_type'         => 'director',
                 'dep_id'            => $dep_id,
                 'months'            => $this->getMonthsNames(),
                 'month'             => $month,
-                'dep_info'               => $dep,
+                'selectDirector'    => '10' .$director_id->director_id,
+                'dep_info'          => $dep,
                 'all_coaching'      => $data['all_coaching']
             ]);
     }
@@ -2224,7 +2225,7 @@ class StatisticsController extends Controller
                     'directors' => $directors,
                     'wiev_type' => 'director',
                     'dep_info'  => $dep_info,
-                    'dep_id' => $request->selected_dep,
+                    'selectDirector' => $request->selected_dep,
                     'months' => $this->getMonthsNames(),
                     'month' => $month,
                     'all_coaching' => $data['all_coaching']
