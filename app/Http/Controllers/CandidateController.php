@@ -129,7 +129,7 @@ class CandidateController extends Controller
                 'Pracownik kadry' => Auth::user()->id
             ];
 
-            //new ActivityRecorder(8, $data);
+            new ActivityRecorder(8, $data, 117, 1);
 
             return $candidate->id;
         }
@@ -215,7 +215,7 @@ class CandidateController extends Controller
                 'recommended_by'            => $request->recommended_by,
                 'Pracownik kadry'           => Auth::user()->id
             ];
-            //new ActivityRecorder(8, $data);
+            new ActivityRecorder(8, $data, 119, 2);
 
             return 1;
         }
@@ -268,7 +268,7 @@ class CandidateController extends Controller
             'Data Szkolenia'            => $date_training
         ];
 
-        //new ActivityRecorder(8, $data);
+        new ActivityRecorder(8, $data,119,1);
 
         /**
          * Zaktualizowanie etapu rekrutacji w danych kandydata
@@ -319,7 +319,7 @@ class CandidateController extends Controller
                 'Id pracownika kadry'           => Auth::user()->id
             ];
 
-            //new ActivityRecorder(8, $data);
+            new ActivityRecorder(8, $data,119,1);
 
             /**
              * Dodanie pierwszego atepu w tej rekrutacji
@@ -363,7 +363,7 @@ class CandidateController extends Controller
                 'Id Kandydata' => $id
             ];
 
-            //new ActivityRecorder(8, $data);
+            new ActivityRecorder(8, $data,119,4);
 
             /**
              * Dodanie etapu w tej rekrutacji
@@ -477,7 +477,7 @@ class CandidateController extends Controller
             'Id kandydata' => $recruitment->candidate_id,
             'Data rozmowy' => $recruitment_date
         ];
-        //new ActivityRecorder(8, $data);
+        new ActivityRecorder(8, $data,119,1);
     }
 
     /**

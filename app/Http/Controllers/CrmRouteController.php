@@ -367,7 +367,13 @@ class CrmRouteController extends Controller
             $numberOfRecords = count($clientRouteInfo);
             $iterator = 0;
             foreach($clientRouteInfo as $item) {
-                $item->hour = $city->timeHotelArr[$iterator]->time . ':00';
+                if($city->timeHotelArr[$iterator]->time == '') {
+                    $item->hour = null;
+                }
+                else {
+                    $item->hour = $city->timeHotelArr[$iterator]->time;
+                }
+
                 $item->hotel_id = $city->timeHotelArr[$iterator]->hotelId;
                 $item->limits = 0; //At this point nobody choose it's value
                 $item->department_info_id = null; //At this point nobody choose it's value, can't be 0 because
@@ -638,6 +644,7 @@ class CrmRouteController extends Controller
                     $item->cityName = $city->name;
                 }
             }
+
             foreach ($hotels as $hotel) {
                 if (isset($item->hotel_id)) {
                     if ($hotel->id == $item->hotel_id) {
@@ -710,7 +717,6 @@ class CrmRouteController extends Controller
                 array_push($fullNameArr, $helpObject);
                 $client_route_indicator = $extendedInfo->client_route_id;
             }
-
 
             if ($lp == count($client_route_info_extended)) {
                 array_push($fullInfoArr, $fullNameArr);

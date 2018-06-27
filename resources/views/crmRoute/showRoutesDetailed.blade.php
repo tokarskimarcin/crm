@@ -59,21 +59,21 @@
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="year">Rok</label>
-                            <select id="year" class="form-control" multiple="multiple">
+                            <select id="year" multiple="multiple" style="width: 100%;">
                             </select>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="weeks">Tygodnie</label>
-                            <select id="weeks" class="form-control" multiple="multiple">
+                            <select id="weeks" multiple="multiple" style="width: 100%;">
                             </select>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="departments">Oddział</label>
-                            <select id="departments" class="form-control" multiple="multiple">
+                            <select id="departments" multiple="multiple" style="width: 100%;">
                                 @foreach($departmentInfo as $item)
                                     <option value="dep_{{$item->id}}">{{$item->name2}} {{$item->name}}</option>
                                 @endforeach
@@ -82,8 +82,8 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label for="typ" style="display: block;">Typ</label>
-                            <select id="typ" multiple="multiple">
+                            <label for="typ">Typ</label>
+                            <select id="typ" multiple="multiple" style="width: 100%;">
                                 <option value="1">Wysyłka</option>
                                 <option value="2">Badania</option>
                             </select>
@@ -92,7 +92,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4 buttonSection" style="min-height: 3.5em;">
-
+                        <button class="btn btn-info" data-toggle="modal" data-target="#editModal" style="margin-bottom: 1em;" id="editOneRecord" disabled="true">Edytuj rekordy</button>
                     </div>
                 </div>
                     <table id="datatable" class="thead-inverse table table-striped table-bordered">
@@ -199,44 +199,14 @@
             * This function append modify button with proper name and remove it if necessary
             */
            function showModifyButton(clientRouteInfoId) {
-               if (clientRouteInfoIdArr.length == 1) {
-                   if (document.querySelector('#editMultipleRecords')) { //if "edytuj rekordy" button exists, remove it
-                       const previousButton = document.querySelector('#editMultipleRecords');
-                       previousButton.parentNode.removeChild(previousButton);
-                   }
-                   const buttonSection = document.querySelector('.buttonSection');
-                   let editButton = document.createElement('button');
-                   editButton.id = 'editOneRecord';
-                   editButton.classList.add('btn', 'btn-info');
-                   editButton.textContent = "Edytuj rekord";
-                   editButton.setAttribute('data-toggle', 'modal');
-                   editButton.setAttribute('data-target', '#editModal');
-                   editButton.style.marginBottom = '1em';
-                   buttonSection.appendChild(editButton);
-                   addModalBodyContext();
-               }
-               else if (clientRouteInfoIdArr.length > 1) {
-                   if (document.querySelector('#editOneRecord')) { //inf "edytuj rekord" button exists, remove it
-                       const previousButton = document.querySelector('#editOneRecord');
-                       previousButton.parentNode.removeChild(previousButton);
-                   }
-                   if (!document.querySelector('#editMultipleRecords')) {
-                       const buttonSection = document.querySelector('.buttonSection');
-                       let editButton = document.createElement('button');
-                       editButton.id = 'editMultipleRecords';
-                       editButton.classList.add('btn', 'btn-info');
-                       editButton.textContent = "Edytuj rekordy";
-                       editButton.setAttribute('data-toggle', 'modal');
-                       editButton.setAttribute('data-target', '#editModal');
-                       editButton.style.marginBottom = '1em';
-                       buttonSection.appendChild(editButton);
-                   }
+               const editButton = document.querySelector('#editOneRecord');
+               if (clientRouteInfoIdArr.length >0) {
 
+                   editButton.disabled = false;
                    addModalBodyContext();
                }
-               else if (clientRouteInfoIdArr.length == 0) { //remove button if no row is selected
-                   const buttonToRemove = document.querySelector('#editOneRecord');
-                   buttonToRemove.parentNode.removeChild(buttonToRemove);
+               else {
+                   editButton.disabled = true;
                }
            }
 
@@ -271,8 +241,7 @@
                submitButton.id = 'submitEdition';
                submitButton.classList.add('btn', 'btn-success');
                submitButton.style.marginTop = '1em';
-               // submitButton.style.marginBottom = '1em';
-               submitButton.style.marginLeft = '90%';
+               submitButton.style.width = "100%";
                submitButton.textContent = 'Zapisz';
                modalBody.appendChild(submitButton);
 
