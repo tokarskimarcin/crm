@@ -2620,27 +2620,30 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             }
         }else if($level_coaching == 3){ // dla dyrektorów
             for($i=1;$i<=3;$i++) {
-                $manager_in_list = $coach_week->where('user_id', '=',$manager->id)
-                    ->where('coaching_type','=',$i)
-                    ->where('coaching_level','=',$level_coaching)
-                    ->first();
-                if (!is_object($manager_in_list)) {
-                    $add_manager = collect();
-                    $add_manager->id = $manager->id;
-                    $add_manager->first_name=$manager->first_name;
-                    $add_manager->last_name =$manager->last_name;
-                    $add_manager->coaching_date= '';
-                    $add_manager->coaching_type= $i;
-                    $add_manager->user_id= 0;
-                    $add_manager->in_progress=0;
-                    $add_manager->unsettled=0;
-                    $add_manager->end_possitive=0;
-                    $add_manager->end_negative=0;
-                    $add_manager->coaching_sum_avg=0;
-                    $add_manager->coaching_sum_rgh=0;
-                    $add_manager->coaching_sum_jakny=0;
-                    $coach_week->push($add_manager);
+                if($manager != null){
+                    $manager_in_list = $coach_week->where('user_id', '=',$manager->id)
+                        ->where('coaching_type','=',$i)
+                        ->where('coaching_level','=',$level_coaching)
+                        ->first();
+                    if (!is_object($manager_in_list)) {
+                        $add_manager = collect();
+                        $add_manager->id = $manager->id;
+                        $add_manager->first_name=$manager->first_name;
+                        $add_manager->last_name =$manager->last_name;
+                        $add_manager->coaching_date= '';
+                        $add_manager->coaching_type= $i;
+                        $add_manager->user_id= 0;
+                        $add_manager->in_progress=0;
+                        $add_manager->unsettled=0;
+                        $add_manager->end_possitive=0;
+                        $add_manager->end_negative=0;
+                        $add_manager->coaching_sum_avg=0;
+                        $add_manager->coaching_sum_rgh=0;
+                        $add_manager->coaching_sum_jakny=0;
+                        $coach_week->push($add_manager);
+                    }
                 }
+
             }
         }
 
