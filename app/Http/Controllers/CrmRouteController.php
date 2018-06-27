@@ -554,7 +554,6 @@ class CrmRouteController extends Controller
             else {
                 $client_route = ClientRoute::all()->pluck('id')->toArray();
             }
-
                     $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
                         ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
                         ->where('date', 'like', $year . '%')
