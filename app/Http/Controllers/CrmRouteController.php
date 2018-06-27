@@ -1813,6 +1813,16 @@ class CrmRouteController extends Controller
         $stopDate   = $request->stopDate;
         $actualDate = $startDate;
         $allInfoCollect = collect();
+
+        $routeInfoOverall = ClientRouteInfo::select(DB::raw('
+            date,
+            department_info_id,
+            SUM(limits) as sumOfLimits,
+            SUM(actual_success) as sumOfActualSuccess
+        '))
+            ->groupBy('date', 'department_info_id')
+            ->get();
+
         while($actualDate != $stopDate){
             $dayCollect = collect();
             $dayCollect->offsetSet('numberOfWeek',date('W',strtotime($actualDate)));
@@ -1821,15 +1831,16 @@ class CrmRouteController extends Controller
             $totalScore = 0;
             $allSet = true;
             foreach ($departmentInfo as $item){
-                $routeInfo =
-                    ClientRouteInfo::
-                    where('date','=',$actualDate)
-                        ->where('department_info_id','=',$item->id)
-                        ->get();
-                $dayLimit = $routeInfo->sum('limits');
-                $daySuccess = $routeInfo->sum('actual_success');
+                $routeInfo = $routeInfoOverall
+                    ->where('department_info_id' ,'=', $item->id)
+                    ->where('date', '=', $actualDate)
+                    ->first();
+
+                $dayLimit = $routeInfo['sumOfLimits'];
+                $daySuccess = $routeInfo['sumOfActualSuccess'];
                 $wynik = $dayLimit - $daySuccess;
-                $dayCollect->offsetSet($item->name2,$wynik);
+                $dayCollect->offsetSet($item->name2, $wynik);
+
                 $totalScore += $wynik;
             }
             $isSet = ClientRouteInfo::
