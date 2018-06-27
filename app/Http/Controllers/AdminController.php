@@ -12,6 +12,8 @@ use App\Departments;
 use App\HourReport;
 use App\LinkGroups;
 use App\Links;
+use App\LogActionType;
+use App\LogInfo;
 use App\Pbx_report_extension;
 use App\PrivilageRelation;
 use App\PrivilageUserRelation;
@@ -760,5 +762,38 @@ class AdminController extends Controller
 
         return redirect()->back();
 
+    }
+
+    public function logInfoGet()
+    {
+
+        $linkGroups = LinkGroups::all();
+        $logActionType = LogActionType::all();
+        return view('admin.logInfo')
+            ->with('linkGroups', json_encode($linkGroups))
+            ->with('logActionType', json_encode($logActionType));
+    }
+
+    public function datatableLogInfoAjax(Request $request)
+    {
+        $operatorActionType = '<>';
+        if ($request->action_type_id > 0)
+            $operatorActionType = '=';
+
+        $operatorGroupLink = '<>';
+        if ($request->group_link_id > 0)
+            $operatorGroupLink = '=';
+
+
+        $logs = DB::table('log_info as lf')
+            ->select('u.first_name', 'u.last_name', 'l.link', 'la.name as action_name', 'lf.updated_at', 'lf.comment')
+            ->leftJoin('log_action_type as la', 'lf.action_type_id', '=', 'la.id')
+            ->leftJoin('links as l', 'lf.links_id', '=', 'l.id')
+            ->leftJoin('users as u', 'lf.user_id', '=', 'u.id')
+            ->where('lf.action_type_id', $operatorActionType, $request->action_type_id)
+            ->where('l.group_link_id',$operatorGroupLink, $request->group_link_id)
+            ->whereBetween('lf.updated_at', [$request->fromDate, $request->toDate . ' 23:59:59'])
+            ->get();
+        return datatables($logs)->make(true);
     }
 }

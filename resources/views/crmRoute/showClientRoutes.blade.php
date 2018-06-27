@@ -262,9 +262,9 @@
 
         document.addEventListener('DOMContentLoaded', function (event) {
 
-            let yearInput = document.querySelector('#year');
-            let typInput = document.querySelector('#type');
-            let stateInput = document.querySelector('#campaignState');
+            let yearInput = $('#year');
+            let typInput = $('#type');
+            let stateInput = $('#campaignState');
 
             //This part is responsible for listing every week number into select
             const lastWeekOfYear ={{$lastWeek}};
@@ -277,17 +277,15 @@
             }
 
             //this part is responsible for redirect button
-            const addNewClientRouteInput = document.querySelector('#addNewClientRoute');
-            addNewClientRouteInput.addEventListener('click', (e) => {
+            const addNewClientRouteInput = $('#addNewClientRoute');
+            addNewClientRouteInput.click((e) => {
                 window.location.href = '{{URL::to('/crmRoute_index')}}';
             });
 
-
-            const showOnlyAssignedInput = document.querySelector('#showOnlyAssigned');
-            const showAllClientsInput = document.querySelector('#showAllClients');
-            const selectedWeekInput = document.querySelector('#weekNumber');
+            const showOnlyAssignedInput = $('#showOnlyAssigned');
+            const showAllClientsInput = $('#showAllClients');
+            const selectedWeekInput = $('#weekNumber');
             let id = null; //after user click on 1st table row, it assing clientRouteId to this variable
-            let selectedWeek = 0;
             let rowIterator = null;
             // let colorIterator = 0;
             let showAllClients = null; //this variable indices whether checkbox "Pokaż wszystkich klientó" is checked
@@ -401,7 +399,7 @@
                     $(row).attr('id', "client_" + data.id);
                     return row;
                 }, "fnDrawCallback": function (settings) {
-                    $('table tbody tr').on('click', function () {
+                    $('#datatable tbody tr').click( function () {
                         if (showAllClients === true) { //all clients checkbox = true + selecting one client
                             showAllClientsInput.checked = false;
                             showAllClients = false;
@@ -463,25 +461,17 @@
 
 
             table2 = $('#datatable2').DataTable({
-                "autoWidth": true,
-                "processing": true,
-                "serverSide": true,
-                "fixedHeader": true,
-                "fnDrawCallback": function (settings) {
+                autoWidth: true,
+                processing: true,
+                serverSide: true,
+                fixedHeader: true,
+                fnDrawCallback: function (settings) {
                     objectArr = [];
-                    const buttons = document.querySelectorAll('.action-buttons-0');
-                    buttons.forEach(btn => {
-                        btn.addEventListener('click', actionButtonHandler);
-                    });
-                    const buttons2 = document.querySelectorAll('.action-buttons-1');
-                    buttons2.forEach(btn => {
-                        btn.addEventListener('click', actionButtonHandlerAccepted);
-                    });
-                    const buttons3 = document.querySelectorAll('.action-buttons-2');
-                    buttons3.forEach(btn => {
-                        btn.addEventListener('click', actionButtonHandlerFinished);
-                    });
-                    $('.show-modal-with-data').on('click', function (e) {
+                    $('.action-buttons-0').click(actionButtonHandler);
+                    $('.action-buttons-1').click(actionButtonHandlerAccepted);
+                    $('.action-buttons-2').click(actionButtonHandlerFinished);
+
+                    $('.show-modal-with-data').click(function (e) {
                         let selectTR = e.currentTarget.parentNode.parentNode;
                         let routeId = $(selectTR).closest('tr').prop('id');
                         routeId = routeId.split('_');
@@ -502,6 +492,43 @@
                                 $('#myModal').modal('show');
                             }
                         });
+                        /*swal({
+                            showCancelButton: false,
+                            onOpen: () => {
+                                swal.showLoading();
+                                swal.clickConfirm();
+                            },
+                            preConfirm: ()=>{
+                                let selectTR = e.currentTarget.parentNode.parentNode;
+                                let routeId = $(selectTR).closest('tr').prop('id');
+                                routeId = routeId.split('_');
+                                routeId = routeId[1];
+                                let resp = null;
+                                $.ajax({
+                                    type: "POST",
+                                    url: '{{--{{ route('api.getReadyRoute') }}--}}',
+                                    data: {
+                                        "route_id": routeId
+                                    },
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    success: function (response) {
+                                        resp = response;
+                                    },
+                                    error: function () {
+                                        resp = response;
+                                    }
+                                });
+                                return resp;
+                            }
+                        }).then((result)=>{
+                            console.leg
+                            let placeToAppend = document.querySelector('#insertModalHere');
+                            placeToAppend.innerHTML = '';
+                            createModalContent(result, placeToAppend);
+                            //$('#myModal').modal('show');
+                        });*/
                     });
                 },
                 "rowCallback": function (row, data, index) {
@@ -513,10 +540,10 @@
                         table2.ajax.reload();
                     }
 
-                    if (row.cells[5].firstChild.classList[2] == "action-buttons-0") {
+                    if (data.status == 0) {
                         row.style.backgroundColor = "#ffc6c6";
                     }
-                    else if (row.cells[5].firstChild.classList[2] == "action-buttons-2") {
+                    else if (data.status == 2) {
                         row.style.backgroundColor = "#7cf76c";
                     }
                     else {
@@ -525,41 +552,28 @@
                     $(row).attr('id', "clientRouteInfoId_" + data.clientRouteId);
                     return row;
                 },
-                "ajax": {
+                ajax: {
                     'url': "{{route('api.getClientRouteInfo')}}",
                     'type': 'POST',
                     'data': function (d) {
                         d.id = id;
-                        d.showAllClients = showAllClients;
-                        d.showOnlyAssigned = showOnlyAssigned;
-                        d.selectedWeek = selectedWeek;
-                        d.year = yearInput.value;
-                        d.typ = typInput.value;
-                        d.state = stateInput.options[stateInput.selectedIndex].value;
+                        d.showAllClients = showAllClientsInput.val();
+                        d.showOnlyAssigned = showOnlyAssignedInput.val();
+                        d.year = yearInput.val();
+                        d.selectedWeek = selectedWeekInput.val();
+                        d.typ = typInput.val();
+                        d.state = stateInput.val();
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
-                "language": {
+                language: {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },
-                "columns": [
-                    {
-                        "data": function (data, type, dataToSet) {
-                            return data.weekOfYear;
-                        }, "name": "weekOfYear"
-                    },
-                    {
-                        "data": function (data, type, dataToSet) {
-                            return data.clientName;
-                        }, "name": "clientName"
-                    },
-                    {
-                        "data": function (data, type, dataToSet) {
-                            return data.minDate;
-                        }, "name": "minDate"
-                    },
-                    {
-                        "data": function (data, type, dataToSet) {
+                columns: [
+                    {"data": "weekOfYear"},
+                    {"data": "clientName"},
+                    {"data": "minDate"},
+                    {"data": function (data, type, dataToSet) {
                             let finalName = '';
                             if (data.typ == '1') {
                                 finalName = data.clientRouteName + ' (W)';
@@ -570,8 +584,7 @@
                             return finalName;
                         }, "name": "clientRouteName"
                     },
-                    {
-                        "data": function (data, type, dataToSet) {
+                    {"data": function (data, type, dataToSet) {
                             if (data.haveHotel != '0' && data.hour != 'nie') {
                                 return '<span style="color: darkgreen;">Tak</span>';
                             }
@@ -580,8 +593,7 @@
                             }
                         }, "name": "hotelName"
                     },
-                    {
-                        "data": function (data, type, dataToSet) {
+                    {"data": function (data, type, dataToSet) {
                             if (data.status == 0) {
                                 return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-success action-buttons-0" style="width:100%">Aktywuj kampanie</button>';
                             }
@@ -594,18 +606,15 @@
 
                         }, "name": "acceptRoute"
                     },
-                    {
-                        "data": function (data, type, dataToSet) {
+                    {"data": function (data, type, dataToSet) {
                             return '<a href="{{URL::to("/specificRoute")}}/' + data.clientRouteId + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
                         }, "name": "link"
                     },
-                    {
-                        "data": function (data, type, dataToSet) {
+                    {"data": function (data, type, dataToSet) {
                             return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.clientRouteId + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
                         }, "name": "link"
                     },
-                    {
-                        "data": function (data, type, dataToSet) {
+                    {"data": function (data, type, dataToSet) {
                             return '<span style="font-size: 2.1em;" class="glyphicon glyphicon-edit show-modal-with-data" data-route_id ="' + data.clientRouteId + '" ></span>';
                         }, "name": "link"
 
@@ -782,9 +791,6 @@
             /**
              * This function refresh datatable after changing a type.
              */
-            function typHandler(e) {
-                table2.ajax.reload();
-            }
 
             /**
              * This funciton sets values of inputs to session storage on page leave
@@ -907,14 +913,13 @@
                 table2.ajax.reload();
             })();
 
+            showAllClientsInput.change(showAllClientsInputHandler);
+            showOnlyAssignedInput.change(()=>{table2.ajax.reload();});
+            selectedWeekInput.change(()=>{table2.ajax.reload();});
 
-            showAllClientsInput.addEventListener('change', showAllClientsInputHandler);
-            showOnlyAssignedInput.addEventListener('change', showOnlyAssignedHandler);
-            selectedWeekInput.addEventListener('change', selectedWeekHandler);
-
-            yearInput.addEventListener('change', yearHandler);
-            typInput.addEventListener('change', typHandler);
-            stateInput.addEventListener('change', typHandler);
+            yearInput.change(yearHandler);
+            typInput.change(()=>{table2.ajax.reload();});
+            stateInput.change(()=>{table2.ajax.reload();});
 
             window.addEventListener('pagehide', setItemsToSeessionStorage);
 
