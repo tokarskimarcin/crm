@@ -92,8 +92,9 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4 buttonSection" style="min-height: 3.5em;">
-                        <button class="btn btn-info" data-toggle="modal" data-target="#editModal" style="margin-bottom: 1em;" id="editOneRecord" disabled="true">Edytuj rekordy</button>
+                        <button class="btn btn-info" data-toggle="modal" data-target="#editModal" style="margin-bottom: 1em;  width: 100%;" id="editOneRecord" disabled="true">Edytuj rekordy</button>
                     </div>
+
                 </div>
                     <table id="datatable" class="thead-inverse table table-striped table-bordered">
                         <thead>
