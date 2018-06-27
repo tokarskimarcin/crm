@@ -118,7 +118,9 @@ class CoachingController extends Controller
             } else {
                 $directors = Department_info::all()->pluck('director_id')->toArray();
                 $directorsHR = Department_info::all()->pluck('director_hr_id')->toArray();
-                array_push($directors,$directorsHR);
+                foreach($directorsHR as $item){
+                    array_push($directors,$item);
+                }
                 $coach = User::where('status_work', '=', '1')
                     ->whereIn('id', $directors)
                     ->get();
