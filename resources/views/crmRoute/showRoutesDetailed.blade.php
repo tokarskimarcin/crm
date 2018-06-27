@@ -92,8 +92,12 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4 buttonSection" style="min-height: 3.5em;">
-                        <button class="btn btn-info" data-toggle="modal" data-target="#editModal" style="margin-bottom: 1em;" id="editOneRecord" disabled="true">Edytuj rekordy</button>
+                        <button class="btn btn-info" data-toggle="modal" data-target="#editModal" style="margin-bottom: 1em;  width: 100%;" id="editOneRecord" disabled="true">Edytuj rekordy</button>
                     </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-basic" id="clearButton" style="width:100%;">Wyczyść zaznaczenia</button>
+                    </div>
+
                 </div>
                     <table id="datatable" class="thead-inverse table table-striped table-bordered">
                         <thead>
@@ -157,7 +161,23 @@
            let clientRouteInfoIdArr = []; //array of client_route_info ids
            let selectedTypes = ['0']; //array of selected by user types
            let arrayOfTableRows = [];
+           const clearButton = document.querySelector('#clearButton');
+           const editButton = document.querySelector('#editOneRecord');
            /*******END OF GLOBAL VARIABLES*********/
+
+           /**
+            * This function shows notification.
+            */
+           function notify($text$string, $type$string = info) {
+               $.notify({
+                   // options
+                   message: $text$string
+               },{
+                   // settings
+                   type: $type$string,
+                   z_index: '100000'
+               });
+           }
 
            /**
             * This function color selected row and add id value to array.
@@ -199,22 +219,12 @@
             * This function append modify button with proper name and remove it if necessary
             */
            function showModifyButton(clientRouteInfoId) {
-               const editButton = document.querySelector('#editOneRecord');
                if (clientRouteInfoIdArr.length >0) {
-
                    editButton.disabled = false;
                    addModalBodyContext();
                }
                else {
                    editButton.disabled = true;
-               }
-           }
-
-           function showUncheckButton(){
-               if(clientRouteInfoIdArr>0){
-
-               }else {
-
                }
            }
 
@@ -301,16 +311,8 @@
                    })
                        .then(response => response.text())
                        .then(response => {
-                           $.notify({
-                               // options
-                               message: 'Rekordy zostały zmienione!'
-                           },{
-                               // settings
-                               type: 'info',
-                               z_index: '100000'
-                           });
+                           notify("Rekordy zostały zmienione!", "info");
                            table.ajax.reload();
-
                        })
                        .catch(error => console.error("Błąd :", error))
 
@@ -356,7 +358,6 @@
                        arrayOfTableRows.push(rowObject);
                    }
                });
-               console.log(arrayOfTableRows);
            }
 
            /**
@@ -577,7 +578,6 @@
                             const clientRouteInfoId = givenRow.attr('data-id');
                             colorRowAndAddIdToArray(clientRouteInfoId, givenRow);
                             showModifyButton();
-                            showUncheckButton();
                         }
                    });
 
@@ -882,6 +882,25 @@
                $('#typ').select2();
            })();
 
+           /**
+            * This function clear all row selections and disable edit button
+            */
+           function clearAllSelections(e) {
+               clientRouteInfoIdArr = [];
+               arrayOfTableRows = [];
+
+               if(document.querySelectorAll('.colorRow')) {
+                   const coloredRows = document.querySelectorAll('.colorRow');
+                   coloredRows.forEach(colorRow => {
+                      colorRow.classList.remove('colorRow');
+                   });
+                   editButton.disabled = true;
+
+                   notify("Wszystkie zaznaczenia zostały usuniete", 'success');
+               }
+           }
+
+           clearButton.addEventListener('click', clearAllSelections);
        });
     </script>
 @endsection
