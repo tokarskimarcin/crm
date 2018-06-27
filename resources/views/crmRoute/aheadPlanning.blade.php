@@ -219,7 +219,16 @@
                     {"data": `{{$item->name2}}`},
                     @endforeach
                     {"data": "totalScore"},
-                    {"data": "allSet"},
+                    {
+                        "data": function (d) {
+                            if (d.allSet == false) {
+                                return "Nie";
+                            }
+                            else {
+                                return "Tak";
+                            }
+                        }
+                    }
                 ]
             });
 
