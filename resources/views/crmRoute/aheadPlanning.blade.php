@@ -76,27 +76,23 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label for="year" style="display: block">Rok</label>
-                                <select id="year" class="form-control" multiple="multiple">
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label for="weeks" style="display: block">Tygodnie</label>
-                                <select id="weeks" class="form-control" multiple="multiple">
-                                </select>
-                            </div>
-                        </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label for="typ" style="display: block">Typ</label>
-                                <select id="typ" multiple="multiple">
-                                    <option value="1">Wysyłka</option>
-                                    <option value="2">Badania</option>
-                                </select>
+                                <label for="date" class="myLabel">Data początkowa:</label>
+                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                    <input class="form-control" name="date_start" id="date_start" type="text" value="{{date("Y-m-d")}}">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="date_stop" class="myLabel">Data końcowa:</label>
+                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                    <input class="form-control" name="date_stop" id="date_stop" type="text" value="{{date("Y-m-d")}}">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -172,9 +168,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', function (mainEvent) {
 
+            $('.form_date').datetimepicker({
+                language:  'pl',
+                autoclose: 1,
+                minView : 2,
+                pickTime: false,
+            });
+
             /********** GLOBAL VARIABLES ***********/
-            let selectedYears = ["0"]; //this array collect selected by user years
-            let selectedWeeks = ["0"]; //this array collect selected by user weeks
             let elementsToSum = {
                 firstElement: {trId: null, tdId: null},
                 lastElement: {trId: null, tdId: null}
@@ -214,71 +215,25 @@
                     {"data": "numberOfWeek"},
                     {"data": "dayName"},
                     {"data": "day"},
-                    {"data": "Lublin"},
-                    {"data": "Lublin"},
-                    {"data": "Radom"},
-                    {"data": "Radom"},
-                    {"data": "numberOfWeek"},
-                    {"data": "numberOfWeek"},
-                    {"data": "numberOfWeek"},
-                    {"data": "numberOfWeek"},
-                    {"data": "numberOfWeek"},
-                    {"data": "numberOfWeek"},
-                    {"data": "numberOfWeek"},
-                    {"data": "numberOfWeek"},
-                    {"data": "numberOfWeek"},
-                    {"data": "numberOfWeek"},
-                    {"data": "numberOfWeek"},
-                    {"data": "numberOfWeek"},
-                    {"data": "numberOfWeek"},
-
+                    @foreach($departmentInfo as $item)
+                    {"data": `{{$item->name2}}`},
+                    @endforeach
+                    {"data": "totalScore"},
+                    {
+                        "data": function (d) {
+                            if (d.allSet == false) {
+                                return "Nie";
+                            }
+                            else {
+                                return "Tak";
+                            }
+                        }
+                    }
                 ]
             });
 
 
             /*********************EVENT LISTENERS FUNCTIONS****************************/
-
-            /**
-             * This event listener change elements of array selected Years while user unselects some year
-             */
-            $('#year').on('select2:unselect', function (e) {
-                if ($('#year').val() != null) {
-                    let yearArr = $('#year').val();
-                    selectedYears = yearArr;
-                }
-                else {
-                    selectedYears = ["0"];
-                }
-                table.ajax.reload();
-            });
-
-            /**
-             * This event listener change elements of array selecteWeeks while user selects another week
-             */
-            $('#weeks').on('select2:select', function (e) {
-                let weeksArr = $('#weeks').val();
-                if (weeksArr.length > 0) {
-                    selectedWeeks = weeksArr;
-                }
-                else {
-                    selectedWeeks = ["0"];
-                }
-                table.ajax.reload();
-            });
-
-            /**
-             * This event listener change elements of array selectedWeeks while user unselects any week.
-             */
-            $("#weeks").on('select2:unselect', function (e) {
-                if ($('#weeks').val() != null) {
-                    let weeksArr = $('#weeks').val();
-                    selectedWeeks = weeksArr;
-                }
-                else {
-                    selectedWeeks = ['0'];
-                }
-                table.ajax.reload();
-            });
 
             /**
              * This event listener change elements of array selectedTypes while user selects any type
@@ -306,6 +261,10 @@
                     selectedTypes = ['0'];
                 }
                 table.ajax.reload();
+            });
+
+            $('#date_start, #date_stop').on('change',function(e) {
+               table.ajax.reload();
             });
 
             /**
@@ -412,40 +371,6 @@
 
             }
 
-            /**
-             * This function appends week numbers to week select element and years to year select element
-             * IIFE function, execute after page is loaded automaticaly
-             */
-            (function appendWeeksAndYears() {
-                const maxWeekInYear = {{$lastWeek}}; //number of last week in current year
-                const weekSelect = document.querySelector('#weeks');
-                const yearSelect = document.querySelector('#year');
-                const baseYear = '2017';
-                const currentYear = {{$currentYear}};
-                const currentWeek = {{$currentWeek}};
-
-                for (let j = baseYear; j <= currentYear + 1; j++) {
-                    const opt = document.createElement('option');
-                    opt.value = j;
-                    opt.textContent = j;
-                    if (j == currentYear) {
-                        opt.setAttribute('selected', 'selected');
-                        selectedYears = [j];
-                    }
-                    yearSelect.appendChild(opt);
-                }
-
-                for (let i = 1; i <= maxWeekInYear + 1; i++) {
-                    const opt = document.createElement('option');
-                    opt.value = i;
-                    opt.textContent = i;
-                    if (i == currentWeek) {
-                        opt.setAttribute('selected', 'selected');
-                        selectedWeeks = [i];
-                    }
-                    weekSelect.appendChild(opt);
-                }
-            })();
             /*Activation select2 framework*/
             (function initial() {
                 $('#weeks').select2();

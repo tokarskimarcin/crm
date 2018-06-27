@@ -12,6 +12,8 @@ use App\Departments;
 use App\HourReport;
 use App\LinkGroups;
 use App\Links;
+use App\LogActionType;
+use App\LogInfo;
 use App\Pbx_report_extension;
 use App\PrivilageRelation;
 use App\PrivilageUserRelation;
@@ -119,7 +121,7 @@ class AdminController extends Controller
         $data['Link adress'] = $request->link_adress;
         $data['Link group'] = $request->link_goup;
 
-        new ActivityRecorder(3, $data);
+        new ActivityRecorder(3, $data,16,2);
 
         Session::flash('message_ok', "Zmiany zapisano!");
         return Redirect::back();
@@ -219,7 +221,7 @@ class AdminController extends Controller
 
         $department_info->save();
 
-        new ActivityRecorder(3, "Dodano oddział o numerze ID: " . $id_dep);
+        new ActivityRecorder(3, "Dodano oddział o numerze ID: " . $id_dep,51,1);
 
         Session::flash('message_ok', "Oddział został dodany!");
         return Redirect::back();
@@ -310,7 +312,7 @@ class AdminController extends Controller
             'Id oddziału' => $request->selected_department_info_id
         ];
 
-        new ActivityRecorder(3, $data);
+        new ActivityRecorder(3, $data,66,2);
 
         Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
         return Redirect::back();
@@ -622,12 +624,15 @@ class AdminController extends Controller
             $newCriterium->audit_header_id = $request->relatedHeader;
             $newCriterium->status = $request->status;
             $newCriterium->save();
+
+            new ActivityRecorder(10,'criterionId: ' .$newCriterium->id, 168,1);
         }
 
         else if($addingCrit == "false") {
             $critToRemove = AuditCriterions::where('id', '=', $request->cID)->first();
             $critToRemove->status = 0;
             $critToRemove->save();
+            new ActivityRecorder(10,'criterionId: ' .$critToRemove->id, 168,3);
         }
 
         else if($addingHeader == "true") {
@@ -636,12 +641,14 @@ class AdminController extends Controller
             $newHeader->name = $newName;
             $newHeader->status = $request->status;
             $newHeader->save();
+            new ActivityRecorder(10,'HeaderId: ' .$newHeader->id, 168,1);
         }
         else if($addingHeader == "false") {
             $headerToRemove = AuditHeaders::where('id', '=', $request->hid)->first();
             $relatedCriterions = AuditCriterions::where('audit_header_id', '=', $request->hid)->where('status', '=', $request->status)->get();
             $headerToRemove->status = 0;
             $headerToRemove->save();
+            new ActivityRecorder(10,'HeaderId: ' .$headerToRemove->id, 168,3);
             foreach($relatedCriterions as $rC) {
                 $rC->status = 0;
                 $rC->save();
@@ -669,12 +676,14 @@ class AdminController extends Controller
             $newTemplate->name = trim($templateName, ' ');
             $newTemplate->isActive = 1;
             $newTemplate->save();
+            new ActivityRecorder(10,'auditStatusId: ' .$newTemplate->id, 170,1);
         }
         else { //condition satisfied when user is deleting given template
             $idToDelete = $request->idToDelete;
             $templateToDelete = AuditStatus::where('id', '=', $idToDelete)->first();
             $templateToDelete->isActive = 0;
             $templateToDelete->save();
+            new ActivityRecorder(10,'auditStatusId: ' .$templateToDelete->id, 170,3);
         }
 
         return Redirect::back();
@@ -753,5 +762,38 @@ class AdminController extends Controller
 
         return redirect()->back();
 
+    }
+
+    public function logInfoGet()
+    {
+
+        $linkGroups = LinkGroups::all();
+        $logActionType = LogActionType::all();
+        return view('admin.logInfo')
+            ->with('linkGroups', json_encode($linkGroups))
+            ->with('logActionType', json_encode($logActionType));
+    }
+
+    public function datatableLogInfoAjax(Request $request)
+    {
+        $operatorActionType = '<>';
+        if ($request->action_type_id > 0)
+            $operatorActionType = '=';
+
+        $operatorGroupLink = '<>';
+        if ($request->group_link_id > 0)
+            $operatorGroupLink = '=';
+
+
+        $logs = DB::table('log_info as lf')
+            ->select('u.first_name', 'u.last_name', 'l.link', 'la.name as action_name', 'lf.updated_at', 'lf.comment')
+            ->leftJoin('log_action_type as la', 'lf.action_type_id', '=', 'la.id')
+            ->leftJoin('links as l', 'lf.links_id', '=', 'l.id')
+            ->leftJoin('users as u', 'lf.user_id', '=', 'u.id')
+            ->where('lf.action_type_id', $operatorActionType, $request->action_type_id)
+            ->where('l.group_link_id',$operatorGroupLink, $request->group_link_id)
+            ->whereBetween('lf.updated_at', [$request->fromDate, $request->toDate . ' 23:59:59'])
+            ->get();
+        return datatables($logs)->make(true);
     }
 }

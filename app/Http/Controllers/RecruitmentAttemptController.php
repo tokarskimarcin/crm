@@ -69,7 +69,7 @@ class RecruitmentAttemptController extends Controller
                 'Id źródła' => $candidate_source->id
             ];
 
-            //new ActivityRecorder(8, $data);
+            new ActivityRecorder(8, $data,119,1);
 
             return 1;
         }
@@ -98,7 +98,7 @@ class RecruitmentAttemptController extends Controller
                 'ID źródła' => $source->id
             ];
 
-            //new ActivityRecorder(8, $data);
+            new ActivityRecorder(8, $data,119,4);
 
             return 1;
         }

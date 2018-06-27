@@ -209,6 +209,7 @@ Route::POST('/delete_notification', 'NotificationController@delete_notification'
 Route::POST('/getMedicalPackagesAdminData', 'AdminController@getMedicalPackagesAdminData')->name('api.getMedicalPackagesAdminData');
 Route::POST('/getMedicalPackageData', 'AdminController@getMedicalPackageData')->name('api.getMedicalPackageData');
 Route::POST('/saveMedicalPackageData', 'AdminController@saveMedicalPackageData')->name('api.saveMedicalPackageData');
+Route::POST('/logInfoDatatable', 'AdminController@datatableLogInfoAjax')->name('api.datatableLogInfo');
 
 
 Route::POST('/getDaysInMonth', 'StatisticsController@getDaysInMonth')->name('api.getDaysInMonth');
@@ -272,7 +273,7 @@ Route::post('/datatableCoachAscription', 'CoachingController@datatableCoachAscri
 Route::post('/coachAscriptionRevert', 'CoachingController@coachAscriptionRevertPost')->name('api.coachAscriptionRevert');
 
 /* END COACHING ROUTES AJAX*/
-/** */
+
 
 /* Report Database ROUTES AJAX*/
 Route::post('/pbxReportDetailedAjax', 'StatisticsController@pbxReportDetailedAjax')->name('api.pbxReportDetailedAjax');
@@ -408,6 +409,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/show_test_for_admin/{id}', 'AdminController@show_test_for_admin');
 
     Route::get('/edit_medical_package', 'AdminController@edit_medical_package');
+
+    Route::get('/logInfo', 'AdminController@logInfoGet');
     // Admin_Panel --Stop--
 
     // Password change --START--

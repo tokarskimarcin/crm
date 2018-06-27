@@ -632,8 +632,8 @@ class CoachingController extends Controller
         if ($coaching_director_id != null || $coaching_director_id != 0) {
             $coachingDirector = null;
             try {
-                $coachingDirector = CoachingDirector::where('id','=', $coaching_director_id)->first();
-            }catch(Exception $e){
+                $coachingDirector = CoachingDirector::where('id', '=', $coaching_director_id)->first();
+            } catch (Exception $e) {
                 report($e);
                 return ["type" => "error", "msg" => "Pojawił się problem z bazą danych, skontaktuj się z administratorem", "title" => "Błąd"];
             }
@@ -1235,16 +1235,22 @@ class CoachingController extends Controller
         $error = !$this->coachDirectorAscription($previousCoachDirector_id, $newCoachDirector_id, $allCoachingsOfPreviousCoach);
 
         if ($request->has('action')) {
-            if ($request->action == "coachAscription")
+            if ($request->action == "coachAscription") {
+                new ActivityRecorder(11, 'Poprzedni Coach: ' . $previousCoachDirector_id . ' Nowy Coach: ' . $newCoachDirector_id, 192, 2);
                 return ['type' => 'success', 'msg' => 'Użytkownik został przypisany', 'title' => 'Przypisano!'];
+            }
+
             if ($error)
                 return ['type' => 'warning', 'msg' => 'Coś poszło nie tak, spróbuj później', 'title' => "Nie udało się!"];
             return ['type' => 'success', 'msg' => 'Użytkownik został przypisany', 'title' => 'Przypisano!'];
         } else
             if ($error)
                 $request->session()->flash('message_warning', 'Coś poszło nie tak, spróbuj później');
-            else
+            else {
+                new ActivityRecorder(11, 'Poprzedni Coach: ' . $previousCoachDirector_id . ' Nowy Coach: ' . $newCoachDirector_id, 192, 2);
                 $request->session()->flash('message_ok', 'Coachingi zostały przypisane do nowego trenera');
+            }
+
         return Redirect::back();
     }
 
@@ -1269,7 +1275,6 @@ class CoachingController extends Controller
                 $oldCoach->manager_id = $newCoachDirector_id;
                 $oldCoach->save();
             }
-            new ActivityRecorder('11', 'Przepisanie coachingu z ' . $previousCoachDirector_id . ' na ' . $newCoachDirector_id);
         } catch (Exception $e) {
             report($e);
             return false;
@@ -1307,10 +1312,12 @@ class CoachingController extends Controller
         if ($request->has('action')) {
             //ponizszy if nie ma znaczenia, to jest tylko flaga oznaczenia wykonania ajax
             if ($request->action == "coachAscriptionRevert") {
+                new ActivityRecorder(11, 'Cofniecie przypisania, Poprzedni Coach: ' . $coachDirectorChange->coach_director_id . ' Nowy Coach: ' . $coachDirectorChange->prev_coach_director_id, 192, 2);
                 return ['type' => 'success', 'msg' => 'Pomyślne cofnięcie zmiany', 'title' => "Udało się!"];
             }
             if ($error)
                 return ['type' => 'warning', 'msg' => 'Coś poszło nie tak, spróbuj później', 'title' => "Nie udało się!"];
+            new ActivityRecorder(11, 'Cofniecie przypisania, Poprzedni Coach: ' . $coachDirectorChange->coach_director_id . ' Nowy Coach: ' . $coachDirectorChange->prev_coach_director_id, 192, 2);
             return ['type' => 'success', 'msg' => 'Pomyślne cofnięcie zmiany', 'title' => "Udało się!"];
         } else {
             return Redirect::back();

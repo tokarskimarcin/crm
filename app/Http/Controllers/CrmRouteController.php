@@ -368,7 +368,13 @@ class CrmRouteController extends Controller
             $numberOfRecords = count($clientRouteInfo);
             $iterator = 0;
             foreach($clientRouteInfo as $item) {
-                $item->hour = $city->timeHotelArr[$iterator]->time . ':00';
+                if($city->timeHotelArr[$iterator]->time == '') {
+                    $item->hour = null;
+                }
+                else {
+                    $item->hour = $city->timeHotelArr[$iterator]->time;
+                }
+
                 $item->hotel_id = $city->timeHotelArr[$iterator]->hotelId;
                 $item->limits = 0; //At this point nobody choose it's value
                 $item->department_info_id = null; //At this point nobody choose it's value, can't be 0 because
@@ -555,7 +561,6 @@ class CrmRouteController extends Controller
             else {
                 $client_route = ClientRoute::all()->pluck('id')->toArray();
             }
-
                     $client_route_info = ClientRouteInfo::whereIn('client_route_id', $client_route)
                         ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
                         ->where('date', 'like', $year . '%')
@@ -640,6 +645,7 @@ class CrmRouteController extends Controller
                     $item->cityName = $city->name;
                 }
             }
+
             foreach ($hotels as $hotel) {
                 if (isset($item->hotel_id)) {
                     if ($hotel->id == $item->hotel_id) {
@@ -712,7 +718,6 @@ class CrmRouteController extends Controller
                 array_push($fullNameArr, $helpObject);
                 $client_route_indicator = $extendedInfo->client_route_id;
             }
-
 
             if ($lp == count($client_route_info_extended)) {
                 array_push($fullInfoArr, $fullNameArr);
@@ -1784,6 +1789,7 @@ class CrmRouteController extends Controller
         '))
         ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
         ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+        ->where('id_dep_type','=',2)
         ->get();
 
         return view('crmRoute.aheadPlanning')
@@ -1801,12 +1807,23 @@ class CrmRouteController extends Controller
         '))
             ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
             ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->where('id_dep_type','=',2)
             ->get();
 
-        $startDate  = '2018-05-09';
-        $stopDate   = '2018-06-10';
+        $startDate  = $request->startDate;
+        $stopDate   = $request->stopDate;
         $actualDate = $startDate;
         $allInfoCollect = collect();
+
+        $routeInfoOverall = ClientRouteInfo::select(DB::raw('
+            date,
+            department_info_id,
+            SUM(limits) as sumOfLimits,
+            SUM(actual_success) as sumOfActualSuccess
+        '))
+            ->groupBy('date', 'department_info_id')
+            ->get();
+
         while($actualDate != $stopDate){
             $dayCollect = collect();
             $dayCollect->offsetSet('numberOfWeek',date('W',strtotime($actualDate)));
@@ -1815,15 +1832,17 @@ class CrmRouteController extends Controller
             $totalScore = 0;
             $allSet = true;
             foreach ($departmentInfo as $item){
-                $routeInfo =
-                    ClientRouteInfo::
-                    where('date','=',$actualDate)
-                        ->where('department_info_id','=',$item->id)
-                        ->get();
-                $dayLimit = $routeInfo->sum('limits');
-                $daySuccess = $routeInfo->sum('actual_success');
-                $dayCollect->offsetSet($item->name2,$dayLimit-$daySuccess);
-                $totalScore += 0;
+                $routeInfo = $routeInfoOverall
+                    ->where('department_info_id' ,'=', $item->id)
+                    ->where('date', '=', $actualDate)
+                    ->first();
+
+                $dayLimit = $routeInfo['sumOfLimits'];
+                $daySuccess = $routeInfo['sumOfActualSuccess'];
+                $wynik = $dayLimit - $daySuccess;
+                $dayCollect->offsetSet($item->name2, $wynik);
+
+                $totalScore += $wynik;
             }
             $isSet = ClientRouteInfo::
             where('date','=',$actualDate)
@@ -1849,7 +1868,7 @@ class CrmRouteController extends Controller
             '5' => 'Piątek',
             '6' => 'Sobota',
             '7' => 'Niedziela'];
-        return $arrayOfWeekName[date('m',strtotime($date))+0];
+        return $arrayOfWeekName[date('N',strtotime($date))+0];
 
     }
 
