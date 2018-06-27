@@ -882,6 +882,9 @@
                $('#typ').select2();
            })();
 
+           /**
+            * This function clear all row selections and disable edit button
+            */
            function clearAllSelections(e) {
                clientRouteInfoIdArr = [];
                arrayOfTableRows = [];
