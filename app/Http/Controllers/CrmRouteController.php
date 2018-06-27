@@ -1788,6 +1788,7 @@ class CrmRouteController extends Controller
         '))
         ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
         ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+        ->where('id_dep_type','=',2)
         ->get();
 
         return view('crmRoute.aheadPlanning')
@@ -1805,10 +1806,11 @@ class CrmRouteController extends Controller
         '))
             ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
             ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->where('id_dep_type','=',2)
             ->get();
 
-        $startDate  = '2018-05-09';
-        $stopDate   = '2018-06-10';
+        $startDate  = $request->startDate;
+        $stopDate   = $request->stopDate;
         $actualDate = $startDate;
         $allInfoCollect = collect();
         while($actualDate != $stopDate){
@@ -1826,8 +1828,9 @@ class CrmRouteController extends Controller
                         ->get();
                 $dayLimit = $routeInfo->sum('limits');
                 $daySuccess = $routeInfo->sum('actual_success');
-                $dayCollect->offsetSet($item->name2,$dayLimit-$daySuccess);
-                $totalScore += 0;
+                $wynik = $dayLimit - $daySuccess;
+                $dayCollect->offsetSet($item->name2,$wynik);
+                $totalScore += $wynik;
             }
             $isSet = ClientRouteInfo::
             where('date','=',$actualDate)
@@ -1853,7 +1856,7 @@ class CrmRouteController extends Controller
             '5' => 'Piątek',
             '6' => 'Sobota',
             '7' => 'Niedziela'];
-        return $arrayOfWeekName[date('m',strtotime($date))+0];
+        return $arrayOfWeekName[date('N',strtotime($date))+0];
 
     }
 
