@@ -168,14 +168,18 @@
            /**
             * This function shows notification.
             */
-           function notify($text$string, $type$string = info) {
+           function notify(htmltext$string, type$string = info, delay$miliseconds$number = 5000) {
                $.notify({
                    // options
-                   message: $text$string
+                   message: htmltext$string
                },{
                    // settings
-                   type: $type$string,
-                   z_index: '100000'
+                   type: type$string,
+                   delay: delay$miliseconds$number,
+                   animate: {
+                       enter: 'animated fadeInRight',
+                       exit: 'animated fadeOutRight'
+                   }
                });
            }
 
@@ -886,18 +890,20 @@
             * This function clear all row selections and disable edit button
             */
            function clearAllSelections(e) {
+
+               if(arrayOfTableRows.length > 0) {
+                   if(document.querySelectorAll('.colorRow')) {
+                       const coloredRows = document.querySelectorAll('.colorRow');
+                       coloredRows.forEach(colorRow => {
+                           colorRow.classList.remove('colorRow');
+                       });
+                       editButton.disabled = true;
+
+                       notify("<strong>Wszystkie zaznaczenia zostały usuniete</strong>", 'success', 4000);
+                   }
+               }
                clientRouteInfoIdArr = [];
                arrayOfTableRows = [];
-
-               if(document.querySelectorAll('.colorRow')) {
-                   const coloredRows = document.querySelectorAll('.colorRow');
-                   coloredRows.forEach(colorRow => {
-                      colorRow.classList.remove('colorRow');
-                   });
-                   editButton.disabled = true;
-
-                   notify("Wszystkie zaznaczenia zostały usuniete", 'success');
-               }
            }
 
            clearButton.addEventListener('click', clearAllSelections);
