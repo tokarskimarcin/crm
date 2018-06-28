@@ -256,6 +256,8 @@ Route::post('/showRoutesDetailedUpdateAjax', 'CrmRouteController@showRoutesDetai
 Route::post('/getClientRouteInfoRecords', 'CrmRouteController@getClientRouteInfoRecords')->name('api.getClientRouteInfoRecords');
 Route::post('/getaHeadPlanningInfo', 'CrmRouteController@getaHeadPlanningInfo')->name('api.getaHeadPlanningInfo');
 
+Route::get('/getPresentationInfo', 'CrmRouteController@getPresentationInfo')->name('api.getPresentationInfo');
+
 /* END CRM-ROUTES AJAX */
 
 /* HR-ROUTES AJAX */
@@ -918,6 +920,7 @@ Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
 
 Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
 
+Route::get('/presentationStatistics', 'CrmRouteController@presentationStatisticsGet');
 
 
 
