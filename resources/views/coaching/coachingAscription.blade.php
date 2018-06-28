@@ -223,9 +223,11 @@
                         return resp;
                     }
                 }).then((response) => {
-                    swal(response.value['title'], response.value['msg'], response.value['type']);
-                    if (response.value['type'] === "success")
-                        tableCoachAscription.ajax.reload();
+                    if(!response.dismiss) {
+                        swal(response.value['title'], response.value['msg'], response.value['type']);
+                        if (response.value['type'] === "success")
+                            tableCoachAscription.ajax.reload();
+                    }
                 });
             }
         });
@@ -250,9 +252,11 @@
                         return resp;
                     }
                 }).then((response) => {
-                    swal(response.value['title'], response.value['msg'], response.value['type']);
-                    if (response.value['type'] === "success")
-                        tableCoachAscription.ajax.reload();
+                    if(!response.dismiss) {
+                        swal(response.value['title'], response.value['msg'], response.value['type']);
+                        if (response.value['type'] === "success")
+                            tableCoachAscription.ajax.reload();
+                    }
                 });
 
             }

@@ -614,18 +614,24 @@
                     '</div>' +
                     '\n' +
                     '<div class="form-group hour_div">' +
-                    '</div>';
-
-
-                if (showNewRoute)
-                    stringAppend +=
-                        '<div class="col-lg-12 button_section button_new_show_section">\n' +
-                        '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
-                        '</div>\n';
-                stringAppend += '</div>';
+                    '</div></div>';
 
                 routeContainer.innerHTML = stringAppend;
+                $(routeContainer).hide();
                 placeToAppend.appendChild(routeContainer);
+                if (showNewRoute) {
+                    buttonStringAppend =
+                        '<div class="row">' +
+                        '<div class="col-lg-12 button_section button_new_show_section">\n' +
+                        '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
+                        '</div>\n' +
+                        '</div>';
+
+                    let newRouteContainer = document.createElement('div');
+                    newRouteContainer.className = 'new-route-container';
+                    newRouteContainer.innerHTML = buttonStringAppend;
+                    placeToAppend.appendChild(newRouteContainer);
+                }
 
             }
 
@@ -857,6 +863,9 @@
                                     $('.city').on('select2:select', function (e) {
                                         setHoursValue(e);
                                     });
+                                    $('.routes-container').slideDown(1000,()=>{
+                                        $("html, body").animate({scrollTop: $(document).height()}, "slow");
+                                    });
                                 }
                             });
                         }
@@ -929,13 +938,7 @@
                     '</div>' +
                     '</div>' +
                     '</div>' +
-                    '\n' +
-                    '<div class="form-group hour_div">' +
-                    '</div>' +
-                    '            <div class="col-lg-12 button_section">\n' +
-                    '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
-                    '            </div>\n' +
-                    '        </div>';
+                    '</div>';
                 newElement.innerHTML = stringAppend;
                 return newElement;
             }
@@ -947,6 +950,19 @@
                     currentDate = basicDate.value; //every time user clicks on manual show creation, date resets
                     let appendPlace = document.querySelector('.route-here');
                     appendPlace.innerHTML = "";
+
+                    buttonStringAppend =
+                        '<div class="row">' +
+                        '<div class="col-lg-12 button_section button_new_show_section">\n' +
+                        '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
+                        '</div>\n' +
+                        '</div>';
+
+                    let newRouteContainer = document.createElement('div');
+                    newRouteContainer.className = 'new-route-container';
+                    newRouteContainer.innerHTML = buttonStringAppend;
+                    appendPlace.appendChild(newRouteContainer);
+
                     let newShow = addNewShow(0, 0); //otrzymujemy nowy formularz z pokazem.
                     removeGlyInFirstShow();
                     $('.city').select2();
@@ -967,15 +983,16 @@
                     //Get lest child of voievoidship
                     let AllVoievoidship = document.getElementsByClassName('voivodeship');
                     let countAllVoievoidship = AllVoievoidship.length;
+                    console.log('countAllVoievoidship:' + countAllVoievoidship);
                     //Get lest child of City
                     let AllCitySelect = document.getElementsByClassName('city');
                     let countAllCitySelect = AllCitySelect.length;
                     let cityId = 0;
                     let voievodeshipId = 0;
 
-                    let thisContainer = e.target.parentNode.parentNode.parentNode;
-                    let dateInput = thisContainer.querySelector('.dateInput'); //we select date input and append its value to currentDate variable
-                    currentDate = dateInput.value;
+                    let thisContainer = $('.routes-container').last();
+                    let dateInput = thisContainer.find('.dateInput').first(); //we select date input and append its value to currentDate variable
+                    currentDate = dateInput.val();
 
                     let validation = true;
                     // Walidacja wybrania
@@ -1067,9 +1084,12 @@
                         showCancelButton: true,
                         confirmButtonClass: "btn-danger",
                         confirmButtonText: "Tak, usuń!",
-                    }).then(() => {
-                        let showContainer = e.target.parentElement.parentElement.parentElement;
-                        removeGivenShow(showContainer);
+
+                    }).then((result) => {
+                        if(result.value) {
+                            let showContainer = e.target.parentElement.parentElement.parentElement;
+                            removeGivenShow(showContainer);
+                        }
                     });
                 }
                 else if (e.target.dataset.refresh == 'refresh') { // click on X glyphicon
@@ -1308,13 +1328,7 @@
                     });
                     let allShows = document.getElementsByClassName('routes-container');
                     let lastShowContainer = allShows[allShows.length - 1];
-                    if (container == lastShowContainer) {
-                        addButtonsToPreviousContainer(container);
-                        container.parentNode.removeChild(container);
-                    }
-                    else {
-                        container.parentNode.removeChild(container);
-                    }
+                        container.remove();
                 });
 
             }
@@ -1333,7 +1347,7 @@
             }
 
             function addNewShow(ajaxResponse, type) {
-                removeButtonsFromLastShow();
+                //removeButtonsFromLastShow();
                 let routePlace = document.querySelector('.route-here');
                 if (type == 0) {
                     var voievodes = @json($voivodes);
@@ -1342,11 +1356,14 @@
                 else {
                     var newShow = createNewShow(ajaxResponse); //otrzymujemy nowy formularz z pokazem.
                 }
-                routePlace.appendChild(newShow);
+                $(newShow).hide();
+                routePlace.insertBefore(newShow, document.querySelector('.new-route-container'));
 
-                activateDatepicker();
+                $(newShow).slideDown(1000,()=>{
+                    activateDatepicker();
+                    $("html, body").animate({scrollTop: $(document).height()}, "slow");
+                });
 
-                $("html, body").animate({scrollTop: $(document).height()}, "slow");
             }
 
             function removeButtonsFromLastShow() {
