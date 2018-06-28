@@ -69,11 +69,21 @@
                                         <tr>
                                             <td>Kamery</td>
                                             <td>{{$item->name}}</td>
+                                            @foreach($allInfo['Wysyłka'][$item->name] as $info)
+                                                @if($info->type == 0)
+                                                    <td>{{$info->amount}}</td>
+                                                @else
+                                                    <td class="sum" data-info="wysylka" data-week="{{$info->week}}">{{$info->amount}}</td>
+                                                @endif
+                                            @endforeach
                                         </tr>
                                     @endforeach
                                     <tr>
                                         <td>Kamery</td>
                                         <td>SUMA DZIEŃ WYSYŁKA</td>
+                                        @foreach($allInfo['Wysyłka']['daySum'] as $info)
+                                                <td>{{$info->daySum}}</td>
+                                        @endforeach
                                     </tr>
                                     <tr>
                                         <td>Kamery</td>
@@ -84,11 +94,22 @@
                                     <tr>
                                         <td>Badania</td>
                                         <td>{{$item->name}}</td>
+                                        @foreach($allInfo['Badania'][$item->name] as $info)
+                                            @if($info->type == 0)
+                                                <td>{{$info->amount}}</td>
+                                            @else
+                                                <td class="sum" data-info="badania" data-week="{{$info->week}}">{{$info->amount}}</td>
+                                            @endif
+
+                                        @endforeach
                                     </tr>
                                 @endforeach
                                 <tr>
                                     <td>Badania</td>
                                     <td>SUMA DZIEŃ BADANIA</td>
+                                    @foreach($allInfo['Badania']['daySum'] as $info)
+                                        <td>{{$info->daySum}}</td>
+                                    @endforeach
                                 </tr>
                                 <tr>
                                     <td>Badania</td>
@@ -113,6 +134,57 @@
 
     <script>
         $(document).ready(function() {
+            /********** GLOBAL VARIABLES ***********/
+                let weeksArray = [];
+                const typeArray = ['badania', 'wysylka'];
+
+            /*******END OF GLOBAL VARIABLES*********/
+
+
+            /**
+             * This function fill weeksArray with weeks Number;
+             */
+            (function fillWeeksArray() {
+                @foreach($clients['Wysyłka'] as $item)
+                    @foreach($allInfo['Wysyłka'][$item->name] as $info)
+                        @if($info->type == 1)
+                            var flag = false;
+                            var weekNumber = {{$info->week}};
+                            weeksArray.forEach(item => {
+                                if(item == weekNumber) {
+                                    flag = true;
+                                }
+                            });
+                            if(flag == false) {
+                                weeksArray.push(weekNumber);
+                            }
+
+                        @endif
+                    @endforeach
+                @endforeach
+            })();
+
+            (function createSums() {
+                let weekSum = 0;
+                typeArray.forEach(type => {
+                   weeksArray.forEach(week => {
+                      const firstSumElement = document.querySelectorAll('[data-week="' + week + '"][data-info="' + type + '"]');
+                      firstSumElement.forEach(element => {
+                         let stringNumber = element.innerText;
+                         let intStringNumber = stringNumber * 1;
+                         weekSum += intStringNumber;
+                      });
+
+                      let lastSumElement = firstSumElement[firstSumElement.length - 1];
+                      let cellIndex = lastSumElement.cellIndex;
+                      let sumElement = lastSumElement.parentElement.nextElementSibling.children[cellIndex];
+                      sumElement.textContent = weekSum;
+
+                      weekSum = 0;
+                   });
+                });
+            })();
+
             $("#fixTable").tableHeadFixer({"head" : false, "left" : 2});
         });
     </script>

@@ -1889,7 +1889,7 @@ class CrmRouteController extends Controller
                 'client.id,
                 client.name,
                 client.type,
-                count(client_route_info.client_route_id),
+                count(client_route_info.client_route_id) as amount,
                 client_route_info.date
                 '))
             ->join('client_route','client_route.client_id','client.id')
@@ -1898,10 +1898,126 @@ class CrmRouteController extends Controller
             ->whereBetween('client_route_info.date',[$split_month[0]->date,$split_month[count($split_month)-1]->date])
             ->groupBy('id','date')
             ->get();
+
         $groupAllInfo = $allInfo->groupBy('type');
         $uniqueClients = $allInfo->unique('name')->groupBy('type');
 
-        dd($uniqueClients);
+        //add last sum item to split_month
+        $sumObj = new \stdClass();
+        $sumObj->date = 'Suma';
+        $sumObj->name = 'Suma';
+        array_push($split_month, $sumObj);
+
+        $clientArr = array();
+        $objectsArr = array();
+
+//        dd($split_month);
+
+        /**
+         * This part is responsible for creating additional arrays of objects to $groupAllInfo. Each array represents all records for given client with amount, date, name.
+         */
+        foreach($groupAllInfo as $item) {
+            $clientCollect = $uniqueClients[$item->first()->type]->pluck('name');
+            $typeArray = array();
+            foreach($clientCollect as $clientList) {
+                $clientArray = array();
+                $weekSum = 0;
+                $weekIterator = 1;
+                $foreachIterator = 0;
+                foreach($split_month as $day) {
+                    if($day->name != 'Suma') {
+                        $insertionsWithClientAndDate = $item->where('date', '=', $day->date)->where('name', '=', $clientList); //wszystkie wpisy z danego dnia dla danego klienta
+                        $dataObject = new \stdClass();
+                        $dataObject->name = $clientList;
+                        $dataObject->date = $day->date;
+                        $dataObject->dayNumber = $day->dayNumber;
+                        $dataObject->week = $weekIterator;
+                        $dataObject->type = 0; // 0 - day data
+
+                        if($insertionsWithClientAndDate->count() == 0) { //jesli nie ma takiego wpisu
+                            $dataObject->amount = 0;
+                        }
+                        else {
+                            $insertionsWithClientAndDate = $insertionsWithClientAndDate->first();
+                            $dataObject->amount = $insertionsWithClientAndDate->amount;
+                        }
+                        $weekSum += $dataObject->amount;
+                        array_push($clientArray, $dataObject);
+                    }
+                    else {
+                        $dataObject = new \stdClass();
+                        $dataObject->name = $clientList;
+                        $dataObject->amount = $weekSum;
+                        $dataObject->type = 1; // 1 - sum
+                        $dataObject->week = $weekIterator;
+
+                        array_push($clientArray, $dataObject);
+                        $weekSum = 0;
+                        $weekIterator++;
+                    }
+
+                    if($foreachIterator == count($split_month)) {
+                        $dataObject = new \stdClass();
+                        $dataObject->name = $clientList;
+                        $dataObject->amount = $weekSum;
+                        $dataObject->type = 1; // 1 - sum
+                        $dataObject->week = $weekIterator;
+
+                        array_push($clientArray, $dataObject);
+                    }
+                    $foreachIterator++;
+                }
+            $item->offsetSet($clientList,$clientArray);
+            }
+        }
+
+
+
+        foreach($groupAllInfo as $group) {
+            $sumArray = array();
+//            dd($group);
+            $clientCollect = $uniqueClients[$group->first()->type]->pluck('name');
+//            dd($clientCollect);
+            $sumAmount = 0;
+            foreach($split_month as $day) {
+//                dd($day);
+                $daySum = 0;
+                if($day->name == "Suma") {
+//                    dd($day);
+                    $sumObject = new \stdClass();
+                    $sumObject->date = 'Suma';
+                    $sumObject->daySum = 0;
+                    array_push($sumArray, $sumObject);
+                }
+                else {
+//                    dd($day);
+                    foreach ($clientCollect as $oneClient) {
+//                        dd($oneClient);
+                        foreach ($group[$oneClient] as $key => $value) {
+//                            dd($group[$oneClient]);
+//                            dd($value->date);
+                            if($value->type == 0) {
+                                if($day->date == $value->date) {
+//                                    dd($value);
+                                        $daySum += $value->amount;
+                                    }
+                                }
+                        }
+
+                    }
+                    $sumObject = new \stdClass();
+                    $sumObject->date = $day->date;
+                    $sumObject->daySum = $daySum;
+                    array_push($sumArray, $sumObject);
+                }
+
+            }
+            $daySumObject = new \stdClass();
+            $group->offsetSet("daySum", $sumArray);
+        }
+
+
+//        dd($groupAllInfo);
         return view('crmRoute.presentationStatistics')
             ->with('clients',$uniqueClients)
             ->with('days',$split_month)
@@ -1911,6 +2027,15 @@ class CrmRouteController extends Controller
     }
 
     public function monthPerWeekDivision($month,$year){
+        $arrayOfWeekName = [
+            '1' => 'Poniedziałek',
+            '2' => 'Wtorek',
+            '3' => 'Środa',
+            '4' => 'Czwartek',
+            '5' => 'Piątek',
+            '6' => 'Sobota',
+            '7' => 'Niedziela'];
+
         $days_in_month = date('t', strtotime($year . '-' . $month));
         $numberOfWeekPreviusMonth = $this::getWeekNumber(date('Y-m-d', strtotime($year.'-'.$month.'-01'. ' - 1 days')));
         $weeks = [];
@@ -1919,10 +2044,23 @@ class CrmRouteController extends Controller
             $date = $year.'-'.$month.'-'.$loop_day;
             $actualWeek = $this::getWeekNumber($date);
             if($actualWeek != $numberOfWeekPreviusMonth){
-                $weeksObj = new \stdClass();
-                $weeksObj->date = $date;
-                $weeksObj->name = $this::getNameOfWeek($date);
-                array_push($weeks,$weeksObj);
+                foreach($arrayOfWeekName as $key => $value) {
+                    if($value == $this::getNameOfWeek($date)) {
+                        $weeksObj = new \stdClass();
+                        $weeksObj->date = $date;
+                        $weeksObj->name = $this::getNameOfWeek($date);
+                        $weeksObj->dayNumber = $key;
+                        array_push($weeks,$weeksObj);
+
+                        // czy niedziela
+                        if($weeksObj->name == $arrayOfWeekName[7]) {
+                            $sumObj = new \stdClass();
+                            $sumObj->date = 'Suma';
+                            $sumObj->name = 'Suma';
+                            array_push($weeks, $sumObj);
+                        }
+                    }
+                }
             }
         }
         $lastNumberOfWeek = $actualWeek;
@@ -1933,10 +2071,15 @@ class CrmRouteController extends Controller
             $date = date('Y-m',strtotime($dateNextMonth)).'-'.$loop_day;
             $actualWeek = $this::getWeekNumber($date);
             if($actualWeek == $lastNumberOfWeek){
-                $weeksObj = new \stdClass();
-                $weeksObj->date = $date;
-                $weeksObj->name = $this::getNameOfWeek($date);
-                array_push($weeks,$weeksObj);
+                foreach($arrayOfWeekName as $key => $value) {
+                    if($value == $this::getNameOfWeek($date)) {
+                        $weeksObj = new \stdClass();
+                        $weeksObj->date = $date;
+                        $weeksObj->name = $this::getNameOfWeek($date);
+                        $weeksObj->dayNumber = $key;
+                        array_push($weeks,$weeksObj);
+                    }
+                }
             }else{
                 break;
             }
