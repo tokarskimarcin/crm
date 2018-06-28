@@ -117,6 +117,14 @@
         document.addEventListener('DOMContentLoaded', function(mainEvent) {
             /********** GLOBAL VARIABLES ***********/
             const modalCloseButton = document.querySelector('#modal-close-button');
+            const now = new Date();
+            const day = ("0" + now.getDate()).slice(-2);
+            const month = ("0" + (now.getMonth() + 1)).slice(-2);
+            const today = now.getFullYear() + "-" + (month) + "-" + (day);
+            const firstDayOfThisMonth = now.getFullYear() + "-" + (month) + "-01";
+            const dateStart = $("#date_start");
+            const dateStop = $('#date_stop');
+            // toDate.val(today);
             /*******END OF GLOBAL VARIABLES*********/
 
             $('.form_date').datetimepicker({
@@ -125,6 +133,8 @@
                 minView : 2,
                 pickTime: false,
             });
+
+            dateStart.val(firstDayOfThisMonth);
 
             table = $('#datatable').DataTable({
                 "autoWidth": true,
@@ -228,13 +238,11 @@
                 const url = `{{route('api.getClientRouteInfoRecords')}}`;
                 const ourHeaders = new Headers();
                 ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
-                const dateStart = $("#date_start").val();
-                const dateStop = $('#date_stop').val();
 
                 const data = new FormData();
                 data.append('cityId', cityId);
-                data.append('dateStart', dateStart);
-                data.append('dateStop', dateStop);
+                data.append('dateStart', dateStart.val());
+                data.append('dateStop', dateStop.val());
 
                 fetch(url, {
                     method: 'post',
