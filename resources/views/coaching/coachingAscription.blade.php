@@ -119,7 +119,7 @@
                     </div>
                     <div id="revertbtns">
                         <div class="panel-body">
-                            <table id='tableCoachAscription' class="table table-striped cell-border hover order-column row-border" style="width:100%">
+                            <table id='tableCoachAscription' class="table table-striped hover order-column row-border" style="width:100%">
                                 <thead>
                                 <tr>
                                     <th>Trener prowadzący</th>
@@ -156,6 +156,10 @@
 @section('script')
     <script>
         let tableCoachAscription = null;
+
+        $('#menu-toggle').change(()=>{
+            tableCoachAscription.columns.adjust().draw();
+        });
         $(document).ready(function () {
             tableCoachAscription = $('#tableCoachAscription').DataTable({
                 "autoWidth": true,
@@ -184,11 +188,11 @@
                     {"data": "created_at"},
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<button class="btn btn-info" type="submit" id="revertbtn_' +
+                            return '<button class="btn btn-default btn-block" type="submit" id="revertbtn_' +
                                 data.id +
                                 '" name="coach_director_change_id" value="' +
                                 data.id +
-                                '" data-type="revert_button">Cofnij</button>';
+                                '" data-type="revert_button"><span class="glyphicon glyphicon-repeat"></span></button>';
                         }, "name": "id", "orderable": false, "searchable": false
                     }
                 ]

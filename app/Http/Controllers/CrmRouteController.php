@@ -500,7 +500,6 @@ class CrmRouteController extends Controller
 //        $newEmptyClient->
         return datatables($client_route_info)->make(true);
     }
-
     /**
      * @param showAllClients(true/false/null), showOnlyAssigned(true/false/null), id(number/null), selectedWeek(number), year(number), typ(number), state(number)
      * This method return data about all client routes to datatable in showClientRoutes
@@ -548,9 +547,15 @@ class CrmRouteController extends Controller
 
         $fullArray = [];
         foreach($client_route_ids as $client_route_id){
-            $client_routes= [];
-            foreach($client_route_info->where('client_route_id','=',$client_route_id)->sortBy('date') as $client_route){
-                array_push($client_routes, $client_route);
+            $grouped_by_day_client_routes= [];
+            foreach($client_route_info->where('client_route_id','=',$client_route_id)->sortBy('date')->groupBy('date') as $client_route_day){
+                array_push($grouped_by_day_client_routes, $client_route_day);
+            }
+            $client_routes = [];
+            foreach($grouped_by_day_client_routes as $client_route_day){
+                foreach ($client_route_day->sortBy('hour') as $client_route){
+                    array_push($client_routes, $client_route);
+                }
             }
             $route_name = $client_routes[0]->cityName;
             $hourOrHotelUnassigned = $client_routes[0]->hour == null || $client_routes[0]->hotel_id == null ? false : true;

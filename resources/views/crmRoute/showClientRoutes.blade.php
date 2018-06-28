@@ -51,9 +51,11 @@
                                 Moduł podgląd tras pozwala na podgląd kampanii oraz zarządzanie nimi. Tabelę z
                                 kampaniami można filtrować dostępnymi polami jak również wyszukiwać poszczególnych fraz
                                 w polu "Szukaj". Kampanie dzielą się na: </br>
-                                <strong>Nie gotowe</strong>, oznaczone kolorem <span style="background: #ffc6c6;"> Czerwonym</span> </br>
-                                <strong>Aktywne</strong>, oznaczone kolorem <span style="background: #c3d6f4;">Niebieskim</span> </br>
-                                <strong>Zakończone</strong>, oznaczone kolorem <span style="background: #b9f7b9;">Zielonym</span>
+                                <ul class="list-group">
+                                    <li class="list-group-item"><strong>Nie gotowe</strong>, oznaczone przyciskiem <button class="btn btn-success">Aktywuj kampanie</button></li>
+                                    <li class="list-group-item"><strong>Aktywne</strong>, oznaczone przyciskiem <button class="btn btn-warning">Zakończ kampanię</button> </li>
+                                    <li class="list-group-item"><strong>Zakończone</strong>, oznaczone przyciskiem <button class="btn btn-primary">Trasa niegotowa</button> </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -142,24 +144,29 @@
                     </div>
 
                     <div class="row">
-                        <table id="datatable2" class="thead-inverse table " cellspacing="0" width="100%">
-                            <thead>
-                            <tr>
-                                <th>Tydzień</th>
-                                <th>Klient</th>
-                                <th>Data I pokazu</th>
-                                <th>Trasa</th>
-                                <th>Przypisany hotel i godziny</th>
-                                <th>Status kampanii</th>
-                                <th>Edycja (Hoteli i godzin)</th>
-                                <th>Edycja (Trasy)</th>
-                                <th>Edycja parametrów (Kampanii)</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                        <div class="col-md-12">
+                            <table id="datatable2" class="thead-inverse table table-striped row-border" cellspacing="0" width="100%">
+                                <thead>
+                                <tr>
+                                    <th>Tydzień</th>
+                                    <th>Klient</th>
+                                    <th>Data I pokazu</th>
+                                    <th>Trasa</th>
+                                    <th>Przypisany hotel i godziny</th>
+                                    <th>Status kampanii</th>
+                                    <th>Edycja (Hoteli i godzin)</th>
+                                    <th>Edycja (Trasy)</th>
+                                    <th>Edycja parametrów (Kampanii)</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+
+                    <button type="button" id='dostosuj' class="btn btn-default">Dostosuj
+                    </button>
 
                 </div>
             </div>
@@ -205,6 +212,10 @@
 @section('script')
     <script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>
     <script>
+
+        $('#menu-toggle').change(()=>{
+            table2.columns.adjust().draw();
+        });
         function saveOptions(e) {
             let allRow = document.getElementsByClassName('campainsOption');
             let arrayOfObject = new Array();
@@ -462,6 +473,8 @@
                 processing: true,
                 serverSide: true,
                 fixedHeader: true,
+                scrollY: '45vh',
+                scrollX: true,
                 fnDrawCallback: function (settings) {
                     objectArr = [];
                     $('.action-buttons-0').click(actionButtonHandler);
@@ -499,8 +512,7 @@
                         sessionStorage.removeItem('search');
                         table2.ajax.reload();
                     }
-
-                    if (data.status == 0) {
+                    /*if (data.status == 0) {
                         row.style.backgroundColor = "#ffc6c6";
                     }
                     else if (data.status == 2) {
@@ -508,7 +520,7 @@
                     }
                     else {
                         row.style.backgroundColor = "#b3c7f4";
-                    }
+                    }*/
                     $(row).attr('id', "clientRouteInfoId_" + data.client_route_id);
                     return row;
                 },
@@ -561,7 +573,7 @@
                                 return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-success action-buttons-0" style="width:100%">Aktywuj kampanie</button>';
                             }
                             else if (data.status == 2) {
-                                return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-primary action-buttons-2" style="width:100%">Trasa nie gotowa</button>';
+                                return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-primary action-buttons-2" style="width:100%">Trasa niegotowa</button>';
                             }
                             else {
                                 return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-warning action-buttons-1" style="width:100%">Zakończ kampanie</button>';
@@ -571,18 +583,18 @@
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
-                        }, "name": "link"
+                            return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '"><button class="btn btn-default btn-block"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></button></a>';
+                        }, "name": "link", width: '10%'
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.client_route_id + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
-                        }, "name": "link"
+                            return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.client_route_id + '"><button class="btn btn-default btn-block"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></button></a>';
+                        }, "name": "link", width: '10%'
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<span style="font-size: 2.1em;" class="glyphicon glyphicon-edit show-modal-with-data" data-route_id ="' + data.client_route_id + '" ></span>';
-                        }, "name": "link"
+                            return '<button class="btn btn-default btn-block show-modal-with-data"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit " data-route_id ="' + data.client_route_id + '" ></span></button>';
+                        }, "name": "link", width: '10%'
 
                     }
                 ]
@@ -766,6 +778,7 @@
              * This function sets input values from sessionStorage
              */
             (function setValuesFromSessionStorage() {
+                let somethingChanged = false;
                 if (sessionStorage.getItem('addnotation')) {
                     const adnotation = sessionStorage.getItem('addnotation');
 
@@ -782,6 +795,7 @@
                 const yearInput = document.querySelector('#year');
                 if (sessionStorage.getItem('year')) {
                     const year = sessionStorage.getItem('year');
+                    somethingChanged = year !== '0' ? true : somethingChanged;
                     for (let i = 0; i < yearInput.length; i++) {
                         if (yearInput[i].value == year) {
                             yearInput[i].selected = true;
@@ -794,6 +808,7 @@
                 const weekNumber = document.querySelector('#weekNumber');
                 if (sessionStorage.getItem('weekNumber')) {
                     const week = sessionStorage.getItem('weekNumber');
+                    somethingChanged = week !== '0' ? true : somethingChanged;
                     for (let i = 0; i < weekNumber.length; i++) {
                         if (weekNumber[i].value == week) {
                             weekNumber[i].selected = true;
@@ -806,6 +821,7 @@
                 const type = document.querySelector('#type');
                 if (sessionStorage.getItem('type')) {
                     const typ = sessionStorage.getItem('type');
+                    somethingChanged = typ !== '0' ? true : somethingChanged;
                     for (let i = 0; i < type.length; i++) {
                         if (type[i].value == typ) {
                             type[i].selected = true;
@@ -817,6 +833,7 @@
                 const campaignState = document.querySelector('#campaignState');
                 if (sessionStorage.getItem('campaignState')) {
                     const state = sessionStorage.getItem('campaignState');
+                    somethingChanged = state !== '-1' ? true : somethingChanged;
                     for (let i = 0; i < campaignState.length; i++) {
                         if (campaignState[i].value == state) {
                             campaignState[i].selected = true;
@@ -828,6 +845,7 @@
                 let showAllClientsCheckbox = document.querySelector('#showAllClients');
                 if (sessionStorage.getItem('showAllClients')) {
                     const isChecked = sessionStorage.getItem('showAllClients');
+                    somethingChanged = isChecked === 'true' ? true : somethingChanged;
                     if (isChecked == 'false') {
                         showAllClientsCheckbox.checked = false;
                     }
@@ -839,6 +857,7 @@
 
                 if (sessionStorage.getItem('showOnlyAssigned')) {
                     const isChecked = sessionStorage.getItem('showOnlyAssigned');
+                    somethingChanged = isChecked === 'true' ? true : somethingChanged;
                     if (isChecked == 'false') {
                         showOnlyAssignedInput.prop('checked', false);
                     }
@@ -847,8 +866,9 @@
                     }
                     sessionStorage.removeItem('showOnlyAssigned');
                 }
-
-                table2.ajax.reload();
+                if(somethingChanged) {
+                    table2.ajax.reload();
+                }
             })();
 
             showAllClientsInput.change(showAllClientsInputHandler);
