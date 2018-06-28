@@ -142,7 +142,7 @@
                     </div>
 
                     <div class="row">
-                        <table id="datatable2" class="thead-inverse table table-bordered" cellspacing="0" width="100%">
+                        <table id="datatable2" class="thead-inverse table " cellspacing="0" width="100%">
                             <thead>
                             <tr>
                                 <th>Tydzień</th>
@@ -285,11 +285,11 @@
             const showOnlyAssignedInput = $('#showOnlyAssigned');
             const showAllClientsInput = $('#showAllClients');
             const selectedWeekInput = $('#weekNumber');
-            let id = null; //after user click on 1st table row, it assing clientRouteId to this variable
+            let id = -1; //after user click on 1st table row, it assing clientRouteId to this variable
             let rowIterator = null;
             // let colorIterator = 0;
-            let showAllClients = null; //this variable indices whether checkbox "Pokaż wszystkich klientó" is checked
-            let showOnlyAssigned = null; //This variable indices whether checkbox "Pokaż tylko trasy bez przypisanego hotelu lub godziny" is checked
+            // let showAllClients = null; //this variable indices whether checkbox "Pokaż wszystkich klientó" is checked
+            // let showOnlyAssigned = null; //This variable indices whether checkbox "Pokaż tylko trasy bez przypisanego hotelu lub godziny" is checked
             // let colorArr = ['#e1e4ea', '#81a3ef', '#5a87ed', '#b2f4b8', '#6ee578', '#e1acef', '#c54ae8'];
             let objectArr = [];
 
@@ -317,9 +317,9 @@
                         '                                                <th>Miasto</th>\n' +
                         '                                                <th>Hotel</th>\n' +
                         '                                                <th>Oddział</th>\n' +
-                        '                                                <th style="width: 10%">Limit</th>\n' +/*
+                        '                                                <th style="width: 10%">Limit</th>\n' + /*
                         '                                                <th>Nr kampanii (PBX)</th>\n' +*/
-                            '                                            </thead>'+
+                        '                                            </thead>' +
                         '                                                <tbody>\n';
 
                     for (var j = 0; j < response[i].length; j++) {
@@ -346,7 +346,7 @@
                         content += ' </select>\n' +
                             '                                                    </td>\n' +
                             '                                                    <td class="optionLimit"><input class="form-control" type="number" value="' + response[i][j].limit + '"></td>\n' +
-                                /*'<td class="nrPBX"><input class="form-control" type="text" value="'+1+'"></td>'+*/
+                            /*'<td class="nrPBX"><input class="form-control" type="text" value="'+1+'"></td>'+*/
                             '                                                </tr>\n';
                     }
                     content += '                                                </tbody>\n' +
@@ -361,9 +361,9 @@
                 routeContainer.innerHTML = content;
                 placeToAppend.appendChild(routeContainer);
 
-               /* $('.table-modal td.nrPBX > input')
-                    .change((e)=>{changeRowsValueOfTable(e)})
-                    .blur((e)=>{changeRowsValueOfTable(e)});*/
+                /* $('.table-modal td.nrPBX > input')
+                     .change((e)=>{changeRowsValueOfTable(e)})
+                     .blur((e)=>{changeRowsValueOfTable(e)});*/
                 /*$('.table-modal td.nrPBX > input').keyup((e)=>{
                     if(!$.isNumeric(e.target.value)){
                         e.target.value = parseInt(e.target.value);
@@ -372,19 +372,19 @@
                 });*/
             }
 
-            function changeRowsValueOfTable(e){
-                if(!$.isNumeric(e.target.value) || e.target.value !== "Brak"){
+            function changeRowsValueOfTable(e) {
+                if (!$.isNumeric(e.target.value) || e.target.value !== "Brak") {
                     e.target.value = parseInt(e.target.value);
-                    if(e.target.value === "NaN")
+                    if (e.target.value === "NaN")
                         e.target.value = "Brak";
                 }
                 let changedInput = $(e.target);
                 let tableChangedRow = changedInput.parent().parent();
                 let cityNameOfChangedRow = tableChangedRow.find(".cityName").text();
                 let tableContainingChangedInput = changedInput.parents().has('table').first().find('table');
-                let tableRowsToChange = tableContainingChangedInput.find('tr[id!='+tableChangedRow.prop("id")+']').has('.cityName:contains('+cityNameOfChangedRow+')');
+                let tableRowsToChange = tableContainingChangedInput.find('tr[id!=' + tableChangedRow.prop("id") + ']').has('.cityName:contains(' + cityNameOfChangedRow + ')');
                 let inputsToChange = tableRowsToChange.find('.nrPBX > input');
-                inputsToChange.each(function (){
+                inputsToChange.each(function () {
                     $(this).val(e.target.value);
                 });
             }
@@ -399,15 +399,14 @@
                     $(row).attr('id', "client_" + data.id);
                     return row;
                 }, "fnDrawCallback": function (settings) {
-                    $('#datatable tbody tr').click( function () {
-                        if (showAllClients === true) { //all clients checkbox = true + selecting one client
-                            showAllClientsInput.checked = false;
-                            showAllClients = false;
+                    $('#datatable tbody tr').click(function () {
+                        if (showAllClientsInput.prop('checked') === true) { //all clients checkbox = true + selecting one client
+                            showAllClientsInput.prop('checked', false)
                         }
                         test = $(this).closest('table');
                         if ($(this).hasClass('check')) {
                             $(this).removeClass('check');
-                            id = null;
+                            id = -1;
                         }
                         else {
                             test.find('tr.check').removeClass('check');
@@ -426,11 +425,11 @@
 
                         table2.ajax.reload();
                     });
-                    if(sessionStorage.getItem('idOfClient')) {
+                    if (sessionStorage.getItem('idOfClient')) {
                         let idOfClient = sessionStorage.getItem('idOfClient');
                         const allClientsInTable = document.querySelectorAll('#datatable tr');
                         allClientsInTable.forEach(client => {
-                            if(client.id == idOfClient) {
+                            if (client.id == idOfClient) {
                                 client.classList.add('check');
                                 const clientIdNotTrimmed = client.id;
                                 indexOfUnderscore = clientIdNotTrimmed.lastIndexOf('_');
@@ -443,8 +442,6 @@
                 }, "ajax": {
                     'url': "{{route('api.getClientRoutes')}}",
                     'type': 'POST',
-                    'data': function (d) {
-                    },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
                 "language": {
@@ -492,47 +489,10 @@
                                 $('#myModal').modal('show');
                             }
                         });
-                        /*swal({
-                            showCancelButton: false,
-                            onOpen: () => {
-                                swal.showLoading();
-                                swal.clickConfirm();
-                            },
-                            preConfirm: ()=>{
-                                let selectTR = e.currentTarget.parentNode.parentNode;
-                                let routeId = $(selectTR).closest('tr').prop('id');
-                                routeId = routeId.split('_');
-                                routeId = routeId[1];
-                                let resp = null;
-                                $.ajax({
-                                    type: "POST",
-                                    url: '{{--{{ route('api.getReadyRoute') }}--}}',
-                                    data: {
-                                        "route_id": routeId
-                                    },
-                                    headers: {
-                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                    },
-                                    success: function (response) {
-                                        resp = response;
-                                    },
-                                    error: function () {
-                                        resp = response;
-                                    }
-                                });
-                                return resp;
-                            }
-                        }).then((result)=>{
-                            console.leg
-                            let placeToAppend = document.querySelector('#insertModalHere');
-                            placeToAppend.innerHTML = '';
-                            createModalContent(result, placeToAppend);
-                            //$('#myModal').modal('show');
-                        });*/
                     });
                 },
                 "rowCallback": function (row, data, index) {
-                    if(sessionStorage.getItem('search')) {
+                    if (sessionStorage.getItem('search')) {
                         let searchBox = document.querySelector('input[type="search"][aria-controls="datatable2"]');
                         let searchInfo = sessionStorage.getItem('search');
                         searchBox.value = searchInfo;
@@ -549,7 +509,7 @@
                     else {
                         row.style.backgroundColor = "#b3c7f4";
                     }
-                    $(row).attr('id', "clientRouteInfoId_" + data.clientRouteId);
+                    $(row).attr('id', "clientRouteInfoId_" + data.client_route_id);
                     return row;
                 },
                 ajax: {
@@ -557,12 +517,12 @@
                     'type': 'POST',
                     'data': function (d) {
                         d.id = id;
-                        d.showAllClients = showAllClientsInput.val();
-                        d.showOnlyAssigned = showOnlyAssignedInput.val();
+                        d.showOnlyAssigned = showOnlyAssignedInput.prop('checked');
                         d.year = yearInput.val();
                         d.selectedWeek = selectedWeekInput.val();
                         d.typ = typInput.val();
                         d.state = stateInput.val();
+                        console.log('datatable2');
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -572,28 +532,31 @@
                 columns: [
                     {"data": "weekOfYear"},
                     {"data": "clientName"},
-                    {"data": "minDate"},
-                    {"data": function (data, type, dataToSet) {
+                    {"data": "date"},
+                    {
+                        "data": function (data, type, dataToSet) {
                             let finalName = '';
-                            if (data.typ == '1') {
-                                finalName = data.clientRouteName + ' (W)';
+                            if (data.type == '1') {
+                                finalName = data.route_name + ' (W)';
                             }
                             else {
-                                finalName = data.clientRouteName + ' (B)';
+                                finalName = data.route_name + ' (B)';
                             }
                             return finalName;
                         }, "name": "clientRouteName"
                     },
-                    {"data": function (data, type, dataToSet) {
-                            if (data.haveHotel != '0' && data.hour != 'nie') {
+                    {
+                        "data": function (data, type, dataToSet) {
+                            if (data.hotelOrHour) {
                                 return '<span style="color: darkgreen;">Tak</span>';
                             }
                             else {
                                 return '<span style="color: red;">Nie</span>';
                             }
-                        }, "name": "hotelName"
+                        }, "name": "hotelOrHour"
                     },
-                    {"data": function (data, type, dataToSet) {
+                    {
+                        "data": function (data, type, dataToSet) {
                             if (data.status == 0) {
                                 return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-success action-buttons-0" style="width:100%">Aktywuj kampanie</button>';
                             }
@@ -606,16 +569,19 @@
 
                         }, "name": "acceptRoute"
                     },
-                    {"data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("/specificRoute")}}/' + data.clientRouteId + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
                         }, "name": "link"
                     },
-                    {"data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.clientRouteId + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.client_route_id + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
                         }, "name": "link"
                     },
-                    {"data": function (data, type, dataToSet) {
-                            return '<span style="font-size: 2.1em;" class="glyphicon glyphicon-edit show-modal-with-data" data-route_id ="' + data.clientRouteId + '" ></span>';
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return '<span style="font-size: 2.1em;" class="glyphicon glyphicon-edit show-modal-with-data" data-route_id ="' + data.client_route_id + '" ></span>';
                         }, "name": "link"
 
                     }
@@ -627,30 +593,8 @@
                 // console.assert(checkedRow, "Brak podswietlonego wiersza");
                 if (checkedRow) { //remove row higlight and reset id variable
                     checkedRow.classList.remove('check');
-                    id = null;
+                    id = -1;
                 }
-
-                if (e.target.checked === true) {
-                    showAllClients = true;
-                }
-                else {
-                    showAllClients = false;
-                }
-                table2.ajax.reload();
-            }
-
-            function showOnlyAssignedHandler(e) {
-                if (e.target.checked === true) {
-                    showOnlyAssigned = true;
-                }
-                else {
-                    showOnlyAssigned = false;
-                }
-                table2.ajax.reload();
-            }
-
-            function selectedWeekHandler(e) {
-                selectedWeek = e.target.value;
                 table2.ajax.reload();
             }
 
@@ -768,7 +712,6 @@
                     })
                         .then(response => response.json())
                         .then(response => {
-                            console.log(response);
                             const weeksInYear = response;
                             selectedWeekInput.innerHTML = '';
                             const basicOptionElement = document.createElement('option');
@@ -803,13 +746,13 @@
                 const showAllClientsCheckbox = document.querySelector('#showAllClients');
                 const showOnlyAssignedCheckbox = document.querySelector('#showOnlyAssigned');
 
-                if(document.querySelector('.check')) {
+                if (document.querySelector('.check')) {
                     let idOfClient = document.querySelector('.check').id;
-                    sessionStorage.setItem('idOfClient',idOfClient);
+                    sessionStorage.setItem('idOfClient', idOfClient);
                 }
 
                 const searchBox = document.querySelector('input[type="search"][aria-controls="datatable2"');
-                sessionStorage.setItem('search',searchBox.value);
+                sessionStorage.setItem('search', searchBox.value);
 
                 sessionStorage.setItem('year', yearInput.options[yearInput.selectedIndex].value);
                 sessionStorage.setItem('weekNumber', weekNumber.options[weekNumber.selectedIndex].value);
@@ -823,13 +766,13 @@
              * This function sets input values from sessionStorage
              */
             (function setValuesFromSessionStorage() {
-                if(sessionStorage.getItem('addnotation')) {
+                if (sessionStorage.getItem('addnotation')) {
                     const adnotation = sessionStorage.getItem('addnotation');
 
                     $.notify({
                         // options
                         message: adnotation
-                    },{
+                    }, {
                         // settings
                         type: 'success'
                     });
@@ -837,10 +780,10 @@
                 }
 
                 const yearInput = document.querySelector('#year');
-                if(sessionStorage.getItem('year')) {
+                if (sessionStorage.getItem('year')) {
                     const year = sessionStorage.getItem('year');
-                    for(let i = 0; i < yearInput.length; i++) {
-                        if(yearInput[i].value == year) {
+                    for (let i = 0; i < yearInput.length; i++) {
+                        if (yearInput[i].value == year) {
                             yearInput[i].selected = true;
                         }
                     }
@@ -849,10 +792,10 @@
 
 
                 const weekNumber = document.querySelector('#weekNumber');
-                if(sessionStorage.getItem('weekNumber')) {
+                if (sessionStorage.getItem('weekNumber')) {
                     const week = sessionStorage.getItem('weekNumber');
-                    for(let i = 0; i < weekNumber.length; i++) {
-                        if(weekNumber[i].value == week) {
+                    for (let i = 0; i < weekNumber.length; i++) {
+                        if (weekNumber[i].value == week) {
                             weekNumber[i].selected = true;
                             selectedWeek = weekNumber[i].value;
                         }
@@ -861,10 +804,10 @@
                 }
 
                 const type = document.querySelector('#type');
-                if(sessionStorage.getItem('type')) {
+                if (sessionStorage.getItem('type')) {
                     const typ = sessionStorage.getItem('type');
-                    for(let i = 0; i < type.length; i++) {
-                        if(type[i].value == typ) {
+                    for (let i = 0; i < type.length; i++) {
+                        if (type[i].value == typ) {
                             type[i].selected = true;
                         }
                     }
@@ -872,10 +815,10 @@
                 }
 
                 const campaignState = document.querySelector('#campaignState');
-                if(sessionStorage.getItem('campaignState')) {
+                if (sessionStorage.getItem('campaignState')) {
                     const state = sessionStorage.getItem('campaignState');
-                    for(let i = 0; i < campaignState.length; i++) {
-                        if(campaignState[i].value == state) {
+                    for (let i = 0; i < campaignState.length; i++) {
+                        if (campaignState[i].value == state) {
                             campaignState[i].selected = true;
                         }
                     }
@@ -883,30 +826,25 @@
                 }
 
                 let showAllClientsCheckbox = document.querySelector('#showAllClients');
-                if(sessionStorage.getItem('showAllClients')) {
+                if (sessionStorage.getItem('showAllClients')) {
                     const isChecked = sessionStorage.getItem('showAllClients');
-                    if(isChecked == 'false') {
+                    if (isChecked == 'false') {
                         showAllClientsCheckbox.checked = false;
                     }
                     else {
                         showAllClientsCheckbox.checked = true;
                     }
-                    showAllClients = isChecked; //global variable
-                    console.log(showAllClients);
                     sessionStorage.removeItem('showAllClients');
                 }
 
-                let showOnlyAssignedCheckbox = document.querySelector('#showOnlyAssigned');
-                if(sessionStorage.getItem('showOnlyAssigned')) {
+                if (sessionStorage.getItem('showOnlyAssigned')) {
                     const isChecked = sessionStorage.getItem('showOnlyAssigned');
-                    if(isChecked == 'false') {
-                        showOnlyAssignedCheckbox.checked = false;
+                    if (isChecked == 'false') {
+                        showOnlyAssignedInput.prop('checked', false);
                     }
                     else {
-                        showOnlyAssignedCheckbox.checked = true;
+                        showOnlyAssignedInput.prop('checked', true);
                     }
-
-                    showOnlyAssigned = isChecked; //global variable
                     sessionStorage.removeItem('showOnlyAssigned');
                 }
 
@@ -914,12 +852,20 @@
             })();
 
             showAllClientsInput.change(showAllClientsInputHandler);
-            showOnlyAssignedInput.change(()=>{table2.ajax.reload();});
-            selectedWeekInput.change(()=>{table2.ajax.reload();});
+            showOnlyAssignedInput.change(() => {
+                table2.ajax.reload();
+            });
+            selectedWeekInput.change(() => {
+                table2.ajax.reload();
+            });
 
             yearInput.change(yearHandler);
-            typInput.change(()=>{table2.ajax.reload();});
-            stateInput.change(()=>{table2.ajax.reload();});
+            typInput.change(() => {
+                table2.ajax.reload();
+            });
+            stateInput.change(() => {
+                table2.ajax.reload();
+            });
 
             window.addEventListener('pagehide', setItemsToSeessionStorage);
 
