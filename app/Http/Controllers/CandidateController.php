@@ -34,7 +34,11 @@ class CandidateController extends Controller
 
         $data = DB::table('candidate')
             ->select(DB::raw('
-                candidate.*,
+                candidate.id,
+                candidate.first_name,
+                candidate.last_name,
+                candidate.phone,
+                candidate.created_at,
                 users.first_name as cadre_name,
                 users.last_name as cadre_surname,
                 attempt_status.name as attempt_name

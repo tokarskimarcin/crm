@@ -37,7 +37,7 @@
                     <select class="form-control" name="selected_dep">
                             @foreach($directors as $director)
                                 <option
-                                    @if($wiev_type == 'director' && ('10' . $director->id == $dep_id)) selected @endif
+                                    @if($wiev_type == 'director' && ('10' . $director->id == $selectDirector)) selected @endif
                                 value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
                             @endforeach
                     </select>

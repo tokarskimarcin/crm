@@ -15,6 +15,7 @@ use App\PbxCrmInfo;
 use App\Route;
 use App\RouteInfo;
 use App\Voivodes;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -1765,6 +1766,7 @@ class CrmRouteController extends Controller
         '))
         ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
         ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+        ->where('id_dep_type','=',2)
         ->get();
 
         return view('crmRoute.aheadPlanning')
@@ -1782,12 +1784,23 @@ class CrmRouteController extends Controller
         '))
             ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
             ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->where('id_dep_type','=',2)
             ->get();
 
-        $startDate  = '2018-05-09';
-        $stopDate   = '2018-06-10';
+        $startDate  = $request->startDate;
+        $stopDate   = $request->stopDate;
         $actualDate = $startDate;
         $allInfoCollect = collect();
+
+        $routeInfoOverall = ClientRouteInfo::select(DB::raw('
+            date,
+            department_info_id,
+            SUM(limits) as sumOfLimits,
+            SUM(actual_success) as sumOfActualSuccess
+        '))
+            ->groupBy('date', 'department_info_id')
+            ->get();
+
         while($actualDate != $stopDate){
             $dayCollect = collect();
             $dayCollect->offsetSet('numberOfWeek',date('W',strtotime($actualDate)));
@@ -1796,15 +1809,17 @@ class CrmRouteController extends Controller
             $totalScore = 0;
             $allSet = true;
             foreach ($departmentInfo as $item){
-                $routeInfo =
-                    ClientRouteInfo::
-                    where('date','=',$actualDate)
-                        ->where('department_info_id','=',$item->id)
-                        ->get();
-                $dayLimit = $routeInfo->sum('limits');
-                $daySuccess = $routeInfo->sum('actual_success');
-                $dayCollect->offsetSet($item->name2,$dayLimit-$daySuccess);
-                $totalScore += 0;
+                $routeInfo = $routeInfoOverall
+                    ->where('department_info_id' ,'=', $item->id)
+                    ->where('date', '=', $actualDate)
+                    ->first();
+
+                $dayLimit = $routeInfo['sumOfLimits'];
+                $daySuccess = $routeInfo['sumOfActualSuccess'];
+                $wynik = $dayLimit - $daySuccess;
+                $dayCollect->offsetSet($item->name2, $wynik);
+
+                $totalScore += $wynik;
             }
             $isSet = ClientRouteInfo::
             where('date','=',$actualDate)
@@ -1830,8 +1845,110 @@ class CrmRouteController extends Controller
             '5' => 'Piątek',
             '6' => 'Sobota',
             '7' => 'Niedziela'];
-        return $arrayOfWeekName[date('m',strtotime($date))+0];
+        return $arrayOfWeekName[date('N',strtotime($date))+0];
 
     }
 
+    public function presentationStatisticsGet()
+    {
+        $actualMonth = date('Y-m');
+        $actualClientsId = ClientRouteInfo::
+            join('client_route','client_route.id','client_route_info.client_route_id')
+            ->where('date','like',$actualMonth.'%')
+            ->groupBy('client_route.client_id')
+            ->get()
+            ->pluck('client_id')->toArray();
+        $date = new DateTime(date('Y-m').'-01');
+        $week = $date->format("W");
+        //Pobranie równych czterech tygodni
+        $split_month = $this->monthPerWeekDivision(date('m'),date('Y'));
+        $allInfo = Clients::select(DB::raw(
+                'client.id,
+                client.name,
+                client.type,
+                count(client_route_info.client_route_id),
+                client_route_info.date
+                '))
+            ->join('client_route','client_route.client_id','client.id')
+            ->join('client_route_info','client_route_info.client_route_id','client_route.id')
+            ->whereIn('client.id',$actualClientsId)
+            ->whereBetween('client_route_info.date',[$split_month[0]->date,$split_month[count($split_month)-1]->date])
+            ->groupBy('id','date')
+            ->get();
+        $groupAllInfo = $allInfo->groupBy('type');
+        $uniqueClients = $allInfo->unique('name')->groupBy('type');
+
+        dd($uniqueClients);
+        return view('crmRoute.presentationStatistics')
+            ->with('clients',$uniqueClients)
+            ->with('days',$split_month)
+            ->with('allInfo',$groupAllInfo)
+            ->with('months',$this->monthArray())
+            ->with('month',date('m'));
+    }
+
+    public function monthPerWeekDivision($month,$year){
+        $days_in_month = date('t', strtotime($year . '-' . $month));
+        $numberOfWeekPreviusMonth = $this::getWeekNumber(date('Y-m-d', strtotime($year.'-'.$month.'-01'. ' - 1 days')));
+        $weeks = [];
+        for ($i = 1; $i <= $days_in_month; $i++) {
+            $loop_day = ($i < 10) ? '0' . $i : $i ;
+            $date = $year.'-'.$month.'-'.$loop_day;
+            $actualWeek = $this::getWeekNumber($date);
+            if($actualWeek != $numberOfWeekPreviusMonth){
+                $weeksObj = new \stdClass();
+                $weeksObj->date = $date;
+                $weeksObj->name = $this::getNameOfWeek($date);
+                array_push($weeks,$weeksObj);
+            }
+        }
+        $lastNumberOfWeek = $actualWeek;
+        $dateNextMonth = date('Y-m-d', strtotime($date . ' + 1 days'));
+        $daysInNextMonth = date('t', strtotime($dateNextMonth));
+        for ($i = 1; $i <= $daysInNextMonth; $i++) {
+            $loop_day = ($i < 10) ? '0' . $i : $i ;
+            $date = date('Y-m',strtotime($dateNextMonth)).'-'.$loop_day;
+            $actualWeek = $this::getWeekNumber($date);
+            if($actualWeek == $lastNumberOfWeek){
+                $weeksObj = new \stdClass();
+                $weeksObj->date = $date;
+                $weeksObj->name = $this::getNameOfWeek($date);
+                array_push($weeks,$weeksObj);
+            }else{
+                break;
+            }
+        }
+        return $weeks;
+    }
+
+    public function getWeekNumber($date){
+        $actualWeek = new DateTime($date);
+        $actualWeek = $actualWeek->format("W");
+        return $actualWeek;
+    }
+
+    public function monthArray(){
+        /**
+         * Tabela z miesiącami
+         */
+        $months = [
+            '01' => 'Styczeń',
+            '02' => 'Luty',
+            '03' => 'Marzec',
+            '04' => 'Kwiecień',
+            '05' => 'Maj',
+            '06' => 'Czerwiec',
+            '07' => 'Lipiec',
+            '08' => 'Sierpień',
+            '09' => 'Wrzesień',
+            '10' => 'Październik',
+            '11' => 'Listopad',
+            '12' => 'Grudzień'
+        ];
+        return $months;
+    }
+    public function getPresentationInfo(){
+        $client = Clients::select('name','type')->get();
+        return datatables($client)->make(true);
+    }
 }

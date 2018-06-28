@@ -71,6 +71,10 @@ class CoachingController extends Controller
     {
         $departments = Department_info::whereIn('id_dep_type', [1, 2])->get();
         $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+        $directorsIdHR = Department_info::select('director_hr_id')->where('director_hr_id', '!=', null)->distinct()->get();
+        foreach($directorsIdHR as $item){
+            $directorsIds->push($item);
+        };
         $directors = User::whereIn('id', $directorsIds)->get();
         $dep_id = Auth::user()->department_info_id;
         $coach = User::where('status_work', '=', '1')
@@ -113,6 +117,10 @@ class CoachingController extends Controller
 
             } else {
                 $directors = Department_info::all()->pluck('director_id')->toArray();
+                $directorsHR = Department_info::all()->pluck('director_hr_id')->toArray();
+                foreach($directorsHR as $item){
+                    array_push($directors,$item);
+                }
                 $coach = User::where('status_work', '=', '1')
                     ->whereIn('id', $directors)
                     ->get();
@@ -143,11 +151,21 @@ class CoachingController extends Controller
      */
     public function progress_table_for_directorGET()
     {
-        $coachingManagerList = $this::getCoachingManagerList(array(Auth::user()->id));
-        $loggedUser = Auth::user()->department_info->id_dep_type;
+        $userId = Auth::user()->id;
+        $isHr = false;
+        $isDirectorHr = Department_info::where('director_hr_id','=',$userId)->get();
+        if(!$isDirectorHr->isEmpty()){
+            $isHr = true;
+            $coachingManagerList = $this::getCoachingManagerListHR($userId,$isHr);
+            $loggedUser = Auth::user()->department_info->id_dep_type;
+        }else{
+            $coachingManagerList = $this::getCoachingManagerList($userId,$isHr);
+            $loggedUser = Auth::user()->department_info->id_dep_type;
+        }
         return view('coaching.progress_table_for_director')
             ->with('coachingManagerList', $coachingManagerList)
-            ->with('user_department_type', $loggedUser);
+            ->with('user_department_type', $loggedUser)
+            ->with('isHr',$isHr);
     }
 
     /**
@@ -691,16 +709,37 @@ class CoachingController extends Controller
     }
 
 
+
+    /**
+     * @return mixed
+     * pobranie Hr dla danego dyrektorów HR
+     */
+    public function getCoachingManagerListHR($director_id,$isHr)
+    {
+        // Pobranie oddziałów przypisanych do dyrektora
+        $director_departments = Department_info::
+        where('director_hr_id', '=', $director_id)
+            ->get();
+        //List Kierowników
+        $all_manager_list = User::
+        whereIn('department_info_id', $director_departments->pluck('id')->toarray())
+            ->where('status_work', '=', 1)
+            ->whereIn('user_type_id', [5])
+            ->where('id', '!=', $director_id)
+            ->get();
+        // Pobranie statystyk dla hr
+        $department_statistics = $this::getDepartmentInfo(1, 1, $director_departments->pluck('id')->toArray(), $all_manager_list,$isHr);
+        return $department_statistics;
+    }
     /**
      * @return mixed
      * pobranie kierowników dla danego dyrektorów
      */
-    public function getCoachingManagerList()
+    public function getCoachingManagerList($director_id,$isHr)
     {
-        // Id dyrektora
-        $director_id = Auth::user()->id;
+
         if (Auth::user()->id == 1364 || Auth::user()->id == 11) {
-            $director_id = 2;
+            $director_id = 29;
         }
         // Pobranie oddziałów przypisanych do dyrektora
         $director_departments = Department_info::
@@ -715,12 +754,12 @@ class CoachingController extends Controller
             ->where('id', '!=', $director_id)
             ->get();
         // Pobranie statystyk dla kierownika
-        $department_statistics = $this::getDepartmentInfo(1, 1, $director_departments->pluck('id')->toArray(), $all_manager_list);
+        $department_statistics = $this::getDepartmentInfo(1, 1, $director_departments->pluck('id')->toArray(), $all_manager_list,$isHr);
         return $department_statistics;
     }
 
     // Informacje o oddziale kierownika
-    public function getDepartmentInfo($date_start, $date_stop, $director_id, $all_manager_list)
+    public function getDepartmentInfo($date_start, $date_stop, $director_id, $all_manager_list,$isHr)
     {
         // od 02.04 do 08.04 tydzień
         $date_start = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d") - 21, date("Y")));
@@ -786,24 +825,36 @@ class CoachingController extends Controller
                     ->get();
                 $janky = $janky_reports->first()->actual_janky;
                 $succes = $janky_reports->first()->sum_success;
+                if($isHr){
+                    $columnName = 'hr_id';
+                }else{
+                    $columnName = 'menager_id';
+                }
                 $manager = DB::table('department_info')
                     ->select(DB::raw('users.id as manager_id,
                                 users.first_name,
                                 users.last_name,
                                 department_info.id as department_info_id'))
-                    ->join('users', 'users.id', 'department_info.menager_id')
+                    ->join('users', 'users.id', $columnName)
                     ->where('department_info.id', '=', $item)
                     ->first();
                 $data = new \stdClass();
                 $data->department_info_id = $item;
-                $data->success = $succes;
                 $data->date_start = $date_start;
                 $data->date_stop = $date_stop;
-                $data->avg_average = round($succes / $rbh, 2);
-                $data->realRBH = $rbh;
-                $data->sum_janky_count = $janky;
                 $data->menager_id = $manager->manager_id;
                 $data->manager_name = $manager->first_name . ' ' . $manager->last_name;
+                if($isHr){
+                    $data->success          = 0;
+                    $data->avg_average      = 0;
+                    $data->realRBH          = 0;
+                    $data->sum_janky_count  = 0;
+                }else{
+                    $data->success          = $succes;
+                    $data->avg_average      = round($succes / $rbh, 2);
+                    $data->realRBH          = $rbh;
+                    $data->sum_janky_count  = $janky;
+                }
                 $ready_data->push($data);
             }
         }
