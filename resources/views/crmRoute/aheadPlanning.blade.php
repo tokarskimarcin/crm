@@ -62,7 +62,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">
-                <div class="alert gray-nav ">Edytuj Hotel</div>
+                <div class="alert gray-nav ">Planowanie Wyprzedzenia</div>
             </div>
         </div>
     </div>
@@ -168,12 +168,15 @@
     <script>
         document.addEventListener('DOMContentLoaded', function (mainEvent) {
 
-            $('.form_date').datetimepicker({
-                language:  'pl',
-                autoclose: 1,
-                minView : 2,
-                pickTime: false,
-            });
+            (function activateDatepicker() {
+                $('.form_date').datetimepicker({
+                    language:  'pl',
+                    autoclose: 1,
+                    minView : 2,
+                    pickTime: false,
+                });
+            })();
+
 
             /********** GLOBAL VARIABLES ***********/
             let elementsToSum = {
@@ -181,8 +184,14 @@
                 lastElement: {trId: null, tdId: null}
             };
             let sumOfSelectedCells = 0;
+            const now = new Date();
+            const day = ("0" + now.getDate()).slice(-2);
+            const month = ("0" + (now.getMonth() + 1)).slice(-2);
+            const today = now.getFullYear() + "-" + (month) + "-" + (day);
+            const firstDayOfThisMonth = now.getFullYear() + "-" + (month) + "-01";
             /*******END OF GLOBAL VARIABLES*********/
 
+            $('#date_start').val(firstDayOfThisMonth);
 
             /*********************DataTable FUNCTUONS****************************/
 
@@ -235,33 +244,6 @@
 
             /*********************EVENT LISTENERS FUNCTIONS****************************/
 
-            /**
-             * This event listener change elements of array selectedTypes while user selects any type
-             */
-            $('#typ').on('select2:select', function (e) {
-                let types = $('#typ').val();
-                if (types.length > 0) {
-                    selectedTypes = types;
-                }
-                else {
-                    selectedTypes = ['0'];
-                }
-                table.ajax.reload();
-            });
-
-            /**
-             * This event listener change elements of array selectedTypes while user unselects any type
-             */
-            $('#typ').on('select2:unselect', function (e) {
-                if ($('#typ').val() != null) {
-                    let types = $('#typ').val();
-                    selectedTypes = types;
-                }
-                else {
-                    selectedTypes = ['0'];
-                }
-                table.ajax.reload();
-            });
 
             $('#date_start, #date_stop').on('change',function(e) {
                table.ajax.reload();
@@ -370,13 +352,6 @@
                 //rightTopCell = $($(trElements.get(firstElementTrId + 1)).children().get(lastElementTdId));
 
             }
-
-            /*Activation select2 framework*/
-            (function initial() {
-                $('#weeks').select2();
-                $('#year').select2();
-                $('#typ').select2();
-            })();
         });
     </script>
 @endsection
