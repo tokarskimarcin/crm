@@ -51,9 +51,11 @@
                                 Moduł podgląd tras pozwala na podgląd kampanii oraz zarządzanie nimi. Tabelę z
                                 kampaniami można filtrować dostępnymi polami jak również wyszukiwać poszczególnych fraz
                                 w polu "Szukaj". Kampanie dzielą się na: </br>
-                                <strong>Nie gotowe</strong>, oznaczone kolorem <span style="background: #ffc6c6;"> Czerwonym</span> </br>
-                                <strong>Aktywne</strong>, oznaczone kolorem <span style="background: #c3d6f4;">Niebieskim</span> </br>
-                                <strong>Zakończone</strong>, oznaczone kolorem <span style="background: #b9f7b9;">Zielonym</span>
+                                <ul class="list-group">
+                                    <li class="list-group-item"><strong>Nie gotowe</strong>, oznaczone przyciskiem <button class="btn btn-success">Aktywuj kampanie</button></li>
+                                    <li class="list-group-item"><strong>Aktywne</strong>, oznaczone przyciskiem <button class="btn btn-warning">Zakończ kampanię</button> </li>
+                                    <li class="list-group-item"><strong>Zakończone</strong>, oznaczone przyciskiem <button class="btn btn-primary">Trasa niegotowa</button> </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -143,7 +145,7 @@
 
                     <div class="row">
                         <div class="col-md-12">
-                            <table id="datatable2" class="thead-inverse table " cellspacing="0" width="100%">
+                            <table id="datatable2" class="thead-inverse table table-striped row-border" cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
                                     <th>Tydzień</th>
@@ -510,8 +512,7 @@
                         sessionStorage.removeItem('search');
                         table2.ajax.reload();
                     }
-
-                    if (data.status == 0) {
+                    /*if (data.status == 0) {
                         row.style.backgroundColor = "#ffc6c6";
                     }
                     else if (data.status == 2) {
@@ -519,7 +520,7 @@
                     }
                     else {
                         row.style.backgroundColor = "#b3c7f4";
-                    }
+                    }*/
                     $(row).attr('id', "clientRouteInfoId_" + data.client_route_id);
                     return row;
                 },
@@ -572,7 +573,7 @@
                                 return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-success action-buttons-0" style="width:100%">Aktywuj kampanie</button>';
                             }
                             else if (data.status == 2) {
-                                return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-primary action-buttons-2" style="width:100%">Trasa nie gotowa</button>';
+                                return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-primary action-buttons-2" style="width:100%">Trasa niegotowa</button>';
                             }
                             else {
                                 return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-warning action-buttons-1" style="width:100%">Zakończ kampanie</button>';
@@ -582,18 +583,18 @@
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
-                        }, "name": "link"
+                            return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '"><button class="btn btn-default btn-block"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></button></a>';
+                        }, "name": "link", width: '10%'
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.client_route_id + '"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></a>';
-                        }, "name": "link"
+                            return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.client_route_id + '"><button class="btn btn-default btn-block"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></button></a>';
+                        }, "name": "link", width: '10%'
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<span style="font-size: 2.1em;" class="glyphicon glyphicon-edit show-modal-with-data" data-route_id ="' + data.client_route_id + '" ></span>';
-                        }, "name": "link"
+                            return '<button class="btn btn-default btn-block show-modal-with-data"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit " data-route_id ="' + data.client_route_id + '" ></span></button>';
+                        }, "name": "link", width: '10%'
 
                     }
                 ]
