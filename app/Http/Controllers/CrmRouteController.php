@@ -1885,7 +1885,6 @@ class CrmRouteController extends Controller
         $week = $date->format("W");
         //Pobranie równych czterech tygodni
         $split_month = $this->monthPerWeekDivision(date('m'),date('Y'));
-
         $allInfo = Clients::select(DB::raw(
                 'client.id,
                 client.name,
@@ -1896,12 +1895,13 @@ class CrmRouteController extends Controller
             ->join('client_route','client_route.client_id','client.id')
             ->join('client_route_info','client_route_info.client_route_id','client_route.id')
             ->whereIn('client.id',$actualClientsId)
-            ->whereBetween('client_route_info.date',[$split_month[0],$split_month[count($split_month)-1]])
+            ->whereBetween('client_route_info.date',[$split_month[0]->date,$split_month[count($split_month)-1]->date])
             ->groupBy('id','date')
             ->get();
         $groupAllInfo = $allInfo->groupBy('type');
         $uniqueClients = $allInfo->unique('name')->groupBy('type');
 
+        dd($uniqueClients);
         return view('crmRoute.presentationStatistics')
             ->with('clients',$uniqueClients)
             ->with('days',$split_month)
@@ -1912,14 +1912,17 @@ class CrmRouteController extends Controller
 
     public function monthPerWeekDivision($month,$year){
         $days_in_month = date('t', strtotime($year . '-' . $month));
-        $weeks = [];
         $numberOfWeekPreviusMonth = $this::getWeekNumber(date('Y-m-d', strtotime($year.'-'.$month.'-01'. ' - 1 days')));
+        $weeks = [];
         for ($i = 1; $i <= $days_in_month; $i++) {
             $loop_day = ($i < 10) ? '0' . $i : $i ;
             $date = $year.'-'.$month.'-'.$loop_day;
             $actualWeek = $this::getWeekNumber($date);
             if($actualWeek != $numberOfWeekPreviusMonth){
-                array_push($weeks,$date);
+                $weeksObj = new \stdClass();
+                $weeksObj->date = $date;
+                $weeksObj->name = $this::getNameOfWeek($date);
+                array_push($weeks,$weeksObj);
             }
         }
         $lastNumberOfWeek = $actualWeek;
@@ -1930,7 +1933,10 @@ class CrmRouteController extends Controller
             $date = date('Y-m',strtotime($dateNextMonth)).'-'.$loop_day;
             $actualWeek = $this::getWeekNumber($date);
             if($actualWeek == $lastNumberOfWeek){
-                array_push($weeks,$date);
+                $weeksObj = new \stdClass();
+                $weeksObj->date = $date;
+                $weeksObj->name = $this::getNameOfWeek($date);
+                array_push($weeks,$weeksObj);
             }else{
                 break;
             }

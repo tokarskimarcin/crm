@@ -56,13 +56,13 @@
                                 <tr>
                                     <td colspan="2">Data</td>
                                     @foreach($days as $item)
-                                    <td>{{$item}}</td>
+                                    <td>{{$item->date}}</td>
                                     @endforeach
                                 </tr>
                                 <tr>
                                     <td colspan="2" class="holdDoor">Dzień</td>
                                     @foreach($days as $item)
-                                        <td>{{$item}}</td>
+                                        <td>{{$item->name}}</td>
                                     @endforeach
                                 </tr>
                                     @foreach($clients['Wysyłka'] as $item)
