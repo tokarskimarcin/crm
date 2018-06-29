@@ -103,9 +103,9 @@
             <div class="form-group">
                 <label for="city">System jankowy:<span style="color:red;">*</span></label>
                 <select class="form-control" name="janky_system_id">
-                  <option>Wybierz</option>
-                  <option>Tak</option>
-                  <option>Nie</option>
+                  <option value="0">Wybierz</option>
+                  <option value="1">Tak</option>
+                  <option value="0">Nie</option>
                 </select>
             </div>
             <div class="form-group">
