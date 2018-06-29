@@ -16,14 +16,22 @@
                 <div class="form-group">
                     <label for="date" class="myLabel">Data początkowa:</label>
                     <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:50%;">
-                        <input class="form-control" name="date_start" id="date" type="text" value="{{date("Y-m-d")}}">
+                        @if($date_start)
+                            <input class="form-control" name="date_start" id="date" type="text" value="{{$date_start}}">
+                        @else
+                            <input class="form-control" name="date_start" id="date" type="text" value="{{date("Y-m-d")}}">
+                        @endif
                         <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="date_stop" class="myLabel">Data końcowa:</label>
                     <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:50%;">
-                        <input class="form-control" name="date_stop" id="date_stop" type="text" value="{{date("Y-m-d")}}">
+                        @if($date_stop)
+                            <input class="form-control" name="date_stop" id="date_stop" type="text" value="{{$date_stop}}">
+                        @else
+                            <input class="form-control" name="date_stop" id="date_stop" type="text" value="{{date("Y-m-d")}}">
+                        @endif
                         <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                     </div>
                 </div>

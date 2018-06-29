@@ -51,14 +51,13 @@
             @elseif($item->department_info_id == 15)
                 <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Lublin Potwierdzenia Wysyłka </td>
             @else
-                <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$item->dep}} {{$item->depname}}</td>
+                <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px"> {{$item->depname}} {{$item->deptype}}</td>
             @endif
             <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$item->success}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_all_talks}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_correct_talks}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_janky}}</td>
             @php
-
                         $all_disagreement_proc = 0;
                         $bad_proc = $item->sum_all_talks > 0 ? (100*$item->sum_janky) / $item->sum_all_talks : 0;
                         $check_proc = $item->success > 0 ? (100*$item->sum_all_talks) / $item->success : 0;

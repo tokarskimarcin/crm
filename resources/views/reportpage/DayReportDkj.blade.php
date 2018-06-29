@@ -16,7 +16,11 @@
                 <div class="form-group">
                     <label class="myLabel">Data:</label>
                     <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:50%;">
-                        <input class="form-control" name="date" id="date" type="text" value="{{date("Y-m-d")}}">
+                        @if($today)
+                            <input class="form-control" name="date" id="date" type="text" value="{{$today}}">
+                        @else
+                            <input class="form-control" name="date" id="date" type="text" value="{{date("Y-m-d")}}">
+                        @endif
                         <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                     </div>
                 </div>
