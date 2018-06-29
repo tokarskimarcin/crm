@@ -103,7 +103,7 @@
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="year">Wybierz rok</label>
                                 <select id="year" class="form-control">
-                                    <option value="0">Wybierz</option>
+                                    <option value="0">Wszystkie</option>
                                     <option value="2017">2017</option>
                                     <option value="2018">2018</option>
                                 </select>
@@ -114,7 +114,7 @@
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="weekNumber">Wybierz tydzień</label>
                                 <select id="weekNumber" class="form-control">
-                                    <option value="0">Wybierz</option>
+                                    <option value="0">Wszystkie</option>
                                 </select>
                             </div>
                         </div>
@@ -123,7 +123,7 @@
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="type">Typ</label>
                                 <select id="type" class="form-control">
-                                    <option value="0">Wybierz</option>
+                                    <option value="0">Wszystkie</option>
                                     <option value="1">Wysyłka</option>
                                     <option value="2">Badania</option>
                                 </select>
@@ -134,7 +134,7 @@
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="campaignState">Status Kampanii</label>
                                 <select id="campaignState" class="form-control">
-                                    <option value="-1">Wybierz</option>
+                                    <option value="-1">Wszystkie</option>
                                     <option value="0">Nie gotowe</option>
                                     <option value="1">Aktywne</option>
                                     <option value="2">Zakończone</option>
@@ -213,6 +213,8 @@
     <script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>
     <script>
 
+
+
         $('#menu-toggle').change(()=>{
             table2.columns.adjust().draw();
         });
@@ -272,6 +274,24 @@
         }
 
         document.addEventListener('DOMContentLoaded', function (event) {
+
+            /**
+             * This function shows notification.
+             */
+            function notify(htmltext$string, type$string = info, delay$miliseconds$number = 5000) {
+                $.notify({
+                    // options
+                    message: htmltext$string
+                },{
+                    // settings
+                    type: type$string,
+                    delay: delay$miliseconds$number,
+                    animate: {
+                        enter: 'animated fadeInRight',
+                        exit: 'animated fadeOutRight'
+                    }
+                });
+            }
 
             let yearInput = $('#year');
             let typInput = $('#type');
@@ -569,14 +589,15 @@
                     },
                     {
                         "data": function (data, type, dataToSet) {
+                            // console.log(data);
                             if (data.status == 0) {
-                                return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-success action-buttons-0" style="width:100%">Aktywuj kampanie</button>';
+                                return '<button data-clientRouteId="' + data.client_route_id + '" class="btn btn-success action-buttons-0" style="width:100%">Aktywuj kampanie</button>';
                             }
                             else if (data.status == 2) {
-                                return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-primary action-buttons-2" style="width:100%">Trasa niegotowa</button>';
+                                return '<button data-clientRouteId="' + data.client_route_id + '" class="btn btn-primary action-buttons-2" style="width:100%">Trasa niegotowa</button>';
                             }
                             else {
-                                return '<button data-clientRouteId="' + data.clientRouteId + '" class="btn btn-warning action-buttons-1" style="width:100%">Zakończ kampanie</button>';
+                                return '<button data-clientRouteId="' + data.client_route_id + '" class="btn btn-warning action-buttons-1" style="width:100%">Zakończ kampanie</button>';
                             }
 
                         }, "name": "acceptRoute"
@@ -628,12 +649,15 @@
                     headers: ourHeaders,
                     credentials: "same-origin",
                     body: formData
-                }).then(resp => resp.json())
+                }).then(resp => resp.text())
                     .then(resp => {
-                        swal({
-                            title: `Kampania została aktywowana`,
-                        });
-                        return table2.ajax.reload();
+                        if (resp == 0) {
+                            notify("Operacja się nie powiodła", 'danger');
+                        }
+                        else {
+                            notify(`<strong>Kampania została aktywowana</strong>`, 'success');
+                        }
+                        table2.ajax.reload();
                     })
             }
 
@@ -654,15 +678,13 @@
                     headers: ourHeaders,
                     credentials: "same-origin",
                     body: formData
-                }).then(resp => resp.json())
+                }).then(resp => resp.text())
                     .then(resp => {
                         if (resp == 0) {
-                            console.log("Operacja się nie powiodła");
+                            notify("Operacja się nie powiodła", 'danger');
                         }
                         else {
-                            swal({
-                                title: `Kampania została zakończona`,
-                            });
+                            notify(`<strong>Kampania została zakończona</strong>`, 'success');
                         }
                         table2.ajax.reload();
                     })
@@ -685,15 +707,13 @@
                     headers: ourHeaders,
                     credentials: "same-origin",
                     body: formData
-                }).then(resp => resp.json())
+                }).then(resp => resp.text())
                     .then(resp => {
                         if (resp == 0) {
-                            console.log("Operacja się nie powiodła");
+                            notify("Operacja się nie powiodła", 'danger');
                         }
                         else {
-                            swal({
-                                title: `Kampania została przeniesiona w stan "nie gotowa"`,
-                            });
+                            notify(`<strong>Kampania została przeniesiona w stan "nie gotowa"</strong>`,'success');
                         }
                         table2.ajax.reload();
                     })
