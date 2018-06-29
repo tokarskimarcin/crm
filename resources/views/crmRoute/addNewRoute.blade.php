@@ -100,13 +100,6 @@
                     '                    </select>\n' +
                     '                </div>\n' +
                     '            </div>\n' +
-                    '\n' +
-                    '<div class="form-group hour_div">' +
-                    '</div>' +
-                    '            <div class="col-lg-12 button_section">\n' +
-                    '                <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">\n' +
-                    '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
-                    '            </div>\n' +
                     '        </div>';
 
                 newElement.innerHTML =  stringAppend;
@@ -118,7 +111,7 @@
              * Ta funkcja dodaje nowy pokaz.
              */
             function addNewShow(ajaxResponse,type) {
-                removeButtonsFromLastShow();
+                //removeButtonsFromLastShow();
                 if(type == 0){
                     var voievodes = @json($voivodes);
                     var newShow = createNewShow(voievodes); //otrzymujemy nowy formularz z pokazem.
@@ -126,15 +119,18 @@
                 else{
                     var newShow = createNewShow(ajaxResponse); //otrzymujemy nowy formularz z pokazem.
                 }
-                mainContainer.appendChild(newShow);
+                $(newShow).hide();
+                mainContainer.insertBefore(newShow, document.querySelector('.new-route-container'));
 
                 iterator++;
-
-                $('.form_date').datetimepicker({
-                    language:  'pl',
-                    autoclose: 1,
-                    minView : 2,
-                    pickTime: false
+                $(newShow).slideDown(1000,()=> {
+                    $('.form_date').datetimepicker({
+                        language: 'pl',
+                        autoclose: 1,
+                        minView: 2,
+                        pickTime: false
+                    });
+                    $("html, body").animate({scrollTop: $(document).height()}, "slow");
                 });
             }
 
@@ -172,15 +168,7 @@
                     }, {
                         // settings
                     });
-                    let allShows = document.getElementsByClassName('routes-container');
-                    let lastShowContainer = allShows[allShows.length - 1];
-                    if (container == lastShowContainer) {
-                        addButtonsToPreviousContainer(container);
-                        container.parentNode.removeChild(container);
-                    }
-                    else {
-                        container.parentNode.removeChild(container);
-                    }
+                    container.parentNode.removeChild(container);
                 });
             }
 
@@ -419,8 +407,18 @@
             /***********************************************/
 
             mainContainer.addEventListener('click', buttonHandler);
+            stringAppend =
+            '<div class="row">' +
+            '            <div class="col-lg-12 button_section">\n' +
+            '                <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">\n' +
+            '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
+            '            </div>\n'+
+                '</div>';
 
-
+            newElement = document.createElement('div');
+            newElement.className = 'new-route-container';
+            newElement.innerHTML = stringAppend;
+            mainContainer.appendChild(newElement);
             addNewShow(0,0);
             removeGlyInFirstShow();
 
