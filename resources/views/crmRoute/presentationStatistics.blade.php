@@ -26,7 +26,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="alert gray-nav ">Statystyki miast</div>
+            <div class="alert gray-nav">Statystyki prezentacji</div>
         </div>
     </div>
 </div>
@@ -37,15 +37,14 @@
                 <div class="panel-heading">
                 </div>
                 <div class="panel-body">
-                    <div class="alert alert-info" style="font-size: 1.3em;">
-                        Kolorem <span style="background: #c67979;">Bordowym</span> zostały oznaczone wiersze sumujące wartości dla każdego dnia </br>
-                        Kolorem <span style="background: #e6eff4;">jasno niebieskim</span> zostały oznaczone wiersze sumujące wartości z całęgo tygodnia dla poszególnego klienta </br>
+                    <div class="alert alert-warning" style="font-size: 1.3em;">
+                        Kolorem <span style="background: #e6eff4;">jasno niebieskim</span> zostały oznaczone wiersze sumujące wartości dla każdego dnia </br>
+                        Kolorem <span style="background: #c67979;">Bordowym</span> zostały oznaczone wiersze sumujące wartości z całęgo tygodnia dla poszególnego klienta </br>
                         Kolorem <span style="background: #efef7f;">Zółtym</span> zostały oznaczone komórki, które sumują wartości dla całego tygodnia dla wszystkich klientów.
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="heading-container">
-                                Statystyki miast
+                            <div class="heading-container" style="">
                             </div>
                         </div>
                     </div>

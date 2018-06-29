@@ -1872,6 +1872,9 @@ class CrmRouteController extends Controller
 
     }
 
+    /**
+     * This method returns view presentationStatistics with a data necessary for table
+     */
     public function presentationStatisticsGet()
     {
         $actualMonth = date('Y-m');
@@ -1910,8 +1913,6 @@ class CrmRouteController extends Controller
 
         $clientArr = array();
         $objectsArr = array();
-
-//        dd($split_month);
 
         /**
          * This part is responsible for creating additional arrays of objects to $groupAllInfo. Each array represents all records for given client with amount, date, name.
@@ -1971,34 +1972,24 @@ class CrmRouteController extends Controller
             }
         }
 
-
-
+        //This part is responsible for generating sum row.
         foreach($groupAllInfo as $group) {
             $sumArray = array();
-//            dd($group);
             $clientCollect = $uniqueClients[$group->first()->type]->pluck('name');
-//            dd($clientCollect);
             $sumAmount = 0;
             foreach($split_month as $day) {
-//                dd($day);
                 $daySum = 0;
                 if($day->name == "Suma") {
-//                    dd($day);
                     $sumObject = new \stdClass();
                     $sumObject->date = 'Suma';
                     $sumObject->daySum = 0;
                     array_push($sumArray, $sumObject);
                 }
                 else {
-//                    dd($day);
                     foreach ($clientCollect as $oneClient) {
-//                        dd($oneClient);
                         foreach ($group[$oneClient] as $key => $value) {
-//                            dd($group[$oneClient]);
-//                            dd($value->date);
-                            if($value->type == 0) {
+                            if($value->type == 0) { //day data
                                 if($day->date == $value->date) {
-//                                    dd($value);
                                         $daySum += $value->amount;
                                     }
                                 }
@@ -2010,14 +2001,11 @@ class CrmRouteController extends Controller
                     $sumObject->daySum = $daySum;
                     array_push($sumArray, $sumObject);
                 }
-
             }
             $daySumObject = new \stdClass();
             $group->offsetSet("daySum", $sumArray);
         }
 
-
-//        dd($groupAllInfo);
         return view('crmRoute.presentationStatistics')
             ->with('clients',$uniqueClients)
             ->with('days',$split_month)
