@@ -103,7 +103,7 @@
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="year">Wybierz rok</label>
                                 <select id="year" class="form-control">
-                                    <option value="0">Wybierz</option>
+                                    <option value="0">Wszystkie</option>
                                     <option value="2017">2017</option>
                                     <option value="2018">2018</option>
                                 </select>
@@ -114,7 +114,7 @@
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="weekNumber">Wybierz tydzień</label>
                                 <select id="weekNumber" class="form-control">
-                                    <option value="0">Wybierz</option>
+                                    <option value="0">Wszystkie</option>
                                 </select>
                             </div>
                         </div>
@@ -123,7 +123,7 @@
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="type">Typ</label>
                                 <select id="type" class="form-control">
-                                    <option value="0">Wybierz</option>
+                                    <option value="0">Wszystkie</option>
                                     <option value="1">Wysyłka</option>
                                     <option value="2">Badania</option>
                                 </select>
@@ -134,7 +134,7 @@
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="campaignState">Status Kampanii</label>
                                 <select id="campaignState" class="form-control">
-                                    <option value="-1">Wybierz</option>
+                                    <option value="-1">Wszystkie</option>
                                     <option value="0">Nie gotowe</option>
                                     <option value="1">Aktywne</option>
                                     <option value="2">Zakończone</option>
