@@ -589,7 +589,6 @@
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            // console.log(data);
                             if (data.status == 0) {
                                 return '<button data-clientRouteId="' + data.client_route_id + '" class="btn btn-success action-buttons-0" style="width:100%">Aktywuj kampanie</button>';
                             }

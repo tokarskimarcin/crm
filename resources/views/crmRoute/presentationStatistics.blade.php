@@ -59,51 +59,68 @@
                             <tbody>
                                 <tr>
                                     <td colspan="2">Data</td>
-                                    @foreach($days as $item)
-                                    <td style="font-weight:bold;">{{$item->date}}</td>
-                                    @endforeach
+                                    @if(isset($days))
+                                        @foreach($days as $item)
+                                        <td style="font-weight:bold;">{{$item->date}}</td>
+                                        @endforeach
+                                    @endif
                                 </tr>
                                 <tr>
                                     <td colspan="2" class="holdDoor">Dzień</td>
-                                    @foreach($days as $item)
-                                        <td>{{$item->name}}</td>
-                                    @endforeach
+                                    @if(isset($days))
+                                        @foreach($days as $item)
+                                            <td>{{$item->name}}</td>
+                                        @endforeach
+                                    @endif
+
                                     @php
                                         $i = 0;
                                         $rowspanWysylka = 1;
-                                        foreach($clients['Wysyłka'] as $item) {
-                                            $rowspanWysylka++;
+                                        if(isset($clients['Wysyłka'])) {
+                                            foreach($clients['Wysyłka'] as $item) {
+                                                $rowspanWysylka++;
+                                            }
                                         }
 
+
                                         $rowspanBadania = 1;
-                                        foreach($clients['Badania'] as $item) {
-                                            $rowspanBadania++;
+                                        if(isset($clients['Badania'])) {
+                                            foreach($clients['Badania'] as $item) {
+                                                $rowspanBadania++;
+                                            }
                                         }
+
                                     @endphp
                                 </tr>
-                                    @foreach($clients['Wysyłka'] as $item)
-                                        <tr>
-                                            @if($i == 0)
-                                                <td rowspan="{{$rowspanWysylka}}" style="vertical-align : middle;text-align:center; font-weight:bold;">Kamery</td>
-                                            @endif
-                                            @php
-                                                $i++;
-                                            @endphp
-                                            <td style="font-weight:bold;">{{$item->name}}</td>
-                                            @foreach($allInfo['Wysyłka'][$item->name] as $info)
-                                                @if($info->type == 0)
-                                                    <td>{{$info->amount}}</td>
-                                                @else
-                                                    <td class="sum" data-info="wysylka" data-week="{{$info->week}}" style="background: #c67979;">{{$info->amount}}</td>
+                                    @if(isset($clients['Wysyłka']))
+                                        @foreach($clients['Wysyłka'] as $item)
+                                            <tr>
+                                                @if($i == 0)
+                                                    <td rowspan="{{$rowspanWysylka}}" style="vertical-align : middle;text-align:center; font-weight:bold;">Kamery</td>
                                                 @endif
-                                            @endforeach
-                                        </tr>
-                                    @endforeach
+                                                @php
+                                                    $i++;
+                                                @endphp
+                                                <td style="font-weight:bold;">{{$item->name}}</td>
+                                                @if(isset($allInfo['Wysyłka'][$item->name]))
+                                                    @foreach($allInfo['Wysyłka'][$item->name] as $info)
+                                                        @if($info->type == 0)
+                                                            <td>{{$info->amount}}</td>
+                                                        @else
+                                                            <td class="sum" data-info="wysylka" data-week="{{$info->week}}" style="background: #c67979;">{{$info->amount}}</td>
+                                                        @endif
+                                                    @endforeach
+                                                @endif
+                                            </tr>
+                                        @endforeach
+                                    @endif
                                     <tr>
                                         <td style="font-weight:bold;">SUMA DZIEŃ WYSYŁKA</td>
-                                        @foreach($allInfo['Wysyłka']['daySum'] as $info)
-                                                <td  style="background: #e6eff4;">{{$info->daySum}}</td>
-                                        @endforeach
+                                        @if(isset($allInfo['Wysyłka']['daySum']))
+                                            @foreach($allInfo['Wysyłka']['daySum'] as $info)
+                                                    <td  style="background: #e6eff4;">{{$info->daySum}}</td>
+                                            @endforeach
+                                        @endif
                                     </tr>
                                 <tr>
                                     <td style="border-right: none;"></td><td></td>
@@ -111,31 +128,37 @@
                                     @php
                                         $i = 0;
                                     @endphp
-                                @foreach($clients['Badania'] as $item)
-                                    <tr>
-                                        @if($i == 0)
-                                            <td rowspan="{{$rowspanBadania}}" style="vertical-align : middle;text-align:center; font-weight:bold;">Badania</td>
-                                        @endif
-                                        @php
-                                            $i++;
-                                        @endphp
-                                        <td style="font-weight:bold;">{{$item->name}}</td>
-                                        @foreach($allInfo['Badania'][$item->name] as $info)
-                                            @if($info->type == 0)
-                                                <td>{{$info->amount}}</td>
-                                            @else
-                                                <td class="sum" data-info="badania" data-week="{{$info->week}}"  style="background: #c67979;">{{$info->amount}}</td>
+                                @if(isset($clients['Badania']))
+                                    @foreach($clients['Badania'] as $item)
+                                        <tr>
+                                            @if($i == 0)
+                                                <td rowspan="{{$rowspanBadania}}" style="vertical-align : middle;text-align:center; font-weight:bold;">Badania</td>
                                             @endif
+                                            @php
+                                                $i++;
+                                            @endphp
+                                            <td style="font-weight:bold;">{{$item->name}}</td>
+                                            @if(isset($allInfo['Badania'][$item->name]))
+                                                @foreach($allInfo['Badania'][$item->name] as $info)
+                                                    @if($info->type == 0)
+                                                        <td>{{$info->amount}}</td>
+                                                    @else
+                                                        <td class="sum" data-info="badania" data-week="{{$info->week}}"  style="background: #c67979;">{{$info->amount}}</td>
+                                                    @endif
 
-                                        @endforeach
-                                    </tr>
-                                @endforeach
+                                                @endforeach
+                                            @endif
+                                        </tr>
+                                    @endforeach
+                                @endif
                                 <tr>
 
                                     <td style="font-weight:bold;">SUMA DZIEŃ BADANIA</td>
-                                    @foreach($allInfo['Badania']['daySum'] as $info)
-                                        <td  style="background: #e6eff4;">{{$info->daySum}}</td>
-                                    @endforeach
+                                    @if(isset($allInfo['Badania']['daySum']))
+                                        @foreach($allInfo['Badania']['daySum'] as $info)
+                                            <td  style="background: #e6eff4;">{{$info->daySum}}</td>
+                                        @endforeach
+                                    @endif
                                 </tr>
                             </tbody>
                         </table>
@@ -167,23 +190,25 @@
              * This function fill weeksArray with weeks Number;
              */
             (function fillWeeksArray() {
-                @foreach($clients['Wysyłka'] as $item)
-                    @foreach($allInfo['Wysyłka'][$item->name] as $info)
-                        @if($info->type == 1)
-                            var flag = false;
-                            var weekNumber = {{$info->week}};
-                            weeksArray.forEach(item => {
-                                if(item == weekNumber) {
-                                    flag = true;
+                @if(isset($clients['Wysyłka']))
+                    @foreach($clients['Wysyłka'] as $item)
+                        @foreach($allInfo['Wysyłka'][$item->name] as $info)
+                            @if($info->type == 1)
+                                var flag = false;
+                                var weekNumber = {{$info->week}};
+                                weeksArray.forEach(item => {
+                                    if(item == weekNumber) {
+                                        flag = true;
+                                    }
+                                });
+                                if(flag == false) {
+                                    weeksArray.push(weekNumber);
                                 }
-                            });
-                            if(flag == false) {
-                                weeksArray.push(weekNumber);
-                            }
 
-                        @endif
+                            @endif
+                        @endforeach
                     @endforeach
-                @endforeach
+                @endif
             })();
 
             (function createSums() {
