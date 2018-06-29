@@ -253,11 +253,17 @@ class CrmRouteController extends Controller
      * This method shows specific route
      */
     public function specificRouteEditGet($id) {
-        $clientRouteInfo = ClientRouteInfo::where('client_route_id', '=', $id)->get();
         $clients = Clients::all();
         $cities = Cities::all();
         $voivodes = Voivodes::all();
-        $hotels = Hotel::all();
+        $departments = Department_info::all(); //niezbędne
+
+        $clientRouteInfo = ClientRouteInfo::select('client_route_info.id', 'voivodeship.name as voivode', 'client_route_info.voivode_id as voivode_id','city.name as city', 'client_route_info.city_id as city_id', 'client_route.client_id as client_id', 'client_route_info.client_route_id as client_route_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour')
+            ->join('city', 'city.id', '=', 'client_route_info.city_id')
+            ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
+            ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
+            ->where('client_route_id', '=', $id)
+            ->get();
 
         $clientRouteInfoExtended = array();
         $insideArr = array();
@@ -283,27 +289,12 @@ class CrmRouteController extends Controller
                 $cityId = $info->city_id;
             }
 
-            if($clientName == null) {
-                $clientRId = ClientRoute::find($info->client_route_id)->client_id;
-                $clientName = Clients::find($clientRId)->name;
-            }
+            $clientRId = $info->client_id;
 
             $stdClass = new \stdClass();
 
-            foreach($cities as $city) {
-                if($info->city_id == $city->id) {
-                    $stdClass->cityName = $city->name;
-                }
-            }
-
-            foreach($voivodes as $voivode) {
-                if($info->voivode_id == $voivode->id) {
-                    $stdClass->voivodeName = $voivode->name;
-                }
-            }
-
             foreach($clients as $client) {
-                if($info->client_route_id == $client->id) {
+                if($info->client_id == $client->id) {
                     $stdClass->clientName = $client->name;
                 }
             }
@@ -327,17 +318,16 @@ class CrmRouteController extends Controller
 
         $clientRouteInfo = collect($clientRouteInfoExtended);
 
-        $departments = Department_info::all();
         $today = date('Y-m-d');
         $today .= '';
-        $voivodes = Voivodes::all();
         $year = date('Y',strtotime("this year"));
         $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
 
         $clientRouteInfo = $clientRouteInfo->sortByDesc('date');
-        $clientRouteInfo->map(function($item) {
-            $cityObject = Cities::find($item[0]->city_id);
-            $item[0]->cities = $this::findCityByDistance($cityObject, '2000-01-01');
+        $clientRouteInfoAll = ClientRouteInfo::select('date','city_id')->get();
+        $clientRouteInfo->map(function($item) use($cities,$clientRouteInfoAll) {
+            $cityObject = $cities->where('id','=',$item[0]->city_id)->first();
+            $item[0]->cities = $this::findCityByDistance($cityObject, '2000-01-01',$clientRouteInfoAll);
             return $item;
         });
 
@@ -1166,9 +1156,10 @@ class CrmRouteController extends Controller
             ['routes_id', '=', $id],
             ['status', '=', 1]
         ])->get();
-        $routeInfo->map(function ($item){
+        $clientRouteInfo = ClientRouteInfo::all();
+        $routeInfo->map(function ($item) use($clientRouteInfo){
             $city = Cities::find($item->city_id);
-            $item->cities = $this::findCityByDistance($city,'2000-01-01');
+            $item->cities = $this::findCityByDistance($city,'2000-01-01',$clientRouteInfo);
             return $item;
         });
         $voivodes = Voivodes::all();
@@ -1358,7 +1349,7 @@ class CrmRouteController extends Controller
 
 
 
-    public function findCityByDistance($city, $currentDate){
+    public function findCityByDistance($city, $currentDate,$clientRoutesInfoWithUsedCities){
         $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
             ( 3959 * acos ( cos ( radians('.$city->latitude.') ) * cos( radians( `latitude` ) )
              * cos( radians( `longitude` ) - radians('.$city->longitude.') ) + sin ( radians('.$city->latitude.') )
@@ -1370,31 +1361,27 @@ class CrmRouteController extends Controller
         //part responsible for grace period
         if($currentDate != 0) {
             $properDate = date_create($currentDate);
-
-            //Rekordy clientRoutesInfo w których były użyte miasta
-            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
                 $properDate = date_create($currentDate); //function date_add, changes $properDate variable, so in each loop it has to be reassigned
                 //wartość karencji dla danego miasta
-                $gracePeriod = Cities::find($item->city_id)->grace_period;
+                if($item->city_id == $city->id){
+                    $gracePeriod = $city->grace_period;
+                }else{
+                    $gracePeriod = null;
+                }
                 $goodDate = date_create($item->date);
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
                 $dateString = $dateDifference . " days";
                 $availableAtDate = date_add($properDate,date_interval_create_from_date_string($dateString));
                 $availableAtDate = date_format($availableAtDate, "Y-m-d");
-
-                $arrayFlag = false;
                 if($dateDifference <= $gracePeriod) {
-                    if($arrayFlag == false) {
                         $cityInfoObject = new \stdClass();
                         $cityInfoObject->city_id = $item->city_id;
                         $cityInfoObject->available_date = $availableAtDate;
                         array_push($checkedCities, $cityInfoObject);
-                    }
                 }
-
             }
             $voievodeshipRound->map(function($item) use($checkedCities){
                 $hourNumber = 0; //This variable counts how many times city was used in grace period
@@ -1447,7 +1434,8 @@ class CrmRouteController extends Controller
             $currentDate = $request->currentDate;
             $city = Cities::where('id', '=', $cityId)->first();
             //part responsible for grace period
-            $voievodeshipRound = $this::findCityByDistance($city, $currentDate);
+            $clientRouteInfoAll = ClientRouteInfo::select('date','city_id')->get();
+            $voievodeshipRound = $this::findCityByDistance($city, $currentDate,$clientRouteInfoAll);
 
             $voievodeshipRound = $voievodeshipRound->groupBy('id');
             $voievodeshipDistinc = array();
