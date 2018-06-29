@@ -144,8 +144,8 @@ class StatisticsController extends Controller
     }
 //Mail do raportu Tygodniowego Telemarketing
     public function MailweekReportTelemarketing() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
         $all_data = $this::weekReportTelemarketing($date_start, $date_stop);
         $data = [
             'work_hours' => $all_data['work_hours'],
@@ -158,8 +158,8 @@ class StatisticsController extends Controller
     }
     // Wyswietlenie raportu tygodniowego na stronie 'telemarketing'
     public function pageWeekReportTelemarketing() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
         $data = $this::weekReportTelemarketing($date_start, $date_stop);
 //
         return view('reportpage.WeekReportTelemarketing')
@@ -190,7 +190,7 @@ class StatisticsController extends Controller
         if ($type == 'today') {
             $date = date('Y-m-d');
         } else if ($type == 'yesterday') {
-            $date = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+            $date = date("Y-m-d", strtotime('-1 Day'));
         }
         else {
             $date = $type;
@@ -269,7 +269,7 @@ class StatisticsController extends Controller
     public function MailDayReportTelemarketing() {
         $data = $this::dayReportTelemarketing('yesterday');
 
-        $title = 'Raport dzienny telemarketing '.date("d.m.Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+        $title = 'Raport dzienny telemarketing '.date("d.m.Y", strtotime('-1 Day'));
         $this->sendMailByVerona('dayReportTelemarketing', $data, $title);
     }
     // Wyswietlenie raportu dziennego na stronie 'telemarketing'
@@ -541,8 +541,8 @@ class StatisticsController extends Controller
             return $data;
     }
     public function MailweekReportJanky() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
         $all_data = $this->weekReportJankyData($date_start, $date_stop);
         $data = [
             'dkj' => $all_data['dkj'],
@@ -554,8 +554,8 @@ class StatisticsController extends Controller
     }
 
     public function pageWeekReportJanky(){
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
         $data = $this->weekReportJankyData($date_start, $date_stop);
 
         return view('reportpage.WeekReportJanky')
@@ -685,15 +685,9 @@ class StatisticsController extends Controller
                 ->with('reports', $data['reports']);
     }
 
-    private function dayReportDkjData($type) {
-        if ($type == 'today') {
-            $date = date('Y-m-d');
-        } else if ($type == 'yesterday') {
-            $date = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
-        }
-        else {
-            $date = $type;
-        }
+    private function reportDkjData($date_start, $date_stop = null, $monthReport = false){
+
+        $date_stop = $date_stop === null ? $date_start: $date_stop;
 
         $dkj = DB::table('pbx_dkj_team')
             ->select(DB::raw(
@@ -705,18 +699,18 @@ class StatisticsController extends Controller
                   SUM(all_jaky_disagreement) as all_jaky_disagreement,
                   SUM(good_jaky_disagreement) as good_jaky_disagreement,
                   department_info.id as department_info_id,
-                  department_type.name as dep,
+                  department_type.name as deptype,
                   departments.name as depname
                    '))
             ->join('department_info', 'department_info.id', '=', 'pbx_dkj_team.department_info_id')
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-            ->whereIn('pbx_dkj_team.id', function($query) use($date){
+            ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop){
                 $query->select(DB::raw(
                     'MAX(pbx_dkj_team.id)'
                 ))
                     ->from('pbx_dkj_team')
-                    ->where('report_date', '=',$date)
+                    ->whereBetween('report_date', [$date_start, $date_stop])
                     ->groupBy('department_info_id');
             })
             ->groupBy('pbx_dkj_team.department_info_id')
@@ -724,38 +718,67 @@ class StatisticsController extends Controller
 
 
         $data = [
-            'dkj' => $dkj,
-            'today' => $date
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'today' => $date_start,
+            'dkj' => $dkj
         ];
+
+        if($monthReport){
+            $month = $this->monthReverse(substr($date_start, 5,2));
+//        $year = date('Y');
+            if ($month < 10) {
+                $month = '0' . $month;
+            }
+            $work_hours = DB::table('users')
+                ->select(DB::raw('
+                users.id,
+                sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as work_time
+            '))
+                ->join('work_hours', 'users.id', '=', 'work_hours.id_user')
+                ->whereIn('work_hours.date',[$date_start, $date_stop])
+                ->groupBy('users.id')
+                ->where('users.user_type_id', '=', 2)
+                ->get();
+            $data['month_name'] = $this->monthReverseName($month);
+            $data['work_hours'] = $work_hours;
+            //dd($data);
+        }
         return $data;
     }
 
     public function dayReportDkj() {
-        $data = $this->dayReportDkjData('yesterday');
-        $title = 'Raport dzienny DKJ '.date("d.m.Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
-        $this->sendMailByVerona('dayReportDkj', $data, $title);
+        $data = $this->reportDkjData(date("Y-m-d", strtotime('yesterday')));
+        $title = 'Raport dzienny DKJ '.date("d.m.Y", strtotime('-1 Day'));
+        $this->sendMailByVerona('dayReportDkj', $data, $title, User::whereIn('id',[1364] )->get());
     }
 
     public function pageDayReportDKJ() {
-        $data = $this->dayReportDkjData('today');
+        $today = date("Y-m-d", strtotime('today'));
+        $data = $this->reportDkjData($today);
+
+        return view('reportpage.DayReportDkj')
+            ->with('today', $data['date_start'])
+            ->with('dkj', $data['dkj']);
+        /*$data = $this->dayReportDkjData('today');
 
         return view('reportpage.DayReportDkj')
             ->with('today', $data['today'])
-            ->with('dkj', $data['dkj']);
+            ->with('dkj', $data['dkj']);*/
     }
 
     public function pageDayReportDKJPost(Request $request) {
         $date = $request->date;
-        $data = $this->dayReportDkjData($date);
+        $data = $this->reportDkjData($date);
         return view('reportpage.DayReportDkj')
-            ->with('today', $data['today'])
+            ->with('today', $data['date_start'])
             ->with('dkj', $data['dkj']);
     }
 
     //wyswietlanie danych raportu tygodniowego dla pracownikow DKJ
     public function pageWeekReportEmployeeDkj() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
         $data = $this->weekReportEmployeeDkjData($date_start, $date_stop);
 
         return view('reportpage.WeekReportEmployeeDkj')
@@ -783,8 +806,8 @@ class StatisticsController extends Controller
 
     //wysyłanie email (raport tygodniowy pracownikow dkj)
     public function MailweekReportEmployeeDkj() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Days'));
         $all_data = $this->weekReportEmployeeDkjData($date_start, $date_stop);
         $data = [
             'date_start' => $date_start,
@@ -835,52 +858,11 @@ class StatisticsController extends Controller
         return $data;
     }
 
-    //przygotowanie danych do raportu tygodniowego dkj
-    private function weekReportDkjData($date_start, $date_stop) {
-
-
-
-        $dkj = DB::table('pbx_dkj_team')
-            ->select(DB::raw(
-                'SUM(count_all_check) as sum_all_talks,
-                SUM(count_good_check) as sum_correct_talks,
-                SUM(count_bad_check) as sum_janky,
-                SUM(success) as success,
-                SUM(all_jaky_disagreement) as all_jaky_disagreement,
-                SUM(good_jaky_disagreement) as good_jaky_disagreement,
-                department_info.id as department_info_id,
-                departments.name as dep, 
-                department_type.name as depname,
-                count(departments.name)
-                   '))
-            ->join('department_info', 'department_info.id', '=', 'pbx_dkj_team.department_info_id')
-            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-            ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop){
-                $query->select(DB::raw(
-                    'MAX(pbx_dkj_team.id)'
-                ))
-                    ->from('pbx_dkj_team')
-                    ->whereBetween('report_date', [$date_start, $date_stop])
-                    ->groupBy('department_info_id','report_date');
-            })
-            ->groupBy('pbx_dkj_team.department_info_id')
-            ->get();
-
-//            dd($dkj);
-        $data = [
-            'date_start' => $date_start,
-            'date_stop' => $date_stop,
-            'dkj' => $dkj
-        ];
-        return $data;
-    }
-
     //wysyłanie maila z raportem pracownikow dkj (wczorajszy)
     public function MaildayReportEmployeeDkj()
     {
         $data = $this->dayReportEmployeeDkjData('yesterday');
-        $title = 'Raport dzienny pracowników DKJ '.date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+        $title = 'Raport dzienny pracowników DKJ '.date("Y-m-d",strtotime('-1 Days'));
         $this->sendMailByVerona('dayReportEmployeeDkj', $data, $title);
     }
     // wyświetlenie strony z raportem pracownikow dkj
@@ -905,7 +887,7 @@ class StatisticsController extends Controller
     public function dayReportEmployeeDkjData($type)
     {
         if($type == 'today') {
-            $date = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+            $date = date("Y-m-d",strtotime('-1 Days'));
         }
         else {
             $date = $type;
@@ -948,9 +930,9 @@ class StatisticsController extends Controller
 
     //wyswietlanie danych raportu tygodniowego dla DKJ
     public function pageWeekReportDKJ() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
-        $data = $this->weekReportDkjData($date_start, $date_stop);
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Days'));
+        $data = $this->reportDkjData($date_start, $date_stop);
 
         return view('reportpage.WeekReportDkj')
             ->with([
@@ -963,7 +945,7 @@ class StatisticsController extends Controller
     public function pageWeekReportDKJPost(Request $request) {
         $date_start = $request->date_start;
         $date_stop = $request->date_stop;
-        $data = $this->weekReportDkjData($date_start, $date_stop);
+        $data = $this->reportDkjData($date_start, $date_stop);
 
         return view('reportpage.WeekReportDkj')
             ->with([
@@ -975,126 +957,23 @@ class StatisticsController extends Controller
 
     //wysyłanie email (raport tygodniowy dkj)
     public function MailWeekReportDkj() {
-      $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-      $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
-      $all_data = $this->weekReportDkjData($date_start, $date_stop);
+      $date_start = date("Y-m-d",strtotime('-7 Days'));
+      $date_stop = date("Y-m-d",strtotime('-1 Days'));
+      $all_data = $this->reportDkjData($date_start, $date_stop);
       $data = [
           'date_start' => $date_start,
           'date_stop' => $date_stop,
           'dkj' => $all_data['dkj']
       ];
       $title = 'Raport tygodniowy DKJ ' . $date_start . ' - ' . $date_stop;
-      $this->sendMailByVerona('weekReportDkj', $data, $title);
-    }
-
-    //przygotowanie danych do raportu miesięcznego dkj
-    //type - 0 bierzący miesiac, 1 poprzedni
-    private function MonthReportDkjData($date_start, $date_stop) {
-        $month = $this->monthReverse(substr($date_start, 5,2));
-//        $year = date('Y');
-        if ($month < 10) {
-            $month = '0' . $month;
-        }
-//        if ($month == 12) {
-//            $year -= 1;
-//        }
-//        $selected_date = $year . '-' . $month . '%';
-//        if($type == 0)
-//        {
-//            $month_ini = new DateTime("first day of this month");
-//            $date_start = $month_ini->format('Y-m-d');
-//            $month_end = new DateTime("last day of this month");
-//            $date_stop = $month_end->format('Y-m-d');
-//        }else{
-//            $month_ini = new DateTime("first day of last month");
-//            $date_start = $month_ini->format('Y-m-d');
-//            $month_end = new DateTime("last day of last month");
-//            $date_stop = $month_end->format('Y-m-d');
-//        }
-
-//        $selected_date = substr($date_start, 0, 7) . '%';
-
-
-
-//        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-//        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
-
-//        $dkj = DB::table('users')
-//            ->select(DB::raw('
-//                users.id,
-//                users.first_name,
-//                users.last_name,
-//                users.dating_type,
-//                count(*) as user_sum,
-//                sum(CASE WHEN dkj.dkj_status = 1 THEN 1 ELSE 0 END) as user_janek,
-//                sum(CASE WHEN dkj.dkj_status = 0 THEN 1 ELSE 0 END) as user_not_janek
-//            '))
-//            ->join('dkj', 'users.id', '=', 'dkj.id_dkj')
-//            ->where('dkj.add_date', 'like', $selected_date)
-//            ->groupBy('dkj.id_dkj')
-//            ->get();
-//
-        $work_hours = DB::table('users')
-            ->select(DB::raw('
-                users.id,
-                sec_to_time(sum(time_to_sec(register_stop) - time_to_sec(register_start))) as work_time
-            '))
-            ->join('work_hours', 'users.id', '=', 'work_hours.id_user')
-            ->whereIn('work_hours.date',[$date_start, $date_stop])
-            ->groupBy('users.id')
-            ->where('users.user_type_id', '=', 2)
-            ->get();
-
-        $dkj = DB::table('pbx_dkj_team')
-            ->select(DB::raw(
-                'SUM(count_all_check) as sum_all_talks,
-                SUM(count_good_check) as sum_correct_talks,
-                SUM(count_bad_check) as sum_janky,
-                SUM(success) as success,
-                SUM(all_jaky_disagreement) as all_jaky_disagreement,
-                SUM(good_jaky_disagreement) as good_jaky_disagreement,
-                department_info.id as department_info_id,
-                departments.name as dep, 
-                department_type.name as depname,
-                count(departments.name)
-                   '))
-            ->join('department_info', 'department_info.id', '=', 'pbx_dkj_team.department_info_id')
-            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-            ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop){
-                $query->select(DB::raw(
-                    'MAX(pbx_dkj_team.id)'
-                ))
-                    ->from('pbx_dkj_team')
-                    ->whereBetween('report_date', [$date_start, $date_stop])
-                    ->groupBy('department_info_id','report_date');
-            })
-//            ->where('department_info.id_dep_type', '=', 2)
-            ->groupBy('pbx_dkj_team.department_info_id')
-            ->get();
-
-        $data = [
-            'month_name' => $this->monthReverseName($month),
-            'work_hours' => $work_hours,
-            'date_start' => $date_start,
-            'date_stop' => $date_stop,
-            'dkj' => $dkj
-        ];
-//        dd($data);
-//        $data = [
-//            'month_name' => $this->monthReverseName($month),
-//            'dkj' => $dkj,
-//            'work_hours' => $work_hours
-//        ];
-      
-        return $data;
+      $this->sendMailByVerona('weekReportDkj', $data, $title, User::whereIn('id',[1364] )->get());
     }
 
     //wysyłanie raportu miesięcznego pracownicy dkj
     public function monthReportDkj() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m")-1,date("d"),date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
-      $all_data = $this->MonthReportDkjData($date_start, $date_stop);
+        $date_start = date("Y-m-d",strtotime('-1 Month'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
+      $all_data = $this->reportDkjData($date_start, $date_stop, true);
       $data = [
           'month_name' => $all_data['month_name'],
           'dkj' => $all_data['dkj'],
@@ -1103,14 +982,14 @@ class StatisticsController extends Controller
           'date_stop' => $date_stop
       ];
       $title = 'Raport miesięczny DKJ';
-      $this->sendMailByVerona('monthReportDkj', $data, $title);
+      $this->sendMailByVerona('monthReportDkj', $data, $title, User::whereIn('id',[1364] )->get());
     }
 
     //wyswietlanie raoprtu miesiecznego pracownicy dkj
     public function pageMonthReportDKJ(){
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m")-1,date("d"),date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
-        $data = $this->MonthReportDkjData($date_start, $date_stop);
+        $date_start = date("Y-m-d",strtotime('-1 Month'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
+        $data = $this->reportDkjData($date_start, $date_stop, true);
 
         return view('reportpage.MonthReportDkj')
             ->with([
@@ -1125,7 +1004,7 @@ class StatisticsController extends Controller
     public function pageMonthReportDKJPost(Request $request) {
         $date_start = $request->date_start;
         $date_stop = $request->date_stop;
-        $data = $this->MonthReportDkjData($date_start, $date_stop);
+        $data = $this->reportDkjData($date_start, $date_stop, true);
 
         return view('reportpage.MonthReportDkj')
             ->with([
@@ -1267,7 +1146,7 @@ class StatisticsController extends Controller
             $today = date('Y-m-d');
             $data_help = date('Y-m-d');
         } else if ($type == 'yesterday') {
-            $today = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+            $today = date("Y-m-d",strtotime('-1 Day'));
             $data_help = $today;
         }
         else {
@@ -1300,7 +1179,7 @@ class StatisticsController extends Controller
     public function dayReportChecked() {
       $data = $this->dayReportCheckedData('yesterday');
 
-      $title = 'Raport dzienny odsłuchanych rozmów '.date("d.m.Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+      $title = 'Raport dzienny odsłuchanych rozmów '.date("d.m.Y",strtotime('-1 Day'));
       $this->sendMailByVerona('dayReportChecked', $data, $title);
     }
 
@@ -1374,8 +1253,8 @@ class StatisticsController extends Controller
                     ->groupBy('pbx_dkj_team.department_info_id')
                     ->get();
 
-          $day_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-          $day_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+          $day_start = date("Y-m-d",strtotime('-7 Days'));
+          $day_stop = date("Y-m-d",strtotime('-1 Day'));
 
           $date_start .= ' 00:00:00';
           $date_stop .= ' 23:00:00';
@@ -1403,8 +1282,8 @@ class StatisticsController extends Controller
 
     //Wysyłanie maila raport tygodniowy odsłuchane rozmowy
     public function weekReportChecked() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
         $all_data = $this->weekReportCheckedData($date_start, $date_stop);
         $data = [
             'day_start' => $date_start,
@@ -1418,8 +1297,8 @@ class StatisticsController extends Controller
 
     //wyświetlanie widoku raport tygodniowy odsłuchane rozmowy
     public function pageWeekReportChecked() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
         $data = $this->weekReportCheckedData($date_start, $date_stop);
         return view('reportpage.WeekReportChecked')
             ->with([
@@ -1579,8 +1458,8 @@ class StatisticsController extends Controller
      */
     public function pageWeekReportRecruitmentFlow(){
         $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
 
         return view('reportpage.recruitmentReport.WeekReportRecruitmentFlow')
             ->with([
@@ -1611,8 +1490,8 @@ class StatisticsController extends Controller
 
     public function MailweekReportRecruitmentFlow() {
         $candidate_source = CandidateSource::where('deleted', '=', 0)->get();
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
         $data = [
             'data' => RecruitmentStory::getReportFlowData($date_start,$date_stop),
             'source' => $candidate_source,
@@ -1723,8 +1602,8 @@ class StatisticsController extends Controller
      * Wyświetlanie przeprowadzonych szkoleń Tygodniowy
      */
     public function pageWeekReportTrainingGroup(){
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
 
         return view('reportpage.recruitmentReport.WeekReportRecruitmentTrainingGroup')
             ->with([
@@ -1750,8 +1629,8 @@ class StatisticsController extends Controller
      * Mail przeprowadzonych szkoleń Tygodniowy
      */
     public function MailweekReportTrainingGroup() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
         $data = [
             'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop),
             'date_start' => $date_start,
@@ -1853,8 +1732,8 @@ class StatisticsController extends Controller
      */
 
     public function pageWeekReportInterviews(){
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
 
         return view('reportpage.recruitmentReport.WeekReportInterviews')
             ->with([
@@ -1880,8 +1759,8 @@ class StatisticsController extends Controller
      *  Maila przeprowadzonych rozmów Tygodniowy
      */
     public function MailweekReportInterviews(){
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
         $data = [
             'data' => RecruitmentStory::getReportInterviewsData($date_start,$date_stop,0),
             'date_start' => $date_start,
@@ -1992,8 +1871,8 @@ class StatisticsController extends Controller
      * Raport zatrudnienie Tygodniowy
      */
     public function pageWeekReportHireCandidate(){
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
 
         return view('reportpage.recruitmentReport.WeekReportHireCandidate')
             ->with([
@@ -2019,8 +1898,8 @@ class StatisticsController extends Controller
      *  Maila przeprowadzonych rozmów Tygodniowy
      */
     public function MailweekReportHireCandidate(){
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
         $data = [
             'data' => RecruitmentStory::getReportNewAccountData($date_start,$date_stop,0),
             'date_start' => $date_start,
@@ -3914,8 +3793,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
     public function UnuserdAccount($type){
         $today = date("Y-m-d");
-        $date_warning = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_disable = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-14,date("Y")));
+        $date_warning = date("Y-m-d",strtotime('-7 Days'));
+        $date_disable = date("Y-m-d",strtotime('-14 Days'));
 
 
         $users_warning = User::
@@ -4994,8 +4873,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
      * @return $this method returns data for day campaign report
      */
     public function dayReportCampaignGet() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-1 Day'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
 
         return view('reportpage.DayReportCampaign')
             ->with([
@@ -5024,8 +4903,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
      * This method shows week campaign report
      */
     public function weekReportCampaignGet() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
 
         return view('reportpage.WeekReportCampaign')
             ->with([
@@ -5056,8 +4935,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
      * @return $this method shows month campaign report
      */
     public function monthReportCampaignGet() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m")-1,date("d")-1,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-1 Month -1 Day'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
 
         return view('reportpage.MonthReportCampaign')
             ->with([
@@ -5088,8 +4967,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
      * This method sends email with day campaign report
      */
     public function mailDayReportCampaign() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-1 Day'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
 
         $data = [
             'today' => $date_start,
@@ -5113,8 +4992,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
      * This method sends email with week campaign report
      */
     public function mailWeekReportCampaign() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-7,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-7 Days'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
 
         $data = [
             'date_start' => $date_start,
@@ -5139,8 +5018,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
      * This method sends email with month campaign report
      */
     public function mailMonthReportCampaign() {
-        $date_start = date("Y-m-d",mktime(0,0,0,date("m")-1,date("d")-1,date("Y")));
-        $date_stop = date("Y-m-d",mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+        $date_start = date("Y-m-d",strtotime('-1 Month -1 Day'));
+        $date_stop = date("Y-m-d",strtotime('-1 Day'));
 
         $data = [
             'date_start' => $date_start,

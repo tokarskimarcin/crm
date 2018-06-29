@@ -236,22 +236,22 @@
             @elseif($item->department_info_id == 15)
                 <td style="border:1px solid #231f20;text-align:center;padding:3px;">Lublin Potwierdzenia Wysyłka </td>
             @else
-            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->dep}} {{$item->depname}}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->depname}} {{$item->deptype}}</td>
             @endif
             <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$item->success}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_all_talks}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_correct_talks}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_janky}}</td>
             @php
-                $bad_proc = (100*$item->sum_janky) / $item->sum_all_talks;
-                $check_proc = (100*$item->sum_all_talks) / $item->success;
+                $bad_proc = $item->sum_all_talks > 0 ? (100*$item->sum_janky) / $item->sum_all_talks : 0;
+                $check_proc = $item->success > 0 ? (100*$item->sum_all_talks) / $item->success : 0;
                 $i++;
                 $sum_all_talks += $item->sum_all_talks;
                 $sum_all_good += $item->sum_correct_talks;
                 $sum_all_bad += $item->sum_janky;
                 $sum_succes += $item->success;
-                $sum_proc = (100*$sum_all_bad) / $sum_all_talks;
-                $sum_proc_check = (100*$sum_all_talks) / $sum_succes;
+                $sum_proc = $sum_all_talks > 0 ? (100*$sum_all_bad) / $sum_all_talks : 0;
+                $sum_proc_check = $sum_succes > 0 ? (100*$sum_all_talks) / $sum_succes : 0 ;
                 $sum_all_janky_disagreement += $item->all_jaky_disagreement;
                 $all_good_jaky_disagreement +=  $item->good_jaky_disagreement;
                 $sum_dissa_proc = $item->sum_janky > 0 ? (100*$item->all_jaky_disagreement) / $item->sum_janky : 0;
