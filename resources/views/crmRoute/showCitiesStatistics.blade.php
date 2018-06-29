@@ -53,22 +53,34 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-container">
+                    <div class="form-container" style="margin-bottom:4em;">
 
-                            <div class="form-group" style="margin-left: 1em;">
-                                <label for="date" class="myLabel">Data początkowa:</label>
-                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:50%;">
-                                    <input class="form-control" name="date_start" id="date_start" type="text" value="{{date("Y-m-d")}}">
-                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                        <div class="alert alert-info" style="font-size:2em; margin:1em;">
+                            W module statystyki miast znajduję się lista miast użytych w kampaniach, w określonym przedziale czasu. Przycisk podgląd pozwala podejrzeć szczegóły.
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group" style="margin-left: 1em;">
+                                    <label for="date" class="myLabel">Data początkowa:</label>
+                                    <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                        <input class="form-control" name="date_start" id="date_start" type="text" value="{{date("Y-m-d")}}">
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group"style="margin-left: 1em;">
-                                <label for="date_stop" class="myLabel">Data końcowa:</label>
-                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:50%;">
-                                    <input class="form-control" name="date_stop" id="date_stop" type="text" value="{{date("Y-m-d")}}">
-                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+
+                            <div class="col-md-4">
+                                <div class="form-group"style="margin-left: 1em;">
+                                    <label for="date_stop" class="myLabel">Data końcowa:</label>
+                                    <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                        <input class="form-control" name="date_stop" id="date_stop" type="text" value="{{date("Y-m-d")}}">
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+
+
                         </div>
 
                     <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
@@ -100,7 +112,7 @@
                     <h4 class="modal-title">Info</h4>
                 </div>
                 <div class="modal2-body">
-                    <p>Some text in the modal.</p>
+                    <div class="alert alert-danger">Ładowanie danych.. </div>
                 </div>
                 <div class="modal-footer">
                     <button id="modal-close-button" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -168,8 +180,9 @@
                         },"name":"ilosc","orderable": true
                     },
                     {"data":function (data, type, dataToSet) {
-                            return '<a data-toggle="modal"  class="modal_trigger2" href="#showRecords"> <span class="glyphicon glyphicon-search" data-cityId="' + data.cityId + '" data-type="searchIcon"></span></a>';
-                        },"name":"ilosc","orderable": true
+                       return '<button class="btn btn-default btn-block" data-toggle="modal" data-target="#showRecords" data-type="searchIcon" data-cityId="' + data.cityId + '"><span class="glyphicon glyphicon-search" data-cityId="' + data.cityId + '" data-type="searchIcon" style="font-size: 2em;"></span></button>';
+                            // return '<a data-toggle="modal"  class="modal_trigger2" href="#showRecords"> <span class="glyphicon glyphicon-search" data-cityId="' + data.cityId + '" data-type="searchIcon"></span></a>';
+                        },"name":"ilosc","orderable": true, width: '10%'
                     }
                 ]
             });
