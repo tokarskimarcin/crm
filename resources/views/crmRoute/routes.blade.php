@@ -7,7 +7,7 @@
         width: 100%;
     }
 
-    .routes-container {
+    .routes-container, .new-route-container{
         background-color: white;
         padding: 2em;
         box-shadow: 0 1px 15px 1px rgba(39,39,39,.1);
