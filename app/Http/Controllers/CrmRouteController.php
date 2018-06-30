@@ -1084,7 +1084,6 @@ class CrmRouteController extends Controller
      * @return Return view "show routes"
      */
     public function showRoutesGet() {
-
         return view('crmRoute.showRoutes');
     }
 
@@ -1205,9 +1204,9 @@ class CrmRouteController extends Controller
 
         new ActivityRecorder(12,null,188,1);
 
-        $request->session()->flash('adnotation', 'Hotel został dodany pomyślnie!');
+        $request->session()->flash('adnotation', 'Hotel został zapisany pomyślnie!');
 
-        return Redirect::back();
+        return redirect()->route('showHotels');
 
     }
 
@@ -1279,7 +1278,7 @@ class CrmRouteController extends Controller
     public function hotelGet($id) {
         $hotel = Hotel::find($id);
         $voivodes = Voivodes::all();
-        $cities = Cities::all();
+        $cities = Cities::where('voivodeship_id','=',$hotel->voivode_id)->get();
         $idOfHotel = $id;
 
         return view('crmRoute.hotel')
@@ -1317,7 +1316,7 @@ class CrmRouteController extends Controller
 
             $request->session()->flash('adnotation', 'Hotel został edytowany pomyślnie!');
         }
-        return Redirect::to('/hotel/'. $id);
+        return redirect()->route('showHotels');
     }
 
     /**

@@ -45,6 +45,7 @@
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
+                    Formularz nowego hotelu
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -55,18 +56,8 @@
                         </div>
                     </div>
                     <div class="form-container">
-                        <form action="{{URL::to('/addNewHotel')}}" method="POST">
+                        <form id="formToSubmitt" action="{{URL::to('/addNewHotel')}}" method="POST">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                            @if(Session::has('adnotation'))
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="alert alert-success">{{Session::get('adnotation') }}</div>
-                                    </div>
-                                </div>
-                                @php
-                                    Session::forget('adnotation');
-                                @endphp
-                            @endif
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="col-md-4">
@@ -90,6 +81,7 @@
                                     <div class="form-group">
                                         <label for="city">Miasto</label>
                                         <select name="city" id="city" class="form-control" required>
+                                            <option value="0">Wybierz</option>
                                         </select>
                                     </div>
                                 </div>
@@ -106,12 +98,12 @@
                                     </div>
                                 </div>
                                 <div class="col-md-12">
-                                    <div class="button-container">
-                                        <input type="submit" class="btn btn-success" value="Zapisz" style="width:100%;font-size:1.1em;font-weight:bold;">
-                                    </div>
+                                    <button class="btn btn-info" type="button" id="redir" style="width:100%;margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;">Przejdź do listy hoteli</button>
                                 </div>
                                 <div class="col-md-12">
-                                    <button class="btn btn-info" type="button" id="redir" style="width:100%;margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;">Przejdź do listy hoteli</button>
+                                    <div class="button-container">
+                                        <input type="submit" class="btn btn-success" id="saveHotel" value="Zapisz" style="width:100%;font-size:1.1em;font-weight:bold;">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -141,6 +133,39 @@
         document.addEventListener('DOMContentLoaded', function(event) {
            let formContainer = document.querySelector('.form-container');
 
+            //Walidacja Zapisu
+            $('#saveHotel').on('click', function() {
+                var name = $("#name").val();
+                var price = $('#price').val();
+                var voivode = $('#voivode').val();
+                var city = $('#city').val();
+                var validate = true;
+                if (name.trim().length == 0) {
+                    swal('Wprowadź nazwę hotelu!')
+                    validate = false;
+                    return false;
+                }
+                if (voivode == 0) {
+                    swal('Wybierz województwo!')
+                    validate = false;
+                    return false;
+                }
+                if (city == 0 || city=='') {
+                    swal('Wybierz miasto!')
+                    validate = false;
+                    return false;
+                }
+                if (price == 0) {
+                    swal('Wybierz cene za salę')
+                    validate = false;
+                    return false;
+                }
+                if(validate){
+                    $('#saveHotel').prop("disabled", "disabled");
+                    $('#formToSubmitt').submit();
+                }
+            });
+
            function changeEventHandler(e) {
                if(e.target.dataset.element === 'voivode') {
                    let voivodeId = e.target.value;
@@ -154,7 +179,6 @@
                            "id": voivodeId
                        },
                        success: function(response, status) {
-                           console.log(response);
                          let cityInput = document.getElementById('city');
                          clearContent(cityInput);
                          let zeroValueOption = document.createElement('option');
