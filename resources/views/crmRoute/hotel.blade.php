@@ -43,18 +43,9 @@
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
+                    Formularz edycji hotelu
                 </div>
                 <div class="panel-body">
-                    @if(Session::has('adnotation'))
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="alert alert-success">{{Session::get('adnotation') }}</div>
-                            </div>
-                        </div>
-                        @php
-                            Session::forget('adnotation');
-                        @endphp
-                    @endif
                     <div class="row">
                         <div class="col-md-12">
                             <div class="heading-container">
@@ -63,7 +54,7 @@
                         </div>
                     </div>
                     <div class="form-container">
-                        <form action="{{URL::to('/hotel/'. $id)}}" method="POST" id="formularz">
+                        <form id="formToSubmitt" action="{{URL::to('/hotel/'. $id)}}" method="POST" id="formularz">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                             @if(Session::has('adnotation'))
                                 <div class="row">
@@ -100,6 +91,8 @@
                                         <select name="city" id="city" class="form-control" required>
                                             @foreach($cities as $city)
                                                 @if($city->id == $hotel->city_id)
+                                                    <option value="{{$city->id}}" selected>{{$city->name}}</option>
+                                                @else
                                                     <option value="{{$city->id}}">{{$city->name}}</option>
                                                 @endif
                                             @endforeach
@@ -122,7 +115,7 @@
                                     <div class="button-container">
                                         <input type="button" class="btn btn-danger" value="Usuń hotel" data-element="usun" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">
                                         <button class="btn btn-info" type="button" id="redir" style="width:100%;font-size:1.1em;font-weight:bold;">Pzejdz do listy hoteli</button>
-                                        <input type="submit" class="btn btn-success" value="Zapisz zmiany" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">
+                                        <input type="submit" id="saveHotel" class="btn btn-success" value="Zapisz zmiany" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">
 
                                     </div>
                                 </div>
@@ -150,6 +143,41 @@
         function clearContent(container) {
             container.innerHTML = '';
         }
+
+        //Walidacja Zapisu
+        $('#saveHotel').on('click', function() {
+            var name = $("#name").val();
+            var price = $('#price').val();
+            var voivode = $('#voivode').val();
+            var city = $('#city').val();
+            var validate = true;
+            if (name.trim().length == 0) {
+                swal('Wprowadź nazwę hotelu!')
+                validate = false;
+                return false;
+            }
+            if (voivode == 0) {
+                swal('Wybierz województwo!')
+                validate = false;
+                return false;
+            }
+            if (city == 0 || city=='') {
+                swal('Wybierz miasto!')
+                validate = false;
+                return false;
+            }
+            if (price == 0) {
+                swal('Wybierz cene za salę')
+                validate = false;
+                return false;
+            }
+            if(validate){
+                $('#saveHotel').prop("disabled", "disabled");
+                $('#formToSubmitt').submit();
+            }
+        });
+
+
 
         document.addEventListener('DOMContentLoaded', function(event) {
            let formContainer = document.querySelector('.form-container');
@@ -208,17 +236,10 @@
                            let newElement = document.createElement('div');
                            newElement.innerHTML = '<input type="hidden" value="usun" name="usun">';
                            buttonContainer.appendChild(newElement);
-                           formularz.submit();
-                           swal(
-                               'Usunięte!',
-                               'Hotel został usunięty',
-                               'Sukces'
-                           )
+                           $('#formToSubmitt').submit();
                        }
                    });
-               }
-                else if(e.target.id == 'redir') {
-                   console.log(e.target);
+               }else if(e.target.id == 'redir') {
                    window.location.href = "{{URL::to('/showHotels')}}"
                }
            }

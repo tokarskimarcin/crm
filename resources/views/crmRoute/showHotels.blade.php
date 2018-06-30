@@ -22,7 +22,6 @@
         </div>
     </div>
 </div>
-
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
@@ -31,6 +30,12 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
+                        <div class="col-md-12">
+                            <button class="btn btn-default" id="addNewHotel" style="margin-bottom: 14px">
+                                <span class="glyphicon glyphicon-plus"></span> <span>Dodaj Hotel</span>
+                            </button>
+                        </div>
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="voivode">Województwo</label>
@@ -53,7 +58,9 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-mg-10">
+                    </div>
+
+                        <div class="col-mg-12">
                             <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
@@ -67,10 +74,6 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-                    <div class="col-md-12">
-                        <button id="addNewHotel" class="btn btn-info">Dodaj nowy hotel</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -79,8 +82,16 @@
 
 @section('script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
 
+        if('{{Session::has('adnotation')}}'){
+            $.notify({
+                message: '{{Session::get('adnotation') }}'
+            },{
+                type: 'success'
+            });
+        }
         document.addEventListener('DOMContentLoaded', function(event) {
             let voivodeeId = [];
             let cityId = [];
@@ -119,7 +130,7 @@
                         },"name":"cityName", "orderable": true
                     },
                     {"data":function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("hotel")}}/' + data.id + '" class="links">Edycja</a>';
+                            return '<a href="{{URL::to("hotel")}}/' + data.id + '" class="links button btn btn-info btn-block">Edycja</a>';
                         },"orderable": false, "searchable": false
                     }
                 ]

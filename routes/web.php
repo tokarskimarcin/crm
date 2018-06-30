@@ -853,7 +853,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/addNewHotel', 'CrmRouteController@addNewHotelGet');
     Route::post('/addNewHotel', 'CrmRouteController@addNewHotelPost');
-    Route::get('/showHotels', 'CrmRouteController@showHotelsGet');
+    Route::get('/showHotels', 'CrmRouteController@showHotelsGet')->name('showHotels');
     Route::get('/hotel/{id}', 'CrmRouteController@hotelGet');
     Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
 
