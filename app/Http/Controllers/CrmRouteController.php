@@ -164,10 +164,14 @@ class CrmRouteController extends Controller
      * This method shows specific route
      */
     public function specificRouteGet($id, $onlyResult = null) {
-        $clientRouteInfo = ClientRouteInfo::where('client_route_id', '=', $id)->get();
+        $clientRouteInfo = ClientRouteInfo::select('client_route_info.id as id', 'city.name as cityName', 'voivodeship.name as voivodeName', 'client_route.id as client_route_id', 'city.id as city_id', 'voivodeship.id as voivode_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour', 'client_route.client_id as client_id')
+            ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
+            ->join('city', 'city.id', '=', 'client_route_info.city_id')
+            ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
+            ->where('client_route_id', '=', $id)
+            ->get();
+
         $clients = Clients::all();
-        $cities = Cities::all();
-        $voivodes = Voivodes::all();
         $hotels = Hotel::all();
 
         $clientRouteInfoExtended = array();
@@ -195,40 +199,28 @@ class CrmRouteController extends Controller
             }
 
             if($clientName == null) {
-                $clientRId = ClientRoute::find($info->client_route_id)->client_id;
+                $clientRId = $info->client_id;
                 $clientName = Clients::find($clientRId)->name;
             }
 
             $stdClass = new \stdClass();
-
-            foreach($cities as $city) {
-                if($info->city_id == $city->id) {
-                    $stdClass->cityName = $city->name;
-                }
-            }
-
-            foreach($voivodes as $voivode) {
-                if($info->voivode_id == $voivode->id) {
-                    $stdClass->voivodeName = $voivode->name;
-                }
-            }
 
             foreach($clients as $client) {
                 if($info->client_route_id == $client->id) {
                     $stdClass->clientName = $client->name;
                 }
             }
+
             $stdClass->id = $info->id;
             $stdClass->client_route_id = $info->client_route_id;
             $stdClass->city_id = $info->city_id;
+            $stdClass->cityName = $info->cityName;
             $stdClass->voivode_id = $info->voivode_id;
+            $stdClass->voivodeName = $info->voivodeName;
             $stdClass->date = $info->date;
             $stdClass->hotel_id = $info->hotel_id;
             $stdClass->hotel_info = Hotel::find($info->hotel_id);
             $stdClass->hour = $info->hour;
-            $stdClass->limit = $info->limits == null ? 0 : $info->limits;
-            $stdClass->department_info_id = $info->department_info_id;
-            $stdClass->weekNumber = date("W",strtotime($info->date));
             array_push($insideArr, $stdClass);
             if($flag == 1) {
                 $flag = 0;
@@ -366,7 +358,6 @@ class CrmRouteController extends Controller
                 }
 
                 $item->hotel_id = $city->timeHotelArr[$iterator]->hotelId;
-                $item->limits = 0; //At this point nobody choose it's value
                 $item->department_info_id = null; //At this point nobody choose it's value, can't be 0 because
                 $item->save();
                 $iterator++;
@@ -490,6 +481,7 @@ class CrmRouteController extends Controller
 //        $newEmptyClient->
         return datatables($client_route_info)->make(true);
     }
+
     /**
      * @param showAllClients(true/false/null), showOnlyAssigned(true/false/null), id(number/null), selectedWeek(number), year(number), typ(number), state(number)
      * This method return data about all client routes to datatable in showClientRoutes
@@ -569,214 +561,6 @@ class CrmRouteController extends Controller
         }
 
         return datatables($full_clients_routes)->make(true);
-/*
-        $client_route_info = ClientRouteInfo::where('client_route.client_id','like',$clientId)
-            ->where('date', 'like', $year . '%')
-            ->where('weekOfYear', 'like', $selectedWeek)
-            ->where('client_route.type', 'like', $typ)
-            ->where('client_route.status', 'like', $state)
-            ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id');
-
-        if($showOnlyAssigned == 'true'){
-            $client_route_info->where(function($query){
-                $query->where('hotel_id','=', null)->orWhere('hour','=', null);
-            }
-            );
-        }
-        $client_route_info = $client_route_info->get();
-
-        $allDataArr = array();
-        $cities = Cities::all();
-        $clients = Clients::all();
-        $clientRoutes = ClientRoute::all();
-
-        $client_route_info_extended = $client_route_info->map(function ($item) use ($cities, $clients, $clientRoutes) {
-
-            $hotelIterator = 0; //this variable counts hotels for each clientRoute
-            $thisClientRouteData = ClientRouteInfo::where('client_route_id', '=', $item->client_route_id)->get(); //all insertions for given ClientRoute
-            foreach($thisClientRouteData as $clientData) {
-                if(isset($clientData->hotel_id)) {
-                    $hotelIterator++;
-                }
-            }
-
-            if($hotelIterator == $thisClientRouteData->count()) {
-                $item->haveHotel = "1";
-            }
-            else {
-                $item->haveHotel = "0";
-            }
-
-            foreach ($cities as $city) {
-                if ($city->id == $item->city_id) {
-                    $item->cityName = $city->name;
-                }
-            }
-
-            foreach ($hotels as $hotel) {
-                if (isset($item->hotel_id)) {
-                    if ($hotel->id == $item->hotel_id) {
-                        $item->hotelName = $hotel->name;
-                    }
-                } else {
-                    $item->hotelName = 'brak';
-                }
-            }
-
-            $clientName = DB::table('client_route_info')->select(DB::raw('
-                client.name as clientName,
-                client_route.type as typ,
-                client_route.status as status
-            '))
-                ->join('client_route', 'client_route.id', 'client_route_info.client_route_id')
-                ->join('client', 'client.id', '=', 'client_route.client_id')
-                ->where('client_route_info.client_route_id', '=', $item->client_route_id)
-                ->distinct()
-                ->first();
-
-            $clientRoute = $clientRoutes->where('id','=', $item->client_route_id)->first();
-            foreach ($clients as $client){
-                if($client->id == $clientRoute->client_id){
-                    $item->clientName = $client->name;
-                    $item->typ = $clientRoute->type;
-                    $item->status = $clientRoute->status;
-                }
-            }
-
-            return $item;
-        });
-
-        $fullInfoArr = array(); // array of arrays of objects. Each array represent one client_route and objects represent all client_route_info of this client_route
-        $fullNameArr = array(); // array of objects. Each object represents all client_route_info of this client_route
-        $clientRouteName = '';
-        $dateFlag = null;
-        $cityFlag = null;
-        $iterator = 0;
-        $separator = '';
-        $client_route_indicator = null;
-        $lp = 0; // simple iterator
-        foreach ($client_route_info_extended as $extendedInfo) {
-            $lp++;
-            if ($lp == 1) {
-                $client_route_indicator = $extendedInfo->client_route_id; // przypisujemy do zmiennej wartosc pierwsego client_route_id
-            }
-            if ($extendedInfo->client_route_id == $client_route_indicator) {
-                $helpObject = new \stdClass();
-                $helpObject->cityName = $extendedInfo->cityName;
-                $helpObject->date = $extendedInfo->date;
-                $helpObject->clientName = $extendedInfo->clientName;
-                $helpObject->clientRouteId = $extendedInfo->client_route_id;
-                $helpObject->weekOfYear = $extendedInfo->weekOfYear;
-                $helpObject->hotelName = $extendedInfo->hotelName;
-                $helpObject->hour = $extendedInfo->hour;
-                $helpObject->status = $extendedInfo->status;
-                $helpObject->haveHotel = $extendedInfo->haveHotel;
-                $helpObject->typ = $extendedInfo->typ;
-                array_push($fullNameArr, $helpObject);
-            } else {
-                array_push($fullInfoArr, $fullNameArr); //dodaje do fullInfoArr wszystkie dane o poszczególej trasie
-                $fullNameArr = array(); // czyścimy zawartosc tej tablicy
-                $helpObject = new \stdClass();
-                $helpObject->cityName = $extendedInfo->cityName;
-                $helpObject->date = $extendedInfo->date;
-                $helpObject->clientName = $extendedInfo->clientName;
-                $helpObject->clientRouteId = $extendedInfo->client_route_id;
-                $helpObject->weekOfYear = $extendedInfo->weekOfYear;
-                $helpObject->hotelName = $extendedInfo->hotelName;
-                $helpObject->hour = $extendedInfo->hour;
-                $helpObject->status = $extendedInfo->status;
-                $helpObject->haveHotel = $extendedInfo->haveHotel;
-                $helpObject->typ = $extendedInfo->typ;
-                array_push($fullNameArr, $helpObject);
-                $client_route_indicator = $extendedInfo->client_route_id;
-            }
-
-            if ($lp == count($client_route_info_extended)) {
-                array_push($fullInfoArr, $fullNameArr);
-            }
-        }
-//        dd($fullInfoArr);
-        $helpClientNameVariable = '';
-        $helpClientWeekVariable = '';
-        $helpHourVariable = 0;
-        $fullInfoArrExtended = array();
-        $iterator2 = 0;
-        foreach ($fullInfoArr as $eachClientRoute) {
-            $iterator2++;
-            $lp = 0;
-            $iterator = 0;
-            $helpClientNameVariable = '';
-            $clientRouteName = '';
-            $separator = '';
-            $helpClientWeekVariable = '';
-            $helpHourVariable = 0;
-            $minDate = 0; // this variable have value of earliest date from given clientRoute
-            foreach ($eachClientRoute as $item) {
-                if ($item->hour != null && $item->hour != '00:00:00') {
-                    $helpHourVariable++;
-                }
-                $lp++;
-                $dateFlag = null; // true - the same day
-                $cityFlag = null;
-                if ($lp == 1) {
-                    $minDate = $item->date;
-                    $clientRouteName .= $item->cityName;
-                    $iterator++;
-                    $helpClientNameVariable = $item->clientName;
-                    $helpClientWeekVariable = $item->weekOfYear;
-                } else {
-                    if($item->date < $minDate) {
-                        $minDate = $item->date;
-                    }
-
-                    for ($i = 0; $i < $iterator; $i++) {
-                        if ($item->date == $eachClientRoute[$i]->date) {
-
-                            $dateFlag = true;
-                        }
-                    }
-                    if ($dateFlag == true) {
-                        for ($i = 0; $i < $iterator; $i++) {
-                            if ($item->cityName == $eachClientRoute[$i]->cityName) {
-                                $cityFlag = true;
-                            }
-                        }
-                    }
-                    if ($dateFlag == true && $cityFlag != true) {
-                        $separator = '+';
-                        $clientRouteName .= $separator . $item->cityName;
-                    } else if ($dateFlag != true && $cityFlag != true) {
-                        $separator = ' | ';
-                        $clientRouteName .= $separator . $item->cityName;
-                    }
-                    $iterator++;
-                }
-
-                if ($lp == count($eachClientRoute)) {
-                    $helpObject2 = new \stdClass();
-                    $helpObject2->clientRouteName = $clientRouteName;
-                    $helpObject2->clientName = $helpClientNameVariable;
-                    $helpObject2->clientRouteId = $item->clientRouteId;
-                    $helpObject2->weekOfYear = $helpClientWeekVariable;
-                    $helpObject2->hotelName = $item->hotelName;
-                    $helpObject2->status = $item->status;
-                    $helpObject2->haveHotel = $item->haveHotel;
-                    $helpObject2->minDate = $minDate; //lowest date of each clientRoute.
-                    $helpObject2->typ = $item->typ;
-                    if ($helpHourVariable == count($eachClientRoute)) {
-                        $helpObject2->hour = "tak";
-                    } else {
-                        $helpObject2->hour = "nie";
-                    }
-                    array_push($fullInfoArrExtended, $helpObject2);
-                }
-            }
-        }
-        $infoCollection = collect($fullInfoArrExtended);
-        if(isset($request->onlyAccept))
-            $infoCollection = $infoCollection->where('status','=',1);
-
-        return datatables($infoCollection)->make(true);*/
     }
 
     /**
@@ -1346,9 +1130,6 @@ class CrmRouteController extends Controller
         }
     }
 
-
-
-
     public function findCityByDistance($city, $currentDate,$clientRoutesInfoWithUsedCities){
         $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
             ( 3959 * acos ( cos ( radians('.$city->latitude.') ) * cos( radians( `latitude` ) )
@@ -1589,13 +1370,10 @@ class CrmRouteController extends Controller
     public function showRoutesDetailedAjax(Request $request) {
         $detailedInfo = ClientRouteInfo::all();
         $cities = Cities::all();
-
-        $detailedInfo->map(function($item) {
-
-
-
-            return $item;
-        });
+//        $detailedInfo->map(function($item) {
+//
+//            return $item;
+//        });
 
         return datatables($detailedInfo)->make(true);
     }
@@ -1899,6 +1677,10 @@ class CrmRouteController extends Controller
      */
     public function presentationStatisticsGet()
     {
+
+        $year = date('Y',strtotime("this year"));
+        $currentMonth = date('m', strtotime("now"));
+
         $actualMonth = date('Y-m');
         $actualClientsId = ClientRouteInfo::
             join('client_route','client_route.id','client_route_info.client_route_id')
@@ -2033,7 +1815,9 @@ class CrmRouteController extends Controller
             ->with('days',$split_month)
             ->with('allInfo',$groupAllInfo)
             ->with('months',$this->monthArray())
-            ->with('month',date('m'));
+            ->with('month',date('m'))
+            ->with('currentYear', $year)
+            ->with('currentMonth', $currentMonth);
     }
 
     public function monthPerWeekDivision($month,$year){
