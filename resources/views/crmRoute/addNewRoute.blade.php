@@ -400,8 +400,8 @@
             stringAppend =
             '<div class="row">' +
             '            <div class="col-lg-12 button_section">' +
-                '            <input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">'+
-            '                <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">\n' +
+                '            <button class="btn btn-default btn_add_new_route" id="add_new_show" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;"><span class="glyphicon glyphicon-plus"></span> Dodaj nowy pokaz</button>'+
+            '                <button class="btn btn-success" id="save_route" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;"><span class="glyphicon glyphicon-save"></span> Zapisz</button>\n' +
             '            </div>\n'+
                 '</div>';
 

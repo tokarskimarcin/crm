@@ -155,30 +155,30 @@
                 </div>
             </div>
 
-            <div class="new-route-container">
-                <div class="row">
-                    <div class="col-lg-12 button_section second_button_section">
 
-                        <div class="infobuttons">
-                            <input type="button" class="btn btn-info" id="return" value="Powrót"
-                                   style="margin-bottom:1em;width:47%;font-size:1.1em;font-weight:bold;">
-                            <input type="button" class="btn btn-info btn_add_new_route" id="add_new_show"
-                                   value="Dodaj nowy pokaz"
-                                   style="width:47%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">
-                        </div>
-                        <div class="importantButtons">
-                            {{--<input type="button" class="btn btn-danger" value="Usuń trasę" data-element="usun" style="margin-bottom:1em;width:100%;font-size:1.1em;font-weight:bold;">--}}
-                            <input type="button" class="btn btn-success" id="save_route" value="Zapisz!"
-                                   style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">
-                        </div>
+            @php
+                $lp++;
+            @endphp
+        @endforeach
+        <div class="new-route-container">
+            <div class="row">
+                <div class="col-lg-12 button_section second_button_section">
+
+                    <div class="infobuttons">
+                        <button class="btn btn-primary" id="return"
+                                style="margin-bottom:1em;width:47%;font-size:1.1em;font-weight:bold;"><span class='glyphicon glyphicon-repeat'></span> Powrót</button>
+                        <button class="btn btn-default btn_add_new_route" id="add_new_show"
+                                style="width:47%;margin-bottom:1em;font-size:1.1em;font-weight:bold;"><span class="glyphicon glyphicon-plus"></span> Dodaj nowy Pokaz</button>
+                    </div>
+                    <div class="importantButtons">
+                        {{--<input type="button" class="btn btn-danger" value="Usuń trasę" data-element="usun" style="margin-bottom:1em;width:100%;font-size:1.1em;font-weight:bold;">--}}
+                        <button class="btn btn-success" id="save_route"
+                                style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;"><span class='glyphicon glyphicon-save'></span> Zapisz</button>
                     </div>
                 </div>
             </div>
+        </div>
+    @endif
 </div>
-@php
-    $lp++;
-@endphp
-@endforeach
-@endif
 </div>
 

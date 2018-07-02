@@ -54,7 +54,6 @@
 
             let iterator = 1;
             let mainContainer = document.querySelector('.routes-wrapper'); //zaznaczamy główny container
-            console.log(mainContainer);
 
             $(mainContainer).prepend(createDeleteContainer());
 
@@ -63,7 +62,8 @@
                 newElement.className = 'delete-container';
                 let stringAppend = '<div class="row">' +
                     '<div class="col-md-12">' +
-                    '<input type="button" class="btn btn-danger" value="Usuń trasę" data-element="usun" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">' +
+                    '<button class="btn btn-danger" data-element="usun" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">' +
+                    '<span class="glyphicon glyphicon-minus"></span> Usuń trasę</button>' +
                     '</div>'+
                     '</div>';
                 newElement.innerHTML = stringAppend;
