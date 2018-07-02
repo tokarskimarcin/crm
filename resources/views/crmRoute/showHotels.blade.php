@@ -61,7 +61,7 @@
                     </div>
 
                         <div class="col-mg-12">
-                            <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
+                            <table id="datatable" class="thead-inverse table table-striped row-border" cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
                                     <th>Nazwa</th>
@@ -130,7 +130,7 @@
                         },"name":"cityName", "orderable": true
                     },
                     {"data":function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("hotel")}}/' + data.id + '" class="links button btn btn-info btn-block">Edycja</a>';
+                            return '<a href="{{URL::to("hotel")}}/' + data.id + '" class="links button btn btn-block btn-info"><span class="glyphicon glyphicon-edit"></span> Edycja</a>';
                         },"orderable": false, "searchable": false
                     }
                 ]

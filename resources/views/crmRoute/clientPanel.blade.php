@@ -22,10 +22,10 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <button data-toggle="modal" class="btn btn-default" id="clietnModal" data-target="#ModalClient" data-id="1" title="Nowy Klient" style="margin-bottom: 14px">
+                            <button data-toggle="modal" class="btn btn-default" id="clientModal" data-target="#ModalClient" data-id="1" title="Nowy Klient" style="margin-bottom: 14px">
                                 <span class="glyphicon glyphicon-plus"></span> <span>Dodaj Klienta</span>
                             </button>
-                            <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
+                            <table id="datatable" class="thead-inverse table table-striped row-border" cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
                                     <th>Nazwa</th>
@@ -56,7 +56,7 @@
 
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Nowy Klient
+                            Formularz
                         </div>
                         <div class="panel-body">
                             <div class="col-md-12">
@@ -117,6 +117,7 @@
         let editFlag = false;
         let saveButton = document.querySelector('#saveClient');
         let modalTitle = document.querySelector('#modal_title');
+        var saveCityButtonClicked = false;
 
         /**
          * This function shows notification.
@@ -144,6 +145,7 @@
         }
         //Zapisanie klienta
         function saveClient(e) {
+            saveCityButtonClicked = true;
             let clientName = $('#clientName').val();
             let clientPriority = $('#clientPriority').val();
             let clientType = $('#clientType').val();
@@ -191,13 +193,24 @@
             }
         }
 
+        $('#clientModal').click(() => {
+            $('#ModalClient .modal-title').first().text('Dodawanie nowego klienta');
+            let saveClientModalButton = $('#ModalClient #saveClient');
+            saveClientModalButton.first().prop('class','btn btn-default form-control');
+            saveClientModalButton.first().text('');
+            saveClientModalButton.append($('<span class="glyphicon glyphicon-plus"></span>'));
+            saveClientModalButton.append(' Dodaj Klienta');
+        });
 
         $(document).ready(function() {
 
             $('#ModalClient').on('hidden.bs.modal',function () {
                 $('#clientID').val("0");
                 clearModal();
-                table.ajax.reload();
+                if (saveCityButtonClicked) {
+                    table.ajax.reload();
+                    saveCityButtonClicked = false;
+                }
             });
 
             table = $('#datatable').DataTable({
@@ -273,6 +286,12 @@
                      * Educja clienta
                      */
                     $('.button-edit-client').on('click',function () {
+                        $('#ModalClient .modal-title').first().text('Edytowanie klienta');
+                        let saveClientModalButton = $('#ModalClient #saveClient');
+                        saveClientModalButton.first().prop('class','btn btn-info form-control');
+                        saveClientModalButton.first().text('');
+                        saveClientModalButton.append($('<span class="glyphicon glyphicon-edit"></span>'));
+                        saveClientModalButton.append(' Edytuj Klienta');
                         clientId = $(this).data('id');
                         $.ajax({
                             type: "POST",
@@ -304,13 +323,13 @@
                     },
                     {"data":"type"},
                     {"data":function (data, type, dataToSet) {
-                            let returnButton = "<button class='button-edit-client btn btn-warning' style='width:50%; font-size: 1.2em;' data-id="+data.id+">Edycja</button>";
+                            let returnButton = "<button class='button-edit-client btn btn-info btn-block' data-id="+data.id+"><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
                             if(data.status == 0)
-                                returnButton += "<button style='width:49%;font-size: 1.2em;' class='button-status-client btn btn-danger' data-id="+data.id+" data-status=0>Wyłącz</button>";
+                                returnButton += "<button class='button-status-client btn btn-danger btn-block' data-id="+data.id+" data-status=0><span class='glyphicon glyphicon-off'></span> Wyłącz</button>";
                             else
-                                returnButton += "<button style='width:49%;font-size: 1.2em;' class='button-status-client btn btn-success' data-id="+data.id+" data-status=1 >Włącz</button>";
+                                returnButton += "<button class='button-status-client btn btn-success btn-block' data-id="+data.id+" data-status=1 ><span class='glyphicon glyphicon-off'></span> Włącz</button>";
                             return returnButton;
-                        },"orderable": false, "searchable": false
+                        },"orderable": false, "searchable": false, width:'10%'
                     }
                     ],
             });
