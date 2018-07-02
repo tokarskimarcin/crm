@@ -316,6 +316,27 @@
             });
         }
 
+        let editFlag = false;
+        let saveButton = document.querySelector('#saveClient');
+
+        /**
+         * This function shows notification.
+         */
+        function notify(htmltext$string, type$string = info, delay$miliseconds$number = 5000) {
+            $.notify({
+                // options
+                message: htmltext$string
+            },{
+                // settings
+                type: type$string,
+                delay: delay$miliseconds$number,
+                animate: {
+                    enter: 'animated fadeInRight',
+                    exit: 'animated fadeOutRight'
+                }
+            });
+        }
+
         activateDatepicker();
 
         //Clear Client modal
@@ -347,7 +368,7 @@
             }
             if (validation) {
                 saveClientClicked = true;
-                $('#saveClient').prop('disable',true);
+                saveButton.disabled = true; //after first click, disable button
                 $.ajax({
                     type: "POST",
                     url: "{{route('api.saveClient')}}",
@@ -361,8 +382,15 @@
                         'clientID': clientID
                     },
                     success: function (response) {
+                        if(editFlag == false) {
+                            notify('<strong>Klient został pomyślnie dodany</strong>', 'success');
+                        }
+                        else {
+                            notify('<strong>Klient został pomyślnie edytowany</strong>', 'success');
+                            editFlag = false;
+                        }
                         $('#ModalClient').modal('hide');
-                        $('#saveClient').prop('disable',false);
+                        saveButton.disabled = false; //after closing modal, enable button
                     }
                 })
             }
@@ -370,6 +398,9 @@
 
 
         $(document).ready(function () {
+
+            let modalTitle = document.querySelector('#modal_title');
+
             $('#client_choice_type').attr('disabled', true).val(0);
             $('.city').select2();
             $('.voivodeship').select2();
@@ -700,6 +731,7 @@
                                         'clientId': clientId
                                     },
                                     success: function (response) {
+                                        notify("<strong>Status klienta został zmieniony</strong>", 'info');
                                         table_client.ajax.reload();
                                     }
                                 });
@@ -726,11 +758,13 @@
                                 $('#clientType').val(response.type);
                                 $('#clientID').val(response.id);
                                 $('#ModalClient').modal('show');
+                                editFlag = true;
+                                modalTitle.textContent = "Edytuj klienta";
                             }
                         });
                     });
                     //Zaznaczenie kolumny
-                    $('#table_client tbody tr').on('click', function () {
+                    $('#table_client tbody tr').on('click', function (e) {
                         if ($(this).hasClass('check')) {
                             $(this).removeClass('check');
                             $(this).find('.client_check').prop('checked', false);
@@ -739,39 +773,43 @@
                             clearCheckedClientInfo();
                         }
                         else {
-                            table_client.$('tr.check').removeClass('check');
-                            $.each($('#table_client').find('.client_check'), function (item, val) {
-                                $(val).prop('checked', false);
-                            });
-                            $(this).addClass('check');
-                            $(this).find('.client_check').prop('checked', true);
-                            client_id = $(this).attr('id');
-                            finalClientId = $(this).attr('id');
-                            writeCheckedClientInfo();
+                            if(e.target.dataset.noaction != 1) {
+                                table_client.$('tr.check').removeClass('check');
+                                $.each($('#table_client').find('.client_check'), function (item, val) {
+                                    $(val).prop('checked', false);
+                                });
+                                $(this).addClass('check');
+                                $(this).find('.client_check').prop('checked', true);
+                                client_id = $(this).attr('id');
+                                finalClientId = $(this).attr('id');
+                                writeCheckedClientInfo();
+                            }
+
                         }
+                    });
+
+                    /**
+                     * This part is responsible for aplaying default heading to modal.
+                     */
+                    $("#ModalClient").on('hidden.bs.modal', function () {
+                        modalTitle.textContent = "Dodaj nowego klienta";
                     });
 
                 }, "columns": [
                     {"data": "name", "className": "client_name"},
                     {
                         "data": function (data, type, dataToSet) {
-                            if (data.priority == 1) {
-                                return "Niski";
-                            } else if (data.priority == 2) {
-                                return "Średni"
-                            } else {
-                                return "Wysoki";
-                            }
-                        }, "name": "priority", "className": "client_priority"
+                            return data.priorityName;
+                        }, "name": "priorityName", "className": "client_priority"
                     },
                     {"data": "type", "className": "client_type"},
                     {
                         "data": function (data, type, dataToSet) {
-                            let returnButton = "<button class='button-edit-client btn btn-warning' style='margin: 3px;' data-id=" + data.id + ">Edycja</button>";
+                            let returnButton = "<button class='button-edit-client btn btn-warning' style='width:50%; font-size: 1.2em;' data-id=" + data.id + " data-noaction='1'>Edycja</button>";
                             if (data.status == 0)
-                                returnButton += "<button class='button-status-client btn btn-danger' data-id=" + data.id + " data-status=0 >Wyłącz</button>";
+                                returnButton += "<button style='width:49%;font-size: 1.2em;' class='button-status-client btn btn-danger' data-id=" + data.id + " data-status=0 data-noaction='1'>Wyłącz</button>";
                             else
-                                returnButton += "<button class='button-status-client btn btn-success' data-id=" + data.id + " data-status=1 >Włącz</button>";
+                                returnButton += "<button style='width:49%;font-size: 1.2em;' class='button-status-client btn btn-success' data-id=" + data.id + " data-status=1 data-noaction='1'>Włącz</button>";
                             return returnButton;
                         }, "orderable": false, "searchable": false
                     },

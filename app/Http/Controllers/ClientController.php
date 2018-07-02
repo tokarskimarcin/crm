@@ -21,7 +21,19 @@ class ClientController extends Controller
     public function getClient(Request $request){
         if($request->ajax()){
            $clients = Clients::all();
-           return datatables($clients)->make(true);
+            $clientExtended = $clients->map(function($item) {
+                if($item->priority == 1) {
+                    $item->priorityName = "Niski";
+                }
+                else if($item->priority == 2) {
+                    $item->priorityName = "Średni";
+                }
+                else if($item->priority == 3) {
+                    $item->priorityName = "Wysoki";
+                }
+                return $item;
+            });
+           return datatables($clientExtended)->make(true);
         }
     }
 
@@ -44,7 +56,11 @@ class ClientController extends Controller
             $client->name = $request->clientName;
             $client->priority = $request->clientPriority;
             $client->type = $request->clientType;
-            $client->status = 0;
+
+            if ($request->clientID == 0) {
+                $client->status = 0;
+            }
+
             $client->save();
 
             return 200;
