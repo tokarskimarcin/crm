@@ -1448,7 +1448,27 @@ class CrmRouteController extends Controller
     }
 
 
-
+    /**
+     * Save new/edit hotel
+     * @param Request $request
+     */
+    public function saveNewHotel(Request $request){
+        if($request->ajax()){
+            if($request->hotelId == 0) // new Hotel
+                $newHotel = new Hotel();
+            else    // Edit Hotel
+                $newHotel = HOtel::find($request->hotelId);
+            $newHotel->city_id     = $request->city;
+            $newHotel->price    = $request->price;
+            $newHotel->name     = $request->name;
+            $newHotel->voivode_id  = $request->voivode;
+            $newHotel->comment  = $request->comment;
+            $newHotel->status  = $request->status;
+            $newHotel->save();
+//            new ActivityRecorder(12,null, 193, 1);
+            return 200;
+        }
+    }
 
     /**
      * Save new/edit city
@@ -1504,6 +1524,16 @@ class CrmRouteController extends Controller
             return $city;
         }
     }
+    /**
+     * find Hotel by id
+     */
+    public function findHotel(Request $request){
+        if($request->ajax()){
+            $hotel = Hotel::find($request->hotelId);
+            return $hotel;
+        }
+    }
+
 
     /**
      * This method returns view showRoutesDetailed
