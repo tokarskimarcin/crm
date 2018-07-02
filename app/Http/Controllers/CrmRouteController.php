@@ -164,7 +164,7 @@ class CrmRouteController extends Controller
      * This method shows specific route
      */
     public function specificRouteGet($id, $onlyResult = null) {
-        $clientRouteInfo = ClientRouteInfo::select('client_route_info.id as id', 'city.name as cityName', 'voivodeship.name as voivodeName', 'client_route.id as client_route_id', 'city.id as city_id', 'voivodeship.id as voivode_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour', 'client_route.client_id as client_id')
+        $clientRouteInfo = ClientRouteInfo::select('client_route_info.limits as limits', 'client_route_info.department_info_id as department_info_id', 'client_route_info.id as id', 'city.name as cityName', 'voivodeship.name as voivodeName', 'client_route.id as client_route_id', 'city.id as city_id', 'voivodeship.id as voivode_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour', 'client_route.client_id as client_id', 'client_route_info.weekOfYear as weekOfYear')
             ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
             ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
@@ -221,6 +221,9 @@ class CrmRouteController extends Controller
             $stdClass->hotel_id = $info->hotel_id;
             $stdClass->hotel_info = Hotel::find($info->hotel_id);
             $stdClass->hour = $info->hour;
+            $stdClass->limit = $info->limits == null ? 0 : $info->limits;
+            $stdClass->department_info_id = $info->department_info_id;
+            $stdClass->weekNumber = $info->weekOfYear;
             array_push($insideArr, $stdClass);
             if($flag == 1) {
                 $flag = 0;
@@ -232,6 +235,7 @@ class CrmRouteController extends Controller
         }
 
         $clientRouteInfo = collect($clientRouteInfoExtended);
+
         if($onlyResult == null)
             return view('crmRoute.specificInfo')
                 ->with('clientRouteInfo', $clientRouteInfoExtended)
