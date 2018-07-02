@@ -111,7 +111,8 @@
                             <header>Klient</header>
                             <div class="alert alert-info">
                                 Wybierz klienta z listy. Jeśli nie ma klienta na liście, dodaj go wypełniając formularz,
-                                który pojawi się po naciśnięciu przycisku <strong>Dodaj klienta</strong>
+                                który pojawi się po naciśnięciu przycisku <strong>Dodaj klienta</strong> </br>
+                                Wiersze zaznaczone na czerwono wskazują na klienta, który został wyłączony.
                             </div>
                             <div class="col-md-12">
                                 <button data-toggle="modal" class="btn btn-default" id="clietnModal"
@@ -258,7 +259,9 @@
                         <div class="client-container">
                             <div class="alert alert-info">
                                 Wybierz szablon trasy z listy. Jeśli nie ma odpowiedniej trasy na liście, stwórz ją
-                                naciskając na przycisk <strong>Dodaj trasę ręcznie</strong>
+                                naciskając na przycisk <strong>Dodaj trasę ręcznie</strong> </br>
+                                Wiersze pokolorowane na czerwono wskazują na szablon trasy, w którym co najmniej 1 miasto przekroczyło karencję, względem
+                                daty pierwszego pokazu.
                             </div>
                             <div class="col-md-4">
                                 <button class="btn btn-default" id="add-new-route" style="margin-bottom: 14px;"><span
@@ -595,7 +598,7 @@
                     '            <div class="col-md-6">\n' +
                     '                <div class="form-group">\n' +
                     '                    <label>Województwo</label>\n' +
-                    '                    <select class="form-control voivodeship" data-type="voivode">\n';
+                    '                    <select class="form-control voivodeship" data-type="voivode" style="width:100%;">\n';
                 for (var j = 0; j < voievodes.length; j++) {
                     if (responseIterator.voivodeship_id == voievodes[j].id)
                         stringAppend += '<option value ="' + responseIterator.voivodeship_id + ' " selected>' + responseIterator.voivode_name + '</option>';
@@ -609,7 +612,7 @@
                     '            <div class="col-md-6">\n' +
                     '                <div class="form-group">\n' +
                     '                    <label for="city">Miasto</label>\n' +
-                    '                    <select class="form-control city">\n';
+                    '                    <select class="form-control city" style="width:100%;">\n';
                 for (var j = 0; j < city.length; j++) {
                     if (responseIterator.city_id == city[j].id) {
                         if (city[j].block == 1) {
@@ -923,7 +926,7 @@
                     {
                         "data": function (data, type, dataToSet) {
                             return '<input type="checkbox" style="display:inline-block" class="route_check">';
-                        }, "orderable": false, "searchable": false
+                        }, "orderable": false, "searchable": false, "width": "10%"
                     }
                 ]
             });
