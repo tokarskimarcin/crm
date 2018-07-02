@@ -89,7 +89,7 @@
 
                         </div>
                     <div class="row" style="padding-left: 2em;padding-right:2em;">
-                        <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
+                        <table id="datatable" class="thead-inverse table table-striped row-border" cellspacing="0" width="100%">
                             <thead>
                             <tr>
                                 <th>Wojewodztwo</th>
@@ -190,7 +190,7 @@
                     {"data":function (data, type, dataToSet) {
                        return '<button class="btn btn-default btn-block" data-toggle="modal" data-target="#showRecords" data-type="searchIcon" data-cityId="' + data.cityId + '"><span class="glyphicon glyphicon-search" data-cityId="' + data.cityId + '" data-type="searchIcon" style="font-size: 2em;"></span></button>';
                             // return '<a data-toggle="modal"  class="modal_trigger2" href="#showRecords"> <span class="glyphicon glyphicon-search" data-cityId="' + data.cityId + '" data-type="searchIcon"></span></a>';
-                        },"name":"ilosc","orderable": true, width: '10%'
+                        },"name":"ilosc","orderable": false, searchable: false, width: '10%'
                     }
                 ]
             });

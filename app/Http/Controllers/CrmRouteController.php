@@ -1013,20 +1013,20 @@ class CrmRouteController extends Controller
         $cityIdArr = $request->city;
 
         if(is_null($voivodeIdArr) && is_null($cityIdArr)) {
-            $hotels = Hotel::where('status', '=', 1)->get();
+            $hotels = Hotel::whereIn('status', [1,0])->get();
         }
         else if(!is_null($voivodeIdArr) != 0 && is_null($cityIdArr)) {
-            $hotels = Hotel::where('status', '=', 1)
+            $hotels = Hotel::whereIn('status', [1,0])
                 ->whereIn('voivode_id', $voivodeIdArr)
                 ->get();
         }
         else if(is_null($voivodeIdArr) && !is_null($cityIdArr) != 0) {
-            $hotels = Hotel::where('status', '=', 1)
+            $hotels = Hotel::whereIn('status', [1,0])
                 ->whereIn('city_id', $cityIdArr)
                 ->get();
         }
         else {
-            $hotels = Hotel::where('status', '=', 1)->get();
+            $hotels = Hotel::whereIn('status', [1,0])->get();
         }
 
         $voivodes = Voivodes::all();
@@ -1036,6 +1036,7 @@ class CrmRouteController extends Controller
             $hotelsExtended = new \stdClass();
             $hotelsExtended->id = $hotel->id;
             $hotelsExtended->name = $hotel->name;
+            $hotelsExtended->status = $hotel->status;
             $hotelsExtended->voivode_id = $hotel->voivode_id;
             $hotelsExtended->city_id = $hotel->city_id;
             foreach($voivodes as $voivode) {
@@ -1228,6 +1229,29 @@ class CrmRouteController extends Controller
         }
     }
 
+
+    /**
+     * Save new/edit hotel
+     * @param Request $request
+     */
+    public function saveNewHotel(Request $request){
+        if($request->ajax()){
+            if($request->hotelId == 0) // new Hotel
+                $newHotel = new Hotel();
+            else    // Edit Hotel
+                $newHotel = HOtel::find($request->hotelId);
+            $newHotel->city_id     = $request->city;
+            $newHotel->price    = $request->price;
+            $newHotel->name     = $request->name;
+            $newHotel->voivode_id  = $request->voivode;
+            $newHotel->comment  = $request->comment;
+            $newHotel->status  = $request->hotelStatus;
+            $newHotel->save();
+//            new ActivityRecorder(12,null, 193, 1);
+            return 200;
+        }
+    }
+
     /**
      * Save new/edit city
      * @param Request $request
@@ -1250,6 +1274,27 @@ class CrmRouteController extends Controller
             new ActivityRecorder(12,null, 193, 1);
 
             return 200;
+        }
+    }
+
+    /**
+     * turn off hotel change status to 0 disable or 1 avaible
+     * @param Request $request
+     */
+    public function changeStatusHotel(Request $request){
+        if($request->ajax()){
+            $newHotel = Hotel::find($request->hotelId);
+            if($newHotel->status == 0) {
+                $newHotel->status = 1;
+//                new ActivityRecorder(12,null, 193, 3);
+            }
+
+            else {
+                $newHotel->status = 0;
+//                new ActivityRecorder(12,null, 193, 4);
+            }
+
+            $newHotel->save();
         }
     }
 
@@ -1282,6 +1327,16 @@ class CrmRouteController extends Controller
             return $city;
         }
     }
+    /**
+     * find Hotel by id
+     */
+    public function findHotel(Request $request){
+        if($request->ajax()){
+            $hotel = Hotel::find($request->hotelId);
+            return $hotel;
+        }
+    }
+
 
     /**
      * This method returns view showRoutesDetailed

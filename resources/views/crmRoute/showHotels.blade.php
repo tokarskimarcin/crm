@@ -31,7 +31,9 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <button class="btn btn-default" id="addNewHotel" style="margin-bottom: 14px">
+                            <button data-toggle="modal" class="btn btn-default hotelToModal" id="NewHotelModal"
+                                    data-target="#HotelModal" data-id="1" title="Nowy Hotel"
+                                    style="margin-bottom: 14px">
                                 <span class="glyphicon glyphicon-plus"></span> <span>Dodaj Hotel</span>
                             </button>
                         </div>
@@ -78,6 +80,84 @@
             </div>
         </div>
     </div>
+
+
+
+<div id="HotelModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 90%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" id="modal_title">Dodaj Hotel<span id="modalHotel"></span></h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Formularz
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-container">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="name">Nazwa Hotelu</label>
+                                                <input type="text" id="name" class="form-control" name="name" placeholder="Tutaj wprowadź nazwę hotelu" value="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="voivode">Województwo</label>
+                                                <select name="voivodeAdd" id="voivodeAdd" class="form-control" data-element="voivode" required>
+                                                    <option value="0">Wybierz</option>
+                                                    @foreach($voivodes as $voivode)
+                                                        <option value ="{{$voivode->id}}">{{$voivode->name}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="city">Miasto</label>
+                                                <select name="cityAdd" id="cityAdd" class="form-control" required>
+                                                    <option value="0">Wybierz</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="price">Cena za salę</label>
+                                                <input type="number" step="0.01" min="0" name="price" id="price" class="form-control" placeholder="Cena w złotówkach np. 125,99" value="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="comment">Komentarz</label>
+                                                <input type="text" name="comment" id="comment" class="form-control" placeholder="Tutaj wprowadź krótki komentarz max 255 znaków" value="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="button-container">
+                                                <input type="submit" id="saveHotel" class="btn btn-success" value="Zapisz zmiany" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" value="0" id="hotelId"/>
 @endsection
 
 @section('script')
@@ -85,25 +165,125 @@
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
 
-        if('{{Session::has('adnotation')}}'){
-            $.notify({
-                message: '{{Session::get('adnotation') }}'
-            },{
-                type: 'success'
-            });
+        //flaga dodania nowego hotelu - po poprawnym wykonaniu ajaxa wyswietli sie komunikat
+        var addNewHotelFlag = false;
+        var editHotelFlag = false;
+        var hotelStatus = 1;
+        var city = 0;
+        function clearContent(container) {
+            container.innerHTML = '';
         }
+        // czyszczenie modalu
+        function clearModal() {
+            cityId = 0;
+            addNewHotelFlag = false;
+            editHotelFlag = false;
+            $('#HotelModal .modal-title').first().text('Dodaj Hotel');
+            $('#HotelModal #saveHotel').first().text('Zapisz');
+            $("#name").val("");
+            $('#price').val("");
+            $('#voivodeAdd').val(0);
+            $('#cityAdd').val(0);
+            $('#comment').val("");
+            $('#hotelId').val(0);
+        }
+
         document.addEventListener('DOMContentLoaded', function(event) {
+            $('#NewHotelModal').on('click',function () {
+                hotelStatus = 1;
+                clearModal();
+                addNewHotelFlag = true;
+            });
+
+            $('#HotelModal').on('hidden.bs.modal', function () {
+                hotelStatus = 1;
+                table.ajax.reload();
+            });
             let voivodeeId = [];
             let cityId = [];
-            const addNewHotelInput = document.querySelector('#addNewHotel');
-            addNewHotelInput.addEventListener('click',(e) => {
-                window.location.href = '{{URL::to('/addNewHotel')}}';
-            });
             table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,
                 "serverSide": true,
                 "drawCallback": function( settings ) {
+                },"fnDrawCallback": function (settings) {
+                    /**
+                     * Edycja Hotelu
+                     */
+                    $('.button-edit-hotel').on('click', function () {
+                        let hotel_id = $(this).data('id');
+                        $.ajax({
+                            type: "POST",
+                            url: "{{ route('api.findHotel') }}", // do zamiany
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            data: {
+                                'hotelId': $(this).data('id')
+                            },
+                            success: function (response) {
+                               clearModal();
+                               $('#hotelId').val(hotel_id);
+                               editHotelFlag = true;
+                               $('#HotelModal .modal-title').first().text('Edycja Hotelu');
+                               $('#HotelModal #saveHotel').first().text('Edytuj Hotel');
+                               $("#name").val(response.name);
+                               $('#price').val(response.price);
+                                hotelStatus = response.status;
+                               $('#voivodeAdd').val(response.voivode_id);
+                               $('#comment').val(response.comment);
+                                city = response.city_id;
+                               $('#voivodeAdd').trigger( "change" );
+                               $('#HotelModal').modal('show');
+                            }
+                        });
+                    });
+
+                    /**
+                     * Zmiana statusu hotelu
+                     */
+                    $('.button-status-hotel').on('click',function () {
+                        $(this).prop('disabled', true);
+                        let hotelId = $(this).data('id');
+                        hotelStatus = $(this).data('status');
+                        let nameOfAction = "";
+                        if(hotelStatus == 0)
+                            nameOfAction = "Tak, wyłącz Hotel";
+                        else
+                            nameOfAction = "Tak, włącz Hotel";
+                        swal({
+                            title: 'Jesteś pewien?',
+                            type: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: nameOfAction
+                        }).then((result) => {
+                            if (result.value) {
+
+                                $.ajax({
+                                    type: "POST",
+                                    url: "{{ route('api.changeStatusHotel') }}", // do zamiany
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    data: {
+                                        'hotelId'   : hotelId
+                                    },
+                                    success: function (response) {
+                                        $(this).prop('disabled', false);
+                                        $.notify({
+                                            icon: 'glyphicon glyphicon-ok',
+                                            message: 'Status hotelu został zmieniony'
+                                        }, {
+                                            type: "info"
+                                        });
+                                        table.ajax.reload();
+                                    }
+                                });
+                            }})
+                    });
+
                 },
                 "ajax": {
                     'url': "{{ route('api.showHotelsAjax') }}",
@@ -130,11 +310,125 @@
                         },"name":"cityName", "orderable": true
                     },
                     {"data":function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("hotel")}}/' + data.id + '" class="links button btn btn-info btn-block">Edycja</a>';
+                            let returnButton = "<button class='button-edit-hotel btn btn-info btn-block'  data-id=" + data.id + "><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
+                            if (data.status == 0)
+                                returnButton += "<button class='button-status-hotel btn btn-danger btn-block' data-id=" + data.id + " data-status=0 ><span class='glyphicon glyphicon-off'></span> Wyłącz</button>";
+                            else
+                                returnButton += "<button class='button-status-hotel btn btn-success btn-block' data-id=" + data.id + " data-status=1 ><span class='glyphicon glyphicon-off'></span> Włącz</button>";
+                            return returnButton;
                         },"orderable": false, "searchable": false
                     }
                 ]
             });
+
+            $('#voivodeAdd').on('change',function (e) {
+                $.ajax({
+                    method: "POST",
+                    url: "{{ route('api.getCitiesNames') }}",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        "id": $(this).val()
+                    },
+                    success: function(response, status) {
+                        let cityInput = document.getElementById('cityAdd');
+                        clearContent(cityInput);
+                        let zeroValueOption = document.createElement('option');
+                        zeroValueOption.value = 0;
+                        zeroValueOption.textContent = "Wybierz";
+                        cityInput.appendChild(zeroValueOption);
+
+                        for(var i = 0; i < response.length; i++) {
+                            let optionC = document.createElement('option');
+                            optionC.value = response[i].id;
+                            optionC.textContent = response[i].name;
+                            if(response[i].id == city){
+                                optionC.selected = true;
+                            }
+                            cityInput.appendChild(optionC);
+                        }
+
+                    },
+                    error: function(err, status, info) {
+                        console.log(err);
+                        console.log(status);
+                        console.log(info);
+                    }
+                })
+            });
+
+            //Walidacja Zapisu
+            $('#saveHotel').on('click', function() {
+                var name = $("#name").val();
+                var price = $('#price').val();
+                var voivode = $('#voivodeAdd').val();
+                var city = $('#cityAdd').val();
+                var comment = $('#comment').val();
+                var validate = true;
+                let hotelId = $('#hotelId').val();
+                console.log(hotelStatus);
+                if (name.trim().length == 0) {
+                    swal('Wprowadź nazwę hotelu!')
+                    validate = false;
+                }
+                if (voivode == 0) {
+                    swal('Wybierz województwo!')
+                    validate = false;
+                }
+                if (city == 0 || city=='') {
+                    swal('Wybierz miasto!')
+                    validate = false;
+                }
+                if (price == 0) {
+                    swal('Wybierz cene za salę')
+                    validate = false;
+                }
+                if(validate) {
+                    $('#saveHotel').prop('disabled', true);
+                    $.ajax({
+                        type: "POST",
+                        url: "{{route('api.saveNewHotel')}}",
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data: {
+                            'voivode': voivode,
+                            'name': name,
+                            'price': price,
+                            'city': city,
+                            'hotelId': hotelId,
+                            'comment' : comment,
+                            'hotelStatus' : hotelStatus,
+                        },
+                        success: function (response) {
+                            $('#HotelModal').modal('hide');
+                            if (addNewHotelFlag) {
+                                $.notify({
+                                    icon: 'glyphicon glyphicon-ok',
+                                    message: 'Dodano nowy hotel <strong>' + name + '</strong>'
+                                }, {
+                                    type: "success"
+                                });
+                                addNewHotelFlag = false;
+                            }
+                            if (editHotelFlag) {
+                                $.notify({
+                                    icon: 'glyphicon glyphicon-ok',
+                                    message: 'Edytowano hotel <strong>' + name + '</strong>'
+                                }, {
+                                    type: "success"
+                                });
+                                editHotelFlag = false;
+                            }
+                            $('#saveHotel').prop('disabled', false);
+                        }
+                    })
+                }
+
+            });
+
+
 
             $('#voivode').select2();
             $('#city').select2();

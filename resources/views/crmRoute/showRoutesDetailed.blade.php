@@ -92,10 +92,12 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4 buttonSection" style="min-height: 3.5em;">
-                        <button class="btn btn-info" data-toggle="modal" data-target="#editModal" style="margin-bottom: 1em;  width: 100%;" id="editOneRecord" disabled="true">Edytuj rekordy</button>
+                        <button class="btn btn-info" data-toggle="modal" data-target="#editModal" style="margin-bottom: 1em;  width: 100%;" id="editOneRecord" disabled="true">
+                            <span class='glyphicon glyphicon-edit'></span> Edytuj rekordy</button>
                     </div>
                     <div class="col-md-4">
-                        <button class="btn btn-basic" id="clearButton" style="width:100%;">Wyczyść zaznaczenia</button>
+                        <button class="btn btn-basic" id="clearButton" style="width:100%;">
+                            <span class='glyphicon glyphicon-unchecked'></span> Wyczyść zaznaczenia</button>
                     </div>
 
                 </div>
@@ -264,7 +266,9 @@
                submitButton.classList.add('btn', 'btn-success');
                submitButton.style.marginTop = '1em';
                submitButton.style.width = "100%";
-               submitButton.textContent = 'Zapisz';
+               $(submitButton).append($("<span class='glyphicon glyphicon-save'></span>"));
+               $(submitButton).append(" Zapisz");
+
                modalBody.appendChild(submitButton);
 
                /*Event Listener Part*/
