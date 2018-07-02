@@ -288,7 +288,6 @@
                    data.append('ids', JSONClientRouteInfoIdArr);
 
                    if(nrPBXValue != ''){
-                       console.log(nrPBXValue+' '+typeof (nrPBXValue));
                        data.append('nrPBX', nrPBXValue);
                    }
                    if(baseDivisionValue != ''){
@@ -642,7 +641,6 @@
                        },"name":"verification"
                    },
                    {"data":function (data, type, dataToSet) {
-                        console.log(data);
                            return data.actual_success;
                        },"name":"actual_success"
                    },
