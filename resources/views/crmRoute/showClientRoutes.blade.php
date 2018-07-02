@@ -16,14 +16,9 @@
             background: #B0BED9 !important;
         }
 
-        .glyphicon-edit {
-            color: #477ab7;
+        a {
+            text-decoration: none !important;
         }
-
-        .glyphicon-edit:hover {
-            cursor: pointer;
-        }
-
         .alert-info {
             font-size: 1.5em;
         }
@@ -588,22 +583,22 @@
                                 return '<button data-clientRouteId="' + data.client_route_id + '" class="btn btn-warning action-buttons-1" style="width:100%">Zakończ kampanie</button>';
                             }
 
-                        }, "name": "acceptRoute"
+                        }, "name": "status", searchable: false
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '"><button class="btn btn-default btn-block"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></button></a>';
-                        }, "name": "link", width: '10%'
+                            return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block"><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
+                        }, "name": "link", width: '10%', searchable: false, orderable: false
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.client_route_id + '"><button class="btn btn-default btn-block"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit"></span></button></a>';
-                        }, "name": "link", width: '10%'
+                            return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block"><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
+                        }, "name": "link", width: '10%', searchable: false, orderable: false
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<button class="btn btn-default btn-block show-modal-with-data"><span style="font-size: 2.1em;" class="glyphicon glyphicon-edit " data-route_id ="' + data.client_route_id + '" ></span></button>';
-                        }, "name": "link", width: '10%'
+                            return '<button class="btn btn-info btn-block show-modal-with-data"><span class="glyphicon glyphicon-edit " data-route_id ="' + data.client_route_id + '" ></span> Edytuj</button>';
+                        }, "name": "link", width: '10%', searchable: false, orderable: false
 
                     }
                 ]

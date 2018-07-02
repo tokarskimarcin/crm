@@ -114,7 +114,7 @@
                                 który pojawi się po naciśnięciu przycisku <strong>Dodaj klienta</strong>
                             </div>
                             <div class="col-md-12">
-                                <button data-toggle="modal" class="btn btn-default" id="clietnModal"
+                                <button data-toggle="modal" class="btn btn-default" id="clientModal"
                                         data-target="#ModalClient" data-id="1" title="Nowy Klient"
                                         style="margin-bottom: 14px">
                                     <span class="glyphicon glyphicon-plus"></span> <span>Dodaj Klienta</span>
@@ -205,7 +205,7 @@
 
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            Nowy Klient
+                                            Formularz
                                         </div>
                                         <div class="panel-body">
                                             <div class="col-md-12">
@@ -283,12 +283,12 @@
                     </div>
                     <div class="client-wrapper">
                         <div class="client-container">
-                            <button class="btn btn-info" style="margin-top:1em;font-size:1.1em;font-weight:bold;"
-                                    id="redirect">Powrót
+                            <button class="btn btn-primary" style="margin-top:1em;font-size:1.1em;font-weight:bold;"
+                                    id="redirect"><span class='glyphicon glyphicon-repeat'></span> Powrót
                             </button>
                             <button class="btn btn-success"
                                     style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;"
-                                    id="save">Zapisz
+                                    id="save"><span class='glyphicon glyphicon-save'></span> Zapisz
                             </button>
                         </div>
                     </div>
@@ -338,6 +338,15 @@
         }
 
         activateDatepicker();
+
+        $('#clientModal').click(() => {
+            $('#ModalClient .modal-title').first().text('Dodawanie nowego klienta');
+            let saveClientModalButton = $('#ModalClient #saveClient');
+            saveClientModalButton.first().prop('class','btn btn-default form-control');
+            saveClientModalButton.first().text('');
+            saveClientModalButton.append($('<span class="glyphicon glyphicon-plus"></span>'));
+            saveClientModalButton.append(' Dodaj Klienta');
+        });
 
         //Clear Client modal
         function clearModal() {
@@ -564,7 +573,7 @@
                 let buttonStringAppend =
                     '<div class="row">' +
                     '<div class="col-lg-12 button_section button_new_show_section">\n' +
-                    '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
+                    '<button class="btn btn-default btn-block btn_add_new_route" id="add_new_show"><span class="glyphicon glyphicon-plus"></span> Dodaj nowy pokaz</button>' +
                     '</div>\n' +
                     '</div>';
 
@@ -679,6 +688,7 @@
 
                 table_client = $('#table_client').DataTable({
                 "autoWidth": true,
+                scrollY: '40vh',
                 "processing": true,
                 "serverSide": true,
                 "drawCallback": function (settings) {
@@ -741,6 +751,12 @@
 
 
                     $('.button-edit-client').on('click', function () {
+                        $('#ModalClient .modal-title').first().text('Edytowanie klienta');
+                        let saveClientModalButton = $('#ModalClient #saveClient');
+                        saveClientModalButton.first().prop('class','btn btn-info form-control');
+                        saveClientModalButton.first().text('');
+                        saveClientModalButton.append($('<span class="glyphicon glyphicon-edit"></span>'));
+                        saveClientModalButton.append(' Edytuj Klienta');
                         clientId = $(this).data('id');
                         $.ajax({
                             type: "POST",
@@ -805,13 +821,13 @@
                     {"data": "type", "className": "client_type"},
                     {
                         "data": function (data, type, dataToSet) {
-                            let returnButton = "<button class='button-edit-client btn btn-warning' style='width:50%; font-size: 1.2em;' data-id=" + data.id + " data-noaction='1'>Edycja</button>";
+                            let returnButton = "<button class='button-edit-client btn btn-block btn-info' data-id=" + data.id + " data-noaction='1'><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
                             if (data.status == 0)
-                                returnButton += "<button style='width:49%;font-size: 1.2em;' class='button-status-client btn btn-danger' data-id=" + data.id + " data-status=0 data-noaction='1'>Wyłącz</button>";
+                                returnButton += "<button class='button-status-client btn btn-block btn-danger' data-id=" + data.id + " data-status=0 data-noaction='1'><span class='glyphicon glyphicon-off'></span> Wyłącz</button>";
                             else
-                                returnButton += "<button style='width:49%;font-size: 1.2em;' class='button-status-client btn btn-success' data-id=" + data.id + " data-status=1 data-noaction='1'>Włącz</button>";
+                                returnButton += "<button class='button-status-client btn btn-block btn-success' data-id=" + data.id + " data-status=1 data-noaction='1'><span class='glyphicon glyphicon-off'></span> Włącz</button>";
                             return returnButton;
-                        }, "orderable": false, "searchable": false
+                        }, "orderable": false, "searchable": false, width:'10%'
                     },
                     {
                         "data": function (data, type, dataToSet) {
@@ -821,6 +837,9 @@
                 ],
             });
 
+            $('#menu-toggle').change(()=>{
+                table_client.columns.adjust().draw();
+            });
 
 //*********************END CLIENT SECTON***************************
 

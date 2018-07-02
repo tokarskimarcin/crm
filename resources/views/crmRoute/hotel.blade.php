@@ -113,9 +113,11 @@
                                 </div>
                                 <div class="col-md-12">
                                     <div class="button-container">
-                                        <input type="button" class="btn btn-danger" value="Usuń hotel" data-element="usun" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">
-                                        <button class="btn btn-info" type="button" id="redir" style="width:100%;font-size:1.1em;font-weight:bold;">Pzejdz do listy hoteli</button>
-                                        <input type="submit" id="saveHotel" class="btn btn-success" value="Zapisz zmiany" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">
+                                        <button class="btn btn-danger" data-element="usun" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;"><span class='glyphicon glyphicon-minus'></span> Usuń hotel</button>
+                                        <button class="btn btn-primary"  id="redir" style="width:100%;font-size:1.1em;font-weight:bold;"><span class='glyphicon glyphicon-repeat'></span> Pzejdz do listy hoteli</button>
+                                        <button type="submit" id="saveHotel" class="btn btn-success" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">
+                                            <span class='glyphicon glyphicon-save'></span> Zapisz zmiany
+                                        </button>
 
                                     </div>
                                 </div>

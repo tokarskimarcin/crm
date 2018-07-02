@@ -34,12 +34,13 @@
                     @endif
                     <div class="row" >
                             <div class="col-md-12">
-                                <button id="addNewRoute" class="btn btn-info">Przejdz do dodawania tras</button>
+                                <button id="addNewRoute" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span>
+                                    Przejdz do dodawania tras</button>
                             </div>
                     </div>
                     <div class="row" style="margin-top: 1em">
                         <div class="col-md-12">
-                            <table id="datatable" class="thead-inverse table table-striped table-bordered"
+                            <table id="datatable" class="thead-inverse table table-striped row-border"
                                    cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
@@ -89,7 +90,7 @@
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("route")}}/' + data.id + '" style="text-decoration:none;" class="links"><button class="btn btn-block btn-warning">Edycja</button></a>';
+                            return '<a href="{{URL::to("route")}}/' + data.id + '" style="text-decoration:none;" class="links"><button class="btn btn-block btn-info"><span class="glyphicon glyphicon-edit"></span> Edycja</button></a>';
                         }, "orderable": false, "searchable": false, "width": "20%"
                     }
                 ]

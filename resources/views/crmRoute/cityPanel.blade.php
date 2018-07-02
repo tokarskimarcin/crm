@@ -47,7 +47,7 @@
                                 <span class="glyphicon glyphicon-plus"></span> <span>Dodaj Miasto</span>
                             </button>
                             <div>
-                                <table id="datatable" class="thead-inverse table table-striped table-bordered"
+                                <table id="datatable" class="thead-inverse table row-border table-striped "
                                        cellspacing="0" width="100%">
                                     <thead>
                                     <tr>
@@ -161,8 +161,8 @@
                                         </div>
                                     </div>
                                     <div class="col-md-12">
-                                        <button class="btn btn-success form-control" id="saveCityModal"
-                                                onclick="saveCity(this)">Dodaj Miasto
+                                        <button class="btn btn-default form-control" id="saveCityModal"
+                                                onclick="saveCity(this)"><span class=’glyphicon glyphicon-plus’></span> Dodaj Miasto
                                         </button>
                                     </div>
                                 </div>
@@ -351,7 +351,11 @@
 
             $('#NewCityModal').click(() => {
                 $('#ModalCity .modal-title').first().text('Dodawanie Miasta');
-                $('#ModalCity #saveCityModal').first().text('Dodaj Miasto');
+                saveCityModalButton = $('#ModalCity #saveCityModal');
+                saveCityModalButton.first().prop('class','btn btn-default form-control');
+                saveCityModalButton.first().text('');
+                saveCityModalButton.append($('<span class="glyphicon glyphicon-plus"></span>'));
+                saveCityModalButton.append(' Dodaj Miasto');
             });
 
             table = $('#datatable').DataTable({
@@ -447,7 +451,11 @@
                             success: function (response) {
                                 clearModal();
                                 $('#ModalCity .modal-title').first().text('Edycja Miasta');
-                                $('#ModalCity #saveCityModal').first().text('Edytuj Miasto');
+                                saveCityModalButton = $('#ModalCity #saveCityModal');
+                                saveCityModalButton.first().prop('class','btn btn-info form-control');
+                                saveCityModalButton.first().text('');
+                                saveCityModalButton.append($('<span class="glyphicon glyphicon-edit"></span>'));
+                                saveCityModalButton.append(' Edytuj Miasto');
                                 $('#voiovedshipID').val(response.voivodeship_id);
                                 $('#cityName').val(response.name);
                                 $('#eventCount').val(response.max_hour);
@@ -492,11 +500,11 @@
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            let returnButton = "<button class='button-edit-city btn btn-warning btn-block'  data-id=" + data.id + ">Edycja</button>";
+                            let returnButton = "<button class='button-edit-city btn btn-info btn-block'  data-id=" + data.id + "><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
                             if (data.status == 0)
-                                returnButton += "<button class='button-status-city btn btn-danger btn-block' data-id=" + data.id + " data-status=0 >Wyłącz</button>";
+                                returnButton += "<button class='button-status-city btn btn-danger btn-block' data-id=" + data.id + " data-status=0 ><span class='glyphicon glyphicon-off'></span> Wyłącz</button>";
                             else
-                                returnButton += "<button class='button-status-city btn btn-success btn-block' data-id=" + data.id + " data-status=1 >Włącz</button>";
+                                returnButton += "<button class='button-status-city btn btn-success btn-block' data-id=" + data.id + " data-status=1 ><span class='glyphicon glyphicon-off'></span> Włącz</button>";
                             return returnButton;
                         }, "orderable": false, "searchable": false
                     }
