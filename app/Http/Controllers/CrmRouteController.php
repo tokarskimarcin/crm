@@ -164,10 +164,14 @@ class CrmRouteController extends Controller
      * This method shows specific route
      */
     public function specificRouteGet($id, $onlyResult = null) {
-        $clientRouteInfo = ClientRouteInfo::where('client_route_id', '=', $id)->get();
+        $clientRouteInfo = ClientRouteInfo::select('client_route_info.id as id', 'city.name as cityName', 'voivodeship.name as voivodeName', 'client_route.id as client_route_id', 'city.id as city_id', 'voivodeship.id as voivode_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour', 'client_route.client_id as client_id')
+            ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
+            ->join('city', 'city.id', '=', 'client_route_info.city_id')
+            ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
+            ->where('client_route_id', '=', $id)
+            ->get();
+
         $clients = Clients::all();
-        $cities = Cities::all();
-        $voivodes = Voivodes::all();
         $hotels = Hotel::all();
 
         $clientRouteInfoExtended = array();
@@ -195,40 +199,28 @@ class CrmRouteController extends Controller
             }
 
             if($clientName == null) {
-                $clientRId = ClientRoute::find($info->client_route_id)->client_id;
+                $clientRId = $info->client_id;
                 $clientName = Clients::find($clientRId)->name;
             }
 
             $stdClass = new \stdClass();
-
-            foreach($cities as $city) {
-                if($info->city_id == $city->id) {
-                    $stdClass->cityName = $city->name;
-                }
-            }
-
-            foreach($voivodes as $voivode) {
-                if($info->voivode_id == $voivode->id) {
-                    $stdClass->voivodeName = $voivode->name;
-                }
-            }
 
             foreach($clients as $client) {
                 if($info->client_route_id == $client->id) {
                     $stdClass->clientName = $client->name;
                 }
             }
+
             $stdClass->id = $info->id;
             $stdClass->client_route_id = $info->client_route_id;
             $stdClass->city_id = $info->city_id;
+            $stdClass->cityName = $info->cityName;
             $stdClass->voivode_id = $info->voivode_id;
+            $stdClass->voivodeName = $info->voivodeName;
             $stdClass->date = $info->date;
             $stdClass->hotel_id = $info->hotel_id;
             $stdClass->hotel_info = Hotel::find($info->hotel_id);
             $stdClass->hour = $info->hour;
-            $stdClass->limit = $info->limits == null ? 0 : $info->limits;
-            $stdClass->department_info_id = $info->department_info_id;
-            $stdClass->weekNumber = date("W",strtotime($info->date));
             array_push($insideArr, $stdClass);
             if($flag == 1) {
                 $flag = 0;
@@ -366,7 +358,6 @@ class CrmRouteController extends Controller
                 }
 
                 $item->hotel_id = $city->timeHotelArr[$iterator]->hotelId;
-                $item->limits = 0; //At this point nobody choose it's value
                 $item->department_info_id = null; //At this point nobody choose it's value, can't be 0 because
                 $item->save();
                 $iterator++;
