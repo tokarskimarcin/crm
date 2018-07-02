@@ -1622,6 +1622,10 @@ class CrmRouteController extends Controller
      */
     public function presentationStatisticsGet()
     {
+
+        $year = date('Y',strtotime("this year"));
+        $currentMonth = date('m', strtotime("now"));
+
         $actualMonth = date('Y-m');
         $actualClientsId = ClientRouteInfo::
             join('client_route','client_route.id','client_route_info.client_route_id')
@@ -1756,7 +1760,9 @@ class CrmRouteController extends Controller
             ->with('days',$split_month)
             ->with('allInfo',$groupAllInfo)
             ->with('months',$this->monthArray())
-            ->with('month',date('m'));
+            ->with('month',date('m'))
+            ->with('currentYear', $year)
+            ->with('currentMonth', $currentMonth);
     }
 
     public function monthPerWeekDivision($month,$year){
