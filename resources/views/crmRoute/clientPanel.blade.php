@@ -88,7 +88,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-12 editButtonSection">
                                 <button class="btn btn-success form-control" id="saveClient" onclick = "saveClient(this)" >Zapisz Klienta</button>
                             </div>
                         </div>
@@ -113,6 +113,28 @@
             minView : 2,
             pickTime: false
         });
+
+        let editFlag = false;
+        let saveButton = document.querySelector('#saveClient');
+        console.log(saveButton);
+
+        /**
+         * This function shows notification.
+         */
+        function notify(htmltext$string, type$string = info, delay$miliseconds$number = 5000) {
+            $.notify({
+                // options
+                message: htmltext$string
+            },{
+                // settings
+                type: type$string,
+                delay: delay$miliseconds$number,
+                animate: {
+                    enter: 'animated fadeInRight',
+                    exit: 'animated fadeOutRight'
+                }
+            });
+        }
 
         function clearModal() {
             $('#clientName').val("");
@@ -140,6 +162,7 @@
                 swal("Wybierz typ klienta")
             }
             if(validation){
+                saveButton.disabled = true; //after first click, disable button
                 $.ajax({
                     type: "POST",
                     url: "{{route('api.saveClient')}}",
@@ -153,7 +176,15 @@
                         'clientID'      : clientID
                     },
                     success: function (response) {
+                        if(editFlag == false) {
+                            notify('<strong>Klient został pomyślnie dodany</strong>', 'success');
+                        }
+                        else {
+                            notify('<strong>Klient został pomyślnie edytowany</strong>', 'success');
+                            editFlag = false;
+                        }
                         $('#ModalClient').modal('hide');
+                        saveButton.disabled = false; //after closing modal, enable button
                     }
                 })
             }
@@ -161,6 +192,7 @@
 
 
         $(document).ready(function() {
+
             $('#ModalClient').on('hidden.bs.modal',function () {
                 $('#clientID').val("0");
                 clearModal();
@@ -221,6 +253,7 @@
                                         'clientId'   : clientId
                                     },
                                     success: function (response) {
+                                        notify("<strong>Status klienta został zmieniony</strong>", 'info');
                                         table.ajax.reload();
                                     }
                                 });
@@ -242,13 +275,13 @@
                                 'clientId'         : clientId
                             },
                             success: function (response) {
-                                console.log(response);
                                 clearModal();
                                 $('#clientName').val(response.name);
                                 $('#clientPriority').val(response.priority);
                                 $('#clientType').val(response.type);
                                 $('#clientID').val(response.id);
                                 $('#ModalClient').modal('show');
+                                editFlag = true;
                             }
                         });
                     });
@@ -256,22 +289,16 @@
                     {"data":"name"},
                     {
                         "data": function (data, type, dataToSet) {
-                            if(data.priority == 1){
-                                return "Niski";
-                            }else if(data.priority == 2){
-                                return "Średni"
-                            }else{
-                                return "Wysoki";
-                            }
-                        },"name": "priority"
+                            return data.priorityName;
+                        },"name": "priorityName"
                     },
                     {"data":"type"},
                     {"data":function (data, type, dataToSet) {
-                            let returnButton = "<button class='button-edit-client btn btn-warning' style='margin: 3px;' data-id="+data.id+">Edycja</button>";
+                            let returnButton = "<button class='button-edit-client btn btn-warning' style='width:50%; font-size: 1.2em;' data-id="+data.id+">Edycja</button>";
                             if(data.status == 0)
-                                returnButton += "<button class='button-status-client btn btn-danger' data-id="+data.id+" data-status=0 >Wyłącz</button>";
+                                returnButton += "<button style='width:49%;font-size: 1.2em;' class='button-status-client btn btn-danger' data-id="+data.id+" data-status=0>Wyłącz</button>";
                             else
-                                returnButton += "<button class='button-status-client btn btn-success' data-id="+data.id+" data-status=1 >Włącz</button>";
+                                returnButton += "<button style='width:49%;font-size: 1.2em;' class='button-status-client btn btn-success' data-id="+data.id+" data-status=1 >Włącz</button>";
                             return returnButton;
                         },"orderable": false, "searchable": false
                     }
