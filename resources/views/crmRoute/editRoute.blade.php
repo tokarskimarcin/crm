@@ -54,7 +54,6 @@
 
             let iterator = 1;
             let mainContainer = document.querySelector('.routes-wrapper'); //zaznaczamy główny container
-            console.log(mainContainer);
 
             $(mainContainer).prepend(createDeleteContainer());
 
