@@ -306,18 +306,9 @@
             }
         }
 
-        $('#zipCode2').keyup((e)=>{
-            checkValue = parseInt(e.target.value);
-            e.target.value = isNaN(checkValue) ? "" : checkValue;
-            if(e.target.value>3)
-                e.target.value = e.target.value.slice(0,3);
-
-        }).focus((e)=>{
-            $(e.target).select();
-        });
         $('#zipCode1').keyup((e)=>{
             checkValue = parseInt(e.target.value);
-            e.target.value = isNaN(checkValue) ? "" : checkValue;
+            e.target.value = isNaN(checkValue) ? "" : e.target.value;
             if(e.target.value>2)
                 e.target.value = e.target.value.slice(0,2);
             checkValue = e.target.value;
@@ -327,6 +318,17 @@
         }).focus((e)=>{
             $(e.target).select();
         });
+
+        $('#zipCode2').keyup((e)=>{
+            checkValue = parseInt(e.target.value);
+            e.target.value = isNaN(checkValue) ? "" : e.target.value;
+            if(e.target.value>3)
+                e.target.value = e.target.value.slice(0,3);
+
+        }).focus((e)=>{
+            $(e.target).select();
+        });
+
         $(document).ready(function () {
 
             $('#ModalCity').on('hidden.bs.modal', function () {
@@ -450,8 +452,13 @@
                                 $('#cityName').val(response.name);
                                 $('#eventCount').val(response.max_hour);
                                 $('#gracePeriod').val(response.grace_period);
-                                $('#zipCode1').val(String(response.zip_code).slice(0,2));
-                                $('#zipCode2').val(String(response.zip_code).slice(2,5));
+                                zipCode = String(response.zip_code);
+                                length = zipCode.length;
+                                for(i = 0; i < 5-length; i++){
+                                    zipCode = "0".concat(zipCode);
+                                }
+                                $('#zipCode1').val(zipCode.slice(0,2));
+                                $('#zipCode2').val(zipCode.slice(2,5));
                                 $('#latitude').val(response.latitude);
                                 $('#longitude').val(response.longitude);
                                 $('#cityID').val(response.id);
@@ -463,10 +470,15 @@
                 }, "columns": [
                     {"data": "vojName"},
                     {"data": "name"},
-                    {"data": /*function(data,type,dataToSet){
-                            return String(data.zip_code).slice(0,2)+'-'+
-                            String(data.zip_code).slice(2,5);
-                        },name:*/"zip_code"},
+                    {"data": function(data,type,dataToSet){
+                            zipCode = String(data.zip_code);
+                            length = zipCode.length;
+                            for(i = 0; i < 5-length; i++){
+                                zipCode = "0".concat(zipCode);
+                            }
+                            return zipCode.slice(0,2)+'-'+
+                                zipCode.slice(2,5);
+                        },name:"zip_code"},
                     {"data": "latitude"},
                     {"data": "longitude"},
                     {"data": "max_hour"},

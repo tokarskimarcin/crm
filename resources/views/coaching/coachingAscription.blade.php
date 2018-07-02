@@ -201,8 +201,8 @@
 
         $('#submitButton').click((e) => {
             e.preventDefault();
-            let newCoachSelected = $('#coaches').val();
-            let prevCoachSelected = $('#newCoach').val();
+            let newCoachSelected = $('#newCoach').val();
+            let prevCoachSelected = $('#coaches').val();
             if (prevCoachSelected === "0" || newCoachSelected === "0") {
                 swal('Wybierz trenerów w obu polach');
             }
