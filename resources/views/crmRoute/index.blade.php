@@ -398,6 +398,9 @@
 
 
         $(document).ready(function () {
+
+            let modalTitle = document.querySelector('#modal_title');
+
             $('#client_choice_type').attr('disabled', true).val(0);
             $('.city').select2();
             $('.voivodeship').select2();
@@ -756,11 +759,12 @@
                                 $('#clientID').val(response.id);
                                 $('#ModalClient').modal('show');
                                 editFlag = true;
+                                modalTitle.textContent = "Edytuj klienta";
                             }
                         });
                     });
                     //Zaznaczenie kolumny
-                    $('#table_client tbody tr').on('click', function () {
+                    $('#table_client tbody tr').on('click', function (e) {
                         if ($(this).hasClass('check')) {
                             $(this).removeClass('check');
                             $(this).find('.client_check').prop('checked', false);
@@ -769,16 +773,26 @@
                             clearCheckedClientInfo();
                         }
                         else {
-                            table_client.$('tr.check').removeClass('check');
-                            $.each($('#table_client').find('.client_check'), function (item, val) {
-                                $(val).prop('checked', false);
-                            });
-                            $(this).addClass('check');
-                            $(this).find('.client_check').prop('checked', true);
-                            client_id = $(this).attr('id');
-                            finalClientId = $(this).attr('id');
-                            writeCheckedClientInfo();
+                            if(e.target.dataset.noaction != 1) {
+                                table_client.$('tr.check').removeClass('check');
+                                $.each($('#table_client').find('.client_check'), function (item, val) {
+                                    $(val).prop('checked', false);
+                                });
+                                $(this).addClass('check');
+                                $(this).find('.client_check').prop('checked', true);
+                                client_id = $(this).attr('id');
+                                finalClientId = $(this).attr('id');
+                                writeCheckedClientInfo();
+                            }
+
                         }
+                    });
+
+                    /**
+                     * This part is responsible for aplaying default heading to modal.
+                     */
+                    $("#ModalClient").on('hidden.bs.modal', function () {
+                        modalTitle.textContent = "Dodaj nowego klienta";
                     });
 
                 }, "columns": [
@@ -786,16 +800,16 @@
                     {
                         "data": function (data, type, dataToSet) {
                             return data.priorityName;
-                        }, "name": "priorityName"
+                        }, "name": "priorityName", "className": "client_priority"
                     },
                     {"data": "type", "className": "client_type"},
                     {
                         "data": function (data, type, dataToSet) {
-                            let returnButton = "<button class='button-edit-client btn btn-warning' style='width:50%; font-size: 1.2em;' data-id=" + data.id + ">Edycja</button>";
+                            let returnButton = "<button class='button-edit-client btn btn-warning' style='width:50%; font-size: 1.2em;' data-id=" + data.id + " data-noaction='1'>Edycja</button>";
                             if (data.status == 0)
-                                returnButton += "<button style='width:49%;font-size: 1.2em;' class='button-status-client btn btn-danger' data-id=" + data.id + " data-status=0 >Wyłącz</button>";
+                                returnButton += "<button style='width:49%;font-size: 1.2em;' class='button-status-client btn btn-danger' data-id=" + data.id + " data-status=0 data-noaction='1'>Wyłącz</button>";
                             else
-                                returnButton += "<button style='width:49%;font-size: 1.2em;' class='button-status-client btn btn-success' data-id=" + data.id + " data-status=1 >Włącz</button>";
+                                returnButton += "<button style='width:49%;font-size: 1.2em;' class='button-status-client btn btn-success' data-id=" + data.id + " data-status=1 data-noaction='1'>Włącz</button>";
                             return returnButton;
                         }, "orderable": false, "searchable": false
                     },

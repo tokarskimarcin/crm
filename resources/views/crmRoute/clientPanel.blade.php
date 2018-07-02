@@ -116,6 +116,7 @@
 
         let editFlag = false;
         let saveButton = document.querySelector('#saveClient');
+        let modalTitle = document.querySelector('#modal_title');
 
         /**
          * This function shows notification.
@@ -181,6 +182,7 @@
                         else {
                             notify('<strong>Klient został pomyślnie edytowany</strong>', 'success');
                             editFlag = false;
+                            modalTitle.textContent = 'Dodaj nowego klienta';
                         }
                         $('#ModalClient').modal('hide');
                         saveButton.disabled = false; //after closing modal, enable button
@@ -260,6 +262,14 @@
                     });
 
                     /**
+                     * This part is responsible for aplaying default heading to modal.
+                     */
+                    $("#ModalClient").on('hidden.bs.modal', function () {
+                        modalTitle.textContent = "Dodaj nowego klienta";
+                    });
+
+
+                    /**
                      * Educja clienta
                      */
                     $('.button-edit-client').on('click',function () {
@@ -281,6 +291,7 @@
                                 $('#clientID').val(response.id);
                                 $('#ModalClient').modal('show');
                                 editFlag = true;
+                                modalTitle.textContent = "Edytuj klienta";
                             }
                         });
                     });
