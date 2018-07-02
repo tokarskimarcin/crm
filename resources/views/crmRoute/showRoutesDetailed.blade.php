@@ -168,6 +168,11 @@
            const editButton = document.querySelector('#editOneRecord');
            /*******END OF GLOBAL VARIABLES*********/
 
+           $('#menu-toggle').change(()=>{
+               table.columns.adjust().draw();
+           });
+
+
            /**
             * This function shows notification.
             */
