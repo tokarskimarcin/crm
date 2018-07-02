@@ -559,7 +559,7 @@
                                 finalName = data.route_name + ' (B)';
                             }
                             return finalName;
-                        }, "name": "clientRouteName"
+                        }, "name": "route_name"
                     },
                     {
                         "data": function (data, type, dataToSet) {
