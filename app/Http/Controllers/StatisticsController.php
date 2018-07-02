@@ -2114,7 +2114,7 @@ class StatisticsController extends Controller
         $year = date('Y');
         $dep = Department_info::find($dep_id);
         $data = $this->getCoachingDataAllLevel( $month, $year, (array)$dep_id,1);
-        return view('reportpage.ReportCoachingWeekCoach')
+                return view('reportpage.ReportCoachingWeekCoach')
             ->with([
                 'departments'       => $departments,
                 'directors'         => $directors,
@@ -2348,6 +2348,10 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                         ->where('coaching_type','=',$i)
                         ->where('coaching_level','=',$level_coaching)
                         ->first();
+                    $managerAllcoach = $coach_week->where('user_id', '=', $manager_user_relation->id)
+                        ->where('coaching_type','=',$i)
+                        ->where('coaching_level','=',$level_coaching)
+                        ->sum('in_progress');
                     if (!is_object($manager_in_list)) {
                         $add_manager = collect();
                         $add_manager->id = $manager_user_relation->id;
@@ -2378,7 +2382,13 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                                 ->groupby('coaching_director.id')
                                 ->get();
                         $manager_in_list->unsettled = $count_unsettled->where('couching_rbh','>=','64800')->count();
-                        $manager_in_list->in_progress = $manager_in_list->in_progress- $manager_in_list->unsettled ;
+                        if(($managerAllcoach - $manager_in_list->unsettled) < 0 ){
+                            $manager_in_list->in_progress = 0;
+                        }else{
+                            $manager_in_list->in_progress = $managerAllcoach - $manager_in_list->unsettled ;
+                        }
+
+
                     }
                 }
             }
