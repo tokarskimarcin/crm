@@ -90,7 +90,7 @@
                     {
                         "data": function (data, type, dataToSet) {
                             return '<a href="{{URL::to("route")}}/' + data.id + '" style="text-decoration:none;" class="links"><button class="btn btn-block btn-warning">Edycja</button></a>';
-                        }, "orderable": false, "searchable": false
+                        }, "orderable": false, "searchable": false, "width": "20%"
                     }
                 ]
             });

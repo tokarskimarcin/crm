@@ -48,9 +48,9 @@
                     <div class="row">
                         <div class="col-md-12 info-section">
                             <div class="alert alert-info">
-                                Moduł podglądu tras pozwala na podgląd kampanii oraz zarządzanie nimi. Tabelę z
-                                kampaniami można filtrować dostępnymi polami jak również wyszukiwać poszczególnych fraz
-                                w polu "Szukaj". Trasy dzielą się na: </br>
+                                Moduł plik klientów pozwala na podgląd tras oraz zarządzanie nimi. Tabelę z
+                                trasami można filtrować dostępnymi polami jak również filtrować za pomocą dowolnych fraz
+                                wpisanych w polu "Szukaj". Trasy dzielą się na: </br>
                                 <ul class="list-group">
                                     <li class="list-group-item"><strong>Nie gotowe</strong>, oznaczone przyciskiem <button class="btn btn-success">Aktywuj kampanie</button></li>
                                     <li class="list-group-item"><strong>Aktywne</strong>, oznaczone przyciskiem <button class="btn btn-warning">Zakończ kampanię</button> </li>

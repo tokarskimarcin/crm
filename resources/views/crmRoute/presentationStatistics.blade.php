@@ -37,7 +37,7 @@
                 <div class="panel-heading">
                 </div>
                 <div class="panel-body">
-                    <div class="alert alert-warning" style="font-size: 1.3em;">
+                    <div class="alert alert-info" style="font-size: 1.3em;">
                         Kolorem <span style="background: #e6eff4;">jasno niebieskim</span> zostały oznaczone wiersze sumujące wartości dla każdego dnia </br>
                         Kolorem <span style="background: #c67979;">Bordowym</span> zostały oznaczone wiersze sumujące wartości z całęgo tygodnia dla poszególnego klienta </br>
                         Kolorem <span style="background: #efef7f;">Zółtym</span> zostały oznaczone komórki, które sumują wartości dla całego tygodnia dla wszystkich klientów.

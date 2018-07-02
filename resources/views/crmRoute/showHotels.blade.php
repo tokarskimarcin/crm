@@ -390,6 +390,7 @@
                 let voivodeInp = document.querySelector('#voivode');
                 voivodeeId = $('#voivode').val();
                 cityId = [];
+                clearSelection('city');
                 table.ajax.reload();
             });
 
@@ -397,8 +398,19 @@
                 let cityInp = document.querySelector('#city');
                 cityId = $('#city').val();
                 voivodeeId = [];
+                clearSelection('voivode');
                 table.ajax.reload();
             });
+
+            function clearSelection(element) {
+                if(element == 'city') {
+                    $('#city').val(null).trigger('change');
+                }
+                else {
+                    $('#voivode').val(null).trigger('change');
+                }
+
+            }
         });
     </script>
 @endsection
