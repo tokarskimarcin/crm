@@ -168,7 +168,8 @@
         //flaga dodania nowego hotelu - po poprawnym wykonaniu ajaxa wyswietli sie komunikat
         var addNewHotelFlag = false;
         var editHotelFlag = false;
-        var cityId = 0;
+        var hotelStatus = 1;
+        var city = 0;
         function clearContent(container) {
             container.innerHTML = '';
         }
@@ -189,13 +190,14 @@
 
         document.addEventListener('DOMContentLoaded', function(event) {
             $('#NewHotelModal').on('click',function () {
+                hotelStatus = 1;
                 clearModal();
                 addNewHotelFlag = true;
             });
 
             $('#HotelModal').on('hidden.bs.modal', function () {
-                    console.log(123);
-                    table.ajax.reload();
+                hotelStatus = 1;
+                table.ajax.reload();
             });
             let voivodeeId = [];
             let cityId = [];
@@ -227,14 +229,59 @@
                                $('#HotelModal #saveHotel').first().text('Edytuj Hotel');
                                $("#name").val(response.name);
                                $('#price').val(response.price);
+                                hotelStatus = response.status;
                                $('#voivodeAdd').val(response.voivode_id);
                                $('#comment').val(response.comment);
-                                cityId = response.city_id;
+                                city = response.city_id;
                                $('#voivodeAdd').trigger( "change" );
                                $('#HotelModal').modal('show');
                             }
                         });
                     });
+
+                    /**
+                     * Zmiana statusu hotelu
+                     */
+                    $('.button-status-hotel').on('click',function () {
+                        let hotelId = $(this).data('id');
+                        hotelStatus = $(this).data('status');
+                        let nameOfAction = "";
+                        if(hotelStatus == 0)
+                            nameOfAction = "Tak, wyłącz Hotel";
+                        else
+                            nameOfAction = "Tak, włącz Hotel";
+                        swal({
+                            title: 'Jesteś pewien?',
+                            type: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: nameOfAction
+                        }).then((result) => {
+                            if (result.value) {
+
+                                $.ajax({
+                                    type: "POST",
+                                    url: "{{ route('api.changeStatusHotel') }}", // do zamiany
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    data: {
+                                        'hotelId'   : hotelId
+                                    },
+                                    success: function (response) {
+                                        $.notify({
+                                            icon: 'glyphicon glyphicon-ok',
+                                            message: 'Status hotelu został zmieniony'
+                                        }, {
+                                            type: "info"
+                                        });
+                                        table.ajax.reload();
+                                    }
+                                });
+                            }})
+                    });
+
                 },
                 "ajax": {
                     'url': "{{ route('api.showHotelsAjax') }}",
@@ -262,7 +309,7 @@
                     },
                     {"data":function (data, type, dataToSet) {
                             var returnButton = "<button class='button-edit-hotel btn btn-warning btn-block'  data-id=" + data.id + ">Edycja</button>";
-                            if (data.status == 0)
+                            if (data.status == 1)
                                 returnButton += "<button class='button-status-hotel btn btn-danger btn-block' data-id=" + data.id + " data-status=0 >Wyłącz</button>";
                             else
                                 returnButton += "<button class='button-status-hotel btn btn-success btn-block' data-id=" + data.id + " data-status=1 >Włącz</button>";
@@ -294,7 +341,7 @@
                             let optionC = document.createElement('option');
                             optionC.value = response[i].id;
                             optionC.textContent = response[i].name;
-                            if(response[i].id == cityId){
+                            if(response[i].id == city){
                                 optionC.selected = true;
                             }
                             cityInput.appendChild(optionC);
@@ -316,10 +363,9 @@
                 var voivode = $('#voivodeAdd').val();
                 var city = $('#cityAdd').val();
                 var comment = $('#comment').val();
-                var hotslStatus = 0;
                 var validate = true;
                 let hotelId = $('#hotelId').val();
-                console.log(hotelId);
+                console.log(hotelStatus);
                 if (name.trim().length == 0) {
                     swal('Wprowadź nazwę hotelu!')
                     validate = false;
@@ -351,7 +397,7 @@
                             'city': city,
                             'hotelId': hotelId,
                             'comment' : comment,
-                            'hotslStatus' : hotslStatus,
+                            'hotelStatus' : hotelStatus,
                         },
                         success: function (response) {
                             $('#HotelModal').modal('hide');

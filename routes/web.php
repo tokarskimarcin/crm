@@ -245,10 +245,12 @@ Route::post('/findCity', 'CrmRouteController@findCity')->name('api.findCity');
 Route::post('/findHotel', 'CrmRouteController@findHotel')->name('api.findHotel');
 Route::POST('/saveNewCity','CrmRouteController@saveNewCity')->name('api.saveNewCity');
 Route::POST('/saveNewHotel','CrmRouteController@saveNewHotel')->name('api.saveNewHotel');
+Route::POST('/changeStatusHotel','CrmRouteController@changeStatusHotel')->name('api.changeStatusHotel');
 
 Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
 Route::post('/findClient', 'ClientController@findClient')->name('api.findClient');
 Route::POST('/changeStatusClient','ClientController@changeStatusClient')->name('api.changeStatusClient');
+
 Route::POST('/saveClient','ClientController@saveClient')->name('api.saveClient');
 //Route::POST('/EditClient','ClientController@EditClient')->name('api.saveClient');
 Route::post('/showRoutesDetailedAjax', 'CrmRouteController@showRoutesDetailedAjax')->name('api.getDetailedInfo');
