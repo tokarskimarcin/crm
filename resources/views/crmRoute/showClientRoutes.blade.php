@@ -33,7 +33,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">
-                <div class="alert gray-nav ">Podgląd Kampanii</div>
+                <div class="alert gray-nav ">Plik klientów</div>
             </div>
         </div>
     </div>
@@ -42,15 +42,15 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Wybierz kampanie
+                    Wybierz trasę
                 </div>
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-12 info-section">
                             <div class="alert alert-info">
-                                Moduł podgląd tras pozwala na podgląd kampanii oraz zarządzanie nimi. Tabelę z
+                                Moduł podglądu tras pozwala na podgląd kampanii oraz zarządzanie nimi. Tabelę z
                                 kampaniami można filtrować dostępnymi polami jak również wyszukiwać poszczególnych fraz
-                                w polu "Szukaj". Kampanie dzielą się na: </br>
+                                w polu "Szukaj". Trasy dzielą się na: </br>
                                 <ul class="list-group">
                                     <li class="list-group-item"><strong>Nie gotowe</strong>, oznaczone przyciskiem <button class="btn btn-success">Aktywuj kampanie</button></li>
                                     <li class="list-group-item"><strong>Aktywne</strong>, oznaczone przyciskiem <button class="btn btn-warning">Zakończ kampanię</button> </li>
@@ -164,10 +164,6 @@
                             </table>
                         </div>
                     </div>
-
-                    <button type="button" id='dostosuj' class="btn btn-default">Dostosuj
-                    </button>
-
                 </div>
             </div>
         </div>
@@ -210,11 +206,7 @@
 @endsection
 
 @section('script')
-    <script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>
     <script>
-
-
-
         $('#menu-toggle').change(()=>{
             table2.columns.adjust().draw();
         });
@@ -329,7 +321,6 @@
                 let routeContainer = document.createElement('div');
                 routeContainer.className = 'campain-container';
                 var content = '';
-                console.log(response);
                 for (var i = 0; i < response.length; i++) {
                     content += '<div class="row">\n' +
                         '                            <div class="col-lg-12">\n' +
@@ -492,7 +483,6 @@
                 autoWidth: true,
                 processing: true,
                 serverSide: true,
-                fixedHeader: true,
                 scrollY: '45vh',
                 scrollX: true,
                 fnDrawCallback: function (settings) {
@@ -554,7 +544,6 @@
                         d.selectedWeek = selectedWeekInput.val();
                         d.typ = typInput.val();
                         d.state = stateInput.val();
-                        console.log('datatable2');
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -634,88 +623,136 @@
              * This function changes campaign status from nto ready to started.
              */
             function actionButtonHandler(e) {
-                const clientRouteId = e.target.dataset.clientrouteid;
-                const url = `{{URL::to('/showClientRoutesStatus')}}`;
-                const ourHeaders = new Headers();
-                ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
-                ourHeaders.set('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
-                const formData = new FormData();
-                formData.append('clientRouteId', clientRouteId);
-                formData.append('delete', '0');
+                swal({
+                    title: "Czy na pewno?",
+                    type: "warning",
+                    text: "Czy chcesz aktywować kampanię?",
+                    showCancelButton: true,
+                    confirmButtonClass: "btn-danger",
+                    confirmButtonText: "Tak, aktywuj!",
 
-                fetch(url, {
-                    method: 'post',
-                    headers: ourHeaders,
-                    credentials: "same-origin",
-                    body: formData
-                }).then(resp => resp.text())
-                    .then(resp => {
-                        if (resp == 0) {
-                            notify("Operacja się nie powiodła", 'danger');
-                        }
-                        else {
-                            notify(`<strong>Kampania została aktywowana</strong>`, 'success');
-                        }
-                        table2.ajax.reload();
-                    })
+                }).then((result) => {
+                    if (result.value) {
+                        const clientRouteId = e.target.dataset.clientrouteid;
+                        const url = `{{URL::to('/showClientRoutesStatus')}}`;
+                        const ourHeaders = new Headers();
+                        ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                        ourHeaders.set('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                        const formData = new FormData();
+                        formData.append('clientRouteId', clientRouteId);
+                        formData.append('delete', '0');
+
+                        fetch(url, {
+                            method: 'post',
+                            headers: ourHeaders,
+                            credentials: "same-origin",
+                            body: formData
+                        }).then(resp => resp.text())
+                            .then(resp => {
+                                if (resp == 0) {
+                                    notify("Operacja się nie powiodła", 'danger');
+                                }
+                                else {
+                                    notify(`<strong>Kampania została aktywowana</strong>`, 'success');
+                                    $(e.target).prop('class', "btn btn-warning action-buttons-1");
+                                    $(e.target).text('Zakończ kampanie');
+                                    $(e.target).off();
+                                    $(e.target).click(actionButtonHandlerAccepted);
+                                }
+                                //table2.ajax.reload();
+                            });
+                    }
+                });
             }
 
             /**
              * This function changes campaign status from started to finished
              */
             function actionButtonHandlerAccepted(e) {
-                const clientRouteId = e.target.dataset.clientrouteid;
-                const url = `{{URL::to('/showClientRoutesStatus')}}`;
-                const ourHeaders = new Headers();
-                ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
-                const formData = new FormData();
-                formData.append('clientRouteId', clientRouteId);
-                formData.append('delete', '1');
+                swal({
+                    title: "Czy na pewno?",
+                    type: "warning",
+                    text: "Czy chcesz zakończyć kampanię?",
+                    showCancelButton: true,
+                    confirmButtonClass: "btn-danger",
+                    confirmButtonText: "Tak, zakończ!",
 
-                fetch(url, {
-                    method: 'post',
-                    headers: ourHeaders,
-                    credentials: "same-origin",
-                    body: formData
-                }).then(resp => resp.text())
-                    .then(resp => {
-                        if (resp == 0) {
-                            notify("Operacja się nie powiodła", 'danger');
-                        }
-                        else {
-                            notify(`<strong>Kampania została zakończona</strong>`, 'success');
-                        }
-                        table2.ajax.reload();
-                    })
+                }).then((result) => {
+                    if (result.value) {
+                        const clientRouteId = e.target.dataset.clientrouteid;
+                        const url = `{{URL::to('/showClientRoutesStatus')}}`;
+                        const ourHeaders = new Headers();
+                        ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                        const formData = new FormData();
+                        formData.append('clientRouteId', clientRouteId);
+                        formData.append('delete', '1');
+
+                        fetch(url, {
+                            method: 'post',
+                            headers: ourHeaders,
+                            credentials: "same-origin",
+                            body: formData
+                        }).then(resp => resp.text())
+                            .then(resp => {
+                                if (resp == 0) {
+                                    notify("Operacja się nie powiodła", 'danger');
+                                }
+                                else {
+                                    notify(`<strong>Kampania została zakończona</strong>`, 'success');
+                                    $(e.target).prop('class', "btn btn-primary action-buttons-2");
+                                    $(e.target).text('Trasa niegotowa');
+                                    $(e.target).off();
+                                    $(e.target).click(actionButtonHandlerFinished);
+                                }
+                                //table2.ajax.reload();
+                            })
+                    }
+                });
             }
 
             /**
              * This function changes campaign status from finished to not ready
              */
             function actionButtonHandlerFinished(e) {
-                const clientRouteId = e.target.dataset.clientrouteid;
-                const url = `{{URL::to('/showClientRoutesStatus')}}`;
-                const ourHeaders = new Headers();
-                ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
-                const formData = new FormData();
-                formData.append('clientRouteId', clientRouteId);
-                formData.append('delete', '2');
+                swal({
+                    title: "Czy na pewno?",
+                    type: "warning",
+                    text: "Czy chcesz ustawić kampanię na niegotową?",
+                    showCancelButton: true,
+                    confirmButtonClass: "btn-danger",
+                    confirmButtonText: "Tak, ustaw na niegotową!",
 
-                fetch(url, {
-                    method: 'post',
-                    headers: ourHeaders,
-                    credentials: "same-origin",
-                    body: formData
-                }).then(resp => resp.text())
-                    .then(resp => {
-                        if (resp == 0) {
-                            notify("Operacja się nie powiodła", 'danger');
-                        }
-                        else {
-                            notify(`<strong>Kampania została przeniesiona w stan "nie gotowa"</strong>`,'success');
-                        }
-                        table2.ajax.reload();
-                    })
+                }).then((result) => {
+                    if (result.value) {
+                        const clientRouteId = e.target.dataset.clientrouteid;
+                        const url = `{{URL::to('/showClientRoutesStatus')}}`;
+                        const ourHeaders = new Headers();
+                        ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                        const formData = new FormData();
+                        formData.append('clientRouteId', clientRouteId);
+                        formData.append('delete', '2');
+
+                        fetch(url, {
+                            method: 'post',
+                            headers: ourHeaders,
+                            credentials: "same-origin",
+                            body: formData
+                        }).then(resp => resp.text())
+                            .then(resp => {
+                                if (resp == 0) {
+                                    notify("Operacja się nie powiodła", 'danger');
+                                }
+                                else {
+                                    notify(`<strong>Kampania została przeniesiona w stan "nie gotowa"</strong>`, 'success');
+                                    $(e.target).prop('class', "btn btn-success action-buttons-0");
+                                    $(e.target).text('Aktywuj kampanię');
+                                    $(e.target).off();
+                                    $(e.target).click(actionButtonHandler);
+                                }
+                                //table2.ajax.reload();
+                            })
+                    }
+                });
             }
 
             /**
