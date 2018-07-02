@@ -54,7 +54,21 @@
 
             let iterator = 1;
             let mainContainer = document.querySelector('.routes-wrapper'); //zaznaczamy główny container
+            console.log(mainContainer);
 
+            $(mainContainer).prepend(createDeleteContainer());
+
+            function createDeleteContainer(){
+                let newElement = document.createElement('div');
+                newElement.className = 'delete-container';
+                let stringAppend = '<div class="row">' +
+                    '<div class="col-md-12">' +
+                    '<input type="button" class="btn btn-danger" value="Usuń trasę" data-element="usun" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">' +
+                    '</div>'+
+                    '</div>';
+                newElement.innerHTML = stringAppend;
+                return newElement;
+            }
             /**
              *Ta funkcja tworzy nowy show - tu jest napisany kod html całego formularza
              */
@@ -91,16 +105,7 @@
                 '                        <option value="0">Wybierz</option>\n' +
                 '                    </select>\n' +
                 '                </div>\n' +
-                '            </div>\n' +
-                '\n' +
-                '<div class="form-group hour_div">' +
-                '</div>' +
-                '            <div class="col-lg-12 button_section second_button_section">\n' +
-                    '<input type="button" class="btn btn-danger" value="Usuń trasę" data-element="usun" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">' +
-                '                <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">\n' +
-                '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;">' +
-                '            </div>\n' +
-                '        </div>';
+                '            </div>';
 
 
                 newElement.innerHTML = stringAppend;
@@ -124,7 +129,7 @@
              * Ta funkcja dodaje nowy pokaz.
              */
             function addNewShow(ajaxResponse,type) {
-                removeButtonsFromLastShow();
+                //removeButtonsFromLastShow();
                 if(type == 0){
                     var voievodes = @json($voivodes);
                     var newShow = createNewShow(voievodes); //otrzymujemy nowy formularz z pokazem.
@@ -132,15 +137,21 @@
                 else{
                     var newShow = createNewShow(ajaxResponse); //otrzymujemy nowy formularz z pokazem.
                 }
-                mainContainer.appendChild(newShow);
+
+                $(newShow).hide();
+                mainContainer.insertBefore(newShow, document.querySelector('.new-route-container'));
 
                 iterator++;
+                $(newShow).slideDown(1000,()=>{
 
-                $('.form_date').datetimepicker({
-                    language:  'pl',
-                    autoclose: 1,
-                    minView : 2,
-                    pickTime: false
+                    $('.form_date').datetimepicker({
+                        language:  'pl',
+                        autoclose: 1,
+                        minView : 2,
+                        pickTime: false
+                    });
+                    $("html, body").animate({scrollTop: $(document).height()}, "slow");
+                    $('#add_new_show').prop('disabled', false);
                 });
             }
 
@@ -171,13 +182,25 @@
             function removeGivenShow(container) {
                 let allShows = document.getElementsByClassName('routes-container');
                 let lastShowContainer = allShows[allShows.length - 1];
-                if(container == lastShowContainer) {
+               /* if(container == lastShowContainer) {
                     addButtonsToPreviousContainer(container);
                     container.parentNode.removeChild(container);
                 }
                 else {
                     container.parentNode.removeChild(container);
-                }
+                }*/
+                $(container).slideUp(1000, () => {
+                    $.notify({
+                        // options
+                        icon: 'glyphicon glyphicon-trash',
+                        title: '',
+                        message: 'Pokaz został usunięty'
+                    }, {
+                        // settings
+                        type: 'danger'
+                    });
+                    container.remove();
+                });
             }
 
             function addButtonsToPreviousContainer(container) {
@@ -186,7 +209,7 @@
                 let buttonsElement = document.createElement('div');
                 buttonsElement.classList.add('col-lg-12');
                 buttonsElement.classList.add('button_section');
-                buttonsElement.innerHTML = '  <input type="button" class="btn btn-danger" value="Usuń trasę" data-element="usun" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">              <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">\n' +
+                buttonsElement.innerHTML = '<input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">\n' +
                     '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;">';
                 buttonsElement.appendAfter(placeInPreviousContainer);
             }
@@ -306,6 +329,7 @@
                         validation = false;
                     }
                     if(validation){
+                        $(e.target).prop('disabled',true);
                         $.ajax({
                             type: "POST",
                             url: '{{ route('api.getVoivodeshipRound') }}',
@@ -335,7 +359,6 @@
                                         //zmiana ręczna województwa
                                         for(var i = 0; i < cityInfo.length; i++) {
                                             if(cityInfo[i].id == headerId){
-                                                console.log(cityInfo);
                                                 let responseOption = document.createElement('option');
                                                 responseOption.value = cityInfo[i].city_id;
                                                 responseOption.textContent = cityInfo[i].city_name;
@@ -413,8 +436,20 @@
                     }
                 }
                 else if(e.target.dataset.remove == 'show') { // click on X glyphicon
-                    let showContainer = e.target.parentElement.parentElement.parentElement;
-                    removeGivenShow(showContainer);
+                    swal({
+                        title: "Jesteś pewien?",
+                        type: "warning",
+                        text: "Czy chcesz usunąć pokaz?",
+                        showCancelButton: true,
+                        confirmButtonClass: "btn-danger",
+                        confirmButtonText: "Tak, usuń!",
+
+                    }).then((result) => {
+                        if(result.value) {
+                            let showContainer = e.target.parentElement.parentElement.parentElement;
+                            removeGivenShow(showContainer);
+                        }
+                    });
                 }
                 else if(e.target.dataset.hour == 'true') { // click on add hour button
                     let hourContainer = e.target.parentElement;

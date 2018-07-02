@@ -6,20 +6,20 @@
 
 
 
-{{--Header page --}}
-<div class="row">
-    <div class="col-md-12">
-        <div class="page-header">
-            <div class="alert gray-nav ">Podgląd Tras</div>
+    {{--Header page --}}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="alert gray-nav ">Podgląd Szablonów Tras</div>
+            </div>
         </div>
     </div>
-</div>
 
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                   Wybierz trasę
+                    Wybierz trasę
                 </div>
                 <div class="panel-body">
                     @if(Session::has('adnotation'))
@@ -32,9 +32,15 @@
                             Session::forget('adnotation');
                         @endphp
                     @endif
-                    <div class="row">
-                        <div class="col-mg-10">
-                            <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
+                    <div class="row" >
+                            <div class="col-md-12">
+                                <button id="addNewRoute" class="btn btn-info">Przejdz do dodawania tras</button>
+                            </div>
+                    </div>
+                    <div class="row" style="margin-top: 1em">
+                        <div class="col-md-12">
+                            <table id="datatable" class="thead-inverse table table-striped table-bordered"
+                                   cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
                                     <th>Nazwa</th>
@@ -46,9 +52,6 @@
                             </table>
                         </div>
                     </div>
-                        <div class="col-md-12">
-                            <button id="addNewRoute" class="btn btn-info">Przejdz do dodawania tras</button>
-                        </div>
                 </div>
             </div>
         </div>
@@ -57,16 +60,16 @@
 
 @section('script')
     <script>
-        document.addEventListener('DOMContentLoaded', function(event) {
+        document.addEventListener('DOMContentLoaded', function (event) {
             const addNewRouteInput = document.querySelector('#addNewRoute');
-            addNewRouteInput.addEventListener('click',(e) => {
+            addNewRouteInput.addEventListener('click', (e) => {
                 window.location.href = '{{URL::to('/addNewRoute')}}';
             });
             table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,
                 "serverSide": true,
-                "drawCallback": function( settings ) {
+                "drawCallback": function (settings) {
                 },
                 "ajax": {
                     'url': "{{ route('api.showRoutesAjax') }}",
@@ -78,14 +81,16 @@
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
-                },"columns":[
-                    {"data":function (data, type, dataToSet) {
-                                return data.name;
-                        },"name":"name","orderable": true
+                }, "columns": [
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.name;
+                        }, "name": "name", "orderable": true
                     },
-                    {"data":function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("route")}}/' + data.id + '" class="links">Edycja</a>';
-                        },"orderable": false, "searchable": false
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return '<a href="{{URL::to("route")}}/' + data.id + '" style="text-decoration:none;" class="links"><button class="btn btn-block btn-warning">Edycja</button></a>';
+                        }, "orderable": false, "searchable": false
                     }
                 ]
             });

@@ -1468,7 +1468,7 @@ class CrmRouteController extends Controller
             $newCity->latitude = $request->latitude;
             $newCity->longitude = $request->longitude;
             $newCity->zip_code = $request->zipCode;
-            $newCity->status = 0;
+            $newCity->status = $request->status;
             $newCity->save();
             new ActivityRecorder(12,null, 193, 1);
 

@@ -304,6 +304,8 @@
     <script>
 
 
+        let saveClientClicked = false;
+
         function activateDatepicker() {
             $('.form_date').datetimepicker({
                 language: 'pl',
@@ -344,6 +346,8 @@
                 swal("Wybierz typ klienta")
             }
             if (validation) {
+                saveClientClicked = true;
+                $('#saveClient').prop('disable',true);
                 $.ajax({
                     type: "POST",
                     url: "{{route('api.saveClient')}}",
@@ -358,6 +362,7 @@
                     },
                     success: function (response) {
                         $('#ModalClient').modal('hide');
+                        $('#saveClient').prop('disable',false);
                     }
                 })
             }
@@ -424,7 +429,10 @@
             $('#ModalClient').on('hidden.bs.modal', function () {
                 $('#clientID').val("0");
                 clearModal();
-                table_client.ajax.reload();
+                if(saveClientClicked) {
+                    table_client.ajax.reload();
+                    saveClientClicked = false;
+                }
             });
 
             function writeCheckedClientInfo() {
@@ -521,7 +529,21 @@
                 });
             }
 
-            function generateRouteDiv(showRemove, showRefresh, showNewRoute, responseIterator, city, voievodes, placeToAppend) {
+            function generateNewShowButton(){
+                let buttonStringAppend =
+                    '<div class="row">' +
+                    '<div class="col-lg-12 button_section button_new_show_section">\n' +
+                    '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
+                    '</div>\n' +
+                    '</div>';
+
+                let newRouteContainer = document.createElement('div');
+                newRouteContainer.className = 'new-route-container';
+                newRouteContainer.innerHTML = buttonStringAppend;
+                return newRouteContainer;
+            }
+
+            function generateRouteDiv(showRemove, showRefresh, responseIterator, city, voievodes, placeToAppend) {
                 let routeContainer = document.createElement('div');
                 routeContainer.className = 'routes-container';
 
@@ -619,20 +641,6 @@
                 routeContainer.innerHTML = stringAppend;
                 $(routeContainer).hide();
                 placeToAppend.appendChild(routeContainer);
-                if (showNewRoute) {
-                    buttonStringAppend =
-                        '<div class="row">' +
-                        '<div class="col-lg-12 button_section button_new_show_section">\n' +
-                        '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
-                        '</div>\n' +
-                        '</div>';
-
-                    let newRouteContainer = document.createElement('div');
-                    newRouteContainer.className = 'new-route-container';
-                    newRouteContainer.innerHTML = buttonStringAppend;
-                    placeToAppend.appendChild(newRouteContainer);
-                }
-
             }
 
             {{--let currentDate ={{$today}};--}}
@@ -843,15 +851,11 @@
                                     for (var i = 0; i < response.length; i++) {
                                         //Pobranie miast dla danego wojew
                                         var city = getCitiesNamesByVoievodeship(response[i].voivodeship_id);
-                                        console.log(city);
                                         //Generowanie Div'a
                                         if (i == 0)
-                                            generateRouteDiv(false, false, false, response[i], city, voievodes, placeToAppend);
+                                            generateRouteDiv(false, false, response[i], city, voievodes, placeToAppend);
                                         else if (i + 1 == response.length)
-                                            generateRouteDiv(true, true, true, response[i], city, voievodes, placeToAppend);
-                                        else
-                                            generateRouteDiv(true, true, false, response[i], city, voievodes, placeToAppend);
-
+                                            generateRouteDiv(true, true, response[i], city, voievodes, placeToAppend);
                                         $('.city').select2();
                                         $('.voivodeship').select2();
                                         $('.voivodeship').off('select2:select'); //remove previous event listeners
@@ -860,6 +864,7 @@
                                         });
                                         activateDatepicker();
                                     }
+                                    placeToAppend.appendChild(generateNewShowButton());
                                     $('.city').on('select2:select', function (e) {
                                         setHoursValue(e);
                                     });
@@ -946,22 +951,12 @@
             //Ta funkcja jest globalnym event listenerem na click
             function buttonHandler(e) {
                 if (e.target.id == 'add-new-route') {
+                    $(e.target).prop('disabled',true);
                     let basicDate = document.querySelector('.first-show-date-input');
                     currentDate = basicDate.value; //every time user clicks on manual show creation, date resets
                     let appendPlace = document.querySelector('.route-here');
                     appendPlace.innerHTML = "";
-
-                    buttonStringAppend =
-                        '<div class="row">' +
-                        '<div class="col-lg-12 button_section button_new_show_section">\n' +
-                        '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
-                        '</div>\n' +
-                        '</div>';
-
-                    let newRouteContainer = document.createElement('div');
-                    newRouteContainer.className = 'new-route-container';
-                    newRouteContainer.innerHTML = buttonStringAppend;
-                    appendPlace.appendChild(newRouteContainer);
+                    appendPlace.appendChild(generateNewShowButton());
 
                     let newShow = addNewShow(0, 0); //otrzymujemy nowy formularz z pokazem.
                     removeGlyInFirstShow();
@@ -977,13 +972,11 @@
                     });
 
                     activateDatepicker();
-
                 }
                 else if (e.target.id == 'add_new_show') {
                     //Get lest child of voievoidship
                     let AllVoievoidship = document.getElementsByClassName('voivodeship');
                     let countAllVoievoidship = AllVoievoidship.length;
-                    console.log('countAllVoievoidship:' + countAllVoievoidship);
                     //Get lest child of City
                     let AllCitySelect = document.getElementsByClassName('city');
                     let countAllCitySelect = AllCitySelect.length;
@@ -1012,6 +1005,7 @@
                         validation = false;
                     }
                     if (validation) {
+                        $(e.target).prop('disabled', true);
                         $.ajax({
                             type: "POST",
                             url: '{{ route('api.getVoivodeshipRound') }}',
@@ -1325,9 +1319,8 @@
                         message: 'Pokaz został usunięty'
                     }, {
                         // settings
+                        type: 'danger'
                     });
-                    let allShows = document.getElementsByClassName('routes-container');
-                    let lastShowContainer = allShows[allShows.length - 1];
                         container.remove();
                 });
 
@@ -1362,6 +1355,8 @@
                 $(newShow).slideDown(1000,()=>{
                     activateDatepicker();
                     $("html, body").animate({scrollTop: $(document).height()}, "slow");
+                    $('#add-new-route').prop('disabled',false);
+                    $('#add_new_show').prop('disabled', false);
                 });
 
             }
