@@ -15,7 +15,10 @@
         .heading-container {
             text-align: center;
             font-size: 2em;
-            margin: 1em;
+            margin-top: 1em;
+            margin-bottom: 1em;
+            margin-left: .5em;
+            margin-right: .5em;
             font-weight: bold;
             box-shadow: 0 1px 15px 1px rgba(39,39,39,.1);
             padding-top: 1em;
@@ -44,6 +47,7 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
+                    Podgląd informacji o wykorzystanych miastach
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -54,10 +58,12 @@
                         </div>
                     </div>
                     <div class="form-container" style="margin-bottom:4em;">
-
-                        <div class="alert alert-info" style="font-size:2em; margin:1em;">
-                            W module statystyki miast znajduję się lista miast użytych w kampaniach, w określonym przedziale czasu. Przycisk podgląd pozwala podejrzeć szczegóły.
+                        <div class="row">
+                            <div class="alert alert-info" style="font-size:2em; margin:1em;">
+                                W module statystyki miast znajduję się lista miast użytych w kampaniach, w określonym przedziale czasu. Przycisk podgląd pozwala podejrzeć szczegóły.
+                            </div>
                         </div>
+
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group" style="margin-left: 1em;">
@@ -82,19 +88,21 @@
 
 
                         </div>
+                    <div class="row" style="padding-left: 2em;padding-right:2em;">
+                        <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
+                            <thead>
+                            <tr>
+                                <th>Wojewodztwo</th>
+                                <th>Miasto</th>
+                                <th>Ilość</th>
+                                <th>Podgląd</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
 
-                    <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
-                        <thead>
-                        <tr>
-                            <th>Wojewodztwo</th>
-                            <th>Miasto</th>
-                            <th>Ilość</th>
-                            <th>Podgląd</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
 
                 </div>
             </div>

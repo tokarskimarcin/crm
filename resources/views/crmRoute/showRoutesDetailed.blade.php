@@ -37,19 +37,19 @@
     </style>
 
 {{--Header page --}}
-<div class="row">
+
     <div class="col-md-12">
         <div class="page-header">
             <div class="alert gray-nav "> Szczegółowe informacje o kampaniach
         </div>
     </div>
-</div>
+
 
 <div class="row">
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-
+                Szczegółowe informacje o kampaniach
             </div>
             <div class="panel-body">
                 <div class="alert alert-info page-info">
@@ -94,12 +94,13 @@
                     <div class="col-md-4 buttonSection" style="min-height: 3.5em;">
                         <button class="btn btn-info" data-toggle="modal" data-target="#editModal" style="margin-bottom: 1em;  width: 100%;" id="editOneRecord" disabled="true">Edytuj rekordy</button>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-4">
                         <button class="btn btn-basic" id="clearButton" style="width:100%;">Wyczyść zaznaczenia</button>
                     </div>
 
                 </div>
-                    <table id="datatable" class="thead-inverse table table-striped table-bordered">
+                <div class="row">
+                    <table id="datatable" class="thead-inverse table table-striped table-bordered" style="max-width:100%;">
                         <thead>
                         <tr>
                             <th>Tydzien</th>
@@ -117,6 +118,8 @@
                         </tr>
                         </thead>
                     </table>
+                </div>
+
                 <div class="row">
                 </div>
             </div>
@@ -561,6 +564,7 @@
                "serverSide": true,
                order: [[1, 'asc']],
                "fixedHeader": true,
+               "scrollX": "100%",
                "drawCallback": function( settings ) {
 
                },
