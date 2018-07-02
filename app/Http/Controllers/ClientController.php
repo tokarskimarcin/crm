@@ -22,13 +22,13 @@ class ClientController extends Controller
         if($request->ajax()){
            $clients = Clients::all();
             $clientExtended = $clients->map(function($item) {
-                if($item->priority == 0) {
+                if($item->priority == 1) {
                     $item->priorityName = "Niski";
                 }
-                else if($item->priority == 1) {
+                else if($item->priority == 2) {
                     $item->priorityName = "Średni";
                 }
-                else if($item->priority == 2) {
+                else if($item->priority == 3) {
                     $item->priorityName = "Wysoki";
                 }
                 return $item;

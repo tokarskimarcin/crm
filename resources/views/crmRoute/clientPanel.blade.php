@@ -116,7 +116,6 @@
 
         let editFlag = false;
         let saveButton = document.querySelector('#saveClient');
-        console.log(saveButton);
 
         /**
          * This function shows notification.

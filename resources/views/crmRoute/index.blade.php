@@ -316,6 +316,27 @@
             });
         }
 
+        let editFlag = false;
+        let saveButton = document.querySelector('#saveClient');
+
+        /**
+         * This function shows notification.
+         */
+        function notify(htmltext$string, type$string = info, delay$miliseconds$number = 5000) {
+            $.notify({
+                // options
+                message: htmltext$string
+            },{
+                // settings
+                type: type$string,
+                delay: delay$miliseconds$number,
+                animate: {
+                    enter: 'animated fadeInRight',
+                    exit: 'animated fadeOutRight'
+                }
+            });
+        }
+
         activateDatepicker();
 
         //Clear Client modal
@@ -347,7 +368,7 @@
             }
             if (validation) {
                 saveClientClicked = true;
-                $('#saveClient').prop('disable',true);
+                saveButton.disabled = true; //after first click, disable button
                 $.ajax({
                     type: "POST",
                     url: "{{route('api.saveClient')}}",
@@ -361,8 +382,15 @@
                         'clientID': clientID
                     },
                     success: function (response) {
+                        if(editFlag == false) {
+                            notify('<strong>Klient został pomyślnie dodany</strong>', 'success');
+                        }
+                        else {
+                            notify('<strong>Klient został pomyślnie edytowany</strong>', 'success');
+                            editFlag = false;
+                        }
                         $('#ModalClient').modal('hide');
-                        $('#saveClient').prop('disable',false);
+                        saveButton.disabled = false; //after closing modal, enable button
                     }
                 })
             }
@@ -700,6 +728,7 @@
                                         'clientId': clientId
                                     },
                                     success: function (response) {
+                                        notify("<strong>Status klienta został zmieniony</strong>", 'info');
                                         table_client.ajax.reload();
                                     }
                                 });
@@ -726,6 +755,7 @@
                                 $('#clientType').val(response.type);
                                 $('#clientID').val(response.id);
                                 $('#ModalClient').modal('show');
+                                editFlag = true;
                             }
                         });
                     });
@@ -755,23 +785,17 @@
                     {"data": "name", "className": "client_name"},
                     {
                         "data": function (data, type, dataToSet) {
-                            if (data.priority == 1) {
-                                return "Niski";
-                            } else if (data.priority == 2) {
-                                return "Średni"
-                            } else {
-                                return "Wysoki";
-                            }
-                        }, "name": "priority", "className": "client_priority"
+                            return data.priorityName;
+                        }, "name": "priorityName"
                     },
                     {"data": "type", "className": "client_type"},
                     {
                         "data": function (data, type, dataToSet) {
-                            let returnButton = "<button class='button-edit-client btn btn-warning' style='margin: 3px;' data-id=" + data.id + ">Edycja</button>";
+                            let returnButton = "<button class='button-edit-client btn btn-warning' style='width:50%; font-size: 1.2em;' data-id=" + data.id + ">Edycja</button>";
                             if (data.status == 0)
-                                returnButton += "<button class='button-status-client btn btn-danger' data-id=" + data.id + " data-status=0 >Wyłącz</button>";
+                                returnButton += "<button style='width:49%;font-size: 1.2em;' class='button-status-client btn btn-danger' data-id=" + data.id + " data-status=0 >Wyłącz</button>";
                             else
-                                returnButton += "<button class='button-status-client btn btn-success' data-id=" + data.id + " data-status=1 >Włącz</button>";
+                                returnButton += "<button style='width:49%;font-size: 1.2em;' class='button-status-client btn btn-success' data-id=" + data.id + " data-status=1 >Włącz</button>";
                             return returnButton;
                         }, "orderable": false, "searchable": false
                     },
