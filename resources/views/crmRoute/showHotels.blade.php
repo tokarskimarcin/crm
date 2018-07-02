@@ -63,7 +63,7 @@
                     </div>
 
                         <div class="col-mg-12">
-                            <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
+                            <table id="datatable" class="thead-inverse table row-border table-striped" cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
                                     <th>Nazwa</th>
@@ -138,9 +138,9 @@
                                             </div>
                                         </div>
                                         <div class="col-md-12">
-                                            <div class="button-container">
-                                                <input type="submit" id="saveHotel" class="btn btn-success" value="Zapisz zmiany" style="width:100%;font-size:1.1em;font-weight:bold;margin-bottom:1em;margin-top:1em;">
-                                            </div>
+                                            <button class="btn btn-default form-control"id="saveHotel">
+                                                <span class=’glyphicon glyphicon-plus’></span> Dodaj Hotel
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -179,7 +179,11 @@
             addNewHotelFlag = false;
             editHotelFlag = false;
             $('#HotelModal .modal-title').first().text('Dodaj Hotel');
-            $('#HotelModal #saveHotel').first().text('Zapisz');
+
+            $('#HotelModal #saveHotel').first().text('');
+            $('#HotelModal #saveHotel').first().prop('class','btn btn-default form-control');
+            $('#HotelModal #saveHotel').first().append($('<span class="glyphicon glyphicon-plus"></span>'));
+            $('#HotelModal #saveHotel').first().append('Dodaj Hotel');
             $("#name").val("");
             $('#price').val("");
             $('#voivodeAdd').val(0);
@@ -226,7 +230,12 @@
                                $('#hotelId').val(hotel_id);
                                editHotelFlag = true;
                                $('#HotelModal .modal-title').first().text('Edycja Hotelu');
-                               $('#HotelModal #saveHotel').first().text('Edytuj Hotel');
+
+
+                                $('#HotelModal #saveHotel').first().text('');
+                                $('#HotelModal #saveHotel').first().prop('class','btn btn-success form-control');
+                                $('#HotelModal #saveHotel').first().append($('<span class="glyphicon glyphicon-edit"></span>'));
+                                $('#HotelModal #saveHotel').first().append('Edytuj Hotel');
                                $("#name").val(response.name);
                                $('#price').val(response.price);
                                 hotelStatus = response.status;
