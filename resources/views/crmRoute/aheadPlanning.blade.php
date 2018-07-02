@@ -79,8 +79,10 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label for="date" class="myLabel">Data początkowa:</label>
-                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                    <input class="form-control" name="date_start" id="date_start" type="text" value="{{date("Y-m-d")}}">
+                                <div class="input-group date form_date col-md-5" data-date=""
+                                     data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                    <input class="form-control" name="date_start" id="date_start" type="text"
+                                           value="{{date("Y-m-d")}}">
                                     <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                 </div>
                             </div>
@@ -89,8 +91,10 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label for="date_stop" class="myLabel">Data końcowa:</label>
-                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                    <input class="form-control" name="date_stop" id="date_stop" type="text" value="{{date("Y-m-d")}}">
+                                <div class="input-group date form_date col-md-5" data-date=""
+                                     data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                    <input class="form-control" name="date_stop" id="date_stop" type="text"
+                                           value="{{date("Y-m-d")}}">
                                     <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                 </div>
                             </div>
@@ -170,9 +174,9 @@
 
             (function activateDatepicker() {
                 $('.form_date').datetimepicker({
-                    language:  'pl',
+                    language: 'pl',
                     autoclose: 1,
-                    minView : 2,
+                    minView: 2,
                     pickTime: false,
                 });
             })();
@@ -201,7 +205,7 @@
                 scrollX: true,
                 scrollCollapse: true,
                 paging: false,
-                fixedColumns:{
+                fixedColumns: {
                     leftColumns: 3
                 },
                 "ajax": {
@@ -224,13 +228,18 @@
                     {"data": "numberOfWeek"},
                     {"data": "dayName"},
                     {"data": "day"},
-                    @foreach($departmentInfo as $item)
-                    {"data": `{{$item->name2}}`,"searchable": false},
-                    @endforeach
-                    {"data": "totalScore"},
-                    {"data":function (data, type, dataToSet) {
+                        @foreach($departmentInfo as $item)
+                    {
+                        "data": `{{$item->name2}}`, "searchable": false
+                    },
+                        @endforeach
+                    {
+                        "data": "totalScore"
+                    },
+                    {
+                        "data": function (data, type, dataToSet) {
                             return data.allSet
-                        },"name":"allSet"
+                        }, "name": "allSet"
                     }
                 ]
             });
@@ -239,8 +248,8 @@
             /*********************EVENT LISTENERS FUNCTIONS****************************/
 
 
-            $('#date_start, #date_stop').on('change',function(e) {
-               table.ajax.reload();
+            $('#date_start, #date_stop').on('change', function (e) {
+                table.ajax.reload();
             });
 
             /**
@@ -269,17 +278,18 @@
                 let tableElement = trElement.parent();
                 let clickedElementTdIndex = trElement.children().index(clickedElement);
                 let clickedElementTrIndex = tableElement.children().index(trElement);
-                if (clickedElement.is('td') && clickedElementTdIndex >= 3)
+                if (clickedElement.is('td') && clickedElementTdIndex >= 3 && clickedElementTdIndex < trElement.children().length - 1)
                     if (e.shiftKey) {
                         if (elementsToSum.firstElement.tdId !== null) {
                             elementsToSum.lastElement.tdId = elementsToSum.lastElement.tdId; //clickedElementTdIndex;
                             elementsToSum.lastElement.trId = clickedElementTrIndex;
                             colorCells(elementsToSum);
                             $.notify({
-                                title: $($('#datatable tr').first().children().get(elementsToSum.firstElement.tdId)).text()+': ' ,
-                                message: '<strong>'+sumOfSelectedCells+'</strong>'
-                            },{
+                                title: $($('#datatable tr').first().children().get(elementsToSum.firstElement.tdId)).text() + ': ',
+                                message: '<strong>' + sumOfSelectedCells + '</strong>'
+                            }, {
                                 type: 'info',
+                                mouse_over: 'pause',
                                 placement: {
                                     from: "bottom",
                                     align: "right"
