@@ -243,6 +243,7 @@
                      * Zmiana statusu hotelu
                      */
                     $('.button-status-hotel').on('click',function () {
+                        $(this).prop('disabled', true);
                         let hotelId = $(this).data('id');
                         hotelStatus = $(this).data('status');
                         let nameOfAction = "";
@@ -270,6 +271,7 @@
                                         'hotelId'   : hotelId
                                     },
                                     success: function (response) {
+                                        $(this).prop('disabled', false);
                                         $.notify({
                                             icon: 'glyphicon glyphicon-ok',
                                             message: 'Status hotelu został zmieniony'
@@ -308,11 +310,11 @@
                         },"name":"cityName", "orderable": true
                     },
                     {"data":function (data, type, dataToSet) {
-                            var returnButton = "<button class='button-edit-hotel btn btn-warning btn-block'  data-id=" + data.id + ">Edycja</button>";
-                            if (data.status == 1)
-                                returnButton += "<button class='button-status-hotel btn btn-danger btn-block' data-id=" + data.id + " data-status=0 >Wyłącz</button>";
+                            let returnButton = "<button class='button-edit-hotel btn btn-info btn-block'  data-id=" + data.id + "><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
+                            if (data.status == 0)
+                                returnButton += "<button class='button-status-hotel btn btn-danger btn-block' data-id=" + data.id + " data-status=0 ><span class='glyphicon glyphicon-off'></span> Wyłącz</button>";
                             else
-                                returnButton += "<button class='button-status-hotel btn btn-success btn-block' data-id=" + data.id + " data-status=1 >Włącz</button>";
+                                returnButton += "<button class='button-status-hotel btn btn-success btn-block' data-id=" + data.id + " data-status=1 ><span class='glyphicon glyphicon-off'></span> Włącz</button>";
                             return returnButton;
                         },"orderable": false, "searchable": false
                     }
