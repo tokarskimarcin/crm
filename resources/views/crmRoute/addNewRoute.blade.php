@@ -123,6 +123,7 @@
                 mainContainer.insertBefore(newShow, document.querySelector('.new-route-container'));
 
                 iterator++;
+                $('#add_new_show').prop('disabled', false);
                 $(newShow).slideDown(1000,()=> {
                     $('.form_date').datetimepicker({
                         language: 'pl',
@@ -167,23 +168,10 @@
                         message: 'Pokaz został usunięty'
                     }, {
                         // settings
+                        type: 'danger'
                     });
                     container.parentNode.removeChild(container);
                 });
-            }
-
-            /*
-            This function is responsible for attaching buttons to previous container
-             */
-            function addButtonsToPreviousContainer(container) {
-                let previousContainer = container.previousElementSibling;
-                let placeInPreviousContainer = previousContainer.getElementsByClassName('hour_div')[0];
-                let buttonsElement = document.createElement('div');
-                buttonsElement.classList.add('col-lg-12');
-                buttonsElement.classList.add('button_section');
-                buttonsElement.innerHTML = '                <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;">\n' +
-                    '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;">';
-                buttonsElement.appendAfter(placeInPreviousContainer);
             }
 
             /*
@@ -276,6 +264,7 @@
                         validation = false;
                     }
                     if(validation){
+                        $(e.target).prop('disabled', true);
                         $.ajax({
                             type: "POST",
                             url: '{{ route('api.getVoivodeshipRound') }}',
@@ -305,7 +294,6 @@
                                         //zmiana ręczna województwa
                                         for(var i = 0; i < cityInfo.length; i++) {
                                             if(cityInfo[i].id == headerId){
-                                                console.log(cityInfo);
                                                 let responseOption = document.createElement('option');
                                                 responseOption.value = cityInfo[i].city_id;
                                                 responseOption.textContent = cityInfo[i].city_name;
@@ -353,9 +341,11 @@
                         showCancelButton: true,
                         confirmButtonClass: "btn-danger",
                         confirmButtonText: "Tak, usuń!",
-                    }).then(() => {
-                    let showContainer = e.target.parentElement.parentElement.parentElement;
-                    removeGivenShow(showContainer);
+                    }).then((result) => {
+                        if(result.value){
+                            let showContainer = e.target.parentElement.parentElement.parentElement;
+                            removeGivenShow(showContainer);
+                        }
                     });
 
                 }else if(e.target.dataset.refresh == 'refresh') { // click on refresh glyphicon
@@ -409,9 +399,9 @@
             mainContainer.addEventListener('click', buttonHandler);
             stringAppend =
             '<div class="row">' +
-            '            <div class="col-lg-12 button_section">\n' +
+            '            <div class="col-lg-12 button_section">' +
+                '            <input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">'+
             '                <input type="button" class="btn btn-success" id="save_route" value="Zapisz!" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">\n' +
-            '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
             '            </div>\n'+
                 '</div>';
 
