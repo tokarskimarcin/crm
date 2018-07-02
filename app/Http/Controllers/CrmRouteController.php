@@ -1793,7 +1793,7 @@ class CrmRouteController extends Controller
             ->groupBy('date', 'department_info_id')
             ->get();
 
-        while($actualDate != $stopDate){
+        while($actualDate <= $stopDate){
             $dayCollect = collect();
             $dayCollect->offsetSet('numberOfWeek',date('W',strtotime($actualDate)));
             $dayCollect->offsetSet('dayName',$this::getNameOfWeek($actualDate));
@@ -1813,13 +1813,14 @@ class CrmRouteController extends Controller
 
                 $totalScore += $wynik;
             }
-            $isSet = ClientRouteInfo::
-            where('date','=',$actualDate)
+            $isSet = ClientRouteInfo::where('date','=',$actualDate)
                 ->where('department_info_id','=',null)
                 ->get()
                 ->count();
             if($isSet != 0)
-                $allSet = false;
+                $allSet = "Nie";
+            else
+                $allSet = "Tak";
             $dayCollect->offsetSet('allSet',$allSet);
             $dayCollect->offsetSet('totalScore',$totalScore);
             $allInfoCollect->push($dayCollect);

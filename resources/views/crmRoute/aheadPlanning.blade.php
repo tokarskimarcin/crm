@@ -72,7 +72,7 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-
+                    Planowanie wyprzedzenia
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -101,7 +101,7 @@
 
                         </div>
                     </div>
-                    <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                    <table id="datatable" class="table table-striped table-bordered" style="width:100%;">
                         <thead>
                         <tr>
                             <th>Tydzien</th>
@@ -225,18 +225,12 @@
                     {"data": "dayName"},
                     {"data": "day"},
                     @foreach($departmentInfo as $item)
-                    {"data": `{{$item->name2}}`},
+                    {"data": `{{$item->name2}}`,"searchable": false},
                     @endforeach
                     {"data": "totalScore"},
-                    {
-                        "data": function (d) {
-                            if (d.allSet == false) {
-                                return "Nie";
-                            }
-                            else {
-                                return "Tak";
-                            }
-                        }
+                    {"data":function (data, type, dataToSet) {
+                            return data.allSet
+                        },"name":"allSet"
                     }
                 ]
             });

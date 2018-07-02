@@ -44,12 +44,13 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="heading-container" style="">
+                            <div class="heading-container">
+                                Statystyki prezentacji
                             </div>
                         </div>
                     </div>
-
                     <div id="parent">
+                        @if(isset($days) && isset($clients['Wysyłka']) && isset($clients['Badania']) && isset($allInfo['Wysyłka'][$item->name]) && isset($allInfo['Wysyłka']['daySum']) && isset($allInfo['Badania'][$item->name]) && isset($allInfo['Badania']['daySum']))
                         <table id="fixTable" class="table table-bordered">
                             <thead>
                             <tr>
@@ -162,6 +163,9 @@
                                 </tr>
                             </tbody>
                         </table>
+                            @else
+                            <div class="alert alert-danger"><strong>Brak danych</strong></div>
+                            @endif
                     </div>
                 {{--</div>--}}
             {{--</div>--}}
