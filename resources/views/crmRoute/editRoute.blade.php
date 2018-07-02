@@ -446,10 +446,35 @@
                     removeGivenHour(givenHourInputContainer);
                 }
                 else if(e.target.id == 'save_route') {
-                    saveRoute();
+                    swal({
+                        title: "Jesteś pewien?",
+                        type: "warning",
+                        text: "Czy chcesz zapisać trasę?",
+                        showCancelButton: true,
+                        confirmButtonClass: "btn-danger",
+                        confirmButtonText: "Tak, usuń!",
+                    }).then((result) => {
+                        if(result.value) {
+                            $(e.target).prop('disabled', true);
+                            saveRoute();
+                        }
+                    });
                 }
                 else if(e.target.dataset.element == 'usun') {
-                    saveRoute("delete");
+
+                    swal({
+                        title: "Jesteś pewien?",
+                        type: "warning",
+                        text: "Czy chcesz usunąć trasę?",
+                        showCancelButton: true,
+                        confirmButtonClass: "btn-danger",
+                        confirmButtonText: "Tak, usuń!",
+                    }).then((result) => {
+                        if(result.value) {
+                            $(e.target).prop('disabled', true);
+                            saveRoute("delete");
+                        }
+                    });
                 }
                 else if(e.target.id == "return") {
                     window.location.href = "{{URL::to('/showRoutes')}}";

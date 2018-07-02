@@ -55,6 +55,7 @@
         .selectedCell {
             border-color: blue !important;
             border-style: dashed !important;
+            border-width: 1px !important;
         }
     </style>
 
@@ -105,7 +106,7 @@
 
                         </div>
                     </div>
-                    <table id="datatable" class="table table-striped table-bordered" style="width:100%;">
+                    <table id="datatable" class="table table-striped row-border" style="width:100%;">
                         <thead>
                         <tr>
                             <th>Tydzien</th>
