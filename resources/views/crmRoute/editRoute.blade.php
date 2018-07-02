@@ -111,20 +111,6 @@
                 newElement.innerHTML = stringAppend;
                 return newElement;
             }
-
-            function clearButtons() {
-                let saveButton = null;
-                let routesContainer = document.getElementsByClassName('routes-container');
-                let thisContainer = null;
-                let thisElement = null;
-                for(var i = 0; i < routesContainer.length - 1; i++) {
-                    thisContainer = routesContainer[i];
-                    buttonSectionCollection = thisContainer.getElementsByClassName('second_button_section');
-                    thisElement = buttonSectionCollection[0];
-                    thisElement.parentNode.removeChild(thisElement);
-                }
-            }
-
             /**
              * Ta funkcja dodaje nowy pokaz.
              */
@@ -516,7 +502,6 @@
                     }
                 });
             });
-            clearButtons();
         });
     </script>
 @endsection
