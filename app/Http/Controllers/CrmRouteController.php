@@ -1013,48 +1013,33 @@ class CrmRouteController extends Controller
         $cityIdArr = $request->city;
 
         if(is_null($voivodeIdArr) && is_null($cityIdArr)) {
-            $hotels = Hotel::whereIn('status', [1,0])->get();
+            $hotels = Hotel::whereIn('hotels.status', [1,0]);
         }
         else if(!is_null($voivodeIdArr) != 0 && is_null($cityIdArr)) {
-            $hotels = Hotel::whereIn('status', [1,0])
-                ->whereIn('voivode_id', $voivodeIdArr)
-                ->get();
+            $hotels = Hotel::whereIn('hotels.status', [1,0])
+                ->whereIn('hotels.voivode_id', $voivodeIdArr);
         }
         else if(is_null($voivodeIdArr) && !is_null($cityIdArr) != 0) {
-            $hotels = Hotel::whereIn('status', [1,0])
-                ->whereIn('city_id', $cityIdArr)
-                ->get();
+            $hotels = Hotel::whereIn('hotels.status', [1,0])
+                ->whereIn('hotels.city_id', $cityIdArr);
         }
         else {
-            $hotels = Hotel::whereIn('status', [1,0])->get();
+            $hotels = Hotel::whereIn('status', [1,0]);
         }
-
-        $voivodes = Voivodes::all();
-        $cities = Cities::all();
-        $hotelArr = array();
-        foreach($hotels as $hotel) {
-            $hotelsExtended = new \stdClass();
-            $hotelsExtended->id = $hotel->id;
-            $hotelsExtended->name = $hotel->name;
-            $hotelsExtended->status = $hotel->status;
-            $hotelsExtended->voivode_id = $hotel->voivode_id;
-            $hotelsExtended->city_id = $hotel->city_id;
-            foreach($voivodes as $voivode) {
-                if($hotel->voivode_id == $voivode->id) {
-                    $hotelsExtended->voivodeName = $voivode->name;
-                }
-            }
-            foreach($cities as $city) {
-                if($hotel->city_id == $city->id) {
-                    $hotelsExtended->cityName = $city->name;
-                }
-            }
-            array_push($hotelArr,$hotelsExtended);
-        }
-        $colection = collect($hotelArr);
-
-
-        return datatables($colection)->make(true);
+        $hotels = $hotels->select(DB::raw(
+        '
+         hotels.id,
+         hotels.name,
+         hotels.status,
+         hotels.voivode_id,
+         hotels.city_id,
+         voivodeship.name as voivodeName,
+         city.name as cityName
+        '))
+            ->join('city','city.id','city_id')
+            ->join('voivodeship','voivodeship.id','voivode_id')
+            ->get();
+        return datatables($hotels)->make(true);
     }
 
     /**
