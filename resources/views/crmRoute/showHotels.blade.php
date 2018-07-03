@@ -69,6 +69,7 @@
                                     <th>Nazwa</th>
                                     <th>Wojewodztwo</th>
                                     <th>Miasto</th>
+                                    <th>Ulica</th>
                                     <th>Akcja</th>
                                 </tr>
                                 </thead>
@@ -125,13 +126,19 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="price">Ulica</label>
+                                                <input type="text" name="street" id="street" class="form-control" placeholder="Nazwa Ulicy" value="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="price">Cena za salę</label>
                                                 <input type="number" step="0.01" min="0" name="price" id="price" class="form-control" placeholder="Cena w złotówkach np. 125,99" value="">
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="comment">Komentarz</label>
                                                 <input type="text" name="comment" id="comment" class="form-control" placeholder="Tutaj wprowadź krótki komentarz max 255 znaków" value="">
@@ -186,6 +193,7 @@
             $('#HotelModal #saveHotel').first().append('Dodaj Hotel');
             $("#name").val("");
             $('#price').val("");
+            $('#street').val("");
             $('#voivodeAdd').val(0);
             $('#cityAdd').val(0);
             $('#comment').val("");
@@ -238,6 +246,7 @@
                                 $('#HotelModal #saveHotel').first().append('Edytuj Hotel');
                                $("#name").val(response.name);
                                $('#price').val(response.price);
+                                $('#street').val(response.street);
                                 hotelStatus = response.status;
                                $('#voivodeAdd').val(response.voivode_id);
                                $('#comment').val(response.comment);
@@ -319,6 +328,10 @@
                         },"name":"cityName", "orderable": true
                     },
                     {"data":function (data, type, dataToSet) {
+                            return data.street;
+                        },"name":"street","orderable": true
+                    },
+                    {"data":function (data, type, dataToSet) {
                             let returnButton = "<button class='button-edit-hotel btn btn-info btn-block'  data-id=" + data.id + "><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
                             if (data.status == 0)
                                 returnButton += "<button class='button-status-hotel btn btn-danger btn-block' data-id=" + data.id + " data-status=0 ><span class='glyphicon glyphicon-off'></span> Wyłącz</button>";
@@ -371,6 +384,7 @@
             $('#saveHotel').on('click', function() {
                 var name = $("#name").val();
                 var price = $('#price').val();
+                var street = $('#street').val();
                 var voivode = $('#voivodeAdd').val();
                 var city = $('#cityAdd').val();
                 var comment = $('#comment').val();
@@ -379,6 +393,10 @@
                 console.log(hotelStatus);
                 if (name.trim().length == 0) {
                     swal('Wprowadź nazwę hotelu!')
+                    validate = false;
+                }
+                if (street.trim().length == 0) {
+                    swal('Wprowadź ulicę!')
                     validate = false;
                 }
                 if (voivode == 0) {
@@ -405,6 +423,7 @@
                             'voivode': voivode,
                             'name': name,
                             'price': price,
+                            'street': street,
                             'city': city,
                             'hotelId': hotelId,
                             'comment' : comment,
