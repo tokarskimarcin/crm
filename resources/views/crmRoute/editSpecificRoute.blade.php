@@ -103,10 +103,12 @@
                         <div class="client-container">
                             <header>Klient</header>
                             <div class="alert alert-info">
-                                Wybierz klienta z listy. Jeśli nie ma klienta na liście, dodaj go wypełniając formularz, który pojawi się po naciśnięciu przycisku <strong>Dodaj klienta</strong>
+                                Wybierz klienta z listy. Jeśli nie ma klienta na liście, dodaj go wypełniając formularz,
+                                który pojawi się po naciśnięciu przycisku <strong>Dodaj klienta</strong> </br>
+                                Wiersze zaznaczone na czerwono wskazują na klienta, który został wyłączony.
                             </div>
                             <div class="col-md-12">
-                                <button data-toggle="modal" class="btn btn-default" id="clietnModal" data-target="#ModalClient" data-id="1" title="Nowy Klient" style="margin-bottom: 14px">
+                                <button data-toggle="modal" class="btn btn-default" id="clientModal" data-target="#ModalClient" data-id="1" title="Nowy Klient" style="margin-bottom: 14px">
                                     <span class="glyphicon glyphicon-plus"></span> <span>Dodaj Klienta</span>
                                 </button>
                                 <div class="table-responsive">
@@ -191,7 +193,7 @@
 
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            Nowy Klient
+                                            Formularz
                                         </div>
                                         <div class="panel-body">
                                             <div class="col-md-12">
@@ -244,9 +246,7 @@
                                     Wybierz szablon trasy z listy. Jeśli nie ma odpowiedniej trasy na liście, stwórz ją naciskając na przycisk <strong>Dodaj trasę ręcznie</strong>
                                 </div>
                                 <div class="col-md-4">
-                                    <a href="#jump-here">
                                         <button class="btn btn-default" id="add-new-route" style="margin-bottom: 14px;"><span class="glyphicon glyphicon-plus"></span>Dodaj trasę ręcznie</button>
-                                    </a>
                                 </div>
                                 <table id="datatable" class="thead-inverse table table-striped table-bordered" cellspacing="0" width="100%">
                                     <thead>
@@ -317,48 +317,54 @@
                                                 <input class="form-control show-hours" min="0" type="number" placeholder="Np. 2" value={{count($item)}}>
                                                 </div>
                                             </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="myLabel">Data:</label>
-                                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                                    <input class="form-control dateInput" type="text" value="{{date($item[0]->date)}}">
-                                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="myLabel">Data:</label>
+                                                    <div class="input-group date form_date col-md-5" data-date=""
+                                                         data-date-format="yyyy-mm-dd" data-link-field="datak"
+                                                         style="width:100%;">
+                                                        <input class="form-control dateInput" type="text"
+                                                               value="{{date($item[0]->date)}}">
+                                                        <span class="input-group-addon"><span
+                                                                    class="glyphicon glyphicon-th"></span></span>
                                                     </div>
                                                 </div>
                                             </div>
-                                        <div class="form-group hour_div">
-                                        </div>
-                                        @if($lp == count($clientRouteInfo))
-                                            <div class="col-lg-12 button_section button_new_show_section">
-                                                <input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">
-                                            </div>
-                                        @endif
+                                    </div>
                                 </div>
-                            </div>
-                            @endforeach
+                                @endforeach
+                                <div class="new-route-container">
+                                    <div class="row">
+                                        <div class="col-lg-12button_section button_new_show_section">
+                                            <button class="btn btn-default btn-block btn_add_new_route" id="add_new_show"><span class="glyphicon glyphicon-plus"></span> Dodaj nowy pokaz</button>
+                                        </div>
+                                    </div>
+                                </div>
                         </div>
                         <div class="client-wrapper">
                             <div class="client-container">
-                                <button class="btn btn-info" style="margin-top:1em;font-size:1.1em;font-weight:bold;" id="redirect">Powrót</button>
-                                <button class="btn btn-success" style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;" id="save">Zapisz</button>
+                                <button class="btn btn-primary" style="margin-top:1em;font-size:1.1em;font-weight:bold;"
+                                        id="redirect"><span class='glyphicon glyphicon-repeat'></span> Powrót
+                                </button>
+                                <button class="btn btn-success"
+                                        style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;"
+                                        id="save"><span class='glyphicon glyphicon-save'></span> Zapisz
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-
-
-
-
 @endsection
-
 @section('script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
 
+        let saveClientClicked = false;
+        let editFlag = false;
+        let saveButton = document.querySelector('#saveClient');
 
     function activateDatepicker() {
       $('.form_date').datetimepicker({
@@ -372,6 +378,14 @@
 
     activateDatepicker();
 
+        $('#clientModal').click(() => {
+            $('#ModalClient .modal-title').first().text('Dodawanie nowego klienta');
+            let saveClientModalButton = $('#ModalClient #saveClient');
+            saveClientModalButton.first().prop('class','btn btn-default form-control');
+            saveClientModalButton.first().text('');
+            saveClientModalButton.append($('<span class="glyphicon glyphicon-plus"></span>'));
+            saveClientModalButton.append(' Dodaj Klienta');
+        });
         //Clear Client modal
         function clearModal() {
             $('#clientName').val("");
@@ -387,19 +401,21 @@
             let clientType = $('#clientType').val();
             let clientID = $('#clientID').val();
             let validation = true;
-            if(clientName.trim().length == 0){
+            if (clientName.trim().length == 0) {
                 validation = false;
                 swal("Podaj nazwę klienta")
             }
-            if(clientPriority == 0){
+            if (clientPriority == 0) {
                 validation = false;
                 swal("Wybierz priorytet klienta")
             }
-            if(clientType == 0){
+            if (clientType == 0) {
                 validation = false;
                 swal("Wybierz typ klienta")
             }
-            if(validation){
+            if (validation) {
+                saveClientClicked = true;
+                saveButton.disabled = true; //after first click, disable button
                 $.ajax({
                     type: "POST",
                     url: "{{route('api.saveClient')}}",
@@ -407,17 +423,41 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     data: {
-                        'clientName'    : clientName,
+                        'clientName': clientName,
                         'clientPriority': clientPriority,
-                        'clientType'    : clientType,
-                        'clientID'      : clientID
+                        'clientType': clientType,
+                        'clientID': clientID
                     },
                     success: function (response) {
+                        if(editFlag == false) {
+                            notify('<strong>Klient został pomyślnie dodany</strong>', 'success');
+                        }
+                        else {
+                            notify('<strong>Klient został pomyślnie edytowany</strong>', 'success');
+                            editFlag = false;
+                        }
                         $('#ModalClient').modal('hide');
+                        saveButton.disabled = false; //after closing modal, enable button
                     }
                 })
             }
         }
+
+        function notify(htmltext$string, type$string = info, delay$miliseconds$number = 5000) {
+            $.notify({
+                // options
+                message: htmltext$string
+            },{
+                // settings
+                type: type$string,
+                delay: delay$miliseconds$number,
+                animate: {
+                    enter: 'animated fadeInRight',
+                    exit: 'animated fadeOutRight'
+                }
+            });
+        }
+
         $(document).ready(function() {
             $('.voivodeship').select2();
           //Ta funkcja działa analogicznie jak jQuerry .appendAfter();
@@ -463,7 +503,10 @@
             $('#ModalClient').on('hidden.bs.modal',function () {
                 $('#clientID').val("0");
                 clearModal();
+                if(saveClientClicked) {
                 table_client.ajax.reload();
+                    saveClientClicked = false;
+                }
             });
 
             function writeCheckedClientInfo(){
@@ -553,111 +596,104 @@
               });
             }
 
-            function generateRouteDiv(showRemove,showRefresh,showNewRoute,responseIterator,city,voievodes,placeToAppend){
-              let routeContainer = document.createElement('div');
-              routeContainer.className = 'routes-container';
+            function generateRouteDiv(showRemove, showRefresh, responseIterator, city, voievodes, placeToAppend) {
+                let routeContainer = document.createElement('div');
+                routeContainer.className = 'routes-container';
 
-              let stringAppend =
-               '<div class="row">\n' +
-                     '<div class="button_section">';
-                     if(showRemove)
-                         stringAppend += '<span class="glyphicon glyphicon-remove" data-remove="show"></span>';
-                     stringAppend += '</div>' +
-                        '<header>Pokaz </header>\n';
-                     if(showRefresh)
-                         stringAppend +='<div class=colmd-12 style="text-align: center">' +
-                     '<span class="glyphicon glyphicon-refresh" data-refresh="refresh" style="font-size: 30px"></span>' +
-               '</div>';
+                let stringAppend =
+                    '<div class="row">\n' +
+                    '<div class="button_section">';
+                if (showRemove)
+                    stringAppend += '<span class="glyphicon glyphicon-remove" data-remove="show"></span>';
+                stringAppend += '</div>' +
+                    '<header>Pokaz </header>\n';
+                if (showRefresh)
+                    stringAppend += '<div class=colmd-12 style="text-align: center">' +
+                        '<span class="glyphicon glyphicon-refresh" data-refresh="refresh" style="font-size: 30px"></span>' +
+                        '</div>';
 
-               stringAppend +=
-               '\n' +
-               '            <div class="col-md-6">\n' +
-               '                <div class="form-group">\n' +
-               '                    <label>Województwo</label>\n' +
-               '                    <select class="form-control voivodeship" data-type="voivode">\n';
-                       for(var j = 0; j<voievodes.length; j++){
-                           if(responseIterator.voivodeship_id == voievodes[j].id)
-                               stringAppend +=  '<option value ="' + responseIterator.voivodeship_id + ' " selected>' + responseIterator.voivode_name + '</option>';
-                           else
-                               stringAppend +=  '<option value ="' + voievodes[j].id + '">' + voievodes[j].name + '</option>';
+                stringAppend +=
+                    '\n' +
+                    '            <div class="col-md-6">\n' +
+                    '                <div class="form-group">\n' +
+                    '                    <label>Województwo</label>\n' +
+                    '                    <select class="form-control voivodeship" data-type="voivode" style="width:100%;">\n';
+                for (var j = 0; j < voievodes.length; j++) {
+                    if (responseIterator.voivodeship_id == voievodes[j].id)
+                        stringAppend += '<option value ="' + responseIterator.voivodeship_id + ' " selected>' + responseIterator.voivode_name + '</option>';
+                    else
+                        stringAppend += '<option value ="' + voievodes[j].id + '">' + voievodes[j].name + '</option>';
+                }
+                stringAppend += '                    </select>\n' +
+                    '                </div>\n' +
+                    '            </div>\n' +
+                    '\n' +
+                    '            <div class="col-md-6">\n' +
+                    '                <div class="form-group">\n' +
+                    '                    <label for="city">Miasto</label>\n' +
+                    '                    <select class="form-control city" style="width:100%;">\n';
+                for (var j = 0; j < city.length; j++) {
+                    if (responseIterator.city_id == city[j].id) {
+                        if (city[j].block == 1) {
+                            if (city[j].exceeded == 0) { //When city is still available
+                                stringAppend += '<option value="' + city[j].id + '" data-max_hours="' + city[j].used_hours + '"  selected>' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
                             }
-               stringAppend += '                    </select>\n' +
-               '                </div>\n' +
-               '            </div>\n' +
-               '\n' +
-               '            <div class="col-md-6">\n' +
-               '                <div class="form-group">\n' +
-               '                    <label for="city">Miasto</label>\n' +
-               '                    <select class="form-control city">\n';
-               for(var j = 0; j<city.length; j++) {
-                   if (responseIterator.city_id == city[j].id){
-                       if(city[j].block == 1) {
-                           if(city[j].exceeded == 0) { //When city is still available
-                               stringAppend += '<option value="' + city[j].id + '" data-max_hours="' + city[j].used_hours + '"  selected>' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
-                           }
-                           else {
-                               stringAppend += '<option value="' + city[j].id + '"  data-max_hours="0" selected>' + city[j].name + '(KARENCJA do ' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
-                           }
+                            else {
+                                stringAppend += '<option value="' + city[j].id + '"  data-max_hours="0" selected>' + city[j].name + '(KARENCJA do ' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
+                            }
 
-                       }
-                       else {
-                           stringAppend += '<option value="' + city[j].city_id + '"  data-max_hours="' + city[j].max_hour + '" selected>' + city[j].name +'</option>\n';
-                       }
+                        }
+                        else {
+                            stringAppend += '<option value="' + city[j].id + '"  data-max_hours="' + city[j].max_hour + '" selected>' + city[j].name + '</option>\n';
+                        }
 
-                   }else{
-                       if(city[j].block == 1) {
-                           if(city[j].exceeded == 0) { //When city is still available
-                               stringAppend += '<option value="' + city[j].city_id + '" data-max_hours="' + city[j].used_hours + '">' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
-                           }
-                           else {
-                               stringAppend += '<option value="' + city[j].city_id + '"  data-max_hours="0">' + city[j].name + '(KARENCJA' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
-                           }
+                    } else {
+                        if (city[j].block == 1) {
+                            if (city[j].exceeded == 0) { //When city is still available
+                                stringAppend += '<option value="' + city[j].id + '" data-max_hours="' + city[j].used_hours + '">' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
+                            }
+                            else {
+                                stringAppend += '<option value="' + city[j].id + '"  data-max_hours="0">' + city[j].name + '(KARENCJA' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
+                            }
 
-                       }
-                       else {
-                           stringAppend += '<option value="' + city[j].city_id + '"  data-max_hours="' + city[j].max_hour + '">' + city[j].name +'</option>\n';
-                       }
+                        }
+                        else {
+                            stringAppend += '<option value="' + city[j].id + '"  data-max_hours="' + city[j].max_hour + '">' + city[j].name + '</option>\n';
+                        }
 
-                   }
-               }
-               stringAppend +='                    </select>\n' +
-               '                </div>\n' +
-               '            </div>\n' +
-                   '<div class="col-md-6">' +
-                   '<div class="form-group">' +
-                   '<label class="myLabel">Ilość godzin pokazów</label>' +
-                   '<input class="form-control show-hours" min="0" type="number" placeholder="Np. 2">' +
-                   '</div>' +
-                   '</div>' +
-                   '<div class="col-md-6">' +
-                   '<div class="form-group">' +
-                   '<label class="myLabel">Data:</label>' +
-                   '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">';
-                    if(currentDate != "0") {
-                        stringAppend += '<input class="form-control dateInput" type="text" value="' + currentDate + '">';
                     }
-                    else {
-                        stringAppend += '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">';
-                    }
-                    stringAppend += '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
-                   '</div>' +
-                   '</div>' +
-                   '</div>' +
-               '\n' +
-                   '<div class="form-group hour_div">' +
-                   '</div>';
+                }
+                stringAppend += '                    </select>\n' +
+                    '                </div>\n' +
+                    '            </div>\n' +
+                    '<div class="col-md-6">' +
+                    '<div class="form-group">' +
+                    '<label class="myLabel">Ilość godzin pokazów</label>' +
+                    '<input class="form-control show-hours" min="0" type="number" placeholder="Np. 2">' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="col-md-6">' +
+                    '<div class="form-group">' +
+                    '<label class="myLabel">Data:</label>' +
+                    '<div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">';
+                if (currentDate != "0") {
+                    stringAppend += '<input class="form-control dateInput" type="text" value="' + currentDate + '">';
+                }
+                else {
+                    stringAppend += '<input class="form-control dateInput" type="text" value="{{date("Y-m-d")}}">';
+                }
 
+                stringAppend += '<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '\n' +
+                    '<div class="form-group hour_div">' +
+                    '</div></div>';
 
-                   if(showNewRoute)
-                     stringAppend +=
-                     '<div class="col-lg-12 button_section button_new_show_section">\n' +
-                              '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
-                     '</div>\n';
-                   stringAppend +='</div>';
-
-               routeContainer.innerHTML = stringAppend;
-               placeToAppend.appendChild(routeContainer);
-
+                routeContainer.innerHTML = stringAppend;
+                $(routeContainer).hide();
+                placeToAppend.appendChild(routeContainer);
             }
 
             {{--let currentDate ={{$today}};--}}
@@ -725,6 +761,12 @@
 
 
                     $('.button-edit-client').on('click',function () {
+                        $('#ModalClient .modal-title').first().text('Edytowanie klienta');
+                        let saveClientModalButton = $('#ModalClient #saveClient');
+                        saveClientModalButton.first().prop('class','btn btn-info form-control');
+                        saveClientModalButton.first().text('');
+                        saveClientModalButton.append($('<span class="glyphicon glyphicon-edit"></span>'));
+                        saveClientModalButton.append(' Edytuj Klienta');
                         clientId = $(this).data('id');
                         $.ajax({
                             type: "POST",
@@ -742,6 +784,7 @@
                                 $('#clientType').val(response.type);
                                 $('#clientID').val(response.id);
                                 $('#ModalClient').modal('show');
+                                editFlag = true;
                             }
                         });
                     });
@@ -785,14 +828,14 @@
                         },"name": "priority","className": "client_priority"
                     },
                     {"data":"type","className": "client_type"},
-                    {"data":function (data, type, dataToSet) {
-                            let returnButton = "<button class='button-edit-client btn btn-warning' style='margin: 3px;' data-id="+data.id+">Edycja</button>";
-                            if(data.status == 0)
-                                returnButton += "<button class='button-status-client btn btn-danger' data-id="+data.id+" data-status=0 >Wyłącz</button>";
+                    {"data": function (data, type, dataToSet) {
+                            let returnButton = "<button class='button-edit-client btn btn-block btn-info' data-id=" + data.id + " data-noaction='1'><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
+                            if (data.status == 0)
+                                returnButton += "<button class='button-status-client btn btn-block btn-danger' data-id=" + data.id + " data-status=0 data-noaction='1'><span class='glyphicon glyphicon-off'></span> Wyłącz</button>";
                             else
-                                returnButton += "<button class='button-status-client btn btn-success' data-id="+data.id+" data-status=1 >Włącz</button>";
+                                returnButton += "<button class='button-status-client btn btn-block btn-success' data-id=" + data.id + " data-status=1 data-noaction='1'><span class='glyphicon glyphicon-off'></span> Włącz</button>";
                             return returnButton;
-                        },"orderable": false, "searchable": false
+                        }, "orderable": false, "searchable": false, width:'10%'
                     },
                     {"data": function (data, type, dataToSet) {
                             return ' <input style="display: inline-block;" type="checkbox" class="client_check"/>';
@@ -873,12 +916,10 @@
                                           //Pobranie miast dla danego wojew
                                             var city = getCitiesNamesByVoievodeship(response[i].voivodeship_id);
                                             //Generowanie Div'a
-                                            if(i == 0)
-                                              generateRouteDiv(false,false,false,response[i],city,voievodes,placeToAppend);
-                                            if(i+1 == response.length)
-                                              generateRouteDiv(true,true,true,response[i],city,voievodes,placeToAppend);
-                                            else
-                                              generateRouteDiv(true,true,false,response[i],city,voievodes,placeToAppend);
+                                            if (i == 0)
+                                                generateRouteDiv(false, false, response[i], city, voievodes, placeToAppend);
+                                            else if (i + 1 == response.length)
+                                                generateRouteDiv(true, true, response[i], city, voievodes, placeToAppend);
 
                                             $('.city').select2();
                                             $('.voivodeship').select2();
@@ -888,8 +929,12 @@
                                             });
                                             activateDatepicker();
                                         }
+                                        placeToAppend.appendChild(generateNewShowButton());
                                         $('.city').on('select2:select', function (e) {
                                             setHoursValue(e);
+                                        });
+                                        $('.routes-container').slideDown(1000,()=>{
+                                            $("html, body").animate({scrollTop: $(document).height()}, "slow");
                                         });
                                     }
                                 });
@@ -961,13 +1006,7 @@
                     '</div>' +
                     '</div>' +
                     '</div>' +
-                    '\n' +
-                    '<div class="form-group hour_div">' +
-                    '</div>' +
-                    '            <div class="col-lg-12 button_section">\n' +
-                    '<input type="button" class="btn btn-info btn_add_new_route" id="add_new_show" value="Dodaj nowy pokaz" style="width:100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;">' +
-                    '            </div>\n' +
-                    '        </div>';
+                    '</div>';
                 newElement.innerHTML = stringAppend;
                 return newElement;
             }
@@ -975,10 +1014,14 @@
             //Ta funkcja jest globalnym event listenerem na click
             function buttonHandler(e) {
                 if(e.target.id == 'add-new-route') {
+                    $(e.target).prop('disabled',true);
                     let basicDate = document.querySelector('.first-show-date-input');
                     currentDate = basicDate.value; //every time user clicks on manual show creation, date resets
                     let appendPlace = document.querySelector('.route-here');
                     appendPlace.innerHTML = "";
+                    appendPlace.appendChild(generateNewShowButton());
+
+
                     let newShow = addNewShow(0,0); //otrzymujemy nowy formularz z pokazem.
                     removeGlyInFirstShow();
                     $('.city').select2();
@@ -1004,9 +1047,9 @@
                     let cityId = 0;
                     let voievodeshipId = 0;
 
-                    let thisContainer = e.target.parentNode.parentNode.parentNode;
-                    let dateInput = thisContainer.querySelector('.dateInput'); //we select date input and append its value to currentDate variable
-                    currentDate = dateInput.value;
+                    let thisContainer = $('.routes-container').last();
+                    let dateInput = thisContainer.find('.dateInput').first();  //we select date input and append its value to currentDate variable
+                    currentDate = dateInput.val();
 
                     let validation = true;
                     // Walidacja wybrania
@@ -1026,6 +1069,7 @@
                         validation = false;
                     }
                     if(validation){
+                        $(e.target).prop('disabled', true);
                         $.ajax({
                             type: "POST",
                             url: '{{ route('api.getVoivodeshipRound') }}',
@@ -1090,8 +1134,20 @@
                     }
                 }
                 else if(e.target.dataset.remove == 'show') { // click on X glyphicon
-                    let showContainer = e.target.parentElement.parentElement.parentElement;
-                    removeGivenShow(showContainer);
+                    swal({
+                        title: "Jesteś pewien?",
+                        type: "warning",
+                        text: "Czy chcesz usunąć pokaz?",
+                        showCancelButton: true,
+                        confirmButtonClass: "btn-danger",
+                        confirmButtonText: "Tak, usuń!",
+
+                    }).then((result) => {
+                        if(result.value) {
+                            let showContainer = e.target.parentElement.parentElement.parentElement;
+                            removeGivenShow(showContainer);
+                        }
+                    });
                 }
                 else if(e.target.dataset.refresh == 'refresh') { // click on X glyphicon
                     //get contener with select (actual and previous)
@@ -1306,15 +1362,18 @@
                     let basisDate = document.querySelector('.first-show-date-input').value;
                     currentDate = basisDate;
                 }
-                let allShows = document.getElementsByClassName('routes-container');
-                let lastShowContainer = allShows[allShows.length - 1];
-                if(container == lastShowContainer) {
-                    addButtonsToPreviousContainer(container);
-                    container.parentNode.removeChild(container);
-                }
-                else {
-                    container.parentNode.removeChild(container);
-                }
+                $(container).slideUp(1000, () => {
+                    $.notify({
+                        // options
+                        icon: 'glyphicon glyphicon-trash',
+                        title: '',
+                        message: 'Pokaz został usunięty'
+                    }, {
+                        // settings
+                        type: 'danger'
+                    });
+                    container.remove();
+                });
             }
 
             /**
@@ -1330,8 +1389,22 @@
                 buttonsElement.appendAfter(placeInPreviousContainer);
             }
 
+            function generateNewShowButton(){
+                let buttonStringAppend =
+                    '<div class="row">' +
+                    '<div class="col-lg-12 button_section button_new_show_section">\n' +
+                    '<button class="btn btn-default btn-block btn_add_new_route" id="add_new_show"><span class="glyphicon glyphicon-plus"></span> Dodaj nowy pokaz</button>' +
+                    '</div>\n' +
+                    '</div>';
+
+                let newRouteContainer = document.createElement('div');
+                newRouteContainer.className = 'new-route-container';
+                newRouteContainer.innerHTML = buttonStringAppend;
+                return newRouteContainer;
+            }
+
             function addNewShow(ajaxResponse,type) {
-                removeButtonsFromLastShow();
+                //removeButtonsFromLastShow();
                 let routePlace = document.querySelector('.route-here');
                 if(type == 0){
                     var voievodes = @json($voivodes);
@@ -1340,11 +1413,14 @@
                 else{
                     var newShow = createNewShow(ajaxResponse); //otrzymujemy nowy formularz z pokazem.
                 }
-                routePlace.appendChild(newShow);
-
-                activateDatepicker();
-
-                $("html, body").animate({ scrollTop: $(document).height() }, "slow");
+                $(newShow).hide();
+                routePlace.insertBefore(newShow, document.querySelector('.new-route-container'));
+                $(newShow).slideDown(1000,()=>{
+                    activateDatepicker();
+                    $("html, body").animate({scrollTop: $(document).height()}, "slow");
+                    $('#add-new-route').prop('disabled',false);
+                    $('#add_new_show').prop('disabled', false);
+                });
             }
 
             function removeButtonsFromLastShow() {

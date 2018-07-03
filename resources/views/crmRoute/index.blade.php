@@ -280,7 +280,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="client-container route-here" id="jump-here">
+                        <div class="client-container route-here" >
 
                         </div>
                     </div>
@@ -916,6 +916,7 @@
                                             generateRouteDiv(false, false, response[i], city, voievodes, placeToAppend);
                                         else if (i + 1 == response.length)
                                             generateRouteDiv(true, true, response[i], city, voievodes, placeToAppend);
+
                                         $('.city').select2();
                                         $('.voivodeship').select2();
                                         $('.voivodeship').off('select2:select'); //remove previous event listeners
