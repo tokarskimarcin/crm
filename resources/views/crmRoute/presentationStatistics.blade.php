@@ -50,7 +50,7 @@
                         </div>
                     </div>
                     <div id="parent">
-                        @if(isset($days) && isset($clients['Wysyłka']) && isset($clients['Badania']) && isset($allInfo['Wysyłka'][$item->name]) && isset($allInfo['Wysyłka']['daySum']) && isset($allInfo['Badania'][$item->name]) && isset($allInfo['Badania']['daySum']))
+                        @if(isset($days) && isset($clients['Wysyłka']) && isset($clients['Badania']) && isset($allInfo['Wysyłka']) && isset($allInfo['Wysyłka']['daySum']) && isset($allInfo['Badania']) && isset($allInfo['Badania']['daySum']))
                         <table id="fixTable" class="table table-bordered">
                             <thead>
                             <tr>
