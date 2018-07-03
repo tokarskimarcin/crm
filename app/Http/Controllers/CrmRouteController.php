@@ -111,6 +111,7 @@ class CrmRouteController extends Controller
         $city = $request->city;
         $hour = $request->hour;
         $date = $request->date;
+        $type = $request->type;
         $clientIdNotTrimmed = $request->clientId;
 
         //explode values into arrays
@@ -128,6 +129,7 @@ class CrmRouteController extends Controller
         $clientRoute->client_id = $clientId;
         $clientRoute->user_id = $loggedUser->id;
         $clientRoute->status = 0;
+        $clientRoute->type = $type;
         $clientRoute->save();
 
         ClientRouteInfo::where('client_route_id','=',$request->route_id)->delete();
@@ -254,7 +256,7 @@ class CrmRouteController extends Controller
         $voivodes = Voivodes::all();
         $departments = Department_info::all(); //niezbędne
 
-        $clientRouteInfo = ClientRouteInfo::select('client_route_info.id', 'voivodeship.name as voivode', 'client_route_info.voivode_id as voivode_id','city.name as city', 'client_route_info.city_id as city_id', 'client_route.client_id as client_id', 'client_route_info.client_route_id as client_route_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour')
+        $clientRouteInfo = ClientRouteInfo::select('client_route_info.id', 'voivodeship.name as voivode', 'client_route_info.voivode_id as voivode_id','city.name as city', 'client_route_info.city_id as city_id', 'client_route.client_id as client_id', 'client_route_info.client_route_id as client_route_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour', 'client_route.type as type')
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
             ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
             ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
@@ -268,8 +270,13 @@ class CrmRouteController extends Controller
         $iterator = 0; //It count loops of foreach
         $iteratorFinish = count($clientRouteInfo); // indices when condition inside foreach should push array into $clientRouteInfoExtended array.
         $clientName = null;
+        $clientType = null;
 
         foreach($clientRouteInfo as $info) {
+            if($iterator == 0) {
+                $clientType = $info->type;
+            }
+
             if($cityId == null) {
                 $flag = 0;
                 $cityId = $info->city_id;
@@ -334,7 +341,8 @@ class CrmRouteController extends Controller
             ->with('today', $today)
             ->with('clientRouteInfo',$clientRouteInfo)
             ->with('clientRId', $clientRId)
-            ->with('routeId',$id);
+            ->with('routeId',$id)
+            ->with('clientType', $clientType);
     }
 
 
@@ -1261,7 +1269,22 @@ class CrmRouteController extends Controller
             $newCity->latitude = $request->latitude;
             $newCity->longitude = $request->longitude;
             $newCity->zip_code = $request->zipCode;
-            $newCity->status = $request->status;
+
+            if(is_null($request->status)) {
+                $newCity->status = 0;
+            }
+            else {
+                $newCity->status = $request->status;
+            }
+
+
+            if($request->weekGrace != '') {
+                $newCity->grace_week = $request->weekGrace;
+            }
+            else {
+                $newCity->grace_week = 0;
+            }
+
             $newCity->save();
             new ActivityRecorder(12,null, 193, 1);
 

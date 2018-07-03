@@ -153,6 +153,13 @@
                                                    placeholder="Długość geograficzna" type="number">
                                         </div>
                                     </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label class="myLabel">Max pokazów tygodniowo</label>
+                                            <input class="form-control" id="weekGrace" name="weekGrace" placeholder="Maksymalna ilość pokazów tygodniowo"
+                                                   type="number" min="0" step="1" disabled>
+                                        </div>
+                                    </div>
                                     <div class="col-md-3" style="visibility: hidden; display:inline;">
                                         <div class="form-group">
                                             <label class="myLabel">Status</label>
@@ -221,6 +228,7 @@
             $('#eventCount').val("");
             $('#gracePeriod').val("");
             $('#cityID').val(0);
+            $('#weekGrace').val('');
         }
 
         //Zapisanie miasta
@@ -234,6 +242,7 @@
             let zipCode = $('#zipCode1').val()+$('#zipCode2').val();
             let latitude = $('#latitude').val();
             let longitude = $('#longitude').val();
+            let weekGrace = $('#weekGrace').val();
 
             let validation = true;
 
@@ -278,6 +287,7 @@
                         'longitude': longitude,
                         'zipCode': zipCode,
                         'cityID': $('#cityID').val(),
+                        'weekGrace': weekGrace,
                         'status': status
                     },
                     success: function (response) {
@@ -338,13 +348,16 @@
                     table.ajax.reload();
                     saveCityButtonClicked = false;
                 }
+                $('#weekGrace').prop('disabled', true);
             });
 
             $('#saveCityModal').click((e) => {
                 saveCityButtonClicked = true;
-                if ($(e.target).text() === 'Dodaj Miasto') {
+
+                if(e.target.dataset.type == 2) {
                     addNewCityFlag = true;
-                } else if ($(e.target).text() === 'Edytuj Miasto') {
+                }
+                else if(e.target.dataset.type == 1) {
                     editCityFlag = true;
                 }
             });
@@ -353,6 +366,7 @@
                 $('#ModalCity .modal-title').first().text('Dodawanie Miasta');
                 saveCityModalButton = $('#ModalCity #saveCityModal');
                 saveCityModalButton.first().prop('class','btn btn-default form-control');
+                saveCityModalButton.first().attr('data-type', '2');
                 saveCityModalButton.first().text('');
                 saveCityModalButton.append($('<span class="glyphicon glyphicon-plus"></span>'));
                 saveCityModalButton.append(' Dodaj Miasto');
@@ -453,6 +467,7 @@
                                 $('#ModalCity .modal-title').first().text('Edycja Miasta');
                                 saveCityModalButton = $('#ModalCity #saveCityModal');
                                 saveCityModalButton.first().prop('class','btn btn-info form-control');
+                                saveCityModalButton.first().attr('data-type', '1');
                                 saveCityModalButton.first().text('');
                                 saveCityModalButton.append($('<span class="glyphicon glyphicon-edit"></span>'));
                                 saveCityModalButton.append(' Edytuj Miasto');
@@ -460,6 +475,10 @@
                                 $('#cityName').val(response.name);
                                 $('#eventCount').val(response.max_hour);
                                 $('#gracePeriod').val(response.grace_period);
+                                $('#weekGrace').val(response.grace_week);
+                                if(response.grace_period == '-1') {
+                                    $('#weekGrace').prop('disabled', false);
+                                }
                                 zipCode = String(response.zip_code);
                                 length = zipCode.length;
                                 for(i = 0; i < 5-length; i++){
@@ -509,6 +528,18 @@
                         }, "orderable": false, "searchable": false
                     }
                 ]
+            });
+
+
+            $('#gracePeriod').on('input', e => {
+                let weekGraceInput = $('#weekGrace');
+                if(e.target.value === '-1') {
+                    weekGraceInput.prop('disabled', false);
+                }
+                else {
+                    weekGraceInput.prop('disabled', true);
+                    weekGraceInput.val('');
+                }
             });
         })
     </script>
