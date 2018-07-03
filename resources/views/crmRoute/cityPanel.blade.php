@@ -242,7 +242,7 @@
             let zipCode = $('#zipCode1').val()+$('#zipCode2').val();
             let latitude = $('#latitude').val();
             let longitude = $('#longitude').val();
-            let weekGrace = $('#weekGrace').val();
+            // let weekGrace = $('#weekGrace').val();
 
             let validation = true;
 
@@ -348,7 +348,7 @@
                     table.ajax.reload();
                     saveCityButtonClicked = false;
                 }
-                $('#weekGrace').prop('disabled', true);
+                // $('#weekGrace').prop('disabled', true);
             });
 
             $('#saveCityModal').click((e) => {
@@ -531,16 +531,16 @@
             });
 
 
-            $('#gracePeriod').on('input', e => {
-                let weekGraceInput = $('#weekGrace');
-                if(e.target.value === '-1') {
-                    weekGraceInput.prop('disabled', false);
-                }
-                else {
-                    weekGraceInput.prop('disabled', true);
-                    weekGraceInput.val('');
-                }
-            });
+            // $('#gracePeriod').on('input', e => {
+            //     let weekGraceInput = $('#weekGrace');
+            //     if(e.target.value === '-1') {
+            //         weekGraceInput.prop('disabled', false);
+            //     }
+            //     else {
+            //         weekGraceInput.prop('disabled', true);
+            //         weekGraceInput.val('');
+            //     }
+            // });
         })
     </script>
 @endsection
