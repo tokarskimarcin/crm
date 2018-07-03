@@ -342,9 +342,11 @@
 
             $('#saveCityModal').click((e) => {
                 saveCityButtonClicked = true;
-                if ($(e.target).text() === 'Dodaj Miasto') {
+
+                if(e.target.dataset.type == 2) {
                     addNewCityFlag = true;
-                } else if ($(e.target).text() === 'Edytuj Miasto') {
+                }
+                else if(e.target.dataset.type == 1) {
                     editCityFlag = true;
                 }
             });
@@ -353,6 +355,7 @@
                 $('#ModalCity .modal-title').first().text('Dodawanie Miasta');
                 saveCityModalButton = $('#ModalCity #saveCityModal');
                 saveCityModalButton.first().prop('class','btn btn-default form-control');
+                saveCityModalButton.first().attr('data-type', '2');
                 saveCityModalButton.first().text('');
                 saveCityModalButton.append($('<span class="glyphicon glyphicon-plus"></span>'));
                 saveCityModalButton.append(' Dodaj Miasto');
@@ -453,6 +456,7 @@
                                 $('#ModalCity .modal-title').first().text('Edycja Miasta');
                                 saveCityModalButton = $('#ModalCity #saveCityModal');
                                 saveCityModalButton.first().prop('class','btn btn-info form-control');
+                                saveCityModalButton.first().attr('data-type', '1');
                                 saveCityModalButton.first().text('');
                                 saveCityModalButton.append($('<span class="glyphicon glyphicon-edit"></span>'));
                                 saveCityModalButton.append(' Edytuj Miasto');
