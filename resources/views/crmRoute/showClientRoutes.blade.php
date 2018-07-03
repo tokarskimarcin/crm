@@ -917,6 +917,10 @@
                     }
                     sessionStorage.removeItem('showOnlyAssigned');
                 }
+                if(sessionStorage.getItem('routeName')) {
+                    sessionStorage.removeItem('routeName');
+                }
+
                 if(somethingChanged) {
                     table2.ajax.reload();
                 }

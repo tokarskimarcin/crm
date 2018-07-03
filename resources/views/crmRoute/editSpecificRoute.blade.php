@@ -446,9 +446,6 @@
             let mainContainer = document.querySelector('.routes-wrapper'); //zaznaczamy główny container
             let route_id = 0;
             let client_id = 0;
-            let actualLocation = window.location.href;
-            console.log("Aktualna lokalizacja: ", actualLocation);
-
 
             (function setRouteName() {
                 const panelHeadingElement = document.querySelector('.top-heading');
@@ -1357,19 +1354,8 @@
                 }
             }
 
-            function closePageHandler(e) {
-                let actualPageURL = e.target.baseURI;
-                console.log('actualPageURL: ', actualPageURL);
-                let targetPageURL = e.target.referrer;
-                console.log("targetPageURL: ", targetPageURL);
-                // console.log(window.location);
-                if(actualPageURL != targetPageURL)
-                sessionStorage.removeItem('routeName');
-            }
 
             document.addEventListener('click', buttonHandler);
-
-            window.addEventListener('pagehide', closePageHandler);
 
             $('.form_date').on('change.dp', function(e) {
                 currentDate = e.target.value;
