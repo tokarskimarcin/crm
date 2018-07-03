@@ -1471,6 +1471,7 @@ class CrmRouteController extends Controller
         $invitation = $request->invitation;
         $department = $request->department;
         $verification = $request->verification;
+        $liveInvitations = $request->liveInvitation;
 
         $clientRouteInfoRecords = ClientRouteInfo::whereIn('id', $ids)->get();
 
@@ -1516,6 +1517,13 @@ class CrmRouteController extends Controller
         if($verification != '') {
             foreach($clientRouteInfoRecords as $record) {
                 $record->verification = $verification;
+                $record->save();
+            }
+        }
+
+        if($liveInvitations != '') {
+            foreach($clientRouteInfoRecords as $record) {
+                $record->actual_success = $liveInvitations;
                 $record->save();
             }
         }
