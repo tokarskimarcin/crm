@@ -10,7 +10,6 @@
     {{--<link rel="stylesheet" href="{{asset('/css/ScrollTabla.css')}}">--}}
 @endsection
 @section('content')
-
     <style>
         #parent {
             height: 500px;
@@ -48,6 +47,26 @@
                             <div class="heading-container">
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="year">Rok</label>
+                                <select id="year" class="form-control">
+                                    <option value="%">Wszystkie</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="month">Miesiąc</label>
+                                <select id="month" class="form-control">
+                                    <option value="%">Wszystkie</option>
+                                </select>
+                            </div>
+                        </div>
+
                     </div>
                     <div id="parent">
                         @if(isset($days) && isset($clients['Wysyłka']) && isset($clients['Badania']) && isset($allInfo['Wysyłka']) && isset($allInfo['Wysyłka']['daySum']) && isset($allInfo['Badania']) && isset($allInfo['Badania']['daySum']))
@@ -97,7 +116,7 @@
                                         @foreach($clients['Wysyłka'] as $item)
                                             <tr>
                                                 @if($i == 0)
-                                                    <td rowspan="{{$rowspanWysylka}}" style="vertical-align : middle;text-align:center; font-weight:bold;">Kamery</td>
+                                                    <td rowspan="{{$rowspanWysylka}}" style="vertical-align : middle;text-align:center; font-weight:bold;"  data-specialrow="1">Kamery</td>
                                                 @endif
                                                 @php
                                                     $i++;
@@ -133,7 +152,7 @@
                                     @foreach($clients['Badania'] as $item)
                                         <tr>
                                             @if($i == 0)
-                                                <td rowspan="{{$rowspanBadania}}" style="vertical-align : middle;text-align:center; font-weight:bold;">Badania</td>
+                                                <td rowspan="{{$rowspanBadania}}" style="vertical-align : middle;text-align:center; font-weight:bold;" data-specialrow="1">Badania</td>
                                             @endif
                                             @php
                                                 $i++;
@@ -226,8 +245,17 @@
                          weekSum += intStringNumber;
                       });
 
+                       let cellIndex = null;
+
                       let lastSumElement = firstSumElement[firstSumElement.length - 1];
-                      let cellIndex = lastSumElement.cellIndex;
+                       let firstRowToCheck = lastSumElement.parentElement.children[0];
+                       if(firstRowToCheck.dataset.specialrow) {
+                           cellIndex = lastSumElement.cellIndex - 1;
+                       }
+                       else {
+                           cellIndex = lastSumElement.cellIndex;
+                       }
+
                       let sumElement = lastSumElement.parentElement.nextElementSibling.children[cellIndex];
                       sumElement.textContent = weekSum;
                       sumElement.style.background = '#efef7f';
@@ -235,6 +263,40 @@
                       weekSum = 0;
                    });
                 });
+            })();
+
+            /**
+             * This function appends week numbers to month select element and years to year select element
+             * IIFE function, execute after page is loaded automaticaly
+             */
+            (function appendMonthsAndYears() {
+                const monthSelect = document.querySelector('#month');
+                const yearSelect = document.querySelector('#year');
+                const baseYear = '2017';
+                const currentYear = {{$currentYear}};
+                const currentMonth = {{$currentMonth}};
+
+                for(let j = baseYear; j <= currentYear + 1; j++) {
+                    const opt = document.createElement('option');
+                    opt.value = j;
+                    opt.textContent = j;
+                    if(j == currentYear) {
+                        opt.setAttribute('selected', 'selected');
+                        selectedYear = [j];
+                    }
+                    yearSelect.appendChild(opt);
+                }
+
+                for(let i = 1; i < 13; i++) {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.textContent = i;
+                    if(i == currentMonth) {
+                        opt.setAttribute('selected', 'selected');
+                        selectedMonth = [i];
+                    }
+                    monthSelect.appendChild(opt);
+                }
             })();
 
             $("#fixTable").tableHeadFixer({"head" : false, "left" : 2});

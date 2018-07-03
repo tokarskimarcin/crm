@@ -1278,12 +1278,12 @@ class CrmRouteController extends Controller
             }
 
 
-            if($request->weekGrace != '') {
-                $newCity->grace_week = $request->weekGrace;
-            }
-            else {
-                $newCity->grace_week = 0;
-            }
+//            if($request->weekGrace != '') {
+//                $newCity->grace_week = $request->weekGrace;
+//            }
+//            else {
+//                $newCity->grace_week = 0;
+//            }
 
             $newCity->save();
             new ActivityRecorder(12,null, 193, 1);
