@@ -260,6 +260,7 @@
                appendVerificationSelect(modalBody);
                appendInvitationInput(modalBody);
                appendDepartmentSelect(modalBody);
+               appendLiveInvitationsInput(modalBody);
 
                let submitButton = document.createElement('button');
                submitButton.id = 'submitEdition';
@@ -280,6 +281,7 @@
                    const verificationInput = document.querySelector('#changeVerification');
                    const invitationInput = document.querySelector('#invitations');
                    const departmentSelect = document.querySelector('#modalDepartment');
+                   const liveInput = document.querySelector('#liveInvitation');
 
                    const nrPBXValue = nrPBXInput.value;
                    const baseDivisionValue = baseDivisionInput.value;
@@ -288,6 +290,8 @@
                    const verificationValue = verificationInput.options[verificationInput.selectedIndex].value;
                    const invitationValue = invitationInput.value;
                    const departmentValue = departmentSelect.options[departmentSelect.selectedIndex].value;
+                   const liveInvitationValue = liveInput.value;
+                   console.info('Live Invitations; ', liveInvitationValue);
 
                    const url = `{{route('api.updateClientRouteInfoRecords')}}`;
                    const header = new Headers();
@@ -317,6 +321,9 @@
                    if(departmentValue != '0') {
                        data.append('department', departmentValue);
                    }
+                   if(liveInvitationValue > 0) {
+                       data.append('liveInvitation', liveInvitationValue);
+                   }
 
                    fetch(url, {
                        method: "POST",
@@ -333,6 +340,21 @@
 
                    $('#editModal').modal('toggle');
                });
+           }
+
+           function appendLiveInvitationsInput(placeToAppend) {
+               let label = document.createElement('label');
+               label.setAttribute('for', 'liveInvitation');
+               label.textContent = 'Zaproszenia Live';
+               placeToAppend.appendChild(label);
+
+               let liveInput = document.createElement('input');
+               liveInput.id = 'liveInvitation';
+               liveInput.setAttribute('type', 'number');
+               liveInput.setAttribute('step', '1');
+               liveInput.setAttribute('min', '0');
+               liveInput.classList.add('form-control');
+               placeToAppend.appendChild(liveInput);
            }
 
            /**
