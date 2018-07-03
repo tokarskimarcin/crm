@@ -553,10 +553,10 @@
                         "data": function (data, type, dataToSet) {
                             let finalName = '';
                             if (data.type == '1') {
-                                finalName = data.route_name + ' (W)';
+                                finalName = data.route_name + ' (B)';
                             }
                             else {
-                                finalName = data.route_name + ' (B)';
+                                finalName = data.route_name + ' (W)';
                             }
                             return finalName;
                         }, "name": "route_name"
@@ -592,7 +592,7 @@
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block"><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
+                            return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block" data-type="2"><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
                         }, "name": "link", width: '10%', searchable: false, orderable: false
                     },
                     {
@@ -939,6 +939,19 @@
             });
 
             window.addEventListener('pagehide', setItemsToSeessionStorage);
+
+            function globalClickHandler(e) {
+                //after clicking on route edit, we append to sessionStorage info about givenRole
+                if(e.target.dataset.type == 2) {
+                    const clickedRow = e.target.parentElement.parentElement.parentElement;
+                    const rowRoleAttribute = clickedRow.attributes["role"].nodeValue;
+                    console.assert(rowRoleAttribute === 'row', "Nie wykryto wiersza");
+                    const routeName = clickedRow.children[3].textContent;
+                    sessionStorage.setItem('routeName', routeName);
+                }
+            }
+
+            document.addEventListener('click', globalClickHandler);
 
         });
     </script>

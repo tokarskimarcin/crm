@@ -77,7 +77,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="alert gray-nav ">Tworzenie Tras</div>
+            <div class="alert gray-nav top-heading">Edycja Trasy</div>
         </div>
     </div>
 </div>
@@ -86,7 +86,7 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Tworzenie Tras
+                    Edycja Trasy
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -152,8 +152,14 @@
                                     <label id="client_choice_priority"></label>
                                 </div>
                                 <div class="col-md-4">
-                                    <label>Typ:</label>
-                                    <label id="client_choice_type"></label>
+                                    <div class="form-group">
+                                        <label for="client_choice_type">Typ:</label>
+                                        <select id="client_choice_type" class="form-control">
+                                            <option value="0">Wybierz</option>
+                                            <option value="1" @if(isset($clientType)) @if($clientType == '1') selected @endif @endif>Badania</option>
+                                            <option value="2" @if(isset($clientType)) @if($clientType == '2') selected @endif @endif>Wysyłka</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -440,6 +446,18 @@
             let mainContainer = document.querySelector('.routes-wrapper'); //zaznaczamy główny container
             let route_id = 0;
             let client_id = 0;
+            let actualLocation = window.location.href;
+            console.log("Aktualna lokalizacja: ", actualLocation);
+
+
+            (function setRouteName() {
+                const panelHeadingElement = document.querySelector('.top-heading');
+                console.log(panelHeadingElement);
+                if(sessionStorage.getItem('routeName')) {
+                    const routeName = sessionStorage.getItem('routeName');
+                    panelHeadingElement.textContent = "Edycja trasy: " + routeName;
+                }
+            })();
 
 //*********************START CLIENT SECTON***************************
 
@@ -455,10 +473,10 @@
                 tr_line = document.getElementsByClassName('check')[0];
                 var tr_line_name = tr_line.getElementsByClassName('client_name')[0].textContent;
                 var tr_line_phone = tr_line.getElementsByClassName('client_priority')[0].textContent;
-                var tr_line_type = tr_line.getElementsByClassName('client_type')[0].textContent;
+                // var tr_line_type = tr_line.getElementsByClassName('client_type')[0].textContent;
                 document.getElementById('client_choice_name').textContent = tr_line_name;
                 document.getElementById('client_choice_priority').textContent = tr_line_phone;
-                document.getElementById('client_choice_type').textContent = tr_line_type;
+                // document.getElementById('client_choice_type').textContent = tr_line_type;
             }
 
             function clearCheckedClientInfo(){
@@ -1199,7 +1217,7 @@
                     if(everythingIsGood == true) {
                         let formContainer = document.createElement('div');
                         formContainer.innerHTML = '' +
-                            '<form method="post" action="{{URL::to('/crmRoute_indexEdit')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"><input type="hidden" name="route_id" value="'+ {{$routeId}} +'"></form>';
+                            '<form method="post" action="{{URL::to('/crmRoute_indexEdit')}}" id="user_form"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" value="' + voivodeArr + '" name="voivode"><input type="hidden" value="' + cityArr + '" name="city"><input type="hidden" value="' + hourArr + '" name="hour"><input type="hidden" name="clientId" value="' + finalClientId + '"><input type="hidden" name="date" value="' + dateArr + '"><input type="hidden" name="route_id" value="'+ {{$routeId}} +'"><input type="hidden" name="type" value="'+ $('#client_choice_type').val() +'"></form>';
                         let place = document.querySelector('.route-here');
                         place.appendChild(formContainer);
                         let userForm = document.getElementById('user_form');
@@ -1339,7 +1357,20 @@
                 }
             }
 
+            function closePageHandler(e) {
+                let actualPageURL = e.target.baseURI;
+                console.log('actualPageURL: ', actualPageURL);
+                let targetPageURL = e.target.referrer;
+                console.log("targetPageURL: ", targetPageURL);
+                // console.log(window.location);
+                if(actualPageURL != targetPageURL)
+                sessionStorage.removeItem('routeName');
+            }
+
             document.addEventListener('click', buttonHandler);
+
+            window.addEventListener('pagehide', closePageHandler);
+
             $('.form_date').on('change.dp', function(e) {
                 currentDate = e.target.value;
                 table.ajax.reload();
@@ -1351,6 +1382,8 @@
             });
 
             $('.city').select2();
+
+
 
         });
 
