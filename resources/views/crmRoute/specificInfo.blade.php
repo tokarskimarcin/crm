@@ -142,6 +142,7 @@
 
 @section('script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded',function(event) {
 
@@ -151,6 +152,7 @@
             let hotelIdArr = []; //here we collect id's of each city's hotel;
             const voivodeeId = null;
             const cityId = null;
+            let lastEach = false;
             let numberOfLoops = '{{$iterator}}';
             var tableArray = new Array();
             var lp = 1;
@@ -192,7 +194,10 @@
                         $(row).attr('id', "hotelId_" + data.id);
                         return row;
                     },"fnDrawCallback": function(settings) {
-                        if(lp == tableNumber){
+                        if(lp == tableNumber || lastEach){
+                            lastEach = true;
+                            $('table tbody tr').off('click');
+
                             $('table tbody tr').on('click', function() {
                                 test = $(this).closest('table');
                                 if($(this).hasClass('check')) {
@@ -263,7 +268,12 @@
                     ]
                 })
                 )
+            });
+            tableArray.forEach(function (item){
+               item.on('init.dt',function (e) {
 
+
+               });
             });
 
             //This object will store every info about given city.
