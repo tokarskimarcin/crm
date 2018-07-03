@@ -153,13 +153,13 @@
                                                    placeholder="Długość geograficzna" type="number">
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label class="myLabel">Max pokazów tygodniowo</label>
-                                            <input class="form-control" id="weekGrace" name="weekGrace" placeholder="Maksymalna ilość pokazów tygodniowo"
-                                                   type="number" min="0" step="1" disabled>
-                                        </div>
-                                    </div>
+                                    {{--<div class="col-md-3">--}}
+                                        {{--<div class="form-group">--}}
+                                            {{--<label class="myLabel">Max pokazów tygodniowo</label>--}}
+                                            {{--<input class="form-control" id="weekGrace" name="weekGrace" placeholder="Maksymalna ilość pokazów tygodniowo"--}}
+                                                   {{--type="number" min="0" step="1" disabled>--}}
+                                        {{--</div>--}}
+                                    {{--</div>--}}
                                     <div class="col-md-3" style="visibility: hidden; display:inline;">
                                         <div class="form-group">
                                             <label class="myLabel">Status</label>
@@ -228,7 +228,7 @@
             $('#eventCount').val("");
             $('#gracePeriod').val("");
             $('#cityID').val(0);
-            $('#weekGrace').val('');
+            // $('#weekGrace').val('');
         }
 
         //Zapisanie miasta
@@ -287,7 +287,7 @@
                         'longitude': longitude,
                         'zipCode': zipCode,
                         'cityID': $('#cityID').val(),
-                        'weekGrace': weekGrace,
+                        // 'weekGrace': weekGrace,
                         'status': status
                     },
                     success: function (response) {
@@ -475,10 +475,10 @@
                                 $('#cityName').val(response.name);
                                 $('#eventCount').val(response.max_hour);
                                 $('#gracePeriod').val(response.grace_period);
-                                $('#weekGrace').val(response.grace_week);
-                                if(response.grace_period == '-1') {
-                                    $('#weekGrace').prop('disabled', false);
-                                }
+                                // $('#weekGrace').val(response.grace_week);
+                                // if(response.grace_period == '-1') {
+                                //     $('#weekGrace').prop('disabled', false);
+                                // }
                                 zipCode = String(response.zip_code);
                                 length = zipCode.length;
                                 for(i = 0; i < 5-length; i++){
