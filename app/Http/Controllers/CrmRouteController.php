@@ -1031,6 +1031,7 @@ class CrmRouteController extends Controller
          hotels.id,
          hotels.name,
          hotels.status,
+         hotels.street,
          hotels.voivode_id,
          hotels.city_id,
          voivodeship.name as voivodeName,
@@ -1116,12 +1117,13 @@ class CrmRouteController extends Controller
     }
 
     public function findCityByDistance($city, $currentDate,$clientRoutesInfoWithUsedCities){
+        $distance = 200;
         $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
             ( 3959 * acos ( cos ( radians('.$city->latitude.') ) * cos( radians( `latitude` ) )
              * cos( radians( `longitude` ) - radians('.$city->longitude.') ) + sin ( radians('.$city->latitude.') )
               * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
             ->join('voivodeship','voivodeship.id','city.voivodeship_id')
-            ->having('distance', '<', '100')
+            ->having('distance', '<', $distance)
             ->get();
 
         //part responsible for grace period
@@ -1226,6 +1228,7 @@ class CrmRouteController extends Controller
             else    // Edit Hotel
                 $newHotel = HOtel::find($request->hotelId);
             $newHotel->city_id     = $request->city;
+            $newHotel->street     = $request->street;
             $newHotel->price    = $request->price;
             $newHotel->name     = $request->name;
             $newHotel->voivode_id  = $request->voivode;
