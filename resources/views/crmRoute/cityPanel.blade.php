@@ -316,30 +316,62 @@
             }
         }
 
-        $('#zipCode1').keyup((e)=>{
-            checkValue = parseInt(e.target.value);
-            e.target.value = isNaN(checkValue) ? "" : e.target.value;
-            if(e.target.value>2)
-                e.target.value = e.target.value.slice(0,2);
-            checkValue = e.target.value;
-            if(checkValue.length === 2){
-                $('#zipCode2').focus();
-            }
-        }).focus((e)=>{
-            $(e.target).select();
-        });
-
-        $('#zipCode2').keyup((e)=>{
-            checkValue = parseInt(e.target.value);
-            e.target.value = isNaN(checkValue) ? "" : e.target.value;
-            if(e.target.value>3)
-                e.target.value = e.target.value.slice(0,3);
-
-        }).focus((e)=>{
-            $(e.target).select();
-        });
-
         $(document).ready(function () {
+
+            /**
+             * This function validate first zip code input
+             * @param e
+             */
+            function zipCode1Handler(e) {
+                let typedByUser = e.target.value;
+                let lastDigit = typedByUser.substr(typedByUser.length - 1, 1);
+                let wordUntilLastDigit = typedByUser.substr(0, typedByUser.length - 1);
+                let isANumber = !isNaN(lastDigit);
+                console.assert(isANumber === false || isANumber === true, "Variable isANumber is not boolean");
+
+                //check wether typed symbol is number, if false, cut value to previous state
+                if(isANumber === false) {
+                    e.target.value = wordUntilLastDigit;
+                }
+
+                //check wether length = 2 and is only digit
+                if(typedByUser.length == 2 && isANumber === true) {
+                    zipCode2.focus();
+                }
+                else if(typedByUser.length > 2) { //if value is > 2, if true cut to only 2
+                    e.target.value = wordUntilLastDigit;
+                }
+            }
+
+            /**
+             * This function validate second zip code input
+             * @param e
+             */
+            function zipCode2Handler(e) {
+                let typedByUser = e.target.value;
+                let lastDigit = typedByUser.substr(typedByUser.length - 1, 1);
+                let wordUntilLastDigit = typedByUser.substr(0, typedByUser.length - 1);
+                let isANumber = !isNaN(lastDigit);
+                console.assert(isANumber === false || isANumber === true, "Variable isANumber is not boolean");
+
+                //check wether typed symbol is number, if false, cut value to previous state
+                if(isANumber === false) {
+                    e.target.value = wordUntilLastDigit;
+                }
+
+                //check wether length = 3 and is only digit
+                if(typedByUser.length == 3 && isANumber === true) {
+                    zipCode2.blur();
+                }
+                else if(typedByUser.length > 3) { //if value is > 3, if true cut to only 3
+                    e.target.value = wordUntilLastDigit;
+                }
+            }
+
+            let zipCode2 = document.getElementById('zipCode2');
+            let zipCode1 = document.getElementById('zipCode1');
+            zipCode1.addEventListener('input', zipCode1Handler);
+            zipCode2.addEventListener('input', zipCode2Handler);
 
             $('#ModalCity').on('hidden.bs.modal', function () {
                 $('#cityID').val("0");

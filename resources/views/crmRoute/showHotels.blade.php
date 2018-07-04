@@ -70,6 +70,7 @@
                                     <th>Wojewodztwo</th>
                                     <th>Miasto</th>
                                     <th>Ulica</th>
+                                    <th>Kod Pocztowy</th>
                                     <th>Akcja</th>
                                 </tr>
                                 </thead>
@@ -144,6 +145,24 @@
                                                 <input type="text" name="comment" id="comment" class="form-control" placeholder="Tutaj wprowadź krótki komentarz max 255 znaków" value="">
                                             </div>
                                         </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <label class="myLabel">Kod pocztowy:</label>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="input-group">
+                                                            <input type="text" id="zipCode1" class="form-control col-md-4" placeholder="- -" aria-describedby="basic-addon1" style="text-align: center; letter-spacing: 8px">
+                                                            <span class="input-group-addon" id="basic-addon1">-</span>
+                                                            <input type="text" id="zipCode2" class="form-control col-md-7" placeholder="- - -" aria-describedby="basic-addon1" style="text-align: center; letter-spacing: 8px">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="col-md-12">
                                             <button class="btn btn-default form-control"id="saveHotel">
                                                 <span class=’glyphicon glyphicon-plus’></span> Dodaj Hotel
@@ -177,6 +196,9 @@
         var editHotelFlag = false;
         var hotelStatus = 1;
         var city = 0;
+        let zipCode2 = document.getElementById('zipCode2');
+        let zipCode1 = document.getElementById('zipCode1');
+
         function clearContent(container) {
             container.innerHTML = '';
         }
@@ -198,6 +220,8 @@
             $('#cityAdd').val(0);
             $('#comment').val("");
             $('#hotelId').val(0);
+            $('#zipCode1').val("");
+            $('#zipCode2').val("");
         }
 
         document.addEventListener('DOMContentLoaded', function(event) {
@@ -250,6 +274,21 @@
                                 hotelStatus = response.status;
                                $('#voivodeAdd').val(response.voivode_id);
                                $('#comment').val(response.comment);
+
+                                zipCode = String(response.zip_code);
+                                if(zipCode != "null") {
+                                    length = zipCode.length;
+                                    for(i = 0; i < 5-length; i++){
+                                        zipCode = "0".concat(zipCode);
+                                    }
+                                    $('#zipCode1').val(zipCode.slice(0,2));
+                                    $('#zipCode2').val(zipCode.slice(2,5));
+                                }
+                                else {
+                                    $('#zipCode1').val('');
+                                    $('#zipCode2').val('');
+                                }
+
                                 city = response.city_id;
                                $('#voivodeAdd').trigger( "change" );
                                $('#HotelModal').modal('show');
@@ -331,6 +370,25 @@
                             return data.street;
                         },"name":"street","orderable": true
                     },
+                    {"data": function(data,type,dataToSet){
+                            if(data.zip_code == null) {
+                                return "Brak kodu";
+                            }
+                            else {
+                                let zipCode = data.zip_code;
+                                console.assert(zipCode.length === 5, "Zip code length != 5");
+                                let firstPart = 'Niepoprawny';
+                                let secondPart = 'Format';
+                                if(zipCode.length === 5) {
+                                    firstPart = zipCode.substr(0,2);
+                                    secondPart = zipCode.substr(2,3);
+                                }
+
+                                let fullZipCode = firstPart + '-' + secondPart;
+                                return fullZipCode;
+                            }
+                        },name:"zip_code"
+                    },
                     {"data":function (data, type, dataToSet) {
                             let returnButton = "<button class='button-edit-hotel btn btn-info btn-block'  data-id=" + data.id + "><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
                             if (data.status == 0)
@@ -390,7 +448,12 @@
                 var comment = $('#comment').val();
                 var validate = true;
                 let hotelId = $('#hotelId').val();
-                console.log(hotelStatus);
+                let zipCode = $('#zipCode1').val()+$('#zipCode2').val();
+
+                if (zipCode.trim().length == 0) {
+                    validation = false;
+                    swal("Podaj kod pocztowy")
+                }
                 if (name.trim().length == 0) {
                     swal('Wprowadź nazwę hotelu!')
                     validate = false;
@@ -425,6 +488,7 @@
                             'price': price,
                             'street': street,
                             'city': city,
+                            'zipCode': zipCode,
                             'hotelId': hotelId,
                             'comment' : comment,
                             'hotelStatus' : hotelStatus,
@@ -456,7 +520,57 @@
 
             });
 
+            /**
+             * This function validate first zip code input
+             * @param e
+             */
+            function zipCode1Handler(e) {
+                let typedByUser = e.target.value;
+                let lastDigit = typedByUser.substr(typedByUser.length - 1, 1);
+                let wordUntilLastDigit = typedByUser.substr(0, typedByUser.length - 1);
+                let isANumber = !isNaN(lastDigit);
+                console.assert(isANumber === false || isANumber === true, "Variable isANumber is not boolean");
 
+                //check wether typed symbol is number, if false, cut value to previous state
+                if(isANumber === false) {
+                    e.target.value = wordUntilLastDigit;
+                }
+
+                //check wether length = 2 and is only digit
+                if(typedByUser.length == 2 && isANumber === true) {
+                    zipCode2.focus();
+                }
+                else if(typedByUser.length > 2) { //if value is > 2, if true cut to only 2
+                    e.target.value = wordUntilLastDigit;
+                }
+            }
+
+            /**
+             * This function validate second zip code input
+             * @param e
+             */
+            function zipCode2Handler(e) {
+                let typedByUser = e.target.value;
+                let lastDigit = typedByUser.substr(typedByUser.length - 1, 1);
+                let wordUntilLastDigit = typedByUser.substr(0, typedByUser.length - 1);
+                let isANumber = !isNaN(lastDigit);
+                console.assert(isANumber === false || isANumber === true, "Variable isANumber is not boolean");
+
+                //check wether typed symbol is number, if false, cut value to previous state
+                if(isANumber === false) {
+                    e.target.value = wordUntilLastDigit;
+                }
+
+                //check wether length = 3 and is only digit
+                if(typedByUser.length == 3 && isANumber === true) {
+                    zipCode2.blur();
+                }
+                else if(typedByUser.length > 3) { //if value is > 3, if true cut to only 3
+                    e.target.value = wordUntilLastDigit;
+                }
+            }
+            zipCode1.addEventListener('input', zipCode1Handler);
+            zipCode2.addEventListener('input', zipCode2Handler);
 
             $('#voivode').select2();
             $('#city').select2();
