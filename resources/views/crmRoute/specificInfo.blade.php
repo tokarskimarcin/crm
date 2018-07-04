@@ -96,7 +96,7 @@
                             <h2 class="city_info" data-identificator="{{$item->city_id}}">Miasto: {{$item->cityName}}</h2>
                             @endif
                         <label>Wybierz hotel:</label>
-                        <table id="datatable_@php echo $iterator @endphp" class="thead-inverse table table-striped table-bordered datatable" data-typ="datatable" cellspacing="0" width="100%">
+                        <table id="datatable_@php echo $iterator @endphp" class="thead-inverse table table-striped row-border datatable hover" data-typ="datatable" cellspacing="0" width="100%">
                             <thead>
                             <tr>
                                 <th>Nazwa</th>
@@ -164,13 +164,15 @@
                                 @if(isset($item->hotel_id))
                                     var hotelObj = {
                                             hotel_id: {{$item->hotel_id}},
-                                            city_id: {{$item->city_id}}
+                                            city_id: {{$item->city_id}},
+                                            hotel_page: {{$item->hotel_page}}
                                         };
                                     hotelIdArr.push(hotelObj);
                                 @else
                                     var hotelObj = {
                                             hotel_id: "0",
-                                            city_id: {{$item->city_id}}
+                                            city_id: {{$item->city_id}},
+                                            hotel_page: {{$item->hotel_page}}
                                         };
                                     hotelIdArr.push(hotelObj);
                                 @endif
@@ -179,8 +181,8 @@
                     @endforeach
 
             newTable = $('.datatable');
-            newTable.each(function() {
-                var cityElementOfGivenContainer = $(this).siblings('.city_info').attr('data-identificator');
+            newTable.each(function(key, value) {
+                var cityElementOfGivenContainer = $(value).siblings('.city_info').attr('data-identificator');
                 let cityFlag = null;
                 let helpFlag = 0;
 
@@ -188,10 +190,15 @@
                     "autoWidth": true,
                     "processing": true,
                     "serverSide": true,
+                        displayStart: hotelIdArr[key].hotel_page*10,
                     "drawCallback": function( settings ) {
                     },
                     "rowCallback": function( row, data, index ) {
                         $(row).attr('id', "hotelId_" + data.id);
+                        $(row).data('hotel_id', data.id);
+                        if(data.id == hotelIdArr[key].hotel_id) {
+                            $(row).find('.checkbox_info').prop('checked', true);
+                        }
                         return row;
                     },"fnDrawCallback": function(settings) {
                         if(lp == tableNumber || lastEach){
@@ -199,10 +206,12 @@
                             $('table tbody tr').off('click');
 
                             $('table tbody tr').on('click', function() {
+                                let datatables = $('.datatable');
                                 test = $(this).closest('table');
                                 if($(this).hasClass('check')) {
                                     $(this).removeClass('check');
                                     $(this).find('.checkbox_info').prop('checked',false);
+                                    hotelIdArr[datatables.index($(this).parent().parent())].hotel_id = 0;
                                 }
                                 else {
                                     test.find('tr.check').removeClass('check');
@@ -211,6 +220,7 @@
                                     });
                                     $(this).addClass('check');
                                     $(this).find('.checkbox_info').prop('checked', true);
+                                    hotelIdArr[datatables.index($(this).parent().parent())].hotel_id = $(this).data('hotel_id');
                                 }
                             })
                         }
@@ -243,7 +253,7 @@
                             },"name":"cityName", "orderable": false
                         },
                         {"data":function (data, type, dataToSet) {
-                                var cityId = cityElementOfGivenContainer;
+                               /* var cityId = cityElementOfGivenContainer;
                                 let newarray = new Array();
                                 if(helpFlag == 0) {
                                     for(var i = 0; i<hotelIdArr.length;i++){
@@ -261,20 +271,19 @@
 
                                         }
                                     }
-                                }
-                                       return '<input class="checkbox_info" type="checkbox" value="' + data.id + '" style="display:inline-block;">';
-                            },"orderable": false, "searchable": false
+                                }*/
+                                       return '<input class="checkbox_info btn-block" type="checkbox" value="' + data.id + '" style="display:inline-block;">';
+                            },"orderable": false, "searchable": false, width:'10%'
                         }
                     ]
                 })
                 )
             });
-            tableArray.forEach(function (item){
+            /*tableArray.forEach(function (item, index){
                item.on('init.dt',function (e) {
-
-
+                   item.page(hotelIdArr[index].hotel_page).draw('page');
                });
-            });
+            });*/
 
             //This object will store every info about given city.
             function CityObject(voivode_id, city_id, time_hotel_arr, client_route_id) {

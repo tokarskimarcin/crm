@@ -16,6 +16,7 @@ use App\Route;
 use App\RouteInfo;
 use App\Voivodes;
 use DateTime;
+use function foo\func;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -174,7 +175,7 @@ class CrmRouteController extends Controller
             ->get();
 
         $clients = Clients::all();
-        $hotels = Hotel::all();
+        $hotels = Hotel::whereIn('status', [1,0]);
 
         $clientRouteInfoExtended = array();
         $insideArr = array();
@@ -238,10 +239,20 @@ class CrmRouteController extends Controller
 
         $clientRouteInfo = collect($clientRouteInfoExtended);
 
+        $clientRouteInfo->each(function ($city, $key) use ($hotels) {
+            foreach($city as $showHour){
+                $hotels->each(function ($hotel, $key) use ($showHour) {
+                    if($hotel->id == $showHour->hotel_id){
+                        $showHour->hotel_page = intval(floor($key/10));
+                    }
+                });
+            }
+        });
+
         if($onlyResult == null)
             return view('crmRoute.specificInfo')
                 ->with('clientRouteInfo', $clientRouteInfoExtended)
-                ->with('hotels', $hotels)
+                //->with('hotels', $hotels)
                 ->with('clientName', $clientName);
         else
             return $clientRouteInfo->sortByDesc('date');
