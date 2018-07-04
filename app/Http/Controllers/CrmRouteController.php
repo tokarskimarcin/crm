@@ -1843,6 +1843,157 @@ class CrmRouteController extends Controller
             ->with('currentMonth', $currentMonth);
     }
 
+
+    /**
+     * @params: year - "2017", month - '4'
+     * This function returns data to datatable about statistics from given year and month
+     */
+    public function presentationStatisticsPost(Request $request) {
+        $year = $request->year;
+        $month = $request->month;
+        if($month < 10) {
+            $month = '0' . $month;
+        }
+
+        $actualMonth = date($year . '-' . $month);
+        $currentMonth = date($month);
+        $actualClientsId = ClientRouteInfo::
+        join('client_route','client_route.id','client_route_info.client_route_id')
+            ->where('date','like',$actualMonth.'%')
+            ->groupBy('client_route.client_id')
+            ->get()
+            ->pluck('client_id')->toArray();
+        $date = new DateTime($year. '-' . $month . '-01');
+        $week = $date->format("W");
+        //Pobranie równych czterech tygodni
+        $split_month = $this->monthPerWeekDivision($month,$year);
+        $allInfo = Clients::select(DB::raw(
+            'client.id,
+                client.name,
+                client.type,
+                count(client_route_info.client_route_id) as amount,
+                client_route_info.date
+                '))
+            ->join('client_route','client_route.client_id','client.id')
+            ->join('client_route_info','client_route_info.client_route_id','client_route.id')
+            ->whereIn('client.id',$actualClientsId)
+            ->whereBetween('client_route_info.date',[$split_month[0]->date,$split_month[count($split_month)-1]->date])
+            ->groupBy('id','date')
+            ->get();
+        $groupAllInfo = $allInfo->groupBy('type');
+        $uniqueClients = $allInfo->unique('name')->groupBy('type');
+
+        //add last sum item to split_month
+        $sumObj = new \stdClass();
+        $sumObj->date = 'Suma';
+        $sumObj->name = 'Suma';
+        array_push($split_month, $sumObj);
+
+        $clientArr = array();
+        $objectsArr = array();
+
+        /**
+         * This part is responsible for creating additional arrays of objects to $groupAllInfo. Each array represents all records for given client with amount, date, name.
+         */
+        foreach($groupAllInfo as $item) {
+            $clientCollect = $uniqueClients[$item->first()->type]->pluck('name');
+            $typeArray = array();
+            foreach($clientCollect as $clientList) {
+                $clientArray = array();
+                $weekSum = 0;
+                $weekIterator = 1;
+                $foreachIterator = 0;
+                foreach($split_month as $day) {
+                    if($day->name != 'Suma') {
+                        $insertionsWithClientAndDate = $item->where('date', '=', $day->date)->where('name', '=', $clientList); //wszystkie wpisy z danego dnia dla danego klienta
+                        $dataObject = new \stdClass();
+                        $dataObject->name = $clientList;
+                        $dataObject->date = $day->date;
+                        $dataObject->dayNumber = $day->dayNumber;
+                        $dataObject->week = $weekIterator;
+                        $dataObject->type = 0; // 0 - day data
+
+                        if($insertionsWithClientAndDate->count() == 0) { //jesli nie ma takiego wpisu
+                            $dataObject->amount = 0;
+                        }
+                        else {
+                            $insertionsWithClientAndDate = $insertionsWithClientAndDate->first();
+                            $dataObject->amount = $insertionsWithClientAndDate->amount;
+                        }
+                        $weekSum += $dataObject->amount;
+                        array_push($clientArray, $dataObject);
+                    }
+                    else {
+                        $dataObject = new \stdClass();
+                        $dataObject->name = $clientList;
+                        $dataObject->amount = $weekSum;
+                        $dataObject->type = 1; // 1 - sum
+                        $dataObject->week = $weekIterator;
+
+                        array_push($clientArray, $dataObject);
+                        $weekSum = 0;
+                        $weekIterator++;
+                    }
+
+                    if($foreachIterator == count($split_month)) {
+                        $dataObject = new \stdClass();
+                        $dataObject->name = $clientList;
+                        $dataObject->amount = $weekSum;
+                        $dataObject->type = 1; // 1 - sum
+                        $dataObject->week = $weekIterator;
+
+                        array_push($clientArray, $dataObject);
+                    }
+                    $foreachIterator++;
+                }
+                $item->offsetSet($clientList,$clientArray);
+            }
+        }
+
+        //This part is responsible for generating sum row.
+        foreach($groupAllInfo as $group) {
+            $sumArray = array();
+            $clientCollect = $uniqueClients[$group->first()->type]->pluck('name');
+            $sumAmount = 0;
+            foreach($split_month as $day) {
+                $daySum = 0;
+                if($day->name == "Suma") {
+                    $sumObject = new \stdClass();
+                    $sumObject->date = 'Suma';
+                    $sumObject->daySum = 0;
+                    array_push($sumArray, $sumObject);
+                }
+                else {
+                    foreach ($clientCollect as $oneClient) {
+                        foreach ($group[$oneClient] as $key => $value) {
+                            if($value->type == 0) { //day data
+                                if($day->date == $value->date) {
+                                    $daySum += $value->amount;
+                                }
+                            }
+                        }
+
+                    }
+                    $sumObject = new \stdClass();
+                    $sumObject->date = $day->date;
+                    $sumObject->daySum = $daySum;
+                    array_push($sumArray, $sumObject);
+                }
+            }
+            $daySumObject = new \stdClass();
+            $group->offsetSet("daySum", $sumArray);
+        }
+
+        return view('crmRoute.presentationStatistics')
+            ->with('clients',$uniqueClients)
+            ->with('days',$split_month)
+            ->with('allInfo',$groupAllInfo)
+            ->with('months',$this->monthArray())
+            ->with('month',date('m'))
+            ->with('currentYear', $year)
+            ->with('currentMonth', $currentMonth);
+    }
+
     public function monthPerWeekDivision($month,$year){
         $arrayOfWeekName = [
             '1' => 'Poniedziałek',

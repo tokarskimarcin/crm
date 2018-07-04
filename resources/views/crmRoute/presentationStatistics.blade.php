@@ -21,6 +21,11 @@
 
     </style>
 
+
+    @php
+        $badaniaFlag = false;
+        $wysylkaFlag = false;
+    @endphp
 {{--Header page --}}
 <div class="row">
     <div class="col-md-12">
@@ -48,11 +53,13 @@
                             </div>
                         </div>
                     </div>
+                    <form action="{{URL::to('/presentationStatistics')}}" method="POST">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="year">Rok</label>
-                                <select id="year" class="form-control">
+                                <select id="year" class="form-control" name="year">
                                     <option value="%">Wszystkie</option>
                                 </select>
                             </div>
@@ -61,15 +68,23 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="month">Miesiąc</label>
-                                <select id="month" class="form-control">
+                                <select id="month" class="form-control" name="month">
                                     <option value="%">Wszystkie</option>
                                 </select>
                             </div>
                         </div>
 
                     </div>
+                    <div class="row">
+                        <div class="col-md-2"></div>
+                        <div class="col-md-8">
+                            <input type="submit" class="btn btn-info" style="width:100%; margin:1em; margin-top:0;" value="Generuj"></input>
+                        </div>
+                        <div class="col-md-2"></div>
+                    </div>
+                    </form>
                     <div id="parent">
-                        @if(isset($days) && isset($clients['Wysyłka']) && isset($clients['Badania']) && isset($allInfo['Wysyłka']) && isset($allInfo['Wysyłka']['daySum']) && isset($allInfo['Badania']) && isset($allInfo['Badania']['daySum']))
+                        @if((isset($clients['Wysyłka']) && isset($allInfo['Wysyłka']['daySum']) && isset($allInfo['Wysyłka'])) || (isset($clients['Badania']) && isset($allInfo['Badania']) && isset($allInfo['Badania']['daySum'])))
                         <table id="fixTable" class="table table-bordered">
                             <thead>
                             <tr>
@@ -77,23 +92,26 @@
                             </tr>
                             </thead>
                             <tbody>
+
+                            @if(isset($days))
                                 <tr>
                                     <td colspan="2">Data</td>
-                                    @if(isset($days))
+
                                         @foreach($days as $item)
                                         <td style="font-weight:bold;">{{$item->date}}</td>
                                         @endforeach
-                                    @endif
+
                                 </tr>
                                 <tr>
                                     <td colspan="2" class="holdDoor">Dzień</td>
-                                    @if(isset($days))
                                         @foreach($days as $item)
                                             <td>{{$item->name}}</td>
                                         @endforeach
-                                    @endif
+                            @endif
+                            @if(isset($clients['Wysyłka']) && isset($allInfo['Wysyłka']['daySum']) && isset($allInfo['Wysyłka']))
 
                                     @php
+                                        $wysylkaFlag = true;
                                         $i = 0;
                                         $rowspanWysylka = 1;
                                         if(isset($clients['Wysyłka'])) {
@@ -101,18 +119,9 @@
                                                 $rowspanWysylka++;
                                             }
                                         }
-
-
-                                        $rowspanBadania = 1;
-                                        if(isset($clients['Badania'])) {
-                                            foreach($clients['Badania'] as $item) {
-                                                $rowspanBadania++;
-                                            }
-                                        }
-
                                     @endphp
                                 </tr>
-                                    @if(isset($clients['Wysyłka']))
+
                                         @foreach($clients['Wysyłka'] as $item)
                                             <tr>
                                                 @if($i == 0)
@@ -122,7 +131,7 @@
                                                     $i++;
                                                 @endphp
                                                 <td style="font-weight:bold;">{{$item->name}}</td>
-                                                @if(isset($allInfo['Wysyłka'][$item->name]))
+
                                                     @foreach($allInfo['Wysyłka'][$item->name] as $info)
                                                         @if($info->type == 0)
                                                             <td>{{$info->amount}}</td>
@@ -130,25 +139,38 @@
                                                             <td class="sum" data-info="wysylka" data-week="{{$info->week}}" style="background: #c67979;">{{$info->amount}}</td>
                                                         @endif
                                                     @endforeach
-                                                @endif
+
                                             </tr>
                                         @endforeach
-                                    @endif
+
                                     <tr>
                                         <td style="font-weight:bold;">SUMA DZIEŃ WYSYŁKA</td>
-                                        @if(isset($allInfo['Wysyłka']['daySum']))
+
                                             @foreach($allInfo['Wysyłka']['daySum'] as $info)
                                                     <td  style="background: #e6eff4;">{{$info->daySum}}</td>
                                             @endforeach
-                                        @endif
+
                                     </tr>
+                            @endif
+
+                            @if(isset($clients['Badania']) && isset($allInfo['Badania']) && isset($allInfo['Badania']['daySum']))
+                                @php
+                                    $badaniaFlag = true;
+                                    $rowspanBadania = 1;
+                                            if(isset($clients['Badania'])) {
+                                                foreach($clients['Badania'] as $item) {
+                                                    $rowspanBadania++;
+                                                }
+                                            }
+
+                                @endphp
                                 <tr>
                                     <td style="border-right: none;"></td><td></td>
                                 </tr>
                                     @php
                                         $i = 0;
                                     @endphp
-                                @if(isset($clients['Badania']))
+
                                     @foreach($clients['Badania'] as $item)
                                         <tr>
                                             @if($i == 0)
@@ -158,7 +180,7 @@
                                                 $i++;
                                             @endphp
                                             <td style="font-weight:bold;">{{$item->name}}</td>
-                                            @if(isset($allInfo['Badania'][$item->name]))
+
                                                 @foreach($allInfo['Badania'][$item->name] as $info)
                                                     @if($info->type == 0)
                                                         <td>{{$info->amount}}</td>
@@ -167,24 +189,26 @@
                                                     @endif
 
                                                 @endforeach
-                                            @endif
+
                                         </tr>
                                     @endforeach
-                                @endif
+
                                 <tr>
 
                                     <td style="font-weight:bold;">SUMA DZIEŃ BADANIA</td>
-                                    @if(isset($allInfo['Badania']['daySum']))
+
                                         @foreach($allInfo['Badania']['daySum'] as $info)
                                             <td  style="background: #e6eff4;">{{$info->daySum}}</td>
                                         @endforeach
-                                    @endif
+
                                 </tr>
+                            @endif
+
                             </tbody>
                         </table>
-                            @else
-                            <div class="alert alert-danger"><strong>Brak danych</strong></div>
-                            @endif
+                        @else
+                            <div class="alert alert-info">Brak danych</div>
+                        @endif
                     </div>
                 {{--</div>--}}
             {{--</div>--}}
@@ -204,7 +228,15 @@
         $(document).ready(function() {
             /********** GLOBAL VARIABLES ***********/
                 let weeksArray = [];
-                const typeArray = ['badania', 'wysylka'];
+                @if($badaniaFlag == true && $wysylkaFlag == true)
+                    const typeArray = ['badania', 'wysylka'];
+                @elseif($badaniaFlag == true)
+                    const typeArray = ['badania'];
+                @elseif($wysylkaFlag == true)
+                    const typeArray = ['wysylka'];
+                @else
+                    const typeArray = [];
+                @endif
 
             /*******END OF GLOBAL VARIABLES*********/
 
@@ -212,6 +244,7 @@
             /**
              * This function fill weeksArray with weeks Number;
              */
+
             (function fillWeeksArray() {
                 @if(isset($clients['Wysyłka']))
                     @foreach($clients['Wysyłka'] as $item)
@@ -231,6 +264,26 @@
                             @endif
                         @endforeach
                     @endforeach
+                @else
+                @if(isset($clients['Badania']))
+                    @foreach($clients['Badania'] as $item)
+                        @foreach($allInfo['Badania'][$item->name] as $info)
+                            @if($info->type == 1)
+                                var flag = false;
+                                var weekNumber = {{$info->week}};
+                                weeksArray.forEach(item => {
+                                    if(item == weekNumber) {
+                                        flag = true;
+                                    }
+                                });
+                                if(flag == false) {
+                                    weeksArray.push(weekNumber);
+                                }
+
+                            @endif
+                        @endforeach
+                    @endforeach
+                @endif
                 @endif
             })();
 
@@ -238,7 +291,7 @@
                 let weekSum = 0;
                 typeArray.forEach(type => {
                    weeksArray.forEach(week => {
-                      const firstSumElement = document.querySelectorAll('[data-week="' + week + '"][data-info="' + type + '"]');
+                      const firstSumElement = document.querySelectorAll('[data-week="' + week + '"][data-info="' + type + '"]'); //all sum
                       firstSumElement.forEach(element => {
                          let stringNumber = element.innerText;
                          let intStringNumber = stringNumber * 1;
@@ -247,7 +300,7 @@
 
                        let cellIndex = null;
 
-                      let lastSumElement = firstSumElement[firstSumElement.length - 1];
+                       let lastSumElement = firstSumElement[firstSumElement.length - 1];
                        let firstRowToCheck = lastSumElement.parentElement.children[0];
                        if(firstRowToCheck.dataset.specialrow) {
                            cellIndex = lastSumElement.cellIndex - 1;
