@@ -99,6 +99,7 @@
                         <table id="datatable_@php echo $iterator @endphp" class="thead-inverse table table-striped row-border datatable hover" data-typ="datatable" cellspacing="0" width="100%">
                             <thead>
                             <tr>
+                                <th>Id</th>
                                 <th>Nazwa</th>
                                 <th>Wojewodztwo</th>
                                 <th>Miasto</th>
@@ -240,6 +241,9 @@
                     "language": {
                         "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                     },"columns":[
+                        {"data":
+                                'id',"orderable": false, visible: false
+                        },
                         {"data":function (data, type, dataToSet) {
                                 return data.name;
                             },"name":"name","orderable": false

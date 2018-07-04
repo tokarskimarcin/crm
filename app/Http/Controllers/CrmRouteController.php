@@ -175,7 +175,7 @@ class CrmRouteController extends Controller
             ->get();
 
         $clients = Clients::all();
-        $hotels = Hotel::whereIn('status', [1,0])->orderBy('name')->get();
+        $hotels = Hotel::whereIn('status', [1,0])->orderBy('id')->get();
 
         $clientRouteInfoExtended = array();
         $insideArr = array();
@@ -1065,7 +1065,7 @@ class CrmRouteController extends Controller
          city.name as cityName
         '))
             ->join('city','city.id','city_id')
-            ->join('voivodeship','voivodeship.id','voivode_id')
+            ->join('voivodeship','voivodeship.id','voivode_id')->orderBy('id')
             ->get();
         return datatables($hotels)->make(true);
     }
