@@ -46,7 +46,7 @@ class StatisticsController extends Controller
     public function MailhourReportTelemarketing() {
         $data = $this::hourReportTelemarketing();
         $title = 'Raport godzinny telemarketing ' . date('Y-m-d');
-        $this->sendMailByVerona('hourReportTelemarketing', $data, $title);
+        $this->sendMailByVerona('hourReportTelemarketing', $data, $title,null,[2]);
         foreach ($data['reports'] as $report) {
             $report->is_send = 1;
             $report->save();
@@ -154,7 +154,7 @@ class StatisticsController extends Controller
             'date_stop' => $date_stop
         ];
         $title = 'Raport tygodniowy telemarketing';
-        $this->sendMailByVerona('weekReportTelemarketing', $data, $title);
+        $this->sendMailByVerona('weekReportTelemarketing', $data, $title,null,[2]);
     }
     // Wyswietlenie raportu tygodniowego na stronie 'telemarketing'
     public function pageWeekReportTelemarketing() {
@@ -270,7 +270,7 @@ class StatisticsController extends Controller
         $data = $this::dayReportTelemarketing('yesterday');
 
         $title = 'Raport dzienny telemarketing '.date("d.m.Y", strtotime('-1 Day'));
-        $this->sendMailByVerona('dayReportTelemarketing', $data, $title);
+        $this->sendMailByVerona('dayReportTelemarketing', $data, $title,null,[2]);
     }
     // Wyswietlenie raportu dziennego na stronie 'telemarketing'
     public function pageDayReportTelemarketing() {
@@ -489,7 +489,7 @@ class StatisticsController extends Controller
         $data = $this::monthReportTelemarketing($month,$year);
 
         $title = 'Raport miesięczny telemarketing';
-        $this->sendMailByVerona('monthReportTelemarketing', $data, $title);
+        $this->sendMailByVerona('monthReportTelemarketing', $data, $title,null,[2]);
     }
     // wyswietlenie raportu miesiecznego
     public function pageMonthReportTelemarketing()
@@ -1392,7 +1392,7 @@ class StatisticsController extends Controller
     public function MailhourReportTimeOnRecord() {
         $data = $this::hourReportTimeOnRecord();
         $title = 'Raport godzinny potwierdzenia połączenia ' . date('Y-m-d');
-        $this->sendMailByVerona('hourReportTimeOnRecord', $data, $title);
+        $this->sendMailByVerona('hourReportTimeOnRecord', $data, $title,null,[1]);
     }
 // Wyswietlenie Czas na rekord na stronie
     public function pageHourReportTimeOnRecord()
@@ -4608,7 +4608,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     *
     */
 
-    private function sendMailByVerona($mail_type, $data, $mail_title, $default_users = null) {
+    private function sendMailByVerona($mail_type, $data, $mail_title, $default_users = null,$depTypeId = [1,2]) {
+
         if ($default_users !== null) {
             $email = [];
             $mail_type_pom = $mail_type;
@@ -4636,12 +4637,14 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             users.email_off
             '))
                 ->join('privilage_relation', 'privilage_relation.user_type_id', '=', 'users.user_type_id')
+                ->join('department_info','department_info.id','users.department_info_id')
+                ->join('department_type','department_type.id','department_info.id_dep_type')
                 ->join('links', 'privilage_relation.link_id', '=', 'links.id')
+                ->whereIn('department_type.id',$depTypeId)
                 ->where('links.link', '=', $mail_type2)
                 ->where('users.status_work', '=', 1)
                 ->where('users.id', '!=', 4592) // tutaj szczesna
                 ->get();
-
             $szczesny = new User();
             $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
             $szczesny->first_name = 'Bartosz';
