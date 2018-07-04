@@ -300,9 +300,9 @@
                      * Zmiana statusu hotelu
                      */
                     $('.button-status-hotel').on('click',function () {
-                        $(this).prop('disabled', true);
-                        let hotelId = $(this).data('id');
-                        hotelStatus = $(this).data('status');
+                        let thisButton = $(this);
+                        let hotelId = thisButton.data('id');
+                        hotelStatus = thisButton.data('status');
                         let nameOfAction = "";
                         if(hotelStatus == 0)
                             nameOfAction = "Tak, wyłącz Hotel";
@@ -317,7 +317,7 @@
                             confirmButtonText: nameOfAction
                         }).then((result) => {
                             if (result.value) {
-
+                                thisButton.prop('disabled',true);
                                 $.ajax({
                                     type: "POST",
                                     url: "{{ route('api.changeStatusHotel') }}", // do zamiany
@@ -328,14 +328,26 @@
                                         'hotelId'   : hotelId
                                     },
                                     success: function (response) {
-                                        $(this).prop('disabled', false);
                                         $.notify({
                                             icon: 'glyphicon glyphicon-ok',
                                             message: 'Status hotelu został zmieniony'
                                         }, {
                                             type: "info"
                                         });
-                                        table.ajax.reload();
+                                        if(hotelStatus == 0){
+                                            thisButton.removeClass('btn-danger');
+                                            thisButton.addClass('btn-success');
+                                            thisButton.data('status', 1);
+                                            thisButton.text('Włącz');
+                                            thisButton.prepend("<span class='glyphicon glyphicon-off'></span> ");
+                                        }else {
+                                            thisButton.removeClass('btn-success');
+                                            thisButton.addClass('btn-danger');
+                                            thisButton.data('status', 0);
+                                            thisButton.text('Wyłącz');
+                                            thisButton.prepend("<span class='glyphicon glyphicon-off'></span> ");
+                                        }
+                                        thisButton.prop('disabled', false);
                                     }
                                 });
                             }})
@@ -348,6 +360,7 @@
                     'data': function (d) {
                         d.voivode = voivodeeId;
                         d.city = cityId;
+                        d.status = [1,0]
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -391,7 +404,7 @@
                     },
                     {"data":function (data, type, dataToSet) {
                             let returnButton = "<button class='button-edit-hotel btn btn-info btn-block'  data-id=" + data.id + "><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
-                            if (data.status == 0)
+                            if (data.status == 1)
                                 returnButton += "<button class='button-status-hotel btn btn-danger btn-block' data-id=" + data.id + " data-status=0 ><span class='glyphicon glyphicon-off'></span> Wyłącz</button>";
                             else
                                 returnButton += "<button class='button-status-hotel btn btn-success btn-block' data-id=" + data.id + " data-status=1 ><span class='glyphicon glyphicon-off'></span> Włącz</button>";
