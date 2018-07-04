@@ -175,7 +175,7 @@ class CrmRouteController extends Controller
             ->get();
 
         $clients = Clients::all();
-        $hotels = Hotel::whereIn('status', [1,0]);
+        $hotels = Hotel::whereIn('status', [1,0])->get();
 
         $clientRouteInfoExtended = array();
         $insideArr = array();
@@ -239,15 +239,15 @@ class CrmRouteController extends Controller
 
         $clientRouteInfo = collect($clientRouteInfoExtended);
 
-        $clientRouteInfo->each(function ($city, $key) use ($hotels) {
+        $clientRouteInfo->each(function ($city, $key) use ($hotels, &$ddArray) {
             foreach($city as $showHour){
-                $hotels->each(function ($hotel, $key) use ($showHour) {
+                $hotels->each(function ($hotel, $key) use ($showHour, &$ddArray) {
                     if($hotel->id == $showHour->hotel_id){
                         $showHour->hotel_page = intval(floor($key/10));
+                        return false;
                     }else{
                         $showHour->hotel_page = 0;
                     }
-
                 });
             }
         });
