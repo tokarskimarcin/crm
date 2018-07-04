@@ -1060,6 +1060,7 @@ class CrmRouteController extends Controller
          hotels.street,
          hotels.voivode_id,
          hotels.city_id,
+         hotels.zip_code,
          voivodeship.name as voivodeName,
          city.name as cityName
         '))
@@ -1260,6 +1261,7 @@ class CrmRouteController extends Controller
             $newHotel->voivode_id  = $request->voivode;
             $newHotel->comment  = $request->comment;
             $newHotel->status  = $request->hotelStatus;
+            $newHotel->zip_code = $request->zipCode;
             $newHotel->save();
 //            new ActivityRecorder(12,null, 193, 1);
             return 200;
