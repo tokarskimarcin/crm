@@ -371,22 +371,13 @@
                         },"name":"street","orderable": true
                     },
                     {"data": function(data,type,dataToSet){
-                            if(data.zip_code == null) {
-                                return "Brak kodu";
+                            zipCode = String(data.zip_code);
+                            length = zipCode.length;
+                            for(i = 0; i < 5-length; i++){
+                                zipCode = "0".concat(zipCode);
                             }
-                            else {
-                                let zipCode = data.zip_code;
-                                console.assert(zipCode.length === 5, "Zip code length != 5");
-                                let firstPart = 'Niepoprawny';
-                                let secondPart = 'Format';
-                                if(zipCode.length === 5) {
-                                    firstPart = zipCode.substr(0,2);
-                                    secondPart = zipCode.substr(2,3);
-                                }
-
-                                let fullZipCode = firstPart + '-' + secondPart;
-                                return fullZipCode;
-                            }
+                            return zipCode.slice(0,2)+'-'+
+                                zipCode.slice(2,5);
                         },name:"zip_code"
                     },
                     {"data":function (data, type, dataToSet) {
@@ -448,12 +439,15 @@
                 var comment = $('#comment').val();
                 var validate = true;
                 let hotelId = $('#hotelId').val();
-                let zipCode = $('#zipCode1').val()+$('#zipCode2').val();
+                let zipCode1 = $('#zipCode1').val();
+                let zipCode2 = $('#zipCode2').val();
+                let zipCode = zipCode1 + zipCode2;
 
-                if (zipCode.trim().length == 0) {
-                    validation = false;
+                if (zipCode.trim().length < 5) {
+                    validate = false;
                     swal("Podaj kod pocztowy")
                 }
+
                 if (name.trim().length == 0) {
                     swal('Wprowadź nazwę hotelu!')
                     validate = false;

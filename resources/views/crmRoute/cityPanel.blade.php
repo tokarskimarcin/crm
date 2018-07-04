@@ -246,7 +246,7 @@
 
             let validation = true;
 
-            if (zipCode.trim().length == 0) {
+            if (zipCode.trim().length < 5) {
                 validation = false;
                 swal("Podaj kod pocztowy")
             }
