@@ -244,7 +244,10 @@ class CrmRouteController extends Controller
                 $hotels->each(function ($hotel, $key) use ($showHour) {
                     if($hotel->id == $showHour->hotel_id){
                         $showHour->hotel_page = intval(floor($key/10));
+                    }else{
+                        $showHour->hotel_page = 0;
                     }
+
                 });
             }
         });
