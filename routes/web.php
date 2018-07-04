@@ -927,6 +927,7 @@ Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->nam
 
 Route::get('/presentationStatistics', 'CrmRouteController@presentationStatisticsGet');
 
+Route::get('/test', 'CrmRouteController@test');
 
 
 

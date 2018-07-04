@@ -163,6 +163,13 @@ class CrmRouteController extends Controller
 
     }
 
+    public function test(){
+
+        $hotels = Hotel::whereIn('status', [1,0])->orderBy('name')->get()->pluck('name');
+
+        dd($hotels);
+    }
+
     /**
      * This method shows specific route
      */
