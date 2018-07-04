@@ -385,12 +385,18 @@
                     },
                     {"data": function(data,type,dataToSet){
                             zipCode = String(data.zip_code);
-                            length = zipCode.length;
-                            for(i = 0; i < 5-length; i++){
-                                zipCode = "0".concat(zipCode);
+                            if(zipCode != 'null') {
+                                length = zipCode.length;
+                                for(i = 0; i < 5-length; i++){
+                                    zipCode = "0".concat(zipCode);
+                                }
+                                return zipCode.slice(0,2)+'-'+
+                                    zipCode.slice(2,5);
                             }
-                            return zipCode.slice(0,2)+'-'+
-                                zipCode.slice(2,5);
+                            else {
+                                return '';
+                            }
+
                         },name:"zip_code"
                     },
                     {"data":function (data, type, dataToSet) {
