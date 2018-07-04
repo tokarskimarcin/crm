@@ -175,7 +175,10 @@ class CrmRouteController extends Controller
             ->get();
 
         $clients = Clients::all();
-        $hotels = Hotel::whereIn('status', [1,0])->orderBy('id')->get();
+
+        $status = [1];
+
+        $hotels = Hotel::whereIn('status', $status)->orderBy('id')->get();
 
         $clientRouteInfoExtended = array();
         $insideArr = array();
@@ -1038,19 +1041,21 @@ class CrmRouteController extends Controller
         $voivodeIdArr = $request->voivode;
         $cityIdArr = $request->city;
 
+        $status = $request->status;
+
         if(is_null($voivodeIdArr) && is_null($cityIdArr)) {
-            $hotels = Hotel::whereIn('hotels.status', [1,0]);
+            $hotels = Hotel::whereIn('hotels.status', $status);
         }
         else if(!is_null($voivodeIdArr) != 0 && is_null($cityIdArr)) {
-            $hotels = Hotel::whereIn('hotels.status', [1,0])
+            $hotels = Hotel::whereIn('hotels.status', $status)
                 ->whereIn('hotels.voivode_id', $voivodeIdArr);
         }
         else if(is_null($voivodeIdArr) && !is_null($cityIdArr) != 0) {
-            $hotels = Hotel::whereIn('hotels.status', [1,0])
+            $hotels = Hotel::whereIn('hotels.status', $status)
                 ->whereIn('hotels.city_id', $cityIdArr);
         }
         else {
-            $hotels = Hotel::whereIn('status', [1,0]);
+            $hotels = Hotel::whereIn('status', $status);
         }
         $hotels = $hotels->select(DB::raw(
         '

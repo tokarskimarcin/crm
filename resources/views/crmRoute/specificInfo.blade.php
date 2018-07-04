@@ -235,6 +235,7 @@
                         'data': function (d) {
                             d.voivode = voivodeeId;
                             d.city = cityId;
+                            d.status = [1]
                         },
                         'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                     },
