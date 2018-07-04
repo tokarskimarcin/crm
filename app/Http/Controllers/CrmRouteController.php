@@ -175,7 +175,7 @@ class CrmRouteController extends Controller
             ->get();
 
         $clients = Clients::all();
-        $hotels = Hotel::whereIn('status', [1,0])->get();
+        $hotels = Hotel::whereIn('status', [1,0])->get()->sortBy('name');
 
         $clientRouteInfoExtended = array();
         $insideArr = array();
