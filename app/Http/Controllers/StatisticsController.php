@@ -750,7 +750,7 @@ class StatisticsController extends Controller
     public function dayReportDkj() {
         $data = $this->reportDkjData(date("Y-m-d", strtotime('yesterday')));
         $title = 'Raport dzienny DKJ '.date("d.m.Y", strtotime('-1 Day'));
-        $this->sendMailByVerona('dayReportDkj', $data, $title, User::whereIn('id',[1364] )->get());
+        $this->sendMailByVerona('dayReportDkj', $data, $title);
     }
 
     public function pageDayReportDKJ() {
@@ -966,7 +966,7 @@ class StatisticsController extends Controller
           'dkj' => $all_data['dkj']
       ];
       $title = 'Raport tygodniowy DKJ ' . $date_start . ' - ' . $date_stop;
-      $this->sendMailByVerona('weekReportDkj', $data, $title, User::whereIn('id',[1364] )->get());
+      $this->sendMailByVerona('weekReportDkj', $data, $title);
     }
 
     //wysyłanie raportu miesięcznego pracownicy dkj
@@ -982,7 +982,7 @@ class StatisticsController extends Controller
           'date_stop' => $date_stop
       ];
       $title = 'Raport miesięczny DKJ';
-      $this->sendMailByVerona('monthReportDkj', $data, $title, User::whereIn('id',[1364] )->get());
+      $this->sendMailByVerona('monthReportDkj', $data, $title);
     }
 
     //wyswietlanie raoprtu miesiecznego pracownicy dkj
