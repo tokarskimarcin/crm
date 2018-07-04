@@ -926,6 +926,7 @@ Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
 Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
 
 Route::get('/presentationStatistics', 'CrmRouteController@presentationStatisticsGet');
+Route::post('/presentationStatistics', 'CrmRouteController@presentationStatisticsPost');
 
 
 
