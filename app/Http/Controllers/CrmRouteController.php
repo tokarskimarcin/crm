@@ -174,6 +174,11 @@ class CrmRouteController extends Controller
             ->where('client_route_id', '=', $id)
             ->get();
 
+        $clientRoute = $this->getClientRouteGroupedByDateSortedByHour($id, $clientRouteInfo);
+        $routeInfo = new \stdClass;
+        $routeInfo->routeName = $this->createRouteName($clientRoute);
+        $routeInfo->firstDate = $clientRoute[0]->date;
+        $routeInfo->week =  $clientRoute[0]->weekOfYear;
         $clients = Clients::all();
 
         $status = [1];
@@ -259,6 +264,7 @@ class CrmRouteController extends Controller
             return view('crmRoute.specificInfo')
                 ->with('clientRouteInfo', $clientRouteInfoExtended)
                 //->with('hotels', $hotels)
+                    ->with('routeInfo', $routeInfo)
                 ->with('clientName', $clientName);
         else
             return $clientRouteInfo->sortByDesc('date');
@@ -558,28 +564,17 @@ class CrmRouteController extends Controller
 
         $fullArray = [];
         foreach($client_route_ids as $client_route_id){
-            $grouped_by_day_client_routes= [];
-            foreach($client_route_info->where('client_route_id','=',$client_route_id)->sortBy('date')->groupBy('date') as $client_route_day){
-                array_push($grouped_by_day_client_routes, $client_route_day);
-            }
-            $client_routes = [];
-            foreach($grouped_by_day_client_routes as $client_route_day){
-                foreach ($client_route_day->sortBy('hour') as $client_route){
-                    array_push($client_routes, $client_route);
-                }
-            }
-            $route_name = $client_routes[0]->cityName;
-            $hourOrHotelUnassigned = $client_routes[0]->hour == null || $client_routes[0]->hotel_id == null ? false : true;
+
+            $client_routes = $this->getClientRouteGroupedByDateSortedByHour($client_route_id, $client_route_info);
+
+            $route_name = $this->createRouteName($client_routes);
+            $hourOrHotelAssigned = $client_routes[0]->hour == null || $client_routes[0]->hotel_id == null ? false : true;
             for($i = 1; $i < count($client_routes);$i++){
-                if($client_routes[$i]->cityName !== $client_routes[$i-1]->cityName)
-                    if($client_routes[$i]->date!=$client_routes[$i-1]->date){
-                        $route_name .= ' | '.$client_routes[$i]->cityName;
-                    }else
-                        $route_name .= '+'.$client_routes[$i]->cityName;
-                if($hourOrHotelUnassigned && ($client_routes[$i]->hotel_id == null || $client_routes[$i]->hour == null) )
-                    $hourOrHotelUnassigned = false;
+                if($hourOrHotelAssigned)
+                    $hourOrHotelAssigned = $client_routes[0]->hour == null || $client_routes[0]->hotel_id == null ? false : true;
             }
-            $client_routes[0]->hotelOrHour = $hourOrHotelUnassigned;
+
+            $client_routes[0]->hotelOrHour = $hourOrHotelAssigned;
             $client_routes[0]->route_name = $route_name;
             array_push($fullArray, $client_routes[0]);
         }
@@ -592,6 +587,38 @@ class CrmRouteController extends Controller
         return datatables($full_clients_routes)->make(true);
     }
 
+    private function getClientRouteGroupedByDateSortedByHour($client_route_id, $client_route_info = null){
+        $grouped_by_day_client_routes= [];
+        if($client_route_info === null){
+            foreach (ClientRouteInfo::where('client_route_id', '=', $client_route_id)->sortBy('date')->groupBy('date') as $client_route_day) {
+                array_push($grouped_by_day_client_routes, $client_route_day);
+            }
+        }else {
+            foreach ($client_route_info->where('client_route_id', '=', $client_route_id)->sortBy('date')->groupBy('date') as $client_route_day) {
+                array_push($grouped_by_day_client_routes, $client_route_day);
+            }
+        }
+        $client_routes = [];
+        foreach($grouped_by_day_client_routes as $client_route_day){
+            foreach ($client_route_day->sortBy('hour') as $client_route){
+                array_push($client_routes, $client_route);
+            }
+        }
+        return $client_routes;
+    }
+
+    private function createRouteName($client_routes){
+        $route_name = $client_routes[0]->cityName;
+
+        for($i = 1; $i < count($client_routes);$i++){
+            if($client_routes[$i]->cityName !== $client_routes[$i-1]->cityName)
+                if($client_routes[$i]->date!=$client_routes[$i-1]->date){
+                    $route_name .= ' | '.$client_routes[$i]->cityName;
+                }else
+                    $route_name .= '+'.$client_routes[$i]->cityName;
+        }
+        return $route_name;
+    }
     /**
      * @param $collection of client_route_info
      * @return array of client_route_id's that has at least one hotel assigned

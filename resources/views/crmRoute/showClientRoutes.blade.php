@@ -587,7 +587,7 @@
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block"><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
+                            return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block" data-type="1"><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
                         }, "name": "link", width: '10%', searchable: false, orderable: false
                     },
                     {
@@ -945,6 +945,23 @@
             window.addEventListener('pagehide', setItemsToSeessionStorage);
 
             function globalClickHandler(e) {
+
+                //after clicking on hotels and hours edit, we append to localStorage info about givenRole
+                /*if(e.target.dataset.type == 1) {
+                    const clickedRow = e.target.parentElement.parentElement.parentElement;
+                    const weekNumber = $(clickedRow).children().get(0).innerHTML;
+                    const clientName = $(clickedRow).children().get(1).innerHTML;
+                    const firstShowDate = $(clickedRow).children().get(2).innerHTML;
+                    const routeName = $(clickedRow).children().get(3).innerHTML;
+                    let routeId = clickedRow.closest('tr').prop('id');
+                    routeId = routeId.split('_');
+                    routeId = routeId[1];
+                    localStorage.setItem('weekNumber_' + routeId, weekNumber);
+                    localStorage.setItem('clientName_' + routeId, clientName);
+                    localStorage.setItem('firstShowDate_' + routeId, firstShowDate);
+                    localStorage.setItem('routeName_' + routeId, routeName);
+                }*/
+
                 //after clicking on route edit, we append to sessionStorage info about givenRole
                 if(e.target.dataset.type == 2) {
                     const clickedRow = e.target.parentElement.parentElement.parentElement;
@@ -953,6 +970,7 @@
                     const routeName = clickedRow.children[3].textContent;
                     sessionStorage.setItem('routeName', routeName);
                 }
+
             }
 
             document.addEventListener('click', globalClickHandler);
