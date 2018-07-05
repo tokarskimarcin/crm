@@ -12,7 +12,7 @@
 @section('content')
     <style>
         #parent {
-            height: 500px;
+            max-height: 88vh;
         }
 
         #fixTable {
