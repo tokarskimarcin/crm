@@ -18,7 +18,7 @@
             width: 100%;
         }
 
-        .client-container {
+        .client-container, .client-info-container {
             background-color: white;
             padding: 2em;
             box-shadow: 0 1px 15px 1px rgba(39,39,39,.1);
@@ -59,6 +59,20 @@
     <div class="client-wrapper">
         <div class="client-container">
             <header>Przypisywanie szczegółowych informacji do tras klienta @if(isset($clientName))<i>{{$clientName}}</i>@endif</header>
+        </div>
+
+        <div class="client-info-container">
+            <div class="row">
+                <div class="col-lg-2">
+                        <header>{{$routeInfo->week}}</header>
+                </div>
+                <div class="col-lg-2">
+                    <header>{{$routeInfo->firstDate}}</header>
+                </div>
+                <div class="col-lg-8">
+                    <header>{{$routeInfo->routeName}}</header>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -417,8 +431,39 @@
             redirectButton.addEventListener('click', redirectHandler);
             submitButton.addEventListener('click', submitHandler);
 
-        })
+        });
 
+        /**
+         * This function sets input values from localStorage
+         */
 
+        /*$(document).ready(function() {
+            (function setValuesFromLocalStorage() {
+                let routeId = <?php /*Print($routeId)  */?>;
+
+                let container = $('.client-info-container');
+                console.log(routeId);
+                if (localStorage.getItem('weekNumber_'+routeId)) {
+                    container.append('Nr tygodnia: ' + localStorage.getItem('weekNumber_'+routeId));
+                    localStorage.removeItem('weekNumber_'+routeId);
+                }
+
+                if (localStorage.getItem('clientName_'+routeId)) {
+                    clientName = localStorage.getItem('clientName_'+routeId);
+
+                    localStorage.removeItem('clientName_'+routeId);
+                }
+                if (localStorage.getItem('firstShowDate_'+routeId)) {
+                    container.append('Data pierwszego pokazu: ' + localStorage.getItem('firstShowDate_'+routeId));
+
+                    localStorage.removeItem('firstShowDate_'+routeId);
+                }
+                if (localStorage.getItem('routeName_'+routeId)) {
+                    container.append('Trasa: ' + localStorage.getItem('routeName_'+routeId));
+
+                    localStorage.removeItem('routeName_'+routeId);
+                }
+            })();
+        });*/
     </script>
 @endsection
