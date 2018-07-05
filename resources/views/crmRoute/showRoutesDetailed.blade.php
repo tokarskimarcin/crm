@@ -107,6 +107,7 @@
                         <tr>
                             <th>Tydzien</th>
                             <th>Data</th>
+                            <th>Godzina</th>
                             <th>Kampania</th>
                             <th>Podział bazy</th>
                             <th>Sprawdzenie</th>
@@ -592,7 +593,6 @@
                "autoWidth": false,
                "processing": true,
                "serverSide": true,
-               order: [[1, 'asc']],
                "fixedHeader": true,
                "scrollX": "100%",
                "drawCallback": function( settings ) {
@@ -639,8 +639,12 @@
                        },"name":"weekOfYear"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return data.date+' '+data.hour.slice(0,-3);
+                           return data.date;
                        },"name":"date"
+                   },
+                   {"data":function (data, type, dataToSet) {
+                           return data.hour.slice(0,-3);
+                       },"name":"hour"
                    },
                    {"data":function (data, type, dataToSet) {
                        if(data.nrPBX != null)
@@ -706,6 +710,7 @@
                    {"data":"nrPBX", "visible":false
                    }
                ],
+               order: [[1, 'asc'], [2, 'asc']],
                rowGroup: {
                    dataSrc: 'date',
                    startRender: null,
