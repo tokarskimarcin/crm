@@ -9,10 +9,17 @@
 @extends('layouts.main')
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+
+
+
 @endsection
 @section('content')
 
-
+    <style>
+        .colorRow {
+            background: #c500002e !important;
+        }
+    </style>
 
 {{--Header page --}}
 <div class="row">
@@ -242,6 +249,12 @@
                 "processing": true,
                 "serverSide": true,
                 "drawCallback": function( settings ) {
+                },
+                "rowCallback": function (row, data, index) {
+                    if (data.status == 0) {
+                        $(row).addClass('colorRow');
+                    }
+                    return row;
                 },"fnDrawCallback": function (settings) {
                     /**
                      * Edycja Hotelu
@@ -334,18 +347,23 @@
                                         }, {
                                             type: "info"
                                         });
+                                        const thisRow = thisButton[0].parentElement.parentElement;
                                         if(hotelStatus == 0){
+
                                             thisButton.removeClass('btn-danger');
                                             thisButton.addClass('btn-success');
                                             thisButton.data('status', 1);
                                             thisButton.text('Włącz');
                                             thisButton.prepend("<span class='glyphicon glyphicon-off'></span> ");
+
+                                            thisRow.classList.add('colorRow');
                                         }else {
                                             thisButton.removeClass('btn-success');
                                             thisButton.addClass('btn-danger');
                                             thisButton.data('status', 0);
                                             thisButton.text('Wyłącz');
                                             thisButton.prepend("<span class='glyphicon glyphicon-off'></span> ");
+                                            thisRow.classList.remove('colorRow');
                                         }
                                         thisButton.prop('disabled', false);
                                     }
