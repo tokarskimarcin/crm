@@ -42,6 +42,12 @@
             font-size: 2em;
             font-weight: bold;
         }
+
+        .route-info-bar {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
         .check{
             background: #B0BED9 !important;
         }
@@ -64,13 +70,13 @@
         <div class="client-info-container">
             <div class="row">
                 <div class="col-lg-2">
-                        <header>{{$routeInfo->week}}</header>
+                     <div class="route-info-bar">Tydzień: {{$routeInfo->week}}</div>
                 </div>
-                <div class="col-lg-2">
-                    <header>{{$routeInfo->firstDate}}</header>
+                <div class="col-lg-4">
+                    <div class="route-info-bar">Data pierwszego pokazu: {{$routeInfo->firstDate}}</div>
                 </div>
-                <div class="col-lg-8">
-                    <header>{{$routeInfo->routeName}}</header>
+                <div class="col-lg-6">
+                    <div class="route-info-bar">Nazwa trasy: {{$routeInfo->routeName}}</div>
                 </div>
             </div>
         </div>
@@ -117,6 +123,7 @@
                                 <th>Nazwa</th>
                                 <th>Wojewodztwo</th>
                                 <th>Miasto</th>
+                                <th>Kod Pocztowy</th>
                                 <th>Wybierz</th>
                             </tr>
                             </thead>
@@ -270,6 +277,21 @@
                         {"data": function(data, type, dataToSet) {
                                 return data.cityName;
                             },"name":"cityName", "orderable": false
+                        },
+                        {"data": function(data, type, dataToSet) {
+                                zipCode = String(data.zip_code);
+                                if(zipCode != 'null') {
+                                    length = zipCode.length;
+                                    for(i = 0; i < 5-length; i++){
+                                        zipCode = "0".concat(zipCode);
+                                    }
+                                    return zipCode.slice(0,2)+'-'+
+                                        zipCode.slice(2,5);
+                                }
+                                else {
+                                    return '';
+                                }
+                            },"name":"zip_code", "orderable": false, "width": "10%"
                         },
                         {"data":function (data, type, dataToSet) {
                                /* var cityId = cityElementOfGivenContainer;
