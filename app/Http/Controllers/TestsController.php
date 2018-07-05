@@ -826,8 +826,15 @@ class TestsController extends Controller
         /**
          * Przesłanie maila z informacją o wyniku testu
          */
-        if($user->user_type_id != 1 && $user->user_type_id != 2)
-            $this->sendMail($user_mail, $user_name, $mail_title, $data, $mail_type);
+        if($user->user_type_id != 1 && $user->user_type_id != 2){
+            if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
+                $this->sendMail($user->username, $user_name, $mail_title, $data, $mail_type);
+            }
+            if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
+                $this->sendMail($user->email_off, $user_name, $mail_title, $data, $mail_type);
+            }
+        }
+
         Session::flash('message_ok', "Ocena została przesłana!");
         return Redirect::back();
     }
