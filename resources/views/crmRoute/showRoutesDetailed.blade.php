@@ -256,12 +256,12 @@
                createModalTable(modalBody); //table part of modal
                appendNrPBXInput(modalBody);
                appendBaseDivisionInput(modalBody);
-               appendLimitInput(modalBody);
-               appendCommentInput(modalBody);
                appendVerificationSelect(modalBody);
-               appendInvitationInput(modalBody);
-               appendDepartmentSelect(modalBody);
+               // appendInvitationInput(modalBody);
                appendLiveInvitationsInput(modalBody);
+               appendLimitInput(modalBody);
+               appendDepartmentSelect(modalBody);
+               appendCommentInput(modalBody);
 
                let submitButton = document.createElement('button');
                submitButton.id = 'submitEdition';
@@ -280,7 +280,7 @@
                    const limitInput = document.querySelector('#changeLimits');
                    const commentInput = document.querySelector('#changeComments');
                    const verificationInput = document.querySelector('#changeVerification');
-                   const invitationInput = document.querySelector('#invitations');
+                   // const invitationInput = document.querySelector('#invitations');
                    const departmentSelect = document.querySelector('#modalDepartment');
                    const liveInput = document.querySelector('#liveInvitation');
 
@@ -289,10 +289,9 @@
                    const limitValue = limitInput.value;
                    const commentValue = commentInput.value;
                    const verificationValue = verificationInput.options[verificationInput.selectedIndex].value;
-                   const invitationValue = invitationInput.value;
+                   // const invitationValue = invitationInput.value;
                    const departmentValue = departmentSelect.options[departmentSelect.selectedIndex].value;
                    const liveInvitationValue = liveInput.value;
-                   console.info('Live Invitations; ', liveInvitationValue);
 
                    const url = `{{route('api.updateClientRouteInfoRecords')}}`;
                    const header = new Headers();
@@ -316,9 +315,9 @@
                    if(verificationValue != -1) {
                        data.append('verification', verificationValue);
                    }
-                   if(invitationValue != '') {
-                       data.append('invitation', invitationValue);
-                   }
+                   // if(invitationValue != '') {
+                   //     data.append('invitation', invitationValue);
+                   // }
                    if(departmentValue != '0') {
                        data.append('department', departmentValue);
                    }
@@ -375,8 +374,8 @@
                    if(addFlag == true) {
                        let givenRow = document.querySelector('[data-id="' + idItem + '"]');
                        givenRowData = givenRow.cells[1].textContent;
-                       givenRowKampania = givenRow.cells[2].textContent;
-                       givenRowProjekt = givenRow.cells[7].textContent;
+                       givenRowKampania = givenRow.cells[3].textContent;
+                       givenRowProjekt = givenRow.cells[9].textContent;
                        let tr = document.createElement('tr');
                        let td1 = document.createElement('td');
                        td1.textContent = givenRowData;
@@ -444,7 +443,7 @@
            function appendVerificationSelect(placeToAppend) {
                let label3 = document.createElement('label');
                label3.setAttribute('for', 'changeVerification');
-               label3.textContent = "Czy kampania została sprawdzona?";
+               label3.textContent = "Sprawdzenie";
                placeToAppend.appendChild(label3);
 
                let verificationSelect = document.createElement('select');
@@ -505,7 +504,7 @@
            function appendLimitInput(placeToAppend) {
                let label = document.createElement('label');
                label.setAttribute('for', 'changeLimits');
-               label.textContent = 'Podaj wartość limitu';
+               label.textContent = 'Limit';
                placeToAppend.appendChild(label);
 
                let limitInput = document.createElement('input');
@@ -523,7 +522,7 @@
            function appendCommentInput(placeToAppend) {
                let label2 = document.createElement('label');
                label2.setAttribute('for', 'changeComments');
-               label2.textContent = 'Treść komentarza';
+               label2.textContent = 'Uwagi';
                placeToAppend.appendChild(label2);
 
                let commentInput = document.createElement('input');
@@ -549,7 +548,7 @@
            function appendInvitationInput(placeToAppend) {
                let label = document.createElement('label');
                label.setAttribute('for', 'invitations');
-               label.textContent = 'Zaproszenia';
+               label.textContent = 'Zaproszenia Live';
                placeToAppend.appendChild(label);
 
                let invitationInput = document.createElement('input');
