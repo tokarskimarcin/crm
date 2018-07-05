@@ -639,7 +639,7 @@
                        },"name":"weekOfYear"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return data.date;
+                           return data.date+' '+data.hour.slice(0,-3);
                        },"name":"date"
                    },
                    {"data":function (data, type, dataToSet) {
