@@ -830,7 +830,7 @@ class TestsController extends Controller
             if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
                 $this->sendMail($user->username, $user_name, $mail_title, $data, $mail_type);
             }
-            if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
+            else if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
                 $this->sendMail($user->email_off, $user_name, $mail_title, $data, $mail_type);
             }
         }
