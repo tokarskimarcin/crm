@@ -448,44 +448,44 @@
                 location.href="{{URL::to('/showClientRoutes')}}";
             }
 
+            //MULTI SEARCH
+            function globalClickHandler(e) {
+                if(e.target.attributes) {
+                    const attributesOfClickedElement = e.target.attributes;
+
+                    if(attributesOfClickedElement.getNamedItem('type')) {
+                        let typeAttribute = attributesOfClickedElement.getNamedItem('type').nodeValue;
+                        if(typeAttribute == 'search') {
+                            const clickedInput = e.target;
+                            const clickedInputValue = clickedInput.value;
+                            const wholeContainer = clickedInput.parentElement.parentElement.parentElement.parentElement;
+                            const allSearchBars = wholeContainer.querySelectorAll('[type="search"]');
+
+                            let flag = false;
+                            allSearchBars.forEach(bar => {
+                                if(bar == clickedInput) {
+                                    flag = true;
+                                }
+
+                                if(flag == true) {
+                                    bar.value = clickedInputValue;
+                                }
+                            });
+
+                        }
+                    }
+
+                }
+
+            }
+
             const submitButton = document.querySelector('#submit-button');
             const redirectButton = document.querySelector('#redirect');
             redirectButton.addEventListener('click', redirectHandler);
             submitButton.addEventListener('click', submitHandler);
 
+            document.addEventListener('input', globalClickHandler); // MULTI SEARCH
         });
 
-        /**
-         * This function sets input values from localStorage
-         */
-
-        /*$(document).ready(function() {
-            (function setValuesFromLocalStorage() {
-                let routeId = <?php /*Print($routeId)  */?>;
-
-                let container = $('.client-info-container');
-                console.log(routeId);
-                if (localStorage.getItem('weekNumber_'+routeId)) {
-                    container.append('Nr tygodnia: ' + localStorage.getItem('weekNumber_'+routeId));
-                    localStorage.removeItem('weekNumber_'+routeId);
-                }
-
-                if (localStorage.getItem('clientName_'+routeId)) {
-                    clientName = localStorage.getItem('clientName_'+routeId);
-
-                    localStorage.removeItem('clientName_'+routeId);
-                }
-                if (localStorage.getItem('firstShowDate_'+routeId)) {
-                    container.append('Data pierwszego pokazu: ' + localStorage.getItem('firstShowDate_'+routeId));
-
-                    localStorage.removeItem('firstShowDate_'+routeId);
-                }
-                if (localStorage.getItem('routeName_'+routeId)) {
-                    container.append('Trasa: ' + localStorage.getItem('routeName_'+routeId));
-
-                    localStorage.removeItem('routeName_'+routeId);
-                }
-            })();
-        });*/
     </script>
 @endsection
