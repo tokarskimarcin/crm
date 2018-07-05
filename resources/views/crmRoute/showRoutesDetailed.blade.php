@@ -746,6 +746,7 @@
 
                        return $('<tr/>')
                            .append('<td colspan="2">Podsumowanie Dnia: ' + group + '</td>')
+                           .append('<td></td>')
                            .append('<td>' + sumAllCampaings + '</td>')
                            .append('<td></td>')
                            .append('<td></td>')
