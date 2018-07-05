@@ -448,43 +448,43 @@
                 location.href="{{URL::to('/showClientRoutes')}}";
             }
 
-            ////MULTI SEARCH
-            // function globalClickHandler(e) {
-            //     if(e.target.attributes) {
-            //         const attributesOfClickedElement = e.target.attributes;
-            //
-            //         if(attributesOfClickedElement.getNamedItem('type')) {
-            //             let typeAttribute = attributesOfClickedElement.getNamedItem('type').nodeValue;
-            //             if(typeAttribute == 'search') {
-            //                 const clickedInput = e.target;
-            //                 const clickedInputValue = clickedInput.value;
-            //                 const wholeContainer = clickedInput.parentElement.parentElement.parentElement.parentElement;
-            //                 const allSearchBars = wholeContainer.querySelectorAll('[type="search"]');
-            //
-            //                 let flag = false;
-            //                 allSearchBars.forEach(bar => {
-            //                     if(bar == clickedInput) {
-            //                         flag = true;
-            //                     }
-            //
-            //                     if(flag == true) {
-            //                         bar.value = clickedInputValue;
-            //                     }
-            //                 });
-            //
-            //             }
-            //         }
-            //
-            //     }
-            //
-            // }
+            //MULTI SEARCH
+            function globalClickHandler(e) {
+                if(e.target.attributes) {
+                    const attributesOfClickedElement = e.target.attributes;
+
+                    if(attributesOfClickedElement.getNamedItem('type')) {
+                        let typeAttribute = attributesOfClickedElement.getNamedItem('type').nodeValue;
+                        if(typeAttribute == 'search') {
+                            const clickedInput = e.target;
+                            const clickedInputValue = clickedInput.value;
+                            const wholeContainer = clickedInput.parentElement.parentElement.parentElement.parentElement;
+                            const allSearchBars = wholeContainer.querySelectorAll('[type="search"]');
+
+                            let flag = false;
+                            allSearchBars.forEach(bar => {
+                                if(bar == clickedInput) {
+                                    flag = true;
+                                }
+
+                                if(flag == true) {
+                                    bar.value = clickedInputValue;
+                                }
+                            });
+
+                        }
+                    }
+
+                }
+
+            }
 
             const submitButton = document.querySelector('#submit-button');
             const redirectButton = document.querySelector('#redirect');
             redirectButton.addEventListener('click', redirectHandler);
             submitButton.addEventListener('click', submitHandler);
 
-            // document.addEventListener('input', globalClickHandler); // MULTI SEARCH
+            document.addEventListener('input', globalClickHandler); // MULTI SEARCH
         });
 
     </script>
