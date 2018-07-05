@@ -99,9 +99,22 @@
                 <div class="panel-body">
                     <div class="row">
                         @if(Session::has('adnotation'))
-                            <div class="alert alert-warning"
+                            <div class="alert alert-warning addnotation-container"
                                  style="font-size:1.2em;font-weight:bold;text-align:center;">
                                 {{Session::get('adnotation')}}
+
+                                <script>
+                                    const addnotationContainer = document.querySelector('.addnotation-container');
+                                    let redirectButton2 = document.createElement('button');
+                                    redirectButton2.classList.add('btn');
+                                    redirectButton2.classList.add('btn-primary');
+                                    redirectButton2.innerHTML = '<span class="glyphicon glyphicon-repeat"></span> Powrót';
+                                    addnotationContainer.appendChild(redirectButton2);
+
+                                    redirectButton2.addEventListener('click', (e) => {
+                                        window.location.href = `{{URL::to('/showClientRoutes')}}`;
+                                    });
+                                </script>
                             </div>
                             {{Session::forget('adnotation')}}
                         @endif
