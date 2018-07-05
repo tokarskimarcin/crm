@@ -1716,7 +1716,7 @@ class CrmRouteController extends Controller
 
                 $dayLimit = $routeInfo['sumOfLimits'];
                 $daySuccess = $routeInfo['sumOfActualSuccess'];
-                $wynik = $dayLimit - $daySuccess;
+                $wynik = $daySuccess - $dayLimit;
                 $dayCollect->offsetSet($item->name2, $wynik);
 
                 $totalScore += $wynik;
