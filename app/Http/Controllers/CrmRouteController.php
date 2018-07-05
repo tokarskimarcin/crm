@@ -577,8 +577,8 @@ class CrmRouteController extends Controller
             $route_name = $this->createRouteName($client_routes);
             $hourOrHotelAssigned = $client_routes[0]->hour == null || $client_routes[0]->hotel_id == null ? false : true;
             for($i = 1; $i < count($client_routes);$i++){
-                if($hourOrHotelAssigned)
-                    $hourOrHotelAssigned = $client_routes[0]->hour == null || $client_routes[0]->hotel_id == null ? false : true;
+                if($hourOrHotelAssigned && ($client_routes[$i]->hotel_id == null || $client_routes[$i]->hour == null) )
+                    $hourOrHotelAssigned = false;
             }
 
             $client_routes[0]->hotelOrHour = $hourOrHotelAssigned;
