@@ -77,7 +77,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="alert gray-nav top-heading">Edycja Trasy</div>
+            <div class="alert gray-nav top-heading">Edycja Trasy @if(isset($routeInfo)) {{$routeInfo->routeName}} @endif</div>
         </div>
     </div>
 </div>
@@ -486,15 +486,6 @@
             let mainContainer = document.querySelector('.routes-wrapper'); //zaznaczamy główny container
             let route_id = 0;
             let client_id = 0;
-
-            (function setRouteName() {
-                const panelHeadingElement = document.querySelector('.top-heading');
-                console.log(panelHeadingElement);
-                if(sessionStorage.getItem('routeName')) {
-                    const routeName = sessionStorage.getItem('routeName');
-                    panelHeadingElement.textContent = "Edycja trasy: " + routeName;
-                }
-            })();
 
 //*********************START CLIENT SECTON***************************
 

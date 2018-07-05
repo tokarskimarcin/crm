@@ -917,9 +917,6 @@
                     }
                     sessionStorage.removeItem('showOnlyAssigned');
                 }
-                if(sessionStorage.getItem('routeName')) {
-                    sessionStorage.removeItem('routeName');
-                }
 
                 if(somethingChanged) {
                     table2.ajax.reload();
@@ -964,11 +961,6 @@
 
                 //after clicking on route edit, we append to sessionStorage info about givenRole
                 if(e.target.dataset.type == 2) {
-                    const clickedRow = e.target.parentElement.parentElement.parentElement;
-                    const rowRoleAttribute = clickedRow.attributes["role"].nodeValue;
-                    console.assert(rowRoleAttribute === 'row', "Nie wykryto wiersza");
-                    const routeName = clickedRow.children[3].textContent;
-                    sessionStorage.setItem('routeName', routeName);
                 }
 
             }
