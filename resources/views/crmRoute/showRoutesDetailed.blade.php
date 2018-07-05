@@ -118,7 +118,6 @@
                             <th>Oddział</th>
                             <th>Uwagi</th>
                             <th>Nr kampanii (PBX)</th>
-                            <th>id</th>
                         </tr>
                         </thead>
                     </table>
@@ -708,11 +707,10 @@
                            return data.comment;
                        },"name":"comment"
                    },
-                   {"data":"nrPBX", "visible":false},
-                   {"data":"id", "visible":false, "searchable": "false"}
+                   {"data":"nrPBX", "visible":false}
 
                ],
-               order: [[1, 'asc'], [13, 'desc']],
+               order: [[1, 'asc'], [3, 'desc'], [2, 'asc']],
                rowGroup: {
                    dataSrc: 'date',
                    startRender: null,
