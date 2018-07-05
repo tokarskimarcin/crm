@@ -279,12 +279,18 @@ class CrmRouteController extends Controller
         $voivodes = Voivodes::all();
         $departments = Department_info::all(); //niezbędne
 
-        $clientRouteInfo = ClientRouteInfo::select('client_route_info.id', 'voivodeship.name as voivode', 'client_route_info.voivode_id as voivode_id','city.name as city', 'client_route_info.city_id as city_id', 'client_route.client_id as client_id', 'client_route_info.client_route_id as client_route_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour', 'client_route.type as type')
+        $clientRouteInfo = ClientRouteInfo::select('client_route_info.id', 'voivodeship.name as voivode', 'client_route_info.voivode_id as voivode_id','city.name as city','city.name as cityName', 'client_route_info.city_id as city_id', 'client_route.client_id as client_id', 'client_route_info.client_route_id as client_route_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour', 'client_route.type as type')
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
             ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
             ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
             ->where('client_route_id', '=', $id)
             ->get();
+
+        $clientRoute = $this->getClientRouteGroupedByDateSortedByHour($id, $clientRouteInfo);
+        $routeInfo = new \stdClass;
+        $routeInfo->routeName = $this->createRouteName($clientRoute);
+        $routeInfo->firstDate = $clientRoute[0]->date;
+        $routeInfo->week =  $clientRoute[0]->weekOfYear;
 
         $clientRouteInfoExtended = array();
         $insideArr = array();
@@ -365,7 +371,8 @@ class CrmRouteController extends Controller
             ->with('clientRouteInfo',$clientRouteInfo)
             ->with('clientRId', $clientRId)
             ->with('routeId',$id)
-            ->with('clientType', $clientType);
+            ->with('clientType', $clientType)
+            ->with('routeInfo', $routeInfo);
     }
 
 
