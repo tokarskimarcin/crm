@@ -31,7 +31,7 @@
             flex-direction: column;
             justify-content: center;
             min-width: 90%;
-            max-width: 90%;
+            max-width: 100%;
 
             line-height: 2em;
 
@@ -83,7 +83,7 @@
         </div>
 
         <div class="client-container">
-            <section>
+
                 @foreach($clientRouteInfo as $info)
                     @php
                         $i = 1;
@@ -125,7 +125,7 @@
                     $iterator++;
                     @endphp
                 @endforeach
-            </section>
+
         </div>
 
         <div class="client-container placeToAppendForm">
