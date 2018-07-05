@@ -84,8 +84,8 @@
                         <div class="form-group">
                             <label for="typ">Typ</label>
                             <select id="typ" multiple="multiple" style="width: 100%;">
-                                <option value="1">Wysyłka</option>
-                                <option value="2">Badania</option>
+                                <option value="2">Wysyłka</option>
+                                <option value="1">Badania</option>
                             </select>
                         </div>
                     </div>
@@ -643,7 +643,13 @@
                        },"name":"date"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return data.hour.slice(0,-3);
+                            if(data.hour) {
+                                return data.hour.slice(0,-3);
+                            }
+                            else {
+                                return '';
+                            }
+
                        },"name":"hour"
                    },
                    {"data":function (data, type, dataToSet) {
@@ -690,10 +696,10 @@
                    {"data":function (data, type, dataToSet) {
                        let clientNameVariable = '';
                        if(data.typ == '2') {
-                           clientNameVariable = data.clientName + ' (B)'
+                           clientNameVariable = data.clientName + ' (W)'
                        }
                        else {
-                           clientNameVariable = data.clientName + ' (W)'
+                           clientNameVariable = data.clientName + ' (B)'
                        }
                            return clientNameVariable;
                        },"name":"clientName"
