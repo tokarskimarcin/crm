@@ -114,6 +114,7 @@
                                                                                 <th>Kara</th>
                                                                                 <th>Student</th>
                                                                                 <th>Dokument</th>
+                                                                                <th>Całość na konto</th>
                                                                                 <th>Max na konto</th>
                                                                                 <th>Wynagrodzenie</th>
                                                                             </tr>
@@ -135,6 +136,7 @@
                                                                                     $payment_total=+$salary_total_all;
                                                                                     $toAccount = ($item2->max_transaction == null) ? 0 : $item2->max_transaction;
                                                                                     $to_account_total_all += $toAccount;
+                                                                                    $salary_to_account = $item2->salary_to_account == 0 ? "Nie" : "Tak";
                                                                             @endphp
                                                                             <tr>
                                                                                 <td>{{$row_number++}}</td>
@@ -148,12 +150,14 @@
                                                                                 <td>{{$penatly*(-1)}}</td>
                                                                                 <td>{{$student}}</td>
                                                                                 <td>{{$documents}}</td>
+                                                                                <td>{{$salary_to_account}}</td>
                                                                                 <td>{{$toAccount}}</td>
                                                                                 <td>{{$total_one_salary}}</td>
                                                                             </tr>
                                                                         @endforeach
                                                                         <tr>
-                                                                            <td colspan="10"></td>
+                                                                            <td colspan="11"></td>
+                                                                            <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
                                                                             <td style="display: none;"></td>
@@ -241,7 +245,7 @@
         '#DCF2E7',
         '#00d5d1',
         '#42df00'];
-    var addCount = 14;
+    var addCount = 15;
     $(document).ready(function() {
         $('thead > tr> th').css({ 'min-width': '1px', 'max-width': '100px' });
 
@@ -305,7 +309,7 @@
                                             $('row:nth-child('+row_number+') c', sheet).attr('s', (cellXfscount + departments[l].id) + '');
                                         }
                                     }
-                                }
+                            }
                         });
                         $('row:nth-child(2) c', sheet).attr( 's', '42' );
                         $('row:first c', sheet).attr( 's', '51','1','2' );
