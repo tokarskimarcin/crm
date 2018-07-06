@@ -1183,7 +1183,7 @@ class CrmRouteController extends Controller
     }
 
     public function findCityByDistance($city, $currentDate,$clientRoutesInfoWithUsedCities){
-        $distance = 200;
+        $distance = 100;
         $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
             ( 3959 * acos ( cos ( radians('.$city->latitude.') ) * cos( radians( `latitude` ) )
              * cos( radians( `longitude` ) - radians('.$city->longitude.') ) + sin ( radians('.$city->latitude.') )
