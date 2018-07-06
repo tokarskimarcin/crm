@@ -46,6 +46,7 @@ class FinancesController extends Controller
             `users`.`max_transaction`,
             `users`.`first_name`,
             `users`.`last_name`,
+            `users`.`salary_to_account`,
             `users`.`username`,
             `departments`.`name` as dep_name, 
             `department_type`.`name`  as dep_type,
