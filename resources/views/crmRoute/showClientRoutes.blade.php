@@ -148,7 +148,7 @@
                                 <label for="campaignState">Status Kampanii</label>
                                 <select id="campaignState" class="form-control">
                                     <option value="-1">Wszystkie</option>
-                                    <option value="0">Nie gotowe</option>
+                                    <option value="0">Niegotowe</option>
                                     <option value="1">Aktywne</option>
                                     <option value="2">Zakończone</option>
                                 </select>
