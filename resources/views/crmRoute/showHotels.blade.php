@@ -45,7 +45,7 @@
                             </button>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="voivode">Województwo</label>
                                 <select name="voivode" id="voivode" class="form-control" multiple="multiple">
@@ -56,13 +56,24 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="city">Miasto</label>
                                 <select name="city" id="city" class="form-control" multiple="multiple">
                                     <option value="0">Wybierz</option>
                                     @foreach($cities as $city)
                                         <option value="{{$city->id}}">{{$city->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="city">Kod pocztowy</label>
+                                <select name="zipCode" id="zipCode" class="form-control" multiple="multiple">
+                                    <option value="0">Wybierz</option>
+                                    @foreach($zipCode as $item)
+                                        <option>{{$item->zip_code}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -244,6 +255,7 @@
             });
             let voivodeeId = [];
             let cityId = [];
+            let zipCode = [];
             table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,
@@ -377,6 +389,7 @@
                     'type': 'POST',
                     'data': function (d) {
                         d.voivode = voivodeeId;
+                        d.zipCode = zipCode;
                         d.city = cityId;
                         d.status = [1,0]
                     },
@@ -386,6 +399,7 @@
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },"columns":[
                     {"data":function (data, type, dataToSet) {
+                        console.log(zipCode);
                                 return data.name;
                         },"name":"name","orderable": true
                     },
@@ -402,19 +416,7 @@
                         },"name":"street","orderable": true
                     },
                     {"data": function(data,type,dataToSet){
-                            zipCode = String(data.zip_code);
-                            if(zipCode != 'null') {
-                                length = zipCode.length;
-                                for(i = 0; i < 5-length; i++){
-                                    zipCode = "0".concat(zipCode);
-                                }
-                                return zipCode.slice(0,2)+'-'+
-                                    zipCode.slice(2,5);
-                            }
-                            else {
-                                return '';
-                            }
-
+                        return data.zip_code;
                         },name:"zip_code"
                     },
                     {"data":function (data, type, dataToSet) {
@@ -605,7 +607,7 @@
 
             $('#voivode').select2();
             $('#city').select2();
-
+            $('#zipCode').select2();
 
             $('#voivode').on('select2:select select2:unselect', function (e) {
                 let voivodeInp = document.querySelector('#voivode');
@@ -620,6 +622,11 @@
                 cityId = $('#city').val();
                 voivodeeId = [];
                 clearSelection('voivode');
+                table.ajax.reload();
+            });
+
+            $('#zipCode').on('select2:select select2:unselect', function (e) {
+                zipCode = $('#zipCode').val();
                 table.ajax.reload();
             });
 
