@@ -22,6 +22,24 @@
         .alert-info {
             font-size: 1.5em;
         }
+
+        .activated{
+            background-color: #449d44 !important;
+            color: white !important;
+            font-weight: bold;
+        }
+
+        .deactivated{
+            background-color: #31b0d5 !important;
+            color: white !important;
+            font-weight: bold;
+        }
+
+        .unready{
+            background-color: #c9302c !important;
+            color: white !important;
+            font-weight: bold;
+        }
     </style>
 
     {{--Header page --}}
@@ -47,9 +65,9 @@
                                 trasami można filtrować dostępnymi polami jak również filtrować za pomocą dowolnych fraz
                                 wpisanych w polu "Szukaj". Trasy dzielą się na: </br>
                                 <ul class="list-group">
-                                    <li class="list-group-item"><strong>Nie gotowe</strong>, oznaczone przyciskiem <button class="btn btn-success">Aktywuj kampanie</button></li>
-                                    <li class="list-group-item"><strong>Aktywne</strong>, oznaczone przyciskiem <button class="btn btn-warning">Zakończ kampanię</button> </li>
-                                    <li class="list-group-item"><strong>Zakończone</strong>, oznaczone przyciskiem <button class="btn btn-primary">Trasa niegotowa</button> </li>
+                                    <li class="list-group-item"><strong>Niegotowe</strong> oznaczone jako <button class="btn btn-danger" style="font-weight:bold;"s>Niegotowa</button></li>
+                                    <li class="list-group-item"><strong>Aktywne</strong> oznaczone jako <button class="btn btn-success" style="font-weight:bold;">Aktywna</button> </li>
+                                    <li class="list-group-item"><strong>Zakończone</strong> oznaczone jako <button class="btn btn-info" style="font-weight:bold;">Zakończona</button> </li>
                                 </ul>
                             </div>
                         </div>
@@ -130,7 +148,7 @@
                                 <label for="campaignState">Status Kampanii</label>
                                 <select id="campaignState" class="form-control">
                                     <option value="-1">Wszystkie</option>
-                                    <option value="0">Nie gotowe</option>
+                                    <option value="0">Niegotowe</option>
                                     <option value="1">Aktywne</option>
                                     <option value="2">Zakończone</option>
                                 </select>
@@ -148,7 +166,7 @@
                                     <th>Data I pokazu</th>
                                     <th>Trasa</th>
                                     <th>Przypisany hotel i godziny</th>
-                                    <th>Status kampanii</th>
+                                    <th>Status trasy</th>
                                     <th>Edycja (Hoteli i godzin)</th>
                                     <th>Edycja (Trasy)</th>
                                     <th>Edycja parametrów (Kampanii)</th>
@@ -482,9 +500,11 @@
                 scrollX: true,
                 fnDrawCallback: function (settings) {
                     objectArr = [];
-                    $('.action-buttons-0').click(actionButtonHandler);
+                    $('#datatable2 select').change(changeStatus);
+
+                    $/*('.action-buttons-0').click(actionButtonHandler);
                     $('.action-buttons-1').click(actionButtonHandlerAccepted);
-                    $('.action-buttons-2').click(actionButtonHandlerFinished);
+                    $('.action-buttons-2').click(actionButtonHandlerFinished);*/
 
                     $('.show-modal-with-data').click(function (e) {
                         let selectTR = e.currentTarget.parentNode.parentNode;
@@ -573,7 +593,29 @@
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            if (data.status == 0) {
+                            option1 = '<option value="0">Niegotowa</option>\n';
+                            option2 = '<option value="1">Aktywna</option>\n';
+                            option3 = '<option value="2">Zakończona</option>\n';
+                            color='';
+                            if(data.status ==0){
+                                option1 = '<option value="0" selected="selected">Niegotowa</button></option>\n';
+                                color = 'unready';
+
+                            }else if(data.status ==1){
+                                option2 = '<option value="1" selected="selected">Aktywna</option>\n';
+                                color = 'activated';
+
+                            }else {
+                                option3 = '<option value="2" selected="selected">Zakończona</option>\n';
+                                color = 'deactivated';
+                            }
+                            select  ='<select class="form-control '+ color+'" data-status="'+data.status+'" data-clientRouteId="'+ data.client_route_id+'">' +
+                                option1 +
+                                option2 +
+                                option3 +
+                                '</select>';
+                            return select;
+                            /*if (data.status == 0) {
                                 return '<button data-clientRouteId="' + data.client_route_id + '" class="btn btn-success action-buttons-0" style="width:100%">Aktywuj kampanie</button>';
                             }
                             else if (data.status == 2) {
@@ -582,8 +624,8 @@
                             else {
                                 return '<button data-clientRouteId="' + data.client_route_id + '" class="btn btn-warning action-buttons-1" style="width:100%">Zakończ kampanie</button>';
                             }
-
-                        }, "name": "status", searchable: false
+*/
+                        }, "name": "status", searchable: false,width:'15%'
                     },
                     {
                         "data": function (data, type, dataToSet) {
@@ -614,6 +656,51 @@
                 table2.ajax.reload();
             }
 
+            function changeStatus(e) {
+                    swal({
+                        title: "Czy na pewno?",
+                        type: "warning",
+                        text: "Czy chcesz zmienić status trasy na "+$(e.target).find('option:selected').text()+"?",
+                        showCancelButton: true,
+                        confirmButtonClass: "btn-danger",
+                        confirmButtonText: "Tak, zmień!",
+
+                    }).then((result) => {
+                        if (result.value) {
+                            let selectedValue = parseInt($(e.target).val());
+                            status = selectedValue-1 < 0 ? 2 : selectedValue-1;
+                            const clientRouteId = $(e.target).data('clientrouteid');
+                            const url = `{{URL::to('/showClientRoutesStatus')}}`;
+                            const ourHeaders = new Headers();
+                            ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                            ourHeaders.set('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                            const formData = new FormData();
+                            formData.append('clientRouteId', clientRouteId);
+                            formData.append('delete', status);
+
+                            fetch(url, {
+                                method: 'post',
+                                headers: ourHeaders,
+                                credentials: "same-origin",
+                                body: formData
+                            }).then(resp => resp.text())
+                                .then(resp => {
+                                    if (resp == 0) {
+                                        notify("Operacja się nie powiodła", 'danger');
+                                        $(e.target).val($(e.target).data('status'));
+                                    }
+                                    else {
+                                        notify('Trasa <strong>'+$(e.target).find('option:selected').text()+'</strong>', 'success');
+
+                                        $(e.target).data('status',$(e.target).val());
+                                    }
+                                    table2.ajax.reload();
+                                });
+                        }else{
+                            $(e.target).val($(e.target).data('status'));
+                        }
+                    });
+                }
             /**
              * This function changes campaign status from nto ready to started.
              */
