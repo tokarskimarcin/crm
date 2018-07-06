@@ -38,7 +38,7 @@ class FinancesController extends Controller
         $date = $request->search_money_month.'%';
         $agencies = Agencies::all();
         $salary = DB::table(DB::raw("users"))
-            ->whereNotIn('users.user_type_id',[1,2,14])
+            ->whereNotIn('users.user_type_id',[1,2])
             ->where('users.salary','>',0)
             ->selectRaw('
             `users`.`id`,
@@ -94,7 +94,7 @@ class FinancesController extends Controller
                 salary
             "))
             ->where('start_work', 'like', $date)
-            ->whereNotIn('user_type_id', [1,2,14])
+            ->whereNotIn('user_type_id', [1,2])
             ->get();
 
         /**
@@ -129,7 +129,7 @@ class FinancesController extends Controller
                 salary
             "))
             ->where('end_work', 'like', $date)
-            ->whereNotIn('user_type_id', [1,2,14])
+            ->whereNotIn('user_type_id', [1,2])
             ->get();
 
         /**
@@ -167,7 +167,7 @@ class FinancesController extends Controller
             "))
             ->where('end_work', 'like', $date)
             ->where('start_work', 'like', $date)
-            ->whereNotIn('user_type_id', [1,2,14])
+            ->whereNotIn('user_type_id', [1,2])
             ->get();
 
         /**
