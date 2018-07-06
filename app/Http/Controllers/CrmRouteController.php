@@ -1063,9 +1063,16 @@ class CrmRouteController extends Controller
     public function showHotelsGet() {
         $voivodes = Voivodes::all()->sortByDesc('name');
         $cities = Cities::all()->sortBy('name');
+        $zipCode = Hotel::select(DB::raw('distinct(zip_code)'))
+            ->where('zip_code','!=','null')->get();
+        $zipCode->map(function ($item){
+            $item->zip_code = $this::zipCodeNumberToString($item->zip_code);
+            return $item;
+        });
         return view('crmRoute.showHotels')
             ->with('voivodes', $voivodes)
-            ->with('cities', $cities);
+            ->with('cities', $cities)
+            ->with('zipCode',$zipCode);
     }
 
     /**
@@ -1074,7 +1081,7 @@ class CrmRouteController extends Controller
     public function showHotelsAjax(Request $request) {
         $voivodeIdArr = $request->voivode;
         $cityIdArr = $request->city;
-
+        $zipCode = $request->zipCode;
         $status = $request->status;
 
         if(is_null($voivodeIdArr) && is_null($cityIdArr)) {
@@ -1106,7 +1113,27 @@ class CrmRouteController extends Controller
             ->join('city','city.id','city_id')
             ->join('voivodeship','voivodeship.id','voivode_id')->orderBy('id')
             ->get();
+        $hotels->map(function ($item){
+                $item->zip_code = $this::zipCodeNumberToString($item->zip_code);
+            return $item;
+        });
+        if(!is_null($zipCode) && count($zipCode) != 0){
+            $hotels = $hotels->whereIn('zip_code',$zipCode);
+        }
         return datatables($hotels)->make(true);
+    }
+
+    public function zipCodeNumberToString($zipCode){
+        if($zipCode == null){
+            $zipCode = '';
+        }else{
+            $length = strlen($zipCode);
+            for($i = 0; $i < 5-$length; $i++){
+                $zipCode = "0".$zipCode;
+            }
+            $zipCode = substr($zipCode,0,2).'-'.substr($zipCode,2,5);
+        }
+        return $zipCode;
     }
 
     /**
