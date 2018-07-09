@@ -909,7 +909,7 @@
                                             //Generowanie Div'a
                                             if (i == 0)
                                                 generateRouteDiv(false, false, response[i], city, voievodes, placeToAppend);
-                                            else if (i + 1 == response.length)
+                                            else
                                                 generateRouteDiv(true, true, response[i], city, voievodes, placeToAppend);
 
                                             $('.city').select2();
