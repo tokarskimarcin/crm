@@ -221,7 +221,6 @@ class DatabaseURLController extends Controller
 
     $accepted_users = [
         'cytawa.verona@gmail.com',
-        'jarzyna.verona@gmail.com',
         'pawel.zielinski@veronaconsulting.pl',
         'kamil.kostecki@veronaconsulting.pl',
     ];
@@ -262,12 +261,6 @@ class DatabaseURLController extends Controller
         $user3->first_name = 'Kamil';
         $user3->last_name = 'Kostecki';
         $accepted_users->push($user3);
-
-        $user = new User();
-        $user->username = 'daniel.abramowicz@veronaconsulting.pl';
-        $user->first_name = 'Daniel';
-        $user->last_name = 'Abramowicz';
-        $accepted_users->push($user);
 
         $user2 = new User();
         $user2->username = 'sylwia.kwiecien@veronaconsulting.pl';
