@@ -399,7 +399,6 @@
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },"columns":[
                     {"data":function (data, type, dataToSet) {
-                        console.log(zipCode);
                                 return data.name;
                         },"name":"name","orderable": true
                     },
