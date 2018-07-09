@@ -279,7 +279,7 @@
                             },"name":"cityName", "orderable": false
                         },
                         {"data": function(data, type, dataToSet) {
-                                zipCode = String(data.zip_code);
+                               /* zipCode = String(data.zip_code);
                                 if(zipCode != 'null') {
                                     length = zipCode.length;
                                     for(i = 0; i < 5-length; i++){
@@ -290,7 +290,8 @@
                                 }
                                 else {
                                     return '';
-                                }
+                                }*/
+                               return data.zip_code;
                             },"name":"zip_code", "orderable": false, "width": "10%"
                         },
                         {"data":function (data, type, dataToSet) {
