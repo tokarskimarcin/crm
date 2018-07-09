@@ -254,7 +254,10 @@ class StatisticsController extends Controller
             $info_with_janky = $pbx_dkj_data->where('id', '=', $item->id)->first();
             $item->janki = $info_with_janky != null ? $info_with_janky->janky_proc : 0;
             $info_with_work_hours= $work_hours->where('id', '=', $item->id)->first();
-            $item->avg_average = $info_with_work_hours->realRBH != 0 ? round($item->sum_success/$info_with_work_hours->realRBH,2) : 0;
+            if(is_object($info_with_work_hours))
+                $item->avg_average = $info_with_work_hours->realRBH != 0 ? round($item->sum_success/$info_with_work_hours->realRBH,2) : 0;
+            else
+                $item->avg_average = 0;
             return $item;
         });
 
@@ -460,7 +463,7 @@ class StatisticsController extends Controller
 
         $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data,$work_hours) {
             $info_with_work_hours= $work_hours->where('id', '=', $item->id)->first();
-            $item->avg_average = $info_with_work_hours->realRBH != 0 ? round($item->success/$info_with_work_hours->realRBH,2) : 0;
+            $item->avg_average = $info_with_work_hours->realRBH != 0 ? round($item->sum_success/$info_with_work_hours->realRBH,2) : 0;
             $info_with_janky = $pbx_dkj_data->where('id', '=', $item->id)->first();
             $item->janki = $info_with_janky != null ? $info_with_janky->janky_proc : 0;
             return $item;
