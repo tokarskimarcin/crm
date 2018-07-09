@@ -853,13 +853,14 @@ class CrmRouteController extends Controller
 //                ->toArray();
 
             //Rekordy clientRoutesInfo w których były użyte miasta
-            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->get();
+            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
+                ->join('city','city.id','client_route_info.city_id')->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
                 $properDate = date_create($currentDate);
                 //wartość karencji dla danego miasta
-                $gracePeriod = $cities->where('id', '=',$item->city_id)->first()->grace_period;
-
+//
+                $gracePeriod = $item->grace_period;
                 $goodDate = date_create($item->date);
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
