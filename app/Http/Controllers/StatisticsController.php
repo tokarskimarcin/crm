@@ -4640,7 +4640,10 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 ->join('department_info','department_info.id','users.department_info_id')
                 ->join('department_type','department_type.id','department_info.id_dep_type')
                 ->join('links', 'privilage_relation.link_id', '=', 'links.id')
-                ->whereIn('department_type.id',$depTypeId)
+                ->where(function ($querry) use ($depTypeId) {
+                    $querry ->whereIn('department_type.id',$depTypeId)
+                        ->orwhere('users.user_type_id','=',3);
+                })
                 ->where('links.link', '=', $mail_type2)
                 ->where('users.status_work', '=', 1)
                 ->where('users.id', '!=', 4592) // tutaj szczesna
@@ -4651,7 +4654,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             $szczesny->last_name = 'Szczęsny';
             $accepted_users->push($szczesny);
         }
-
 //    $accepted_users = [
 //        'cytawa.verona@gmail.com',
 //        'jarzyna.verona@gmail.com'
@@ -4996,6 +4998,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         ])
             ->whereIn('user_type_id', [8,3])
             ->orWhere('id', '=', 6)
+            ->where('users.id', '!=', 4592)
             ->get();
 
         $this->sendMailByVerona('dayReportCampaign', $data, $title, $users);
