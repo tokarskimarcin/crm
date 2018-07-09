@@ -1812,6 +1812,13 @@ class CrmRouteController extends Controller
             ->groupBy('id','date')
             ->get();
 
+
+        foreach($split_month as $singleDay) {
+            $shortDate = new \stdClass();
+            $singleDay->shortDate = substr($singleDay->date, 5);
+            $singleDay->hidden = 0;
+        }
+
         $groupAllInfo = $allInfo->groupBy('type');
         $uniqueClients = $allInfo->unique('name')->groupBy('type');
 
@@ -1819,6 +1826,7 @@ class CrmRouteController extends Controller
         $sumObj = new \stdClass();
         $sumObj->date = 'Suma';
         $sumObj->name = 'Suma';
+        $sumObj->hidden = 0;
         array_push($split_month, $sumObj);
 
         $clientArr = array();
@@ -1926,6 +1934,13 @@ class CrmRouteController extends Controller
             ->with('currentMonth', $currentMonth);
     }
 
+    public function presentationStatisticsAjax(Request $request) {
+
+            $month = $request->month;
+            $year = $request->year;
+            $days = $this->monthPerWeekDivision($month,$year);
+            return $days;
+    }
 
     /**
      * @params: year - "2017", month - '4'
@@ -1937,6 +1952,8 @@ class CrmRouteController extends Controller
         if($month < 10) {
             $month = '0' . $month;
         }
+        $weekNumber = $request->week;
+//        dd($weekNumber);
 
         $actualMonth = date($year . '-' . $month);
         $currentMonth = date($month);
@@ -1966,14 +1983,39 @@ class CrmRouteController extends Controller
         $groupAllInfo = $allInfo->groupBy('type');
         $uniqueClients = $allInfo->unique('name')->groupBy('type');
 
-        //add last sum item to split_month
-        $sumObj = new \stdClass();
-        $sumObj->date = 'Suma';
-        $sumObj->name = 'Suma';
-        array_push($split_month, $sumObj);
+        $lastMonthVariable = null;
+        foreach($split_month as $key => $value) {
+            if($weekNumber != '%') {
+                if($value->weekNumber == $weekNumber) {
+                    $shortDate = new \stdClass();
+                    $value->shortDate = substr($value->date, 5);
+                    $value->hidden = 0; //0 - show, 1 - hide
+                }
+                else {
+                    $value->hidden = 1; //0 - show, 1 - hide
+                }
+            }
+            else {
+                $shortDate = new \stdClass();
+                $value->shortDate = substr($value->date, 5);
+                $value->hidden = 0; //0 - show, 1 - hide
+            }
+            $lastMonthVariable = $value->weekNumber;
+        }
+
+
+        //add last sum item to split_month if user selected last month's week or all weeks
+        if($lastMonthVariable == $weekNumber || $weekNumber == '%') {
+            $sumObj = new \stdClass();
+            $sumObj->date = 'Suma';
+            $sumObj->name = 'Suma';
+            $sumObj->hidden = 0; //0 - show, 1 - hide
+            array_push($split_month, $sumObj);
+        }
 
         $clientArr = array();
         $objectsArr = array();
+
 
         /**
          * This part is responsible for creating additional arrays of objects to $groupAllInfo. Each array represents all records for given client with amount, date, name.
@@ -1987,35 +2029,39 @@ class CrmRouteController extends Controller
                 $weekIterator = 1;
                 $foreachIterator = 0;
                 foreach($split_month as $day) {
-                    if($day->name != 'Suma') {
-                        $insertionsWithClientAndDate = $item->where('date', '=', $day->date)->where('name', '=', $clientList); //wszystkie wpisy z danego dnia dla danego klienta
-                        $dataObject = new \stdClass();
-                        $dataObject->name = $clientList;
-                        $dataObject->date = $day->date;
-                        $dataObject->dayNumber = $day->dayNumber;
-                        $dataObject->week = $weekIterator;
-                        $dataObject->type = 0; // 0 - day data
+//                    dd($split_month);
+                    if($day->hidden == 0) {
+                        if($day->name != 'Suma') {
+                            $insertionsWithClientAndDate = $item->where('date', '=', $day->date)->where('name', '=', $clientList); //wszystkie wpisy z danego dnia dla danego klienta
+                            $dataObject = new \stdClass();
+                            $dataObject->name = $clientList;
+                            $dataObject->date = $day->date;
+                            $dataObject->dayNumber = $day->dayNumber;
+                            $dataObject->week = $weekIterator;
+                            $dataObject->type = 0; // 0 - day data
 
-                        if($insertionsWithClientAndDate->count() == 0) { //jesli nie ma takiego wpisu
-                            $dataObject->amount = 0;
+                            if($insertionsWithClientAndDate->count() == 0) { //jesli nie ma takiego wpisu
+                                $dataObject->amount = 0;
+                            }
+                            else {
+                                $insertionsWithClientAndDate = $insertionsWithClientAndDate->first();
+                                $dataObject->amount = $insertionsWithClientAndDate->amount;
+                            }
+                            $weekSum += $dataObject->amount;
+                            array_push($clientArray, $dataObject);
+                            $lastMonthVariable == $day->weekNumber;
                         }
                         else {
-                            $insertionsWithClientAndDate = $insertionsWithClientAndDate->first();
-                            $dataObject->amount = $insertionsWithClientAndDate->amount;
-                        }
-                        $weekSum += $dataObject->amount;
-                        array_push($clientArray, $dataObject);
-                    }
-                    else {
-                        $dataObject = new \stdClass();
-                        $dataObject->name = $clientList;
-                        $dataObject->amount = $weekSum;
-                        $dataObject->type = 1; // 1 - sum
-                        $dataObject->week = $weekIterator;
+                            $dataObject = new \stdClass();
+                            $dataObject->name = $clientList;
+                            $dataObject->amount = $weekSum;
+                            $dataObject->type = 1; // 1 - sum
+                            $dataObject->week = $weekIterator;
 
-                        array_push($clientArray, $dataObject);
-                        $weekSum = 0;
-                        $weekIterator++;
+                            array_push($clientArray, $dataObject);
+                            $weekSum = 0;
+                            $weekIterator++;
+                        }
                     }
 
                     if($foreachIterator == count($split_month)) {
@@ -2039,28 +2085,32 @@ class CrmRouteController extends Controller
             $clientCollect = $uniqueClients[$group->first()->type]->pluck('name');
             $sumAmount = 0;
             foreach($split_month as $day) {
-                $daySum = 0;
-                if($day->name == "Suma") {
-                    $sumObject = new \stdClass();
-                    $sumObject->date = 'Suma';
-                    $sumObject->daySum = 0;
-                    array_push($sumArray, $sumObject);
-                }
-                else {
-                    foreach ($clientCollect as $oneClient) {
-                        foreach ($group[$oneClient] as $key => $value) {
-                            if($value->type == 0) { //day data
-                                if($day->date == $value->date) {
-                                    $daySum += $value->amount;
+                if($day->hidden == 0) {
+                    $daySum = 0;
+                    if($day->name == "Suma") {
+                        $sumObject = new \stdClass();
+                        $sumObject->date = 'Suma';
+                        $sumObject->daySum = 0;
+                        $sumObject->hidden = 0; //0 - show, 1 - hide
+                        array_push($sumArray, $sumObject);
+                    }
+                    else {
+                        foreach ($clientCollect as $oneClient) {
+                            foreach ($group[$oneClient] as $key => $value) {
+                                if($value->type == 0) { //day data
+                                    if($day->date == $value->date) {
+                                        $daySum += $value->amount;
+                                    }
                                 }
                             }
-                        }
 
+                        }
+                        $sumObject = new \stdClass();
+                        $sumObject->date = $day->date;
+                        $sumObject->daySum = $daySum;
+                        $sumObject->hidden = 0; //0 - show, 1 - hide
+                        array_push($sumArray, $sumObject);
                     }
-                    $sumObject = new \stdClass();
-                    $sumObject->date = $day->date;
-                    $sumObject->daySum = $daySum;
-                    array_push($sumArray, $sumObject);
                 }
             }
             $daySumObject = new \stdClass();
@@ -2099,6 +2149,7 @@ class CrmRouteController extends Controller
                     if($value == $this::getNameOfWeek($date)) {
                         $weeksObj = new \stdClass();
                         $weeksObj->date = $date;
+                        $weeksObj->weekNumber = date('W', strtotime($date));
                         $weeksObj->name = $this::getNameOfWeek($date);
                         $weeksObj->dayNumber = $key;
                         array_push($weeks,$weeksObj);
@@ -2107,6 +2158,7 @@ class CrmRouteController extends Controller
                         if($weeksObj->name == $arrayOfWeekName[7]) {
                             $sumObj = new \stdClass();
                             $sumObj->date = 'Suma';
+                            $sumObj->weekNumber = date('W', strtotime($date));
                             $sumObj->name = 'Suma';
                             array_push($weeks, $sumObj);
                         }
@@ -2126,6 +2178,7 @@ class CrmRouteController extends Controller
                     if($value == $this::getNameOfWeek($date)) {
                         $weeksObj = new \stdClass();
                         $weeksObj->date = $date;
+                        $weeksObj->weekNumber = date('W', strtotime($date));
                         $weeksObj->name = $this::getNameOfWeek($date);
                         $weeksObj->dayNumber = $key;
                         array_push($weeks,$weeksObj);
