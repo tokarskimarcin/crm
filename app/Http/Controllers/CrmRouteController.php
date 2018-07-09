@@ -356,7 +356,8 @@ class CrmRouteController extends Controller
         $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
 
         $clientRouteInfo = $clientRouteInfo->sortByDesc('date');
-        $clientRouteInfoAll = ClientRouteInfo::select('date','city_id')->get();
+        $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
+            ->join('city','city.id','client_route_info.city_id')->get();
         $clientRouteInfo->map(function($item) use($cities,$clientRouteInfoAll) {
             $cityObject = $cities->where('id','=',$item[0]->city_id)->first();
             $item[0]->cities = $this::findCityByDistance($cityObject, '2000-01-01',$clientRouteInfoAll,$cities);
@@ -1004,7 +1005,8 @@ class CrmRouteController extends Controller
             ['status', '=', 1]
         ])->get();
         $cities = Cities::all();
-        $clientRouteInfo = ClientRouteInfo::all();
+        $clientRouteInfo = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
+            ->join('city','city.id','client_route_info.city_id')->get();
         $routeInfo->map(function ($item) use($clientRouteInfo,$cities){
             $city = Cities::find($item->city_id);
             $item->cities = $this::findCityByDistance($city,'2000-01-01',$clientRouteInfo,$cities);
@@ -1229,7 +1231,8 @@ class CrmRouteController extends Controller
             foreach($clientRoutesInfoWithUsedCities as $item) {
                 $properDate = date_create($currentDate); //function date_add, changes $properDate variable, so in each loop it has to be reassigned
                 //wartość karencji dla danego miasta
-                $gracePeriod = $cities->where('id', '=', $item->city_id)->first()->grace_period;
+                $gracePeriod = $item->grace_period;
+//                $gracePeriod = null;
 //                if($item->city_id == $city->id){
 //                    $gracePeriod = $city->grace_period;
 //                }else{
@@ -1300,7 +1303,8 @@ class CrmRouteController extends Controller
             $cities = Cities::all();
             $city = Cities::where('id', '=', $cityId)->first();
             //part responsible for grace period
-            $clientRouteInfoAll = ClientRouteInfo::select('date','city_id')->get();
+            $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
+                ->join('city','city.id','client_route_info.city_id')->get();
             $voievodeshipRound = $this::findCityByDistance($city, $currentDate,$clientRouteInfoAll,$cities);
 
             $voievodeshipRound = $voievodeshipRound->groupBy('id');
