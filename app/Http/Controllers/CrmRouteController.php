@@ -1117,8 +1117,9 @@ class CrmRouteController extends Controller
                 $item->zip_code = $this::zipCodeNumberToString($item->zip_code);
             return $item;
         });
-        if(!is_null($zipCode) && count($zipCode) != 0){
-            $hotels = $hotels->whereIn('zip_code',$zipCode);
+        if(!is_null($zipCode) && is_array($zipCode)){
+            if(count($zipCode) != 0)
+                $hotels = $hotels->whereIn('zip_code',$zipCode);
         }
         return datatables($hotels)->make(true);
     }
