@@ -907,46 +907,58 @@
                             let placeToAppend = document.querySelector('.route-here');
                             placeToAppend.innerHTML = '';
 
-                            // Pobranie informacji o zaznaczonej trasie
-                            $.ajax({
-                                type: "POST",
-                                url: '{{ route('api.getRoute') }}',
-                                data: {
-                                    "route_id": route_id
-                                },
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                                success: function (response) {
-                                    var voievodes = @json($voivodes);
-                                    //Dla wybranego wojew.. z trasy, pobierz wszystkie
-                                    //miasta
-                                    for (var i = 0; i < response.length; i++) {
-                                        //Pobranie miast dla danego wojew
-                                        var city = getCitiesNamesByVoievodeship(response[i].voivodeship_id);
-                                        //Generowanie Div'a
-                                        if (i == 0)
-                                            generateRouteDiv(false, false, response[i], city, voievodes, placeToAppend);
-                                        else 
-                                            generateRouteDiv(true, true, response[i], city, voievodes, placeToAppend);
+                            swal({
+                                title: 'Ładowawnie...',
+                                text: 'To może chwilę zająć',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                allowEnterKey: false,
+                                onOpen: () => {
+                                    swal.showLoading();
+                                    // Pobranie informacji o zaznaczonej trasie
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '{{ route('api.getRoute') }}',
+                                        data: {
+                                            "route_id": route_id
+                                        },
+                                        headers: {
+                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                        },
+                                        success: function (response) {
+                                            var voievodes = @json($voivodes);
+                                            //Dla wybranego wojew.. z trasy, pobierz wszystkie
+                                            //miasta
+                                            for (var i = 0; i < response.length; i++) {
+                                                //Pobranie miast dla danego wojew
+                                                var city = getCitiesNamesByVoievodeship(response[i].voivodeship_id);
+                                                //Generowanie Div'a
+                                                if (i == 0)
+                                                    generateRouteDiv(false, false, response[i], city, voievodes, placeToAppend);
+                                                else
+                                                    generateRouteDiv(true, true, response[i], city, voievodes, placeToAppend);
 
-                                        $('.city').select2();
-                                        $('.voivodeship').select2();
-                                        $('.voivodeship').off('select2:select'); //remove previous event listeners
-                                        $('.voivodeship').on('select2:select', function (e) {
-                                            getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
-                                        });
-                                        activateDatepicker();
-                                    }
-                                    placeToAppend.appendChild(generateNewShowButton());
-                                    $('.city').on('select2:select', function (e) {
-                                        setHoursValue(e);
-                                    });
-                                    $('.routes-container').slideDown(1000,()=>{
-                                        $("html, body").animate({scrollTop: $(document).height()}, "slow");
+                                                $('.city').select2();
+                                                $('.voivodeship').select2();
+                                                $('.voivodeship').off('select2:select'); //remove previous event listeners
+                                                $('.voivodeship').on('select2:select', function (e) {
+                                                    getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
+                                                });
+                                                activateDatepicker();
+                                            }
+                                            swal.close();
+                                            placeToAppend.appendChild(generateNewShowButton());
+                                            $('.city').on('select2:select', function (e) {
+                                                setHoursValue(e);
+                                            });
+                                            $('.routes-container').slideDown(1000, () => {
+                                                $("html, body").animate({scrollTop: $(document).height()}, "slow");
+                                            });
+                                        }
                                     });
                                 }
                             });
+
                         }
                     });
                 },
