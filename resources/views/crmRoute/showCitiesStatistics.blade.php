@@ -133,6 +133,7 @@
 @endsection
 
 @section('script')
+    <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function(mainEvent) {
             /********** GLOBAL VARIABLES ***********/

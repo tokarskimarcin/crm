@@ -67,16 +67,26 @@
             <header>Przypisywanie szczegółowych informacji do tras klienta @if(isset($clientName))<i>{{$clientName}}</i>@endif</header>
         </div>
 
-        <div class="client-info-container">
-            <div class="row">
-                <div class="col-lg-2">
-                     <div class="route-info-bar">Tydzień: {{$routeInfo->week}}</div>
+        <div class="client-container">
+            <div class="client-info-container">
+                <div class="row">
+                    <div class="col-lg-2">
+                         <div class="route-info-bar">Tydzień: {{$routeInfo->week}}</div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="route-info-bar">Data pierwszego pokazu: {{$routeInfo->firstDate}}</div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="route-info-bar">Nazwa trasy: {{$routeInfo->routeName}}</div>
+                    </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="route-info-bar">Data pierwszego pokazu: {{$routeInfo->firstDate}}</div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="route-info-bar">Nazwa trasy: {{$routeInfo->routeName}}</div>
+            </div>
+            <div class="client-container" style="width: 49%">
+                <div class="row">
+                    <div class="col-lg-6" style="display:-webkit-box;">
+                        <label for="user_reservation" style="margin-right: 10px;">Osoba Rezerwująca : </label>
+                        <input id="user_reservation" name="user_reservation" type="text" class="form-control price-input" @if(isset($user_reservation)) value="{{$user_reservation}}" @else value="Brak"@endif>
+                    </div>
                 </div>
             </div>
         </div>
@@ -123,6 +133,7 @@
                                 <th>Nazwa</th>
                                 <th>Wojewodztwo</th>
                                 <th>Miasto</th>
+                                <th>Ulica</th>
                                 <th>Kod Pocztowy</th>
                                 <th>Wybierz</th>
                             </tr>
@@ -134,6 +145,10 @@
                             <label>Godzina pokazu nr. @php echo $i; @endphp</label>
                             <input type="time" class="form-control time-input" @if(isset($item->hour)) value="{{$item->hour}}" @endif>
                         </div>
+                            <div class="form-group">
+                                <label>Cena za salę</label>
+                                <input id="hotel_price" type="number" class="form-control price-input" @if(isset($item->hotel_price)) value="{{$item->hotel_price}}" @endif>
+                            </div>
                         @if(!$loop->last)
                             <div style="width: 100%; height:2px; border-top:3px dashed black; margin-top:1em; margin-bottom:1em;"></div>
                         @endif
@@ -278,6 +293,10 @@
                                 return data.cityName;
                             },"name":"cityName", "orderable": false
                         },
+                            {"data": function(data, type, dataToSet) {
+                                    return data.street;
+                                },"name":"street", "orderable": false
+                            },
                         {"data": function(data, type, dataToSet) {
                                /* zipCode = String(data.zip_code);
                                 if(zipCode != 'null') {
@@ -328,16 +347,20 @@
             });*/
 
             //This object will store every info about given city.
-            function CityObject(voivode_id, city_id, time_hotel_arr, client_route_id) {
+            function CityObject(voivode_id, city_id, time_hotel_arr, client_route_id,price_hotel_arr) {
                 this.voivodeId = voivode_id;
                 this.cityId = city_id;
                 this.clientRouteId = client_route_id;
                 this.timeHotelArr = time_hotel_arr;
+                this.priceHotelArr = price_hotel_arr;
+                this.user_reservation = document.getElementById('user_reservation').value;
                 this.showValues = function() {
                     console.log("voivodeId: " + voivode_id);
                     console.log("cityId: " + city_id);
                     console.log("timeArr: " + time_arr);
+                    console.log("priceArr: " + price_hotel_arr);
                     console.log("clientRouteId: " + client_route_id);
+                    console.log("user_reservation: " + user_reservation);
                     console.log("hotelId: " + hotel_id);
                 };
                 this.validate = function() {
@@ -370,7 +393,9 @@
                         voivodeId: this.voivodeId,
                         cityId: this.cityId,
                         timeHotelArr: this.timeHotelArr,
+                        priceHotelArr: this.priceHotelArr,
                         clientRouteId: this.clientRouteId,
+                        user_reservation: this.user_reservation
                     };
                     cityInfoArray.push(obj);
 
@@ -394,6 +419,24 @@
 
             }
 
+            function createPriceHotelArrayOfObjects(cityContainer) {
+                const allHotels = cityContainer.querySelectorAll('table');
+                const allPrice = cityContainer.querySelectorAll('.price-input');
+                let priceHotelArr = [];
+                for(let i = 0; i < allHotels.length; i++) { //number of hotels = number of times
+                    const hotelId = allHotels[i].querySelector('input[type="checkbox"]:checked') == null ? null : allHotels[i].querySelector('input[type="checkbox"]:checked').value; //null or id
+                    const price = allPrice[i].value;
+                    const priceHotelObject = {
+                        hotelId: hotelId,
+                        price: price
+                    };
+                    priceHotelArr.push(priceHotelObject);
+                }
+                return priceHotelArr;
+            }
+
+
+
             //this function collect data from forms and validate it.
             function submitHandler(e) {
                 let isOk = null;
@@ -405,11 +448,11 @@
                     const cityElement = cityContainer.querySelector('.city_info'); //city element
                     const clientRouteId = cityContainer.querySelector('.idOfClientRoute').value;
                     const timeHotelArr = createTimeHotelArrayOfObjects(cityContainer);
-
+                    const priceHotelArr = createPriceHotelArrayOfObjects(cityContainer);
                     const voivodeId = voivodeElement.dataset.identificator;
                     const cityId = cityElement.dataset.identificator;
 
-                    const cityObject = new CityObject(voivodeId, cityId, timeHotelArr, clientRouteId);
+                    const cityObject = new CityObject(voivodeId, cityId, timeHotelArr, clientRouteId,priceHotelArr);
                     if(isOk != false) {
                         isOk = cityObject.validate();
                     }
@@ -456,11 +499,14 @@
 
                     if(attributesOfClickedElement.getNamedItem('type')) {
                         let typeAttribute = attributesOfClickedElement.getNamedItem('type').nodeValue;
-                        if(typeAttribute == 'search') {
+                        if(typeAttribute == 'search' || typeAttribute == 'number') {
                             const clickedInput = e.target;
                             const clickedInputValue = clickedInput.value;
-                            const wholeContainer = clickedInput.parentElement.parentElement.parentElement.parentElement;
-                            const allSearchBars = wholeContainer.querySelectorAll('[type="search"]');
+                            if(typeAttribute == 'search')
+                                var wholeContainer = clickedInput.parentElement.parentElement.parentElement.parentElement;
+                            else
+                                var wholeContainer = clickedInput.parentElement.parentElement;
+                            const allSearchBars = wholeContainer.querySelectorAll('[type='+typeAttribute+']');
 
                             let flag = false;
                             allSearchBars.forEach(bar => {
@@ -472,7 +518,6 @@
                                     bar.value = clickedInputValue;
                                 }
                             });
-
                         }
                     }
 

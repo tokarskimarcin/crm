@@ -167,12 +167,13 @@ class CrmRouteController extends Controller
      * This method shows specific route
      */
     public function specificRouteGet($id, $onlyResult = null) {
-        $clientRouteInfo = ClientRouteInfo::select('client_route_info.limits as limits', 'client_route_info.department_info_id as department_info_id', 'client_route_info.id as id', 'city.name as cityName', 'voivodeship.name as voivodeName', 'client_route.id as client_route_id', 'city.id as city_id', 'voivodeship.id as voivode_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour', 'client_route.client_id as client_id', 'client_route_info.weekOfYear as weekOfYear')
+        $clientRouteInfo = ClientRouteInfo::select('client_route_info.user_reservation as user_reservation','client_route_info.hotel_price as hotel_price','client_route_info.limits as limits', 'client_route_info.department_info_id as department_info_id', 'client_route_info.id as id', 'city.name as cityName', 'voivodeship.name as voivodeName', 'client_route.id as client_route_id', 'city.id as city_id', 'voivodeship.id as voivode_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour', 'client_route.client_id as client_id', 'client_route_info.weekOfYear as weekOfYear')
             ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
             ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
             ->where('client_route_id', '=', $id)
             ->get();
+        $userReservation = $clientRouteInfo->first()->user_reservation;
 
         $clientRoute = $this->getClientRouteGroupedByDateSortedByHour($id, $clientRouteInfo);
         $routeInfo = new \stdClass;
@@ -232,6 +233,7 @@ class CrmRouteController extends Controller
             $stdClass->hotel_id = $info->hotel_id;
             $stdClass->hotel_info = Hotel::find($info->hotel_id);
             $stdClass->hour = $info->hour;
+            $stdClass->hotel_price = $info->hotel_price;
             $stdClass->limit = $info->limits == null ? 0 : $info->limits;
             $stdClass->department_info_id = $info->department_info_id;
             $stdClass->weekNumber = $info->weekOfYear;
@@ -260,12 +262,14 @@ class CrmRouteController extends Controller
             }
         });
 
-        if($onlyResult == null)
+        if($onlyResult == null){
             return view('crmRoute.specificInfo')
                 ->with('clientRouteInfo', $clientRouteInfoExtended)
-                //->with('hotels', $hotels)
-                    ->with('routeInfo', $routeInfo)
+                ->with('user_reservation', $userReservation)
+                ->with('routeInfo', $routeInfo)
                 ->with('clientName', $clientName);
+        }
+
         else
             return $clientRouteInfo->sortByDesc('date');
     }
@@ -279,7 +283,7 @@ class CrmRouteController extends Controller
         $voivodes = Voivodes::all();
         $departments = Department_info::all(); //niezbędne
 
-        $clientRouteInfo = ClientRouteInfo::select('client_route_info.id', 'voivodeship.name as voivode', 'client_route_info.voivode_id as voivode_id','city.name as city','city.name as cityName', 'client_route_info.city_id as city_id', 'client_route.client_id as client_id', 'client_route_info.client_route_id as client_route_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour', 'client_route.type as type')
+        $clientRouteInfo = ClientRouteInfo::select('client_route_info.id', 'voivodeship.name as voivode', 'client_route_info.voivode_id as voivode_id','city.name as city','city.name as cityName', 'client_route_info.city_id as city_id','client_route_info.hotel_price as hotel_price', 'client_route.client_id as client_id', 'client_route_info.client_route_id as client_route_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour', 'client_route.type as type')
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
             ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
             ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
@@ -399,9 +403,16 @@ class CrmRouteController extends Controller
                 else {
                     $item->hour = $city->timeHotelArr[$iterator]->time;
                 }
+                if($city->priceHotelArr[$iterator]->price == '') {
+                    $item->hotel_price = null;
+                }
+                else {
+                    $item->hotel_price = $city->priceHotelArr[$iterator]->price;
+                }
 
                 $item->hotel_id = $city->timeHotelArr[$iterator]->hotelId;
                 $item->department_info_id = null; //At this point nobody choose it's value, can't be 0 because
+                $item->user_reservation = $city->user_reservation;
                 $item->save();
                 $iterator++;
                 $clientRouteInfoIds .= $item->id . ', ';
@@ -2243,7 +2254,12 @@ class CrmRouteController extends Controller
 
     public function getClientRouteInfo(){
 
-        return view('crmRoute.showClientRouteInfo');
+        $weeksString = date('W', strtotime("this week"));
+        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, date('Y')));
+        return view('crmRoute.showClientRouteInfo')
+            ->with('currentWeek',$weeksString)
+            ->with('currentYear',date('Y'))
+            ->with('lastWeek',$numberOfLastYearsWeek);
     }
 
     public function datatableClientRouteInfoAjax(Request $request){
@@ -2258,9 +2274,14 @@ class CrmRouteController extends Controller
             ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
             ->join('client','client.id','=','client_route.client_id')
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
-            ->join('hotels', 'hotels.id','=','hotel_id')
-            ->get();
-        return datatables($clientRouteInfo)->make(true);
+            ->join('hotels', 'hotels.id','=','hotel_id');
+        if($request->years[0] != 0){
+            $clientRouteInfo = $clientRouteInfo->whereIn(DB::raw('YEAR(client_route_info.date)'),$request->years);
+        }
+        if($request->weeks[0] != 0){
+            $clientRouteInfo = $clientRouteInfo->whereIn('client_route_info.weekOfYear',$request->weeks);
+        }
+        return datatables($clientRouteInfo->get())->make(true);
     }
 
     public function test(){
