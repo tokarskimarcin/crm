@@ -2244,7 +2244,12 @@ class CrmRouteController extends Controller
 
     public function getClientRouteInfo(){
 
-        return view('crmRoute.showClientRouteInfo');
+        $weeksString = date('W', strtotime("this week"));
+        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, date('Y')));
+        return view('crmRoute.showClientRouteInfo')
+            ->with('currentWeek',$weeksString)
+            ->with('currentYear',date('Y'))
+            ->with('lastWeek',$numberOfLastYearsWeek);
     }
 
     public function datatableClientRouteInfoAjax(Request $request){
@@ -2259,9 +2264,14 @@ class CrmRouteController extends Controller
             ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
             ->join('client','client.id','=','client_route.client_id')
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
-            ->join('hotels', 'hotels.id','=','hotel_id')
-            ->get();
-        return datatables($clientRouteInfo)->make(true);
+            ->join('hotels', 'hotels.id','=','hotel_id');
+        if($request->years[0] != 0){
+            $clientRouteInfo = $clientRouteInfo->whereIn(DB::raw('YEAR(client_route_info.date)'),$request->years);
+        }
+        if($request->weeks[0] != 0){
+            $clientRouteInfo = $clientRouteInfo->whereIn('client_route_info.weekOfYear',$request->weeks);
+        }
+        return datatables($clientRouteInfo->get())->make(true);
     }
 
     public function test(){
