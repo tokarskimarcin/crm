@@ -34,7 +34,7 @@
         </div>
 
         <div class="panel-body">
-            <table id="datatable" class="table row-border table-striped">
+            <table id="datatable" class="thead-inverse table row-border table-striped">
                 <thead>
                 <tr>
                     <th>Klient</th>
