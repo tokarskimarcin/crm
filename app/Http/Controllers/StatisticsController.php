@@ -4651,6 +4651,20 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 ->where('users.status_work', '=', 1)
                 ->where('users.id', '!=', 4592) // tutaj szczesna
                 ->get();
+
+            $selectedUsers = DB::table('users')
+                ->select(DB::raw('
+            users.first_name,
+            users.last_name,
+            users.username,
+            users.email_off
+            '))
+                ->join('privilage_user_relation', 'privilage_user_relation.user_id', '=', 'users.id')
+                ->join('links', 'privilage_user_relation.link_id', 'links.id')
+                ->where('links.link', '=', $mail_type2)
+                ->get();
+            $accepted_users = $accepted_users->merge($selectedUsers);
+
             $szczesny = new User();
             $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
             $szczesny->first_name = 'Bartosz';
