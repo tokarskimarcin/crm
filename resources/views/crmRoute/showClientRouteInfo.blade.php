@@ -37,6 +37,7 @@
     </div>
 @endsection
 @section('script')
+    <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
         let table = $('#datatable').DataTable({
             autoWidth: true,

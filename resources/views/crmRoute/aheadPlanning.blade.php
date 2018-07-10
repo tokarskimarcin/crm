@@ -168,7 +168,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script src="{{ asset('/js/fixedColumns.dataTables.min.js')}}"></script>
     <script src="{{ asset('/js/dataTables.fixedHeader.min.js')}}"></script>
-
+    <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function (mainEvent) {
