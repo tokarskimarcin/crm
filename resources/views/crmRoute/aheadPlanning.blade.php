@@ -225,6 +225,12 @@
                     elementsToSum.firstElement.trId = null;
                     elementsToSum.lastElement.tdId = null;
                     elementsToSum.lastElement.trId = null;
+                    const allTd = document.querySelectorAll('td');
+                    allTd.forEach(cell => {
+                        if(cell.textContent == '0') {
+                            cell.style.background = "#b9f4b7";
+                        }
+                    })
                 }, "columns": [
                     {"data": "numberOfWeek"},
                     {"data": "dayName"},
