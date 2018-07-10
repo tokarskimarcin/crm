@@ -263,6 +263,7 @@ Route::post('/getaHeadPlanningInfo', 'CrmRouteController@getaHeadPlanningInfo')-
 
 Route::get('/getPresentationInfo', 'CrmRouteController@getPresentationInfo')->name('api.getPresentationInfo');
 
+Route::post('/datatableClientRouteInfoAjax', 'CrmRouteController@datatableClientRouteInfoAjax')->name('api.datatableClientRouteInfoAjax');
 /* END CRM-ROUTES AJAX */
 
 /* HR-ROUTES AJAX */
@@ -287,7 +288,7 @@ Route::post('/pbxReportDetailedAjax', 'StatisticsController@pbxReportDetailedAja
 
 
 
-//********************AJAX*********************** */
+//********************END AJAX*********************** */
 
 //Emails
 
@@ -872,6 +873,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/presentationStatistics', 'CrmRouteController@presentationStatisticsGet');
     Route::post('/presentationStatistics', 'CrmRouteController@presentationStatisticsPost');
+
+    Route::get('/showClientRouteInfo', 'CrmRouteController@getClientRouteInfo');
     /** KONIEC CRM **/
 
 });
@@ -927,9 +930,3 @@ Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
 
 Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
 Route::post('/presentationStatisticsAjax', 'CrmRouteController@presentationStatisticsAjax')->name('getPresentationWeeks');
-
-
-
-
-
-
