@@ -1343,7 +1343,7 @@ class CrmRouteController extends Controller
                 $newHotel = HOtel::find($request->hotelId);
             $newHotel->city_id     = $request->city;
             $newHotel->street     = $request->street;
-            $newHotel->price    = $request->price;
+            //$newHotel->price    = $request->price;
             $newHotel->name     = $request->name;
             $newHotel->voivode_id  = $request->voivode;
             $newHotel->comment  = $request->comment;

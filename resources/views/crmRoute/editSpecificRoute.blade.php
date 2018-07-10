@@ -754,10 +754,10 @@
                     $('.button-edit-client').on('click',function () {
                         $('#ModalClient .modal-title').first().text('Edytowanie klienta');
                         let saveClientModalButton = $('#ModalClient #saveClient');
-                        saveClientModalButton.first().prop('class','btn btn-info form-control');
+                        saveClientModalButton.first().prop('class','btn btn-success form-control');
                         saveClientModalButton.first().text('');
-                        saveClientModalButton.append($('<span class="glyphicon glyphicon-edit"></span>'));
-                        saveClientModalButton.append(' Edytuj Klienta');
+                        saveClientModalButton.append($('<span class="glyphicon glyphicon-save"></span>'));
+                        saveClientModalButton.append(' Zapisz Klienta');
                         clientId = $(this).data('id');
                         $.ajax({
                             type: "POST",
