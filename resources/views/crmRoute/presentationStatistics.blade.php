@@ -56,7 +56,7 @@
                     <form action="{{URL::to('/presentationStatistics')}}" method="POST">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="year">Rok</label>
                                 <select id="year" class="form-control" name="year">
@@ -65,10 +65,19 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="month">Miesiąc</label>
                                 <select id="month" class="form-control" name="month">
+                                    <option value="%">Wszystkie</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="week">Tydzień</label>
+                                <select id="week" class="form-control" name="week">
                                     <option value="%">Wszystkie</option>
                                 </select>
                             </div>
@@ -98,14 +107,20 @@
                                     <td colspan="2">Data</td>
 
                                         @foreach($days as $item)
-                                        <td style="font-weight:bold;">{{$item->date}}</td>
+                                            @if($item->date == 'Suma' && $item->hidden == '0')
+                                                <td style="font-weight:bold;">{{$item->date}}</td>
+                                            @elseif($item->date != 'Suma' && $item->hidden == '0')
+                                                <td style="font-weight:bold;font-family: 'Trebuchet MS','sans-serif';">{{$item->shortDate}}({{date('W', strtotime($item->date))}})</td>
+                                            @endif
                                         @endforeach
 
                                 </tr>
                                 <tr>
                                     <td colspan="2" class="holdDoor">Dzień</td>
                                         @foreach($days as $item)
-                                            <td>{{$item->name}}</td>
+                                            @if($item->hidden == '0')
+                                                <td>{{$item->name}}</td>
+                                            @endif
                                         @endforeach
                             @endif
                             @if(isset($clients['Wysyłka']) && isset($allInfo['Wysyłka']['daySum']) && isset($allInfo['Wysyłka']))
@@ -145,9 +160,8 @@
 
                                     <tr>
                                         <td style="font-weight:bold;">SUMA DZIEŃ WYSYŁKA</td>
-
                                             @foreach($allInfo['Wysyłka']['daySum'] as $info)
-                                                    <td  style="background: #e6eff4;">{{$info->daySum}}</td>
+                                                    <td style="background: #e6eff4;">{{$info->daySum}}</td>
                                             @endforeach
 
                                     </tr>
@@ -228,6 +242,10 @@
         $(document).ready(function() {
             /********** GLOBAL VARIABLES ***********/
                 let weeksArray = [];
+                const monthSelect = document.querySelector('#month');
+                const yearSelect = document.querySelector('#year');
+                const weekSelect = document.getElementById('week');
+
                 @if($badaniaFlag == true && $wysylkaFlag == true)
                     const typeArray = ['badania', 'wysylka'];
                 @elseif($badaniaFlag == true)
@@ -322,12 +340,13 @@
              * This function appends week numbers to month select element and years to year select element
              * IIFE function, execute after page is loaded automaticaly
              */
-            (function appendMonthsAndYears() {
-                const monthSelect = document.querySelector('#month');
-                const yearSelect = document.querySelector('#year');
+            (function appendMonthsAndYearsAndWeeks() {
                 const baseYear = '2017';
                 const currentYear = {{$currentYear}};
                 const currentMonth = {{$currentMonth}};
+                const monthNames = ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'];
+                const firstWeek = {{date('W', strtotime($days[0]->date))}};
+                const lastWeek = {{date('W', strtotime($days[count($days) - 2]->date))}};
 
                 for(let j = baseYear; j <= currentYear + 1; j++) {
                     const opt = document.createElement('option');
@@ -343,14 +362,69 @@
                 for(let i = 1; i < 13; i++) {
                     const opt = document.createElement('option');
                     opt.value = i;
-                    opt.textContent = i;
+                    opt.textContent = monthNames[i - 1];
                     if(i == currentMonth) {
                         opt.setAttribute('selected', 'selected');
                         selectedMonth = [i];
                     }
                     monthSelect.appendChild(opt);
                 }
+
+                for(let k = firstWeek; k <= lastWeek; k++ ) {
+                    const opt = document.createElement('option');
+                    opt.value = k;
+                    opt.textContent = k;
+                    weekSelect.appendChild(opt);
+                }
+
+
             })();
+
+            /**
+             *This event listener callback append week numbers to week select.
+             */
+            function monthSelectHandler(e) {
+                const currentYear = yearSelect.options[yearSelect.selectedIndex].value;
+                const currentMonth = monthSelect.options[monthSelect.selectedIndex].value;
+
+                const ajaxUrl = `{{URL::to('/presentationStatisticsAjax')}}`;
+
+                const header = new Headers();
+                header.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+
+                const data = new FormData();
+                data.append('year', currentYear);
+                data.append('month', currentMonth);
+
+                fetch(ajaxUrl, {
+                    body: data,
+                    method: "POST",
+                    headers: header,
+                    credentials: "same-origin"
+                })
+                    .then(resp => resp.json())
+                    .then(resp => {
+                        const firstWeek = resp[0].weekNumber;
+                        const lastWeek = resp[resp.length - 2].weekNumber;
+                        weekSelect.innerHTML = '';
+                        const basicOpt = document.createElement('option');
+                        basicOpt.value = '%';
+                        basicOpt.textContent = 'Wszystkie';
+                        weekSelect.appendChild(basicOpt);
+
+                        for(let k = firstWeek; k <= lastWeek; k++ ) {
+                            const opt = document.createElement('option');
+                            opt.value = k;
+                            opt.textContent = k;
+                            weekSelect.appendChild(opt);
+                        }
+                    })
+
+
+
+            }
+
+            monthSelect.addEventListener('change', monthSelectHandler);
 
             $("#fixTable").tableHeadFixer({"head" : false, "left" : 2});
         });

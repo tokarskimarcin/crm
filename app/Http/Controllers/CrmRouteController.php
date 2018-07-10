@@ -356,10 +356,11 @@ class CrmRouteController extends Controller
         $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
 
         $clientRouteInfo = $clientRouteInfo->sortByDesc('date');
-        $clientRouteInfoAll = ClientRouteInfo::select('date','city_id')->get();
+        $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
+            ->join('city','city.id','client_route_info.city_id')->get();
         $clientRouteInfo->map(function($item) use($cities,$clientRouteInfoAll) {
             $cityObject = $cities->where('id','=',$item[0]->city_id)->first();
-            $item[0]->cities = $this::findCityByDistance($cityObject, '2000-01-01',$clientRouteInfoAll);
+            $item[0]->cities = $this::findCityByDistance($cityObject, '2000-01-01',$clientRouteInfoAll,$cities);
             return $item;
         });
 
@@ -839,6 +840,7 @@ class CrmRouteController extends Controller
     public function addNewRouteAjax(Request $request) {
         $voivodeId = $request->id;
         $currentDate = $request->currentDate;
+        $cities = Cities::all();
         if($currentDate != 0) {
             $all_cities = Cities::where('voivodeship_id', '=', $voivodeId)->get();
             $properDate = date_create($currentDate);
@@ -851,13 +853,14 @@ class CrmRouteController extends Controller
 //                ->toArray();
 
             //Rekordy clientRoutesInfo w których były użyte miasta
-            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->get();
+            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
+                ->join('city','city.id','client_route_info.city_id')->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
                 $properDate = date_create($currentDate);
                 //wartość karencji dla danego miasta
-                $gracePeriod = Cities::find($item->city_id)->grace_period;
-
+//
+                $gracePeriod = $item->grace_period;
                 $goodDate = date_create($item->date);
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
@@ -1002,10 +1005,12 @@ class CrmRouteController extends Controller
             ['routes_id', '=', $id],
             ['status', '=', 1]
         ])->get();
-        $clientRouteInfo = ClientRouteInfo::all();
-        $routeInfo->map(function ($item) use($clientRouteInfo){
+        $cities = Cities::all();
+        $clientRouteInfo = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
+            ->join('city','city.id','client_route_info.city_id')->get();
+        $routeInfo->map(function ($item) use($clientRouteInfo,$cities){
             $city = Cities::find($item->city_id);
-            $item->cities = $this::findCityByDistance($city,'2000-01-01',$clientRouteInfo);
+            $item->cities = $this::findCityByDistance($city,'2000-01-01',$clientRouteInfo,$cities);
             return $item;
         });
         $voivodes = Voivodes::all();
@@ -1210,7 +1215,7 @@ class CrmRouteController extends Controller
         }
     }
 
-    public function findCityByDistance($city, $currentDate,$clientRoutesInfoWithUsedCities){
+    public function findCityByDistance($city, $currentDate,$clientRoutesInfoWithUsedCities,$cities){
         $distance = 100;
         $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
             ( 3959 * acos ( cos ( radians('.$city->latitude.') ) * cos( radians( `latitude` ) )
@@ -1227,11 +1232,13 @@ class CrmRouteController extends Controller
             foreach($clientRoutesInfoWithUsedCities as $item) {
                 $properDate = date_create($currentDate); //function date_add, changes $properDate variable, so in each loop it has to be reassigned
                 //wartość karencji dla danego miasta
-                if($item->city_id == $city->id){
-                    $gracePeriod = $city->grace_period;
-                }else{
-                    $gracePeriod = null;
-                }
+                $gracePeriod = $item->grace_period;
+//                $gracePeriod = null;
+//                if($item->city_id == $city->id){
+//                    $gracePeriod = $city->grace_period;
+//                }else{
+//                    $gracePeriod = null;
+//                }
                 $goodDate = date_create($item->date);
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
@@ -1294,10 +1301,12 @@ class CrmRouteController extends Controller
         if($request->ajax()) {
             $cityId = $request->cityId;
             $currentDate = $request->currentDate;
+            $cities = Cities::all();
             $city = Cities::where('id', '=', $cityId)->first();
             //part responsible for grace period
-            $clientRouteInfoAll = ClientRouteInfo::select('date','city_id')->get();
-            $voievodeshipRound = $this::findCityByDistance($city, $currentDate,$clientRouteInfoAll);
+            $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
+                ->join('city','city.id','client_route_info.city_id')->get();
+            $voievodeshipRound = $this::findCityByDistance($city, $currentDate,$clientRouteInfoAll,$cities);
 
             $voievodeshipRound = $voievodeshipRound->groupBy('id');
             $voievodeshipDistinc = array();
@@ -1812,6 +1821,13 @@ class CrmRouteController extends Controller
             ->groupBy('id','date')
             ->get();
 
+
+        foreach($split_month as $singleDay) {
+            $shortDate = new \stdClass();
+            $singleDay->shortDate = substr($singleDay->date, 5);
+            $singleDay->hidden = 0;
+        }
+
         $groupAllInfo = $allInfo->groupBy('type');
         $uniqueClients = $allInfo->unique('name')->groupBy('type');
 
@@ -1819,6 +1835,7 @@ class CrmRouteController extends Controller
         $sumObj = new \stdClass();
         $sumObj->date = 'Suma';
         $sumObj->name = 'Suma';
+        $sumObj->hidden = 0;
         array_push($split_month, $sumObj);
 
         $clientArr = array();
@@ -1926,6 +1943,13 @@ class CrmRouteController extends Controller
             ->with('currentMonth', $currentMonth);
     }
 
+    public function presentationStatisticsAjax(Request $request) {
+
+            $month = $request->month;
+            $year = $request->year;
+            $days = $this->monthPerWeekDivision($month,$year);
+            return $days;
+    }
 
     /**
      * @params: year - "2017", month - '4'
@@ -1937,6 +1961,8 @@ class CrmRouteController extends Controller
         if($month < 10) {
             $month = '0' . $month;
         }
+        $weekNumber = $request->week;
+//        dd($weekNumber);
 
         $actualMonth = date($year . '-' . $month);
         $currentMonth = date($month);
@@ -1966,14 +1992,39 @@ class CrmRouteController extends Controller
         $groupAllInfo = $allInfo->groupBy('type');
         $uniqueClients = $allInfo->unique('name')->groupBy('type');
 
-        //add last sum item to split_month
-        $sumObj = new \stdClass();
-        $sumObj->date = 'Suma';
-        $sumObj->name = 'Suma';
-        array_push($split_month, $sumObj);
+        $lastMonthVariable = null;
+        foreach($split_month as $key => $value) {
+            if($weekNumber != '%') {
+                if($value->weekNumber == $weekNumber) {
+                    $shortDate = new \stdClass();
+                    $value->shortDate = substr($value->date, 5);
+                    $value->hidden = 0; //0 - show, 1 - hide
+                }
+                else {
+                    $value->hidden = 1; //0 - show, 1 - hide
+                }
+            }
+            else {
+                $shortDate = new \stdClass();
+                $value->shortDate = substr($value->date, 5);
+                $value->hidden = 0; //0 - show, 1 - hide
+            }
+            $lastMonthVariable = $value->weekNumber;
+        }
+
+
+        //add last sum item to split_month if user selected last month's week or all weeks
+        if($lastMonthVariable == $weekNumber || $weekNumber == '%') {
+            $sumObj = new \stdClass();
+            $sumObj->date = 'Suma';
+            $sumObj->name = 'Suma';
+            $sumObj->hidden = 0; //0 - show, 1 - hide
+            array_push($split_month, $sumObj);
+        }
 
         $clientArr = array();
         $objectsArr = array();
+
 
         /**
          * This part is responsible for creating additional arrays of objects to $groupAllInfo. Each array represents all records for given client with amount, date, name.
@@ -1987,35 +2038,39 @@ class CrmRouteController extends Controller
                 $weekIterator = 1;
                 $foreachIterator = 0;
                 foreach($split_month as $day) {
-                    if($day->name != 'Suma') {
-                        $insertionsWithClientAndDate = $item->where('date', '=', $day->date)->where('name', '=', $clientList); //wszystkie wpisy z danego dnia dla danego klienta
-                        $dataObject = new \stdClass();
-                        $dataObject->name = $clientList;
-                        $dataObject->date = $day->date;
-                        $dataObject->dayNumber = $day->dayNumber;
-                        $dataObject->week = $weekIterator;
-                        $dataObject->type = 0; // 0 - day data
+//                    dd($split_month);
+                    if($day->hidden == 0) {
+                        if($day->name != 'Suma') {
+                            $insertionsWithClientAndDate = $item->where('date', '=', $day->date)->where('name', '=', $clientList); //wszystkie wpisy z danego dnia dla danego klienta
+                            $dataObject = new \stdClass();
+                            $dataObject->name = $clientList;
+                            $dataObject->date = $day->date;
+                            $dataObject->dayNumber = $day->dayNumber;
+                            $dataObject->week = $weekIterator;
+                            $dataObject->type = 0; // 0 - day data
 
-                        if($insertionsWithClientAndDate->count() == 0) { //jesli nie ma takiego wpisu
-                            $dataObject->amount = 0;
+                            if($insertionsWithClientAndDate->count() == 0) { //jesli nie ma takiego wpisu
+                                $dataObject->amount = 0;
+                            }
+                            else {
+                                $insertionsWithClientAndDate = $insertionsWithClientAndDate->first();
+                                $dataObject->amount = $insertionsWithClientAndDate->amount;
+                            }
+                            $weekSum += $dataObject->amount;
+                            array_push($clientArray, $dataObject);
+                            $lastMonthVariable == $day->weekNumber;
                         }
                         else {
-                            $insertionsWithClientAndDate = $insertionsWithClientAndDate->first();
-                            $dataObject->amount = $insertionsWithClientAndDate->amount;
-                        }
-                        $weekSum += $dataObject->amount;
-                        array_push($clientArray, $dataObject);
-                    }
-                    else {
-                        $dataObject = new \stdClass();
-                        $dataObject->name = $clientList;
-                        $dataObject->amount = $weekSum;
-                        $dataObject->type = 1; // 1 - sum
-                        $dataObject->week = $weekIterator;
+                            $dataObject = new \stdClass();
+                            $dataObject->name = $clientList;
+                            $dataObject->amount = $weekSum;
+                            $dataObject->type = 1; // 1 - sum
+                            $dataObject->week = $weekIterator;
 
-                        array_push($clientArray, $dataObject);
-                        $weekSum = 0;
-                        $weekIterator++;
+                            array_push($clientArray, $dataObject);
+                            $weekSum = 0;
+                            $weekIterator++;
+                        }
                     }
 
                     if($foreachIterator == count($split_month)) {
@@ -2039,28 +2094,32 @@ class CrmRouteController extends Controller
             $clientCollect = $uniqueClients[$group->first()->type]->pluck('name');
             $sumAmount = 0;
             foreach($split_month as $day) {
-                $daySum = 0;
-                if($day->name == "Suma") {
-                    $sumObject = new \stdClass();
-                    $sumObject->date = 'Suma';
-                    $sumObject->daySum = 0;
-                    array_push($sumArray, $sumObject);
-                }
-                else {
-                    foreach ($clientCollect as $oneClient) {
-                        foreach ($group[$oneClient] as $key => $value) {
-                            if($value->type == 0) { //day data
-                                if($day->date == $value->date) {
-                                    $daySum += $value->amount;
+                if($day->hidden == 0) {
+                    $daySum = 0;
+                    if($day->name == "Suma") {
+                        $sumObject = new \stdClass();
+                        $sumObject->date = 'Suma';
+                        $sumObject->daySum = 0;
+                        $sumObject->hidden = 0; //0 - show, 1 - hide
+                        array_push($sumArray, $sumObject);
+                    }
+                    else {
+                        foreach ($clientCollect as $oneClient) {
+                            foreach ($group[$oneClient] as $key => $value) {
+                                if($value->type == 0) { //day data
+                                    if($day->date == $value->date) {
+                                        $daySum += $value->amount;
+                                    }
                                 }
                             }
-                        }
 
+                        }
+                        $sumObject = new \stdClass();
+                        $sumObject->date = $day->date;
+                        $sumObject->daySum = $daySum;
+                        $sumObject->hidden = 0; //0 - show, 1 - hide
+                        array_push($sumArray, $sumObject);
                     }
-                    $sumObject = new \stdClass();
-                    $sumObject->date = $day->date;
-                    $sumObject->daySum = $daySum;
-                    array_push($sumArray, $sumObject);
                 }
             }
             $daySumObject = new \stdClass();
@@ -2099,6 +2158,7 @@ class CrmRouteController extends Controller
                     if($value == $this::getNameOfWeek($date)) {
                         $weeksObj = new \stdClass();
                         $weeksObj->date = $date;
+                        $weeksObj->weekNumber = date('W', strtotime($date));
                         $weeksObj->name = $this::getNameOfWeek($date);
                         $weeksObj->dayNumber = $key;
                         array_push($weeks,$weeksObj);
@@ -2107,6 +2167,7 @@ class CrmRouteController extends Controller
                         if($weeksObj->name == $arrayOfWeekName[7]) {
                             $sumObj = new \stdClass();
                             $sumObj->date = 'Suma';
+                            $sumObj->weekNumber = date('W', strtotime($date));
                             $sumObj->name = 'Suma';
                             array_push($weeks, $sumObj);
                         }
@@ -2126,6 +2187,7 @@ class CrmRouteController extends Controller
                     if($value == $this::getNameOfWeek($date)) {
                         $weeksObj = new \stdClass();
                         $weeksObj->date = $date;
+                        $weeksObj->weekNumber = date('W', strtotime($date));
                         $weeksObj->name = $this::getNameOfWeek($date);
                         $weeksObj->dayNumber = $key;
                         array_push($weeks,$weeksObj);

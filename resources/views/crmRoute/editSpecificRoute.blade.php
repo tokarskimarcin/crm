@@ -888,7 +888,14 @@
                             route_id = $(this).attr('id'); // przypisuje route_id gdy zaznaczamy checkboxa
                             let placeToAppend = document.querySelector('.route-here');
                             placeToAppend.innerHTML = '';
-
+                            swal({
+                                title: 'Ładowawnie...',
+                                text: 'To może chwilę zająć',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                allowEnterKey: false,
+                                onOpen: () => {
+                                    swal.showLoading();
                             // Pobranie informacji o zaznaczonej trasie
                                 $.ajax({
                                     type: "POST",
@@ -909,7 +916,7 @@
                                             //Generowanie Div'a
                                             if (i == 0)
                                                 generateRouteDiv(false, false, response[i], city, voievodes, placeToAppend);
-                                            else if (i + 1 == response.length)
+                                            else
                                                 generateRouteDiv(true, true, response[i], city, voievodes, placeToAppend);
 
                                             $('.city').select2();
@@ -920,6 +927,7 @@
                                             });
                                             activateDatepicker();
                                         }
+                                        swal.close();
                                         placeToAppend.appendChild(generateNewShowButton());
                                         $('.city').on('select2:select', function (e) {
                                             setHoursValue(e);
@@ -929,6 +937,8 @@
                                         });
                                     }
                                 });
+                                }
+                            });
                         }
                     });
                 },
