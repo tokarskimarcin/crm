@@ -5001,10 +5001,9 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         ])
             ->whereIn('user_type_id', [8,3])
             ->orWhere('id', '=', 6)
-            ->where('users.id', '!=', 4592)
             ->get();
 
-        $this->sendMailByVerona('dayReportCampaign', $data, $title, $users);
+        $this->sendMailByVerona('dayReportCampaign', $data, $title, $users->where('id', '!=', 4592));
     }
 
     /**
@@ -5028,9 +5027,10 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         ])
             ->whereIn('user_type_id', [8,3])
             ->orWhere('id', '=', 6)
+            ->where('users.id', '!=', 4592)
             ->get();
 
-        $this->sendMailByVerona('weekReportCampaign', $data, $title, $users);
+        $this->sendMailByVerona('weekReportCampaign', $data, $title, $users->where('id', '!=', 4592));
     }
 
     /**
@@ -5056,7 +5056,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ->orWhere('id', '=', 6)
             ->get();
 
-        $this->sendMailByVerona('monthReportCampaign', $data, $title, $users);
+        $this->sendMailByVerona('monthReportCampaign', $data, $title, $users->where('id', '!=', 4592));
     }
     /**
      * @param $sum == 0 indices that we want raw data, $sum == 1 indices that we want agreggate data
