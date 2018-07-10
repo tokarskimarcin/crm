@@ -2241,4 +2241,32 @@ class CrmRouteController extends Controller
         $client = Clients::select('name','type')->get();
         return datatables($client)->make(true);
     }
+
+    public function getClientRouteInfo(){
+
+        return view('crmRoute.showClientRouteInfo');
+    }
+
+    public function datatableClientRouteInfoAjax(Request $request){
+        $clientRouteInfo = ClientRouteInfo::select(
+            'client.name as clientName',
+            'weekOfYear',
+            'client_route_info.date',
+            'city.name as cityName',
+            'hotels.name as hotelName',
+            'hotel_price as hotelPrice',
+            'user_reservation as userReservation')
+            ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
+            ->join('client','client.id','=','client_route.client_id')
+            ->join('city', 'city.id', '=', 'client_route_info.city_id')
+            ->join('hotels', 'hotels.id','=','hotel_id')
+            ->get();
+        return datatables($clientRouteInfo)->make(true);
+    }
+
+    public function test(){
+        $str = 'Aaasd asd  a';
+        dd($str, str_ireplace(' ',';',$str),
+            ord($str[5]));
+    }
 }
