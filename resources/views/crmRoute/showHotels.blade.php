@@ -147,23 +147,17 @@
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="price">Ulica</label>
+                                                <label for="street">Ulica</label>
                                                 <input type="text" name="street" id="street" class="form-control" placeholder="Nazwa Ulicy" value="">
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        {{--<div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="price">Cena za salę</label>
                                                 <input type="number" step="0.01" min="0" name="price" id="price" class="form-control" placeholder="Cena w złotówkach np. 125,99" value="">
                                             </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="comment">Komentarz</label>
-                                                <input type="text" name="comment" id="comment" class="form-control" placeholder="Tutaj wprowadź krótki komentarz max 255 znaków" value="">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
+                                        </div>--}}
+                                        <div class="col-md-2">
                                             <div class="form-group">
                                                 <div class="row">
                                                     <div class="col-md-12">
@@ -179,6 +173,12 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="comment">Komentarz</label>
+                                                <input type="text" name="comment" id="comment" class="form-control" placeholder="Tutaj wprowadź krótki komentarz max 255 znaków" value="">
                                             </div>
                                         </div>
                                         <div class="col-md-12">
@@ -232,7 +232,7 @@
             $('#HotelModal #saveHotel').first().append($('<span class="glyphicon glyphicon-plus"></span>'));
             $('#HotelModal #saveHotel').first().append('Dodaj Hotel');
             $("#name").val("");
-            $('#price').val("");
+            //$('#price').val("");
             $('#street').val("");
             $('#voivodeAdd').val(0);
             $('#cityAdd').val(0);
@@ -291,10 +291,10 @@
 
                                 $('#HotelModal #saveHotel').first().text('');
                                 $('#HotelModal #saveHotel').first().prop('class','btn btn-success form-control');
-                                $('#HotelModal #saveHotel').first().append($('<span class="glyphicon glyphicon-edit"></span>'));
-                                $('#HotelModal #saveHotel').first().append('Edytuj Hotel');
+                                $('#HotelModal #saveHotel').first().append($('<span class="glyphicon glyphicon-save"></span>'));
+                                $('#HotelModal #saveHotel').first().append(' Zapisz Hotel');
                                $("#name").val(response.name);
-                               $('#price').val(response.price);
+                               //$('#price').val(response.price);
                                 $('#street').val(response.street);
                                 hotelStatus = response.status;
                                $('#voivodeAdd').val(response.voivode_id);
@@ -470,7 +470,7 @@
             //Walidacja Zapisu
             $('#saveHotel').on('click', function() {
                 var name = $("#name").val();
-                var price = $('#price').val();
+                //var price = $('#price').val();
                 var street = $('#street').val();
                 var voivode = $('#voivodeAdd').val();
                 var city = $('#cityAdd').val();
@@ -502,10 +502,10 @@
                     swal('Wybierz miasto!')
                     validate = false;
                 }
-                if (price == 0) {
+               /* if (price == 0) {
                     swal('Wybierz cene za salę')
                     validate = false;
-                }
+                }*/
                 if(validate) {
                     $('#saveHotel').prop('disabled', true);
                     $.ajax({
@@ -517,7 +517,7 @@
                         data: {
                             'voivode': voivode,
                             'name': name,
-                            'price': price,
+                            //'price': price,
                             'street': street,
                             'city': city,
                             'zipCode': zipCode,
