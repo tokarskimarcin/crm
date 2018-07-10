@@ -498,11 +498,11 @@
                                 clearModal();
                                 $('#ModalCity .modal-title').first().text('Edycja Miasta');
                                 saveCityModalButton = $('#ModalCity #saveCityModal');
-                                saveCityModalButton.first().prop('class','btn btn-info form-control');
+                                saveCityModalButton.first().prop('class','btn btn-success form-control');
                                 saveCityModalButton.first().attr('data-type', '1');
                                 saveCityModalButton.first().text('');
-                                saveCityModalButton.append($('<span class="glyphicon glyphicon-edit"></span>'));
-                                saveCityModalButton.append(' Edytuj Miasto');
+                                saveCityModalButton.append($('<span class="glyphicon glyphicon-save"></span>'));
+                                saveCityModalButton.append(' Zapisz Miasto');
                                 $('#voiovedshipID').val(response.voivodeship_id);
                                 $('#cityName').val(response.name);
                                 $('#eventCount').val(response.max_hour);

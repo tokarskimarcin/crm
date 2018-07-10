@@ -291,8 +291,8 @@
 
                                 $('#HotelModal #saveHotel').first().text('');
                                 $('#HotelModal #saveHotel').first().prop('class','btn btn-success form-control');
-                                $('#HotelModal #saveHotel').first().append($('<span class="glyphicon glyphicon-edit"></span>'));
-                                $('#HotelModal #saveHotel').first().append('Edytuj Hotel');
+                                $('#HotelModal #saveHotel').first().append($('<span class="glyphicon glyphicon-save"></span>'));
+                                $('#HotelModal #saveHotel').first().append(' Zapisz Hotel');
                                $("#name").val(response.name);
                                //$('#price').val(response.price);
                                 $('#street').val(response.street);
