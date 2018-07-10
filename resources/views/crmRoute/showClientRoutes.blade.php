@@ -219,6 +219,7 @@
 @endsection
 
 @section('script')
+    <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
         $('#menu-toggle').change(()=>{
             table2.columns.adjust().draw();
