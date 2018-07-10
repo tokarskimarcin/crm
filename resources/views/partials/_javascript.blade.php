@@ -107,21 +107,24 @@ if (typeof(Storage) !== "undefined") {
 }
 
 $(document).ready(function() {
-    var menu_visible = localStorage.menu_visible;
-
     let side_bar_status = $('#sidebar-wrapper').css('display'); //none or block
 
-    if($(window).width() <= 880 && side_bar_status == 'block'){
+    if($(window).width() <= 880 && side_bar_status === 'block'){
         console.log();
         $('.toggle-on').trigger('click');
-    }else if($(window).width() > 880 && side_bar_status == 'none'){
+    }else if($(window).width() > 880 && side_bar_status === 'none'){
         console.log();
         $('.toggle-on').trigger('click');
     }
 
 
-    if (menu_visible == 'false') {
-        $('#menu-toggle').prop('checked', true).change();
+    let menu_visible = localStorage.menu_visible;
+    if (menu_visible === 'false') {
+        let toggleBtn = $('.toggle.btn');
+        toggleBtn.removeClass('btn-default');
+        toggleBtn.removeClass('off');
+        toggleBtn.addClass('btn-primary');
+        $('#menu-toggle').prop('checked', true);
         $('#sidebar-wrapper').fadeOut(0);
         localStorage.setItem("menu_visible", "false");
         $("#wrapper").toggleClass("toggled");
@@ -130,7 +133,6 @@ $(document).ready(function() {
 });
 
 $('#menu-toggle').change(function() {
-
       var menu_visible = localStorage.menu_visible;
       if (menu_visible == 'true') {
           $('#sidebar-wrapper').fadeOut(0);
