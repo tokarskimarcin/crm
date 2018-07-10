@@ -67,25 +67,28 @@
             <header>Przypisywanie szczegółowych informacji do tras klienta @if(isset($clientName))<i>{{$clientName}}</i>@endif</header>
         </div>
 
-        <div class="client-info-container">
-            <div class="row">
-                <div class="col-lg-2">
-                     <div class="route-info-bar">Tydzień: {{$routeInfo->week}}</div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="route-info-bar">Data pierwszego pokazu: {{$routeInfo->firstDate}}</div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="route-info-bar">Nazwa trasy: {{$routeInfo->routeName}}</div>
+        <div class="client-container">
+            <div class="client-info-container">
+                <div class="row">
+                    <div class="col-lg-2">
+                         <div class="route-info-bar">Tydzień: {{$routeInfo->week}}</div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="route-info-bar">Data pierwszego pokazu: {{$routeInfo->firstDate}}</div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="route-info-bar">Nazwa trasy: {{$routeInfo->routeName}}</div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="client-info-container" style="width: 49%">
-            <div class="row">
-                <div class="col-lg-6" style="display:flex; flex-direction: row; justify-content: center; align-items: center">
-                    <label for="user_reservation" >Osoba Rezerwująca : </label>
-                    <input id="user_reservation" name="user_reservation" type="text" class="form-control price-input" @if(isset($user_reservation)) value="{{$user_reservation}}" @else value="Brak"@endif>
+            <div class="client-container" style="width: 49%">
+                <div class="row">
+                    <div class="col-lg-6" style="display:-webkit-box;">
+                        <label for="user_reservation" style="margin-right: 10px;">Osoba Rezerwująca : </label>
+                        <input id="user_reservation" name="user_reservation" type="text" class="form-control price-input" @if(isset($user_reservation)) value="{{$user_reservation}}" @else value="Brak"@endif>
+                    </div>
                 </div>
+            </div>
         </div>
     </div>
 
@@ -496,7 +499,6 @@
 
                     if(attributesOfClickedElement.getNamedItem('type')) {
                         let typeAttribute = attributesOfClickedElement.getNamedItem('type').nodeValue;
-                        console.log(typeAttribute);
                         if(typeAttribute == 'search' || typeAttribute == 'number') {
                             const clickedInput = e.target;
                             const clickedInputValue = clickedInput.value;
@@ -504,7 +506,6 @@
                                 var wholeContainer = clickedInput.parentElement.parentElement.parentElement.parentElement;
                             else
                                 var wholeContainer = clickedInput.parentElement.parentElement;
-                            console.log(wholeContainer);
                             const allSearchBars = wholeContainer.querySelectorAll('[type='+typeAttribute+']');
 
                             let flag = false;
