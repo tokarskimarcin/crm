@@ -287,7 +287,7 @@
                                                 <div class=col-md-12>
                                                     <input id="removeLimit" class="form-check-input removeLimit"
                                                            data-refresh="removeLimit" type="checkbox"
-                                                           style="display: inline-block">
+                                                           style="display: inline-block;margin-right:1em;">
                                                     <label class="form-check-label" for="removeLimit">Zdejmij
                                                         ograniczenie</label>
                                                 </div>
@@ -664,7 +664,7 @@
                     stringAppend +=
                         '<div class="removeLimitContainer">'+
                         '<div class=col-md-12 >' +
-                        '<input id="removeLimit" class="form-check-input removeLimit" data-refresh="removeLimit" type="checkbox" style="display: inline-block">'+
+                        '<input id="removeLimit" class="form-check-input removeLimit" data-refresh="removeLimit" type="checkbox" style="display: inline-block;margin-right:1em;">'+
                         '<label class="form-check-label" for="removeLimit">Zdejmij ograniczenie</label>'+
                         '</div>'+
                         '</div>';
@@ -1038,7 +1038,7 @@
                     '        <header>Pokaz </header>\n' +
                     '<div class="removeLimitContainer">'+
                     '<div class=col-md-12 >' +
-                    '<input id="removeLimit" class="form-check-input removeLimit" data-refresh="removeLimit" type="checkbox" style="display: inline-block">'+
+                    '<input id="removeLimit" class="form-check-input removeLimit" data-refresh="removeLimit" type="checkbox" style="display: inline-block; margin-right:1em;">'+
                     '<label class="form-check-label" for="removeLimit">Zdejmij ograniczenie</label>'+
                     '</div>'+
                     '</div>'+
