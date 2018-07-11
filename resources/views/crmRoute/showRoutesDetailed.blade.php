@@ -166,7 +166,7 @@
            let selectedDepartments = ["0"]; //this array collect selected by user departments
            let clientRouteInfoIdArr = []; //array of client_route_info ids
            let selectedTypes = ['0']; //array of selected by user types
-           let arrayOfTableRows = [];
+           let arrayOfTableRows = []; //array of modal table rows
            const clearButton = document.querySelector('#clearButton');
            const editButton = document.querySelector('#editOneRecord');
            /*******END OF GLOBAL VARIABLES*********/
@@ -243,7 +243,9 @@
                }
            }
 
-           /*****************MODAL FUNCTIONS**********************/
+           /**********************************************************/
+           /*****************MODAL FUNCTIONS**************************/
+           /**********************************************************/
 
            /**
             * This function fill modal body and attach event listener to submit button.
@@ -342,26 +344,10 @@
                });
            }
 
-           function appendLiveInvitationsInput(placeToAppend) {
-               let label = document.createElement('label');
-               label.setAttribute('for', 'liveInvitation');
-               label.textContent = 'Zaproszenia Live';
-               placeToAppend.appendChild(label);
-
-               let liveInput = document.createElement('input');
-               liveInput.id = 'liveInvitation';
-               liveInput.setAttribute('type', 'number');
-               liveInput.setAttribute('step', '1');
-               liveInput.setAttribute('min', '0');
-               liveInput.classList.add('form-control');
-               placeToAppend.appendChild(liveInput);
-           }
-
            /**
             * This function create one row of modal table and place it in rows array.
             */
            function createModalTableRow() {
-
                clientRouteInfoIdArr.forEach(item => {
                    let addFlag = true;
                    let idItem = item;
@@ -435,6 +421,24 @@
 
                infoTable.appendChild(tbodyElement);
                placeToAppend.appendChild(infoTable);
+           }
+
+           /**
+            * This function append to modal Live Invitation input
+            */
+           function appendLiveInvitationsInput(placeToAppend) {
+               let label = document.createElement('label');
+               label.setAttribute('for', 'liveInvitation');
+               label.textContent = 'Zaproszenia Live';
+               placeToAppend.appendChild(label);
+
+               let liveInput = document.createElement('input');
+               liveInput.id = 'liveInvitation';
+               liveInput.setAttribute('type', 'number');
+               liveInput.setAttribute('step', '1');
+               liveInput.setAttribute('min', '0');
+               liveInput.classList.add('form-control');
+               placeToAppend.appendChild(liveInput);
            }
 
            /**
@@ -560,6 +564,9 @@
                placeToAppend.appendChild(invitationInput);
            }
 
+           /**
+            * This function append to modal department select
+            */
            function appendDepartmentSelect(placeToAppend) {
                let label = document.createElement('label');
                label.setAttribute('for', 'modalDepartment');
@@ -585,7 +592,9 @@
                placeToAppend.appendChild(departmentSelect);
            }
 
+           /**********************************************************/
            /****************END OF MODAL FUNCTIONS********************/
+           /**********************************************************/
 
            table = $('#datatable').DataTable({
 
@@ -794,6 +803,8 @@
            })();
 
            /*********************EVENT LISTENERS FUNCTIONS****************************/
+           /*Functions from this section moslty update arrays which are going to be send by ajax for datatable.
+           /**********************************************************/
 
            /**
             * This event listener change elements of array selected Years while user selects another year
@@ -934,7 +945,6 @@
             * This function clear all row selections and disable edit button
             */
            function clearAllSelections(e) {
-
                if(arrayOfTableRows.length > 0) {
                    if(document.querySelectorAll('.colorRow')) {
                        const coloredRows = document.querySelectorAll('.colorRow');

@@ -2256,10 +2256,12 @@ class CrmRouteController extends Controller
 
         $weeksString = date('W', strtotime("this week"));
         $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, date('Y')));
+        $clients = Clients::select('id', 'name')->get();
         return view('crmRoute.showClientRouteInfo')
             ->with('currentWeek',$weeksString)
             ->with('currentYear',date('Y'))
-            ->with('lastWeek',$numberOfLastYearsWeek);
+            ->with('lastWeek',$numberOfLastYearsWeek)
+            ->with('clients', $clients);
     }
 
     public function datatableClientRouteInfoAjax(Request $request){
@@ -2280,6 +2282,9 @@ class CrmRouteController extends Controller
         }
         if($request->weeks[0] != 0){
             $clientRouteInfo = $clientRouteInfo->whereIn('client_route_info.weekOfYear',$request->weeks);
+        }
+        if($request->clients[0] != 0) {
+            $clientRouteInfo = $clientRouteInfo->whereIn('client.id', $request->clients);
         }
         return datatables($clientRouteInfo->get())->make(true);
     }
