@@ -159,7 +159,10 @@
                                         <td>
                                             @foreach($audit_audios as $audio)
                                                 @if($c->id == $audio->criterion_id)
-                                                    <a data-toggle="modal" data-info="{{$audio->id}}" class="modal_trigger2" href="#play"> <span data-nameOfFile="{{$audio->name}}"  class="glyphicon glyphicon-play-circle" data-element="play" data-identyfier="{{$audio->id}}"></span></a>
+                                                    <?php $format = substr($audio->name,strlen($audio->name)-3) ?>
+                                                    @if($format == 'mp3' || $format == 'wav' || $format == 'ogg')
+                                                        <a data-toggle="modal" data-info="{{$audio->id}}" class="modal_trigger2" href="#play"> <span data-nameOfFile="{{$audio->name}}"  class="glyphicon glyphicon-play-circle" data-element="play" data-identyfier="{{$audio->id}}"></span></a>
+                                                    @endif
                                                 @endif
                                             @endforeach
                                         </td>
