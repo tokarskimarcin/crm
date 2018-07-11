@@ -18,6 +18,7 @@ use App\Pbx_report_extension;
 use App\PrivilageRelation;
 use App\PrivilageUserRelation;
 use App\UserTypes;
+use DeepCopy\f006\A;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -151,12 +152,16 @@ class AdminController extends Controller
 
     public function lockerPost(Request $request) {
         if($request->ajax()) {
+            $data = [];
             $department_info_id = Department_info::find($request->department_info_id);
             if ($department_info_id == null) {
                 return 0;
             } else {
                 $department_info_id->blocked = $request->type;
                 $department_info_id->save();
+                $data['ID oddziału'] = $department_info_id->id;
+                $data['Status'] = $request->type;
+                new ActivityRecorder(3, $data, 50, 4);
                 return 1;
             }
         }
@@ -329,6 +334,7 @@ class AdminController extends Controller
     }
 
     public function multipleDepartmentPost(Request $request) {
+        $data = [];
         if($request->request_type == 'select_user'){
           $users = User::where('status_work', '=', 1)
               ->whereNotIn('user_type_id',[1,2])
@@ -340,7 +346,6 @@ class AdminController extends Controller
               return view('errors.404');
           }
           $user_id_post = $user->id;
-
           $user_dep = DB::table('multiple_departments')
               ->select(DB::raw('
                   department_info_id
@@ -368,18 +373,25 @@ class AdminController extends Controller
               ->where('user_id', '=', $request->user_department_post)
               ->delete();
 
+          $data['Edycja użytkownika'] = $userCheck->last_name.' '.$userCheck->first_name;
+          $data['ID użytkownika'] = $userCheck->id;
+          $data['Przydzielone ID oddziały'] = '[';
           for($i = 1; $i <= $last_id; $i++) {
               $actual_dep = 'dep' . $i;
               if($request->$actual_dep == $i){
+                  $data['Przydzielone ID oddziały'] .= $request->$actual_dep.',';
                 DB::table('multiple_departments')->insert(
                   ['user_id' => $request->user_department_post, 'department_info_id' => $request->$actual_dep]
                 );
               }
           }
           $users = User::where('status_work', '=', 1)
+              ->whereNotIn('user_type_id',[1,2])
               ->orderBy('last_name')
               ->get();
-
+          $data['Przydzielone ID oddziały'] = rtrim($data['Przydzielone ID oddziały'], ',');
+          $data['Przydzielone ID oddziały'] .= ']';
+          new ActivityRecorder(3, $data, 70, 2);
           return view('admin.multipleDepartments')
               ->with('success', 'Zmiany zapisano pomyślnie!')
               ->with('users', $users);
@@ -394,34 +406,45 @@ class AdminController extends Controller
     }
 
     public function createLinkPost(Request $request){
+        $data = [];
         $link = new Links();
         $linkGroupCheck = LinkGroups::find($request->group_link_id);
         if ($linkGroupCheck == null) {
             return view('errors.404');
         }
 
+        $data['Nazwa linku'] = $request->name;
+        $data['Link'] = $request->link;
+        $data['ID grupy'] = $request->group_link_id;
         $link->name = $request->name;
         $link->link = $request->link;
         $link->group_link_id = $request->group_link_id;
 
         $link->save();
 
+        new ActivityRecorder(3,$data, 72, 1);
         Session::flash('message_ok', "Link został dodany!");
         return Redirect::back();
     }
 
     public function addGroup(Request $request) {
+        $data = [];
         $newGroupName = trim($request->addLinkGroup, ' ');
         $newGroup = new LinkGroups();
+        $data['Nazwa dodanej grupy'] = $newGroupName;
         $newGroup->name = $newGroupName;
         $newGroup->save();
+        new ActivityRecorder(3,$data, 72, 1);
         return Redirect::back();
     }
 
     public function removeGroup(Request $request) {
+        $data = [];
+        $data['ID grupy'] = removeLinkGroup;
         $groupID = $request->removeLinkGroup;
         $groupToDelete = LinkGroups::where('id', '=', $groupID)->first();
         $groupToDelete->delete();
+        new ActivityRecorder(3,$data, 72, 3);
         return Redirect::back();
     }
 
@@ -433,16 +456,20 @@ class AdminController extends Controller
     }
 
     public function firewallPost(Request $request) {
+        $data = [];
         $firewall = new Firewall();
 
         if ($request->ip_status != 1 && $request->ip_status != 2) {
             return view('errors.404');
         }
 
+        $data['IP'] = $request->new_ip;
+        $data['Status'] = $request->ip_status;
         $firewall->ip_address = $request->new_ip;
         $firewall->whitelisted = $request->ip_status;
         $firewall->save();
 
+        new ActivityRecorder(3, $data, 88,1);
         Session::flash('message_ok', "Adres IP został dodany!");
         return Redirect::back();
     }
@@ -460,11 +487,14 @@ class AdminController extends Controller
     }
 
     public function firewallPrivilegesPost(Request $request) {
+        $data = [];
         $obj = new FirewallPrivileges();
 
+        $data['ID użytkownika'] = $request->user_selected;
         $obj->user_id = $request->user_selected;
         $obj->save();
 
+        new ActivityRecorder(3,$data, 89, 1);
         Session::flash('message_ok', "Użytkownik został dodany!");
         return Redirect::back();
     }
@@ -477,6 +507,9 @@ class AdminController extends Controller
                 return 0;
             } else {
                 FirewallPrivileges::where('user_id', '=', $request->user_id)->delete();
+                $data['ID użytkownika'] = $request->user_id;
+                $data['Użytkownik'] = $user->first_name.' '.$user->last_name;
+                new ActivityRecorder(3,$data,89,3);
                 return 1;
             }
         }
@@ -560,6 +593,7 @@ class AdminController extends Controller
      */
     public function saveMedicalPackageData(Request $request) {
         if ($request->ajax()) {
+            $data = [];
             $package = MedicalPackage::find($request->package_id);
 
             $package->user_id           = $request->user_id;
@@ -579,6 +613,26 @@ class AdminController extends Controller
             $package->month_start       = $request->month_start;
             $package->month_stop        = $request->month_stop;
             $package->deleted           = $request->deleted;
+
+            $data['ID użytkownika'] = $request->user_id;
+            $data['Imię'] = $request->user_first_name;
+            $data['Nazwisko'] = $request->user_last_name;
+            $data['PESEL'] = $request->pesel;
+            $data['Data urodzenia'] = $request->birth_date;
+            $data['Miasto'] = $request->city;
+            $data['Ulica'] = $request->street;
+            $data['Nr domu'] = $request->house_number;
+            $data['Nr mieszkania'] = $request->flat_number;
+            $data['Kod pocztowy'] = $request->postal_code;
+            $data['Nr tel'] = $request->phone_number;
+            $data['Pakiet'] = $request->package_name;
+            $data['Wariant'] = $request->package_variable;
+            $data['Zakres']  = $request->package_scope;
+            $data['Rozpoczęcie'] = $request->month_start;
+            $data['Zakończenie'] = $request->month_stop;
+            $data['Usunięty'] = $request->deleted;
+            $data['Usunięty trwale'] = $request->hard_deleted;
+
             if ($request->hard_deleted == 1) {
                 $package->hard_deleted  = 1;
             } else {
@@ -589,6 +643,7 @@ class AdminController extends Controller
 
             $package->save();
 
+            new ActivityRecorder(3,$data,130,2);
             return 1;
         }
     }
@@ -741,6 +796,7 @@ class AdminController extends Controller
 
     //usuwanie i dodawanie uprawnień
     public function userPrivilagesPOST(Request $request) {
+        $data = [];
         $remove_id = $request->remove_privilage_id; //link_id
         $user_id = $request->user_id; //user_id
         $adding = $request->isAdding;
@@ -750,6 +806,9 @@ class AdminController extends Controller
                     ->where('user_id', '=', $user_id)
                     ->where('link_id', '=', $remove_id)
                     ->delete();
+                $data['ID użytkownika'] = $user_id;
+                $data['ID linku'] = $remove_id;
+                new ActivityRecorder(3,$data,191,3);
             }
         }
         else {
@@ -758,6 +817,10 @@ class AdminController extends Controller
             $new_privilage->link_id = $new_privilage_number;
             $new_privilage->user_id = $user_id;
             $new_privilage->save();
+
+            $data['ID użytkownika'] = $user_id;
+            $data['ID linku'] = $new_privilage_number;
+            new ActivityRecorder(3,$data,191,1);
         }
 
         return redirect()->back();
