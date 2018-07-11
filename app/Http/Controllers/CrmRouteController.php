@@ -364,10 +364,9 @@ class CrmRouteController extends Controller
             ->join('city','city.id','client_route_info.city_id')->get();
         $clientRouteInfo->map(function($item) use($cities,$clientRouteInfoAll) {
             $cityObject = $cities->where('id','=',$item[0]->city_id)->first();
-            $item[0]->cities = $this::findCityByDistance($cityObject, '2000-01-01',$clientRouteInfoAll,$cities);
+            $item[0]->cities = $this::findCityByDistance($cityObject, $item[0]->date,$clientRouteInfoAll,$cities);
             return $item;
         });
-
         return view('crmRoute.editSpecificRoute')
             ->with('departments', $departments)
             ->with('voivodes', $voivodes)
@@ -1702,6 +1701,7 @@ class CrmRouteController extends Controller
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
             ->where('city_id', '=', $cityId)
             ->whereBetween('date', [$dateStart, $dateStop])
+            ->orderBy('date')
             ->get();
 
         return $clientRouteInfoRecords;
@@ -2287,6 +2287,26 @@ class CrmRouteController extends Controller
             $clientRouteInfo = $clientRouteInfo->whereIn('client.id', $request->clients);
         }
         return datatables($clientRouteInfo->get())->make(true);
+    }
+
+    /**
+     * @param City_id, date
+     * This method returns data about clientROuteInfo records from given range of dates.
+     */
+    public function getClientRouteInfoRecord(Request $request) {
+        $cityId = $request->city_id;
+        $date = $request->date;
+        $dateStart = date('Y-m-d', strtotime("+1 month", strtotime($date)));
+        $dateStop = date('Y-m-d', strtotime("-1 month", strtotime($date)));
+
+        $clientRouteInfoRecords = ClientRouteInfo::select('city.name as cityName', 'client_route_info.date as date')
+            ->join('city', 'city.id', '=', 'client_route_info.city_id')
+            ->where('city_id', '=', $cityId)
+            ->whereBetween('date', [$dateStop, $dateStart])
+            ->orderBy('date')
+            ->get();
+
+        return $clientRouteInfoRecords;
     }
 
     public function test(){
