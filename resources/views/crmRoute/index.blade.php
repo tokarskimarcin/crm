@@ -79,6 +79,16 @@
             margin-top: 1em;
         }
 
+        .show-cities-statistics {
+            padding-top: 1.65em;
+            font-size: 1.3em;
+        }
+
+        .show-cities-statistics:hover {
+            cursor: pointer;
+            color: blue;
+        }
+
     </style>
 
     {{--Header page --}}
@@ -273,7 +283,8 @@
                             <div class="alert alert-info">
                                 Wybierz szablon trasy z listy. Jeśli nie ma odpowiedniej trasy na liście, stwórz ją
                                 naciskając na przycisk <strong>Dodaj trasę ręcznie</strong> </br>
-                                Wiersze pokolorowane na czerwono wskazują na szablon trasy, w którym co najmniej 1 miasto przekroczyło karencję, względem
+                                Wiersze pokolorowane na czerwono wskazują na szablon trasy, w którym co najmniej 1
+                                miasto przekroczyło karencję, względem
                                 daty pierwszego pokazu.
                             </div>
                             <div class="col-md-4">
@@ -293,7 +304,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="client-container route-here" >
+                        <div class="client-container route-here">
 
                         </div>
                     </div>
@@ -310,6 +321,28 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="showRecords" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Wykorzystanie miasta</h4>
+                </div>
+                <div class="modal2-body">
+                    <div class="alert alert-danger">Ładowanie danych..</div>
+                </div>
+                <div class="modal-footer">
+                    <button id="modal-close-button" type="button" class="btn btn-default" data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 @endsection
@@ -342,7 +375,7 @@
             $.notify({
                 // options
                 message: htmltext$string
-            },{
+            }, {
                 // settings
                 type: type$string,
                 delay: delay$miliseconds$number,
@@ -358,7 +391,7 @@
         $('#clientModal').click(() => {
             $('#ModalClient .modal-title').first().text('Dodawanie nowego klienta');
             let saveClientModalButton = $('#ModalClient #saveClient');
-            saveClientModalButton.first().prop('class','btn btn-default form-control');
+            saveClientModalButton.first().prop('class', 'btn btn-default form-control');
             saveClientModalButton.first().text('');
             saveClientModalButton.append($('<span class="glyphicon glyphicon-plus"></span>'));
             saveClientModalButton.append(' Dodaj Klienta');
@@ -407,7 +440,7 @@
                         'clientID': clientID
                     },
                     success: function (response) {
-                        if(editFlag == false) {
+                        if (editFlag == false) {
                             notify('<strong>Klient został pomyślnie dodany</strong>', 'success');
                         }
                         else {
@@ -485,7 +518,7 @@
             $('#ModalClient').on('hidden.bs.modal', function () {
                 $('#clientID').val("0");
                 clearModal();
-                if(saveClientClicked) {
+                if (saveClientClicked) {
                     table_client.ajax.reload();
                     saveClientClicked = false;
                 }
@@ -514,7 +547,6 @@
                 document.getElementById('client_choice_name').textContent = "";
                 document.getElementById('client_choice_priority').textContent = "";
                 $('#client_choice_type').attr('disabled', true).val(0);
-
             }
 
             function getCitiesNamesByVoievodeship(voivodeship_id) {
@@ -585,7 +617,7 @@
                 });
             }
 
-            function generateNewShowButton(){
+            function generateNewShowButton() {
                 let buttonStringAppend =
                     '<div class="row">' +
                     '<div class="col-lg-12 button_section button_new_show_section">\n' +
@@ -612,11 +644,11 @@
                     '<header>Pokaz </header>\n';
                 if (showRemoveLimit)
                     stringAppend +=
-                            '<div class="removeLimitContainer">'+
+                        '<div class="removeLimitContainer">' +
                         '<div class=col-md-12 >' +
-                        '<label class="form-check-label" for="removeLimit">Zdejmij ograniczenie</label>'+
-                        '<input id="removeLimit" class="form-check-input removeLimit" data-refresh="removeLimit" type="checkbox" style="display: block">'+
-                        '</div>'+
+                        '<input id="removeLimit" class="form-check-input removeLimit" data-refresh="removeLimit" type="checkbox" style="display: inline-block;margin-right:1em;">' +
+                        '<label class="form-check-label" for="removeLimit">Zdejmij ograniczenie</label>' +
+                        '</div>' +
                         '</div>';
                 if (showRefresh)
                     stringAppend += '<div class=col-md-12 style="text-align: center">' +
@@ -639,7 +671,7 @@
                     '                </div>\n' +
                     '            </div>\n' +
                     '\n' +
-                    '            <div class="col-md-6">\n' +
+                    '            <div class="col-md-5">\n' +
                     '                <div class="form-group">\n' +
                     '                    <label for="city">Miasto</label>\n' +
                     '                    <select class="form-control city" style="width:100%;">\n';
@@ -664,7 +696,7 @@
                                 stringAppend += '<option value="' + city[j].id + '" data-max_hours="' + city[j].used_hours + '">' + city[j].name + ' [dostępne jeszcze ' + city[j].used_hours + ' godzin]</option>\n';
                             }
                             else {
-                                stringAppend += '<option value="' + city[j].id + '"  data-max_hours="0">' + city[j].name + '(KARENCJA' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
+                                stringAppend += '<option value="' + city[j].id + '"  data-max_hours="0">' + city[j].name + '(KARENCJA do ' + city[j].available_date + ') [przekroczono o ' + city[j].used_hours + ' godzin]</option>\n';
                             }
 
                         }
@@ -677,6 +709,9 @@
                 stringAppend += '                    </select>\n' +
                     '                </div>\n' +
                     '            </div>\n' +
+                    '<div class="col-md-1">' +
+                    '<span class="glyphicon glyphicon-search show-cities-statistics"></span>' +
+                    '</div>' +
                     '<div class="col-md-6">' +
                     '<div class="form-group">' +
                     '<label class="myLabel">Ilość godzin pokazów</label>' +
@@ -777,7 +812,7 @@
                     $('.button-edit-client').on('click', function () {
                         $('#ModalClient .modal-title').first().text('Edytowanie klienta');
                         let saveClientModalButton = $('#ModalClient #saveClient');
-                        saveClientModalButton.first().prop('class','btn btn-success form-control');
+                        saveClientModalButton.first().prop('class', 'btn btn-success form-control');
                         saveClientModalButton.first().text('');
                         saveClientModalButton.append($('<span class="glyphicon glyphicon-save"></span>'));
                         saveClientModalButton.append(' Zapisz Klienta');
@@ -813,7 +848,7 @@
                             clearCheckedClientInfo();
                         }
                         else {
-                            if(e.target.dataset.noaction != 1) {
+                            if (e.target.dataset.noaction != 1) {
                                 table_client.$('tr.check').removeClass('check');
                                 $.each($('#table_client').find('.client_check'), function (item, val) {
                                     $(val).prop('checked', false);
@@ -851,7 +886,7 @@
                             else
                                 returnButton += "<button class='button-status-client btn btn-block btn-success' data-id=" + data.id + " data-status=1 data-noaction='1'><span class='glyphicon glyphicon-off'></span> Włącz</button>";
                             return returnButton;
-                        }, "orderable": false, "searchable": false, width:'10%'
+                        }, "orderable": false, "searchable": false, width: '10%'
                     },
                     {
                         "data": function (data, type, dataToSet) {
@@ -861,7 +896,7 @@
                 ],
             });
 
-            $('#menu-toggle').change(()=>{
+            $('#menu-toggle').change(() => {
                 table_client.columns.adjust().draw();
             });
 
@@ -993,12 +1028,12 @@
                     '<span class="glyphicon glyphicon-remove" data-remove="show"></span>' +
                     '</div>' +
                     '        <header>Pokaz </header>\n' +
-                    '<div class="removeLimitContainer">'+
+                    '<div class="removeLimitContainer">' +
                     '<div class=col-md-12 >' +
-                    '<label class="form-check-label" for="removeLimit">Zdejmij ograniczenie</label>'+
-                    '<input id="removeLimit" class="form-check-input removeLimit" data-refresh="removeLimit" type="checkbox" style="display: block">'+
-                    '</div>'+
-                    '</div>'+
+                    '<input id="removeLimit" class="form-check-input removeLimit" data-refresh="removeLimit" type="checkbox" style="display: inline-block;margin-right:1em;">' +
+                    '<label class="form-check-label" for="removeLimit">Zdejmij ograniczenie</label>' +
+                    '</div>' +
+                    '</div>' +
                     '<div class=colmd-12 style="text-align: center">' +
                     '   <span class="glyphicon glyphicon-refresh" data-refresh="refresh" style="font-size: 30px"></span>' +
                     '</div>' +
@@ -1015,7 +1050,7 @@
                     '                </div>\n' +
                     '            </div>\n' +
                     '\n' +
-                    '            <div class="col-md-6">\n' +
+                    '            <div class="col-md-5">\n' +
                     '                <div class="form-group">\n' +
                     '                    <label for="city">Miasto</label>\n' +
                     '                    <select class="form-control city">\n' +
@@ -1023,6 +1058,9 @@
                     '                    </select>\n' +
                     '                </div>\n' +
                     '            </div>\n' +
+                    '<div class="col-md-1">' +
+                    '<span class="glyphicon glyphicon-search show-cities-statistics"></span>' +
+                    '</div>' +
                     '<div class="col-md-6">' +
                     '<div class="form-group">' +
                     '<label class="myLabel">Ilość godzin pokazów</label>' +
@@ -1051,7 +1089,7 @@
             //Ta funkcja jest globalnym event listenerem na click
             function buttonHandler(e) {
                 if (e.target.id == 'add-new-route') {
-                    $(e.target).prop('disabled',true);
+                    $(e.target).prop('disabled', true);
                     let basicDate = document.querySelector('.first-show-date-input');
                     currentDate = basicDate.value; //every time user clicks on manual show creation, date resets
                     let appendPlace = document.querySelector('.route-here');
@@ -1180,14 +1218,14 @@
                         confirmButtonText: "Tak, usuń!",
 
                     }).then((result) => {
-                        if(result.value) {
+                        if (result.value) {
                             let showContainer = e.target.parentElement.parentElement.parentElement;
                             removeGivenShow(showContainer);
                         }
                     });
                 }
-                else if (e.target.dataset.refresh == 'removeLimit'){
-                    if(e.target.checked){
+                else if (e.target.dataset.refresh == 'removeLimit') {
+                    if (e.target.checked) {
                         swal({
                             title: "Jesteś pewien?",
                             type: "warning",
@@ -1197,14 +1235,13 @@
                             confirmButtonText: "Tak, zdejmij!",
 
                         }).then((result) => {
-                            if(result.value) {
+                            if (result.value) {
                                 refreshVoivodeshipAndCities(e.target.parentNode)
-                            }else
-                            {
+                            } else {
                                 e.target.checked = false;
                             }
                         });
-                    }else{
+                    } else {
                         swal({
                             title: "Jesteś pewien?",
                             type: "warning",
@@ -1214,10 +1251,9 @@
                             confirmButtonText: "Tak, przywróć!",
 
                         }).then((result) => {
-                            if(result.value) {
+                            if (result.value) {
                                 refreshVoivodeshipAndCities(e.target.parentNode)
-                            }else
-                            {
+                            } else {
                                 e.target.checked = true;
                             }
                         });
@@ -1288,7 +1324,111 @@
                 else if (e.target.id == 'redirect') {
                     location.href = "{{URL::to('/showClientRoutes')}}";
                 }
+                else if (e.target.matches('.show-cities-statistics')) { //after clicking on search glyphicon, open modal with cities.
+                    const cityContainer = e.target.parentElement.previousElementSibling;
+                    const citySelect = cityContainer.querySelector('.city');
+                    const dateContainer = e.target.parentElement.nextElementSibling.nextElementSibling;
+                    const dateInput = dateContainer.querySelector('.dateInput');
 
+                    const selectedDate = dateInput.value;
+                    let selectedCity = citySelect.options[citySelect.selectedIndex].value;
+
+                    const url = `{{route('api.getClientRouteInfoRecord')}}`;
+                    const ourHeaders = new Headers();
+                    ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+
+                    const ajaxData = new FormData();
+                    ajaxData.append('city_id', selectedCity);
+                    ajaxData.append('date', selectedDate);
+
+                    fetch(url, {
+                        method: 'post',
+                        headers: ourHeaders,
+                        body: ajaxData,
+                        credentials: "same-origin"
+                    })
+                        .then(resp => resp.json())
+                        .then(resp => {
+                            const modalBody = document.querySelector('.modal2-body');
+                            modalBody.innerHTML = '';
+                            createModalTable(modalBody, resp);
+                            return resp.length;
+                        })
+                        .then(numberOfElements => {
+                            const modalBody = document.querySelector('.modal2-body');
+                            const info = document.createElement('div');
+                            info.classList.add('alert', 'alert-info', 'loadedMessage');
+                            if(selectedCity == 0) {
+                                info.textContent = "Miasto nie zostało wybrane";
+                            }
+                            else if (numberOfElements === 0) {
+                                info.textContent = "Miasto nie zostało wykorzystane w przeciągu ostatniego miesiąca";
+                            }
+                            else {
+                                info.textContent = "Załadowano dane";
+                            }
+
+                            modalBody.appendChild(info);
+                            $('#showRecords').modal('show');
+                        })
+
+                }
+
+            }
+
+            /**
+             * This method creates on fly table with clientRouteInfo records
+             * @param placeToAppend - modal body
+             * @param data - mostly clientRouteInfo records
+             */
+            function createModalTable(placeToAppend, data) {
+                if (data.length != 0) {
+                    const infoTable = document.createElement('table');
+                    infoTable.classList.add('table', 'table-striped');
+
+                    const theadElement = document.createElement('thead');
+                    const tbodyElement = document.createElement('tbody');
+                    const tr1Element = document.createElement('tr');
+                    const th1Element = document.createElement('th');
+                    const th2Element = document.createElement('th');
+
+                    th1Element.textContent = 'Miasto';
+                    tr1Element.appendChild(th1Element);
+
+                    th2Element.textContent = 'Data';
+                    tr1Element.appendChild(th2Element);
+
+                    theadElement.appendChild(tr1Element);
+                    infoTable.appendChild(theadElement);
+
+                    let dateFlag = null;
+                    if(data[0].date) {
+                        dateFlag = data[0].date;
+                    }
+
+                    for (let i = 0; i < data.length; i++) {
+
+                        if(dateFlag != data[i].date) { //this part add row if there is date change
+                            const additionalTRelement = document.createElement('tr');
+                            const additionaltd1Element = document.createElement('td');
+                            const additionaltd2Element = document.createElement('td');
+                            additionalTRelement.appendChild(additionaltd1Element);
+                            additionalTRelement.appendChild(additionaltd2Element);
+                            tbodyElement.appendChild(additionalTRelement);
+                        }
+                        dateFlag = data[i].date;
+                        const trElement = document.createElement('tr');
+                        const td1Element = document.createElement('td');
+                        const td2Element = document.createElement('td');
+                        td1Element.textContent = data[i].cityName;
+                        td2Element.textContent = data[i].date;
+                        trElement.appendChild(td1Element);
+                        trElement.appendChild(td2Element);
+                        tbodyElement.appendChild(trElement);
+                    }
+                    infoTable.appendChild(tbodyElement);
+                    placeToAppend.appendChild(infoTable);
+                }
             }
 
             function refreshVoivodeshipAndCities(element) {
@@ -1384,6 +1524,7 @@
                     }
                 }
             }
+
             /**
              * Parameters: e - select2 event after selecting of city
              * Result: This function automatically sets value of hours input basing on attribute data-max_hours in option element.
@@ -1466,7 +1607,7 @@
                         // settings
                         type: 'danger'
                     });
-                        container.remove();
+                    container.remove();
                 });
 
             }
@@ -1497,10 +1638,10 @@
                 $(newShow).hide();
                 routePlace.insertBefore(newShow, document.querySelector('.new-route-container'));
 
-                $(newShow).slideDown(1000,()=>{
+                $(newShow).slideDown(1000, () => {
                     activateDatepicker();
                     $("html, body").animate({scrollTop: $(document).height()}, "slow");
-                    $('#add-new-route').prop('disabled',false);
+                    $('#add-new-route').prop('disabled', false);
                     $('#add_new_show').prop('disabled', false);
                 });
 

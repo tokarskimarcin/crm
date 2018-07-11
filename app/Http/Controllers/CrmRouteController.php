@@ -2289,6 +2289,25 @@ class CrmRouteController extends Controller
         return datatables($clientRouteInfo->get())->make(true);
     }
 
+    /**
+     * @param City_id, date
+     * This method returns data about clientROuteInfo records from given range of dates.
+     */
+    public function getClientRouteInfoRecord(Request $request) {
+        $cityId = $request->city_id;
+        $date = $request->date;
+        $dateStart = date('Y-m-d', strtotime("+1 month", strtotime($date)));
+        $dateStop = date('Y-m-d', strtotime("-1 month", strtotime($date)));
+
+        $clientRouteInfoRecords = ClientRouteInfo::select('city.name as cityName', 'client_route_info.date as date')
+            ->join('city', 'city.id', '=', 'client_route_info.city_id')
+            ->where('city_id', '=', $cityId)
+            ->whereBetween('date', [$dateStop, $dateStart])
+            ->get();
+
+        return $clientRouteInfoRecords;
+    }
+
     public function test(){
         $str = 'Aaasd asd  a';
         dd($str, str_ireplace(' ',';',$str),
