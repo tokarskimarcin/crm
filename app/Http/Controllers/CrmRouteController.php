@@ -890,7 +890,7 @@ class CrmRouteController extends Controller
                     if($arrayFlag == false) {
                         $cityInfoObject = new \stdClass();
                         $cityInfoObject->city_id = $item->city_id;
-                        $cityInfoObject->available_date =  date_format(date_add($properDate,date_interval_create_from_date_string(($gracePeriod-$dateDifference).' days') ), "Y-m-d");
+                        $cityInfoObject->available_date =  date_format(date_add($goodDate,date_interval_create_from_date_string(($gracePeriod).' days') ), "Y-m-d");
                         array_push($checkedCities, $cityInfoObject);
                     }
                 }
@@ -1265,7 +1265,7 @@ class CrmRouteController extends Controller
                 if($dateDifference <= $gracePeriod) {
                         $cityInfoObject = new \stdClass();
                         $cityInfoObject->city_id = $item->city_id;
-                        $cityInfoObject->available_date =  date_format(date_add($properDate,date_interval_create_from_date_string(($gracePeriod-$dateDifference).' days') ), "Y-m-d");
+                        $cityInfoObject->available_date =  date_format(date_add($goodDate,date_interval_create_from_date_string(($gracePeriod).' days') ), "Y-m-d");
                         array_push($checkedCities, $cityInfoObject);
                 }
             }
