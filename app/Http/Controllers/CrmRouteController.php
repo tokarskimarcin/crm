@@ -364,10 +364,9 @@ class CrmRouteController extends Controller
             ->join('city','city.id','client_route_info.city_id')->get();
         $clientRouteInfo->map(function($item) use($cities,$clientRouteInfoAll) {
             $cityObject = $cities->where('id','=',$item[0]->city_id)->first();
-            $item[0]->cities = $this::findCityByDistance($cityObject, '2000-01-01',$clientRouteInfoAll,$cities);
+            $item[0]->cities = $this::findCityByDistance($cityObject, $item[0]->date,$clientRouteInfoAll,$cities);
             return $item;
         });
-
         return view('crmRoute.editSpecificRoute')
             ->with('departments', $departments)
             ->with('voivodes', $voivodes)

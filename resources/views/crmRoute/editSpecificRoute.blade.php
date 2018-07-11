@@ -323,9 +323,25 @@
                                                     @foreach($item[0]->cities as $localCities)
                                                         @if($item[0]->voivode_id == $localCities->id)
                                                             @if($item[0]->city_id == $localCities->city_id)
-                                                                <option value={{$localCities->city_id}} selected>{{$localCities->city_name}}</option>
+                                                               @if($localCities->block == 1)
+                                                                   @if($localCities->exceeded == 0)
+                                                                       <option value={{$localCities->city_id}} selected>{{$localCities->city_name}} [dostępne jeszcze {{$localCities->used_hours}} godzin]</option>
+                                                                   @else
+                                                                       <option value={{$localCities->city_id}} selected>{{$localCities->city_name}} (KARENCJA do {{$localCities->available_date}}) [przekroczono o {{$localCities->used_hours}} godzin]</option>
+                                                                   @endif
+                                                               @else
+                                                                   <option value={{$localCities->city_id}} selected>{{$localCities->city_name}}</option>
+                                                               @endif
                                                             @else
-                                                               <option value={{$localCities->city_id}}>{{$localCities->city_name}}</option>
+                                                                @if($localCities->block == 1)
+                                                                    @if($localCities->exceeded == 0)
+                                                                       <option value={{$localCities->city_id}}>{{$localCities->city_name}} [dostępne jeszcze {{$localCities->used_hours}} godzin]</option>
+                                                                    @else
+                                                                       <option value={{$localCities->city_id}}>{{$localCities->city_name}} (KARENCJA do {{$localCities->available_date}}) [przekroczono o {{$localCities->used_hours}} godzin]</option>
+                                                                   @endif
+                                                                @else
+                                                                   <option value={{$localCities->city_id}}>{{$localCities->city_name}}</option>
+                                                                @endif
                                                             @endif
                                                        @endif
                                                     @endforeach
