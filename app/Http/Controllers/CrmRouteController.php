@@ -854,6 +854,7 @@ class CrmRouteController extends Controller
         if($currentDate != 0) {
             $all_cities = Cities::where('voivodeship_id', '=', $voivodeId)->get();
             $properDate = date_create($currentDate);
+            $properDatePom = date_create($currentDate);
 
             //lista miast we wszystkich trasach.
 //            $citiesAvailable = DB::table('routes_info')->select(DB::raw('
@@ -867,15 +868,16 @@ class CrmRouteController extends Controller
                 ->join('city','city.id','client_route_info.city_id')->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
-                $properDate = date_create($currentDate);
                 //wartość karencji dla danego miasta
+                $properDate = date_create($currentDate);
+                $properDatePom = date_create($currentDate);
 //
                 $gracePeriod = $item->grace_period;
                 $goodDate = date_create($item->date);
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
                 $dateString = $dateDifference . " days";
-                $availableAtDate = date_add($properDate,date_interval_create_from_date_string($dateString));
+                $availableAtDate = date_add($properDatePom,date_interval_create_from_date_string($dateString));
                 $availableAtDate = date_format($availableAtDate, "Y-m-d");
 
                 $arrayFlag = false;
@@ -888,7 +890,7 @@ class CrmRouteController extends Controller
                     if($arrayFlag == false) {
                         $cityInfoObject = new \stdClass();
                         $cityInfoObject->city_id = $item->city_id;
-                        $cityInfoObject->available_date = $availableAtDate;
+                        $cityInfoObject->available_date =  date_format(date_add($goodDate,date_interval_create_from_date_string(($gracePeriod).' days') ), "Y-m-d");
                         array_push($checkedCities, $cityInfoObject);
                     }
                 }
@@ -1242,10 +1244,10 @@ class CrmRouteController extends Controller
         }
         //part responsible for grace period
         if($currentDate != 0) {
-            $properDate = date_create($currentDate);
             $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
-                $properDate = date_create($currentDate); //function date_add, changes $properDate variable, so in each loop it has to be reassigned
+                $properDate = date_create($currentDate);
+                $properDatePom = date_create($currentDate);
                 //wartość karencji dla danego miasta
                 $gracePeriod = $item->grace_period;
 //                $gracePeriod = null;
@@ -1258,12 +1260,12 @@ class CrmRouteController extends Controller
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
                 $dateString = $dateDifference . " days";
-                $availableAtDate = date_add($properDate,date_interval_create_from_date_string($dateString));
+                $availableAtDate = date_add($properDatePom,date_interval_create_from_date_string($dateString));
                 $availableAtDate = date_format($availableAtDate, "Y-m-d");
                 if($dateDifference <= $gracePeriod) {
                         $cityInfoObject = new \stdClass();
                         $cityInfoObject->city_id = $item->city_id;
-                        $cityInfoObject->available_date = $availableAtDate;
+                        $cityInfoObject->available_date =  date_format(date_add($goodDate,date_interval_create_from_date_string(($gracePeriod).' days') ), "Y-m-d");
                         array_push($checkedCities, $cityInfoObject);
                 }
             }
