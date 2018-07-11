@@ -71,6 +71,16 @@
     .check{
     background: #B0BED9 !important;
     }
+
+    .show-cities-statistics {
+        padding-top: 1.65em;
+        font-size: 1.3em;
+    }
+
+    .show-cities-statistics:hover {
+        cursor: pointer;
+        color: blue;
+    }
     </style>
 
 {{--Header page --}}
@@ -275,11 +285,11 @@
                                         @if($lp != 0 )
                                             <div class="removeLimitContainer">
                                                 <div class=col-md-12>
-                                                    <label class="form-check-label" for="removeLimit">Zdejmij
-                                                        ograniczenie</label>
                                                     <input id="removeLimit" class="form-check-input removeLimit"
                                                            data-refresh="removeLimit" type="checkbox"
-                                                           style="display: block">
+                                                           style="display: inline-block">
+                                                    <label class="form-check-label" for="removeLimit">Zdejmij
+                                                        ograniczenie</label>
                                                 </div>
                                             </div>
                                         @endif
@@ -306,7 +316,7 @@
                                             </div>
                                         </div>
                                             {{--{{dd($item[0])}}--}}
-                                      <div class="col-md-6">
+                                      <div class="col-md-5">
                                             <div class="form-group">
                                                <label for="city">Miasto</label>
                                                <select class="form-control city">
@@ -322,6 +332,9 @@
                                                </select>
                                             </div>
                                       </div>
+                                        <div class="col-md-1">
+                                            <span class="glyphicon glyphicon-search show-cities-statistics"></span>
+                                        </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="myLabel">Ilość godzin pokazów</label>
@@ -365,6 +378,28 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div id="showRecords" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Wykorzystanie miasta</h4>
+                    </div>
+                    <div class="modal2-body">
+                        <div class="alert alert-danger">Ładowanie danych..</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="modal-close-button" type="button" class="btn btn-default" data-dismiss="modal">Close
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
 @endsection
@@ -613,8 +648,8 @@
                     stringAppend +=
                         '<div class="removeLimitContainer">'+
                         '<div class=col-md-12 >' +
+                        '<input id="removeLimit" class="form-check-input removeLimit" data-refresh="removeLimit" type="checkbox" style="display: inline-block">'+
                         '<label class="form-check-label" for="removeLimit">Zdejmij ograniczenie</label>'+
-                        '<input id="removeLimit" class="form-check-input removeLimit" data-refresh="removeLimit" type="checkbox" style="display: block">'+
                         '</div>'+
                         '</div>';
                 if (showRefresh)
@@ -638,7 +673,7 @@
                     '                </div>\n' +
                     '            </div>\n' +
                     '\n' +
-                    '            <div class="col-md-6">\n' +
+                    '            <div class="col-md-5">\n' +
                     '                <div class="form-group">\n' +
                     '                    <label for="city">Miasto</label>\n' +
                     '                    <select class="form-control city" style="width:100%;">\n';
@@ -676,6 +711,9 @@
                 stringAppend += '                    </select>\n' +
                     '                </div>\n' +
                     '            </div>\n' +
+                    '<div class="col-md-1">' +
+                    '<span class="glyphicon glyphicon-search show-cities-statistics"></span>' +
+                    '</div>' +
                     '<div class="col-md-6">' +
                     '<div class="form-group">' +
                     '<label class="myLabel">Ilość godzin pokazów</label>' +
@@ -984,8 +1022,8 @@
                     '        <header>Pokaz </header>\n' +
                     '<div class="removeLimitContainer">'+
                     '<div class=col-md-12 >' +
+                    '<input id="removeLimit" class="form-check-input removeLimit" data-refresh="removeLimit" type="checkbox" style="display: inline-block">'+
                     '<label class="form-check-label" for="removeLimit">Zdejmij ograniczenie</label>'+
-                    '<input id="removeLimit" class="form-check-input removeLimit" data-refresh="removeLimit" type="checkbox" style="display: block">'+
                     '</div>'+
                     '</div>'+
                     '<div class=colmd-12 style="text-align: center">' +
@@ -1004,7 +1042,7 @@
                     '                </div>\n' +
                     '            </div>\n' +
                     '\n' +
-                    '            <div class="col-md-6">\n' +
+                    '            <div class="col-md-5">\n' +
                     '                <div class="form-group">\n' +
                     '                    <label for="city">Miasto</label>\n' +
                     '                    <select class="form-control city">\n' +
@@ -1012,6 +1050,9 @@
                     '                    </select>\n' +
                     '                </div>\n' +
                     '            </div>\n' +
+                    '<div class="col-md-1">' +
+                    '<span class="glyphicon glyphicon-search show-cities-statistics"></span>' +
+                    '</div>' +
                     '<div class="col-md-6">' +
                     '<div class="form-group">' +
                     '<label class="myLabel">Ilość godzin pokazów</label>' +
@@ -1271,7 +1312,112 @@
                 else if(e.target.id == 'redirect') {
                     location.href="{{URL::to('/showClientRoutes')}}";
                 }
+                else if (e.target.matches('.show-cities-statistics')) { //after clicking on search glyphicon, open modal with cities.
+                    const cityContainer = e.target.parentElement.previousElementSibling;
+                    const citySelect = cityContainer.querySelector('.city');
+                    const dateContainer = e.target.parentElement.nextElementSibling.nextElementSibling;
+                    const dateInput = dateContainer.querySelector('.dateInput');
 
+                    const selectedDate = dateInput.value;
+                    let selectedCity = citySelect.options[citySelect.selectedIndex].value;
+
+                    const url = `{{route('api.getClientRouteInfoRecord')}}`;
+                    const ourHeaders = new Headers();
+                    ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+
+                    const ajaxData = new FormData();
+                    ajaxData.append('city_id', selectedCity);
+                    ajaxData.append('date', selectedDate);
+
+                    fetch(url, {
+                        method: 'post',
+                        headers: ourHeaders,
+                        body: ajaxData,
+                        credentials: "same-origin"
+                    })
+                        .then(resp => resp.json())
+                        .then(resp => {
+                            const modalBody = document.querySelector('.modal2-body');
+                            modalBody.innerHTML = '';
+                            createModalTable(modalBody, resp);
+                            return resp.length;
+                        })
+                        .then(numberOfElements => {
+                            const modalBody = document.querySelector('.modal2-body');
+                            const info = document.createElement('div');
+                            info.classList.add('alert', 'alert-info', 'loadedMessage');
+                            if(selectedCity == 0) {
+                                info.textContent = "Miasto nie zostało wybrane";
+                            }
+                            else if (numberOfElements === 0) {
+                                info.textContent = "Miasto nie zostało wykorzystane w przeciągu ostatniego miesiąca";
+                            }
+                            else {
+                                info.textContent = "Załadowano dane";
+                            }
+
+                            modalBody.appendChild(info);
+                            $('#showRecords').modal('show');
+                        })
+
+                }
+
+            }
+
+
+            /**
+             * This method creates on fly table with clientRouteInfo records
+             * @param placeToAppend - modal body
+             * @param data - mostly clientRouteInfo records
+             */
+            function createModalTable(placeToAppend, data) {
+                if (data.length != 0) {
+                    const infoTable = document.createElement('table');
+                    infoTable.classList.add('table', 'table-striped');
+
+                    const theadElement = document.createElement('thead');
+                    const tbodyElement = document.createElement('tbody');
+                    const tr1Element = document.createElement('tr');
+                    const th1Element = document.createElement('th');
+                    const th2Element = document.createElement('th');
+
+                    th1Element.textContent = 'Miasto';
+                    tr1Element.appendChild(th1Element);
+
+                    th2Element.textContent = 'Data';
+                    tr1Element.appendChild(th2Element);
+
+                    theadElement.appendChild(tr1Element);
+                    infoTable.appendChild(theadElement);
+
+                    let dateFlag = null;
+                    if(data[0].date) {
+                        dateFlag = data[0].date;
+                    }
+
+                    for (let i = 0; i < data.length; i++) {
+
+                        if(dateFlag != data[i].date) { //this part add row if there is date change
+                            const additionalTRelement = document.createElement('tr');
+                            const additionaltd1Element = document.createElement('td');
+                            const additionaltd2Element = document.createElement('td');
+                            additionalTRelement.appendChild(additionaltd1Element);
+                            additionalTRelement.appendChild(additionaltd2Element);
+                            tbodyElement.appendChild(additionalTRelement);
+                        }
+                        dateFlag = data[i].date;
+                        const trElement = document.createElement('tr');
+                        const td1Element = document.createElement('td');
+                        const td2Element = document.createElement('td');
+                        td1Element.textContent = data[i].cityName;
+                        td2Element.textContent = data[i].date;
+                        trElement.appendChild(td1Element);
+                        trElement.appendChild(td2Element);
+                        tbodyElement.appendChild(trElement);
+                    }
+                    infoTable.appendChild(tbodyElement);
+                    placeToAppend.appendChild(infoTable);
+                }
             }
 
             function refreshVoivodeshipAndCities(element) {

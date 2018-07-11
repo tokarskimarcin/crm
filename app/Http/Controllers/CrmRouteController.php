@@ -1702,6 +1702,7 @@ class CrmRouteController extends Controller
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
             ->where('city_id', '=', $cityId)
             ->whereBetween('date', [$dateStart, $dateStop])
+            ->orderBy('date')
             ->get();
 
         return $clientRouteInfoRecords;
@@ -2303,6 +2304,7 @@ class CrmRouteController extends Controller
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
             ->where('city_id', '=', $cityId)
             ->whereBetween('date', [$dateStop, $dateStart])
+            ->orderBy('date')
             ->get();
 
         return $clientRouteInfoRecords;
