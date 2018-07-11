@@ -1226,16 +1226,21 @@ class CrmRouteController extends Controller
         }
     }
 
-    public function findCityByDistance($city, $currentDate,$clientRoutesInfoWithUsedCities,$cities){
+    public function findCityByDistance($city, $currentDate,$clientRoutesInfoWithUsedCities,$cities, $removeLimit = false){
         $distance = 100;
-        $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
-            ( 3959 * acos ( cos ( radians('.$city->latitude.') ) * cos( radians( `latitude` ) )
-             * cos( radians( `longitude` ) - radians('.$city->longitude.') ) + sin ( radians('.$city->latitude.') )
+        if($removeLimit){
+            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour'))
+                ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
+                ->get();
+        }else {
+            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
+            ( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
+             * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
               * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
-            ->join('voivodeship','voivodeship.id','city.voivodeship_id')
-            ->having('distance', '<', $distance)
-            ->get();
-
+                ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
+                ->having('distance', '<', $distance)
+                ->get();
+        }
         //part responsible for grace period
         if($currentDate != 0) {
             $properDate = date_create($currentDate);
@@ -1312,12 +1317,17 @@ class CrmRouteController extends Controller
         if($request->ajax()) {
             $cityId = $request->cityId;
             $currentDate = $request->currentDate;
+            if($request->has('removeLimit'))
+                $removeLimit = filter_var($request->removeLimit, FILTER_VALIDATE_BOOLEAN);
+            else
+                $removeLimit = false;
+
             $cities = Cities::all();
             $city = Cities::where('id', '=', $cityId)->first();
             //part responsible for grace period
             $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
                 ->join('city','city.id','client_route_info.city_id')->get();
-            $voievodeshipRound = $this::findCityByDistance($city, $currentDate,$clientRouteInfoAll,$cities);
+            $voievodeshipRound = $this::    findCityByDistance($city, $currentDate, $clientRouteInfoAll, $cities, $removeLimit);
 
             $voievodeshipRound = $voievodeshipRound->groupBy('id');
             $voievodeshipDistinc = array();

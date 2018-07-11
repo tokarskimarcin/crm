@@ -599,7 +599,7 @@
                 return newRouteContainer;
             }
 
-            function generateRouteDiv(showRemove, showRefresh, responseIterator, city, voievodes, placeToAppend) {
+            function generateRouteDiv(showRemove, showRefresh, showRemoveLimit, responseIterator, city, voievodes, placeToAppend) {
                 let routeContainer = document.createElement('div');
                 routeContainer.className = 'routes-container';
 
@@ -610,8 +610,16 @@
                     stringAppend += '<span class="glyphicon glyphicon-remove" data-remove="show"></span>';
                 stringAppend += '</div>' +
                     '<header>Pokaz </header>\n';
+                if (showRemoveLimit)
+                    stringAppend +=
+                            '<div class="removeLimitContainer">'+
+                        '<div class=col-md-12 >' +
+                        '<label class="form-check-label" for="removeLimit">Zdejmij ograniczenie</label>'+
+                        '<input id="removeLimit" class="form-check-input removeLimit" data-refresh="removeLimit" type="checkbox" style="display: block">'+
+                        '</div>'+
+                        '</div>';
                 if (showRefresh)
-                    stringAppend += '<div class=colmd-12 style="text-align: center">' +
+                    stringAppend += '<div class=col-md-12 style="text-align: center">' +
                         '<span class="glyphicon glyphicon-refresh" data-refresh="refresh" style="font-size: 30px"></span>' +
                         '</div>';
 
@@ -934,9 +942,9 @@
                                                 var city = getCitiesNamesByVoievodeship(response[i].voivodeship_id);
                                                 //Generowanie Div'a
                                                 if (i == 0)
-                                                    generateRouteDiv(false, false, response[i], city, voievodes, placeToAppend);
+                                                    generateRouteDiv(false, false, false, response[i], city, voievodes, placeToAppend);
                                                 else
-                                                    generateRouteDiv(true, true, response[i], city, voievodes, placeToAppend);
+                                                    generateRouteDiv(true, true, true, response[i], city, voievodes, placeToAppend);
 
                                                 $('.city').select2();
                                                 $('.voivodeship').select2();
@@ -985,6 +993,12 @@
                     '<span class="glyphicon glyphicon-remove" data-remove="show"></span>' +
                     '</div>' +
                     '        <header>Pokaz </header>\n' +
+                    '<div class="removeLimitContainer">'+
+                    '<div class=col-md-12 >' +
+                    '<label class="form-check-label" for="removeLimit">Zdejmij ograniczenie</label>'+
+                    '<input id="removeLimit" class="form-check-input removeLimit" data-refresh="removeLimit" type="checkbox" style="display: block">'+
+                    '</div>'+
+                    '</div>'+
                     '<div class=colmd-12 style="text-align: center">' +
                     '   <span class="glyphicon glyphicon-refresh" data-refresh="refresh" style="font-size: 30px"></span>' +
                     '</div>' +
@@ -1172,94 +1186,45 @@
                         }
                     });
                 }
-                else if (e.target.dataset.refresh == 'refresh') { // click on X glyphicon
-                    //get contener with select (actual and previous)
-                    var actualContener = e.target.parentNode.parentNode;
-                    var previousContener = e.target.parentNode.parentNode.parentNode.previousElementSibling;
-                    var actualSelectCity = actualContener.getElementsByClassName('city')[0];
-                    var actualSelectVoievode = actualContener.getElementsByClassName('voivodeship')[0];
-                    if (previousContener != null) {
-                        var previousSelectCityVal = previousContener.getElementsByClassName('city')[0].value;
-                        var previousSelectVoievodeVal = previousContener.getElementsByClassName('voivodeship')[0].value;
-                        let dateFromPreviousContainer = previousContener.querySelector('.dateInput').value; //we are selecting date value from previous contener and assing it into currentDate variable
-                        currentDate = dateFromPreviousContainer;
+                else if (e.target.dataset.refresh == 'removeLimit'){
+                    if(e.target.checked){
+                        swal({
+                            title: "Jesteś pewien?",
+                            type: "warning",
+                            text: "Czy chcesz zdjąć ograniczenia odległości?",
+                            showCancelButton: true,
+                            confirmButtonClass: "btn-danger",
+                            confirmButtonText: "Tak, zdejmij!",
 
-                        let validation = true;
-                        if (previousSelectVoievodeVal == 0) {
-                            swal("Przed synchronizacją nowego pokazu, uprzednio wybierz Województwo");
-                            validation = false;
-                        } else if (previousSelectCityVal == 0) {
-                            swal("Przed synchronizacją nowego pokazu, uprzednio wybierz Miasto");
-                            validation = false;
-                        }
-                        if (validation) {
-                            $.ajax({
-                                type: "POST",
-                                url: '{{ route('api.getVoivodeshipRound') }}',
-                                data: {
-                                    "voievodeshipId": previousSelectVoievodeVal,
-                                    "cityId": previousSelectCityVal,
-                                    "currentDate": currentDate
-                                },
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                                success: function (response) {
-                                    $(actualSelectVoievode).off('select2:select');
-                                    $('.city').off('select2:select'); //remove previous event listeners
+                        }).then((result) => {
+                            if(result.value) {
+                                refreshVoivodeshipAndCities(e.target.parentNode)
+                            }else
+                            {
+                                e.target.checked = false;
+                            }
+                        });
+                    }else{
+                        swal({
+                            title: "Jesteś pewien?",
+                            type: "warning",
+                            text: "Czy chcesz przywrócić ograniczenia odległości?",
+                            showCancelButton: true,
+                            confirmButtonClass: "btn-danger",
+                            confirmButtonText: "Tak, przywróć!",
 
-                                    let stringAppend = '<option value=0>Wybierz</option>';
-                                    for (let i = 0; i < response['voievodeInfo'].length; i++) {
-                                        stringAppend += '<option value =' + response['voievodeInfo'][i]['id'] + '>' + response['voievodeInfo'][i]['name'] + '</option>';
-                                    }
-                                    actualSelectVoievode.innerHTML = stringAppend;
-                                    stringAppend = '<option value=0>Wybierz</option>';
-                                    actualSelectCity.innerHTML = stringAppend;
-
-                                    $(actualSelectVoievode).on('select2:select', function (e) {
-                                        let container = e.target.parentElement.parentElement.parentElement.parentElement;
-                                        let headerId = e.params.data.id;
-
-                                        let placeToAppend2 = container.getElementsByClassName('city')[0];
-                                        placeToAppend2.innerHTML = '';
-                                        let basicOption = document.createElement('option');
-                                        basicOption.value = '0';
-                                        basicOption.textContent = 'Wybierz';
-                                        placeToAppend2.appendChild(basicOption);
-                                        let responseObject = response['cityInfo'];
-                                        for (var i = 0; i < responseObject[headerId].length; i++) {
-
-
-                                            let responseOption = document.createElement('option');
-                                            responseOption.value = responseObject[headerId][i].city_id;
-
-                                            if (responseObject[headerId][i].block == 1) {
-                                                if (responseObject[headerId][i].exceeded == 0) { //When city is still available
-                                                    responseOption.textContent = responseObject[headerId][i].city_name + " [dostępne jeszcze " + responseObject[headerId][i].used_hours + " godzin]";
-                                                    responseOption.setAttribute('data-max_hours', responseObject[headerId][i].used_hours); //needed for auto setting hours
-                                                }
-                                                else { //when city is not available
-                                                    responseOption.textContent = responseObject[headerId][i].city_name + " (KARENCJA do " + responseObject[headerId][i].available_date + ") [przekroczono o " + responseObject[headerId][i].used_hours + " godzin]";
-                                                    responseOption.setAttribute('data-max_hours', 0); //needed for auto setting hours
-                                                }
-                                            }
-                                            else {
-                                                responseOption.textContent = responseObject[headerId][i].city_name;
-                                                if (responseObject[headerId][i].max_hour > 0) {
-                                                    responseOption.setAttribute('data-max_hours', responseObject[headerId][i].max_hour); //needed for auto setting hours
-                                                }
-                                            }
-
-                                            placeToAppend2.appendChild(responseOption);
-                                        }
-                                    });
-                                    $('.city').on('select2:select', function (e) {
-                                        setHoursValue(e);
-                                    });
-                                }
-                            });
-                        }
+                        }).then((result) => {
+                            if(result.value) {
+                                refreshVoivodeshipAndCities(e.target.parentNode)
+                            }else
+                            {
+                                e.target.checked = true;
+                            }
+                        });
                     }
+                }
+                else if (e.target.dataset.refresh == 'refresh') { // click on X glyphicon
+                    refreshVoivodeshipAndCities(e.target);
                 }
                 else if (e.target.id == "save") {
                     let everythingIsGood = undefined;
@@ -1326,7 +1291,99 @@
 
             }
 
+            function refreshVoivodeshipAndCities(element) {
+                //get contener with select (actual and previous)
+                var actualContener = element.parentNode.parentNode;
+                var previousContener = element.parentNode.parentNode.parentNode.previousElementSibling;
+                var actualSelectCity = actualContener.getElementsByClassName('city')[0];
+                var actualSelectVoievode = actualContener.getElementsByClassName('voivodeship')[0];
+                var removeLimitCheckbox = actualContener.getElementsByClassName('removeLimit')[0];
 
+                if (previousContener != null) {
+                    var previousSelectCityVal = previousContener.getElementsByClassName('city')[0].value;
+                    var previousSelectVoievodeVal = previousContener.getElementsByClassName('voivodeship')[0].value;
+                    let dateFromPreviousContainer = previousContener.querySelector('.dateInput').value; //we are selecting date value from previous contener and assing it into currentDate variable
+                    currentDate = dateFromPreviousContainer;
+                    let removeLimit = removeLimitCheckbox.checked;
+
+                    let validation = true;
+                    if (previousSelectVoievodeVal == 0) {
+                        swal("Przed synchronizacją nowego pokazu, uprzednio wybierz Województwo");
+                        validation = false;
+                    } else if (previousSelectCityVal == 0) {
+                        swal("Przed synchronizacją nowego pokazu, uprzednio wybierz Miasto");
+                        validation = false;
+                    }
+                    if (validation || removeLimit) {
+                        $.ajax({
+                            type: "POST",
+                            url: '{{ route('api.getVoivodeshipRound') }}',
+                            data: {
+                                "voievodeshipId": previousSelectVoievodeVal,
+                                "cityId": previousSelectCityVal,
+                                "currentDate": currentDate,
+                                "removeLimit": removeLimit
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function (response) {
+                                $(actualSelectVoievode).off('select2:select');
+                                $('.city').off('select2:select'); //remove previous event listeners
+
+                                let stringAppend = '<option value=0>Wybierz</option>';
+                                for (let i = 0; i < response['voievodeInfo'].length; i++) {
+                                    stringAppend += '<option value =' + response['voievodeInfo'][i]['id'] + '>' + response['voievodeInfo'][i]['name'] + '</option>';
+                                }
+                                actualSelectVoievode.innerHTML = stringAppend;
+                                stringAppend = '<option value=0>Wybierz</option>';
+                                actualSelectCity.innerHTML = stringAppend;
+
+                                $(actualSelectVoievode).on('select2:select', function (e) {
+                                    let container = e.target.parentElement.parentElement.parentElement.parentElement;
+                                    let headerId = e.params.data.id;
+
+                                    let placeToAppend2 = container.getElementsByClassName('city')[0];
+                                    placeToAppend2.innerHTML = '';
+                                    let basicOption = document.createElement('option');
+                                    basicOption.value = '0';
+                                    basicOption.textContent = 'Wybierz';
+                                    placeToAppend2.appendChild(basicOption);
+                                    let responseObject = response['cityInfo'];
+                                    for (var i = 0; i < responseObject[headerId].length; i++) {
+
+
+                                        let responseOption = document.createElement('option');
+                                        responseOption.value = responseObject[headerId][i].city_id;
+
+                                        if (responseObject[headerId][i].block == 1) {
+                                            if (responseObject[headerId][i].exceeded == 0) { //When city is still available
+                                                responseOption.textContent = responseObject[headerId][i].city_name + " [dostępne jeszcze " + responseObject[headerId][i].used_hours + " godzin]";
+                                                responseOption.setAttribute('data-max_hours', responseObject[headerId][i].used_hours); //needed for auto setting hours
+                                            }
+                                            else { //when city is not available
+                                                responseOption.textContent = responseObject[headerId][i].city_name + " (KARENCJA do " + responseObject[headerId][i].available_date + ") [przekroczono o " + responseObject[headerId][i].used_hours + " godzin]";
+                                                responseOption.setAttribute('data-max_hours', 0); //needed for auto setting hours
+                                            }
+                                        }
+                                        else {
+                                            responseOption.textContent = responseObject[headerId][i].city_name;
+                                            if (responseObject[headerId][i].max_hour > 0) {
+                                                responseOption.setAttribute('data-max_hours', responseObject[headerId][i].max_hour); //needed for auto setting hours
+                                            }
+                                        }
+
+                                        placeToAppend2.appendChild(responseOption);
+                                    }
+                                });
+                                $('.city').on('select2:select', function (e) {
+                                    setHoursValue(e);
+                                });
+                            }
+                        });
+                    }
+                }
+            }
             /**
              * Parameters: e - select2 event after selecting of city
              * Result: This function automatically sets value of hours input basing on attribute data-max_hours in option element.
@@ -1343,8 +1400,10 @@
              */
             function removeGlyInFirstShow() {
                 let firstShow = document.getElementsByClassName('routes-container')[0];
+                let removeLimitCheckbox = firstShow.getElementsByClassName('removeLimitContainer')[0];
                 let removeGlyphicon = firstShow.getElementsByClassName('glyphicon-remove')[0];
                 let removeGlyphiconRefresh = firstShow.getElementsByClassName('glyphicon-refresh')[0];
+                removeLimitCheckbox.parentNode.removeChild(removeLimitCheckbox);
                 removeGlyphicon.parentNode.removeChild(removeGlyphicon);
                 removeGlyphiconRefresh.parentNode.removeChild(removeGlyphiconRefresh);
             }
@@ -1453,6 +1512,7 @@
                     buttonSection.parentNode.removeChild(buttonSection);
                 }
             }
+
 
             document.addEventListener('click', buttonHandler);
             $('.form_date').on('change.dp', function (e) {
