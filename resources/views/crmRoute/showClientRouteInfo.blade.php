@@ -33,6 +33,19 @@
             </div>
         </div>
 
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="clients">Klienci</label>
+                <select id="clients" multiple="multiple" style="width: 100%;">
+                    @if(isset($clients))
+                        @foreach($clients as $client)
+                            <option value="{{$client->id}}">{{$client->name}}</option>
+                        @endforeach
+                    @endif
+                </select>
+            </div>
+        </div>
+
         <div class="panel-body">
             <table id="datatable" class="thead-inverse table row-border table-striped">
                 <thead>
@@ -60,10 +73,12 @@
     <script>
         let selectedYears = ["0"]; //this array collect selected by user years
         let selectedWeeks = ["0"]; //this array collect selected by user weeks
+        let selectedClients = ["0"]; //this array collect selected by user clients
         /*Activation select2 framework*/
         (function initial() {
             $('#weeks').select2();
             $('#year').select2();
+            $('#clients').select2();
         })();
 
         let table = $('#datatable').DataTable({
@@ -77,6 +92,7 @@
                 data: function (d) {
                     d.years = selectedYears;
                     d.weeks = selectedWeeks;
+                    d.clients = selectedClients;
                 },
                 headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
             },
@@ -154,6 +170,32 @@
             }
             table.ajax.reload();
         });
+
+        $("#clients").on('select2:select', function(e) {
+            let clientsArr = $('#clients').val();
+            if(clientsArr.length > 0) {
+                selectedClients = clientsArr;
+            }
+            else {
+                selectedClients = ['0'];
+            }
+            table.ajax.reload();
+        });
+
+        /**
+         * This event listener change lements of array selectedClients while user unselects any week
+         */
+        $("#clients").on('select2:unselect', function(e) {
+            if($('#clients').val() != null) {
+                let clientsArr = $('#clients').val();
+                selectedClients = clientsArr;
+            }
+            else {
+                selectedClients = ['0'];
+            }
+            table.ajax.reload();
+        });
+
 
         /**
          * This function appends week numbers to week select element and years to year select element
