@@ -1669,6 +1669,98 @@
                 }
             }
 
+            $(document).on('change', function(e) {
+                if(e.target.matches('.dateInput')) {
+                    const aDate = e.target.value;
+                    const thisContainer = e.target.closest('.routes-container');
+                    let removeLimit = null;
+                    let prevCity = null;
+                    let prevVoivode = null;
+                    if(thisContainer.previousElementSibling) { // if exist previous container;
+                        const previousContainer = thisContainer.previousElementSibling;
+                        const prevCitySelect = previousContainer.querySelector('.city');
+                        const prevVoivodeSelect = previousContainer.querySelector('.voivodeship');
+
+                        prevCity = prevCitySelect.options[prevCitySelect.selectedIndex].value;
+                        prevVoivode = prevVoivodeSelect.options[prevVoivodeSelect.selectedIndex].value;
+                        removeLimit = false;
+                    }
+                    else {
+                        const prevCity = 1;
+                        const prevVoivode = 1;
+                        removeLimit = true;
+                    }
+                        const hourSelect = thisContainer.querySelector('.show-hours');
+                        const citySelect = thisContainer.querySelector('.city');
+                        const voivodeSelect = thisContainer.querySelector('.voivodeship');
+
+                        $.ajax({
+                            type: "POST",
+                            url: '{{ route('api.getVoivodeshipRound') }}',
+                            data: {
+                                "voievodeshipId": prevVoivode,
+                                "cityId": prevCity,
+                                "currentDate": aDate,
+                                "removeLimit": removeLimit
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function (response) {
+                                $(voivodeSelect).off('select2:select');
+                                $('.city').off('select2:select'); //remove previous event listeners
+
+                                let stringAppend = '<option value=0>Wybierz</option>';
+                                for (let i = 0; i < response['voievodeInfo'].length; i++) {
+                                    stringAppend += '<option value =' + response['voievodeInfo'][i]['id'] + '>' + response['voievodeInfo'][i]['name'] + '</option>';
+                                }
+                                voivodeSelect.innerHTML = stringAppend;
+                                citySelect.innerHTML = '<option value="0">Wybierz</option>';
+
+                                $(voivodeSelect).on('select2:select', function (e) {
+                                    let container = e.target.closest('.routes-container');
+                                    let headerId = e.params.data.id;
+
+                                    let placeToAppend2 = container.getElementsByClassName('city')[0];
+                                    placeToAppend2.innerHTML = '';
+                                    let basicOption = document.createElement('option');
+                                    basicOption.value = '0';
+                                    basicOption.textContent = 'Wybierz';
+                                    placeToAppend2.appendChild(basicOption);
+                                    let responseObject = response['cityInfo'];
+                                    for (var i = 0; i < responseObject[headerId].length; i++) {
+
+
+                                        let responseOption = document.createElement('option');
+                                        responseOption.value = responseObject[headerId][i].city_id;
+
+                                        if (responseObject[headerId][i].block == 1) {
+                                            if (responseObject[headerId][i].exceeded == 0) { //When city is still available
+                                                responseOption.textContent = responseObject[headerId][i].city_name + " [dostępne jeszcze " + responseObject[headerId][i].used_hours + " godzin]";
+                                                responseOption.setAttribute('data-max_hours', responseObject[headerId][i].used_hours); //needed for auto setting hours
+                                            }
+                                            else { //when city is not available
+                                                responseOption.textContent = responseObject[headerId][i].city_name + " (KARENCJA do " + responseObject[headerId][i].available_date + ") [przekroczono o " + responseObject[headerId][i].used_hours + " godzin]";
+                                                responseOption.setAttribute('data-max_hours', 0); //needed for auto setting hours
+                                            }
+                                        }
+                                        else {
+                                            responseOption.textContent = responseObject[headerId][i].city_name;
+                                            if (responseObject[headerId][i].max_hour > 0) {
+                                                responseOption.setAttribute('data-max_hours', responseObject[headerId][i].max_hour); //needed for auto setting hours
+                                            }
+                                        }
+
+                                        placeToAppend2.appendChild(responseOption);
+                                    }
+                                });
+                                $('.city').on('select2:select', function (e) {
+                                    setHoursValue(e);
+                                });
+                            }
+                        });
+                }
+            });
 
             document.addEventListener('click', buttonHandler);
 
