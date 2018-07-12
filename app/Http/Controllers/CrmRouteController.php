@@ -686,21 +686,21 @@ class CrmRouteController extends Controller
             $clientRoute->status = 1;
             $clientRoute->save();
             $success = 1;
-            new ActivityRecorder(array_merge(['T'=>'Zmiana statusu trasy','Akcja'=>'Aktywacja'],$clientRoute),213,4);
+            new ActivityRecorder(array_merge(['T'=>'Zmiana statusu trasy','Akcja'=>'Aktywacja'],$clientRoute->toArray()),213,4);
         }
         else if($clientRouteId && $toDelete == '1') {
             $clientRoute = ClientRoute::find($clientRouteId);
             $clientRoute->status = 2;
             $clientRoute->save();
             $success = 1;
-            new ActivityRecorder(array_merge(['T'=>'Zmiana statusu trasy','Akcja'=>'Zakończenie'],$clientRoute),213,4);
+            new ActivityRecorder(array_merge(['T'=>'Zmiana statusu trasy','Akcja'=>'Zakończenie'],$clientRoute->toArray()),213,4);
         }
         else if($clientRouteId && $toDelete == '2') {
             $clientRoute = ClientRoute::find($clientRouteId);
             $clientRoute->status = 0;
             $clientRoute->save();
             $success = 1;
-            new ActivityRecorder(array_merge(['T'=>'Zmiana statusu trasy','Akcja'=>'Niegotowa'],$clientRoute),213,4);
+            new ActivityRecorder(array_merge(['T'=>'Zmiana statusu trasy','Akcja'=>'Niegotowa'],$clientRoute->toArray()),213,4);
         }
 
         return $success;
