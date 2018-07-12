@@ -165,10 +165,48 @@ class UsersController extends Controller
         $userEmployment->user_id = $user->id;
         $userEmployment->save();
 
-        $log = array('T' => 'Dodanie nowego użytkownika');
-        $log = array_merge($log, $user->toArray());
+        $data = [
+            'T' => 'Dodanie użytkownika',
+            'id' =>  $user->id,
+            'max_transaction' =>  $user->max_transaction,
+            'created_at' => $user->created_at,
+            'dating_type' => $user->dating_type,
+            'password_date' => $user->password_date,
+            'username' =>  $user->username,
+            'email_off' =>  $user->email_off,
+            'first_name' =>  $user->first_name,
+            'last_name' =>  $user->last_name,
+            'updated_at' =>  $user->updated_at,
+            'phone' =>  $user->phone,
+            'coach_id' =>  $user->coach_id,
+            'recommended_by' =>  $user->recommended_by,
+            'promotion_date' => $user->promotion_date,
+            'degradation_date' => $user->degradation_date,
+            'email_off' =>  $user->email_off,
+            'private_phone' =>  $user->private_phone,
+            'description' =>  $user->description,
+            'student' =>  $user->student,
+            'salary_to_account' =>  $user->salary_to_account,
+            'agency_id' =>  $user->agency_id,
+            'rate' =>  $user->rate,
+            'salary' =>  $user->salary,
+            'documents' =>  $user->documents,
+            'id_manager' =>  $user->id_manager,
+            'additional_salary' =>  $user->additional_salary,
+            'status_work' =>  $user->status_work,
+            'dating_type' =>  $user->dating_type,
+            'start_work' =>  $user->start_work,
+            'candidate_id' =>  $user->candidate_id,
+            'department_info_id' =>  $user->department_info_id,
+            'main_department_id' =>  $user->main_department_id,
+            'password' =>  $user->password,
+            'guid' =>  $user->guid,
+            'end_work' =>  $user->end_work,
+            'user_type_id' =>  $user->user_type_id,
+            'login_phone' =>  $user->login_phone,
+        ];
 
-        new ActivityRecorder($log, 8,1);
+        new ActivityRecorder($data, 8,1);
 
         /**
          * Dodanie pakietu medycznego
@@ -529,13 +567,49 @@ class UsersController extends Controller
                 ->update(['deleted' => 1, 'month_stop' => $month_to_end]);
         }
         $user->save();
-
+//        dd($user->toArray());
         $data = [
-            'T' => 'Edycja użytkownika'
+            'T' => 'Edycja użytkownika',
+            'id' =>  $user->id,
+            'max_transaction' =>  $user->max_transaction,
+            'created_at' => $user->created_at,
+            'dating_type' => $user->dating_type,
+            'password_date' => $user->password_date,
+            'username' =>  $user->username,
+            'email_off' =>  $user->email_off,
+            'first_name' =>  $user->first_name,
+            'last_name' =>  $user->last_name,
+            'updated_at' =>  $user->updated_at,
+            'phone' =>  $user->phone,
+            'coach_id' =>  $user->coach_id,
+            'recommended_by' =>  $user->recommended_by,
+            'promotion_date' => $user->promotion_date,
+            'degradation_date' => $user->degradation_date,
+            'email_off' =>  $user->email_off,
+            'private_phone' =>  $user->private_phone,
+            'description' =>  $user->description,
+            'student' =>  $user->student,
+            'salary_to_account' =>  $user->salary_to_account,
+            'agency_id' =>  $user->agency_id,
+            'rate' =>  $user->rate,
+            'salary' =>  $user->salary,
+            'documents' =>  $user->documents,
+            'id_manager' =>  $user->id_manager,
+            'additional_salary' =>  $user->additional_salary,
+            'status_work' =>  $user->status_work,
+            'dating_type' =>  $user->dating_type,
+            'start_work' =>  $user->start_work,
+            'candidate_id' =>  $user->candidate_id,
+            'department_info_id' =>  $user->department_info_id,
+            'main_department_id' =>  $user->main_department_id,
+            'password' =>  $user->password,
+            'guid' =>  $user->guid,
+            'end_work' =>  $user->end_work,
+            'user_type_id' =>  $user->user_type_id,
+            'login_phone' =>  $user->login_phone,
             ];
-        $log = array_merge($data, $user->toArray());
 
-        new ActivityRecorder($log,10,2);
+        new ActivityRecorder($data,10,2);
 
         /**
          * Ewentualna zmiana pakietów medycznych
@@ -768,6 +842,9 @@ class UsersController extends Controller
             $medicalPackage->updated_at = null;
 
             $medicalPackage->save();
+            $log = array('T' => 'dodanie pakietu medycznego');
+            $log = array_merge($log, $medicalPackage->toArray());
+            new ActivityRecorder($log, 10, 1);
         }
     }
 
@@ -876,6 +953,10 @@ class UsersController extends Controller
 
                 $medicalPackage->save();
             }
+//            dd($medicalPackage);
+            $data = array('T' => 'edycja pakietu medycznego');
+            $log = array_merge($data, $medicalPackage->toArray());
+                new ActivityRecorder($log, 10, 2);
         }
     }
 
