@@ -247,7 +247,6 @@ class WorkHoursController extends Controller
         }
         $data = [
             'T' => 'Akceptacja godzin pracy',
-            'id' => $id,
             'Id czasu pracy' => $request->id,
             'register_start' => $request->register_start,
             'register_stop' => $request->register_stop,
@@ -553,7 +552,7 @@ class WorkHoursController extends Controller
                     'status' => 5]);
             $data = [
                 'T' => 'Edycja godzin pracy',
-                'wpis id godzin pracy:' => $id,
+                'Id godzin pracy:' => $id,
                 'accept_start' => $request->accept_start,
                 'accept_stop' => $request->accept_stop,
                 'success' => $request->success

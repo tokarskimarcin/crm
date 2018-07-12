@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
 use function MongoDB\BSON\toJSON;
+use PhpParser\Node\Expr\Array_;
 use Session;
 use Symfony\Component\HttpKernel\Client;
 
@@ -94,7 +95,7 @@ class CrmRouteController extends Controller
             }
         }
 
-        new ActivityRecorder('ClientRouteId: '. $clientRoute->id,196,1);
+        new ActivityRecorder(array_merge(['T'=>'Dodanie trasy dla klienta'],$clientRoute->toArray()),209,1);
         $request->session()->flash('adnotation', 'Trasa została pomyślnie przypisana dla klienta');
 
         return Redirect::back();
@@ -157,7 +158,7 @@ class CrmRouteController extends Controller
         }
         $request->session()->flash('adnotation', 'Trasa została pomyślnie przypisana dla klienta');
 
-        new ActivityRecorder('ClientRouteId: '. $request->route_id, 206,2);
+        new ActivityRecorder(array_merge(['T'=>'Dodanie trasy dla klienta'],$clientRoute->toArray()),212,1);
 
         return Redirect::back();
 
@@ -417,7 +418,7 @@ class CrmRouteController extends Controller
                 $clientRouteInfoIds .= $item->id . ', ';
             }
         }
-        new ActivityRecorder($clientRouteInfoIds, 206,2);
+        new ActivityRecorder(array_merge(['T'=>'Edycja hoteli i godzin trasy'],$clientRouteInfoIds->toArray()), 211,2);
 
         return $all_data;
     }
@@ -446,7 +447,7 @@ class CrmRouteController extends Controller
                 $clientRoadInfo->save();
                 $clientRouteIds .= $item['id'] .', ';
             }
-            new ActivityRecorder($clientRouteIds,200,2);
+            new ActivityRecorder(array_merge(['T'=>'Edycja parametrów kampanii'],$clientRouteIds->toArray()),213,2);
 
             return 200;
         }else
@@ -685,21 +686,21 @@ class CrmRouteController extends Controller
             $clientRoute->status = 1;
             $clientRoute->save();
             $success = 1;
-            new ActivityRecorder('Aktywacja kampanii',200,4);
+            new ActivityRecorder(array_merge(['T'=>'Zmiana statusu trasy','Akcja'=>'Aktywacja'],$clientRoute),213,4);
         }
         else if($clientRouteId && $toDelete == '1') {
             $clientRoute = ClientRoute::find($clientRouteId);
             $clientRoute->status = 2;
             $clientRoute->save();
             $success = 1;
-            new ActivityRecorder('Zakończenie kampanii',200,4);
+            new ActivityRecorder(array_merge(['T'=>'Zmiana statusu trasy','Akcja'=>'Zakończenie'],$clientRoute),213,4);
         }
         else if($clientRouteId && $toDelete == '2') {
             $clientRoute = ClientRoute::find($clientRouteId);
             $clientRoute->status = 0;
             $clientRoute->save();
             $success = 1;
-            new ActivityRecorder('Zmiana statusu na "nie gotowa"',200,4);
+            new ActivityRecorder(array_merge(['T'=>'Zmiana statusu trasy','Akcja'=>'Niegotowa'],$clientRoute),213,4);
         }
 
         return $success;
@@ -742,7 +743,6 @@ class CrmRouteController extends Controller
         $newRoute->status = 1; // 1 - aktywne dane, 0 - usunięte dane
         $newRoute->name = $nameOfRoute;
         $newRoute->save();
-
         foreach($voivodeIdArr as $voivodekey => $voivode) {
             foreach($cityIdArr as $citykey => $city) {
                 if($voivodekey == $citykey) {
@@ -756,7 +756,7 @@ class CrmRouteController extends Controller
             }
 
         }
-        new ActivityRecorder(null,185,1);
+        new ActivityRecorder(array_merge(['T' => 'Dodanie nowego szablonu trasy'], $newRoute->toArray()),193,1);
 
         $request->session()->flash('adnotation', 'Trasa została dodana pomyślnie!');
 
@@ -782,7 +782,7 @@ class CrmRouteController extends Controller
 
             $request->session()->flash('adnotation', 'Trasa została usunięta pomyślnie!');
 
-            new ActivityRecorder('Route_id: ' . $request->route_id,188,3);
+            new ActivityRecorder(array_merge(['T'=>'Usunięcie szablonu trasy'],$oldRoute->toArray()),188,3);
 
             return Redirect::to('/showRoutes');
         }
@@ -808,6 +808,7 @@ class CrmRouteController extends Controller
             $nameOfRoute = trim($nameOfRoute, ' | ');
 
             $thisRoute = Route::find($request->route_id);
+            $oldRouteName = $thisRoute->name;
             $thisRoute->name = $nameOfRoute;
             $thisRoute->save();
 
@@ -836,7 +837,7 @@ class CrmRouteController extends Controller
             }
             $request->session()->flash('adnotation', 'Trasa została edytowana pomyślnie!');
 
-            new ActivityRecorder('Route_id: ' . $request->route_id,188,2);
+            new ActivityRecorder(array_merge(['T'=>'Edycja szablonu trasy','old_name'=> $oldRouteName],$thisRoute->toArray()),188,2);
 
             return Redirect::to('/showRoutes');
         }
@@ -1348,10 +1349,18 @@ class CrmRouteController extends Controller
      */
     public function saveNewHotel(Request $request){
         if($request->ajax()){
-            if($request->hotelId == 0) // new Hotel
+            $data = [];
+            $action = 0;
+            if($request->hotelId == 0) { // new Hotel
                 $newHotel = new Hotel();
-            else    // Edit Hotel
+                $data = ['T'=>'Dodanie nowego hotelu'];
+                $action = 1;
+            }
+            else {    // Edit Hotel
                 $newHotel = HOtel::find($request->hotelId);
+                $data = ['T'=>'Edycja hotelu'];
+                $action = 2;
+            }
             $newHotel->city_id     = $request->city;
             $newHotel->street     = $request->street;
             //$newHotel->price    = $request->price;
@@ -1361,7 +1370,7 @@ class CrmRouteController extends Controller
             $newHotel->status  = $request->hotelStatus;
             $newHotel->zip_code = $request->zipCode;
             $newHotel->save();
-//            new ActivityRecorder(null, 193, 1);
+            new ActivityRecorder(array_merge($data,$newHotel->toArray()), 198, $action);
             return 200;
         }
     }
@@ -1372,10 +1381,18 @@ class CrmRouteController extends Controller
      */
     public function saveNewCity(Request $request){
         if($request->ajax()){
-            if($request->cityID == 0) // new city
+            $data = [];
+            $action = 0;
+            if($request->cityID == 0) { // new city
                 $newCity = new Cities();
-            else    // Edit city
+                $data = ['T' => 'Dodanie nowego miasta'];
+                $action = 1;
+            }
+            else{    // Edit city
                 $newCity = Cities::find($request->cityID);
+                $data = ['T'=>'Edycja miasta'];
+                $action = 2;
+            }
             $newCity->voivodeship_id = $request->voiovedshipID;
             $newCity->name = $request->cityName;
             $newCity->max_hour = $request->eventCount;
@@ -1400,7 +1417,7 @@ class CrmRouteController extends Controller
 //            }
 
             $newCity->save();
-            new ActivityRecorder(null, 193, 1);
+            new ActivityRecorder(array_merge(['T'=>'Dodanie nowego miasta'],$newCity->toArray()), 207, 1);
 
             return 200;
         }
@@ -1422,7 +1439,7 @@ class CrmRouteController extends Controller
                 $newHotel->status = 0;
 //                new ActivityRecorder(null, 193, 4);
             }
-
+            new ActivityRecorder(array_merge(['T'=>'Zmiana statusu hotelu'], $newHotel->toArray()),198,4);
             $newHotel->save();
         }
     }
@@ -1436,14 +1453,15 @@ class CrmRouteController extends Controller
             $newCity = Cities::find($request->cityId);
             if($newCity->status == 0) {
                 $newCity->status = 1;
-                new ActivityRecorder(null, 193, 3);
+                //new ActivityRecorder(null, 193, 3);
             }
 
             else {
                 $newCity->status = 0;
-                new ActivityRecorder(null, 193, 4);
+                //new ActivityRecorder(null, 193, 4);
             }
 
+            new ActivityRecorder(array_merge(['T'=>'Zmiana statusu miasta'], $newCity->toArray()),207,4);
             $newCity->save();
         }
     }
@@ -1655,7 +1673,7 @@ class CrmRouteController extends Controller
             $log .= $record->id . ', ';
         }
 
-        new ActivityRecorder($log,212,2);
+        new ActivityRecorder(['T'=>'Edycja informacji o kampaniach','campaign_ids' => '['.implode(",",$clientRouteInfoRecords->pluck('id')->toArray()).']'],215,2);
 
         return $adnotation;
     }
@@ -2309,11 +2327,5 @@ class CrmRouteController extends Controller
             ->get();
 
         return $clientRouteInfoRecords;
-    }
-
-    public function test(){
-        $str = 'Aaasd asd  a';
-        dd($str, str_ireplace(' ',';',$str),
-            ord($str[5]));
     }
 }
