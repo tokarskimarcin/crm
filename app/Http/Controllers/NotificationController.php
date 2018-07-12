@@ -46,6 +46,7 @@ class NotificationController extends Controller
         $notification->created_at = date("Y-m-d H:i:s");
         $notification->save();
 
+        new ActivityRecorder(array_merge(['T'=>'Dodanie nowego zgłoszenia problemu'],$notification->toArray()), 35, 1);
         Session::flash('message_ok', "Problem zgłoszony pomyślnie!");
         return Redirect::back();
 
@@ -103,14 +104,9 @@ class NotificationController extends Controller
               $notification->sec= $sec[0]->time;
             }
 
-            $data = [
-                'Edycja statusu powiadomienia o problemie' => '',
-                'Id problemu' => $notification->id,
-                'status' => $request->status
-            ];
-            new ActivityRecorder($data,36,2);
-
             $notification->save();
+            new ActivityRecorder(array_merge(['T'=>'Edycja statusu powiadomienia o problemie'],$notification->toArray()),36,2);
+
             $user = User::find($notification->displayed_by);
 
             Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
@@ -428,6 +424,7 @@ class NotificationController extends Controller
                 {
                     $notification->status = 0;
                     $notification->save();
+                    new ActivityRecorder(array_merge(['T'=>'Usunięcie zgłoszonego problemu'], $notification->toArray()),35,3);
                     return 1;
                 }else
                     return 0;

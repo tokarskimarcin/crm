@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\ActivityRecorder;
 use Illuminate\Support\Facades\Redirect;
+use PhpParser\Node\Expr\Array_;
 use Session;
 use App\User;
 use App\Notifications;
@@ -117,7 +118,7 @@ class AdminController extends Controller
             }
 
             }
-        $data['Zmiana uprawnień grup i użytkowników'] = '';
+        $data['T'] = 'Zmiana uprawnień grup i użytkowników';
         $data['Link name'] = $request->link_name;
         $data['Link adress'] = $request->link_adress;
         $data['Link group'] = $request->link_goup;
@@ -159,6 +160,8 @@ class AdminController extends Controller
             } else {
                 $department_info_id->blocked = $request->type;
                 $department_info_id->save();
+
+                $data['T'] = 'Edycja statusu oddziału';
                 $data['ID oddziału'] = $department_info_id->id;
                 $data['Status'] = $request->type;
                 new ActivityRecorder($data, 50, 4);
@@ -199,7 +202,6 @@ class AdminController extends Controller
                 ->orderBy('id', 'desc')
                 ->limit(1)
                 ->get();
-
             $id_dep = $departments[0]->id;
         }
 
@@ -224,9 +226,10 @@ class AdminController extends Controller
         $department_info->director_hr_id = ($request->director_hr != 0) ? $request->director_hr : null;
         $department_info->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : null ;
 
-        $department_info->save();
+        if($department_info->save()){
+            new ActivityRecorder(array_merge(['T'=>'Dodanie oddziału'],$department_info->toArray()),51,1);
+        }
 
-        new ActivityRecorder("Dodano oddział o numerze ID: " . $id_dep,51,1);
 
         Session::flash('message_ok', "Oddział został dodany!");
         return Redirect::back();
@@ -309,15 +312,12 @@ class AdminController extends Controller
             $selected_department->director_id = ($request->director != 0) ? $request->director : null ;
             $selected_department->director_hr_id = ($request->director_hr != 0) ? $request->director_hr : null;
             $selected_department->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : null ;
-            $selected_department->save();
+            if($selected_department->save()){
+                new ActivityRecorder(array_merge(['T'=>'Edycja oddziału'],$selected_department->toArray()),66,2);
+            }
         }
 
-        $data = [
-            'Edycja danych oddziału' => '',
-            'Id oddziału' => $request->selected_department_info_id
-        ];
 
-        new ActivityRecorder($data,66,2);
 
         Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
         return Redirect::back();
@@ -373,8 +373,9 @@ class AdminController extends Controller
               ->where('user_id', '=', $request->user_department_post)
               ->delete();
 
-          $data['Edycja użytkownika'] = $userCheck->last_name.' '.$userCheck->first_name;
+          $data['T']='Edycja oddziałów użytkownika';
           $data['ID użytkownika'] = $userCheck->id;
+          $data['Użytkownik'] = $userCheck->last_name.' '.$userCheck->first_name;
           $data['Przydzielone ID oddziały'] = '[';
           for($i = 1; $i <= $last_id; $i++) {
               $actual_dep = 'dep' . $i;
@@ -406,40 +407,36 @@ class AdminController extends Controller
     }
 
     public function createLinkPost(Request $request){
-        $data = [];
         $link = new Links();
         $linkGroupCheck = LinkGroups::find($request->group_link_id);
         if ($linkGroupCheck == null) {
             return view('errors.404');
         }
 
-        $data['Nazwa linku'] = $request->name;
-        $data['Link'] = $request->link;
-        $data['ID grupy'] = $request->group_link_id;
         $link->name = $request->name;
         $link->link = $request->link;
         $link->group_link_id = $request->group_link_id;
 
-        $link->save();
+        if($link->save()){
+            new ActivityRecorder(array_merge(['T'=>'Dodanie linku'],$link->toArray()), 72, 1);
+        }
 
-        new ActivityRecorder($data, 72, 1);
         Session::flash('message_ok', "Link został dodany!");
         return Redirect::back();
     }
 
     public function addGroup(Request $request) {
-        $data = [];
         $newGroupName = trim($request->addLinkGroup, ' ');
         $newGroup = new LinkGroups();
-        $data['Nazwa dodanej grupy'] = $newGroupName;
         $newGroup->name = $newGroupName;
-        $newGroup->save();
-        new ActivityRecorder($data, 72, 1);
+        if($newGroup->save())
+            new ActivityRecorder(array_merge(['T'=>'Dodanie grupy linku'],$newGroup->toArray()), 72, 1);
         return Redirect::back();
     }
 
     public function removeGroup(Request $request) {
         $data = [];
+        $data['T'] = 'Usunięcie grupy linków';
         $data['ID grupy'] = removeLinkGroup;
         $groupID = $request->removeLinkGroup;
         $groupToDelete = LinkGroups::where('id', '=', $groupID)->first();
@@ -456,20 +453,16 @@ class AdminController extends Controller
     }
 
     public function firewallPost(Request $request) {
-        $data = [];
         $firewall = new Firewall();
 
         if ($request->ip_status != 1 && $request->ip_status != 2) {
             return view('errors.404');
         }
 
-        $data['IP'] = $request->new_ip;
-        $data['Status'] = $request->ip_status;
         $firewall->ip_address = $request->new_ip;
         $firewall->whitelisted = $request->ip_status;
-        $firewall->save();
-
-        new ActivityRecorder($data, 88,1);
+        if($firewall->save())
+            new ActivityRecorder(array_merge(['T'=>'Dodanie adresu IP do firewalla'],$firewall->toArray()), 88,1);
         Session::flash('message_ok', "Adres IP został dodany!");
         return Redirect::back();
     }
@@ -487,14 +480,11 @@ class AdminController extends Controller
     }
 
     public function firewallPrivilegesPost(Request $request) {
-        $data = [];
         $obj = new FirewallPrivileges();
 
-        $data['ID użytkownika'] = $request->user_selected;
         $obj->user_id = $request->user_selected;
-        $obj->save();
-
-        new ActivityRecorder($data, 89, 1);
+        if($obj->save())
+            new ActivityRecorder(array_merge(['T'=>'Dodanie zaufanego użytkownika spoza zaufanych IP'],$obj->toArray()), 89, 1);
         Session::flash('message_ok', "Użytkownik został dodany!");
         return Redirect::back();
     }
@@ -507,6 +497,7 @@ class AdminController extends Controller
                 return 0;
             } else {
                 FirewallPrivileges::where('user_id', '=', $request->user_id)->delete();
+                $data['T'] = 'Usunięcie dostępu użytkownikowi';
                 $data['ID użytkownika'] = $request->user_id;
                 $data['Użytkownik'] = $user->first_name.' '.$user->last_name;
                 new ActivityRecorder($data,89,3);
@@ -593,7 +584,6 @@ class AdminController extends Controller
      */
     public function saveMedicalPackageData(Request $request) {
         if ($request->ajax()) {
-            $data = [];
             $package = MedicalPackage::find($request->package_id);
 
             $package->user_id           = $request->user_id;
@@ -614,25 +604,6 @@ class AdminController extends Controller
             $package->month_stop        = $request->month_stop;
             $package->deleted           = $request->deleted;
 
-            $data['ID użytkownika'] = $request->user_id;
-            $data['Imię'] = $request->user_first_name;
-            $data['Nazwisko'] = $request->user_last_name;
-            $data['PESEL'] = $request->pesel;
-            $data['Data urodzenia'] = $request->birth_date;
-            $data['Miasto'] = $request->city;
-            $data['Ulica'] = $request->street;
-            $data['Nr domu'] = $request->house_number;
-            $data['Nr mieszkania'] = $request->flat_number;
-            $data['Kod pocztowy'] = $request->postal_code;
-            $data['Nr tel'] = $request->phone_number;
-            $data['Pakiet'] = $request->package_name;
-            $data['Wariant'] = $request->package_variable;
-            $data['Zakres']  = $request->package_scope;
-            $data['Rozpoczęcie'] = $request->month_start;
-            $data['Zakończenie'] = $request->month_stop;
-            $data['Usunięty'] = $request->deleted;
-            $data['Usunięty trwale'] = $request->hard_deleted;
-
             if ($request->hard_deleted == 1) {
                 $package->hard_deleted  = 1;
             } else {
@@ -641,9 +612,8 @@ class AdminController extends Controller
             $package->updated_at        = date('Y-m-d H:i:s');
             $package->updated_by        = Auth::user()->id;
 
-            $package->save();
-
-            new ActivityRecorder($data,130,2);
+            if($package->save())
+                new ActivityRecorder(array_merge(['T'=>'Edycja pakietu medycznego'],$package->toArray()),130,2);
             return 1;
         }
     }
@@ -680,14 +650,14 @@ class AdminController extends Controller
             $newCriterium->status = $request->status;
             $newCriterium->save();
 
-            new ActivityRecorder('criterionId: ' .$newCriterium->id, 168,1);
+            new ActivityRecorder(array_merge(['T'=>'Dodanie kryterium audytów'],$newCriterium->toArray()), 168,1);
         }
 
         else if($addingCrit == "false") {
             $critToRemove = AuditCriterions::where('id', '=', $request->cID)->first();
             $critToRemove->status = 0;
             $critToRemove->save();
-            new ActivityRecorder('criterionId: ' .$critToRemove->id, 168,3);
+            new ActivityRecorder(array_merge(['T'=>'Usunięcie kryterium audytów'],$critToRemove->toArray()), 168,3);
         }
 
         else if($addingHeader == "true") {
@@ -696,14 +666,14 @@ class AdminController extends Controller
             $newHeader->name = $newName;
             $newHeader->status = $request->status;
             $newHeader->save();
-            new ActivityRecorder('HeaderId: ' .$newHeader->id, 168,1);
+            new ActivityRecorder(array_merge(['T'=>'Dodanie nagłówka audytu'],$newHeader->toArray()), 168,1);
         }
         else if($addingHeader == "false") {
             $headerToRemove = AuditHeaders::where('id', '=', $request->hid)->first();
             $relatedCriterions = AuditCriterions::where('audit_header_id', '=', $request->hid)->where('status', '=', $request->status)->get();
             $headerToRemove->status = 0;
             $headerToRemove->save();
-            new ActivityRecorder('HeaderId: ' .$headerToRemove->id, 168,3);
+            new ActivityRecorder(array_merge(['T'=>'Usunięcie nagłówka audytu'],$headerToRemove->toArray()), 168,3);
             foreach($relatedCriterions as $rC) {
                 $rC->status = 0;
                 $rC->save();
@@ -731,14 +701,14 @@ class AdminController extends Controller
             $newTemplate->name = trim($templateName, ' ');
             $newTemplate->isActive = 1;
             $newTemplate->save();
-            new ActivityRecorder('auditStatusId: ' .$newTemplate->id, 170,1);
+            new ActivityRecorder(array_merge(['T'=>'Dodanie szablonu audytu'],$newTemplate->toArray()), 170,1);
         }
         else { //condition satisfied when user is deleting given template
             $idToDelete = $request->idToDelete;
             $templateToDelete = AuditStatus::where('id', '=', $idToDelete)->first();
             $templateToDelete->isActive = 0;
             $templateToDelete->save();
-            new ActivityRecorder('auditStatusId: ' .$templateToDelete->id, 170,3);
+            new ActivityRecorder(array_merge(['T'=>'Usunięcie szablonu audytu'],$templateToDelete->toArray()), 170,3);
         }
 
         return Redirect::back();
@@ -806,6 +776,7 @@ class AdminController extends Controller
                     ->where('user_id', '=', $user_id)
                     ->where('link_id', '=', $remove_id)
                     ->delete();
+                $data['T'] = 'Usunięcie uprawnień do strony';
                 $data['ID użytkownika'] = $user_id;
                 $data['ID linku'] = $remove_id;
                 new ActivityRecorder($data,191,3);
@@ -818,9 +789,7 @@ class AdminController extends Controller
             $new_privilage->user_id = $user_id;
             $new_privilage->save();
 
-            $data['ID użytkownika'] = $user_id;
-            $data['ID linku'] = $new_privilage_number;
-            new ActivityRecorder($data,191,1);
+            new ActivityRecorder(array_merge(['T'=>'Dodanie uprawnień do strony'],$new_privilage->toArray()),191,1);
         }
 
         return redirect()->back();

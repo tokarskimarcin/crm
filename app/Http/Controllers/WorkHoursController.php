@@ -246,7 +246,7 @@ class WorkHoursController extends Controller
             }
         }
         $data = [
-            'Akceptacja godzin pracy' => '',
+            'T' => 'Akceptacja godzin pracy',
             'Id czasu pracy' => $request->id,
             'register_start' => $request->register_start,
             'register_stop' => $request->register_stop,
@@ -516,7 +516,11 @@ class WorkHoursController extends Controller
                     'accept_stop' => null,
                     'updated_at' => date('Y-m-d H:i:s'),
                     'status' => 6]);
-            new ActivityRecorder('Usunięcie godzin pracy, wpis id godzin pracy: ' . $id,6,3);
+
+            $data=[];
+            $data['T'] = 'Usunięcie godzin pracy';
+            $data['ID godzin pracy'] = $id;
+            new ActivityRecorder($data,6,3);
             return 1;
         }
     }
@@ -541,7 +545,8 @@ class WorkHoursController extends Controller
                     'updated_at' => date('Y-m-d H:i:s'),
                     'status' => 5]);
             $data = [
-                'Edycja godzin pracy, wpis id godzin pracy:' => $id,
+                'T' => 'Edycja godzin pracy',
+                'Id godzin pracy:' => $id,
                 'accept_start' => $request->accept_start,
                 'accept_stop' => $request->accept_stop,
                 'success' => $request->success
@@ -577,15 +582,7 @@ class WorkHoursController extends Controller
             $work_hour->created_at = date('Y-m-d H:i:s');
             $work_hour->save();
 
-            $data = [
-                'Dodanie czasu pracy pracownika' => '',
-                'success' => $succes,
-                'accept_start' => $accept_start,
-                'accept_stop' => $accept_stop,
-                'id_user' => $date[0],
-                'date' => $date[1]
-            ];
-            new ActivityRecorder($data,6,1);
+            new ActivityRecorder(array_merge(['T'=>'Dodanie czasu pracy pracownika'],$work_hour->toArray()),6,1);
         }
     }
     //******************ViewHour****************** Stop

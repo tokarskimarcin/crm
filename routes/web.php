@@ -857,11 +857,12 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/showRoutes', 'CrmRouteController@showRoutesGet');
 
-    Route::get('/addNewHotel', 'CrmRouteController@addNewHotelGet');
-    Route::post('/addNewHotel', 'CrmRouteController@addNewHotelPost');
+   /* Route::get('/addNewHotel', 'CrmRouteController@addNewHotelGet');
+    Route::post('/addNewHotel', 'CrmRouteController@addNewHotelPost');*/
+
     Route::get('/showHotels', 'CrmRouteController@showHotelsGet')->name('showHotels');
-    Route::get('/hotel/{id}', 'CrmRouteController@hotelGet');
-    Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
+    /*Route::get('/hotel/{id}', 'CrmRouteController@hotelGet');
+    Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');*/
 
     Route::get('/cityPanel', 'CrmRouteController@cityPanel');
     Route::get('/clientPanel', 'ClientController@clientPanel');

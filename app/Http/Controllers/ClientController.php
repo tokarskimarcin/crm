@@ -43,14 +43,21 @@ class ClientController extends Controller
      */
     public function saveClient(Request $request){
         if($request->ajax()) {
+            $data = [];
+            $action = 0;
             if ($request->clientID == 0) {
-                // new city
+                // new client
                 $client = new Clients();
-                new ActivityRecorder(null, 194, 1);
+                $data = ['T'=>'Dodanie nowego klienta'];
+                $action = 1;
+                /*
+                new ActivityRecorder(null, 194, 1);*/
             }
-            else { // Edit city
-                new ActivityRecorder(null, 194, 2);
+            else { // Edit client
+                //new ActivityRecorder(null, 194, 2);
                 $client = Clients::find($request->clientID);
+                $data = ['T'=>'Edycja klilenta'];
+                $action = 1;
             }
 
             $client->name = $request->clientName;
@@ -63,6 +70,7 @@ class ClientController extends Controller
 
             $client->save();
 
+            new ActivityRecorder(array_merge($data,$client->toArray()), 208, $action);
             return 200;
         }
     }
@@ -79,7 +87,7 @@ class ClientController extends Controller
             else
                 $client->status = 0;
             $client->save();
-            new ActivityRecorder(null, 194, 4);
+            new ActivityRecorder(array_merge(['T'=>'Zmiana statusu klienta'], $client->toArray()),208,4);
         }
     }
     /**
