@@ -119,22 +119,8 @@ class CandidateController extends Controller
             $candidate->updated_at = date('Y-m-d H:i:s');
 
             $candidate->save();
-
-            $data = [
-                'Dodanie kandydata' => '',
-                'Imie' => $request->candidate_name,
-                'Nazwisko' => $request->candidate_surname,
-                'Telefon' => $request->candidate_phone,
-                'Oddział' => $request->candidate_department,
-                'Źródło' => $request->candidate_source,
-                'Opis' => $request->candidate_desc,
-                'User_id' => $request->ex_id_user,
-                'recommended_by' => $request->recommended_by,
-                'Pracownik kadry' => Auth::user()->id
-            ];
-
-            new ActivityRecorder($data, 117, 1);
-
+            $LogData = array_merge(['T ' => 'Dodanie newgo kandydata'],$candidate->toArray());
+            new ActivityRecorder($LogData, 117, 1);
             return $candidate->id;
         }
     }
@@ -206,20 +192,8 @@ class CandidateController extends Controller
             $candidate->updated_at = date('Y-m-d H:i:s');
 
             $candidate->save();
-
-            $data = [
-                'Edycja danych kandydata'   => '',
-                'Imie'                      => $request->candidate_name,
-                'Nazwisko'                  => $request->candidate_surname,
-                'Telefon'                   => $request->candidate_phone,
-                'Oddział'                   => $request->candidate_department,
-                'Źródło'                    => $request->candidate_source,
-                'Opis'                      => $request->candidate_desc,
-                'User_id'                   => $request->ex_id_user,
-                'recommended_by'            => $request->recommended_by,
-                'Pracownik kadry'           => Auth::user()->id
-            ];
-            new ActivityRecorder($data, 119, 2);
+            $LogData = array_merge(['T ' => 'Edycja danych kandydata '],$candidate->toArray());
+            new ActivityRecorder($LogData, 119, 2);
 
             return 1;
         }
@@ -263,16 +237,8 @@ class CandidateController extends Controller
             ->first();
         $recruitment_attempt->training_date = $date_training;
         $recruitment_attempt->save();
-        $data = [
-            'Dodanie etapu rekrutacji'  =>   '',
-            'Id kandydata'              => $candidate_id,
-            'Id rekrutacji'             => $attempt_id,
-            'Status rekrutacji'         => $status,
-            'Komentarz'                 => $comment,
-            'Data Szkolenia'            => $date_training
-        ];
-
-        new ActivityRecorder($data,119,1);
+        $LogData = array_merge(['T ' => 'Dodanie etapu rekrutacji'],$recruitment_attempt->toArray());
+        new ActivityRecorder($LogData, 119,1);
 
         /**
          * Zaktualizowanie etapu rekrutacji w danych kandydata
@@ -317,14 +283,8 @@ class CandidateController extends Controller
             
             $newAttempt->save();
 
-            $data = [
-                'Rozpoczęcie nowej rekrutacji'  => '',
-                'Id kandydata'                  => $newAttempt->candidate_id,
-                'Id pracownika kadry'           => Auth::user()->id
-            ];
-
-            new ActivityRecorder($data,119,1);
-
+            $LogData = array_merge(['T ' => 'Rozpoczęcie nowej rekrutacji'],$newAttempt->toArray());
+            new ActivityRecorder($LogData, 119,1);
             /**
              * Dodanie pierwszego atepu w tej rekrutacji
              */
@@ -360,14 +320,8 @@ class CandidateController extends Controller
             $recruitmentAttempt->updated_at = date('Y-m-d H:i:s');
 
             $recruitmentAttempt->save();
-
-            $data = [
-                'Zakończenie procesu rekrutacji' => '',
-                'Status zakończenia' => $request->stop_recruitment_status,
-                'Id Kandydata' => $id
-            ];
-
-            new ActivityRecorder($data,119,4);
+            $LogData = array_merge(['T ' => 'Zakończenie procesu rekrutacji'],$recruitmentAttempt->toArray());
+            new ActivityRecorder($LogData, 119,4);
 
             /**
              * Dodanie etapu w tej rekrutacji
@@ -475,13 +429,8 @@ class CandidateController extends Controller
         $recruitment->interview_date = $recruitment_date;
         $recruitment->interview_cadre = Auth::user()->id;
         $recruitment->save();
-
-        $data = [
-            'Dodanie rozmowy kwalifikacyjnej' => '',
-            'Id kandydata' => $recruitment->candidate_id,
-            'Data rozmowy' => $recruitment_date
-        ];
-        new ActivityRecorder($data,119,1);
+        $LogData = array_merge(['T ' => 'Dodanie rozmowy kwalifikacyjnej'],$recruitment->toArray());
+        new ActivityRecorder($LogData, 119,1);
     }
 
     /**
@@ -499,7 +448,8 @@ class CandidateController extends Controller
             $data->updated_at = date('Y-m-d H:i:s');
             $data->cadre_edit_id = Auth::user()->id;
             $data->save();
-
+            $LogData = array_merge(['T ' => 'Zmiana daty rozmowy kwalifikacyjnej'],$data->toArray());
+            new ActivityRecorder($LogData, 119,2);
             return 1;
         }
     }

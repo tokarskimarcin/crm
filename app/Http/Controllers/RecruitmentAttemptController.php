@@ -43,6 +43,9 @@ class RecruitmentAttemptController extends Controller
             $candidate_source->updated_at = date('Y-m-d H:i:s');
             $candidate_source->deleted = 0;
             $candidate_source->save();
+
+            $LogData = array_merge(["T" => " Dodanie zasobu rekrutacji"], $candidate_source->toArray());
+            new ActivityRecorder($LogData, 120, 1);
     
             return 1;
         }
@@ -62,14 +65,8 @@ class RecruitmentAttemptController extends Controller
             $candidate_source->name = $request->name;     
             $candidate_source->updated_at = date('Y-m-d H:i:s');     
             $candidate_source->save();
-
-            $data = [
-                'Edycja źródła kandydata' => '',
-                'Nowa nazwa' => $request->name,
-                'Id źródła' => $candidate_source->id
-            ];
-
-            new ActivityRecorder($data,119,1);
+            $LogData = array_merge(["T" => " Edycja zasobu rekrutacji"], $candidate_source->toArray());
+            new ActivityRecorder($LogData, 120, 2);
 
             return 1;
         }
@@ -91,14 +88,8 @@ class RecruitmentAttemptController extends Controller
             $source->deleted = $request->deleted;
             $source->updated_at = date('Y-m-d H:i:s');
             $source->save();
-
-            $data = [
-                'Zmiana statusu źródła: 1 - wyłączone, 0 - włączone' => '',
-                'Nowy status' => $request->deleted,
-                'ID źródła' => $source->id
-            ];
-
-            new ActivityRecorder($data,119,4);
+            $LogData = array_merge(["T" => "Zmiana statusu zasobu rekrutacji"], $source->toArray());
+            new ActivityRecorder($LogData, 120, 4);
 
             return 1;
         }
@@ -416,12 +407,22 @@ class RecruitmentAttemptController extends Controller
                         'attempt_status_id' => $request->selected_status,
                         'attempt_result_id' => $request->selected_result
                     ]);
+                $LogData = array_merge(["T" => " Dodanie rezultatu epatu"], [
+                    'attempt_status_id' => $request->selected_status,
+                    'attempt_result_id' => $request->selected_result
+                ]);
+                new ActivityRecorder($LogData, 120, 1);
                 return $request->type;
             } elseif ($request->type == 'delete') {
                 DB::table('attempt_result_attempt_status')
                     ->where('attempt_status_id', '=', $request->selected_status)
                     ->where('attempt_result_id', '=', $request->selected_result)
                     ->delete();
+                $LogData = array_merge(["T" => " Usunięcie rezultatu epatu"], [
+                    'attempt_status_id' => $request->selected_status,
+                    'attempt_result_id' => $request->selected_result
+                ]);
+                new ActivityRecorder($LogData, 120, 3);
                 return $request->type;
             }
         }
