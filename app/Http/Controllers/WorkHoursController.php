@@ -246,7 +246,8 @@ class WorkHoursController extends Controller
             }
         }
         $data = [
-            'Akceptacja godzin pracy' => '',
+            'T' => 'Akceptacja godzin pracy',
+            'id' => $id,
             'Id czasu pracy' => $request->id,
             'register_start' => $request->register_start,
             'register_stop' => $request->register_stop,
@@ -254,7 +255,7 @@ class WorkHoursController extends Controller
             'succes' => $request->succes
         ];
 
-        new ActivityRecorder($data, 3,1);
+        new ActivityRecorder($data, 17,1);
     }
     //******************acceptHour****************** Stop
 
@@ -516,7 +517,17 @@ class WorkHoursController extends Controller
                     'accept_stop' => null,
                     'updated_at' => date('Y-m-d H:i:s'),
                     'status' => 6]);
-            new ActivityRecorder('Usunięcie godzin pracy, wpis id godzin pracy: ' . $id,6,3);
+
+            $log = array(
+                'T' => 'Usunięcie godzin pracy',
+                'id' => $id,
+                'id_manager' => Auth::id(),
+                'accept_start' => null,
+                'accept_stop' => null,
+                'updated_at' => date('Y-m-d H:i:s'),
+                'status' => 6
+            );
+            new ActivityRecorder($log,18,3);
             return 1;
         }
     }
@@ -541,12 +552,13 @@ class WorkHoursController extends Controller
                     'updated_at' => date('Y-m-d H:i:s'),
                     'status' => 5]);
             $data = [
-                'Edycja godzin pracy, wpis id godzin pracy:' => $id,
+                'T' => 'Edycja godzin pracy',
+                'wpis id godzin pracy:' => $id,
                 'accept_start' => $request->accept_start,
                 'accept_stop' => $request->accept_stop,
                 'success' => $request->success
             ];
-            new ActivityRecorder($data,6,2);
+            new ActivityRecorder($data,18,2);
             return 1;
         }
     }
@@ -577,15 +589,9 @@ class WorkHoursController extends Controller
             $work_hour->created_at = date('Y-m-d H:i:s');
             $work_hour->save();
 
-            $data = [
-                'Dodanie czasu pracy pracownika' => '',
-                'success' => $succes,
-                'accept_start' => $accept_start,
-                'accept_stop' => $accept_stop,
-                'id_user' => $date[0],
-                'date' => $date[1]
-            ];
-            new ActivityRecorder($data,6,1);
+            $log = array("T" => "Dodanie godzin");
+            $log = array_merge($log, $work_hour->toArray());
+            new ActivityRecorder($log,18,1);
         }
     }
     //******************ViewHour****************** Stop
