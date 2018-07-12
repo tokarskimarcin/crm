@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ActivityRecorder;
 use App\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -155,6 +156,11 @@ class ScheduleController extends Controller
             $schedule->sunday_comment =  $reasons[6];
 
             $schedule->save();
+
+            $log = array("T" => "Edycja grafiku");
+            $log = array_merge($log, $schedule->toArray());
+
+            new ActivityRecorder($log, 22,2);
 
         return $schedule;
     }

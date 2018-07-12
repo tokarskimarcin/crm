@@ -262,7 +262,9 @@ Route::post('/getClientRouteInfoRecords', 'CrmRouteController@getClientRouteInfo
 Route::post('/getaHeadPlanningInfo', 'CrmRouteController@getaHeadPlanningInfo')->name('api.getaHeadPlanningInfo');
 
 Route::get('/getPresentationInfo', 'CrmRouteController@getPresentationInfo')->name('api.getPresentationInfo');
-
+Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
+Route::post('/presentationStatisticsAjax', 'CrmRouteController@presentationStatisticsAjax')->name('getPresentationWeeks');
+Route::post('/getClientRouteInfoRecord', 'CrmRouteController@getClientRouteInfoRecord')->name('api.getClientRouteInfoRecord');
 Route::post('/datatableClientRouteInfoAjax', 'CrmRouteController@datatableClientRouteInfoAjax')->name('api.datatableClientRouteInfoAjax');
 /* END CRM-ROUTES AJAX */
 
@@ -857,12 +859,11 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/showRoutes', 'CrmRouteController@showRoutesGet');
 
-   /* Route::get('/addNewHotel', 'CrmRouteController@addNewHotelGet');
-    Route::post('/addNewHotel', 'CrmRouteController@addNewHotelPost');*/
-
+    Route::get('/addNewHotel', 'CrmRouteController@addNewHotelGet');
+    Route::post('/addNewHotel', 'CrmRouteController@addNewHotelPost');
     Route::get('/showHotels', 'CrmRouteController@showHotelsGet')->name('showHotels');
-    /*Route::get('/hotel/{id}', 'CrmRouteController@hotelGet');
-    Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');*/
+    Route::get('/hotel/{id}', 'CrmRouteController@hotelGet');
+    Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
 
     Route::get('/cityPanel', 'CrmRouteController@cityPanel');
     Route::get('/clientPanel', 'ClientController@clientPanel');
@@ -928,8 +929,3 @@ Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table
 
 Route::get('/addNewCampaigns', 'CampaignsController@addNewCampaignsGet');
 Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
-
-Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
-Route::post('/presentationStatisticsAjax', 'CrmRouteController@presentationStatisticsAjax')->name('getPresentationWeeks');
-
-Route::post('/getClientRouteInfoRecord', 'CrmRouteController@getClientRouteInfoRecord')->name('api.getClientRouteInfoRecord');

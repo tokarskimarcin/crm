@@ -418,7 +418,6 @@
 
             let validation = true;
             if(manager_id == 'Wybierz'){
-                console.log('123')
                 validation = false;
                 swal('Wybierz kierownika')
             }else if(coaching_type == 'Wybierz'){
@@ -526,7 +525,6 @@
                         'status'                : $('#status_coauching').val(),
                     },
                     success: function (response) {
-                        console.log(response);
                         $('#Modal_Coaching').modal('hide');
                     }
                 })
@@ -548,7 +546,6 @@
 
             var manager = JSON.parse('{!!$coachingManagerList['collect_report']!!}');
             $('#couaching_manager_id').on('change',function () {
-                console.log(manager);
                 for(var i =0;i<manager.length;i++){
                     if(manager[i].menager_id == $(this).val()){
                         $('input[name="manager_actual_avg"]').val((Math.round(manager[i].avg_average*100))/100);
@@ -870,7 +867,6 @@
                                             'rbh_end': rbh_end,
                                         },
                                         success: function (response) {
-                                            console.log(response)
                                             table_unsettled.ajax.reload();
                                             table_settled.ajax.reload();
                                         }
@@ -1138,7 +1134,6 @@
                         "coaching_director_id": coaching_director_id,
                     },
                     success: function (response) {
-                        console.log(response);
                         callback(response);
                     },
                     error: function (jqXHR, textStatus, thrownError) {
