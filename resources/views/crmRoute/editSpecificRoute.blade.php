@@ -1241,12 +1241,13 @@
                             showCancelButton: true,
                             confirmButtonClass: "btn-danger",
                             confirmButtonText: "Tak, zdejmij!",
-
+                            showLoaderOnConfirm: true,
+                            preConfirm: function () {
+                                return refreshVoivodeshipAndCities(e.target.parentNode)
+                            }
                         }).then((result) => {
-                            if(result.value) {
-                                refreshVoivodeshipAndCities(e.target.parentNode)
-                            }else
-                            {
+                            if (result.value) {
+                            } else {
                                 e.target.checked = false;
                             }
                         });
@@ -1258,19 +1259,32 @@
                             showCancelButton: true,
                             confirmButtonClass: "btn-danger",
                             confirmButtonText: "Tak, przywróć!",
-
+                            showLoaderOnConfirm: true,
+                            preConfirm: function () {
+                                return refreshVoivodeshipAndCities(e.target.parentNode)
+                            }
                         }).then((result) => {
-                            if(result.value) {
-                                refreshVoivodeshipAndCities(e.target.parentNode)
-                            }else
-                            {
+                            if (result.value) {
+                            } else {
                                 e.target.checked = true;
                             }
                         });
                     }
                 }
                 else if(e.target.dataset.refresh == 'refresh') { // click on X glyphicon
-                    refreshVoivodeshipAndCities(e.target);
+                    swal({
+                        title: 'Ładowawnie...',
+                        text: 'To może chwilę zająć',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        allowEnterKey: false,
+                        onOpen: () => {
+                            swal.showLoading();
+                            refreshVoivodeshipAndCities(e.target).then(() => {
+                                swal.close();
+                            });
+                        }
+                    });
                 }
                 else if(e.target.id == "save") {
                     let everythingIsGood = undefined;
@@ -1460,7 +1474,7 @@
                         validation = false;
                     }
                     if (validation || removeLimit) {
-                        $.ajax({
+                        return $.ajax({
                             type: "POST",
                             url: '{{ route('api.getVoivodeshipRound') }}',
                             data: {
@@ -1471,60 +1485,62 @@
                             },
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function (response) {
-                                $(actualSelectVoievode).off('select2:select');
-                                $('.city').off('select2:select'); //remove previous event listeners
-
-                                let stringAppend = '<option value=0>Wybierz</option>';
-                                for (let i = 0; i < response['voievodeInfo'].length; i++) {
-                                    stringAppend += '<option value =' + response['voievodeInfo'][i]['id'] + '>' + response['voievodeInfo'][i]['name'] + '</option>';
-                                }
-                                actualSelectVoievode.innerHTML = stringAppend;
-                                stringAppend = '<option value=0>Wybierz</option>';
-                                actualSelectCity.innerHTML = stringAppend;
-
-                                $(actualSelectVoievode).on('select2:select', function (e) {
-                                    let container = e.target.parentElement.parentElement.parentElement.parentElement;
-                                    let headerId = e.params.data.id;
-
-                                    let placeToAppend2 = container.getElementsByClassName('city')[0];
-                                    placeToAppend2.innerHTML = '';
-                                    let basicOption = document.createElement('option');
-                                    basicOption.value = '0';
-                                    basicOption.textContent = 'Wybierz';
-                                    placeToAppend2.appendChild(basicOption);
-                                    let responseObject = response['cityInfo'];
-                                    for (var i = 0; i < responseObject[headerId].length; i++) {
-
-
-                                        let responseOption = document.createElement('option');
-                                        responseOption.value = responseObject[headerId][i].city_id;
-
-                                        if (responseObject[headerId][i].block == 1) {
-                                            if (responseObject[headerId][i].exceeded == 0) { //When city is still available
-                                                responseOption.textContent = responseObject[headerId][i].city_name + " [dostępne jeszcze " + responseObject[headerId][i].used_hours + " godzin]";
-                                                responseOption.setAttribute('data-max_hours', responseObject[headerId][i].used_hours); //needed for auto setting hours
-                                            }
-                                            else { //when city is not available
-                                                responseOption.textContent = responseObject[headerId][i].city_name + " (KARENCJA do " + responseObject[headerId][i].available_date + ") [przekroczono o " + responseObject[headerId][i].used_hours + " godzin]";
-                                                responseOption.setAttribute('data-max_hours', 0); //needed for auto setting hours
-                                            }
-                                        }
-                                        else {
-                                            responseOption.textContent = responseObject[headerId][i].city_name;
-                                            if (responseObject[headerId][i].max_hour > 0) {
-                                                responseOption.setAttribute('data-max_hours', responseObject[headerId][i].max_hour); //needed for auto setting hours
-                                            }
-                                        }
-
-                                        placeToAppend2.appendChild(responseOption);
-                                    }
-                                });
-                                $('.city').on('select2:select', function (e) {
-                                    setHoursValue(e);
-                                });
                             }
+                        }).done(function (response){
+                            $(actualSelectVoievode).off('select2:select');
+                            $('.city').off('select2:select'); //remove previous event listeners
+
+                            let stringAppend = '<option value=0>Wybierz</option>';
+                            for (let i = 0; i < response['voievodeInfo'].length; i++) {
+                                stringAppend += '<option value =' + response['voievodeInfo'][i]['id'] + '>' + response['voievodeInfo'][i]['name'] + '</option>';
+                            }
+                            actualSelectVoievode.innerHTML = stringAppend;
+                            stringAppend = '<option value=0>Wybierz</option>';
+                            actualSelectCity.innerHTML = stringAppend;
+
+                            $(actualSelectVoievode).on('select2:select', function (e) {
+                                let container = e.target.parentElement.parentElement.parentElement.parentElement;
+                                let headerId = e.params.data.id;
+
+                                let placeToAppend2 = container.getElementsByClassName('city')[0];
+                                placeToAppend2.innerHTML = '';
+                                let basicOption = document.createElement('option');
+                                basicOption.value = '0';
+                                basicOption.textContent = 'Wybierz';
+                                placeToAppend2.appendChild(basicOption);
+                                let responseObject = response['cityInfo'];
+                                for (var i = 0; i < responseObject[headerId].length; i++) {
+
+
+                                    let responseOption = document.createElement('option');
+                                    responseOption.value = responseObject[headerId][i].city_id;
+
+                                    if (responseObject[headerId][i].block == 1) {
+                                        if (responseObject[headerId][i].exceeded == 0) { //When city is still available
+                                            responseOption.textContent = responseObject[headerId][i].city_name + " [dostępne jeszcze " + responseObject[headerId][i].used_hours + " godzin]";
+                                            responseOption.setAttribute('data-max_hours', responseObject[headerId][i].used_hours); //needed for auto setting hours
+                                        }
+                                        else { //when city is not available
+                                            responseOption.textContent = responseObject[headerId][i].city_name + " (KARENCJA do " + responseObject[headerId][i].available_date + ") [przekroczono o " + responseObject[headerId][i].used_hours + " godzin]";
+                                            responseOption.setAttribute('data-max_hours', 0); //needed for auto setting hours
+                                        }
+                                    }
+                                    else {
+                                        responseOption.textContent = responseObject[headerId][i].city_name;
+                                        if (responseObject[headerId][i].max_hour > 0) {
+                                            responseOption.setAttribute('data-max_hours', responseObject[headerId][i].max_hour); //needed for auto setting hours
+                                        }
+                                    }
+
+                                    placeToAppend2.appendChild(responseOption);
+                                }
+                            });
+                            $('.city').on('select2:select', function (e) {
+                                setHoursValue(e);
+                            });
+                            return new Promise((resolve)=>{
+                                resolve();
+                            });
                         });
                     }
                 }
