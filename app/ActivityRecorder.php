@@ -195,9 +195,8 @@ class ActivityRecorder extends Model
         $string = '';
 
         if (is_array($this->action)) {
-            foreach ($this->action as $key => $value) {
-                $string .= $key . ' : ' . $value . ', ';
-            }
+            $this->appendingKeyValueToString($string, $this->action);
+            $string = rtrim($string, ', ');
         } else {
             $string = $this->action;
         }
@@ -210,8 +209,22 @@ class ActivityRecorder extends Model
         $newLog->action_type_id = $action_id;
         $newLog->comment = $content;
         $newLog->save();
-
     }
+
+    private function appendingKeyValueToString(&$string, $data){
+        foreach ($data as $key => $value) {
+            if(is_array($value)){
+                $string .= $key . ': ';
+                $string.='[';
+                $this->appendingKeyValueToString($string, $value);
+                $string = rtrim($string, ', ');
+                $string.='], ';
+            }else {
+                $string .= $key . ': ' . $value . ', ';
+            }
+        }
+    }
+
 }
 //        // foreach($this->logTypes as $type) {
 //        //     $file = File::get(storage_path('app/' . $type));
