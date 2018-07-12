@@ -680,14 +680,18 @@ class AdminController extends Controller
             $newCriterium->status = $request->status;
             $newCriterium->save();
 
-            new ActivityRecorder('criterionId: ' .$newCriterium->id, 168,1);
+            $log = Array("T " => "Dodanie kryterium");
+            $log = array_merge($log, $newCriterium->toArray());
+            new ActivityRecorder($log, 171,1);
         }
 
         else if($addingCrit == "false") {
             $critToRemove = AuditCriterions::where('id', '=', $request->cID)->first();
             $critToRemove->status = 0;
             $critToRemove->save();
-            new ActivityRecorder('criterionId: ' .$critToRemove->id, 168,3);
+            $log = Array("T " => "Usunięcie kryterium");
+            $log = array_merge($log, $critToRemove->toArray());
+            new ActivityRecorder($log, 171,3);
         }
 
         else if($addingHeader == "true") {
@@ -696,14 +700,18 @@ class AdminController extends Controller
             $newHeader->name = $newName;
             $newHeader->status = $request->status;
             $newHeader->save();
-            new ActivityRecorder('HeaderId: ' .$newHeader->id, 168,1);
+            $log = Array("T " => "Dodanie nagłówka");
+            $log = array_merge($log, $newHeader->toArray());
+            new ActivityRecorder($log, 171,1);
         }
         else if($addingHeader == "false") {
             $headerToRemove = AuditHeaders::where('id', '=', $request->hid)->first();
             $relatedCriterions = AuditCriterions::where('audit_header_id', '=', $request->hid)->where('status', '=', $request->status)->get();
             $headerToRemove->status = 0;
             $headerToRemove->save();
-            new ActivityRecorder('HeaderId: ' .$headerToRemove->id, 168,3);
+            $log = Array("T " => "Usunięcie nagłówka");
+            $log = array_merge($log, $headerToRemove->toArray());
+            new ActivityRecorder($log, 171,3);
             foreach($relatedCriterions as $rC) {
                 $rC->status = 0;
                 $rC->save();
@@ -731,14 +739,20 @@ class AdminController extends Controller
             $newTemplate->name = trim($templateName, ' ');
             $newTemplate->isActive = 1;
             $newTemplate->save();
-            new ActivityRecorder('auditStatusId: ' .$newTemplate->id, 170,1);
+
+            $log = Array("T " => "Dodanie szablonu");
+            $log = array_merge($log, $newTemplate->toArray());
+
+            new ActivityRecorder($log, 163,1);
         }
         else { //condition satisfied when user is deleting given template
             $idToDelete = $request->idToDelete;
             $templateToDelete = AuditStatus::where('id', '=', $idToDelete)->first();
             $templateToDelete->isActive = 0;
             $templateToDelete->save();
-            new ActivityRecorder('auditStatusId: ' .$templateToDelete->id, 170,3);
+            $log = Array("T " => "Usunięcie szablonu");
+            $log = array_merge($log, $templateToDelete->toArray());
+            new ActivityRecorder($log, 163,3);
         }
 
         return Redirect::back();
