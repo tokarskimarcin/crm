@@ -196,23 +196,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-12">
-                                {{--<div class="form-group" style="margin-top:1em;">--}}
-                                {{--<label for="weekNumber">Wybierz tydzień</label>--}}
-                                {{--<select id="weekNumber" class="form-control"></select>--}}
-                                {{--</div>--}}
-                                <div class="form-group first-show-date">
-                                    <label class="myLabel">Data pierwszego pokazu:</label>
-                                    <div class="input-group date form_date col-md-5" data-date-calendarWeeks="true"
-                                         data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                                        <input class="form-control first-show-date-input" name="date" id="date"
-                                               type="text" value="{{date("Y-m-d")}}">
-                                        <span class="input-group-addon"><span
-                                                    class="glyphicon glyphicon-th"></span></span>
-                                    </div>
-                                </div>
-
-                            </div>
                         </div>
                     </div>
 
@@ -286,6 +269,18 @@
                                 Wiersze pokolorowane na czerwono wskazują na szablon trasy, w którym co najmniej 1
                                 miasto przekroczyło karencję, względem
                                 daty pierwszego pokazu.
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group first-show-date">
+                                    <label class="myLabel">Data pierwszego pokazu:</label>
+                                    <div class="input-group date form_date col-md-5" data-date-calendarWeeks="true"
+                                         data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                        <input class="form-control first-show-date-input" name="date" id="date"
+                                               type="text" value="{{date("Y-m-d")}}">
+                                        <span class="input-group-addon"><span
+                                                    class="glyphicon glyphicon-th"></span></span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-4">
                                 <button class="btn btn-default" id="add-new-route" style="margin-bottom: 14px;"><span

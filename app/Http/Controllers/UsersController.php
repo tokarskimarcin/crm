@@ -733,7 +733,7 @@ class UsersController extends Controller
 
             new ActivityRecorder('Zmiana hasła przez użytkownika, nowe hasło: ' . base64_encode($request->new_pass),39,4);
             Session::flash('message_ok', "Hasło zmienione pomyślnie!");
-            return Redirect::back();
+            return Redirect::to('/');
         } else {
             Session::flash('message_nok', "Podałeś nieprawidłowe stare hasło!");
             return Redirect::back();
