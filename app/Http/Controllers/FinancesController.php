@@ -275,7 +275,7 @@ class FinancesController extends Controller
             'comment' => $request->reason
         ];
 
-        new ActivityRecorder(2, $data,10,1);
+        new ActivityRecorder($data,10,1);
 
         $message_type = ($request->penalty_type == 1) ? 'Kara' : 'Premia' ;
         $message = $message_type . ' została dodana pomyślnie';
@@ -607,7 +607,7 @@ class FinancesController extends Controller
                     'data' => date('Y-m-d H:i:s'),
                     'Id kary/premii' => $object->id
                 ];
-                new ActivityRecorder(2, $data,25,3);
+                new ActivityRecorder($data,25,3);
                 return 1;
             } else {
                 return 0;

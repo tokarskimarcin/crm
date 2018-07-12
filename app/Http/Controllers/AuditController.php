@@ -102,12 +102,6 @@ class AuditController extends Controller
         $fileCatalog = "auditFiles";
         $suffix = '';
 
-        //Saving info about edition to log file
-        $log = [
-            "ID nowego audytu" => $newForm->id
-        ];
-        new ActivityRecorder(10,$log,158,1);
-
         /*fill "audit_info" table*/
         $criterions = AuditCriterions::where('status', '=', $template)->get();
         foreach($criterions as $c) {
@@ -164,6 +158,12 @@ class AuditController extends Controller
             $newCrit->save();
             Session::flash('adnotation', "Audyt został dodany!");
         }
+        //Saving info about edition to log file
+        $log = [
+            "ID nowego audytu" => $newForm->id
+        ];
+        new ActivityRecorder($log,158,1);
+
         return Redirect::to('/showAudits');
     }
 
@@ -302,7 +302,7 @@ class AuditController extends Controller
         $log = [
             "ID edytowanego audytu" => $audit->id
         ];
-        new ActivityRecorder(10, $log,171, 2);
+        new ActivityRecorder($log,171, 2);
 
         $criterions = AuditCriterions::all();
         foreach($criterions as $c) {
@@ -403,7 +403,7 @@ class AuditController extends Controller
             $log = [
                 "ID usuniętego pliku" => $request->id_picture
             ];
-            new ActivityRecorder(10, $log,171 ,3);
+            new ActivityRecorder($log,171 ,3);
 
             return 1;
         }else return 0;

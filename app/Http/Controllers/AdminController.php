@@ -122,7 +122,7 @@ class AdminController extends Controller
         $data['Link adress'] = $request->link_adress;
         $data['Link group'] = $request->link_goup;
 
-        new ActivityRecorder(3, $data,16,2);
+        new ActivityRecorder($data,16,2);
 
         Session::flash('message_ok', "Zmiany zapisano!");
         return Redirect::back();
@@ -161,7 +161,7 @@ class AdminController extends Controller
                 $department_info_id->save();
                 $data['ID oddziału'] = $department_info_id->id;
                 $data['Status'] = $request->type;
-                new ActivityRecorder(3, $data, 50, 4);
+                new ActivityRecorder($data, 50, 4);
                 return 1;
             }
         }
@@ -226,7 +226,7 @@ class AdminController extends Controller
 
         $department_info->save();
 
-        new ActivityRecorder(3, "Dodano oddział o numerze ID: " . $id_dep,51,1);
+        new ActivityRecorder("Dodano oddział o numerze ID: " . $id_dep,51,1);
 
         Session::flash('message_ok', "Oddział został dodany!");
         return Redirect::back();
@@ -317,7 +317,7 @@ class AdminController extends Controller
             'Id oddziału' => $request->selected_department_info_id
         ];
 
-        new ActivityRecorder(3, $data,66,2);
+        new ActivityRecorder($data,66,2);
 
         Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
         return Redirect::back();
@@ -391,7 +391,7 @@ class AdminController extends Controller
               ->get();
           $data['Przydzielone ID oddziały'] = rtrim($data['Przydzielone ID oddziały'], ',');
           $data['Przydzielone ID oddziały'] .= ']';
-          new ActivityRecorder(3, $data, 70, 2);
+          new ActivityRecorder($data, 70, 2);
           return view('admin.multipleDepartments')
               ->with('success', 'Zmiany zapisano pomyślnie!')
               ->with('users', $users);
@@ -422,7 +422,7 @@ class AdminController extends Controller
 
         $link->save();
 
-        new ActivityRecorder(3,$data, 72, 1);
+        new ActivityRecorder($data, 72, 1);
         Session::flash('message_ok', "Link został dodany!");
         return Redirect::back();
     }
@@ -434,7 +434,7 @@ class AdminController extends Controller
         $data['Nazwa dodanej grupy'] = $newGroupName;
         $newGroup->name = $newGroupName;
         $newGroup->save();
-        new ActivityRecorder(3,$data, 72, 1);
+        new ActivityRecorder($data, 72, 1);
         return Redirect::back();
     }
 
@@ -444,7 +444,7 @@ class AdminController extends Controller
         $groupID = $request->removeLinkGroup;
         $groupToDelete = LinkGroups::where('id', '=', $groupID)->first();
         $groupToDelete->delete();
-        new ActivityRecorder(3,$data, 72, 3);
+        new ActivityRecorder($data, 72, 3);
         return Redirect::back();
     }
 
@@ -469,7 +469,7 @@ class AdminController extends Controller
         $firewall->whitelisted = $request->ip_status;
         $firewall->save();
 
-        new ActivityRecorder(3, $data, 88,1);
+        new ActivityRecorder($data, 88,1);
         Session::flash('message_ok', "Adres IP został dodany!");
         return Redirect::back();
     }
@@ -494,7 +494,7 @@ class AdminController extends Controller
         $obj->user_id = $request->user_selected;
         $obj->save();
 
-        new ActivityRecorder(3,$data, 89, 1);
+        new ActivityRecorder($data, 89, 1);
         Session::flash('message_ok', "Użytkownik został dodany!");
         return Redirect::back();
     }
@@ -509,7 +509,7 @@ class AdminController extends Controller
                 FirewallPrivileges::where('user_id', '=', $request->user_id)->delete();
                 $data['ID użytkownika'] = $request->user_id;
                 $data['Użytkownik'] = $user->first_name.' '.$user->last_name;
-                new ActivityRecorder(3,$data,89,3);
+                new ActivityRecorder($data,89,3);
                 return 1;
             }
         }
@@ -643,7 +643,7 @@ class AdminController extends Controller
 
             $package->save();
 
-            new ActivityRecorder(3,$data,130,2);
+            new ActivityRecorder($data,130,2);
             return 1;
         }
     }
@@ -680,14 +680,14 @@ class AdminController extends Controller
             $newCriterium->status = $request->status;
             $newCriterium->save();
 
-            new ActivityRecorder(10,'criterionId: ' .$newCriterium->id, 168,1);
+            new ActivityRecorder('criterionId: ' .$newCriterium->id, 168,1);
         }
 
         else if($addingCrit == "false") {
             $critToRemove = AuditCriterions::where('id', '=', $request->cID)->first();
             $critToRemove->status = 0;
             $critToRemove->save();
-            new ActivityRecorder(10,'criterionId: ' .$critToRemove->id, 168,3);
+            new ActivityRecorder('criterionId: ' .$critToRemove->id, 168,3);
         }
 
         else if($addingHeader == "true") {
@@ -696,14 +696,14 @@ class AdminController extends Controller
             $newHeader->name = $newName;
             $newHeader->status = $request->status;
             $newHeader->save();
-            new ActivityRecorder(10,'HeaderId: ' .$newHeader->id, 168,1);
+            new ActivityRecorder('HeaderId: ' .$newHeader->id, 168,1);
         }
         else if($addingHeader == "false") {
             $headerToRemove = AuditHeaders::where('id', '=', $request->hid)->first();
             $relatedCriterions = AuditCriterions::where('audit_header_id', '=', $request->hid)->where('status', '=', $request->status)->get();
             $headerToRemove->status = 0;
             $headerToRemove->save();
-            new ActivityRecorder(10,'HeaderId: ' .$headerToRemove->id, 168,3);
+            new ActivityRecorder('HeaderId: ' .$headerToRemove->id, 168,3);
             foreach($relatedCriterions as $rC) {
                 $rC->status = 0;
                 $rC->save();
@@ -731,14 +731,14 @@ class AdminController extends Controller
             $newTemplate->name = trim($templateName, ' ');
             $newTemplate->isActive = 1;
             $newTemplate->save();
-            new ActivityRecorder(10,'auditStatusId: ' .$newTemplate->id, 170,1);
+            new ActivityRecorder('auditStatusId: ' .$newTemplate->id, 170,1);
         }
         else { //condition satisfied when user is deleting given template
             $idToDelete = $request->idToDelete;
             $templateToDelete = AuditStatus::where('id', '=', $idToDelete)->first();
             $templateToDelete->isActive = 0;
             $templateToDelete->save();
-            new ActivityRecorder(10,'auditStatusId: ' .$templateToDelete->id, 170,3);
+            new ActivityRecorder('auditStatusId: ' .$templateToDelete->id, 170,3);
         }
 
         return Redirect::back();
@@ -808,7 +808,7 @@ class AdminController extends Controller
                     ->delete();
                 $data['ID użytkownika'] = $user_id;
                 $data['ID linku'] = $remove_id;
-                new ActivityRecorder(3,$data,191,3);
+                new ActivityRecorder($data,191,3);
             }
         }
         else {
@@ -820,7 +820,7 @@ class AdminController extends Controller
 
             $data['ID użytkownika'] = $user_id;
             $data['ID linku'] = $new_privilage_number;
-            new ActivityRecorder(3,$data,191,1);
+            new ActivityRecorder($data,191,1);
         }
 
         return redirect()->back();
