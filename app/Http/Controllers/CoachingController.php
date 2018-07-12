@@ -234,11 +234,15 @@ class CoachingController extends Controller
     public function saveCoachingDirector(Request $request)
     {
         if ($request->ajax()) {
+            $activitiStatus = 1;
             if ($request->status == 0) {
                 $new_coaching = new CoachingDirector();
                 $new_coaching->coaching_level = $request->coaching_level;
+                $headInfo = ["T" => 'Nowy coaching'];
             } else {
+                $activitiStatus = 2;
                 $new_coaching = CoachingDirector::find($request->status);
+                $headInfo = ["T" => 'Edycja coachingu'];
             }
             $new_coaching->user_id = $request->manager_id;
             $new_coaching->manager_id = Auth::user()->id;
@@ -257,6 +261,7 @@ class CoachingController extends Controller
             $new_coaching->coaching_type = $request->coaching_type;
 
             if ($new_coaching->save()) {
+                $this::saveLogInfo($new_coaching,$activitiStatus);
                 return 0;
             } else {
                 return -1;
@@ -838,24 +843,27 @@ class CoachingController extends Controller
                     ->join('users', 'users.id', $columnName)
                     ->where('department_info.id', '=', $item)
                     ->first();
-                $data = new \stdClass();
-                $data->department_info_id = $item;
-                $data->date_start = $date_start;
-                $data->date_stop = $date_stop;
-                $data->menager_id = $manager->manager_id;
-                $data->manager_name = $manager->first_name . ' ' . $manager->last_name;
-                if($isHr){
-                    $data->success          = 0;
-                    $data->avg_average      = 0;
-                    $data->realRBH          = 0;
-                    $data->sum_janky_count  = 0;
-                }else{
-                    $data->success          = $succes;
-                    $data->avg_average      = round($succes / $rbh, 2);
-                    $data->realRBH          = $rbh;
-                    $data->sum_janky_count  = $janky;
+                if(is_object($manager)){
+                    $data = new \stdClass();
+                    $data->department_info_id = $item;
+                    $data->date_start = $date_start;
+                    $data->date_stop = $date_stop;
+                    $data->menager_id = $manager->manager_id;
+                    $data->manager_name = $manager->first_name . ' ' . $manager->last_name;
+                    if($isHr){
+                        $data->success          = 0;
+                        $data->avg_average      = 0;
+                        $data->realRBH          = 0;
+                        $data->sum_janky_count  = 0;
+                    }else{
+                        $data->success          = $succes;
+                        $data->avg_average      = round($succes / $rbh, 2);
+                        $data->realRBH          = $rbh;
+                        $data->sum_janky_count  = $janky;
+                    }
+                    $ready_data->push($data);
                 }
-                $ready_data->push($data);
+
             }
         }
 
@@ -1108,6 +1116,7 @@ class CoachingController extends Controller
             //Ilość rgb przed zaakceptowaniem coachingu
             $coaching->rbh_end = $request->rbh_end;
             $coaching->save();
+            $this::saveLogInfo($coaching,2);
             return $coaching->average_goal;
         } else
             return 0;
@@ -1141,6 +1150,7 @@ class CoachingController extends Controller
             $coaching = CoachingDirector::find($request->coaching_id);
             $coaching->status = 3;
             $coaching->save();
+            $this::saveLogInfo($coaching,3,$request->coaching_id);
             return 1;
         } else
             return 0;
@@ -1236,7 +1246,7 @@ class CoachingController extends Controller
 
         if ($request->has('action')) {
             if ($request->action == "coachAscription") {
-                new ActivityRecorder('Poprzedni Coach: ' . $previousCoachDirector_id . ' Nowy Coach: ' . $newCoachDirector_id, 192, 2);
+                new ActivityRecorder('T : Przepisanie coachingu, Poprzedni Coach: ' . $previousCoachDirector_id . ' Nowy Coach: ' . $newCoachDirector_id, 192, 2);
                 return ['type' => 'success', 'msg' => 'Użytkownik został przypisany', 'title' => 'Przypisano!'];
             }
 
@@ -1312,7 +1322,7 @@ class CoachingController extends Controller
         if ($request->has('action')) {
             //ponizszy if nie ma znaczenia, to jest tylko flaga oznaczenia wykonania ajax
             if ($request->action == "coachAscriptionRevert") {
-                new ActivityRecorder('Cofniecie przypisania, Poprzedni Coach: ' . $coachDirectorChange->coach_director_id . ' Nowy Coach: ' . $coachDirectorChange->prev_coach_director_id, 192, 2);
+                new ActivityRecorder('T : Cofniecie przypisania coacingu , Poprzedni Coach: ' . $coachDirectorChange->coach_director_id . ' Nowy Coach: ' . $coachDirectorChange->prev_coach_director_id, 192, 2);
                 return ['type' => 'success', 'msg' => 'Pomyślne cofnięcie zmiany', 'title' => "Udało się!"];
             }
             if ($error)
@@ -1340,6 +1350,26 @@ class CoachingController extends Controller
                     ->orderBy('c.id', 'desc')
                     ->get();
         return datatables($coachDirectorChanges)->make(true);
+    }
+
+    public function saveLogInfo($collect,$actionType,$coaching_id = null){
+        if($collect->coaching_level == 1)
+            $link_id = 175;
+        else if($collect->coaching_level == 2)
+            $link_id = 165;
+        else
+            $link_id = 166;
+
+        if($actionType == 3){
+            new ActivityRecorder('T : Usunuęcie coachingu id:'.$coaching_id,$link_id,$actionType);
+        }else{
+            if($actionType == 1)
+                $header = ["T" => 'Dodanie nowego coachingu '];
+            else
+                $header = ["T" => 'Edycja coachingu '];
+            new ActivityRecorder(array_merge($header,$collect->toArray()),$link_id,$actionType);
+        }
+
     }
 
 }

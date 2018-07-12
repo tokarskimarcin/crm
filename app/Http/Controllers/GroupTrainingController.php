@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use App\ActivityRecorder;
 use App\AttemptResult;
 use App\AttemptStatus;
 use App\Candidate;
@@ -134,7 +135,10 @@ class GroupTrainingController extends Controller
             }
             $candidate_story_new->comment = $comment;
             $candidate_story_new->save();
-
+            if($candidate_story_new->attempt_status_id != 8) {
+                $LogData = array_merge(["T" => " Zakończenie szkolenia kandydata"], $candidate_story_new->toArray());
+                new ActivityRecorder($LogData, 118, 2);
+            }
 
             $CandidateTraining = CandidateTraining::where('training_id','=',$training_group)
                 ->where('candidate_id','=',$candidate_id)
@@ -157,12 +161,21 @@ class GroupTrainingController extends Controller
                 $candidate_story_new->attempt_result_id         = 19;
                 $candidate_story_new->comment                   = $comment;
                 $candidate_story_new->save();
+
+                $LogData = array_merge(["T"=>" Zapisanie Kandydata na 2 etap szkolenia"],$candidate_story_new->toArray());
+                new ActivityRecorder($LogData, 118, 2);
+
             }
             return 1;
         }
     }
 
 
+    /**
+     * Zakończenie szkolenia po kliknięcu na przycisk "Zakończ szkolenie"
+     * @param Request $request
+     * @return int
+     */
     public function EndGroupTraining(Request $request)
     {
         if($request->ajax())
@@ -172,6 +185,9 @@ class GroupTrainingController extends Controller
             $training_group->status = 2;
 
             if($training_group->save()){
+
+                $LogData = array_merge(["T"=>" Zakończenie szkolenia"],$training_group->toArray());
+                new ActivityRecorder($LogData, 118, 4);
 
                 $all_candidate = CandidateTraining::where('training_id','=',$training_group_id)->get();
                 foreach ($all_candidate as $item)
@@ -284,7 +300,10 @@ class GroupTrainingController extends Controller
             $training_grou->status          = 0;
             $training_grou->edit_cadre_id   = Auth::user()->id;
 
+
             if($training_grou->save()){
+                $LogData = array_merge(["T"=>" Usunięcie szkolenia"],$training_grou->toArray());
+                new ActivityRecorder($LogData, 118, 3);
 
                  $all_candidate = CandidateTraining::where('training_id','=',$training_id)->get();
                  foreach ($all_candidate as $item)
@@ -421,9 +440,13 @@ class GroupTrainingController extends Controller
             // nowe szkolenie lub instniejące
             if($saving_type == 1 && $request->id_training_group == 0) // 1 - nowy wpis, 0 - edycja
             {
+                $logTitle = ['T ' => 'Dodanie nowego szkolenia'];
+                $logAction = 1;
                 $training = new GroupTraining();
 
             }else if($request->id_training_group != 0){
+                $logTitle = ['T ' => 'Edycja szkolenia'];
+                $logAction = 2;
                 $training = GroupTraining::find($request->id_training_group);
             }
             // wypełnienie danych odnośnie szkolenia
@@ -447,6 +470,8 @@ class GroupTrainingController extends Controller
             // Próba zapisu
             if($training->save())
             {
+                $LogData = array_merge($logTitle,$training->toArray());
+                new ActivityRecorder($LogData, 118, $logAction);
                 $flag = true;
             }else{
                 return 0;

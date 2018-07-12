@@ -422,7 +422,6 @@
 
                     let validation = true;
                     if(manager_id == 'Wybierz'){
-                        console.log('123')
                         validation = false;
                         swal('Wybierz kierownika')
                     }else if(coaching_type == 'Wybierz'){
@@ -532,7 +531,6 @@
                                 'status'                : $('#status_coauching').val(),
                             },
                             success: function (response) {
-                                console.log(response);
                                 $('#Modal_Coaching').modal('hide');
                             }
                         })
@@ -556,7 +554,6 @@
 
                     var manager = JSON.parse('{!!$coachingManagerList!!}');
                     $('#couaching_manager_id').on('change',function () {
-                        console.log(manager);
                         for(var i =0;i<manager.length;i++){
                             if(manager[i].manager_id == $(this).val()){
                                 $('input[name="manager_actual_avg"]').val((Math.round(manager[i].manager_actual_avg*100))/100);
@@ -630,7 +627,6 @@
                             'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                         },
                         "rowCallback": function( row, data, index ) {
-                            console.log(data);
                             var coaching_end_date = Date.parse(data.coaching_date);
                             coaching_end_date +=345600*1000; // stworzenie daty + dodanie 4 dni
                             var actual_date = new Date();
@@ -851,7 +847,6 @@
                                 let rbh_end = row.find('td:nth-child(9)').text();
                                 let user_department_typ ="{{$user_department_type}}";
                                 let is_a_number = true;
-                                console.log(coaching_type+' '+end_score+' '+rbh_end);
                                 let manager_type_id = $.ajax({
                                     async: false,
                                     type: "POST",
@@ -877,7 +872,6 @@
                                     if(isNumeric(row.find('td:nth-child(7)').children().val()) == false) {
                                         is_a_number = false;
                                     }
-                                console.log(coaching_type+' '+end_score+' '+rbh_end);
                                 if(is_a_number == true) {
                                     swal({
                                         title: 'Jesteś pewien?',
@@ -903,7 +897,6 @@
                                                     'rbh_end': rbh_end,
                                                 },
                                                 success: function (response) {
-                                                    console.log(response)
                                                     table_unsettled.ajax.reload();
                                                     table_settled.ajax.reload();
                                                 }
@@ -995,7 +988,6 @@
                                         else
                                             return span_bad_start + data.actual_rbh + span_end;
                                     }else if(user_department_type == 1 || isHR == true) {
-                                        console.log(isHR);
                                         if(data.coaching_type == 1){
                                             return '<input type="number" name="average_avg_inp" class="typed_by_user form-control">'
                                         }else if(data.coaching_type == 2){

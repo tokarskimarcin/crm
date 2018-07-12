@@ -557,7 +557,6 @@
                                 'status': $('#status_coauching').val(),
                             },
                             success: function (response) {
-                                console.log(response);
                                 $('#Modal_Coaching').modal('hide');
                             }
                         })
@@ -580,7 +579,6 @@
                     $('#couaching_manager_id').on('change', function () {
                         for (var i = 0; i < manager.length; i++) {
                             if (manager[i].id == $(this).val()) {
-                                console.log(manager);
                                 $('input[name="manager_actual_avg"]').val((Math.round(manager[i].avg_consultant * 100)) / 100);
                                 $('input[name="manager_actual_janky"]').val((Math.round(manager[i].sum_janky_count * 100)) / 100);
                                 $('input[name="manager_actual_rbh"]').val((Math.round(manager[i].rbh * 100)) / 100);
@@ -928,7 +926,6 @@
                                         is_a_number = false;
                                     }
                                 let rbh_end = row.find('td:nth-child(9)').text();
-                                console.log(coaching_type + ' ' + end_score + ' ' + rbh_end);
                                 if (is_a_number == true) {
                                     swal({
                                         title: 'Jesteś pewien?',
@@ -954,7 +951,6 @@
                                                     'rbh_end': rbh_end,
                                                 },
                                                 success: function (response) {
-                                                    console.log(response);
                                                     table_unsettled.ajax.reload();
                                                     table_settled.ajax.reload();
                                                 }
@@ -1247,7 +1243,6 @@
                             "coaching_director_id": coaching_director_id,
                         },
                         success: function (response) {
-                            console.log(response);
                             callback(response);
                         },
                         error: function (jqXHR, textStatus, thrownError) {
