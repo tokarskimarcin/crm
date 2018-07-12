@@ -266,16 +266,8 @@ class FinancesController extends Controller
         $object->event_date = $request->date_penalty;
         $object->save();
 
-        $data = [
-            'Dodanie kary/premii dla użytkownika' => '',
-            'Id użytkownika' => $request->user_id,
-            'typ' => $request->penalty_type,
-            'amount' => $request->cost,
-            'event_date' => date('Y-m-d'),
-            'comment' => $request->reason
-        ];
-
-        new ActivityRecorder($data,10,1);
+        $LogData = array_merge(['T ' => 'Dodanie kary/premii '],$object->toArray());
+        new ActivityRecorder($LogData, 10, 1);
 
         $message_type = ($request->penalty_type == 1) ? 'Kara' : 'Premia' ;
         $message = $message_type . ' została dodana pomyślnie';
@@ -302,7 +294,8 @@ class FinancesController extends Controller
         $object->id_manager = Auth::user()->id;
         $object->comment = $request->reason;
         $object->save();
-
+        $LogData = array_merge(['T ' => 'Dodanie kary/premii '],$object->toArray());
+        new ActivityRecorder($LogData, 10, 1);
         Session::flash('message_ok', "Kara/premia dodana pomyślnie!");
         return Redirect::back();
     }
@@ -430,6 +423,8 @@ class FinancesController extends Controller
             $summary_payment->employee_count = $request->user_total;
             $summary_payment->id_user = Auth::user()->id;
             $summary_payment->save();
+            $LogData = array_merge(['T ' => 'Sumowanie wypłat oddziałów '],$summary_payment->toArray());
+            new ActivityRecorder($LogData, 24, 1);
             return $summary_payment;
         }
     }
@@ -449,6 +444,8 @@ class FinancesController extends Controller
             $object->comment = $request->comment;
             $object->id_manager_edit = Auth::user()->id;
             $object->save();
+            $LogData = array_merge(['T ' => 'Edycja kary/premii '],$object->toArray());
+            new ActivityRecorder($LogData, 10, 2);
             return 1;
         }
     }
@@ -601,13 +598,8 @@ class FinancesController extends Controller
                 $object->status = 0;
                 $object->updated_at = date('Y-m-d H:i:s');
                 $object->save();
-
-                $data = [
-                    'Usunięcie kary/premii' => '',
-                    'data' => date('Y-m-d H:i:s'),
-                    'Id kary/premii' => $object->id
-                ];
-                new ActivityRecorder($data,25,3);
+                $LogData = array_merge(['T ' => 'Usunięcie kary/premii'],$object->toArray());
+                new ActivityRecorder($LogData, 25, 3);
                 return 1;
             } else {
                 return 0;
@@ -648,6 +640,8 @@ class FinancesController extends Controller
                     }
                     PaymentAgencyStory::insert($data);
                     $accept_payment->save();
+                    $LogData = array_merge(['T ' => ' Zapisanie wypłat '],$accept_payment->toArray());
+                    new ActivityRecorder($LogData, 24, 1);
                     return $data;
             }
             return 0;
