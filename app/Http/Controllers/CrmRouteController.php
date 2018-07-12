@@ -94,7 +94,7 @@ class CrmRouteController extends Controller
             }
         }
 
-        new ActivityRecorder(12,'ClientRouteId: '. $clientRoute->id,196,1);
+        new ActivityRecorder('ClientRouteId: '. $clientRoute->id,196,1);
         $request->session()->flash('adnotation', 'Trasa została pomyślnie przypisana dla klienta');
 
         return Redirect::back();
@@ -157,7 +157,7 @@ class CrmRouteController extends Controller
         }
         $request->session()->flash('adnotation', 'Trasa została pomyślnie przypisana dla klienta');
 
-        new ActivityRecorder(12,'ClientRouteId: '. $request->route_id, 206,2);
+        new ActivityRecorder('ClientRouteId: '. $request->route_id, 206,2);
 
         return Redirect::back();
 
@@ -417,7 +417,7 @@ class CrmRouteController extends Controller
                 $clientRouteInfoIds .= $item->id . ', ';
             }
         }
-        new ActivityRecorder(12,$clientRouteInfoIds, 206,2);
+        new ActivityRecorder($clientRouteInfoIds, 206,2);
 
         return $all_data;
     }
@@ -446,7 +446,7 @@ class CrmRouteController extends Controller
                 $clientRoadInfo->save();
                 $clientRouteIds .= $item['id'] .', ';
             }
-            new ActivityRecorder(12,$clientRouteIds,200,2);
+            new ActivityRecorder($clientRouteIds,200,2);
 
             return 200;
         }else
@@ -685,21 +685,21 @@ class CrmRouteController extends Controller
             $clientRoute->status = 1;
             $clientRoute->save();
             $success = 1;
-            new ActivityRecorder(12,'Aktywacja kampanii',200,4);
+            new ActivityRecorder('Aktywacja kampanii',200,4);
         }
         else if($clientRouteId && $toDelete == '1') {
             $clientRoute = ClientRoute::find($clientRouteId);
             $clientRoute->status = 2;
             $clientRoute->save();
             $success = 1;
-            new ActivityRecorder(12,'Zakończenie kampanii',200,4);
+            new ActivityRecorder('Zakończenie kampanii',200,4);
         }
         else if($clientRouteId && $toDelete == '2') {
             $clientRoute = ClientRoute::find($clientRouteId);
             $clientRoute->status = 0;
             $clientRoute->save();
             $success = 1;
-            new ActivityRecorder(12,'Zmiana statusu na "nie gotowa"',200,4);
+            new ActivityRecorder('Zmiana statusu na "nie gotowa"',200,4);
         }
 
         return $success;
@@ -756,7 +756,7 @@ class CrmRouteController extends Controller
             }
 
         }
-        new ActivityRecorder(12, null,185,1);
+        new ActivityRecorder(null,185,1);
 
         $request->session()->flash('adnotation', 'Trasa została dodana pomyślnie!');
 
@@ -782,7 +782,7 @@ class CrmRouteController extends Controller
 
             $request->session()->flash('adnotation', 'Trasa została usunięta pomyślnie!');
 
-            new ActivityRecorder(12,'Route_id: ' . $request->route_id,188,3);
+            new ActivityRecorder('Route_id: ' . $request->route_id,188,3);
 
             return Redirect::to('/showRoutes');
         }
@@ -836,7 +836,7 @@ class CrmRouteController extends Controller
             }
             $request->session()->flash('adnotation', 'Trasa została edytowana pomyślnie!');
 
-            new ActivityRecorder(12,'Route_id: ' . $request->route_id,188,2);
+            new ActivityRecorder('Route_id: ' . $request->route_id,188,2);
 
             return Redirect::to('/showRoutes');
         }
@@ -1066,7 +1066,7 @@ class CrmRouteController extends Controller
         $newHotel->status = $status;
         $newHotel->save();
 
-        new ActivityRecorder(12,null,188,1);
+        new ActivityRecorder(null,188,1);
 
         $request->session()->flash('adnotation', 'Hotel został zapisany pomyślnie!');
 
@@ -1182,7 +1182,7 @@ class CrmRouteController extends Controller
             $hotel = Hotel::find($id);
             $hotel->status = 0; // status 0 - usuniety, status = 1 - aktywny
             $hotel->save();
-            new ActivityRecorder(12,$id, 191,3);
+            new ActivityRecorder($id, 191,3);
 
             $request->session()->flash('adnotation', 'Hotel został usunięty pomyślnie!');
         }
@@ -1194,7 +1194,7 @@ class CrmRouteController extends Controller
             $hotel->price = $request->price;
             $hotel->comment = $request->comment;
             $hotel->save();
-            new ActivityRecorder(12,$id, 191,2);
+            new ActivityRecorder($id, 191,2);
 
             $request->session()->flash('adnotation', 'Hotel został edytowany pomyślnie!');
         }
@@ -1361,7 +1361,7 @@ class CrmRouteController extends Controller
             $newHotel->status  = $request->hotelStatus;
             $newHotel->zip_code = $request->zipCode;
             $newHotel->save();
-//            new ActivityRecorder(12,null, 193, 1);
+//            new ActivityRecorder(null, 193, 1);
             return 200;
         }
     }
@@ -1400,7 +1400,7 @@ class CrmRouteController extends Controller
 //            }
 
             $newCity->save();
-            new ActivityRecorder(12,null, 193, 1);
+            new ActivityRecorder(null, 193, 1);
 
             return 200;
         }
@@ -1415,12 +1415,12 @@ class CrmRouteController extends Controller
             $newHotel = Hotel::find($request->hotelId);
             if($newHotel->status == 0) {
                 $newHotel->status = 1;
-//                new ActivityRecorder(12,null, 193, 3);
+//                new ActivityRecorder(null, 193, 3);
             }
 
             else {
                 $newHotel->status = 0;
-//                new ActivityRecorder(12,null, 193, 4);
+//                new ActivityRecorder(null, 193, 4);
             }
 
             $newHotel->save();
@@ -1436,12 +1436,12 @@ class CrmRouteController extends Controller
             $newCity = Cities::find($request->cityId);
             if($newCity->status == 0) {
                 $newCity->status = 1;
-                new ActivityRecorder(12,null, 193, 3);
+                new ActivityRecorder(null, 193, 3);
             }
 
             else {
                 $newCity->status = 0;
-                new ActivityRecorder(12,null, 193, 4);
+                new ActivityRecorder(null, 193, 4);
             }
 
             $newCity->save();
@@ -1655,7 +1655,7 @@ class CrmRouteController extends Controller
             $log .= $record->id . ', ';
         }
 
-        new ActivityRecorder(12,$log,212,2);
+        new ActivityRecorder($log,212,2);
 
         return $adnotation;
     }

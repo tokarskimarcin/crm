@@ -139,7 +139,7 @@ class EquipmentsController extends Controller
             'model' => $request->model
         ];
 
-        new ActivityRecorder(6, $data, 34,1);
+        new ActivityRecorder($data, 34,1);
 
         Session::flash('message_ok', "Sprzęt został dodany pomyślnie!");
         return redirect('/show_equipment');
@@ -183,7 +183,7 @@ class EquipmentsController extends Controller
 
         $equipment->deleted = $request->status_delete;
         if ($request->status_delete == 1) {
-          new ActivityRecorder(6, 'Usunięcie sprzętu o Id: ' . $equipment->id,33,3);
+          new ActivityRecorder('Usunięcie sprzętu o Id: ' . $equipment->id,33,3);
           $equipment->save();
           Session::flash('message_ok', "Sprzęt usunięty pomyślnie!");
           return redirect('/show_equipment');
@@ -244,7 +244,7 @@ class EquipmentsController extends Controller
             'deleted' => $request->deleted
         ];
 
-        new ActivityRecorder(6, $data,33,2);
+        new ActivityRecorder($data,33,2);
 
         $equipment = Equipments::find($id);
         $users = User::all();

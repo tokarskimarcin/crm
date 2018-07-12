@@ -46,10 +46,10 @@ class ClientController extends Controller
             if ($request->clientID == 0) {
                 // new city
                 $client = new Clients();
-                new ActivityRecorder(12, null, 194, 1);
+                new ActivityRecorder(null, 194, 1);
             }
             else { // Edit city
-                new ActivityRecorder(12, null, 194, 2);
+                new ActivityRecorder(null, 194, 2);
                 $client = Clients::find($request->clientID);
             }
 
@@ -79,7 +79,7 @@ class ClientController extends Controller
             else
                 $client->status = 0;
             $client->save();
-            new ActivityRecorder(12, null, 194, 4);
+            new ActivityRecorder(null, 194, 4);
         }
     }
     /**

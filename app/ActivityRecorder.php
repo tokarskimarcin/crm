@@ -52,15 +52,150 @@ class ActivityRecorder extends Model
       12 - CRM
     */
 
-    public function __construct($type, $action, $link_id = null, $action_id = null) {
+//    public function __construct($type, $action, $link_id = null, $action_id = null)
+//    {
+//        $this->user = Auth::user()->id;
+//        $type = 1;
+//        $this->date = date("Y-m-d H:i:s");
+//        $this->action = $action;
+//
+//        $string = '';
+//
+//        if (is_array($this->action)) {
+//            foreach ($this->action as $key => $value) {
+//                $string .= $key . ' : ' . $value . ', ';
+//            }
+//        } else {
+//            $string = $this->action;
+//        }
+//
+//        $content = $string;
+//
+//        switch ($type) {
+//            case '1':
+//                $newLog = new Logs();
+//                $newLog->links_id = $link_id;
+//                $newLog->user_id = $this->user;
+//                $newLog->action_type_id = $action_id;
+//                $newLog->comment = $content;
+//                $newLog->save();
+//                break;
+//
+//            case '2':
+//                $newLog = new Logs();
+//                $newLog->links_id = $link_id;
+//                $newLog->user_id = $this->user;
+//                $newLog->action_type_id = $action_id;
+//                $newLog->comment = $content;
+//                $newLog->save();
+//                break;
+//
+//            case '3':
+//                $newLog = new Logs();
+//                $newLog->links_id = $link_id;
+//                $newLog->user_id = $this->user;
+//                $newLog->action_type_id = $action_id;
+//                $newLog->comment = $content;
+//                $newLog->save();
+//                break;
+//
+//            case '4':
+//                $newLog = new Logs();
+//                $newLog->links_id = $link_id;
+//                $newLog->user_id = $this->user;
+//                $newLog->action_type_id = $action_id;
+//                $newLog->comment = $content;
+//                $newLog->save();
+//                break;
+//
+//            case '5':
+//                $newLog = new Logs();
+//                $newLog->links_id = $link_id;
+//                $newLog->user_id = $this->user;
+//                $newLog->action_type_id = $action_id;
+//                $newLog->comment = $content;
+//                $newLog->save();
+//                break;
+//
+//            case '6':
+//                $newLog = new Logs();
+//                $newLog->links_id = $link_id;
+//                $newLog->user_id = $this->user;
+//                $newLog->action_type_id = $action_id;
+//                $newLog->comment = $content;
+//                $newLog->save();
+//                break;
+//
+//            case '7':
+//                $newLog = new Logs();
+//                $newLog->links_id = $link_id;
+//                $newLog->user_id = $this->user;
+//                $newLog->action_type_id = $action_id;
+//                $newLog->comment = $content;
+//                $newLog->save();
+//                break;
+//
+//            case '8':
+//                $newLog = new Logs();
+//                $newLog->links_id = $link_id;
+//                $newLog->user_id = $this->user;
+//                $newLog->action_type_id = $action_id;
+//                $newLog->comment = $content;
+//                $newLog->save();
+//                break;
+//
+//            case '9':
+//                $contents = Storage::get('medicalPackagesActivity.txt');
+//                $size = File::size(storage_path('app/medicalPackagesActivity.txt'));
+//                if ($size < 104857600) {
+//                    Storage::append('medicalPackagesActivity.txt', $content);
+//                }
+//                break;
+//
+//            case '10':
+//                $newLog = new Logs();
+//                $newLog->links_id = $link_id;
+//                $newLog->user_id = $this->user;
+//                $newLog->action_type_id = $action_id;
+//                $newLog->comment = $content;
+//                $newLog->save();
+//                break;
+//
+//            case '11':
+//                $newLog = new Logs();
+//                $newLog->links_id = $link_id;
+//                $newLog->user_id = $this->user;
+//                $newLog->action_type_id = $action_id;
+//                $newLog->comment = $content;
+//                $newLog->save();
+//                break;
+//
+//            case '12':
+//                $newLog = new Logs();
+//                $newLog->links_id = $link_id;
+//                $newLog->user_id = $this->user;
+//                $newLog->action_type_id = $action_id;
+//                $newLog->comment = $content;
+//                $newLog->save();
+//                break;
+//
+//            default:
+//
+//                break;
+//        }
+//    }
+
+    public function __construct($action, $link_id = null, $action_id = null)
+    {
         $this->user = Auth::user()->id;
+        $type = 1;
         $this->date = date("Y-m-d H:i:s");
         $this->action = $action;
 
         $string = '';
 
         if (is_array($this->action)) {
-            foreach($this->action as $key => $value) {
+            foreach ($this->action as $key => $value) {
                 $string .= $key . ' : ' . $value . ', ';
             }
         } else {
@@ -69,119 +204,15 @@ class ActivityRecorder extends Model
 
         $content = $string;
 
-        switch ($type) {
-            case '1':
-                $newLog = new Logs();
-                $newLog->links_id = $link_id;
-                $newLog->user_id = $this->user;
-                $newLog->action_type_id = $action_id;
-                $newLog->comment = $content;
-                $newLog->save();
-                break;
+        $newLog = new Logs();
+        $newLog->links_id = $link_id;
+        $newLog->user_id = $this->user;
+        $newLog->action_type_id = $action_id;
+        $newLog->comment = $content;
+        $newLog->save();
 
-            case '2':
-                $newLog = new Logs();
-                $newLog->links_id = $link_id;
-                $newLog->user_id = $this->user;
-                $newLog->action_type_id = $action_id;
-                $newLog->comment = $content;
-                $newLog->save();
-                break;
-
-            case '3':
-                $newLog = new Logs();
-                $newLog->links_id = $link_id;
-                $newLog->user_id = $this->user;
-                $newLog->action_type_id = $action_id;
-                $newLog->comment = $content;
-                $newLog->save();
-                break;
-
-            case '4':
-                $newLog = new Logs();
-                $newLog->links_id = $link_id;
-                $newLog->user_id = $this->user;
-                $newLog->action_type_id = $action_id;
-                $newLog->comment = $content;
-                $newLog->save();
-                break;
-
-            case '5':
-                $newLog = new Logs();
-                $newLog->links_id = $link_id;
-                $newLog->user_id = $this->user;
-                $newLog->action_type_id = $action_id;
-                $newLog->comment = $content;
-                $newLog->save();
-                break;
-
-            case '6':
-                $newLog = new Logs();
-                $newLog->links_id = $link_id;
-                $newLog->user_id = $this->user;
-                $newLog->action_type_id = $action_id;
-                $newLog->comment = $content;
-                $newLog->save();
-                break;
-
-            case '7':
-                $newLog = new Logs();
-                $newLog->links_id = $link_id;
-                $newLog->user_id = $this->user;
-                $newLog->action_type_id = $action_id;
-                $newLog->comment = $content;
-                $newLog->save();
-                break;
-
-            case '8':
-                $newLog = new Logs();
-                $newLog->links_id = $link_id;
-                $newLog->user_id = $this->user;
-                $newLog->action_type_id = $action_id;
-                $newLog->comment = $content;
-                $newLog->save();
-                break;
-
-            case '9':
-                $contents = Storage::get('medicalPackagesActivity.txt');
-                $size = File::size(storage_path('app/medicalPackagesActivity.txt'));
-                if ($size < 104857600) {
-                    Storage::append('medicalPackagesActivity.txt', $content);
-                }
-                break;
-
-            case '10':
-                $newLog = new Logs();
-                $newLog->links_id = $link_id;
-                $newLog->user_id = $this->user;
-                $newLog->action_type_id = $action_id;
-                $newLog->comment = $content;
-                $newLog->save();
-                break;
-
-            case '11':
-                $newLog = new Logs();
-                $newLog->links_id = $link_id;
-                $newLog->user_id = $this->user;
-                $newLog->action_type_id = $action_id;
-                $newLog->comment = $content;
-                $newLog->save();
-                break;
-
-            case '12':
-                $newLog = new Logs();
-                $newLog->links_id = $link_id;
-                $newLog->user_id = $this->user;
-                $newLog->action_type_id = $action_id;
-                $newLog->comment = $content;
-                $newLog->save();
-                break;
-
-            default:
-
-                break;
-        }
-
+    }
+}
 //        // foreach($this->logTypes as $type) {
 //        //     $file = File::get(storage_path('app/' . $type));
 //        //     $how_much = strlen($file);
@@ -194,7 +225,6 @@ class ActivityRecorder extends Model
 //        // if ($day == 1) {
 //        //     $this->clearLogs();
 //        // }
-    }
 
 //    private function clearLogs() {
 //        $checkIfCleared = File::get(storage_path('app/logData.txt'));
@@ -214,4 +244,4 @@ class ActivityRecorder extends Model
 //
 //    }
 
-}
+

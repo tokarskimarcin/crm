@@ -1236,7 +1236,7 @@ class CoachingController extends Controller
 
         if ($request->has('action')) {
             if ($request->action == "coachAscription") {
-                new ActivityRecorder(11, 'Poprzedni Coach: ' . $previousCoachDirector_id . ' Nowy Coach: ' . $newCoachDirector_id, 192, 2);
+                new ActivityRecorder('Poprzedni Coach: ' . $previousCoachDirector_id . ' Nowy Coach: ' . $newCoachDirector_id, 192, 2);
                 return ['type' => 'success', 'msg' => 'Użytkownik został przypisany', 'title' => 'Przypisano!'];
             }
 
@@ -1247,7 +1247,7 @@ class CoachingController extends Controller
             if ($error)
                 $request->session()->flash('message_warning', 'Coś poszło nie tak, spróbuj później');
             else {
-                new ActivityRecorder(11, 'Poprzedni Coach: ' . $previousCoachDirector_id . ' Nowy Coach: ' . $newCoachDirector_id, 192, 2);
+                new ActivityRecorder('Poprzedni Coach: ' . $previousCoachDirector_id . ' Nowy Coach: ' . $newCoachDirector_id, 192, 2);
                 $request->session()->flash('message_ok', 'Coachingi zostały przypisane do nowego trenera');
             }
 
@@ -1312,12 +1312,12 @@ class CoachingController extends Controller
         if ($request->has('action')) {
             //ponizszy if nie ma znaczenia, to jest tylko flaga oznaczenia wykonania ajax
             if ($request->action == "coachAscriptionRevert") {
-                new ActivityRecorder(11, 'Cofniecie przypisania, Poprzedni Coach: ' . $coachDirectorChange->coach_director_id . ' Nowy Coach: ' . $coachDirectorChange->prev_coach_director_id, 192, 2);
+                new ActivityRecorder('Cofniecie przypisania, Poprzedni Coach: ' . $coachDirectorChange->coach_director_id . ' Nowy Coach: ' . $coachDirectorChange->prev_coach_director_id, 192, 2);
                 return ['type' => 'success', 'msg' => 'Pomyślne cofnięcie zmiany', 'title' => "Udało się!"];
             }
             if ($error)
                 return ['type' => 'warning', 'msg' => 'Coś poszło nie tak, spróbuj później', 'title' => "Nie udało się!"];
-            new ActivityRecorder(11, 'Cofniecie przypisania, Poprzedni Coach: ' . $coachDirectorChange->coach_director_id . ' Nowy Coach: ' . $coachDirectorChange->prev_coach_director_id, 192, 2);
+            new ActivityRecorder('Cofniecie przypisania, Poprzedni Coach: ' . $coachDirectorChange->coach_director_id . ' Nowy Coach: ' . $coachDirectorChange->prev_coach_director_id, 192, 2);
             return ['type' => 'success', 'msg' => 'Pomyślne cofnięcie zmiany', 'title' => "Udało się!"];
         } else {
             return Redirect::back();
