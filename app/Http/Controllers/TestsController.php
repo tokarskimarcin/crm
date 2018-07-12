@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ActivityRecorder;
 use App\TemplateQuestion;
 use App\TemplateUserTest;
 use App\TestUsersQuestion;
@@ -167,7 +168,7 @@ class TestsController extends Controller
     */
     public function testUserPost(Request $request) {
         $question = UserQuestion::find($request->question_id);
-
+        $questionToLog = UserQuestion::find($request->question_id);
         if ($question->test->user_id != Auth::user()->id) {
             return view('errors.404');
         }
@@ -180,6 +181,8 @@ class TestsController extends Controller
         $answer_time = $request->answer_time;
         $question->answer_time = $request->available_time - $answer_time * (-1);
 
+        $LogData = array_merge(['T ' => 'Zapisanie odpowiedzi testu'],$questionToLog->toArray());
+        new ActivityRecorder($LogData, 98, 1);
         $question->save();
 
         return Redirect::back();
@@ -347,7 +350,9 @@ class TestsController extends Controller
                             $new_many_to_many->save();
                         }
                     }
-                    Session::flash('message_ok', "Tester został dodany!");
+                $LogData = ['T ' => 'Zapisanie testu'];
+                new ActivityRecorder($LogData, 97, 1);
+                    Session::flash('message_ok', "Test został dodany!");
                     return 1;
                 }
              return 0;
@@ -402,7 +407,8 @@ class TestsController extends Controller
                                 $new_many_to_many->test_question_id = $item['id'];
                                 $new_many_to_many->save();
                             }
-
+                        $LogData = ['T ' => 'Edycja testu '.$test_id];
+                        new ActivityRecorder($LogData, 108, 2);
                         Session::put('message_ok', "Test został zmieniony!");
                         return 1;
                     }
@@ -448,6 +454,8 @@ class TestsController extends Controller
                 // usunięcie testu
                 UserTest::where('id', '=', $id)->delete();
             }
+        $LogData = array_merge(['T ' => 'Usunięcie testu '],$test_by_id->toArray());
+        new ActivityRecorder($LogData, 100, 3);
          Session::flash('message_delete', "Test został usuniety!");
          return redirect('show_tests');
     }
@@ -583,6 +591,8 @@ class TestsController extends Controller
                 $new_template->name= $request->subject;
                 $new_template->level_template = Auth::user()->user_type_id == 4 ? 1 : 0;
                 $new_template->save();
+                $LogData = array_merge(['T ' => 'Zapisanie szablonu testu'],$new_template->toArray());
+                new ActivityRecorder($LogData, 106, 1);
                 $id_template = $new_template->id;
                 $question_array = $request->question_test_array;
 
@@ -629,6 +639,8 @@ class TestsController extends Controller
         $search_template->deleted = 1;
         $search_template->cadre_id = Auth::user()->id;
         $search_template->save();
+        $LogData = array_merge(['T ' => 'Zmiana statusu szablonu'],$search_template->toArray());
+        new ActivityRecorder($LogData, 106, 4);
         Session::flash('message_delete','Szablon został usunięty');
         return redirect('showTestTemplate');
     }
@@ -683,6 +695,8 @@ class TestsController extends Controller
                 $template->template_name = $request->template;
                 $template->name = $request->subject;
                 $template->save();
+                $LogData = array_merge(['T ' => 'Edycja szablonu'],$template->toArray());
+                new ActivityRecorder($LogData, 106, 2);
                 //usunięcie wszystkich pytań szablonu
 
                 //Dodanie nowych pytań
@@ -834,6 +848,8 @@ class TestsController extends Controller
                 $this->sendMail($user->email_off, $user_name, $mail_title, $data, $mail_type);
             }
         }
+        $LogData = array_merge(['T ' => 'Zapis oceny testu'],$test->toArray());
+        new ActivityRecorder($LogData, 101, 2);
 
         Session::flash('message_ok', "Ocena została przesłana!");
         return Redirect::back();
@@ -972,7 +988,6 @@ class TestsController extends Controller
     */
     public function testsAdminPanelPost(Request $request) {
         $category = new TestCategory();
-
         $category->name = $request->category_name;
         $category->user_id = Auth::user()->id;
         $category->cadre_id = Auth::user()->id;
@@ -986,6 +1001,8 @@ class TestsController extends Controller
         $category->deleted = 0;
         $category->save();
 
+        $LogData = array_merge(['T ' => 'Zapisanie kategorii testu'],$category->toArray());
+        new ActivityRecorder($LogData, 96, 1);
         Session::flash('message_ok', "Kategoria została dodana!");
         return Redirect::back();
     }
@@ -1251,7 +1268,8 @@ class TestsController extends Controller
             $question->deleted = 0;
 
             $question->save();
-
+            $LogData = array_merge(['T ' => 'Nowe pytanie testowe'],$question->toArray());
+            new ActivityRecorder($LogData, 96, 1);
             return 1;
         }
     }
@@ -1270,7 +1288,8 @@ class TestsController extends Controller
             $category->updated_at = date('Y-m-d H:i:s');
             $category->cadre_id = Auth::user()->id;
             $category->save();
-
+            $LogData = array_merge(['T ' => 'Edycja kategorii'],$category->toArray());
+            new ActivityRecorder($LogData, 96, 2);
             return 1;
         }
     }
@@ -1289,6 +1308,8 @@ class TestsController extends Controller
             $category->updated_at = date('Y-m-d H:i:s');
             $category->cadre_id = Auth::user()->id;
             $category->save();
+            $LogData = array_merge(['T ' => 'Zmiana statusu kategorii'],$category->toArray());
+            new ActivityRecorder($LogData, 96, 4);
 
             return 1;
         }
@@ -1325,7 +1346,8 @@ class TestsController extends Controller
             $question->cadre_by = Auth::user()->id;
             
             $question->save();
-            
+            $LogData = array_merge(['T ' => 'Edycja pytania testowego'],$question->toArray());
+            new ActivityRecorder($LogData, 96, 2);
             return 1;
         }
     }
@@ -1346,7 +1368,8 @@ class TestsController extends Controller
             $question->cadre_by = Auth::user()->id;
 
             $question->save();
-
+            $LogData = array_merge(['T ' => 'Zmiana statusu pytania testowego'],$question->toArray());
+            new ActivityRecorder($LogData, 96, 4);
             return 1;
         }
     }
@@ -1379,7 +1402,8 @@ class TestsController extends Controller
 
             $checkTest->status = 2;
             $checkTest->save();
-
+            $LogData = array_merge(['T ' => 'Aktywacja testu'],$checkTest->toArray());
+            new ActivityRecorder($LogData, 100, 4);
             return 1;
         }
     }
@@ -1394,9 +1418,10 @@ class TestsController extends Controller
             if ($checkTest == null) {
                 return 0;
             }
-
             $checkTest->status = 1;
             $checkTest->save();
+            $LogData = array_merge(['T ' => 'Dezaktywacja testu'],$checkTest->toArray());
+            new ActivityRecorder($LogData, 100, 4);
 
             return 1;
         }
@@ -1423,7 +1448,8 @@ class TestsController extends Controller
 
             $question->attempt = date('Y-m-d H:i:s');
             $question->save();
-
+            $LogData = array_merge(['T ' => 'Rozpoczęcie rozwiązywania testu'],$question->toArray());
+            new ActivityRecorder($LogData, 98, 4);
             return 1;
         }
     }
@@ -1547,10 +1573,10 @@ class TestsController extends Controller
         }
 
         DB::table('privilage_user_relation')->insert([
-            ['id' => null, 'link_id' => 96, 'user_id' => $id],
-            ['id' => null, 'link_id' => 97, 'user_id' => $id],
-            ['id' => null, 'link_id' => 98, 'user_id' => $id],
-            ['id' => null, 'link_id' => 99, 'user_id' => $id],
+            ['id' => null, 'link_id' => 96,  'user_id' => $id],
+            ['id' => null, 'link_id' => 97,  'user_id' => $id],
+            ['id' => null, 'link_id' => 98,  'user_id' => $id],
+            ['id' => null, 'link_id' => 99,  'user_id' => $id],
             ['id' => null, 'link_id' => 100, 'user_id' => $id],
             ['id' => null, 'link_id' => 101, 'user_id' => $id],
             ['id' => null, 'link_id' => 102, 'user_id' => $id],
@@ -1567,6 +1593,9 @@ class TestsController extends Controller
             ['id' => null, 'link_id' => 113, 'user_id' => $id],
             ['id' => null, 'link_id' => 114, 'user_id' => $id]
         ]);
+
+        $LogData = ['T ' => 'Dodanie nowego testra do listy id: '.$id];
+        new ActivityRecorder($LogData, 110, 1);
 
         Session::flash('message_ok', "Tester został dodany!");
         return Redirect::back();
@@ -1594,6 +1623,8 @@ class TestsController extends Controller
                 ->where('user_id', '=', $id)
                 ->whereIn('link_id', $links)
                 ->delete();
+            $LogData = ['T ' => 'Usuniecie testera id: '.$id];
+            new ActivityRecorder($LogData, 110, 3);
             return 1;
         }
     }
