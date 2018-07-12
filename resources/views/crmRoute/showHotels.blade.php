@@ -167,9 +167,19 @@
                                                 <div class="row">
                                                     <div class="col-md-12">
                                                         <div class="input-group">
+                                                            <input type="text" id="zipCode1" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                            <span class="input-group-addon" id="basic-addon1" style="padding: 0px"></span>
+                                                            <input type="text" id="zipCode2" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                            <span class="input-group-addon" id="basic-addon1" style="padding: 3px;">-</span>
+                                                            <input type="text" id="zipCode3" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                            <span class="input-group-addon" id="basic-addon1"style="padding: 0px"></span>
+                                                            <input type="text" id="zipCode4" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                            <span class="input-group-addon" id="basic-addon1"style="padding: 0px"></span>
+                                                            <input type="text" id="zipCode5" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                            {{--
                                                             <input type="text" id="zipCode1" class="form-control col-md-4" placeholder="- -" aria-describedby="basic-addon1" style="text-align: center; letter-spacing: 8px">
                                                             <span class="input-group-addon" id="basic-addon1">-</span>
-                                                            <input type="text" id="zipCode2" class="form-control col-md-7" placeholder="- - -" aria-describedby="basic-addon1" style="text-align: center; letter-spacing: 8px">
+                                                            <input type="text" id="zipCode2" class="form-control col-md-7" placeholder="- - -" aria-describedby="basic-addon1" style="text-align: center; letter-spacing: 8px">--}}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -213,9 +223,9 @@
         var addNewHotelFlag = false;
         var editHotelFlag = false;
         var hotelStatus = 1;
-        var city = 0;
+        var city = 0;/*
         let zipCode2 = document.getElementById('zipCode2');
-        let zipCode1 = document.getElementById('zipCode1');
+        let zipCode1 = document.getElementById('zipCode1');*/
 
         function clearContent(container) {
             container.innerHTML = '';
@@ -238,8 +248,9 @@
             $('#cityAdd').val(0);
             $('#comment').val("");
             $('#hotelId').val(0);
-            $('#zipCode1').val("");
-            $('#zipCode2').val("");
+            $('.zipCode').val("");
+            /*
+            $('#zipCode2').val("");*/
         }
 
         document.addEventListener('DOMContentLoaded', function(event) {
@@ -306,12 +317,14 @@
                                     for(i = 0; i < 5-length; i++){
                                         zipCode = "0".concat(zipCode);
                                     }
-                                    $('#zipCode1').val(zipCode.slice(0,2));
-                                    $('#zipCode2').val(zipCode.slice(2,5));
+                                    zipCodeInputs = $('.zipCode');
+                                    for(i = 0; i < 5; i++)
+                                        $(zipCodeInputs.get(i)).val(zipCode.slice(i,i+1));
+                                    /*$('#zipCode1').val(zipCode.slice(0,2));
+                                    $('#zipCode2').val(zipCode.slice(2,5));*/
                                 }
                                 else {
-                                    $('#zipCode1').val('');
-                                    $('#zipCode2').val('');
+                                    $('.zipCode').val('');
                                 }
 
                                 city = response.city_id;
@@ -476,11 +489,14 @@
                 var city = $('#cityAdd').val();
                 var comment = $('#comment').val();
                 var validate = true;
-                let hotelId = $('#hotelId').val();
+                let hotelId = $('#hotelId').val();/*
                 let zipCode1 = $('#zipCode1').val();
-                let zipCode2 = $('#zipCode2').val();
-                let zipCode = zipCode1 + zipCode2;
-
+                let zipCode2 = $('#zipCode2').val();*/
+                let zipCode ='';
+                $('.zipCode').each(function( key, item ) {
+                    zipCode += item.value;
+                });
+                //let zipCode = zipCode1 + zipCode2;
                 if (zipCode.trim().length < 5) {
                     validate = false;
                     swal("Podaj kod pocztowy")
@@ -552,6 +568,57 @@
 
             });
 
+            $('.zipCode').on('input', function(e){
+                console.log('input');
+                $thisZipCode = $(e.target);
+                $zipCodes = $('.zipCode');
+                $stringValue = String($thisZipCode.val()).replace('-', '');
+                $value = parseInt($stringValue);
+                if (isNaN($value)) {
+                        $thisZipCode.val('');
+                } else {
+                        if ($zipCodes.index($thisZipCode) < 4) {
+                            if (String($value).length === 1) {
+
+                                $thisZipCode.val($value);
+                                //focus and select next zipCode input
+                                $index = $zipCodes.index($thisZipCode) + 1;
+                                if ($index !== $zipCodes.length) {
+                                    $($zipCodes.get($index)).focus();
+                                }
+                            } else {
+                                count = 0;
+                                for (; count < String($value).length; count++) {
+                                    $($zipCodes.get(count)).val(String($value).charAt(count));
+                                }
+                                if (count < $zipCodes.length) {
+                                    $($zipCodes.get(count)).focus();
+                                    $($zipCodes.get(count)).select();
+                                } else
+                                    $thisZipCode.blur();
+                            }
+                        } else {
+                            if (String($value).length === 1) {
+                                $thisZipCode.val($value);
+                            } else
+                                $thisZipCode.val(String($value).charAt(0));
+                        }
+                }
+            }).focus(function(e){
+                $(e.target).select();
+            }).keyup(function (e) {
+                if(e.keyCode == 8 && $(e.target).val().length === 0){
+                    $zipCodes = $('.zipCode');
+                    $index = $zipCodes.index($(e.target)) - 1;
+                    if ($index >= 0) {
+                        $($zipCodes.get($index)).focus();
+                        $($zipCodes.get($index)).select();
+                    }
+                }
+            });
+
+
+
             /**
              * This function validate first zip code input
              * @param e
@@ -601,8 +668,10 @@
                     e.target.value = wordUntilLastDigit;
                 }
             }
+
+            /*
             zipCode1.addEventListener('input', zipCode1Handler);
-            zipCode2.addEventListener('input', zipCode2Handler);
+            zipCode2.addEventListener('input', zipCode2Handler);*/
 
             $('#voivode').select2();
             $('#city').select2();

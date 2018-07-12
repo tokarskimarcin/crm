@@ -121,7 +121,7 @@
                                                    placeholder="Karencja" type="number" min="-1">
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <div class="form-group">
                                             <div class="row">
                                                 <div class="col-md-12">
@@ -131,10 +131,20 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="input-group">
-                                                        <input type="text" id="zipCode1" class="form-control col-md-4" placeholder="- -" aria-describedby="basic-addon1" style="text-align: center; letter-spacing: 8px">
-                                                        <span class="input-group-addon" id="basic-addon1">-</span>
-                                                        <input type="text" id="zipCode2" class="form-control col-md-7" placeholder="- - -" aria-describedby="basic-addon1" style="text-align: center; letter-spacing: 8px">
-                                                    </div>
+                                                        <input type="text" id="zipCode1" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                        <span class="input-group-addon" id="basic-addon1" style="padding: 0px"></span>
+                                                        <input type="text" id="zipCode2" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                        <span class="input-group-addon" id="basic-addon1" style="padding: 3px;">-</span>
+                                                        <input type="text" id="zipCode3" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                        <span class="input-group-addon" id="basic-addon1"style="padding: 0px"></span>
+                                                        <input type="text" id="zipCode4" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                        <span class="input-group-addon" id="basic-addon1"style="padding: 0px"></span>
+                                                        <input type="text" id="zipCode5" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+
+                                                        {{-- <input type="text" id="zipCode1" class="form-control col-md-4" placeholder="- -" aria-describedby="basic-addon1" style="text-align: center; letter-spacing: 8px">
+                                                         <span class="input-group-addon" id="basic-addon1">-</span>
+                                                         <input type="text" id="zipCode2" class="form-control col-md-7" placeholder="- - -" aria-describedby="basic-addon1" style="text-align: center; letter-spacing: 8px">
+                                                     --}}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -220,8 +230,10 @@
             $('#voiovedshipID').val("1");
             $('#cityName').val("");
 
+            $('.zipCode').val("");
+            /*
             $('#zipCode1').val("");
-            $('#zipCode2').val("");
+            $('#zipCode2').val("");*/
             $('#latitude').val("");
             $('#longitude').val("");
 
@@ -239,7 +251,11 @@
             let gracePeriod = $('#gracePeriod').val();
 
             let status = $('#status').val();
-            let zipCode = $('#zipCode1').val()+$('#zipCode2').val();
+            let zipCode ='';
+            $('.zipCode').each(function( key, item ) {
+                zipCode += item.value;
+            });
+            /*let zipCode = $('#zipCode1').val()+$('#zipCode2').val();*/
             let latitude = $('#latitude').val();
             let longitude = $('#longitude').val();
             // let weekGrace = $('#weekGrace').val();
@@ -318,6 +334,54 @@
 
         $(document).ready(function () {
 
+            $('.zipCode').on('input', function(e){
+                console.log('input');
+                $thisZipCode = $(e.target);
+                $zipCodes = $('.zipCode');
+                $stringValue = String($thisZipCode.val()).replace('-', '');
+                $value = parseInt($stringValue);
+                if (isNaN($value)) {
+                    $thisZipCode.val('');
+                } else {
+                    if ($zipCodes.index($thisZipCode) < 4) {
+                        if (String($value).length === 1) {
+
+                            $thisZipCode.val($value);
+                            //focus and select next zipCode input
+                            $index = $zipCodes.index($thisZipCode) + 1;
+                            if ($index !== $zipCodes.length) {
+                                $($zipCodes.get($index)).focus();
+                            }
+                        } else {
+                            count = 0;
+                            for (; count < String($value).length; count++) {
+                                $($zipCodes.get(count)).val(String($value).charAt(count));
+                            }
+                            if (count < $zipCodes.length) {
+                                $($zipCodes.get(count)).focus();
+                                $($zipCodes.get(count)).select();
+                            } else
+                                $thisZipCode.blur();
+                        }
+                    } else {
+                        if (String($value).length === 1) {
+                            $thisZipCode.val($value);
+                        } else
+                            $thisZipCode.val(String($value).charAt(0));
+                    }
+                }
+            }).focus(function(e){
+                $(e.target).select();
+            }).keyup(function (e) {
+                if(e.keyCode == 8 && $(e.target).val().length === 0){
+                    $zipCodes = $('.zipCode');
+                    $index = $zipCodes.index($(e.target)) - 1;
+                    if ($index >= 0) {
+                        $($zipCodes.get($index)).focus();
+                        $($zipCodes.get($index)).select();
+                    }
+                }
+            });
             /**
              * This function validate first zip code input
              * @param e
@@ -367,11 +431,11 @@
                     e.target.value = wordUntilLastDigit;
                 }
             }
-
+/*
             let zipCode2 = document.getElementById('zipCode2');
             let zipCode1 = document.getElementById('zipCode1');
             zipCode1.addEventListener('input', zipCode1Handler);
-            zipCode2.addEventListener('input', zipCode2Handler);
+            zipCode2.addEventListener('input', zipCode2Handler);*/
 
             $('#ModalCity').on('hidden.bs.modal', function () {
                 $('#cityID').val("0");
@@ -516,8 +580,13 @@
                                 for(i = 0; i < 5-length; i++){
                                     zipCode = "0".concat(zipCode);
                                 }
-                                $('#zipCode1').val(zipCode.slice(0,2));
-                                $('#zipCode2').val(zipCode.slice(2,5));
+                                zipCodeInputs = $('.zipCode');
+                                for(i = 0; i < 5; i++)
+                                    $(zipCodeInputs.get(i)).val(zipCode.slice(i,i+1));
+                                /*$('#zipCode1').val(zipCode.slice(0,2));
+                                $('#zipCode2').val(zipCode.slice(2,5));*/
+
+
                                 $('#latitude').val(response.latitude);
                                 $('#longitude').val(response.longitude);
                                 $('#cityID').val(response.id);
