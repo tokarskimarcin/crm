@@ -10,7 +10,8 @@
      'LZA' => 'Zamość',
      'LCH' => 'Chełm',
      'LDZ' => 'Łódź',
-     'BST' => 'Białystok'
+     'BST' => 'Białystok',
+     'EDZ' => 'Zduńska Wola'
      );
 @endphp
 
