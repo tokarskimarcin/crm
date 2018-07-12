@@ -101,7 +101,7 @@ class AuditController extends Controller
 
         $fileCatalog = "auditFiles";
         $suffix = '';
-
+        $log = "ID nowego audytu " . $newForm->id . ', data: ' . $newForm->date_audit . ', wynik: ' . $newForm->score . ', department_info_id: ' . $newForm->department_info_id . ', user_type_id: ' . $newForm->user_type . ', wybrana osoba: ' . $newForm->trainer_id . ', rodzaj szablonu ' . $template;
         /*fill "audit_info" table*/
         $criterions = AuditCriterions::where('status', '=', $template)->get();
         foreach($criterions as $c) {
@@ -126,6 +126,7 @@ class AuditController extends Controller
             $audExtensionArr = array('.mp3', '.m4a', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
             $allFilesExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf', '.mp3', '.m4a', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
 
+            $log .= 'audit_criterion_id: ' . $c->id . ', Tak/Nie: ' . $request->$nameAmount . ', komentarz: ' . $request->$nameComment;
             if($request->hasFile($arrFilename))
             {
 
@@ -151,7 +152,7 @@ class AuditController extends Controller
                         $audit_files->save();
                         $file->storeAs($fileCatalog, $newForm->id . '-' . $c->name . '-' . $audit_files->id . $suffix);
                     }
-
+                    $log .= ', plik: ' . $audit_files->name;
                 }
             }
 
@@ -159,10 +160,8 @@ class AuditController extends Controller
             Session::flash('adnotation', "Audyt został dodany!");
         }
         //Saving info about edition to log file
-        $log = [
-            "ID nowego audytu" => $newForm->id
-        ];
-        new ActivityRecorder($log,158,1);
+
+        new ActivityRecorder($log,167,1);
 
         return Redirect::to('/showAudits');
     }
@@ -299,10 +298,8 @@ class AuditController extends Controller
         $audit->save();
 
         //Saving info about edition to log file
-        $log = [
-            "ID edytowanego audytu" => $audit->id
-        ];
-        new ActivityRecorder($log,171, 2);
+        $log = "ID edytowanego audytu " . $audit->id . ', wynik: ' . $audit->score . ', edit_user_id: ' . $audit->edit_user_id;
+
 
         $criterions = AuditCriterions::all();
         foreach($criterions as $c) {
@@ -327,6 +324,8 @@ class AuditController extends Controller
             $picExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf');
             $audExtensionArr = array('.mp3', '.m4a', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
             $allFilesExtensionArr = array('.jpeg', '.jpg', '.png', '.pdf', '.mp3', '.m4a', '.3ga', '.aac', '.ogg', '.oga', '.wav', '.wma', '.amr', '.awb', '.flac', '.mid', '.midi', '.xmf', '.mxmf', '.imy', '.rtttl', '.rtx', '.ota');
+            $log .= 'audit_criterion_id: ' . $c->id . ', Tak/Nie: ' . $request->$nameAmount . ', komentarz: ' . $request->$nameComment;
+
             if($request->hasFile($arrFilename))
             {
 
@@ -351,11 +350,13 @@ class AuditController extends Controller
                         $audit_files->name = $nameOfFile;
                         $audit_files->save();
                         $file->storeAs($fileCatalog, $id . '-' . $c->name . '-' . $audit_files->id . $suffix);
+                        $log .= ', plik: ' . $audit_files->name;
                     }
                 }
             }
             $crit->save();
         }
+        new ActivityRecorder($log,169, 2);
         return Redirect::to('audit/'.$id);
     }
 
@@ -403,7 +404,7 @@ class AuditController extends Controller
             $log = [
                 "ID usuniętego pliku" => $request->id_picture
             ];
-            new ActivityRecorder($log,171 ,3);
+            new ActivityRecorder($log,169 ,3);
 
             return 1;
         }else return 0;
