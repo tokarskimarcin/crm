@@ -165,12 +165,10 @@ class UsersController extends Controller
         $userEmployment->user_id = $user->id;
         $userEmployment->save();
 
-        $user_data = array(
-            'first_name' => $user->first_name,
-            'last_name' => $user->last_name
-        );
+        $log = array('T' => 'Dodanie nowego użytkownika');
+        $log = array_merge($log, $user->toArray());
 
-        new ActivityRecorder('Dodanie użytkownika: ' . $request->first_name . ' ' . $request->last_name . ', login: ' . $request->login_phone,8,1);
+        new ActivityRecorder($log, 8,1);
 
         /**
          * Dodanie pakietu medycznego
@@ -533,28 +531,11 @@ class UsersController extends Controller
         $user->save();
 
         $data = [
-            'Edycja użytkownika:' => ' ',
-            'username' => $request->username,
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'private_phone' => $request->private_phone,
-            'description' => $request->description,
-            'salary_to_account' => $request->salary_to_account,
-            'agency_id' => $request->agency_id,
-            'login_phone' => $request->login_phone,
-            'rate' => $request->rate,
-            'salary' => $request->salary,
-            'documents' => $request->documents,
-            'additional_salary' => $request->additional_salary,
-            'status_work' => $request->status_work,
-            'start_work' => $request->start_date,
-            'stop_work' => $request->stop_date,
-            'guid' => base64_encode($request->password)
-        ];
+            'T' => 'Edycja użytkownika'
+            ];
+        $log = array_merge($data, $user->toArray());
 
-        new ActivityRecorder($data,32,2);
+        new ActivityRecorder($log,10,2);
 
         /**
          * Ewentualna zmiana pakietów medycznych
@@ -920,6 +901,10 @@ class UsersController extends Controller
                 $package->updated_at = date('Y-m-d H:i:s');
 
                 $package->save();
+
+                $log = array('T' => 'Usunięcie pakietu medycznego');
+                $log = array_merge($log, $package->toArray());
+                new ActivityRecorder($log, 10, 3);
             }
             return 1;
         }
@@ -1220,8 +1205,16 @@ class UsersController extends Controller
 
         if ($request->has('action')) {
             //ponizszy if nie ma znaczenia, to jest tylko flaga oznaczenia wykonania ajax
-            if ($request->action == "coachChange")
+            if ($request->action == "coachChange") {
+                $log = array(
+                    'T' => 'Zmiana trenera grupy',
+                    'newCoach_id' => $request->newCoach_id,
+                    'coachId' => $request->coach_id
+                );
+                new ActivityRecorder($log,206,4);
                 return ['type' => 'success', 'msg' => 'Pomyślna zmiana trenera grupy', 'title' => "Udało się!"];
+                }
+
 
             if ($error)
                 return ['type' => 'warning', 'msg' => 'Coś poszło nie tak, spróbuj później', 'title' => "Nie udało się!"];
@@ -1287,6 +1280,12 @@ class UsersController extends Controller
         if ($request->has('action')) {
             //ponizszy if nie ma znaczenia, to jest tylko flaga oznaczenia wykonania ajax
             if ($request->action == "coachChangeRevert") {
+                $log = array(
+                    'T' => 'Cofnięcie zmiany',
+                    'coachChangeId' => $request->coach_change_id,
+                    'previousCoachId' => $coachChange->prev_coach_id
+                );
+                new ActivityRecorder($log,206,4);
                 return ['type' => 'success', 'msg' => 'Pomyślne cofnięcie zmiany', 'title' => "Udało się!"];
             }
             if ($error)

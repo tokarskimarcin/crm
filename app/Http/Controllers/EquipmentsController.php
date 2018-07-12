@@ -133,13 +133,10 @@ class EquipmentsController extends Controller
         $equipment->save();
 
         $data = [
-            'Dodanie sprzętu firmowego' => '',
-            'equipment_type' => $request->equipment_type,
-            'serial_code' => $request->serial_code,
-            'model' => $request->model
+            'T' => 'Dodanie sprzętu firmowego',
         ];
-
-        new ActivityRecorder($data, 34,1);
+        $log = array_merge($data, $equipment->toArray());
+        new ActivityRecorder($log, 34,1);
 
         Session::flash('message_ok', "Sprzęt został dodany pomyślnie!");
         return redirect('/show_equipment');
@@ -220,31 +217,11 @@ class EquipmentsController extends Controller
         $equipment->save();
 
         $data = [
-            'Edycja sprzętu firmowego' => '',
-            'Id sprzętu: ' => $equipment->id,
-            'model' => $request->model,
-            'serial_code' => $request->serial_code,
-            'description' => $request->description,
-            'power_cable' => $request->power_cable,
-            'user_id' => $request->user_id,
-            'department_info_id' => $request->department_info_id,
-            'department_info_id' => $request->department_info_id,
-            'laptop_ram' => $request->laptop_ram,
-            'laptop_hard_drive' => $request->laptop_hard_drive,
-            'phone_box' => $request->phone_box,
-            'tablet_modem' => $request->tablet_modem,
-            'sim_number_phone' => $request->sim_number_phone,
-            'sim_type' => $request->sim_type,
-            'sim_pin' => $request->sim_pin,
-            'sim_puk' => $request->sim_puk,
-            'sim_net' => $request->sim_net,
-            'signal_cable' => $request->signal_cable,
-            'imei' => $request->imei,
-            'tablet_modem' => $request->tablet_modem,
-            'deleted' => $request->deleted
+            'T' => 'Edycja sprzętu firmowego'
         ];
+        $log = array_merge($data, $equipment->toArray());
 
-        new ActivityRecorder($data,33,2);
+        new ActivityRecorder($log,33,2);
 
         $equipment = Equipments::find($id);
         $users = User::all();
