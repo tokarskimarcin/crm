@@ -3416,7 +3416,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                             ->where('user_id','=',$user)->count();
                     }
                     if ($question > 0) {
-                        //Wyłuskanie informacji o konsultancie
+                        //Wyłuskanie informacji o konsultanciee
                         if($date_start < '2018-05-31') {
                             $report = $item->where('report_date', '=', $actual_loop_day)->first();
                         }else{
