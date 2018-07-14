@@ -224,6 +224,7 @@
                             <tr>
                                 <th>Imie i nazwisko</th>
                                 <th>Telefon</th>
+                                <th>W procesie u</th>
                                 <th>Data dodania</th>
                                 <th>Status</th>
                                 <th style="width: 15%">Szczegóły</th>
@@ -432,6 +433,7 @@ table = $('#candidates').DataTable({
             return myName;
         },"orderable": true, "searchable": true, "name": "last_name"},
         {"data": "phone"},
+        {"data": "last_edit_user_name"},
         {"data": "created_at"},
         {"data": "attempt_name"},
         {"data": function (data, type, dataToSet) {

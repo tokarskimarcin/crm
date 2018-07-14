@@ -663,7 +663,13 @@ $('.form_date').datetimepicker({
     minView: 2,
     pickTime: false,
 });
-
+    /**
+     * This function validate phone input
+     * @param e
+     */
+    $('#candidate_phone').on("input propertychange",function (e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
 
     /**
      * Edycja daty rozmowy kwalifikacyjnej

@@ -41,6 +41,7 @@
                         <td>Telefon</td>
                         <td>Data dodania</td>
                         <td>Dodany przez</td>
+                        <td>W procesie u</td>
                         <td>Status</td>
                         <td>Profil</td>
                     </tr>
@@ -106,6 +107,7 @@
                         return myName;
                     }, "orderable": true, "searchable": true, "name": "cadre_surname"
                 },
+                {"data": "last_edit_user_name"},
                 {"data": "attempt_name"},
                 {
                     "data": function (data, type, dataToSet) {
