@@ -1,106 +1,195 @@
-@extends('layouts.main')
-@section('style')
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-@endsection
-@section('content')
-
-    {{--Header page --}}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="page-header">
-                <div class="alert gray-nav ">Panel Klientów</div>
+@extends('layouts.main') @section('style') <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" /> @endsection @section('content') {{--Header page --}} <div class="row"><div class="col-md-12"><div class="page-header"><div class="alert gray-nav ">Panel Klientów</div></div></div></div> <div class="row"><div class="col-lg-12"><div class="panel panel-default"><div class="panel-heading">Zarządzanie klientami</div><div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button data-toggle="modal" class="btn btn-default" id="clientModal" data-target="#ModalClient" data-id="1" title="Nowy Klient" style="margin-bottom: 14px">
+                            <span class="glyphicon glyphicon-plus"></span> <span>Dodaj Klienta</span>
+                        </button>
+                        <table id="datatable" class="thead-inverse table table-striped row-border" cellspacing="0" width="100%">
+                            <thead>
+                            <tr>
+                                <th>Nazwa klienta (Umawianie)</th>
+                                <th>Uwaga</th>
+                                <th>Podgląd</th>
+                                <th style="text-align: center">Akcja</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    Zarządzanie klientami
-                </div>
-                <div class="panel-body">
-                    <div class="row">
+{{--MODAL Dodaj Klienta--}}
+<div id="ModalClient" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 90%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" id="modal_title">Dodaj nowego klienta<span id="modal_category"></span></h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Formularz
+                    </div>
+                    <div class="panel-body">
                         <div class="col-md-12">
-                            <button data-toggle="modal" class="btn btn-default" id="clientModal" data-target="#ModalClient" data-id="1" title="Nowy Klient" style="margin-bottom: 14px">
-                                <span class="glyphicon glyphicon-plus"></span> <span>Dodaj Klienta</span>
-                            </button>
-                            <table id="datatable" class="thead-inverse table table-striped row-border" cellspacing="0" width="100%">
-                                <thead>
-                                <tr>
-                                    <th>Nazwa</th>
-                                    <th>Priorytet</th>
-                                    <th>Typ</th>
-                                    <th style="text-align: center">Akcja</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="myLabel">Nazwa klienta na umawianie</label>
+                                            <input class="form-control" name="clientName" id="clientName" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="myLabel">Nazwa klienta do faktury</label>
+                                            <input class="form-control" name="clientNameInvoice" id="clientNameInvoice" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="myLabel">Rodzaj Spotkania</label>
+                                            <select class="form-control" id="clientMeetingType">
+                                                <option value="0">Wybierz</option>
+                                                @foreach($clientMeetingType as $item)
+                                                    <option value="{{$item->id}}">{{$item->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="myLabel">Upominek</label>
+                                            <select class="form-control" id="clientGiftType">
+                                                <option value="0">Wybierz</option>
+                                                @foreach($clientGiftType as $item)
+                                                    <option value="{{$item->id}}">{{$item->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="myLabel">Priorytet</label>
+                                            <select class="form-control" id="clientPriority">
+                                                <option value="0">Wybierz</option>
+                                                <option value="1">Niski</option>
+                                                <option value="2">Średni</option>
+                                                <option value="3">Wysoki</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="myLabel">Typ</label>
+                                            <select class="form-control" id="clientType">
+                                                <option value="0">Wybierz</option>
+                                                <option>Badania</option>
+                                                <option>Wysyłka</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-    {{--MODAL Dodaj Klienta--}}
-    <div id="ModalClient" class="modal fade" role="dialog">
-        <div class="modal-dialog modal-lg" style="width: 90%">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title" id="modal_title">Dodaj nowego klienta<span id="modal_category"></span></h4>
-                </div>
-                <div class="modal-body">
 
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            Formularz
-                        </div>
-                        <div class="panel-body">
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    Kontakt
+                                </div>
+                                <div class="panel-body">
+                                    <div class="col-md-12">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="myLabel">Płatności (telefon)</label>
+                                                <input class="form-control" name="clientPaymentPhone" id="clientPaymentPhone" />
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="myLabel">Płatności (mail)</label>
+                                                <input class="form-control" name="clientPaymentMail" id="clientPaymentMail" />
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="myLabel">Awarie (telefon)</label>
+                                                <input class="form-control" name="clientFailuresPhone" id="clientFailuresPhone" />
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="myLabel">Awarie (mail)</label>
+                                                <input class="form-control" name="clientFailuresMail" id="clientFailuresMail" />
+                                                </select>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="myLabel">Grafiki (telefon)</label>
+                                                <input class="form-control" name="clientSchedulePhone" id="clientSchedulePhone" />
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="myLabel">Grafik (mail)</label>
+                                                <input class="form-control" name="clientScheduleMail" id="clientScheduleMail" />
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="myLabel">Szef (telefon)</label>
+                                                <input class="form-control" name="clientManagerPhone" id="clientManagerPhone" />
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="myLabel">Szef (mail)</label>
+                                                <input class="form-control" name="clientManagersMail" id="clientManagersMail" />
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-md-12">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label class="myLabel">Nazwa Klienta</label>
-                                        <input class="form-control" name="clientName" id="clientName" />
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label class="myLabel">Priorytet</label>
-                                        <select class="form-control" id="clientPriority">
-                                            <option value="0">Wybierz</option>
-                                            <option value="1">Niski</option>
-                                            <option value="2">Średni</option>
-                                            <option value="3">Wysoki</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label class="myLabel">Typ</label>
-                                        <select class="form-control" id="clientType">
-                                            <option value="0">Wybierz</option>
-                                            <option>Badania</option>
-                                            <option>Wysyłka</option>
-                                        </select>
-                                    </div>
+                                <div class="form-group">
+                                    <label class="myLabel">Uwagi</label>
+                                    <textarea class="form-control" name="clientComment" id="clientComment"></textarea>
                                 </div>
                             </div>
-                            <div class="col-md-12 editButtonSection">
-                                <button class="btn btn-success form-control" id="saveClient" onclick = "saveClient(this)" >Zapisz Klienta</button>
-                            </div>
+                        </div>
+                        <div class="col-md-12 editButtonSection">
+                            <button class="btn btn-success form-control" id="saveClient" onclick = "saveClient(this)" >Zapisz Klienta</button>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
             </div>
         </div>
     </div>
-    <input type="hidden" value="0" id="clientID" />
+</div>
+<input type="hidden" value="0" id="clientID" />
 @endsection
 
 @section('script')
@@ -137,23 +226,157 @@
             });
         }
 
+        function prepereModel(type) {
+            if(type == 'Edit'){
+                $('#ModalClient .modal-title').first().text('Edycja klienta');
+                let saveClientModalButton = $('#ModalClient #saveClient');
+                saveClientModalButton.first().show();
+                saveClientModalButton.first().prop('class','btn btn-success form-control');
+                saveClientModalButton.first().text('');
+                saveClientModalButton.append($('<span class="glyphicon glyphicon-save"></span>'));
+                saveClientModalButton.append(' Zapisz Klienta');
+            }else if(type == 'Show'){
+                $('#ModalClient .modal-title').first().text('Informacje o kliencie');
+                let saveClientModalButton = $('#ModalClient #saveClient');
+                saveClientModalButton.first().hide();
+            }else if (type == 'Add'){
+                $('#ModalClient .modal-title').first().text('Nowy klient');
+                let saveClientModalButton = $('#ModalClient #saveClient');
+                saveClientModalButton.first().show();
+                saveClientModalButton.first().prop('class','btn btn-default form-control');
+                saveClientModalButton.first().text('');
+                saveClientModalButton.append($('<span class="glyphicon glyphicon-plus"></span>'));
+                saveClientModalButton.append(' Dodaj Klienta');
+            }
+        }
+        //Pobranie informacji o kliencie i wstawienie go do modala
+        function getInfoAboutClient(clientId) {
+            $.ajax({
+                type: "POST",
+                url: "{{ route('api.findClient') }}", // do zamiany
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    'clientId'         : clientId
+                },
+                success: function (response) {
+                    clearModal();
+                    $('#clientName').val(response.name);
+                    $('#clientPriority').val(response.priority);
+                    $('#clientType').val(response.type);
+                    $('#clientID').val(response.id);
+                    $('#clientNameInvoice').val(response.invoice_name);
+                    $('#clientMeetingType').val(response.meeting_type_id);
+                    $('#clientGiftType').val(response.gift_type_id);
+                    $('#clientPaymentPhone').val(response.payment_phone);
+                    $('#clientPaymentMail').val(response.payment_mail);
+                    $('#clientFailuresPhone').val(response.failures_phone);
+                    $('#clientFailuresMail').val(response.failures_mail);
+                    $('#clientSchedulePhone').val(response.schedule_phone);
+                    $('#clientScheduleMail').val(response.schedule_mail);
+                    $('#clientManagerPhone').val(response.manager_phone);
+                    $('#clientManagersMail').val(response.manager_mail);
+                    $('#clientComment').val(response.comment);
+                    $('#ModalClient').modal('show');
+                    editFlag = true;
+                    modalTitle.textContent = "Edytuj klienta";
+                }
+            });
+        }
         function clearModal() {
             $('#clientName').val("");
+            $('#clientNameInvoice').val("");
+            $('#clientMeetingType').val("0");
+            $('#clientGiftType').val("0");
+            $('#clientPaymentPhone').val("");
+            $('#clientPaymentMail').val("");
+            $('#clientFailuresPhone').val("");
+            $('#clientFailuresMail').val("");
+            $('#clientSchedulePhone').val("");
+            $('#clientScheduleMail').val("");
+            $('#clientManagerPhone').val("");
+            $('#clientManagersMail').val("");
+            $('#clientComment').val("");
             $('#clientPriority').val("0");
             $('#clientType').val("1");
             $('#clientID').val(0);
         }
+        /**
+         * This function validate phone input
+         * @param e
+         */
+        $('#clientPaymentPhone,#clientFailuresPhone,#clientSchedulePhone,#clientManagerPhone').on("input propertychange",function (e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
         //Zapisanie klienta
         function saveClient(e) {
-            saveCityButtonClicked = true;
-            let clientName = $('#clientName').val();
-            let clientPriority = $('#clientPriority').val();
-            let clientType = $('#clientType').val();
-            let clientID = $('#clientID').val();
+            saveCityButtonClicked       = true;
+            let clientName              = $('#clientName').val();
+            let clientPriority          = $('#clientPriority').val();
+            let clientType              = $('#clientType').val();
+            let clientID                = $('#clientID').val();
+            let clientNameInvoice       = $('#clientNameInvoice').val();
+            let clientMeetingType       = $('#clientMeetingType').val();
+            let clientGiftType          = $('#clientGiftType').val();
+            let clientPaymentPhone      = $('#clientPaymentPhone').val();
+            let clientPaymentMail       = $('#clientPaymentMail').val();
+            let clientFailuresPhone     = $('#clientFailuresPhone').val();
+            let clientFailuresMail      = $('#clientFailuresMail').val();
+            let clientSchedulePhone     = $('#clientSchedulePhone').val();
+            let clientScheduleMail      = $('#clientScheduleMail').val();
+            let clientManagerPhone      = $('#clientManagerPhone').val();
+            let clientManagersMail      = $('#clientManagersMail').val();
+            let clientComment           = $('#clientComment').val();
+
             let validation = true;
-            if(clientName.trim().length == 0){
+
+            if(clientNameInvoice.trim().length == 0 || clientNameInvoice == ''){
                 validation = false;
-                swal("Podaj nazwę klienta")
+                swal("Podaj nazwę klienta (Faktura)")
+            }
+            if(clientPaymentPhone.trim().length == 0 || clientNameInvoice == ''){
+                validation = false;
+                swal("Podaj telefon kontaktowy (płatności)")
+            }
+            if(clientPaymentMail.trim().length == 0 || clientNameInvoice == ''){
+                validation = false;
+                swal("Podaj mail kontaktowy (płatności)")
+            }
+            if(clientFailuresPhone.trim().length == 0 || clientNameInvoice == ''){
+                validation = false;
+                swal("Podaj telefon kontaktowy (awarie)")
+            }
+            if(clientFailuresMail.trim().length == 0 || clientNameInvoice == ''){
+                validation = false;
+                swal("Podaj mail kontaktowy (awarie)")
+            }
+            if(clientSchedulePhone.trim().length == 0 || clientNameInvoice == ''){
+                validation = false;
+                swal("Podaj telefon kontaktowy (grafik)")
+            }if(clientScheduleMail.trim().length == 0 || clientNameInvoice == ''){
+                validation = false;
+                swal("Podaj mail kontaktowy (grafik)")
+            }
+            if(clientManagerPhone.trim().length == 0 || clientNameInvoice == ''){
+                validation = false;
+                swal("Podaj telefon kontaktowy (Szef)")
+            }
+            if(clientManagersMail.trim().length == 0 || clientNameInvoice == ''){
+                validation = false;
+                swal("Podaj mail kontaktowy (Szef)")
+            }
+            if(clientMeetingType == 0){
+                validation = false;
+                swal("Wybierz typ spotkań")
+            }
+            if(clientGiftType == 0){
+                validation = false;
+                swal("Wybierz typ prezentów")
+            }
+            if(clientName.trim().length == 0 || clientNameInvoice == ''){
+                validation = false;
+                swal("Podaj nazwę klienta (umawianie")
             }
             if(clientPriority == 0){
                 validation = false;
@@ -175,7 +398,19 @@
                         'clientName'    : clientName,
                         'clientPriority': clientPriority,
                         'clientType'    : clientType,
-                        'clientID'      : clientID
+                        'clientID'      : clientID,
+                        'clientComment' : clientComment,
+                        'clientNameInvoice' : clientNameInvoice,
+                        'clientMeetingType' : clientMeetingType,
+                        'clientGiftType'    : clientGiftType,
+                        'clientPaymentPhone': clientPaymentPhone,
+                        'clientPaymentMail' : clientPaymentMail,
+                        'clientFailuresPhone' : clientFailuresPhone,
+                        'clientFailuresMail'  : clientFailuresMail,
+                        'clientSchedulePhone' : clientSchedulePhone,
+                        'clientScheduleMail'  : clientScheduleMail,
+                        'clientManagerPhone'  : clientManagerPhone,
+                        'clientManagersMail'  : clientManagersMail,
                     },
                     success: function (response) {
                         if(editFlag == false) {
@@ -194,12 +429,7 @@
         }
 
         $('#clientModal').click(() => {
-            $('#ModalClient .modal-title').first().text('Dodawanie nowego klienta');
-            let saveClientModalButton = $('#ModalClient #saveClient');
-            saveClientModalButton.first().prop('class','btn btn-default form-control');
-            saveClientModalButton.first().text('');
-            saveClientModalButton.append($('<span class="glyphicon glyphicon-plus"></span>'));
-            saveClientModalButton.append(' Dodaj Klienta');
+            prepereModel('Add');
         });
 
         $(document).ready(function() {
@@ -236,6 +466,7 @@
                     $(row).attr('id', data.id);
                     return row;
                 },"fnDrawCallback": function(settings){
+
                     /**
                      * Zmiana statusu klienta
                      */
@@ -283,45 +514,30 @@
 
 
                     /**
-                     * Educja clienta
+                     * Edycja clienta
                      */
                     $('.button-edit-client').on('click',function () {
-                        $('#ModalClient .modal-title').first().text('Edytowanie klienta');
-                        let saveClientModalButton = $('#ModalClient #saveClient');
-                        saveClientModalButton.first().prop('class','btn btn-success form-control');
-                        saveClientModalButton.first().text('');
-                        saveClientModalButton.append($('<span class="glyphicon glyphicon-save"></span>'));
-                        saveClientModalButton.append(' Zapisz Klienta');
+                        prepereModel('Edit');
                         clientId = $(this).data('id');
-                        $.ajax({
-                            type: "POST",
-                            url: "{{ route('api.findClient') }}", // do zamiany
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            data: {
-                                'clientId'         : clientId
-                            },
-                            success: function (response) {
-                                clearModal();
-                                $('#clientName').val(response.name);
-                                $('#clientPriority').val(response.priority);
-                                $('#clientType').val(response.type);
-                                $('#clientID').val(response.id);
-                                $('#ModalClient').modal('show');
-                                editFlag = true;
-                                modalTitle.textContent = "Edytuj klienta";
-                            }
-                        });
+                        getInfoAboutClient(clientId);
+                    });
+                    /**
+                     *  Wyświetlenie informacji o kliencie bez klawisza zapisz
+                     */
+                    $('.show-client').on('click',function () {
+                        prepereModel('Show');
+                        clientId = $(this).data('id');
+                        console.log(clientId);
+                        getInfoAboutClient(clientId);
                     });
                 },"columns":[
                     {"data":"name"},
+                    {"data":"comment"},
                     {
                         "data": function (data, type, dataToSet) {
-                            return data.priorityName;
-                        },"name": "priorityName"
+                            return "<div class='col-md-1'><span class='glyphicon glyphicon-search show-client' data-id="+data.id+"></span></div>";
+                        },"orderable": false, "searchable": false,
                     },
-                    {"data":"type"},
                     {"data":function (data, type, dataToSet) {
                             let returnButton = "<button class='button-edit-client btn btn-info btn-block' data-id="+data.id+"><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
                             if(data.status == 0)
@@ -331,7 +547,7 @@
                             return returnButton;
                         },"orderable": false, "searchable": false, width:'10%'
                     }
-                    ],
+                ],
             });
         });
     </script>

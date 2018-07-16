@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\ActivityRecorder;
+use App\ClientGiftType;
+use App\ClientMeetingType;
 use App\Clients;
 use Illuminate\Http\Request;
 
@@ -13,7 +15,11 @@ class ClientController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function clientPanel(){
-       return view('crmRoute.clientPanel');
+        $clientGiftType = ClientGiftType::all();
+        $clientMeetingType = ClientMeetingType::all();
+       return view('crmRoute.clientPanel')
+            ->with('clientGiftType',$clientGiftType)
+            ->with('clientMeetingType',$clientMeetingType);
     }
     /**
      *  Return all city with info
@@ -63,6 +69,18 @@ class ClientController extends Controller
             $client->name = $request->clientName;
             $client->priority = $request->clientPriority;
             $client->type = $request->clientType;
+            $client->comment = $request->clientComment;
+            $client->invoice_name = $request->clientNameInvoice;
+            $client->meeting_type_id = $request->clientMeetingType;
+            $client->gift_type_id = $request->clientGiftType;
+            $client->payment_phone = $request->clientPaymentPhone;
+            $client->payment_mail = $request->clientPaymentMail;
+            $client->failures_phone = $request->clientFailuresPhone;
+            $client->failures_mail = $request->clientFailuresMail;
+            $client->schedule_phone = $request->clientSchedulePhone;
+            $client->schedule_mail = $request->clientScheduleMail;
+            $client->manager_phone = $request->clientManagerPhone;
+            $client->manager_mail = $request->clientManagersMail;
 
             if ($request->clientID == 0) {
                 $client->status = 0;
