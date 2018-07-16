@@ -7,6 +7,11 @@
 @extends('layouts.main')
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <style>
+        #fullscreen {
+            margin-top: 1.75em;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -18,35 +23,42 @@
             Panel z informacjami
         </div>
 
-        <div class="col-md-2">
-            <div class="form-group">
-                <label for="year">Rok</label>
-                <select id="year" multiple="multiple" style="width: 100%;">
-                </select>
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label for="year">Rok</label>
+                    <select id="year" multiple="multiple" style="width: 100%;">
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="col-md-2">
-            <div class="form-group">
-                <label for="weeks">Tygodnie</label>
-                <select id="weeks" multiple="multiple" style="width: 100%;">
-                </select>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label for="weeks">Tygodnie</label>
+                    <select id="weeks" multiple="multiple" style="width: 100%;">
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="clients">Klienci</label>
+                    <select id="clients" multiple="multiple" style="width: 100%;">
+                        @if(isset($clients))
+                            @foreach($clients as $client)
+                                <option value="{{$client->id}}">{{$client->name}}</option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <button id="fullscreen" class="btn btn-info"><span class="glyphicon glyphicon-fullscreen"></span> Tryb pełnoekranowy</button>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="form-group">
-                <label for="clients">Klienci</label>
-                <select id="clients" multiple="multiple" style="width: 100%;">
-                    @if(isset($clients))
-                        @foreach($clients as $client)
-                            <option value="{{$client->id}}">{{$client->name}}</option>
-                        @endforeach
-                    @endif
-                </select>
-            </div>
-        </div>
 
         <div class="panel-body">
+
             <table id="datatable" class="thead-inverse table row-border table-striped">
                 <thead>
                 <tr>
@@ -74,6 +86,8 @@
         let selectedYears = ["0"]; //this array collect selected by user years
         let selectedWeeks = ["0"]; //this array collect selected by user weeks
         let selectedClients = ["0"]; //this array collect selected by user clients
+        let datatableHeight = '45vh'; //this variable defines height of table
+        let fullscreen = document.getElementById('fullscreen'); // fullscreen button
         /*Activation select2 framework*/
         (function initial() {
             $('#weeks').select2();
@@ -85,7 +99,7 @@
             autoWidth: true,
             processing: true,
             serverSide: true,
-            scrollY: '45vh',
+            scrollY: datatableHeight,
             ajax: {
                 url: "{{route('api.datatableClientRouteInfoAjax')}}",
                 type: 'POST',
@@ -230,5 +244,57 @@
                 weekSelect.appendChild(opt);
             }
         })();
+
+
+        /**
+         * This event listener function allow fullscreen with proper table height.
+         */
+        function fullScreenHandler(e) {
+            const elem = document.querySelector('.panel-default');
+
+            if(elem.mozRequestFullScreen) {
+                datatableHeight = '65vh';
+                $('div.dataTables_scrollBody').css('height',datatableHeight);
+                elem.mozRequestFullScreen();
+            }
+            if(elem.webkitRequestFullscreen) {
+                datatableHeight = '65vh';
+                $('div.dataTables_scrollBody').css('height',datatableHeight);
+                elem.webkitRequestFullscreen();
+            }
+
+            if(elem.msRequestFullscreen) {
+                datatableHeight = '65vh';
+                $('div.dataTables_scrollBody').css('height',datatableHeight);
+                elem.msRequestFullscreen();
+            }
+
+        }
+
+        /**
+         * This event listeners adjust height of table after closing full screen mode.
+         */
+        document.addEventListener("mozfullscreenchange", function( ev ) {
+            if ( document.mozFullScreenElement === null ) {
+                datatableHeight = '45vh';
+                $('div.dataTables_scrollBody').css('height',datatableHeight);
+            }
+        });
+
+        document.addEventListener("webkitfullscreenchange", function( ev ) {
+            if ( document.webkitFullscreenElement === null ) {
+                datatableHeight = '45vh';
+                $('div.dataTables_scrollBody').css('height',datatableHeight);
+            }
+        });
+
+        document.addEventListener("MSFullscreenChange", function( ev ) {
+            if ( document.msFullscreenElement === null ) {
+                datatableHeight = '45vh';
+                $('div.dataTables_scrollBody').css('height',datatableHeight);
+            }
+        });
+
+        fullscreen.addEventListener('click', fullScreenHandler);
     </script>
 @endsection
