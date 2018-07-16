@@ -276,6 +276,7 @@ class NotificationController extends Controller
         $result->judge_sum = round(($request->q2 + $request->q3 + $request->q4) / 3, 2);
         $result->save();
 
+        new ActivityRecorder(array_merge(['T'=>'Dodanie oceny zgłoszenia'],$result->toArray()),76,1);
         return view('admin.myNotifications')
             ->with('message_ok', 'Twoja opinia została przesłana!');
     }
