@@ -7,6 +7,11 @@
 @extends('layouts.main')
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <style>
+        #fullscreen {
+            margin-top: 1.75em;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -18,25 +23,32 @@
             Panel z informacjami
         </div>
 
-        <div class="col-md-2">
-            <div class="form-group">
-                <label for="year">Rok</label>
-                <select id="year" multiple="multiple" style="width: 100%;">
-                </select>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="form-group">
-                <label for="weeks">Tygodnie</label>
-                <select id="weeks" multiple="multiple" style="width: 100%;">
-                </select>
-            </div>
-        </div>
+        <div class="row">
 
-        <div class="col-md-3">
-            <div class="form-group">
+                <div class="col-md-3">
+                    <div class="form-group" style="margin-left: 1em;">
+                        <label for="date" class="myLabel">Data początkowa:</label>
+                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                            <input class="form-control" name="date_start" id="date_start" type="text" value="{{date("Y-m-d")}}">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group"style="margin-left: 1em;">
+                        <label for="date_stop" class="myLabel">Data końcowa:</label>
+                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                            <input class="form-control" name="date_stop" id="date_stop" type="text" value="{{date("Y-m-d")}}">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                        </div>
+                    </div>
+                </div>
+
+
+            <div class="col-md-3">
                 <label for="clients">Klienci</label>
-                <select id="clients" multiple="multiple" style="width: 100%;">
+                <select class="selectpicker form-control" id="clients" name="link_privilages[]" title="Brak wybranych użytkowników" multiple data-actions-box="true">
                     @if(isset($clients))
                         @foreach($clients as $client)
                             <option value="{{$client->id}}">{{$client->name}}</option>
@@ -44,9 +56,14 @@
                     @endif
                 </select>
             </div>
+            <div class="col-md-3">
+                <button id="fullscreen" class="btn btn-info"><span class="glyphicon glyphicon-fullscreen"></span> Tryb pełnoekranowy</button>
+            </div>
         </div>
 
+
         <div class="panel-body">
+
             <table id="datatable" class="thead-inverse table row-border table-striped">
                 <thead>
                 <tr>
@@ -71,28 +88,44 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 
     <script>
-        let selectedYears = ["0"]; //this array collect selected by user years
-        let selectedWeeks = ["0"]; //this array collect selected by user weeks
-        let selectedClients = ["0"]; //this array collect selected by user clients
-        /*Activation select2 framework*/
+        let datatableHeight = '45vh'; //this variable defines height of table
+        let fullscreen = document.getElementById('fullscreen'); // fullscreen button
+
+        const now = new Date();
+        const day = ("0" + now.getDate()).slice(-2);
+        const month = ("0" + (now.getMonth() + 1)).slice(-2);
+        const today = now.getFullYear() + "-" + (month) + "-" + (day);
+        const firstDayOfThisMonth = now.getFullYear() + "-" + (month) + "-01";
+
+        /*Activation selectpicker and datetimepicker framework*/
         (function initial() {
-            $('#weeks').select2();
-            $('#year').select2();
-            $('#clients').select2();
+            $('.selectpicker').selectpicker({
+                selectAllText: 'Zaznacz wszystkie',
+                deselectAllText: 'Odznacz wszystkie'
+            });
+
+            $('.form_date').datetimepicker({
+                language:  'pl',
+                autoclose: 1,
+                minView : 2,
+                pickTime: false,
+            });
+
+            $('#date_start').val(firstDayOfThisMonth);
         })();
 
         let table = $('#datatable').DataTable({
             autoWidth: true,
             processing: true,
             serverSide: true,
-            scrollY: '45vh',
+            scrollY: datatableHeight,
             ajax: {
                 url: "{{route('api.datatableClientRouteInfoAjax')}}",
                 type: 'POST',
                 data: function (d) {
-                    d.years = selectedYears;
-                    d.weeks = selectedWeeks;
-                    d.clients = selectedClients;
+                    d.dateStop = $('#date_stop').val();
+                    d.dateStart = $('#date_start').val();
+                    d.clients = $('#clients').val();
                 },
                 headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
             },
@@ -114,121 +147,62 @@
             table.columns.adjust().draw();
         });
 
-
         /**
-         * This event listener change elements of array selected Years while user selects another year
+         * This event listener reloads table after changing start or stop date
          */
-        $('#year').on('select2:select', function (e) {
-            let yearArr = $('#year').val();
-            if(yearArr.length > 0) { //no values, removed by user
-                selectedYears = yearArr;
-            }
-            else {
-                selectedYears = ["0"];
-            }
+        $('#date_start, #date_stop, #clients').on('change', function(e) {
             table.ajax.reload();
         });
 
         /**
-         * This event listener change elements of array selected Years while user unselects some year
+         * This event listener function allow fullscreen with proper table height.
          */
-        $('#year').on('select2:unselect', function(e) {
-            if($('#year').val() != null) {
-                let yearArr = $('#year').val();
-                selectedYears = yearArr;
+        function fullScreenHandler(e) {
+            const elem = document.querySelector('.panel-default');
+
+            if(elem.mozRequestFullScreen) {
+                datatableHeight = '65vh';
+                $('div.dataTables_scrollBody').css('height',datatableHeight);
+                elem.mozRequestFullScreen();
             }
-            else {
-                selectedYears = ["0"];
+            if(elem.webkitRequestFullscreen) {
+                datatableHeight = '65vh';
+                $('div.dataTables_scrollBody').css('height',datatableHeight);
+                elem.webkitRequestFullscreen();
             }
-            table.ajax.reload();
-        });
+
+            if(elem.msRequestFullscreen) {
+                datatableHeight = '65vh';
+                $('div.dataTables_scrollBody').css('height',datatableHeight);
+                elem.msRequestFullscreen();
+            }
+
+        }
 
         /**
-         * This event listener change elements of array selecteWeeks while user selects another week
+         * This event listeners adjust height of table after closing full screen mode.
          */
-        $('#weeks').on('select2:select', function(e) {
-            let weeksArr = $('#weeks').val();
-            if(weeksArr.length > 0) {
-                selectedWeeks = weeksArr;
+        document.addEventListener("mozfullscreenchange", function( ev ) {
+            if ( document.mozFullScreenElement === null ) {
+                datatableHeight = '45vh';
+                $('div.dataTables_scrollBody').css('height',datatableHeight);
             }
-            else {
-                selectedWeeks = ["0"];
-            }
-            table.ajax.reload();
         });
 
-        /**
-         * This event listener change elements of array selectedWeeks while user unselects any week.
-         */
-        $("#weeks").on('select2:unselect', function(e) {
-            if($('#weeks').val() != null) {
-                let weeksArr = $('#weeks').val();
-                selectedWeeks = weeksArr;
+        document.addEventListener("webkitfullscreenchange", function( ev ) {
+            if ( document.webkitFullscreenElement === null ) {
+                datatableHeight = '45vh';
+                $('div.dataTables_scrollBody').css('height',datatableHeight);
             }
-            else {
-                selectedWeeks = ['0'];
-            }
-            table.ajax.reload();
         });
 
-        $("#clients").on('select2:select', function(e) {
-            let clientsArr = $('#clients').val();
-            if(clientsArr.length > 0) {
-                selectedClients = clientsArr;
+        document.addEventListener("MSFullscreenChange", function( ev ) {
+            if ( document.msFullscreenElement === null ) {
+                datatableHeight = '45vh';
+                $('div.dataTables_scrollBody').css('height',datatableHeight);
             }
-            else {
-                selectedClients = ['0'];
-            }
-            table.ajax.reload();
         });
 
-        /**
-         * This event listener change lements of array selectedClients while user unselects any week
-         */
-        $("#clients").on('select2:unselect', function(e) {
-            if($('#clients').val() != null) {
-                let clientsArr = $('#clients').val();
-                selectedClients = clientsArr;
-            }
-            else {
-                selectedClients = ['0'];
-            }
-            table.ajax.reload();
-        });
-
-
-        /**
-         * This function appends week numbers to week select element and years to year select element
-         * IIFE function, execute after page is loaded automaticaly
-         */
-        (function appendWeeksAndYears() {
-            const maxWeekInYear = {{$lastWeek}}; //number of last week in current year
-            const weekSelect = document.querySelector('#weeks');
-            const yearSelect = document.querySelector('#year');
-            const baseYear = '2017';
-            const currentYear = {{$currentYear}};
-            const currentWeek = {{$currentWeek}};
-            for(let j = baseYear; j <= currentYear + 1; j++) {
-                const opt = document.createElement('option');
-                opt.value = j;
-                opt.textContent = j;
-                if(j == currentYear) {
-                    opt.setAttribute('selected', 'selected');
-                    selectedYears = [j];
-                }
-                yearSelect.appendChild(opt);
-            }
-
-            for(let i = 1; i <= maxWeekInYear + 1; i++) {
-                const opt = document.createElement('option');
-                opt.value = i;
-                opt.textContent = i;
-                if(i == currentWeek) {
-                    opt.setAttribute('selected', 'selected');
-                    selectedWeeks = [i];
-                }
-                weekSelect.appendChild(opt);
-            }
-        })();
+        fullscreen.addEventListener('click', fullScreenHandler);
     </script>
 @endsection

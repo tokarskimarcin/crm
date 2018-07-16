@@ -2297,13 +2297,9 @@ class CrmRouteController extends Controller
             ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
             ->join('client','client.id','=','client_route.client_id')
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
-            ->join('hotels', 'hotels.id','=','hotel_id');
-        if($request->years[0] != 0){
-            $clientRouteInfo = $clientRouteInfo->whereIn(DB::raw('YEAR(client_route_info.date)'),$request->years);
-        }
-        if($request->weeks[0] != 0){
-            $clientRouteInfo = $clientRouteInfo->whereIn('client_route_info.weekOfYear',$request->weeks);
-        }
+            ->join('hotels', 'hotels.id','=','hotel_id')
+            ->whereBetween('client_route_info.date', [$request->dateStart, $request->dateStop]);
+
         if($request->clients[0] != 0) {
             $clientRouteInfo = $clientRouteInfo->whereIn('client.id', $request->clients);
         }
