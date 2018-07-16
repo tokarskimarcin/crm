@@ -47,16 +47,14 @@
 
 
             <div class="col-md-3">
-                <div class="form-group">
-                    <label for="clients">Klienci</label>
-                    <select id="clients" multiple="multiple" style="width: 100%;">
-                        @if(isset($clients))
-                            @foreach($clients as $client)
-                                <option value="{{$client->id}}">{{$client->name}}</option>
-                            @endforeach
-                        @endif
-                    </select>
-                </div>
+                <label for="clients">Klienci</label>
+                <select class="selectpicker form-control" id="clients" name="link_privilages[]" title="Brak wybranych użytkowników" multiple data-actions-box="true">
+                    @if(isset($clients))
+                        @foreach($clients as $client)
+                            <option value="{{$client->id}}">{{$client->name}}</option>
+                        @endforeach
+                    @endif
+                </select>
             </div>
             <div class="col-md-3">
                 <button id="fullscreen" class="btn btn-info"><span class="glyphicon glyphicon-fullscreen"></span> Tryb pełnoekranowy</button>
@@ -90,7 +88,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 
     <script>
-        let selectedClients = ["0"]; //this array collect selected by user clients
         let datatableHeight = '45vh'; //this variable defines height of table
         let fullscreen = document.getElementById('fullscreen'); // fullscreen button
 
@@ -99,12 +96,13 @@
         const month = ("0" + (now.getMonth() + 1)).slice(-2);
         const today = now.getFullYear() + "-" + (month) + "-" + (day);
         const firstDayOfThisMonth = now.getFullYear() + "-" + (month) + "-01";
-        // const dateStart = $("#date_start");
-        // const dateStop = $('#date_stop');
 
-        /*Activation select2 framework*/
+        /*Activation selectpicker and datetimepicker framework*/
         (function initial() {
-            $('#clients').select2();
+            $('.selectpicker').selectpicker({
+                selectAllText: 'Zaznacz wszystkie',
+                deselectAllText: 'Odznacz wszystkie'
+            });
 
             $('.form_date').datetimepicker({
                 language:  'pl',
@@ -127,7 +125,7 @@
                 data: function (d) {
                     d.dateStop = $('#date_stop').val();
                     d.dateStart = $('#date_start').val();
-                    d.clients = selectedClients;
+                    d.clients = $('#clients').val();
                 },
                 headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
             },
@@ -149,38 +147,12 @@
             table.columns.adjust().draw();
         });
 
-        $("#clients").on('select2:select', function(e) {
-            let clientsArr = $('#clients').val();
-            if(clientsArr.length > 0) {
-                selectedClients = clientsArr;
-            }
-            else {
-                selectedClients = ['0'];
-            }
-            table.ajax.reload();
-        });
-
-        /**
-         * This event listener change lements of array selectedClients while user unselects any week
-         */
-        $("#clients").on('select2:unselect', function(e) {
-            if($('#clients').val() != null) {
-                let clientsArr = $('#clients').val();
-                selectedClients = clientsArr;
-            }
-            else {
-                selectedClients = ['0'];
-            }
-            table.ajax.reload();
-        });
-
         /**
          * This event listener reloads table after changing start or stop date
          */
-        $('#date_start, #date_stop').on('change', function(e) {
+        $('#date_start, #date_stop, #clients').on('change', function(e) {
             table.ajax.reload();
         });
-
 
         /**
          * This event listener function allow fullscreen with proper table height.
