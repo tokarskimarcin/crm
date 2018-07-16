@@ -808,7 +808,8 @@ class CrmRouteController extends Controller
             $nameOfRoute = trim($nameOfRoute, ' | ');
 
             $thisRoute = Route::find($request->route_id);
-            $oldRouteName = $thisRoute->name;
+            $prevRoute = $thisRoute->toArray();
+            $thisRoute->name;
             $thisRoute->name = $nameOfRoute;
             $thisRoute->save();
 
@@ -837,7 +838,7 @@ class CrmRouteController extends Controller
             }
             $request->session()->flash('adnotation', 'Trasa została edytowana pomyślnie!');
 
-            new ActivityRecorder(array_merge(['T'=>'Edycja szablonu trasy','old_name'=> $oldRouteName],$thisRoute->toArray()),188,2);
+            new ActivityRecorder(['T'=>'Edycja szablonu trasy','prev_route'=> $prevRoute, 'new_route'=>$thisRoute->toArray()],188,2);
 
             return Redirect::to('/showRoutes');
         }

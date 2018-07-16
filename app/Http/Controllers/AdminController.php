@@ -159,6 +159,7 @@ class AdminController extends Controller
             } else {
                 $department_info_id->blocked = $request->type;
                 $department_info_id->save();
+                $data['T'] = 'Zmiana status oddziału';
                 $data['ID oddziału'] = $department_info_id->id;
                 $data['Status'] = $request->type;
                 new ActivityRecorder($data, 50, 4);

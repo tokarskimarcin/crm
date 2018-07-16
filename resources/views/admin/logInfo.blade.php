@@ -147,14 +147,14 @@
                     return data.first_name+' '+data.last_name;
                     }, name: 'last_name'},
                 {data: 'link'},
-                {data: 'action_name'},
+                {data: 'action_name', visible: false},
                 {data: 'updated_at'},
                 {data: function (data, type, dataToSet) {
                     if(data.comment === null){
                         return '';
                     }
                     if(data.comment.length > 21) {
-                        return data.comment.substring(0, 20) + '<button class="btn btn-default comment" style="float: right" type="button" data-text="'+
+                        return data.comment.substring(0, 30) + '<button class="btn btn-default comment" style="float: right" type="button" data-text="'+
                             data.comment+'">' +
                             '<span class="glyphicon glyphicon-option-horizontal"></span></button>';
                     }else
