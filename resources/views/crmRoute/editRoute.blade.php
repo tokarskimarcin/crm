@@ -452,7 +452,7 @@
                         text: "Czy chcesz zapisać trasę?",
                         showCancelButton: true,
                         confirmButtonClass: "btn-danger",
-                        confirmButtonText: "Tak, usuń!",
+                        confirmButtonText: "Tak, zapisz!",
                     }).then((result) => {
                         if(result.value) {
                             $(e.target).prop('disabled', true);
