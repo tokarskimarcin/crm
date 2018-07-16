@@ -24,34 +24,39 @@
         </div>
 
         <div class="row">
-            <div class="col-md-2">
-                <div class="form-group">
-                    <label for="year">Rok</label>
-                    <select id="year" multiple="multiple" style="width: 100%;">
-                    </select>
+
+                <div class="col-md-3">
+                    <div class="form-group" style="margin-left: 1em;">
+                        <label for="date" class="myLabel">Data początkowa:</label>
+                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                            <input class="form-control" name="date_start" id="date_start" type="text" value="{{date("Y-m-d")}}">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-2">
-                <div class="form-group">
-                    <label for="weeks">Tygodnie</label>
-                    <select id="weeks" multiple="multiple" style="width: 100%;">
-                    </select>
+
+                <div class="col-md-3">
+                    <div class="form-group"style="margin-left: 1em;">
+                        <label for="date_stop" class="myLabel">Data końcowa:</label>
+                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                            <input class="form-control" name="date_stop" id="date_stop" type="text" value="{{date("Y-m-d")}}">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                        </div>
+                    </div>
                 </div>
-            </div>
+
 
             <div class="col-md-3">
-                <div class="form-group">
-                    <label for="clients">Klienci</label>
-                    <select id="clients" multiple="multiple" style="width: 100%;">
-                        @if(isset($clients))
-                            @foreach($clients as $client)
-                                <option value="{{$client->id}}">{{$client->name}}</option>
-                            @endforeach
-                        @endif
-                    </select>
-                </div>
+                <label for="clients">Klienci</label>
+                <select class="selectpicker form-control" id="clients" name="link_privilages[]" title="Brak wybranych użytkowników" multiple data-actions-box="true">
+                    @if(isset($clients))
+                        @foreach($clients as $client)
+                            <option value="{{$client->id}}">{{$client->name}}</option>
+                        @endforeach
+                    @endif
+                </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <button id="fullscreen" class="btn btn-info"><span class="glyphicon glyphicon-fullscreen"></span> Tryb pełnoekranowy</button>
             </div>
         </div>
@@ -83,16 +88,30 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 
     <script>
-        let selectedYears = ["0"]; //this array collect selected by user years
-        let selectedWeeks = ["0"]; //this array collect selected by user weeks
-        let selectedClients = ["0"]; //this array collect selected by user clients
         let datatableHeight = '45vh'; //this variable defines height of table
         let fullscreen = document.getElementById('fullscreen'); // fullscreen button
-        /*Activation select2 framework*/
+
+        const now = new Date();
+        const day = ("0" + now.getDate()).slice(-2);
+        const month = ("0" + (now.getMonth() + 1)).slice(-2);
+        const today = now.getFullYear() + "-" + (month) + "-" + (day);
+        const firstDayOfThisMonth = now.getFullYear() + "-" + (month) + "-01";
+
+        /*Activation selectpicker and datetimepicker framework*/
         (function initial() {
-            $('#weeks').select2();
-            $('#year').select2();
-            $('#clients').select2();
+            $('.selectpicker').selectpicker({
+                selectAllText: 'Zaznacz wszystkie',
+                deselectAllText: 'Odznacz wszystkie'
+            });
+
+            $('.form_date').datetimepicker({
+                language:  'pl',
+                autoclose: 1,
+                minView : 2,
+                pickTime: false,
+            });
+
+            $('#date_start').val(firstDayOfThisMonth);
         })();
 
         let table = $('#datatable').DataTable({
@@ -104,9 +123,9 @@
                 url: "{{route('api.datatableClientRouteInfoAjax')}}",
                 type: 'POST',
                 data: function (d) {
-                    d.years = selectedYears;
-                    d.weeks = selectedWeeks;
-                    d.clients = selectedClients;
+                    d.dateStop = $('#date_stop').val();
+                    d.dateStart = $('#date_start').val();
+                    d.clients = $('#clients').val();
                 },
                 headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
             },
@@ -128,123 +147,12 @@
             table.columns.adjust().draw();
         });
 
-
         /**
-         * This event listener change elements of array selected Years while user selects another year
+         * This event listener reloads table after changing start or stop date
          */
-        $('#year').on('select2:select', function (e) {
-            let yearArr = $('#year').val();
-            if(yearArr.length > 0) { //no values, removed by user
-                selectedYears = yearArr;
-            }
-            else {
-                selectedYears = ["0"];
-            }
+        $('#date_start, #date_stop, #clients').on('change', function(e) {
             table.ajax.reload();
         });
-
-        /**
-         * This event listener change elements of array selected Years while user unselects some year
-         */
-        $('#year').on('select2:unselect', function(e) {
-            if($('#year').val() != null) {
-                let yearArr = $('#year').val();
-                selectedYears = yearArr;
-            }
-            else {
-                selectedYears = ["0"];
-            }
-            table.ajax.reload();
-        });
-
-        /**
-         * This event listener change elements of array selecteWeeks while user selects another week
-         */
-        $('#weeks').on('select2:select', function(e) {
-            let weeksArr = $('#weeks').val();
-            if(weeksArr.length > 0) {
-                selectedWeeks = weeksArr;
-            }
-            else {
-                selectedWeeks = ["0"];
-            }
-            table.ajax.reload();
-        });
-
-        /**
-         * This event listener change elements of array selectedWeeks while user unselects any week.
-         */
-        $("#weeks").on('select2:unselect', function(e) {
-            if($('#weeks').val() != null) {
-                let weeksArr = $('#weeks').val();
-                selectedWeeks = weeksArr;
-            }
-            else {
-                selectedWeeks = ['0'];
-            }
-            table.ajax.reload();
-        });
-
-        $("#clients").on('select2:select', function(e) {
-            let clientsArr = $('#clients').val();
-            if(clientsArr.length > 0) {
-                selectedClients = clientsArr;
-            }
-            else {
-                selectedClients = ['0'];
-            }
-            table.ajax.reload();
-        });
-
-        /**
-         * This event listener change lements of array selectedClients while user unselects any week
-         */
-        $("#clients").on('select2:unselect', function(e) {
-            if($('#clients').val() != null) {
-                let clientsArr = $('#clients').val();
-                selectedClients = clientsArr;
-            }
-            else {
-                selectedClients = ['0'];
-            }
-            table.ajax.reload();
-        });
-
-
-        /**
-         * This function appends week numbers to week select element and years to year select element
-         * IIFE function, execute after page is loaded automaticaly
-         */
-        (function appendWeeksAndYears() {
-            const maxWeekInYear = {{$lastWeek}}; //number of last week in current year
-            const weekSelect = document.querySelector('#weeks');
-            const yearSelect = document.querySelector('#year');
-            const baseYear = '2017';
-            const currentYear = {{$currentYear}};
-            const currentWeek = {{$currentWeek}};
-            for(let j = baseYear; j <= currentYear + 1; j++) {
-                const opt = document.createElement('option');
-                opt.value = j;
-                opt.textContent = j;
-                if(j == currentYear) {
-                    opt.setAttribute('selected', 'selected');
-                    selectedYears = [j];
-                }
-                yearSelect.appendChild(opt);
-            }
-
-            for(let i = 1; i <= maxWeekInYear + 1; i++) {
-                const opt = document.createElement('option');
-                opt.value = i;
-                opt.textContent = i;
-                if(i == currentWeek) {
-                    opt.setAttribute('selected', 'selected');
-                    selectedWeeks = [i];
-                }
-                weekSelect.appendChild(opt);
-            }
-        })();
-
 
         /**
          * This event listener function allow fullscreen with proper table height.
