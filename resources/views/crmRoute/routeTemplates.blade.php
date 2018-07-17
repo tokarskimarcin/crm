@@ -104,6 +104,12 @@
              * This method is used in shows appended between another ones
              */
             function showInTheMiddleAjax(previousCityDistance, previousCityId, nextCityDistance, nextCityId, citySelect, voivodeSelect) {
+                console.assert(citySelect.matches('.citySelect'), 'citySelect in showInTheMiddleAjax method is not city select');
+                console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInTheMiddleAjax method is not voivode select');
+                console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInTheMiddleAjax is not number!');
+                console.assert((!isNaN(parseInt(previousCityId))) && (previousCityId != 0), 'previousCityId in showInTheMiddleAjax is not number!');
+                console.assert((!isNaN(parseInt(previousCityDistance))) || (previousCityDistance == 'infinity'), 'previousCityId in showInTheMiddleAjax is not correct value!');
+                console.assert((!isNaN(parseInt(nextCityDistance))) || (nextCityDistance == 'infinity'), 'nextCityDistance in showInTheMiddleAjax is not correct value!');
                 let firstResponse = null;
                 let secondResponse = null;
                 let intersectionArray = null;
@@ -120,6 +126,7 @@
                     },
                     success: function (response) {
                         firstResponse = response;
+                        console.assert(typeof(firstResponse) === "object", "firstResponse in showInTheMiddleAjax is not object!");
                         $.ajax({
                             type: "POST",
                             url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
@@ -132,6 +139,7 @@
                             },
                             success: function (response2) {
                                 secondResponse = response2;
+                                console.assert(typeof(secondResponse) === "object", "secondResponse in showInTheMiddleAjax is not object!");
                                 intersectionArray = getIntersection(firstResponse, secondResponse);
 
                                 let voivodeSet = intersectionArray[0];
@@ -150,6 +158,7 @@
 
                                     voivodeSet.forEach(voivode => {
                                         citySet.forEach(voivodeCity => {
+                                            console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
                                             voivodeCity.forEach(city => {
                                                 if(city.id === voivode.id) {
                                                     appendCityOptions(citySelect, city);
@@ -170,6 +179,10 @@
              * This method is used in shows appended as first or last ones
              */
             function showInExtreme(limit, nextCityId, citySelect, voivodeSelect) {
+                console.assert(citySelect.matches('.citySelect'), 'citySelect in showInExtreme method is not city select');
+                console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInExtreme method is not voivode select');
+                console.assert(!isNaN(parseInt(limit)), 'limit in showInExtreme is not number!');
+                console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInExtreme is not number!');
                 $.ajax({
                     type: "POST",
                     url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
@@ -182,7 +195,9 @@
                     },
                     success: function (response) {
                         let allVoivodes = response['voievodeInfo'];
+                        console.assert(Array.isArray(allVoivodes), "allVoivodes in showInExtreme method is not array!");
                         let allCitiesGroupedByVoivodes = response['cityInfo'];
+                        console.assert(typeof(allCitiesGroupedByVoivodes) === "object", "allCitiesGroupedByVoivodes in showInExtreme method is not object!");
 
                         allVoivodes.forEach(voivode => {
                             appendVoivodeOptions(voivodeSelect, voivode)
@@ -211,6 +226,8 @@
              * This method is used in shows without distance limit
              */
             function showWithoutDistanceAjax(voivodeId, citySelect) {
+                console.assert(!isNaN(parseInt(voivodeId)) && voivodeId != 0, 'voivodeId in showWithoutDistanceAjax is not number!');
+                console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
                 $.ajax({
                     type: "POST",
                     url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
@@ -221,6 +238,7 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
+                        console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
                         let placeToAppend = citySelect;
                         placeToAppend.innerHTML = '';
                         appendBasicOption(placeToAppend);
@@ -235,29 +253,34 @@
                 });
             }
 
-            /**
-             * This method appends basic option to voivode select
-             */
+        /**
+         * This method appends basic option to voivode select
+         */
         function appendBasicOption(element) {
+            console.assert(element.tagName === "SELECT", 'Element in appendBasicOption is not select element');
             let basicVoivodeOption = document.createElement('option');
             basicVoivodeOption.value = '0';
             basicVoivodeOption.textContent = 'Wybierz';
-
             element.appendChild(basicVoivodeOption);
         }
 
         /**
-         * This method appends optiosn with voivode data
+         * This method appends options with voivode data
          */
         function appendVoivodeOptions(element, data) {
+            console.assert(element.matches('.voivodeSelect'), 'Element in appendVoivodeOptions method is not voivode select');
             let voivodeOption = document.createElement('option');
             voivodeOption.value = data.id;
             voivodeOption.textContent = data.name;
             element.appendChild(voivodeOption);
         }
 
+        /**
+         * This method appends options with city data
+         */
         function appendCityOptions(element,data) {
-            var cityOpt = document.createElement('option');
+            console.assert(element.matches('.citySelect'), 'Element in appendCityOptions method is not city select');
+            let cityOpt = document.createElement('option');
             cityOpt.value = data.city_id;
             cityOpt.textContent = data.city_name;
             element.appendChild(cityOpt);
@@ -273,6 +296,10 @@
             const secondVoivodeInfo = secondResponse['voievodeInfo'];
             const firstCityInfo = firstResponse['cityInfo'];
             const secondCityInfo = secondResponse['cityInfo'];
+            console.assert(Array.isArray(firstVoivodeInfo), "firstVoivodeInfo in getIntersection method is not array!");
+            console.assert(Array.isArray(secondVoivodeInfo), "secondVoivodeInfo in getIntersection method is not array!");
+            console.assert(typeof(firstCityInfo) === "object", "firstCityInfo in getIntersection method is not object!");
+            console.assert(typeof(secondCityInfo) === "object", "secondCityInfo in getIntersection method is not object!");
 
             //linear looking for same voivodes
             firstVoivodeInfo.forEach(voivode => {
@@ -305,6 +332,7 @@
             intersectionArray.push(intersectionVoivodes);
             intersectionArray.push(intersectionCities);
 
+            console.assert(intersectionArray.length === 2, 'Problem with intersectionArray in getIntersection method');
             return intersectionArray;
         }
 
@@ -330,6 +358,7 @@
          * This method validate form
          */
         function validateForm(element) {
+            console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
             let citySelect = element.querySelector('.citySelect');
             let cityValue = citySelect.options[citySelect.selectedIndex].value;
             if(cityValue == 0) {
@@ -625,7 +654,7 @@
                         newFormDomElement = newForm.getForm();
                         thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
                     }
-                    else {
+                    else { //container is not last one
                         const apreviousCitySelect = thisShowContainer.querySelector('.citySelect');
                         const anextCitySelect = nextShowContainer.querySelector('.citySelect');
                         //we are checking if user selected any city in upper and lower show container
@@ -641,7 +670,7 @@
                     }
 
                 }
-                else {
+                else { //validation failed
                     notify('Wybierz miasto');
                 }
             }
@@ -699,6 +728,10 @@
             }
         };
 
+            /**
+             * This event listener is responsible for change event on document
+             * @param e
+             */
         function globalChangeHandler(e) {
             if(e.target.matches('.distance-checkbox')) {
                 let isChecked = e.target.checked;
