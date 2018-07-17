@@ -166,6 +166,9 @@
                 });
             }
 
+            /**
+             * This method is used in shows appended as first or last ones
+             */
             function showInExtreme(limit, nextCityId, citySelect, voivodeSelect) {
                 $.ajax({
                     type: "POST",
@@ -205,6 +208,34 @@
             }
 
             /**
+             * This method is used in shows without distance limit
+             */
+            function showWithoutDistanceAjax(voivodeId, citySelect) {
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
+                    data: {
+                        "id": voivodeId
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        let placeToAppend = citySelect;
+                        placeToAppend.innerHTML = '';
+                        appendBasicOption(placeToAppend);
+                        for(var i = 0; i < response.length; i++) {
+                            let responseOption = document.createElement('option');
+                            responseOption.value = response[i].id;
+                            responseOption.textContent = response[i].name;
+                            placeToAppend.appendChild(responseOption);
+                        }
+
+                    }
+                });
+            }
+
+            /**
              * This method appends basic option to voivode select
              */
         function appendBasicOption(element) {
@@ -239,9 +270,7 @@
             let intersectionVoivodes = [];
             let intersectionCities = [];
             const firstVoivodeInfo = firstResponse['voievodeInfo'];
-            // console.log(firstVoivodeInfo);
             const secondVoivodeInfo = secondResponse['voievodeInfo'];
-            // console.log(secondVoivodeInfo);
             const firstCityInfo = firstResponse['cityInfo'];
             const secondCityInfo = secondResponse['cityInfo'];
 
@@ -447,82 +476,21 @@
                     firstSelect.addEventListener('change', e => {
                         secondSelect.setAttribute('data-distance', 'infinity');
                         let voivodeId = e.target.value;
-                        $.ajax({
-                            type: "POST",
-                            url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
-                            data: {
-                                "id": voivodeId
-                            },
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function(response) {
-                                let placeToAppend = secondSelect;
-                                placeToAppend.innerHTML = '';
-                                appendBasicOption(placeToAppend);
-                                for(var i = 0; i < response.length; i++) {
-                                    let responseOption = document.createElement('option');
-                                    responseOption.value = response[i].id;
-                                    responseOption.textContent = response[i].name;
-                                    placeToAppend.appendChild(responseOption);
-                                }
-
-                            }
-                        });
+                        showWithoutDistanceAjax(voivodeId, secondSelect);
                     });
                 }
                 else if((distance === 100 || distance === 30) && intersetion === false) {
-                    $.ajax({
-                        type: "POST",
-                        url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
-                        data: {
-                            'limit': distance,
-                            "cityId": selectedCity
-                        },
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function (response) {
-                            let allVoivodes = response['voievodeInfo'];
-                            let allCitiesGroupedByVoivodes = response['cityInfo'];
-
-                            allVoivodes.forEach(voivode => {
-                                let voivodeOption = document.createElement('option');
-                                voivodeOption.value = voivode.id;
-                                voivodeOption.textContent = voivode.name;
-                                firstSelect.appendChild(voivodeOption);
-                            });
-                            secondSelect.setAttribute('data-distance', distance);
-
-                            //After selecting voivode, this event listener appends cities from given range into city select
-                            firstSelect.addEventListener('change', e => {
-
-                                secondSelect.innerHTML = ''; //cleaning previous insertions
-                                appendBasicOption(secondSelect);
-
-                               let voivodeId = e.target.value;
-                               for(Id in allCitiesGroupedByVoivodes) {
-                                   if(voivodeId == Id) {
-                                       allCitiesGroupedByVoivodes[Id].forEach(city => {
-                                           appendCityOptions(secondSelect, city);
-                                       });
-                                   }
-                               }
-                            });
-                        }
-                    });
+                    showInExtreme(distance, selectedCity, secondSelect, firstSelect);
                 }
                 else if((distance === 100 || distance === 30) && intersetion === true) { // adding show between some shows
                     const previousCitySelect = previousBox.querySelector('.citySelect');
                     const previousCityDistance = previousCitySelect.dataset.distance;
                     const previousCityId = previousCitySelect.options[previousCitySelect.selectedIndex].value;
-
                     const nextCitySelect = nextBox.querySelector('.citySelect');
                     const nextCityDistance = nextCitySelect.dataset.distance;
                     const nextCityId = nextCitySelect.options[nextCitySelect.selectedIndex].value;
 
                     showInTheMiddleAjax(previousCityDistance,previousCityId,nextCityDistance,nextCityId,secondSelect,firstSelect);
-
                 }
 
                 formBodyLeftColumnGroup.appendChild(firstSelectLabel);
@@ -654,14 +622,24 @@
                     //we are checking whether cliecked singleDayContainer is last one, or between others.
                     if(lastOneFlag === true) {
                         newForm.createDOMBox(30, selectedCityId);
+                        newFormDomElement = newForm.getForm();
+                        thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
                     }
                     else {
-                        const previousShowContainer = thisShowContainer; // relative to newForm, this one is previousShowContainer
-                        newForm.createDOMBox(30, selectedCityId, true, previousShowContainer, nextShowContainer);
+                        const apreviousCitySelect = thisShowContainer.querySelector('.citySelect');
+                        const anextCitySelect = nextShowContainer.querySelector('.citySelect');
+                        //we are checking if user selected any city in upper and lower show container
+                        if(anextCitySelect.options[anextCitySelect.selectedIndex].value != 0 && apreviousCitySelect.options[apreviousCitySelect.selectedIndex].value != 0) {
+                            const previousShowContainer = thisShowContainer; // relative to newForm, this one is previousShowContainer
+                            newForm.createDOMBox(30, selectedCityId, true, previousShowContainer, nextShowContainer);
+                            newFormDomElement = newForm.getForm();
+                            thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                        }
+                        else {
+                            notify('Wybierz miasta w pokazach powyżej i poniżej');
+                        }
                     }
 
-                    newFormDomElement = newForm.getForm();
-                    thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
                 }
                 else {
                     notify('Wybierz miasto');
@@ -755,30 +733,10 @@
                     @endforeach()
                         citySelect.setAttribute('data-distance', 'infinity');
                         voivodeSelect.addEventListener('change', e => {
-                        let voivodeId = e.target.value;
-                        $.ajax({
-                            type: "POST",
-                            url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
-                            data: {
-                                "id": voivodeId
-                            },
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function(response) {
-                                let placeToAppend = citySelect;
-                                placeToAppend.innerHTML = '';
-                                appendBasicOption(placeToAppend);
-                                for(var i = 0; i < response.length; i++) {
-                                    let responseOption = document.createElement('option');
-                                    responseOption.value = response[i].id;
-                                    responseOption.textContent = response[i].name;
-                                    placeToAppend.appendChild(responseOption);
-                                }
-
-                            }
+                            let voivodeId = e.target.value;
+                            showWithoutDistanceAjax(voivodeId, citySelect);
                         });
-                    });
+
                 }
                 else { //deactivate no distance limit option
                     const allSingleShowContainers = document.getElementsByClassName('singleShowContainer');
@@ -804,28 +762,7 @@
                         voivodeSelect.addEventListener('change', e => {
                             citySelect.setAttribute('data-distance', 'infinity');
                             let voivodeId = e.target.value;
-                            $.ajax({
-                                type: "POST",
-                                url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
-                                data: {
-                                    "id": voivodeId
-                                },
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                                success: function(response) {
-                                    let placeToAppend = citySelect;
-                                    placeToAppend.innerHTML = '';
-                                    appendBasicOption(placeToAppend);
-                                    for(var i = 0; i < response.length; i++) {
-                                        let responseOption = document.createElement('option');
-                                        responseOption.value = response[i].id;
-                                        responseOption.textContent = response[i].name;
-                                        placeToAppend.appendChild(responseOption);
-                                    }
-
-                                }
-                            });
+                            showWithoutDistanceAjax(voivodeId, citySelect);
                         });
                     }
                     else if(previousSingleShowContainer !== null && nextSingleShowContainer === null) { //case when show is last one
