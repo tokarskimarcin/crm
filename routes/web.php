@@ -248,6 +248,18 @@ Route::POST('/saveNewHotel','CrmRouteController@saveNewHotel')->name('api.saveNe
 Route::POST('/changeStatusHotel','CrmRouteController@changeStatusHotel')->name('api.changeStatusHotel');
 
 Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
+Route::post('/getGiftType', 'ClientController@getGiftType')->name('api.getGiftType');
+Route::post('/getMeetingType', 'ClientController@getMeetingType')->name('api.getMeetingType');
+
+Route::post('/saveNewGift', 'ClientController@saveNewGift')->name('api.saveNewGift');
+Route::post('/saveNewMeeting', 'ClientController@saveNewMeeting')->name('api.saveNewMeeting');
+
+Route::post('/changeGiftStatus', 'ClientController@changeGiftStatus')->name('api.changeGiftStatus');
+Route::post('/changeMeetingStatus', 'ClientController@changeMeetingStatus')->name('api.changeMeetingStatus');
+
+Route::post('/editGift', 'ClientController@editGift')->name('api.editGift');
+Route::POST('/editMeeting','ClientController@editMeeting')->name('api.editMeeting');
+
 Route::post('/findClient', 'ClientController@findClient')->name('api.findClient');
 Route::POST('/changeStatusClient','ClientController@changeStatusClient')->name('api.changeStatusClient');
 

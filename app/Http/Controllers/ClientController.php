@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\ActivityRecorder;
+use App\ClientGiftType;
+use App\ClientMeetingType;
 use App\Clients;
 use Illuminate\Http\Request;
 
@@ -13,7 +15,11 @@ class ClientController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function clientPanel(){
-       return view('crmRoute.clientPanel');
+        $clientGiftType = ClientGiftType::where('status','=',1)->get();
+        $clientMeetingType = ClientMeetingType::where('status','=',1)->get();
+       return view('crmRoute.clientPanel')
+            ->with('clientGiftType',$clientGiftType)
+            ->with('clientMeetingType',$clientMeetingType);
     }
     /**
      *  Return all city with info
@@ -34,6 +40,27 @@ class ClientController extends Controller
                 return $item;
             });
            return datatables($clientExtended)->make(true);
+        }
+    }
+
+
+    /**
+     *  Return all gift with info
+     */
+    public function getGiftType(Request $request){
+        if($request->ajax()){
+            $gift = ClientGiftType::all();
+            return datatables($gift)->make(true);
+        }
+    }
+
+    /**
+     *  Return all Meeting with info
+     */
+    public function getMeetingType(Request $request){
+        if($request->ajax()){
+            $meeting = ClientMeetingType::all();
+            return datatables($meeting)->make(true);
         }
     }
 
@@ -63,6 +90,18 @@ class ClientController extends Controller
             $client->name = $request->clientName;
             $client->priority = $request->clientPriority;
             $client->type = $request->clientType;
+            $client->comment = $request->clientComment;
+            $client->invoice_name = $request->clientNameInvoice;
+            $client->meeting_type_id = $request->clientMeetingType;
+            $client->gift_type_id = $request->clientGiftType;
+            $client->payment_phone = $request->clientPaymentPhone;
+            $client->payment_mail = $request->clientPaymentMail;
+            $client->failures_phone = $request->clientFailuresPhone;
+            $client->failures_mail = $request->clientFailuresMail;
+            $client->schedule_phone = $request->clientSchedulePhone;
+            $client->schedule_mail = $request->clientScheduleMail;
+            $client->manager_phone = $request->clientManagerPhone;
+            $client->manager_mail = $request->clientManagersMail;
 
             if ($request->clientID == 0) {
                 $client->status = 0;
@@ -90,6 +129,93 @@ class ClientController extends Controller
             new ActivityRecorder(array_merge(['T'=>'Zmiana statusu klienta'], $client->toArray()),208,4);
         }
     }
+    /**
+     * save new gift
+     * @param Request $request
+     */
+    public function saveNewGift(Request $request){
+        if($request->ajax()){
+            $newGift = new ClientGiftType();
+            $newGift->name = $request->name;
+            $newGift->status = 1;
+            $newGift->save();
+            new ActivityRecorder(array_merge(['T'=>'Dodane nowego upominku'], $newGift->toArray()),208,1);
+        }
+    }
+    /**
+     * edit gift
+     * @param Request $request
+     */
+    public function editGift(Request $request){
+        if($request->ajax()){
+            $gift = ClientGiftType::find($request->id);
+            $gift->name = $request->name;
+            $gift->save();
+            new ActivityRecorder(array_merge(['T'=>'Edycja upominku'], $gift->toArray()),208,2);
+        }
+    }
+
+
+
+    /**
+     * turn off gift change status to 1 disable or 0 avaible
+     * @param Request $request
+     */
+    public function changeGiftStatus(Request $request){
+        if($request->ajax()){
+            $gift = ClientGiftType::find($request->giftId);
+            if($gift->status == 0)
+                $gift->status = 1;
+            else
+                $gift->status = 0;
+            $gift->save();
+            new ActivityRecorder(array_merge(['T'=>'Zmiana statusu upominka'], $gift->toArray()),208,4);
+        }
+    }
+
+    /**
+     * saveNewMeeting
+     * @param Request $request
+     */
+    public function saveNewMeeting(Request $request){
+        if($request->ajax()){
+            $newMeeting = new ClientMeetingType();
+            $newMeeting->name = $request->name;
+            $newMeeting->status = 1;
+            $newMeeting->save();
+            new ActivityRecorder(array_merge(['T'=>'Dodane nowego typu trasy'], $newMeeting->toArray()),208,1);
+        }
+    }
+
+    /**
+     * edit Meeting
+     * @param Request $request
+     */
+    public function editMeeting(Request $request){
+        if($request->ajax()){
+            $meeting = ClientGiftType::find($request->id);
+            $meeting->name = $request->name;
+            $meeting->save();
+            new ActivityRecorder(array_merge(['T'=>'Edycja typu pokazu'], $meeting->toArray()),208,2);
+        }
+    }
+
+    /**
+     * turn off meeting change status to 1 disable or 0 avaible
+     * @param Request $request
+     */
+    public function changeMeetingStatus(Request $request){
+        if($request->ajax()){
+            $meeting = ClientMeetingType::find($request->meetingId);
+            if($meeting->status == 0)
+                $meeting->status = 1;
+            else
+                $meeting->status = 0;
+            $meeting->save();
+            new ActivityRecorder(array_merge(['T'=>'Zmiana statusu typu pokazu'], $meeting->toArray()),208,4);
+        }
+    }
+
     /**
      * find client by id
      */
