@@ -100,7 +100,10 @@
             let panelBody = document.querySelector('.panel-body');
         //END GLOBAL VARIABLES
 
-            function showInTheMiddleAjax(previousCityDistance, previousCityId, citySelect, voivodeSelect) {
+            /**
+             * This method is used in shows appended between another ones
+             */
+            function showInTheMiddleAjax(previousCityDistance, previousCityId, nextCityDistance, nextCityId, citySelect, voivodeSelect) {
                 let firstResponse = null;
                 let secondResponse = null;
                 let intersectionArray = null;
@@ -159,6 +162,44 @@
                             }
                         });
 
+                    }
+                });
+            }
+
+            function showInExtreme(limit, nextCityId, citySelect, voivodeSelect) {
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
+                    data: {
+                        'limit': limit,
+                        "cityId": nextCityId
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (response) {
+                        let allVoivodes = response['voievodeInfo'];
+                        let allCitiesGroupedByVoivodes = response['cityInfo'];
+
+                        allVoivodes.forEach(voivode => {
+                            appendVoivodeOptions(voivodeSelect, voivode)
+                        });
+                        citySelect.setAttribute('data-distance', limit); //applaying old value
+
+                        //After selecting voivode, this event listener appends cities from given range into city select
+                        voivodeSelect.addEventListener('change', e => {
+                            citySelect.innerHTML = ''; //cleaning previous insertions
+                            appendBasicOption(citySelect);
+
+                            let voivodeId = e.target.value;
+                            for(Id in allCitiesGroupedByVoivodes) {
+                                if(voivodeId == Id) {
+                                    allCitiesGroupedByVoivodes[Id].forEach(city => {
+                                        appendCityOptions(citySelect, city);
+                                    });
+                                }
+                            }
+                        });
                     }
                 });
             }
@@ -471,10 +512,7 @@
                         }
                     });
                 }
-                else if((distance === 100 || distance === 30) && intersetion === true) {
-                    let firstResponse = null;
-                    let secondResponse = null;
-                    let intersectionArray = null;
+                else if((distance === 100 || distance === 30) && intersetion === true) { // adding show between some shows
                     const previousCitySelect = previousBox.querySelector('.citySelect');
                     const previousCityDistance = previousCitySelect.dataset.distance;
                     const previousCityId = previousCitySelect.options[previousCitySelect.selectedIndex].value;
@@ -483,62 +521,7 @@
                     const nextCityDistance = nextCitySelect.dataset.distance;
                     const nextCityId = nextCitySelect.options[nextCitySelect.selectedIndex].value;
 
-                    $.ajax({
-                        type: "POST",
-                        url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
-                        data: {
-                            'limit': previousCityDistance,
-                            "cityId": previousCityId
-                        },
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function (response) {
-                            firstResponse = response;
-                            $.ajax({
-                                type: "POST",
-                                url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
-                                data: {
-                                    'limit': nextCityDistance,
-                                    "cityId": nextCityId
-                                },
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                                success: function (response2) {
-                                    secondResponse = response2;
-                                    intersectionArray = getIntersection(firstResponse, secondResponse);
-
-                                    let voivodeSet = intersectionArray[0];
-                                    let citySet = intersectionArray[1];
-
-                                    voivodeSet.forEach(voivode => {
-                                        appendVoivodeOptions(firstSelect, voivode);
-                                    });
-
-                                    secondSelect.setAttribute('data-distance', 30);
-                                    //After selecting voivode, this event listener appends cities from given range into city select
-                                    firstSelect.addEventListener('change', e => {
-
-                                        secondSelect.innerHTML = ''; //cleaning previous insertions
-                                        appendBasicOption(secondSelect);
-
-                                        voivodeSet.forEach(voivode => {
-                                            citySet.forEach(voivodeCity => {
-                                               voivodeCity.forEach(city => {
-                                                   if(city.id === voivode.id) {
-                                                       appendCityOptions(secondSelect, city);
-                                                   }
-                                                });
-                                            });
-                                        });
-                                    });
-
-                                }
-                            });
-
-                        }
-                    });
+                    showInTheMiddleAjax(previousCityDistance,previousCityId,nextCityDistance,nextCityId,secondSelect,firstSelect);
 
                 }
 
@@ -848,87 +831,15 @@
                     else if(previousSingleShowContainer !== null && nextSingleShowContainer === null) { //case when show is last one
                         const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
                         const previousCityId = previousCitySelect.options[previousCitySelect.selectedIndex].value;
-                        $.ajax({
-                            type: "POST",
-                            url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
-                            data: {
-                                'limit': citySelect.dataset.previousdistance,
-                                "cityId": previousCityId
-                            },
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function (response) {
-                                let allVoivodes = response['voievodeInfo'];
-                                let allCitiesGroupedByVoivodes = response['cityInfo'];
-                                console.log(allVoivodes);
-
-                                allVoivodes.forEach(voivode => {
-                                    appendVoivodeOptions(voivodeSelect, voivode)
-                                });
-                                citySelect.setAttribute('data-distance', citySelect.dataset.previousdistance); //applaying old value
-
-                                //After selecting voivode, this event listener appends cities from given range into city select
-                                voivodeSelect.addEventListener('change', e => {
-                                    citySelect.innerHTML = ''; //cleaning previous insertions
-                                    appendBasicOption(citySelect);
-
-                                    let voivodeId = e.target.value;
-                                    for(Id in allCitiesGroupedByVoivodes) {
-                                        if(voivodeId == Id) {
-                                            allCitiesGroupedByVoivodes[Id].forEach(city => {
-                                                appendCityOptions(citySelect, city);
-                                            });
-                                        }
-                                    }
-                                });
-                            }
-                        });
+                        showInExtreme(citySelect.dataset.previousdistance, previousCityId, citySelect, voivodeSelect);
                     }
                     else if(previousSingleShowContainer === null && nextSingleShowContainer !== null) { //case when show is first one
                         const nextCitySelect = nextSingleShowContainer.querySelector('.citySelect');
                         const nextCityId = nextCitySelect.options[nextCitySelect.selectedIndex].value;
-                        $.ajax({
-                            type: "POST",
-                            url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
-                            data: {
-                                'limit': 30,
-                                "cityId": nextCityId
-                            },
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function (response) {
-                                let allVoivodes = response['voievodeInfo'];
-                                let allCitiesGroupedByVoivodes = response['cityInfo'];
-                                console.log(allVoivodes);
 
-                                allVoivodes.forEach(voivode => {
-                                    appendVoivodeOptions(voivodeSelect, voivode)
-                                });
-                                citySelect.setAttribute('data-distance', 30); //applaying old value
-
-                                //After selecting voivode, this event listener appends cities from given range into city select
-                                voivodeSelect.addEventListener('change', e => {
-                                    citySelect.innerHTML = ''; //cleaning previous insertions
-                                    appendBasicOption(citySelect);
-
-                                    let voivodeId = e.target.value;
-                                    for(Id in allCitiesGroupedByVoivodes) {
-                                        if(voivodeId == Id) {
-                                            allCitiesGroupedByVoivodes[Id].forEach(city => {
-                                                appendCityOptions(citySelect, city);
-                                            });
-                                        }
-                                    }
-                                });
-                            }
-                        });
+                        showInExtreme(30, nextCityId, citySelect, voivodeSelect);
                     }
                     else if(previousSingleShowContainer !== null && nextSingleShowContainer !== null) { //case when show is in the middle
-                        let firstResponse = null;
-                        let secondResponse = null;
-                        let intersectionArray = null;
                         const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
                         const previousCityDistance = previousCitySelect.dataset.distance;
                         const previousCityId = previousCitySelect.options[previousCitySelect.selectedIndex].value;
@@ -937,62 +848,7 @@
                         const nextCityDistance = nextCitySelect.dataset.distance;
                         const nextCityId = nextCitySelect.options[nextCitySelect.selectedIndex].value;
 
-                        $.ajax({
-                            type: "POST",
-                            url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
-                            data: {
-                                'limit': previousCityDistance,
-                                "cityId": previousCityId
-                            },
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function (response) {
-                                firstResponse = response;
-                                $.ajax({
-                                    type: "POST",
-                                    url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
-                                    data: {
-                                        'limit': nextCityDistance,
-                                        "cityId": nextCityId
-                                    },
-                                    headers: {
-                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                    },
-                                    success: function (response2) {
-                                        secondResponse = response2;
-                                        intersectionArray = getIntersection(firstResponse, secondResponse);
-
-                                        let voivodeSet = intersectionArray[0];
-                                        let citySet = intersectionArray[1];
-
-                                        voivodeSet.forEach(voivode => {
-                                            appendVoivodeOptions(voivodeSelect, voivode);
-                                        });
-
-                                        citySelect.setAttribute('data-distance', 30);
-                                        //After selecting voivode, this event listener appends cities from given range into city select
-                                        voivodeSelect.addEventListener('change', e => {
-
-                                            citySelect.innerHTML = ''; //cleaning previous insertions
-                                            appendBasicOption(citySelect);
-
-                                            voivodeSet.forEach(voivode => {
-                                                citySet.forEach(voivodeCity => {
-                                                    voivodeCity.forEach(city => {
-                                                        if(city.id === voivode.id) {
-                                                            appendCityOptions(citySelect, city);
-                                                        }
-                                                    });
-                                                });
-                                            });
-                                        });
-
-                                    }
-                                });
-
-                            }
-                        });
+                        showInTheMiddleAjax(previousCityDistance, previousCityId, nextCityDistance, nextCityId, citySelect, voivodeSelect);
                     }
 
                 }
