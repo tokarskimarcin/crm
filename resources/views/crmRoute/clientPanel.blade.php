@@ -1,4 +1,23 @@
-@extends('layouts.main') @section('style') <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" /> @endsection @section('content') {{--Header page --}} <div class="row"><div class="col-md-12"><div class="page-header"><div class="alert gray-nav ">Panel Klientów</div></div></div></div> <div class="row"><div class="col-lg-12"><div class="panel panel-default"><div class="panel-heading">Zarządzanie klientami</div><div class="panel-body">
+@extends('layouts.main')
+@section('style')
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .button-edit-meeting,.button-edit-meeting{
+            width: max-content;
+        }
+    </style>
+@endsection
+@section('content') {{--Header page --}}
+<div class="row"><div class="col-md-12">
+        <div class="page-header">
+            <div class="alert gray-nav ">Panel Klientów</div>
+        </div>
+    </div>
+</div>
+<div class="row"><div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">Zarządzanie klientami</div>
+            <div class="panel-body">
                 <div class="row">
                     <div class="col-md-12">
                         <button data-toggle="modal" class="btn btn-default" id="clientModal" data-target="#ModalClient" data-id="1" title="Nowy Klient" style="margin-bottom: 14px">
@@ -48,13 +67,13 @@
                                         </div>
                                         <div class="panel-body">
                                             <div class="col-md-12">
-                                                <div class="newGift">
+                                                <div class="newGift" style="margin-bottom: 1%">
                                                     <div class="col-md-12">
                                                             <div class="form-inline">
                                                                 <label>Dodaj nowy upominek do listy</label>
-                                                                <input type="text" class="form-control" name="giftName" id="giftName" placeholder="Upominek..."/>
-                                                                <button type="submit" class="btn btn-default" id="giftNameSubmit" value="Zapisz">
-                                                                    <span class="glyphicon glyphicon-plus"></span> <span>Zapisz</span>
+                                                                <input type="text" class="form-control" name="NewGiftName" id="NewGiftName" placeholder="Upominek..."/>
+                                                                <button type="submit" class="btn btn-success" id="giftTypeNameBTN" value="Zapisz">
+                                                                    <span class="glyphicon glyphicon-save"></span> <span>Zapisz</span>
                                                                 </button>
                                                             </div>
                                                     </div>
@@ -84,9 +103,9 @@
                                                     <div class="col-md-12">
                                                         <div class="form-inline">
                                                             <label>Dodaj nowy typ trasy do listy</label>
-                                                            <input type="text" class="form-control" name="meetingTypeName" id="giftName" placeholder="Typ trasy..."/>
-                                                            <button type="submit" class="btn btn-default" id="meetingTypeName" value="Zapisz">
-                                                                <span class="glyphicon glyphicon-plus"></span> <span>Zapisz</span>
+                                                            <input type="text" class="form-control" name="NewMeetingTypeName" id="NewMeetingTypeName" placeholder="Typ trasy..."/>
+                                                            <button type="submit" class="btn btn-success" id="meetingTypeNameBTN" value="Zapisz">
+                                                                <span class="glyphicon glyphicon-save"></span> <span>Zapisz</span>
                                                             </button>
                                                         </div>
                                                     </div>
@@ -309,6 +328,7 @@
             },{
                 // settings
                 type: type$string,
+                z_index: 2000,
                 delay: delay$miliseconds$number,
                 animate: {
                     enter: 'animated fadeInRight',
@@ -334,10 +354,10 @@
                 $('#ModalClient .modal-title').first().text('Nowy klient');
                 let saveClientModalButton = $('#ModalClient #saveClient');
                 saveClientModalButton.first().show();
-                saveClientModalButton.first().prop('class','btn btn-default form-control');
+                saveClientModalButton.first().prop('class','btn btn-success form-control');
                 saveClientModalButton.first().text('');
-                saveClientModalButton.append($('<span class="glyphicon glyphicon-plus"></span>'));
-                saveClientModalButton.append(' Dodaj Klienta');
+                saveClientModalButton.append($('<span class="glyphicon glyphicon-save"></span>'));
+                saveClientModalButton.append(' Zapisz Klienta');
             }
         }
         //Pobranie informacji o kliencie i wstawienie go do modala
@@ -467,7 +487,7 @@
             }
             if(clientName.trim().length == 0 || clientNameInvoice == ''){
                 validation = false;
-                swal("Podaj nazwę klienta (umawianie")
+                swal("Podaj nazwę klienta (umawianie)")
             }
             if(clientPriority == 0){
                 validation = false;
@@ -525,6 +545,81 @@
 
         $(document).ready(function() {
 
+            $('#giftTypeNameBTN').on('click',function () {
+                let newGistName = $('#NewGiftName').val();
+                let validate = true;
+                if(newGistName.trim().length == 0 || newGistName == '' ){
+                    validate = false;
+                }
+                if(validate){
+                    swal({
+                        title: 'Chcesz zapisać nowy upominek?',
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: "Tak zapisz"
+                    }).then((result) => {
+                        if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ route('api.saveNewGift') }}", // do zamiany
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                data: {
+                                    'name'   : newGistName
+                                },
+                                success: function (response) {
+                                    $('#NewGiftName').val("");
+                                    notify("<strong>Upominek został dodany</strong>", 'success');
+                                    giftTable.ajax.reload();
+                                }
+                            });
+                        }})
+                }else{
+                    swal("Przed zapisem podaj nazwę nowego upominku")
+                }
+                //zapisane nowego upominku
+            });
+
+            $('#meetingTypeNameBTN').on('click',function () {
+                let newMeetingName = $('#NewMeetingTypeName').val();
+                let validate = true;
+                if(newMeetingName.trim().length == 0 || newMeetingName == '' ){
+                    validate = false;
+                }
+                if(validate){
+                    swal({
+                        title: 'Chcesz zapisać nowy typ pokazu?',
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: "Tak zapisz"
+                    }).then((result) => {
+                        if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ route('api.saveNewMeeting') }}", // do zamiany
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                data: {
+                                    'name'   : newMeetingName
+                                },
+                                success: function (response) {
+                                    $('#NewMeetingTypeName').val("");
+                                    notify("<strong>Nowy typ pokazu zostałdodany</strong>", 'success');
+                                    meetingTable.ajax.reload();
+                                }
+                            });
+                        }})
+                }else{
+                    swal("Przed zapisem podaj nazwę nowego typu pokazu")
+                }
+            });
+
             $('#ModalClient').on('hidden.bs.modal',function () {
                 $('#clientID').val("0");
                 clearModal();
@@ -549,23 +644,111 @@
                         // d.date_start = $('#date_start').val();
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
-                },"columns":[
-                {"data":"name"},
+                },"fnDrawCallback": function(settings){
+
+                /**
+                 * Zmiana statusu upominku
+                 */
+                $('.button-gift-status').on('click',function () {
+                    let giftId = $(this).data('id');
+                    let giftStatus = $(this).data('status');
+                    let nameOfAction = "";
+                    if(giftStatus == 0)
+                        nameOfAction = "Tak, wyłącz upominek";
+                    else
+                        nameOfAction = "Tak, włącz upominek";
+                    swal({
+                        title: 'Jesteś pewien?',
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: nameOfAction
+                    }).then((result) => {
+                        if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ route('api.changeGiftStatus') }}", // do zamiany
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                data: {
+                                    'giftId'   : giftId
+                                },
+                                success: function (response) {
+                                    notify("<strong>Status upominka został zmieniony</strong>", 'success');
+                                    giftTable.ajax.reload();
+                                }
+                            });
+                        }})
+                });
+                /**
+                 * Edycja upominku
+                 */
+                $('.button-edit-gift').on('click',function () {
+                    let actualAction = $(this).data('type');
+                    let giftId = $(this).data('id');
+                    if(actualAction == 1){
+                        let row = $(this).closest('tr');
+                        let cel = row.find("td:first");
+                        let celVal = cel.text();
+                        $(this).toggleClass('btn-info btn-success');
+                        cel.html("<input type='text' class='form-control'  value="+celVal+" />");
+                        $(this).html("<span class='glyphicon glyphicon-save'></span> <span>Zapisz</span>");
+                        $(this).data('type',2);
+                    }else if(actualAction == 2){
+                        let element = $(this);
+                        let row = $(this).closest('tr');
+                        let cel = row.find("td:first");
+                        let celInput = cel.find("input");
+                        let celVal = celInput.val();
+                        let validate = true;
+                        if(celVal.trim().length == 0 || celVal == ''){
+                            validate = false;
+                            swal("Podaj nazwę upominku")
+                        }
+                        if(validate){
+                            element.attr("disabled", true);
+                            $.ajax({
+                                type: "POST",
+                                url: '{{ route('api.editGift') }}',
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                data: {
+                                    "name"  : celVal,
+                                    "id"    : giftId,
+                                },
+                                success: function (response) {
+                                    element.toggleClass('btn-success btn-info');
+                                    element.attr("disabled", false);
+                                    notify("<strong>Zapisano zmiany</strong>", 'success');
+                                    cel.html(celVal);
+                                    element.html("<span class='glyphicon glyphicon-edit'></span> <span>Edycja</span>");
+                                    element.data('type',1);
+                                }
+                            });
+                        }
+
+                    }
+                });
+
+            },"columns":[
+                {"data":"name","width": "100%"},
                 {
                     "data": function (data, type, dataToSet) {
-                        return 1;
+                        return "<button class='button-edit-gift btn btn-info btn-block' data-id="+data.id+"  data-type='1' ><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
                     }
                 },
                     {"data":function (data, type, dataToSet) {
-                            let returnButton = "<button class='button-edit-meeting btn btn-info btn-block' data-id="+data.id+"><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
+                            let returnButton = "";
                             if(data.status == 1)
-                                returnButton += "<button class='button-status-meeting btn btn-danger btn-block' data-id="+data.id+" data-status=0><span class='glyphicon glyphicon-off'></span> Wyłącz</button>";
+                                returnButton += "<button class='button-gift-status btn btn-danger btn-block' data-id="+data.id+" data-status=0><span class='glyphicon glyphicon-off'></span> Wyłącz</button>";
                             else
-                                returnButton += "<button class='button-status-meeting btn btn-success btn-block' data-id="+data.id+" data-status=1 ><span class='glyphicon glyphicon-off'></span> Włącz</button>";
+                                returnButton += "<button class='button-gift-status btn btn-success btn-block' data-id="+data.id+" data-status=1 ><span class='glyphicon glyphicon-off'></span> Włącz</button>";
                             return returnButton;
-                        },"orderable": false, "searchable": false, width:'1%'
+                        },"orderable": false, "searchable": false,"width": "10%"
                     }
-
                 ]
             });
              var meetingTable  = $('#meetingTable').DataTable({
@@ -584,21 +767,109 @@
                         // d.date_start = $('#date_start').val();
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
-                },"columns":[
-                    {"data":"name"},
+                },"fnDrawCallback": function(settings){
+                     /**
+                      * Zmiana statusu typu pokazu
+                      */
+                     $('.button-status-meeting').on('click',function () {
+                         let meeting = $(this).data('id');
+                         let meetingStatus = $(this).data('status');
+                         let nameOfAction = "";
+                         if(meetingStatus == 0)
+                             nameOfAction = "Tak, wyłącz upominek";
+                         else
+                             nameOfAction = "Tak, włącz upominek";
+                         swal({
+                             title: 'Jesteś pewien?',
+                             type: 'warning',
+                             showCancelButton: true,
+                             confirmButtonColor: '#3085d6',
+                             cancelButtonColor: '#d33',
+                             confirmButtonText: nameOfAction
+                         }).then((result) => {
+                             if (result.value) {
+
+                                 $.ajax({
+                                     type: "POST",
+                                     url: "{{ route('api.changeMeetingStatus') }}", // do zamiany
+                                     headers: {
+                                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                     },
+                                     data: {
+                                         'meetingId'   : meeting
+                                     },
+                                     success: function (response) {
+                                         notify("<strong>Status upominka został zmieniony</strong>", 'success');
+                                         meetingTable.ajax.reload();
+                                     }
+                                 });
+                             }})
+                     });
+                     /**
+                      * Edycja typu trasy
+                      */
+                     $('.button-edit-meeting').on('click',function () {
+                         let actualAction = $(this).data('type');
+                         let meetingId = $(this).data('id');
+                         let element = $(this);
+                         if(actualAction == 1){
+                             $(this).toggleClass('btn-info btn-success');
+                             let row = $(this).closest('tr');
+                             let cel = row.find("td:first");
+                             let celVal = cel.text();
+                             cel.html("<input type='text' class='form-control'  value="+celVal+" />");
+                             $(this).html("<span class='glyphicon glyphicon-save'></span> <span>Zapisz</span>");
+                             $(this).data('type',2);
+                         }else if(actualAction == 2){
+                             let row = $(this).closest('tr');
+                             let cel = row.find("td:first");
+                             let celInput = cel.find("input");
+                             let celVal = celInput.val();
+                             let validate = true;
+                             if(celVal.trim().length == 0 || celVal == ''){
+                                 validate = false;
+                                 swal("Podaj nazwę typu poazau")
+                             }
+                             if(validate){
+                                 element.attr("disabled", true);
+                                 $.ajax({
+                                     type: "POST",
+                                     url: '{{ route('api.editMeeting') }}',
+                                     headers: {
+                                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                     },
+                                     data: {
+                                         "name"  : celVal,
+                                         "id"    : meetingId,
+                                     },
+                                     success: function (response) {
+                                         element.toggleClass('btn-success btn-info');
+                                         element.attr("disabled", false);
+                                         notify("<strong>Zapisano zmiany</strong>", 'success');
+                                         cel.html(celVal);
+                                         element.html("<span class='glyphicon glyphicon-edit'></span> <span>Edycja</span>");
+                                         element.data('type',1);
+                                     }
+                                 });
+                             }
+                         }
+                     });
+
+                 },"columns":[
+                    {"data":"name","width": "100%"},
                      {
                          "data": function (data, type, dataToSet) {
-                            return = "<button class='button-edit-meeting btn btn-info btn-block' data-id="+data.id+"><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
+                            return "<button class='button-edit-meeting btn btn-info btn-block' data-id="+data.id+" data-type='1'><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
                          }
                      },
                     {"data":function (data, type, dataToSet) {
-                            let returnButton
+                            let returnButton = "";
                             if(data.status == 1)
                                 returnButton += "<button class='button-status-meeting btn btn-danger btn-block' data-id="+data.id+" data-status=0><span class='glyphicon glyphicon-off'></span> Wyłącz</button>";
                             else
                                 returnButton += "<button class='button-status-meeting btn btn-success btn-block' data-id="+data.id+" data-status=1 ><span class='glyphicon glyphicon-off'></span> Włącz</button>";
                             return returnButton;
-                        },"orderable": false, "searchable": false, width:'1%'
+                        },"orderable": false, "searchable": false, "width": "10%"
                     }
                 ]
             });
@@ -657,7 +928,7 @@
                                         'clientId'   : clientId
                                     },
                                     success: function (response) {
-                                        notify("<strong>Status klienta został zmieniony</strong>", 'info');
+                                        notify("<strong>Status klienta został zmieniony</strong>", 'success');
                                         table.ajax.reload();
                                     }
                                 });
@@ -686,7 +957,6 @@
                     $('.show-client').on('click',function () {
                         prepereModel('Show');
                         clientId = $(this).data('id');
-                        console.log(clientId);
                         getInfoAboutClient(clientId);
                     });
                 },"columns":[
@@ -694,7 +964,7 @@
                     {"data":"comment"},
                     {
                         "data": function (data, type, dataToSet) {
-                            return "<div class='col-md-1'><span class='glyphicon glyphicon-search show-client' data-id="+data.id+"></span></div>";
+                            return "<button class='btn'><span  style='font-size: 30px;' class='glyphicon glyphicon-search show-client' data-id="+data.id+"></span></button>";
                         },"orderable": false, "searchable": false,
                     },
                     {"data":function (data, type, dataToSet) {
