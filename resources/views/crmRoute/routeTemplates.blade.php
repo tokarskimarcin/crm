@@ -100,30 +100,117 @@
             let panelBody = document.querySelector('.panel-body');
         //END GLOBAL VARIABLES
 
-
             /**
-             * This function shows notification.
+             * This method appends basic option to voivode select
              */
-            function notify(htmltext$string, type$string = 'info', delay$miliseconds$number = 5000) {
-                $.notify({
-                    // options
-                    message: htmltext$string
-                },{
-                    // settings
-                    type: type$string,
-                    delay: delay$miliseconds$number,
-                    animate: {
-                        enter: 'animated fadeInRight',
-                        exit: 'animated fadeOutRight'
-                    }
-                });
-            }
+        function appendBasicOption(element) {
+            let basicVoivodeOption = document.createElement('option');
+            basicVoivodeOption.value = '0';
+            basicVoivodeOption.textContent = 'Wybierz';
 
-        function Box() {
+            element.appendChild(basicVoivodeOption);
+        }
+
+        /**
+         * This function return intersection of 2 given sets of cities
+         */
+        function getIntersection(firstResponse, secondResponse) {
+            let intersectionVoivodes = [];
+            let intersectionCities = [];
+            const firstVoivodeInfo = firstResponse['voievodeInfo'];
+            // console.log(firstVoivodeInfo);
+            const secondVoivodeInfo = secondResponse['voievodeInfo'];
+            // console.log(secondVoivodeInfo);
+            const firstCityInfo = firstResponse['cityInfo'];
+            const secondCityInfo = secondResponse['cityInfo'];
+
+            //linear looking for same voivodes
+            firstVoivodeInfo.forEach(voivode => {
+               secondVoivodeInfo.forEach(voivode2 => {
+                   if(voivode2.id === voivode.id) {
+                       intersectionVoivodes.push(voivode);
+                   }
+               })
+            });
+
+            intersectionVoivodes.forEach(voivode => {
+                let voivodeCityArr = [];
+                if(firstCityInfo[voivode.id] && secondCityInfo[voivode.id]) {
+                    let firstCitySet = firstCityInfo[voivode.id];
+                    let secondCitySet = secondCityInfo[voivode.id];
+                    firstCitySet.forEach(city => {
+                       secondCitySet.forEach(city2 => {
+                          if(city.city_id === city2.city_id) {
+                              voivodeCityArr.push(city);
+                          }
+                       });
+                    });
+                }
+                if(voivodeCityArr.length != 0) {
+                    intersectionCities.push(voivodeCityArr);
+                }
+            });
+
+            let intersectionArray = [];
+            intersectionArray.push(intersectionVoivodes);
+            intersectionArray.push(intersectionCities);
+
+            return intersectionArray;
+        }
+
+        /**
+         * This function shows notification.
+         */
+        function notify(htmltext$string, type$string = 'info', delay$miliseconds$number = 5000) {
+            $.notify({
+                // options
+                message: htmltext$string
+            },{
+                // settings
+                type: type$string,
+                delay: delay$miliseconds$number,
+                animate: {
+                    enter: 'animated fadeInRight',
+                    exit: 'animated fadeOutRight'
+                }
+            });
+        }
+
+        /**
+         * This method validate form
+         */
+        function validateForm(element) {
+            let citySelect = element.querySelector('.citySelect');
+            let cityValue = citySelect.options[citySelect.selectedIndex].value;
+            if(cityValue == 0) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+
+        /**
+         * This constructor defines new show object
+         * API:
+         * let variable = new showBox(); - we create new show object,
+         * variable.addNewShowButton() - indices that we want addNewShowButton(optional),
+         * variable.addRemoveShowButton() - indices that we want removeShowButton(optional),
+         * variable.addCheckboxFlag() - indices that we want checkbox(optional),
+         * -----------------------------------------------------------------------
+         * variable.createDOMBox() - we create new DOM element with no distance limit,
+         * variable.createDOMBox(X, cityId) - we create new DOM element with distance limit of X(for example 30) relative to city(cityId),
+         * variable.createDOMBox(x, cityId, true, previousShowContainer, nextShowContainer) -
+         * we create new DOM element with distance limit between previousShowContainer's limit and
+         * nextShowContainer's limit.
+         * let DOMElement = variable.getForm(); - we obtain we obtain DOM representation of showBox
+         * ------------------------------------------------------------------------
+         */
+        function showBox() {
             this.addNewShowButtonFlag = false; //indices whether add newShowButton
             this.addRemoveShowButtonFlag = false; //indices whether add removeShowButton
             this.addCheckboxFlag = false; //indices whether add refreshShowButton
-            this.DOMBox = null; //here is stored DOM representation of Box
+            this.DOMBox = null; //here is stored DOM representation of showBox
             this.addNewShowButton = function() {
                 this.addNewShowButtonFlag = true;
             };
@@ -133,7 +220,7 @@
             this.addDistanceCheckbox = function() {
                 this.addCheckboxFlag = true;
             };
-            this.createDOMBox = function(distance = Infinity, selectedCity = null) { //Creation of DOM form
+            this.createDOMBox = function(distance = Infinity, selectedCity = null, intersetion = false, previousBox = null, nextBox = null) { //Creation of DOM form
                 let formBox = document.createElement('div'); //creation of main form container
                 formBox.classList.add('singleShowContainer');
 
@@ -182,6 +269,7 @@
 
                     let distanceCheckbox = document.createElement('input');
                     distanceCheckbox.setAttribute('type', 'checkbox');
+                    distanceCheckbox.classList.add('distance-checkbox');
                     distanceCheckbox.style.display = 'inline-block';
                     distanceCheckbox.style.marginRight = '1em';
 
@@ -209,9 +297,7 @@
                 secondSelect.classList.add('citySelect');
                 secondSelect.classList.add('form-control');
 
-                let basicCityOption = document.createElement('option');
-                basicCityOption.value = '0';
-                basicCityOption.textContent = 'Wybierz';
+                // appendBasicOption(secondSelect);
 
 
                 let formBodyColLeftColumn = document.createElement('div');
@@ -227,13 +313,9 @@
                 firstSelect.classList.add('voivodeSelect');
                 firstSelect.classList.add('form-control');
 
-                let basicVoivodeOption = document.createElement('option');
-                basicVoivodeOption.value = '0';
-                basicVoivodeOption.textContent = 'Wybierz';
+                appendBasicOption(firstSelect);
 
-                firstSelect.appendChild(basicVoivodeOption);
-
-                if(distance === Infinity) { //every voivodeship and every city
+                if(distance === Infinity && intersetion === false) { //every voivodeship and every city
                     @foreach($voivodes as $voivode)
                         var singleVoivode = document.createElement('option');
                         singleVoivode.value = {{$voivode->id}};
@@ -242,8 +324,8 @@
                     @endforeach()
 
                     firstSelect.addEventListener('change', e => {
+                        secondSelect.setAttribute('data-distance', 'infinity');
                         let voivodeId = e.target.value;
-                        console.log(voivodeId);
                         $.ajax({
                             type: "POST",
                             url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
@@ -254,13 +336,9 @@
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
                             success: function(response) {
-                                console.log(response);
                                 let placeToAppend = secondSelect;
                                 placeToAppend.innerHTML = '';
-                                let basicOption = document.createElement('option');
-                                basicOption.value = '0';
-                                basicOption.textContent = 'Wybierz';
-                                placeToAppend.appendChild(basicOption);
+                                appendBasicOption(placeToAppend);
                                 for(var i = 0; i < response.length; i++) {
                                     let responseOption = document.createElement('option');
                                     responseOption.value = response[i].id;
@@ -272,8 +350,7 @@
                         });
                     });
                 }
-                else if(distance === 100 || distance === 30) {
-                    console.log(selectedCity);
+                else if((distance === 100 || distance === 30) && intersetion === false) {
                     $.ajax({
                         type: "POST",
                         url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
@@ -297,12 +374,9 @@
 
                             //After selecting voivode, this event listener appends cities from given range into city select
                             firstSelect.addEventListener('change', e => {
+                                secondSelect.setAttribute('data-distance', distance);
                                 secondSelect.innerHTML = ''; //cleaning previous insertions
-                                let basicCityOption = document.createElement('option');
-                                basicCityOption.value = '0';
-                                basicCityOption.textContent = 'Wybierz';
-
-                                secondSelect.appendChild(basicCityOption);
+                                appendBasicOption(secondSelect);
 
                                let voivodeId = e.target.value;
                                for(Id in allCitiesGroupedByVoivodes) {
@@ -319,14 +393,88 @@
                         }
                     });
                 }
+                else if((distance === 100 || distance === 30) && intersetion === true) {
+                    let firstResponse = null;
+                    let secondResponse = null;
+                    let intersectionArray = null;
+                    const previousCitySelect = previousBox.querySelector('.citySelect');
+                    const previousCityDistance = previousCitySelect.dataset.distance;
+                    const previousCityId = previousCitySelect.options[previousCitySelect.selectedIndex].value;
+
+                    const nextCitySelect = nextBox.querySelector('.citySelect');
+                    const nextCityDistance = nextCitySelect.dataset.distance;
+                    const nextCityId = nextCitySelect.options[nextCitySelect.selectedIndex].value;
+
+                    $.ajax({
+                        type: "POST",
+                        url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
+                        data: {
+                            'limit': previousCityDistance,
+                            "cityId": previousCityId
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function (response) {
+                            firstResponse = response;
+                            $.ajax({
+                                type: "POST",
+                                url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
+                                data: {
+                                    'limit': nextCityDistance,
+                                    "cityId": nextCityId
+                                },
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                success: function (response2) {
+                                    secondResponse = response2;
+                                    intersectionArray = getIntersection(firstResponse, secondResponse);
+
+                                    let voivodeSet = intersectionArray[0];
+                                    let citySet = intersectionArray[1];
+
+                                    voivodeSet.forEach(voivode => {
+                                        var voivodeOpt = document.createElement('option');
+                                        voivodeOpt.value = voivode.id;
+                                        voivodeOpt.textContent = voivode.name;
+                                        firstSelect.appendChild(voivodeOpt);
+                                    });
+
+                                    //After selecting voivode, this event listener appends cities from given range into city select
+                                    firstSelect.addEventListener('change', e => {
+                                        secondSelect.setAttribute('data-distance', 30);
+                                        secondSelect.innerHTML = ''; //cleaning previous insertions
+                                        appendBasicOption(secondSelect);
+
+                                        voivodeSet.forEach(voivode => {
+                                            citySet.forEach(voivodeCity => {
+                                               voivodeCity.forEach(city => {
+                                                   if(city.id === voivode.id) {
+                                                       var cityOpt = document.createElement('option');
+                                                       cityOpt.value = city.city_id;
+                                                       cityOpt.textContent = city.city_name;
+                                                       secondSelect.appendChild(cityOpt);
+                                                   }
+                                                });
+                                            });
+                                        });
+                                    });
+
+                                }
+                            });
+
+                        }
+                    });
+
+                }
 
                 formBodyLeftColumnGroup.appendChild(firstSelectLabel);
                 formBodyLeftColumnGroup.appendChild(firstSelect);
                 formBodyColLeftColumn.appendChild(formBodyLeftColumnGroup);
                 formBodyRow.appendChild(formBodyColLeftColumn);
 
-
-                secondSelect.appendChild(basicCityOption);
+                appendBasicOption(secondSelect);
                 formBodyRightColumnGroup.appendChild(secondSelectLabel);
                 formBodyRightColumnGroup.appendChild(secondSelect);
                 formBodyColRightColumn.appendChild(formBodyRightColumnGroup);
@@ -364,6 +512,13 @@
             }
         }
 
+        /**
+         * This constructor defines day container object.
+         * API:
+         * let variable = new DayBox();  - we obtain new day element.
+         * variable.createDOMDayBox(); - we create DOM representation of DayBox;
+         * let DOMElement = variable.getBox(); - we obtain DOM representation of DayBox
+         */
         function DayBox() {
                 this.dayBoxDOM = null;
                 this.createDOMDayBox = function() {
@@ -385,17 +540,16 @@
                 }
         }
 
-            /**
-             * This method append first day container and first show container
-             */
+        /**
+         * This method append first day container and first show container
+         */
         (function pageOpen() {
             let firstDay = new DayBox();
             firstDay.createDOMDayBox();
             let firstDayContainer = firstDay.getBox();
-            console.log(firstDayContainer);
             panelBody.insertAdjacentElement("afterbegin", firstDayContainer);
 
-            let firstForm = new Box();
+            let firstForm = new showBox();
             firstForm.addRemoveShowButton();
             firstForm.addDistanceCheckbox();
             firstForm.addNewShowButton();
@@ -405,23 +559,57 @@
             firstDayContainer.appendChild(firstFormDOM);
         })();
 
+        /**
+         * Global click handler
+         */
         function globalClickHandler(e) {
             if(e.target.matches('.addNewShowButton')) { //user clicks on "add new show" button
                 e.preventDefault();
                 const newShowButton = e.target;
                 const dayContainer = newShowButton.closest('.singleDayContainer');
                 const thisShowContainer = newShowButton.closest('.singleShowContainer');
+                const allSingleShowContainers = document.getElementsByClassName('singleShowContainer');
+                const lastSingleShowCOntainer = allSingleShowContainers[allSingleShowContainers.length - 1];
+
                 const selectedCity = thisShowContainer.querySelector('.citySelect');
                 const selectedCityId = selectedCity.options[selectedCity.selectedIndex].value;
 
-                let newForm = new Box();
-                newForm.addRemoveShowButton();
-                newForm.addDistanceCheckbox();
-                newForm.addNewShowButton();
-                newForm.createDOMBox(30, selectedCityId);
-                newFormDomElement = newForm.getForm();
+                var validation = validateForm(thisShowContainer);
 
-                dayContainer.appendChild(newFormDomElement);
+                if(validation) {
+                    let newForm = new showBox();
+                    newForm.addRemoveShowButton();
+                    newForm.addDistanceCheckbox();
+                    newForm.addNewShowButton();
+
+                    lastOneFlag = true;
+                    let nextShowContainer = null;
+                    //we are checking whether there is more single show containers
+                    for(let i = 0; i < allSingleShowContainers.length; i++) {
+                        if(allSingleShowContainers[i] === thisShowContainer) {
+                            if(allSingleShowContainers[i+1]) {
+                                lastOneFlag = false;
+                                nextShowContainer = allSingleShowContainers[i+1];
+                            }
+
+                        }
+                    }
+
+                    //we are checking whether cliecked singleDayContainer is last one, or between others.
+                    if(lastOneFlag === true) {
+                        newForm.createDOMBox(30, selectedCityId);
+                    }
+                    else {
+                        const previousShowContainer = thisShowContainer; // relative to newForm, this one is previousShowContainer
+                        newForm.createDOMBox(30, selectedCityId, true, previousShowContainer, nextShowContainer);
+                    }
+
+                    newFormDomElement = newForm.getForm();
+                    thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                }
+                else {
+                    notify('Wybierz miasto');
+                }
             }
             else if(e.target.matches('.remove-button')) { // user clicks on "remove show" button
                 e.preventDefault();
@@ -450,25 +638,113 @@
                 let firstDayContainer = firstDay.getBox();
                 const allDayContainers = document.getElementsByClassName('singleDayContainer');
                 const lastDayContainer = allDayContainers[allDayContainers.length - 1];
+                const allSingleShowContainers = document.getElementsByClassName('singleShowContainer');
 
-                lastDayContainer.insertAdjacentElement("afterend", firstDayContainer);
+                let validate = validateForm(allSingleShowContainers[allSingleShowContainers.length - 1]);
 
-                const allCitiesSelect = document.getElementsByClassName('citySelect');
-                const selectedCity = allCitiesSelect[allCitiesSelect.length - 1];
-                const selectedCityId = selectedCity.options[selectedCity.selectedIndex].value;
+                if(validate) {
+                    lastDayContainer.insertAdjacentElement("afterend", firstDayContainer);
 
-                let firstForm = new Box();
-                firstForm.addRemoveShowButton();
-                firstForm.addDistanceCheckbox();
-                firstForm.addNewShowButton();
-                firstForm.createDOMBox(100, selectedCityId);
-                let firstFormDOM = firstForm.getForm();
+                    const allCitiesSelect = document.getElementsByClassName('citySelect');
+                    const selectedCity = allCitiesSelect[allCitiesSelect.length - 1];
+                    const selectedCityId = selectedCity.options[selectedCity.selectedIndex].value;
 
-                firstDayContainer.appendChild(firstFormDOM);
+                    let firstForm = new showBox();
+                    firstForm.addRemoveShowButton();
+                    firstForm.addDistanceCheckbox();
+                    firstForm.addNewShowButton();
+                    firstForm.createDOMBox(100, selectedCityId);
+                    let firstFormDOM = firstForm.getForm();
+
+                    firstDayContainer.appendChild(firstFormDOM);
+                }
+                else {
+                    notify('Uzupełnij miasto');
+                }
+
             }
         };
 
+        function globalChangeHandler(e) {
+            if(e.target.matches('.distance-checkbox')) {
+                let isChecked = e.target.checked;
+                let previousSingleShowContainer = null;
+                let nextSingleShowContainer = null;
+                if(isChecked) {
+                    const thisSingleShowContainer = e.target.closest('.singleShowContainer');
+                    let voivodeSelect = thisSingleShowContainer.querySelector('.voivodeSelect');
+                    voivodeSelect.innerHTML = ''; //clear select
+                    let citySelect = thisSingleShowContainer.querySelector('.citySelect');
+                    citySelect.innerHTML = ''; //clear select
+
+
+                    let basicCityOption = document.createElement('option');
+                    basicCityOption.value = '0';
+                    basicCityOption.textContent = 'Wybierz';
+
+                    citySelect.appendChild(basicCityOption);
+
+                    appendBasicOption(voivodeSelect);
+
+                    @foreach($voivodes as $voivode)
+                        var singleVoivode = document.createElement('option');
+                        singleVoivode.value = {{$voivode->id}};
+                        singleVoivode.textContent = '{{$voivode->name}}';
+                        voivodeSelect.appendChild(singleVoivode);
+                    @endforeach()
+
+                        voivodeSelect.addEventListener('change', e => {
+                        citySelect.setAttribute('data-distance', 'infinity');
+                        let voivodeId = e.target.value;
+                        $.ajax({
+                            type: "POST",
+                            url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
+                            data: {
+                                "id": voivodeId
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                let placeToAppend = citySelect;
+                                placeToAppend.innerHTML = '';
+                                let basicOption = document.createElement('option');
+                                basicOption.value = '0';
+                                basicOption.textContent = 'Wybierz';
+                                placeToAppend.appendChild(basicOption);
+                                for(var i = 0; i < response.length; i++) {
+                                    let responseOption = document.createElement('option');
+                                    responseOption.value = response[i].id;
+                                    responseOption.textContent = response[i].name;
+                                    placeToAppend.appendChild(responseOption);
+                                }
+
+                            }
+                        });
+                    });
+                }
+                else {
+                    // const allSingleShowContainers = document.getElementsByClassName('singleShowContainer');
+                    // const thisSingleShowContainer = e.target.closest('.singleShowContainer');
+                    // console.log(thisSingleShowContainer);
+                    // for(let i = 0; i < allSingleShowContainers.length; i++) {
+                    //     if(thisSingleShowContainer == allSingleShowContainers[i]) {
+                    //         if(allSingleShowContainers[i-1]) {
+                    //             previousSingleShowContainer = allSingleShowContainers[i-1];
+                    //         }
+                    //         if(allSingleShowContainers[i+1]) {
+                    //             nextSingleShowContainer = allSingleShowContainers[i+1];
+                    //         }
+                    //     }
+                    // }
+
+
+                }
+            }
+        }
+
         document.addEventListener('click', globalClickHandler);
+        document.addEventListener('change', globalChangeHandler);
 
         });
 
