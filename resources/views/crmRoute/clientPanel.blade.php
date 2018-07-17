@@ -4,6 +4,9 @@
                         <button data-toggle="modal" class="btn btn-default" id="clientModal" data-target="#ModalClient" data-id="1" title="Nowy Klient" style="margin-bottom: 14px">
                             <span class="glyphicon glyphicon-plus"></span> <span>Dodaj Klienta</span>
                         </button>
+                        <button data-toggle="modal" class="btn btn-primary" id="clientParameterModal" data-target="#ModalClientParameter" data-id="1" title="Parametry klientów" style="margin-bottom: 14px">
+                            <span class="glyphicon glyphicon-info-sign"></span> <span>Parametry Klientów</span>
+                        </button>
                         <table id="datatable" class="thead-inverse table table-striped row-border" cellspacing="0" width="100%">
                             <thead>
                             <tr>
@@ -22,6 +25,95 @@
         </div>
     </div>
 </div>
+{{--MODAL Parametrów klientów--}}
+<div id="ModalClientParameter" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg" style="width: 90%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" id="modal_title">Parametry klientów<span id="modal_category"></span></h4>
+            </div>
+            <div class="modal-body">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Parametry klientów
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            Upominki
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="col-md-12">
+                                                <div class="newGift">
+                                                    <div class="col-md-12">
+                                                            <div class="form-inline">
+                                                                <label>Dodaj nowy upominek do listy</label>
+                                                                <input type="text" class="form-control" name="giftName" id="giftName" placeholder="Upominek..."/>
+                                                                <button type="submit" class="btn btn-default" id="giftNameSubmit" value="Zapisz">
+                                                                    <span class="glyphicon glyphicon-plus"></span> <span>Zapisz</span>
+                                                                </button>
+                                                            </div>
+                                                    </div>
+                                                </div>
+                                                <table id="giftTable" class="thead-inverse table table-striped row-border" cellspacing="0" width="100%">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Nazwa</th>
+                                                        <th>Edycja</th>
+                                                        <th>Włącz/Wyłącz</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            Typy pokazów
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="col-md-12">
+                                                <div class="newGift">
+                                                    <div class="col-md-12">
+                                                        <div class="form-inline">
+                                                            <label>Dodaj nowy typ trasy do listy</label>
+                                                            <input type="text" class="form-control" name="meetingTypeName" id="giftName" placeholder="Typ trasy..."/>
+                                                            <button type="submit" class="btn btn-default" id="meetingTypeName" value="Zapisz">
+                                                                <span class="glyphicon glyphicon-plus"></span> <span>Zapisz</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <table id="meetingTable" class="thead-inverse table table-striped row-border" cellspacing="0" width="100%">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Nazwa</th>
+                                                        <th>Edycja</th>
+                                                        <th>Włącz/Wyłącz</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {{--MODAL Dodaj Klienta--}}
 <div id="ModalClient" class="modal fade" role="dialog">
@@ -32,7 +124,6 @@
                 <h4 class="modal-title" id="modal_title">Dodaj nowego klienta<span id="modal_category"></span></h4>
             </div>
             <div class="modal-body">
-
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         Formularz
@@ -442,7 +533,75 @@
                     saveCityButtonClicked = false;
                 }
             });
+            var giftTable  = $('#giftTable').DataTable({
+                "autoWidth": true,
+                "processing": true,
+                "serverSide": true,
+                "drawCallback": function (settings) {
+                },
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+                },
+                "ajax": {
+                    'url': "{{ route('api.getGiftType') }}",
+                    'type': 'POST',
+                    'data': function (d) {
+                        // d.date_start = $('#date_start').val();
+                    },
+                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+                },"columns":[
+                {"data":"name"},
+                {
+                    "data": function (data, type, dataToSet) {
+                        return 1;
+                    }
+                },
+                    {"data":function (data, type, dataToSet) {
+                            let returnButton = "<button class='button-edit-meeting btn btn-info btn-block' data-id="+data.id+"><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
+                            if(data.status == 1)
+                                returnButton += "<button class='button-status-meeting btn btn-danger btn-block' data-id="+data.id+" data-status=0><span class='glyphicon glyphicon-off'></span> Wyłącz</button>";
+                            else
+                                returnButton += "<button class='button-status-meeting btn btn-success btn-block' data-id="+data.id+" data-status=1 ><span class='glyphicon glyphicon-off'></span> Włącz</button>";
+                            return returnButton;
+                        },"orderable": false, "searchable": false, width:'1%'
+                    }
 
+                ]
+            });
+             var meetingTable  = $('#meetingTable').DataTable({
+                "processing": true,
+                 "autoWidth": true,
+                "serverSide": true,
+                "drawCallback": function (settings) {
+                },
+                 "language": {
+                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+                 },
+                "ajax": {
+                    'url': "{{ route('api.getMeetingType') }}",
+                    'type': 'POST',
+                    'data': function (d) {
+                        // d.date_start = $('#date_start').val();
+                    },
+                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+                },"columns":[
+                    {"data":"name"},
+                     {
+                         "data": function (data, type, dataToSet) {
+                            return = "<button class='button-edit-meeting btn btn-info btn-block' data-id="+data.id+"><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
+                         }
+                     },
+                    {"data":function (data, type, dataToSet) {
+                            let returnButton
+                            if(data.status == 1)
+                                returnButton += "<button class='button-status-meeting btn btn-danger btn-block' data-id="+data.id+" data-status=0><span class='glyphicon glyphicon-off'></span> Wyłącz</button>";
+                            else
+                                returnButton += "<button class='button-status-meeting btn btn-success btn-block' data-id="+data.id+" data-status=1 ><span class='glyphicon glyphicon-off'></span> Włącz</button>";
+                            return returnButton;
+                        },"orderable": false, "searchable": false, width:'1%'
+                    }
+                ]
+            });
             table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,

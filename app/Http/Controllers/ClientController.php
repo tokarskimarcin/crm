@@ -43,6 +43,27 @@ class ClientController extends Controller
         }
     }
 
+
+    /**
+     *  Return all gift with info
+     */
+    public function getGiftType(Request $request){
+        if($request->ajax()){
+            $gift = ClientGiftType::all();
+            return datatables($gift)->make(true);
+        }
+    }
+
+    /**
+     *  Return all Meeting with info
+     */
+    public function getMeetingType(Request $request){
+        if($request->ajax()){
+            $meeting = ClientMeetingType::all();
+            return datatables($meeting)->make(true);
+        }
+    }
+
     /**
      * Save new/edit client
      * @param Request $request
