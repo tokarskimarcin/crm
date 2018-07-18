@@ -104,7 +104,7 @@ class ClientController extends Controller
             $client->manager_mail = $request->clientManagersMail;
 
             if ($request->clientID == 0) {
-                $client->status = 0;
+                $client->status = 1;
             }
 
             $client->save();

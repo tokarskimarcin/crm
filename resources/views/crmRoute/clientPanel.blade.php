@@ -2,7 +2,7 @@
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
     <style>
-        .button-edit-meeting,.button-edit-meeting{
+        .button-edit-gift,.button-gift-status,.button-edit-meeting,.button-status-meeting{
             width: max-content;
         }
     </style>
@@ -890,7 +890,7 @@
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },"rowCallback": function( row, data, index ) {
-                    if (data.status == 1) {
+                    if (data.status != 1) {
                         $(row).css('background','#c500002e')
                     }
                     $(row).attr('id', data.id);
@@ -969,7 +969,7 @@
                     },
                     {"data":function (data, type, dataToSet) {
                             let returnButton = "<button class='button-edit-client btn btn-info btn-block' data-id="+data.id+"><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
-                            if(data.status == 0)
+                            if(data.status != 0)
                                 returnButton += "<button class='button-status-client btn btn-danger btn-block' data-id="+data.id+" data-status=0><span class='glyphicon glyphicon-off'></span> Wyłącz</button>";
                             else
                                 returnButton += "<button class='button-status-client btn btn-success btn-block' data-id="+data.id+" data-status=1 ><span class='glyphicon glyphicon-off'></span> Włącz</button>";
