@@ -1,6 +1,7 @@
 @extends('layouts.main')
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{asset('/css/fixedHeader.dataTables.min.css')}}">
 @endsection
 @section('content')
 
@@ -145,10 +146,10 @@
                             <label>Godzina pokazu nr. @php echo $i; @endphp</label>
                             <input type="time" class="form-control time-input" @if(isset($item->hour)) value="{{$item->hour}}" @endif>
                         </div>
-                            <div class="form-group">
-                                <label>Cena za salę</label>
-                                <input id="hotel_price" type="number" class="form-control price-input" @if(isset($item->hotel_price)) value="{{$item->hotel_price}}" @endif>
-                            </div>
+                            {{--<div class="form-group">--}}
+                                {{--<label>Cena za salę</label>--}}
+                                {{--<input id="hotel_price" type="number" class="form-control price-input" @if(isset($item->hotel_price)) value="{{$item->hotel_price}}" @endif>--}}
+                            {{--</div>--}}
                         @if(!$loop->last)
                             <div style="width: 100%; height:2px; border-top:3px dashed black; margin-top:1em; margin-bottom:1em;"></div>
                         @endif
@@ -179,7 +180,7 @@
 
 @section('script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
-
+    <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
         document.addEventListener('DOMContentLoaded',function(event) {
 
@@ -456,7 +457,7 @@
                 let priceHotelArr = [];
                 for(let i = 0; i < allHotels.length; i++) { //number of hotels = number of times
                     const hotelId = allHotels[i].querySelector('input[type="checkbox"]:checked') == null ? null : allHotels[i].querySelector('input[type="checkbox"]:checked').value; //null or id
-                    const price = allPrice[i].value;
+                    const price = 0;
                     const priceHotelObject = {
                         hotelId: hotelId,
                         price: price
