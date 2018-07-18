@@ -926,9 +926,9 @@ Route::get('/pbx_crm_info', 'PBXDataAPI@pbx_crm_info');
 ///
 ///
 //COACHINGS
-Route::get('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryGet'); //do usunięcia, stary
-Route::post('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryPost');//do usunięcia, stary
-Route::get('/ReportCoachingSummary', 'StatisticsController@MailReportCoachingSummary'); //do usunięcia, stary
+//Route::get('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryGet'); //do usunięcia, stary
+//Route::post('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryPost');//do usunięcia, stary
+//Route::get('/ReportCoachingSummary', 'StatisticsController@MailReportCoachingSummary'); //do usunięcia, stary
 
 Route::get('/ReportCoaching', 'StatisticsController@MailpageReportCoaching');
 Route::get('/MailToDirectors', 'StatisticsController@MailToEveryDirector');
@@ -941,3 +941,6 @@ Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table
 
 Route::get('/addNewCampaigns', 'CampaignsController@addNewCampaignsGet');
 Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
+
+//Skrypty
+Route::get('/autoChangeRouteStatus', 'AutoScriptController@autoChangeRouteStatus');
