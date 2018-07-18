@@ -864,6 +864,7 @@
                     let nextDayFlag = null; //indices that next show container is in the same day container (false - same day, true - another day)
                     let prevDayFlag = null; //indices that prev show container is in the same day container (false - same day, true - another day)
                     let grandPrevDayFlag = null;
+                    let grandNextDayFlag = null;
 
                     let siblingShowContainersArr = [];
                     let siblingCheckboxArr = [];
@@ -875,8 +876,8 @@
                     previousShowContainer = siblingShowContainersArr[0] === null ? null : siblingShowContainersArr[0];
                     nextShowContainer = siblingShowContainersArr[1] === null ? null : siblingShowContainersArr[1];
 
-                    //case when next show exist.
-                    if(nextShowContainer) {
+
+                    if(nextShowContainer) { //case when next show exist.
                         if(siblingCheckboxArr[1] === false) { //next show container doesn't have checked distance checkbox
                             let dayContainerOfNextShowContainer = nextShowContainer.closest('.singleDayContainer');
                             nextDayFlag = dayContainerOfNextShowContainer == thisDayContainer ? false : true; //checking if next show is in the same day container
@@ -892,7 +893,14 @@
                                 grandNextShowContainer = siblingsOfNextShowContainerArr[1] === null ? null : siblingsOfNextShowContainerArr[1];
 
                                 if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
+                                    let dayContainerOfGrandNextShowContainer = grandNextShowContainer.closest('.singleDayContainer');
+                                    grandNextDayFlag = dayContainerOfGrandNextShowContainer == dayContainerOfNextShowContainer ? false : true; //checking if grandnext show is in the same day container as next show
+                                    if(grandNextDayFlag) { //grandnext show is in another day container related to next show
 
+                                    }
+                                    else { //grandnext show is in the same day container as next show
+                                        limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer);
+                                    }
                                 }
                                 else { // there is no next container (related to next show container)
                                     limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer);
@@ -919,7 +927,6 @@
                                 grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
 
                                 if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
-                                    console.log('weszlo');
                                     // if(prevSiblingCheckboxArr[0] === false) { //grand prev show container doesn't have checked distance checkbox
                                         console.log('niezaznaczony');
                                         let dayContainerOfGrandPrevShowContainer = grandPrevShowContainer.closest('.singleDayContainer');
@@ -928,29 +935,7 @@
 
                                         }
                                         else { //grandprev show is in the same day container as prev show
-                                            const grandPrevShowContainerCitySelect = grandPrevShowContainer.querySelector('.citySelect');
-                                            const grandPrevShowContainerCitySelectCityDistance = grandPrevShowContainerCitySelect.dataset.distance;
-                                            const grandPrevShowContainerCitySelectCityId = grandPrevShowContainerCitySelect.options[grandPrevShowContainerCitySelect.selectedIndex].value;
-
-                                            const thisSingleShowContainerCitySelect = thisSingleShowContainer.querySelector('.citySelect');
-                                            const thisSingleShowContainerCitySelectCityDistance = thisSingleShowContainerCitySelect.dataset.distance;
-                                            const thisSingleShowContainerCityId = thisSingleShowContainerCitySelect.options[thisSingleShowContainerCitySelect.selectedIndex].value;
-
-                                            const previousShowContainerCitySelect = previousShowContainer.querySelector('.citySelect');
-                                            const previousShowContainerCityid = previousShowContainerCitySelect.options[previousShowContainerCitySelect.selectedIndex].value;
-                                            const previousShowContainerVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
-                                            const previousShowCOntainerVoivodeId = previousShowContainerVoivodeSelect.options[previousShowContainerVoivodeSelect.selectedIndex].value;
-
-                                            let oldValuesArray = [previousShowContainerVoivodeSelect, previousShowCOntainerVoivodeId, previousShowContainerCitySelect, previousShowContainerCityid];
-
-                                            previousShowContainerVoivodeSelect.innerHTML = '';
-                                            previousShowContainerCitySelect.innerHTML = '';
-
-                                            showInTheMiddleAjax(grandPrevShowContainerCitySelectCityDistance,grandPrevShowContainerCitySelectCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,previousShowContainerCitySelect,previousShowContainerVoivodeSelect, oldValuesArray);
-                                            // console.log(grandPrevShowContainerCitySelect);
-                                            // console.log(grandPrevShowContainerCitySelectCityDistance);
-                                            // console.log(grandPrevShowContainerCitySelectCityId);
-
+                                            limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer);
                                         }
 
                                     // }
@@ -973,6 +958,35 @@
             document.addEventListener('click', globalClickHandler);
             document.addEventListener('change', globalChangeHandler);
 
+            function limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer) {
+                const grandNextShowContainerCitySelect = grandNextShowContainer.querySelector('.citySelect');
+                const grandNextShowContainerCityDistance = grandNextShowContainerCitySelect.dataset.distance;
+                const grandNextShowContainerCityId = grandNextShowContainerCitySelect.options[grandNextShowContainerCitySelect.selectedIndex].value;
+
+                const thisSingleShowContainerCitySelect = thisSingleShowContainer.querySelector('.citySelect');
+                const thisSingleShowContainerCitySelectCityDistance = thisSingleShowContainerCitySelect.dataset.distance;
+                const thisSingleShowContainerCityId = thisSingleShowContainerCitySelect.options[thisSingleShowContainerCitySelect.selectedIndex].value;
+
+                const nextShowContainerCitySelect = nextShowContainer.querySelector('.citySelect');
+                const nextShowContainerCityid = nextShowContainerCitySelect.options[nextShowContainerCitySelect.selectedIndex].value;
+                let nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
+                const nextShowContainerVoivodeId = nextShowContainerVoivodeSelect.options[nextShowContainerVoivodeSelect.selectedIndex].value;
+
+                let oldValuesArray = [nextShowContainerVoivodeSelect, nextShowContainerVoivodeId, nextShowContainerCitySelect, nextShowContainerCityid];
+
+                //this part remove all event listeners from this node
+                var old_element = nextShowContainerVoivodeSelect;
+                var new_element = old_element.cloneNode(true);
+                old_element.parentNode.replaceChild(new_element, old_element);
+                //end remove all event listeners
+                nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
+
+                nextShowContainerVoivodeSelect.innerHTML = '';
+                nextShowContainerCitySelect.innerHTML = '';
+
+                showInTheMiddleAjax(grandNextShowContainerCityDistance,grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
+            }
+
             /**
              * This method handle refresh distance case when prev show is in the same day container and there is not previous container && case when next show is in the same day container and there is no next container
              */
@@ -986,6 +1000,13 @@
                 let nextShowContainerRelatedToPreviousShowContainerCitySelect = nextShowContainerRelatedToPreviousShowContainer.querySelector('.citySelect');
                 let nextShowContainerRelatedToPreviousShowContainerCityId = nextShowContainerRelatedToPreviousShowContainerCitySelect.options[nextShowContainerRelatedToPreviousShowContainerCitySelect.selectedIndex].value;
                 let oldValuesArray = [prevShowContainerVoivodeSelect, prevShowVoivodeId, prevShowContainerCitySelect, prevShowCityId];
+
+                //this part remove all event listeners from this node
+                var old_element = prevShowContainerVoivodeSelect;
+                var new_element = old_element.cloneNode(true);
+                old_element.parentNode.replaceChild(new_element, old_element);
+                //end remove all event listeners
+                prevShowContainerVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
 
                 prevShowContainerVoivodeSelect.innerHTML = '';
                 prevShowContainerCitySelect.innerHTML = '';
