@@ -418,7 +418,7 @@ class CrmRouteController extends Controller
                 $clientRouteInfoIds .= $item->id . ', ';
             }
         }
-        new ActivityRecorder(array_merge(['T'=>'Edycja hoteli i godzin trasy'],$clientRouteInfoIds->toArray()), 211,2);
+        new ActivityRecorder(['T'=>'Edycja hoteli i godzin trasy','clientRouteInfoIds:' => $clientRouteInfoIds], 211,2);
 
         return $all_data;
     }

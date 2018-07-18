@@ -65,9 +65,9 @@
                                 trasami można filtrować dostępnymi polami jak również filtrować za pomocą dowolnych fraz
                                 wpisanych w polu "Szukaj". Trasy dzielą się na: </br>
                                 <ul class="list-group">
-                                    <li class="list-group-item"><strong>Niegotowe</strong> oznaczone jako <button class="btn btn-danger" style="font-weight:bold;"s>Niegotowa</button></li>
-                                    <li class="list-group-item"><strong>Aktywne</strong> oznaczone jako <button class="btn btn-success" style="font-weight:bold;">Aktywna</button> </li>
-                                    <li class="list-group-item"><strong>Zakończone</strong> oznaczone jako <button class="btn btn-info" style="font-weight:bold;">Zakończona</button> </li>
+                                    <li class="list-group-item"><strong>Niegotowe</strong> oznaczone jako <button class="btn btn-danger" style="font-weight:bold;"s>Niegotowa</button> - Trasa nie jest widocza w "Informacje o kampaniach" oraz nie jest wliczana w "Planowanie wyprzedzenia" </li>
+                                    <li class="list-group-item"><strong>Aktywne</strong> oznaczone jako <button class="btn btn-success" style="font-weight:bold;">Aktywna</button> - Trasa jest gotowa do użycia (wszystkie godziny oraz hotele muszą być określone aby mogła być aktywna), pobierane są informacje z PBX odnośnie takich kampanii, wyświetlają się we wszystkich statystykach</li>
+                                    <li class="list-group-item"><strong>Zakończone</strong> oznaczone jako <button class="btn btn-info" style="font-weight:bold;">Zakończona</button> - Trasa automatycznie zmienia stan z Aktywnej na Zakończoną, gdy data ostatniego pokazu zostaje osiągnięta</li>
                                 </ul>
                             </div>
                         </div>
@@ -99,7 +99,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="showAllClients">Pokaż wszystkich klientów</label>
-                                <input type="checkbox" style="display:inline-block" id="showAllClients">
+                                <input type="radio" style="display:inline-block" id="showAllClients" checked="checked" >
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -154,6 +154,11 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-md-3">
+                            <div class="form-group" style="margin-top:2.6em;">
+                                <button class="btn btn-default" id="makeReportClient">Generuj Raport Klienta</button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="row">
@@ -165,7 +170,7 @@
                                     <th>Klient</th>
                                     <th>Data I pokazu</th>
                                     <th>Trasa</th>
-                                    <th>Przypisany hotel i godziny</th>
+                                    <th>Hotel i godziny</th>
                                     <th>Status trasy</th>
                                     <th>Edycja (Hoteli i godzin)</th>
                                     <th>Edycja (Trasy)</th>
@@ -281,6 +286,10 @@
 
         document.addEventListener('DOMContentLoaded', function (event) {
 
+
+            $('#makeReportClient').on('click',function (e) {
+               swal('Kiedyś to wygeneruje raprot')
+            });
             /**
              * This function shows notification.
              */
@@ -585,32 +594,39 @@
                     {
                         "data": function (data, type, dataToSet) {
                             if (data.hotelOrHour) {
-                                return '<span style="color: darkgreen;">Tak</span>';
+                                return '<span style="color: darkgreen;">Przypisane</span>';
                             }
                             else {
-                                return '<span style="color: red;">Nie</span>';
+                                return '<span style="color: red;">Nieprzypisane</span>';
                             }
                         }, "name": "hotelOrHour"
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            option1 = '<option value="0">Niegotowa</option>\n';
-                            option2 = '<option value="1">Aktywna</option>\n';
-                            option3 = '<option value="2">Zakończona</option>\n';
+                            disabledOption = '';
+                            if(!data.hotelOrHour){
+                                disabledOption = 'disabled';
+                            }
+                            option1 = '<option value="0" '+disabledOption+' >Niegotowa</option>\n';
+                            option2 = '<option value="1" '+disabledOption+'>Aktywna</option>\n';
+                            option3 = '<option value="2" '+disabledOption+'>Zakończona</option>\n';
                             color='';
-                            if(data.status ==0){
+                            type = '';
+
+                            if(data.status == 0){
                                 option1 = '<option value="0" selected="selected">Niegotowa</button></option>\n';
                                 color = 'unready';
 
                             }else if(data.status ==1){
-                                option2 = '<option value="1" selected="selected">Aktywna</option>\n';
+                                option2 = '<option value="1" selected="selected" '+disabledOption+'>Aktywna</option>\n';
                                 color = 'activated';
 
                             }else {
-                                option3 = '<option value="2" selected="selected">Zakończona</option>\n';
+                                option3 = '<option value="2" selected="selected" '+disabledOption+'>Zakończona</option>\n';
                                 color = 'deactivated';
+                                type = 'disabled';
                             }
-                            select  ='<select class="form-control '+ color+'" data-status="'+data.status+'" data-clientRouteId="'+ data.client_route_id+'">' +
+                            select  ='<select class="form-control '+ color+'" data-status="'+data.status+'" data-clientRouteId="'+ data.client_route_id+'" '+type+'>' +
                                 option1 +
                                 option2 +
                                 option3 +
@@ -630,17 +646,24 @@
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block" data-type="1"><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
+                            type = '';
+                            if(data.status == 2)
+                                type = 'disabled';
+                            return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block" data-type="1" '+type+'><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
                         }, "name": "link", width: '10%', searchable: false, orderable: false
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block" data-type="2"><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
+                            if(data.status == 2)
+                                type = 'disabled';
+                            return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block" data-type="2" '+type+'><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
                         }, "name": "link", width: '10%', searchable: false, orderable: false
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<button class="btn btn-info btn-block show-modal-with-data"><span class="glyphicon glyphicon-edit " data-route_id ="' + data.client_route_id + '" ></span> Edytuj</button>';
+                            if(data.status == 2)
+                                type = 'disabled';
+                            return '<button class="btn btn-info btn-block show-modal-with-data" '+type+'><span class="glyphicon glyphicon-edit " data-route_id ="' + data.client_route_id + '" ></span> Edytuj</button>';
                         }, "name": "link", width: '10%', searchable: false, orderable: false
 
                     }
