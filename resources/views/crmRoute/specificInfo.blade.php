@@ -188,6 +188,7 @@
             let cityInfoArray = []; //Here will be all data about given cities filled by user.
             let hotelIdArr = []; //here we collect id's of each city's hotel;
             const voivodeeId = null;
+            var cityWithId = [];
             const cityId = null;
             let lastEach = false;
             let numberOfLoops = '{{$iterator}}';
@@ -197,6 +198,13 @@
 
                     @foreach($clientRouteInfo as $info)
                         @foreach($info as $item)
+                            var AllInfoAboutCity ={
+                              cityId: '{{$item->city_id}}',
+                              cityName: '{{$item->cityName}}',
+                              voivodeeName: '{{$item->voivodeName}}'
+                            };
+                        cityWithId.push(AllInfoAboutCity);
+
                             {{--@if($loop->first)--}}
                                 @if(isset($item->hotel_id))
                                     var hotelObj = {
@@ -218,17 +226,40 @@
                     @endforeach
 
             newTable = $('.datatable');
+            var actuallIterator = 0;
             newTable.each(function(key, value) {
                 var cityElementOfGivenContainer = $(value).siblings('.city_info').attr('data-identificator');
+                var seachName = "";
+                cityWithId.forEach(function (item) {
+                    if(item['cityId'] == cityElementOfGivenContainer){
+                        if(hotelIdArr[key].hotel_page*10 == 0)
+                            seachName=item['cityName']+' '+item['voivodeeName'];
+                    }
+                });
                 let cityFlag = null;
                 let helpFlag = 0;
-
                 tableArray.push($(this).DataTable({
                     "autoWidth": true,
                     "processing": true,
                     "serverSide": true,
-                        displayStart: hotelIdArr[key].hotel_page*10,
+                    "oSearch": {"sSearch": seachName},
+                    displayStart: hotelIdArr[key].hotel_page*10,
                     "drawCallback": function( settings ) {
+                    },
+                    "initComplete": function (settings, json) {
+                        // let allCitiesContainers = $('.cities-container');
+                        // let actualDrawTable = settings.oInstance.api();
+                        // for(let i = 0;i<allCitiesContainers.length ;i++){
+                        //     //Get Containers Info
+                        //     let container = allCitiesContainers[i];
+                        //     let city = container.getElementsByClassName('city_info')[0].textContent;
+                        //     let voivode = container.getElementsByClassName('voivode_info')[0].textContent;
+                        //     //getDatatble
+                        //
+                        // }
+                        //
+                        // actualDrawTable.search("Lublin Lubelskie").draw();
+                        // actuallIterator++;
                     },
                     "rowCallback": function( row, data, index ) {
                         $(row).attr('id', "hotelId_" + data.id);
@@ -491,6 +522,25 @@
             function redirectHandler(e) {
                 location.href="{{URL::to('/showClientRoutes')}}";
             }
+
+            /*
+                Auto Set City name to datatable
+             */
+            (
+                function autoSetCityInfo() {
+                    let allCitiesContainers = $('.cities-container');
+                    for(let i = 0;i<allCitiesContainers.length ;i++){
+                            //Get Containers Info
+                            let container = allCitiesContainers[i];
+                            let city = container.getElementsByClassName('city_info')[0].textContent;
+                            let voivode = container.getElementsByClassName('voivode_info')[0].textContent;
+                            //getDatatble
+
+                    }
+
+                }
+            )();
+
 
             //MULTI SEARCH
             function globalClickHandler(e) {
