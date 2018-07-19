@@ -234,7 +234,6 @@
                         console.assert(Array.isArray(allVoivodes), "allVoivodes in showInExtreme method is not array!");
                         let allCitiesGroupedByVoivodes = response['cityInfo'];
                         console.assert(typeof(allCitiesGroupedByVoivodes) === "object", "allCitiesGroupedByVoivodes in showInExtreme method is not object!");
-                        appendBasicOption(voivodeSelect);
                         allVoivodes.forEach(voivode => {
                             appendVoivodeOptions(voivodeSelect, voivode)
                         });
@@ -250,7 +249,6 @@
                                 }
                             }
                             setOldValues(oldVoivodeArr[0], oldVoivodeArr[1], oldVoivodeArr[2], oldVoivodeArr[3]);
-
                         }
 
                         //After selecting voivode, this event listener appends cities from given range into city select
@@ -261,26 +259,13 @@
                             let voivodeId = e.target.value;
                             for(Id in allCitiesGroupedByVoivodes) {
                                 if(voivodeId == Id) {
+                                    console.assert(Array.isArray(allCitiesGroupedByVoivodes[Id]), "allCitiesGroupedByVoivodes in showInExtreme method is not array!");
                                     allCitiesGroupedByVoivodes[Id].forEach(city => {
                                         appendCityOptions(citySelect, city);
                                     });
                                 }
                             }
                         });
-                        // voivodeSelect.addEventListener('change', function(e) {
-                        //     voivodeSelect.setAttribute('data-eventlistener', '2');
-                        //     citySelect.innerHTML = ''; //cleaning previous insertions
-                        //     appendBasicOption(citySelect);
-                        //
-                        //     let voivodeId = e.target.value;
-                        //     for(Id in allCitiesGroupedByVoivodes) {
-                        //         if(voivodeId == Id) {
-                        //             allCitiesGroupedByVoivodes[Id].forEach(city => {
-                        //                 appendCityOptions(citySelect, city);
-                        //             });
-                        //         }
-                        //     }
-                        // });
                     }
                 });
             }
@@ -1389,6 +1374,10 @@
                 checkArr.push(isCheckedNext);
 
                 return checkArr;
+            }
+
+            function getSelectedValue(element) {
+                return element.options[element.selectedIndex].value;
             }
 
             /**
