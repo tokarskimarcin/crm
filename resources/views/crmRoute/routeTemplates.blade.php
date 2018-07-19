@@ -1022,23 +1022,58 @@
             function limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr = null) {
                 const grandNextShowContainerCitySelect = grandNextShowContainer.querySelector('.citySelect');
                 const grandNextShowContainerCityDistance = grandNextShowContainerCitySelect.dataset.distance;
-                const grandNextShowContainerCityId = grandNextShowContainerCitySelect.options[grandNextShowContainerCitySelect.selectedIndex].value;
+                let grandNextShowContainerCityId = null;
+                if(grandNextShowContainerCitySelect.options[grandNextShowContainerCitySelect.selectedIndex].value) {
+                    grandNextShowContainerCityId = grandNextShowContainerCitySelect.options[grandNextShowContainerCitySelect.selectedIndex].value;
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach");
+                    return false;
+                }
 
                 const thisSingleShowContainerCitySelect = thisSingleShowContainer.querySelector('.citySelect');
                 const thisSingleShowContainerCitySelectCityDistance = thisSingleShowContainerCitySelect.dataset.distance;
-                const thisSingleShowContainerCityId = thisSingleShowContainerCitySelect.options[thisSingleShowContainerCitySelect.selectedIndex].value;
+                let thisSingleShowContainerCityId = null;
+                if(thisSingleShowContainerCitySelect.options[thisSingleShowContainerCitySelect.selectedIndex].value) {
+                    thisSingleShowContainerCityId = thisSingleShowContainerCitySelect.options[thisSingleShowContainerCitySelect.selectedIndex].value;
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach");
+                    return false;
+                }
 
                 const nextShowContainerCitySelect = nextShowContainer.querySelector('.citySelect');
-                const nextShowContainerCityid = nextShowContainerCitySelect.options[nextShowContainerCitySelect.selectedIndex].value;
+                let nextShowContainerCityid = null;
+                if(nextShowContainerCitySelect.options[nextShowContainerCitySelect.selectedIndex].value) {
+                    nextShowContainerCityid = nextShowContainerCitySelect.options[nextShowContainerCitySelect.selectedIndex].value;
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach");
+                    return false;
+                }
                 let nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
-                const nextShowContainerVoivodeId = nextShowContainerVoivodeSelect.options[nextShowContainerVoivodeSelect.selectedIndex].value;
+                let nextShowContainerVoivodeId = null;
+                if(nextShowContainerVoivodeSelect.options[nextShowContainerVoivodeSelect.selectedIndex].value) {
+                    nextShowContainerVoivodeId = nextShowContainerVoivodeSelect.options[nextShowContainerVoivodeSelect.selectedIndex].value;
+                }
+                else {
+                    notify("Wybierz województwa we wszystkich listach");
+                    return false;
+                }
+
+                if((grandNextShowContainerCitySelect.length == 0 || grandNextShowContainerCityId == 0) ||
+                    (thisSingleShowContainerCitySelect.length == 0 || thisSingleShowContainerCityId == 0) ||
+                    (nextShowContainerCitySelect.length == 0  || nextShowContainerCityid == 0) ||
+                    (nextShowContainerVoivodeSelect.length == 0 || nextShowContainerVoivodeId == 0)) {
+                    notify("Wybierz miasta i województwa we wszystkich listach");
+                    return false;
+                }
 
                 let oldValuesArray = [nextShowContainerVoivodeSelect, nextShowContainerVoivodeId, nextShowContainerCitySelect, nextShowContainerCityid];
 
                 $(nextShowContainerVoivodeSelect).off();
 
-                nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
-
+                // nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
                 nextShowContainerVoivodeSelect.innerHTML = '';
                 nextShowContainerCitySelect.innerHTML = '';
 
@@ -1048,7 +1083,6 @@
                 else {
                     showInTheMiddleAjax(grandNextShowContainerCityDistance,grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
                 }
-
             }
 
             /**
@@ -1056,14 +1090,43 @@
              */
             function limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, limit) {
                 let prevShowContainerVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
-                let prevShowVoivodeId = prevShowContainerVoivodeSelect.options[prevShowContainerVoivodeSelect.selectedIndex].value;
+                let prevShowVoivodeId = null;
+                if(prevShowContainerVoivodeSelect.options[prevShowContainerVoivodeSelect.selectedIndex].value) {
+                    prevShowVoivodeId = prevShowContainerVoivodeSelect.options[prevShowContainerVoivodeSelect.selectedIndex].value;
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach");
+                    return false;
+                }
 
                 let prevShowContainerCitySelect = previousShowContainer.querySelector('.citySelect');
-                let prevShowCityId = prevShowContainerCitySelect.options[prevShowContainerCitySelect.selectedIndex].value;
+                let prevShowCityId = null;
+                if(prevShowContainerCitySelect.options[prevShowContainerCitySelect.selectedIndex].value) {
+                    prevShowCityId = prevShowContainerCitySelect.options[prevShowContainerCitySelect.selectedIndex].value;
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach");
+                    return false;
+                }
 
                 let nextShowContainerRelatedToPreviousShowContainerCitySelect = nextShowContainerRelatedToPreviousShowContainer.querySelector('.citySelect');
-                let nextShowContainerRelatedToPreviousShowContainerCityId = nextShowContainerRelatedToPreviousShowContainerCitySelect.options[nextShowContainerRelatedToPreviousShowContainerCitySelect.selectedIndex].value;
+                let nextShowContainerRelatedToPreviousShowContainerCityId = null;
+                if(nextShowContainerRelatedToPreviousShowContainerCitySelect.options[nextShowContainerRelatedToPreviousShowContainerCitySelect.selectedIndex].value) {
+                    nextShowContainerRelatedToPreviousShowContainerCityId = nextShowContainerRelatedToPreviousShowContainerCitySelect.options[nextShowContainerRelatedToPreviousShowContainerCitySelect.selectedIndex].value;
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach");
+                    return false;
+                }
+
                 let oldValuesArray = [prevShowContainerVoivodeSelect, prevShowVoivodeId, prevShowContainerCitySelect, prevShowCityId];
+
+                if((prevShowContainerVoivodeSelect.length == 0 || prevShowVoivodeId == 0) ||
+                    (prevShowContainerCitySelect.length == 0 || prevShowCityId == 0) ||
+                    (nextShowContainerRelatedToPreviousShowContainerCitySelect.length == 0 || nextShowContainerRelatedToPreviousShowContainerCityId == 0)) {
+                    notify("Wybierz miasta i województwa we wszystkich listach");
+                    return false;
+                }
 
                 $(prevShowContainerVoivodeSelect).off();
 
