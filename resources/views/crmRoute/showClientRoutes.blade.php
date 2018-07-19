@@ -51,6 +51,28 @@
         </div>
     </div>
 
+    <table class="table table-bordered table-striped thead-inverse" id="tabelka" hidden>
+        <thead>
+            <tr>
+                <th>Nazwa Klienta</th>
+                <th>Rodzaj spotkania</th>
+                <th>Upominek</th>
+                <th>Data</th>
+                <th>Miasto</th>
+                <th>Kod pocztowy</th>
+                <th>Hotel</th>
+                <th>Ulica</th>
+                <th>Godzina pokazu</th>
+                <th>Kontakt</th>
+                <th>Cena</th>
+                <th>Typ płatności</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
@@ -229,6 +251,22 @@
         $('#menu-toggle').change(()=>{
             table2.columns.adjust().draw();
         });
+        var toDay = '{{date('Y-m-d')}}';
+        var tableToExcel = (function() {
+            var uri = 'data:application/vnd.ms-excel;base64,'
+                , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+                , base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
+                , format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) }
+            return function(table, name) {
+                if (!table.nodeType) table = document.getElementById(table);
+                var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML};
+                // window.location.href = uri + base64(format(template, ctx))
+                var link = document.createElement("a");
+                link.download = name+" "+toDay+".xls";
+                link.href = uri + base64(format(template, ctx));
+                link.click();
+            }
+        })();
         function saveOptions(e) {
             let allRow = document.getElementsByClassName('campainsOption');
             let arrayOfObject = new Array();
@@ -283,12 +321,64 @@
                 });
             }
         }
-
+        function random_rgba() {
+            var o = Math.round, r = Math.random, s = 255;
+            return 'rgb(' + o(r()*s) + ',' + o(r()*s) + ',' + o(r()*s) +')';
+        }
         document.addEventListener('DOMContentLoaded', function (event) {
 
 
             $('#makeReportClient').on('click',function (e) {
-               swal('Kiedyś to wygeneruje raprot')
+                let selectedClientID = id;
+                let year = yearInput.val();
+                let selectedWeek = selectedWeekInput.val();
+                let typ = typInput.val();
+                let state = stateInput.val();
+                if(selectedClientID == '-1')
+                    swal('Aby wygenerować raport wybierz jednego klienta');
+                else{
+                    $.ajax({
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        url: '{{ route('api.clientReport') }}',
+                        data: {
+                            'clientID'      : selectedClientID,
+                            'year'          : year,
+                            'selectedWeek'  : selectedWeek,
+                            'state'         : state
+                        },
+                        success: function (response) {
+                            var trHTML = '';
+                            var clientColorObj = new Array();
+                            $.each(response['distincRouteID'],function (key,value) {
+                                var clienObject = {key : key, color: random_rgba(),clientName: value[0].clientName};
+                                clientColorObj.push(clienObject);
+                            })
+
+                            $.each(response['infoClient'],function (key,value) {
+                                var color = random_rgba();
+                                trHTML +=
+                                    '<tr><td>' + value.clientName +
+                                    '</td><td>' + value.clientMeetingName +
+                                    '</td><td>' + value.clientGiftName+
+                                    '</td><td style="background-color: '+clientColorObj.find(o => o.key == value.clientRouteID).color+'">' + value.date +
+                                    '</td><td>' + value.cityName +
+                                    '</td><td>' + value.zip_code +
+                                    '</td><td>' + value.hotelName +
+                                    '</td><td>' + value.street +
+                                    '</td><td>' + value.hour +
+                                    '</td><td>' +
+                                    '</td><td>' + value.daily_bid +
+                                    '</td><td>' + value.paymentMethod;
+                            });
+                            $('#tabelka tbody').empty();
+                            $('#tabelka tbody').append(trHTML);
+                            tableToExcel('tabelka', 'Raport klienta '+clientColorObj[0].clientName)
+                        }
+                    });
+                }
             });
             /**
              * This function shows notification.
@@ -868,7 +958,7 @@
             function yearHandler(e) {
                 const selectedYear = e.target.value;
 
-                if (selectedYear > 0) {
+                if (selectedYear >= 0) {
                     //part responsible for sending to server info about selected year
                     const header = new Headers();
                     header.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));

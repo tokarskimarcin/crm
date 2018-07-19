@@ -944,3 +944,7 @@ Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
 
 //Skrypty
 Route::get('/autoChangeRouteStatus', 'AutoScriptController@autoChangeRouteStatus');
+
+Route::get('/hotelConfirmationGet', 'CrmRouteController@hotelConfirmationGet');
+
+Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clientReport');

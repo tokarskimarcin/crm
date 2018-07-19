@@ -2325,4 +2325,56 @@ class CrmRouteController extends Controller
 
         return $clientRouteInfoRecords;
     }
+
+    public function clientReport(Request $request){
+            $data['infoClient'] = $this::getDataToCSV($request->clientID,$request->year
+                ,$request->selectedWeek,$request->state);
+            $data['distincRouteID'] = $data['infoClient']->groupby('clientRouteID');
+            return $data;
+    }
+
+    public function getDataToCSV($clientID,$year,$selectedWeek,$state){
+        if($year == 0)
+            $year = '%';
+        if($selectedWeek == 0)
+            $selectedWeek = '%';
+        if($state == -1)
+            $state = '%';
+        $data = ClientRouteInfo::
+        select(DB::raw('
+            client_route_info.client_route_id as clientRouteID,
+            client_route_info.date,
+            client_route_info.hour,
+            city.name as cityName,
+            hotels.name as hotelName,
+            hotels.street,
+            hotels.zip_code,
+            payment_methods.name as paymentMethod,
+            hotels.daily_bid,
+            hotels.hour_bid,
+            client.name as clientName,
+            client_gift_type.name as clientGiftName,
+            client_meeting_type.name clientMeetingName,
+            hotels.id as hotelID       
+        '))
+            ->join('client_route','client_route.id','client_route_info.client_route_id')
+            ->join('client','client.id','client_route.client_id')
+            ->leftjoin('client_gift_type','client_gift_type.id','client.gift_type_id')
+            ->leftjoin('client_meeting_type','client_meeting_type.id','client.meeting_type_id')
+            ->leftjoin('hotels','hotels.id','client_route_info.hotel_id')
+            ->leftjoin('payment_methods','payment_methods.id','hotels.payment_method_id')
+            ->leftjoin('city','city.id','hotels.city_id')
+            ->where('client_route.client_id','=',$clientID)
+            ->where('client_route.status','like',$state)
+            ->where('client_route_info.weekOfYear','like',$selectedWeek)
+            ->where(DB::raw('YEAR(client_route_info.date)'),'like',$year)
+            ->orderBy('date')
+            ->orderBy('cityName')
+            ->orderBy('hour')
+            ->get();
+        return $data;
+    }
+    public function hotelConfirmationGet(){
+        return view('crmRoute.hotelConfirmation');
+    }
 }
