@@ -144,6 +144,7 @@
 
                                 let voivodeSet = intersectionArray[0];
                                 let citySet = intersectionArray[1];
+                                appendBasicOption(voivodeSelect);
 
                                 voivodeSet.forEach(voivode => {
                                     appendVoivodeOptions(voivodeSelect, voivode);
@@ -151,6 +152,7 @@
 
                                 if(oldValuesArray) { //this is optional
                                     console.assert(Array.isArray(oldValuesArray), "oldVoivodeArr in showInExtreme method is not array!");
+                                    appendBasicOption(citySelect);
                                     voivodeSet.forEach(voivode => {
                                         if(voivode.id == oldValuesArray[1]) {
                                             citySet.forEach(voivodeCity => {
@@ -170,7 +172,6 @@
 
                                 citySelect.setAttribute('data-distance', 30);
                                 $(voivodeSelect).on('change', function(e) {
-                                    voivodeSelect.setAttribute('data-eventlistener', '1');
                                     citySelect.innerHTML = ''; //cleaning previous insertions
                                     appendBasicOption(citySelect);
 
@@ -233,11 +234,13 @@
                         console.assert(Array.isArray(allVoivodes), "allVoivodes in showInExtreme method is not array!");
                         let allCitiesGroupedByVoivodes = response['cityInfo'];
                         console.assert(typeof(allCitiesGroupedByVoivodes) === "object", "allCitiesGroupedByVoivodes in showInExtreme method is not object!");
+                        appendBasicOption(voivodeSelect);
                         allVoivodes.forEach(voivode => {
                             appendVoivodeOptions(voivodeSelect, voivode)
                         });
                         citySelect.setAttribute('data-distance', limit); //applaying old value
                         if(oldVoivodeArr) { //this is optional
+                            appendBasicOption(citySelect);
                             console.assert(Array.isArray(oldVoivodeArr), "oldVoivodeArr in showInExtreme method is not array!");
                             for(Id in allCitiesGroupedByVoivodes) {
                                 if(oldVoivodeArr[1] == Id) {
@@ -252,7 +255,6 @@
 
                         //After selecting voivode, this event listener appends cities from given range into city select
                         $(voivodeSelect).on('change', function(e) {
-                            voivodeSelect.setAttribute('data-eventlistener', '2');
                             citySelect.innerHTML = ''; //cleaning previous insertions
                             appendBasicOption(citySelect);
 
@@ -564,7 +566,6 @@
                         @endforeach()
 
                         $(firstSelect).on('change', function(e) {
-                            secondSelect.setAttribute('data-eventlistener', '3');
                             secondSelect.setAttribute('data-distance', 'infinity');
                             let voivodeId = e.target.value;
                             showWithoutDistanceAjax(voivodeId, secondSelect);
@@ -780,7 +781,7 @@
 
                         if(nextShowContainer) {
                             let dayContOfNextShowContainer = nextShowContainer.closest('.singleDayContainer');
-                            nextShowFlag = dayContOfPrevShowContainer == dayContOfNextShowContainer ? false : true; //checking if next show is in the same day container
+                            nextShowFlag = dayContainer == dayContOfNextShowContainer ? false : true; //checking if next show is in the same day container
                         }
 
                         //main part
@@ -790,14 +791,18 @@
                                     if(nextShowContainer) { //next container exist
                                         if(nextShowFlag) { //next container is in another day
                                             console.log('prev exist & prev day, grandprev exist & grandprev is in grandprevday, nextshowcontaierExist & in another day');
-                                            removeBetween(grandPrevCont, nextShowContainer, prevShowContainer);
+                                            let changeDistanceArr = [100, 100];
+                                            limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
                                         }
                                         else { //next container is in the same day
                                             console.log('prev exist & prev day, grandprev exist & grandprev is in grandprevday, nextshowcontaierExist & in same day');
+                                            let changeDistanceArr = [100, 100];
+                                            limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
                                         }
                                     }
                                     else { //next container doesn't exist
                                         console.log('prev exist & prev day, grandprev exist & grandprev is in grandprevday, nextshowcontaier doesnt exist');
+                                        limitSelectsWhenExtreme(prevShowContainer, grandPrevCont, 100);
                                     }
 
                                 }
@@ -805,13 +810,19 @@
                                     if(nextShowContainer) { //next container exist
                                         if(nextShowFlag) { //next container is in another day
                                             console.log('prev exist & prev day, grandprev exist & grandprev is same day as prev, nextshowcontaier Exist & in another day');
+                                            let changeDistanceArr = ['undefined', 100];
+                                            limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
+
                                         }
                                         else { //next container is in the same day
                                             console.log('prev exist & prev day, grandprev exist & grandprev is same day as prev, nextshowcontaier Exist & in same day');
+                                            let changeDistanceArr = ['undefined', 100];
+                                            limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
                                         }
                                     }
                                     else { //next container doesn't exist
                                         console.log('prev exist & prev day, grandprev exist & grandprev is same day as prev, nextshowcontaier doesnt Exist');
+                                        limitSelectsWhenExtreme(prevShowContainer, grandPrevCont, 30);
                                     }
                                 }
                             }
@@ -819,13 +830,32 @@
                                 if(nextShowContainer) { //next container exist
                                     if(nextShowFlag) { //next container is in another day
                                         console.log('prev exist & prev day, grandprev doesnt exist, nextshowcontaier Exist & in another day');
+                                        //nic nie robie, ponieważ akcja ma miejsce w tym przypadku w przypadku dla nastepnego.
                                     }
                                     else { //next container is in the same day
                                         console.log('prev exist & prev day, grandprev doesnt exist, nextshowcontaier Exist & in same day');
+                                        //nic nie robie, ponieważ akcja ma miejsce w tym przypadku w przypadku dla nastepnego.
                                     }
                                 }
                                 else { //next container doesn't exist
                                     console.log('prev exist & prev day, grandprev doesnt exist, nextshowcontaier doesnt Exist');
+                                    //all cities and all voivodes.
+                                    let previousContVoivodeSelect = prevShowContainer.querySelector('.voivodeSelect');
+                                    let previousContCitySelect = prevShowContainer.querySelector('.citySelect');
+                                    $(previousContVoivodeSelect).off(); //remove all previous event listeners
+                                    @foreach($voivodes as $voivode)
+                                        var singleVoivode = document.createElement('option');
+                                        singleVoivode.value = {{$voivode->id}};
+                                        singleVoivode.textContent = '{{$voivode->name}}';
+                                        previousContVoivodeSelect.appendChild(singleVoivode);
+                                    @endforeach()
+                                    $(previousContVoivodeSelect).on('change', function(e) {
+                                        previousContVoivodeSelect.setAttribute('data-distance', 'infinity');
+                                        let voivodeId = e.target.value;
+                                        showWithoutDistanceAjax(voivodeId, previousContCitySelect);
+                                    });
+
+
                                 }
                             }
                         }
@@ -835,26 +865,36 @@
                                     if(nextShowContainer) { //next container exist
                                         if(nextShowFlag) { //next container is in another day
                                             console.log('prev exist & same day, grandprev exist & grandprev is in grandprevday, nextshowcontaier exist & in another day');
+                                            let changeDistanceArr = [100, 100];
+                                            limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
                                         }
                                         else { //next container is in the same day
                                             console.log('prev exist & same day, grandprev exist & grandprev is in grandprevday, nextshowcontaier exist & in same day');
+                                            let changeDistanceArr = [100, 'undefined'];
+                                            limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
                                         }
                                     }
                                     else { //next container doesn't exist
                                         console.log('prev exist & same day, grandprev exist & grandprev is in grandprevday, nextshowcontaier doesnt exist');
+                                        limitSelectsWhenExtreme(prevShowContainer, grandPrevCont, 100);
                                     }
                                 }
                                 else { //grandprev is in previous day(same as previousShowContainer)(all containers are in same day container case)
                                     if(nextShowContainer) { //next container exist
                                         if(nextShowFlag) { //next container is in another day
                                             console.log('prev exist & same day, grandprev exist & grandprev is prev day, nextshowcontaier Exist & in another day');
+                                            let changeDistanceArr = ['undefined', 100];
+                                            limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
                                         }
                                         else { //next container is in the same day
                                             console.log('prev exist & same day, grandprev exist & grandprev is prev day, nextshowcontaier Exist & in same day');
+                                            let changeDistanceArr = ['undefined', 'undefined'];
+                                            limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
                                         }
                                     }
                                     else { //next container doesn't exist
                                         console.log('prev exist & same day, grandprev exist & grandprev is prev day, nextshowcontaier doesnt exist');
+                                        limitSelectsWhenExtreme(prevShowContainer, grandPrevCont, 30);
                                     }
                                 }
                             }
@@ -862,13 +902,30 @@
                                 if(nextShowContainer) { //next container exist
                                     if(nextShowFlag) { //next container is in another day
                                         console.log('grandprev doesnt exist, next exist and another day');
+                                        ////nic nie robie, ponieważ akcja ma miejsce w tym przypadku w przypadku dla nastepnego.
                                     }
                                     else { //next container is in the same day
                                         console.log('grandprev doesnt exist, next exist and same day');
+                                        //nic nie robie, ponieważ akcja ma miejsce w tym przypadku w przypadku dla nastepnego.
                                     }
                                 }
                                 else { //next container doesn't exist
                                     console.log('grandprev doesnt exist, next doesnt exist');
+                                    //all cities and all voivodes.
+                                    let previousContVoivodeSelect = prevShowContainer.querySelector('.voivodeSelect');
+                                    let previousContCitySelect = prevShowContainer.querySelector('.citySelect');
+                                    $(previousContVoivodeSelect).off(); //remove all previous event listeners
+                                    @foreach($voivodes as $voivode)
+                                        var singleVoivode = document.createElement('option');
+                                        singleVoivode.value = {{$voivode->id}};
+                                        singleVoivode.textContent = '{{$voivode->name}}';
+                                        previousContVoivodeSelect.appendChild(singleVoivode);
+                                    @endforeach()
+                                    $(previousContVoivodeSelect).on('change', function(e) {
+                                        previousContVoivodeSelect.setAttribute('data-distance', 'infinity');
+                                        let voivodeId = e.target.value;
+                                        showWithoutDistanceAjax(voivodeId, previousContCitySelect);
+                                    });
                                 }
                             }
                         }
@@ -1065,7 +1122,7 @@
                                     grandNextShowContainer = siblingsOfNextShowContainerArr[1] === null ? null : siblingsOfNextShowContainerArr[1];
 
                                     if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
-                                        let changeDistanceArr = [100];
+                                        let changeDistanceArr = [100,'undefined'];
                                         limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
                                     }
                                     else { // there is no next container (related to prev show container)
@@ -1083,7 +1140,7 @@
                                         let dayContainerOfGrandNextShowContainer = grandNextShowContainer.closest('.singleDayContainer');
                                         grandNextDayFlag = dayContainerOfGrandNextShowContainer == dayContainerOfNextShowContainer ? false : true; //checking if grandnext show is in the same day container as next show
                                         if(grandNextDayFlag) { //grandnext show is in another day container related to next show
-                                            let changeDistanceArr = [100];
+                                            let changeDistanceArr = [100,'undefined'];
                                             limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
                                         }
                                         else { //grandnext show is in the same day container as next show
@@ -1111,7 +1168,7 @@
                                     let grandPrevShowContainer = undefined; // previous show container of previous show container
                                     grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
                                     if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
-                                        let changeDistanceArr = [100];
+                                         let changeDistanceArr = ['undefined', 100];
                                         limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                     }
                                     else { // there is no previous container (related to prev show container)
@@ -1130,7 +1187,8 @@
                                         let dayContainerOfGrandPrevShowContainer = grandPrevShowContainer.closest('.singleDayContainer');
                                         grandPrevDayFlag = dayContainerOfGrandPrevShowContainer == dayContainerOfPreviousShowContainer ? false : true; //checking if grandprev show is in the same day container as prev show
                                         if(grandPrevDayFlag) { //grandprev show is in another day container related to prev show
-                                            let changeDistanceArr = [100];
+                                            // let changeDistanceArr = [100,'undefined'];
+                                            let changeDistanceArr = ['undefined', 100];
                                             limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                         }
                                         else { //grandprev show is in the same day container as prev show
@@ -1150,81 +1208,6 @@
 
             document.addEventListener('click', globalClickHandler);
             document.addEventListener('change', globalChangeHandler);
-
-
-            function removeBetween(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr = null) {
-                const grandNextShowContainerCitySelect = grandNextShowContainer.querySelector('.citySelect');
-                const grandNextShowContainerCityDistance = grandNextShowContainerCitySelect.dataset.distance;
-                let grandNextShowContainerCityId = null;
-                if(grandNextShowContainerCitySelect.options[grandNextShowContainerCitySelect.selectedIndex].value) {
-                    grandNextShowContainerCityId = grandNextShowContainerCitySelect.options[grandNextShowContainerCitySelect.selectedIndex].value;
-                }
-                else {
-                    notify("Wybierz miasta i województwa we wszystkich listach");
-                    return false;
-                }
-
-                const thisSingleShowContainerCitySelect = thisSingleShowContainer.querySelector('.citySelect');
-                const thisSingleShowContainerCitySelectCityDistance = thisSingleShowContainerCitySelect.dataset.distance;
-                let thisSingleShowContainerCityId = null;
-                if(thisSingleShowContainerCitySelect.options[thisSingleShowContainerCitySelect.selectedIndex].value) {
-                    thisSingleShowContainerCityId = thisSingleShowContainerCitySelect.options[thisSingleShowContainerCitySelect.selectedIndex].value;
-                }
-                else {
-                    notify("Wybierz miasta i województwa we wszystkich listach");
-                    return false;
-                }
-
-                const nextShowContainerCitySelect = nextShowContainer.querySelector('.citySelect');
-                let nextShowContainerCityid = null;
-                if(nextShowContainerCitySelect.options[nextShowContainerCitySelect.selectedIndex].value) {
-                    nextShowContainerCityid = nextShowContainerCitySelect.options[nextShowContainerCitySelect.selectedIndex].value;
-                }
-                else {
-                    notify("Wybierz miasta i województwa we wszystkich listach");
-                    return false;
-                }
-                let nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
-                let nextShowContainerVoivodeId = null;
-                if(nextShowContainerVoivodeSelect.options[nextShowContainerVoivodeSelect.selectedIndex].value) {
-                    nextShowContainerVoivodeId = nextShowContainerVoivodeSelect.options[nextShowContainerVoivodeSelect.selectedIndex].value;
-                }
-                else {
-                    notify("Wybierz województwa we wszystkich listach");
-                    return false;
-                }
-
-                if((grandNextShowContainerCitySelect.length == 0 || grandNextShowContainerCityId == 0) ||
-                    (thisSingleShowContainerCitySelect.length == 0 || thisSingleShowContainerCityId == 0) ||
-                    (nextShowContainerCitySelect.length == 0  || nextShowContainerCityid == 0) ||
-                    (nextShowContainerVoivodeSelect.length == 0 || nextShowContainerVoivodeId == 0)) {
-                    notify("Wybierz miasta i województwa we wszystkich listach");
-                    return false;
-                }
-
-                let oldValuesArray = [nextShowContainerVoivodeSelect, nextShowContainerVoivodeId, nextShowContainerCitySelect, nextShowContainerCityid];
-
-                $(nextShowContainerVoivodeSelect).off();
-
-                // nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
-                nextShowContainerVoivodeSelect.innerHTML = '';
-                nextShowContainerCitySelect.innerHTML = '';
-
-                if(changeDistanceArr[0]) {
-                    if(changeDistanceArr[1]) {
-                        showInTheMiddleAjax(changeDistanceArr[0],grandNextShowContainerCityId,changeDistanceArr[1],thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
-
-                    }
-                    else {
-                        showInTheMiddleAjax(changeDistanceArr[0],grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
-                    }
-                }
-                else {
-                    showInTheMiddleAjax(grandNextShowContainerCityDistance,grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
-                }
-            }
-
-
 
             function limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr = null) {
                 const grandNextShowContainerCitySelect = grandNextShowContainer.querySelector('.citySelect');
@@ -1285,7 +1268,21 @@
                 nextShowContainerCitySelect.innerHTML = '';
 
                 if(changeDistanceArr) {
-                    showInTheMiddleAjax(changeDistanceArr[0],grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
+                    let helpArr = [];
+                    if(changeDistanceArr[0] != 'undefined') {
+                        helpArr.push(changeDistanceArr[0]);
+                    }
+                    else {
+                        helpArr.push(grandNextShowContainerCityDistance);
+                    }
+                    if(changeDistanceArr[1] != 'undefined') {
+                        helpArr.push(changeDistanceArr[1]);
+                    }
+                    else {
+                        helpArr.push(thisSingleShowContainerCitySelectCityDistance);
+                    }
+                    console.log(helpArr);
+                    showInTheMiddleAjax(helpArr[0],grandNextShowContainerCityId,helpArr[1],thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
                 }
                 else {
                     showInTheMiddleAjax(grandNextShowContainerCityDistance,grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
@@ -1402,15 +1399,27 @@
              * @param cityId
              */
             function setOldValues(voivodeSelect, voivodeId, citySelect, cityId) {
+                let voivodeFlag = true;
+                let cityFlag = true;
                 for(let i = 0; i < voivodeSelect.length; i++) {
                     if(voivodeSelect[i].value == voivodeId) {
                         voivodeSelect[i].selected = true;
+                        voivodeFlag = false;
                     }
                 }
                 for(let j = 0; j < citySelect.length; j++) {
                     if(citySelect[j].value == cityId) {
                         citySelect[j].selected = true;
+                        cityFlag = false;
                     }
+                }
+                if(voivodeFlag) {
+                    $(voivodeSelect).val('0');
+                    console.log('zmienilo na wartosc domyslna voivode');
+                }
+                if(cityFlag) {
+                    $(citySelect).val('0');
+                    console.log('zmienilo na wartosc domyslna city');
                 }
             }
 
