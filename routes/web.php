@@ -947,3 +947,7 @@ Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
 
 //Skrypty
 Route::get('/autoChangeRouteStatus', 'AutoScriptController@autoChangeRouteStatus');
+
+Route::get('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplateGet');
+Route::post('/getVoivodeshipRoundWithoutGracePeriodAjax', 'CrmRouteController@getVoivodeshipRoundWithoutGracePeriodAjax')->name('api.getVoivodeshipRoundWithoutGracePeriod');
+Route::post('/allCitiesInGivenVoivodeAjax', 'CrmRouteController@allCitiesInGivenVoivodeAjax')->name('api.allCitiesInGivenVoivodeAjax');
