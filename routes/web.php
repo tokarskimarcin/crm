@@ -245,6 +245,8 @@ Route::post('/findCity', 'CrmRouteController@findCity')->name('api.findCity');
 Route::post('/findHotel', 'CrmRouteController@findHotel')->name('api.findHotel');
 Route::POST('/saveNewCity','CrmRouteController@saveNewCity')->name('api.saveNewCity');
 Route::POST('/saveNewHotel','CrmRouteController@saveNewHotel')->name('api.saveNewHotel');
+Route::POST('/uploadHotelFilesAjax', 'CrmRouteController@uploadHotelFilesAjax')->name('api.uploadHotelFilesAjax');
+Route::POST('/downloadHotelFilesAjax', 'CrmRouteController@downloadHotelFilesAjax')->name('api.downloadHotelFilesAjax');
 Route::POST('/changeStatusHotel','CrmRouteController@changeStatusHotel')->name('api.changeStatusHotel');
 
 Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
@@ -874,6 +876,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/addNewHotel', 'CrmRouteController@addNewHotelGet');
     Route::post('/addNewHotel', 'CrmRouteController@addNewHotelPost');
     Route::get('/showHotels', 'CrmRouteController@showHotelsGet')->name('showHotels');
+    Route::get('/downloadHotelFiles/{id}', 'CrmRouteController@downloadHotelFiles');
     Route::get('/hotel/{id}', 'CrmRouteController@hotelGet');
     Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
 
