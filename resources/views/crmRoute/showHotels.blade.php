@@ -587,7 +587,7 @@
                             let spanButton = $(document.createElement('span')).addClass('glyphicon glyphicon-search');
                             let previewButton = $(document.createElement('button')).addClass('button-preview-hotel btn btn-default btn-block').attr('data-id', data.id).append(spanButton);
                             return previewButton.prop('outerHTML');
-                        }
+                        },"orderable": false, "searchable": false
                     }
                 ]
             });
