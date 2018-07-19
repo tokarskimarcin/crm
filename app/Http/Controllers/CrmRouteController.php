@@ -11,12 +11,16 @@ use App\ClientRoute;
 use App\ClientRouteInfo;
 use App\Department_info;
 use App\Hotel;
+use App\HotelsClientsExceptions;
+use App\HotelsContacts;
+use App\PaymentMethod;
 use App\PbxCrmInfo;
 use App\Route;
 use App\RouteInfo;
 use App\Voivodes;
 use DateTime;
 use function foo\func;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +33,8 @@ use Symfony\Component\HttpKernel\Client;
 
 class CrmRouteController extends Controller
 {
+    private $validHotelInvoiceTemplatesExtensions = ['pdf','png'];
+
     public function index()
     {
         $departments = Department_info::all();
@@ -1082,16 +1088,21 @@ class CrmRouteController extends Controller
     public function showHotelsGet() {
         $voivodes = Voivodes::all()->sortByDesc('name');
         $cities = Cities::all()->sortBy('name');
+        $paymentMethods = PaymentMethod::all();
         $zipCode = Hotel::select(DB::raw('distinct(zip_code)'))
             ->where('zip_code','!=','null')->get();
         $zipCode->map(function ($item){
             $item->zip_code = $this::zipCodeNumberToString($item->zip_code);
             return $item;
         });
+        $clients = Clients::all()->sortByDesc('name');
         return view('crmRoute.showHotels')
             ->with('voivodes', $voivodes)
             ->with('cities', $cities)
-            ->with('zipCode',$zipCode);
+            ->with('zipCode',$zipCode)
+            ->with('paymentMethods', $paymentMethods)
+            ->with('clients', $clients)
+            ->with('validHotelInvoiceTemplatesExtensions',json_encode($this->validHotelInvoiceTemplatesExtensions));
     }
 
     /**
@@ -1126,6 +1137,7 @@ class CrmRouteController extends Controller
          hotels.voivode_id,
          hotels.city_id,
          hotels.zip_code,
+         hotels.comment,
          voivodeship.name as voivodeName,
          city.name as cityName
         '))
@@ -1348,32 +1360,144 @@ class CrmRouteController extends Controller
      * Save new/edit hotel
      * @param Request $request
      */
-    public function saveNewHotel(Request $request){
-        if($request->ajax()){
+    public function saveNewHotel(Request $request)
+    {
+        if ($request->ajax()) {
             $data = [];
             $action = 0;
-            if($request->hotelId == 0) { // new Hotel
+            if ($request->hotelId == 0) { // new Hotel
                 $newHotel = new Hotel();
-                $data = ['T'=>'Dodanie nowego hotelu'];
+                $data = ['T' => 'Dodanie nowego hotelu'];
                 $action = 1;
-            }
-            else {    // Edit Hotel
-                $newHotel = HOtel::find($request->hotelId);
-                $data = ['T'=>'Edycja hotelu'];
+            } else {    // Edit Hotel
+                $newHotel = Hotel::find($request->hotelId);
+                $data = ['T' => 'Edycja hotelu'];
                 $action = 2;
             }
-            $newHotel->city_id     = $request->city;
-            $newHotel->street     = $request->street;
+            $newHotel->city_id = $request->city;
+            $newHotel->street = $request->street;
             //$newHotel->price    = $request->price;
-            $newHotel->name     = $request->name;
-            $newHotel->voivode_id  = $request->voivode;
-            $newHotel->comment  = $request->comment;
-            $newHotel->status  = $request->hotelStatus;
+            $newHotel->name = $request->name;
+            $newHotel->voivode_id = $request->voivode;
+            $newHotel->comment = $request->comment;
+            $newHotel->status = $request->hotelStatus;
             $newHotel->zip_code = $request->zipCode;
+            $newHotel->payment_method_id = $request->paymentMethodId;
+            $newHotel->parking = $request->parking;
+            $newHotel->hour_bid = $request->hourBid;
+            $newHotel->daily_bid = $request->dailyBid;
             $newHotel->save();
-            new ActivityRecorder(array_merge($data,$newHotel->toArray()), 198, $action);
+
+            $emails = $request->emails;
+            $phones = $request->phones;
+
+            $hotelContactsIds =  HotelsContacts::where('hotel_id','=', $newHotel->id)->get()->pluck('id')->toArray();
+            if ((is_array($emails) || is_object($emails)) && !is_null($emails)) {
+                foreach ($emails as $email) {
+                    $contact = null;
+                    if ($email['new'] === 'false') {
+                        $contact = HotelsContacts::find($email['id']);
+                        if(array_search($email['id'],$hotelContactsIds) !== false) {
+                            unset($hotelContactsIds[array_search($email['id'], $hotelContactsIds)]);
+                        }
+                    } else {
+                        $contact = new HotelsContacts;
+                    }
+                    $contact->hotel_id = $newHotel->id;
+                    $contact->contact = $email['value'];
+                    $contact->type = 'mail';
+                    $contact->suggested = $email['suggested'] == 'true' ? 1 : 0;
+                    $contact->save();
+                }
+            }
+            if ((is_array($phones) || is_object($phones)) && !is_null($phones)) {
+                foreach ($phones as $phone) {
+                    $contact = null;
+                    if ($phone['new'] === 'false') {
+                        $contact = HotelsContacts::find($phone['id']);
+                        if(array_search($phone['id'],$hotelContactsIds) !== false) {
+                            unset($hotelContactsIds[array_search($phone['id'], $hotelContactsIds)]);
+                        }
+                    } else {
+                        $contact = new HotelsContacts;
+                    }
+                    $contact->hotel_id = $newHotel->id;
+                    $contact->contact = $phone['value'];
+                    $contact->type = 'phone';
+                    $contact->suggested = $phone['suggested'] == 'true' ? 1 : 0;
+                    $contact->save();
+                }
+            }
+
+            if(!is_null($hotelContactsIds)){
+                HotelsContacts::whereIn('id',$hotelContactsIds)->delete();
+            }
+
+            HotelsClientsExceptions::where('hotel_id', '=', $newHotel->id)->delete();
+            $clientsExceptions = $request->clientsExceptions;
+            if ((is_array($clientsExceptions) || is_object($clientsExceptions)) && !is_null($clientsExceptions)) {
+                foreach ($clientsExceptions as $clientExceptionId) {
+                    $hotelClientException = new HotelsClientsExceptions;
+                    $hotelClientException->hotel_id = $newHotel->id;
+                    $hotelClientException->client_id = $clientExceptionId;
+                    $hotelClientException->save();
+                }
+
+            }
+
+            //saving information of new hotel for uploading files in uploadHotelFilesAjax method
+            session()->put('savedHotelId', $newHotel->id);
+            new ActivityRecorder(array_merge($data, $newHotel->toArray()), 198, $action);
             return 200;
         }
+    }
+
+    /**
+     * Upload hotel invoice templates
+     */
+    public function uploadHotelFilesAjax(Request $request){
+        if(session()->has('savedHotelId')){
+            $fileNames = json_decode($request->file_names);
+            foreach ($fileNames as $fileName) {
+                $hotel_invoice_templates_path =  $fileName.'_files';
+
+                $path = $hotel_invoice_templates_path . '/'; // upload directory
+
+                $file = $request->file($fileName);
+                if ($file !== null) {
+                    $img = $file->getClientOriginalName();
+                    $tmp = $file->getRealPath();
+
+                    // get uploaded file's extension
+                    $ext = strtolower(pathinfo($img, PATHINFO_EXTENSION));
+
+                    // check's valid format
+                    if (in_array($ext, $this->validHotelInvoiceTemplatesExtensions)) {
+                        if (!in_array($hotel_invoice_templates_path, Storage::allDirectories())) {
+                            Storage::makeDirectory($hotel_invoice_templates_path);
+                        }
+                        $hotel_id = session()->get('savedHotelId');
+                        //insert $path in the database
+                        $hotel = Hotel::find($hotel_id);
+                        $hotel->invoice_template_path = $file->storeAs($hotel_invoice_templates_path, rand(1000,100000).'_'.$fileName.'_'.$hotel_id.'.'. $ext);
+                        $hotel->save();
+                        session()->remove('savedHotelId');
+                        return 'success';
+                    } else {
+                        session()->remove('savedHotelId');
+                        return '';
+                    }
+                }
+                session()->remove('savedHotelId');
+            }
+        }
+        return 'fail';
+    }
+
+    public static function downloadHotelFiles($id){
+        $hotel = Hotel::find($id);
+        $url = $hotel->invoice_template_path;
+        return Storage::download($url);
     }
 
     /**
@@ -1481,7 +1605,10 @@ class CrmRouteController extends Controller
     public function findHotel(Request $request){
         if($request->ajax()){
             $hotel = Hotel::find($request->hotelId);
-            return $hotel;
+            $hotel->invoice_template_path = basename($hotel->invoice_template_path);
+            $contacts = HotelsContacts::where('hotel_id','=',$hotel->id)->get();
+            $clientsExceptions = HotelsClientsExceptions::where('hotel_id','=',$hotel->id)->get();
+            return ['hotel'=>$hotel,'contacts'=>$contacts, 'clientsExceptions'=>$clientsExceptions->pluck('client_id')->toArray()];
         }
     }
 
