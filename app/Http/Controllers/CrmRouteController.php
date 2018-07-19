@@ -33,7 +33,7 @@ use Symfony\Component\HttpKernel\Client;
 
 class CrmRouteController extends Controller
 {
-    private $validHotelInvoiceTemplatesExtensions = ['pdf','png'];
+    private $validHotelInvoiceTemplatesExtensions = ['pdf'];
 
     public function index()
     {
@@ -1457,29 +1457,26 @@ class CrmRouteController extends Controller
      */
     public function uploadHotelFilesAjax(Request $request){
         if(session()->has('savedHotelId')){
-            $fileNames = json_decode($request->file_names);
+            $fileNames = json_decode($request->fileNames);
             foreach ($fileNames as $fileName) {
-                $hotel_invoice_templates_path =  $fileName.'_files';
-
-                $path = $hotel_invoice_templates_path . '/'; // upload directory
+                $hotelInvoiceTemplatesPath =  $fileName.'_files';
 
                 $file = $request->file($fileName);
                 if ($file !== null) {
                     $img = $file->getClientOriginalName();
-                    $tmp = $file->getRealPath();
 
                     // get uploaded file's extension
                     $ext = strtolower(pathinfo($img, PATHINFO_EXTENSION));
 
                     // check's valid format
                     if (in_array($ext, $this->validHotelInvoiceTemplatesExtensions)) {
-                        if (!in_array($hotel_invoice_templates_path, Storage::allDirectories())) {
-                            Storage::makeDirectory($hotel_invoice_templates_path);
+                        if (!in_array($hotelInvoiceTemplatesPath, Storage::allDirectories())) {
+                            Storage::makeDirectory($hotelInvoiceTemplatesPath);
                         }
-                        $hotel_id = session()->get('savedHotelId');
+                        $hotelId = session()->get('savedHotelId');
                         //insert $path in the database
-                        $hotel = Hotel::find($hotel_id);
-                        $hotel->invoice_template_path = $file->storeAs($hotel_invoice_templates_path, rand(1000,100000).'_'.$fileName.'_'.$hotel_id.'.'. $ext);
+                        $hotel = Hotel::find($hotelId);
+                        $hotel->invoice_template_path = $file->storeAs($hotelInvoiceTemplatesPath, rand(1000,100000).'_'.$fileName.'_'.$hotelId.'.'. $ext);
                         $hotel->save();
                         session()->remove('savedHotelId');
                         return 'success';
@@ -1605,7 +1602,11 @@ class CrmRouteController extends Controller
     public function findHotel(Request $request){
         if($request->ajax()){
             $hotel = Hotel::find($request->hotelId);
-            $hotel->invoice_template_path = basename($hotel->invoice_template_path);
+            $files = Storage::files(dirname($hotel->invoice_template_path));
+            if(in_array($hotel->invoice_template_path,$files))
+                $hotel->invoice_template_path = basename($hotel->invoice_template_path);
+            else
+                $hotel->invoice_template_path = '';
             $contacts = HotelsContacts::where('hotel_id','=',$hotel->id)->get();
             $clientsExceptions = HotelsClientsExceptions::where('hotel_id','=',$hotel->id)->get();
             return ['hotel'=>$hotel,'contacts'=>$contacts, 'clientsExceptions'=>$clientsExceptions->pluck('client_id')->toArray()];
