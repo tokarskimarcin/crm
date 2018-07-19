@@ -169,7 +169,6 @@
                                     setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
                                 }
 
-
                                 citySelect.setAttribute('data-distance', 30);
                                 $(voivodeSelect).on('change', function(e) {
                                     citySelect.innerHTML = ''; //cleaning previous insertions
@@ -186,24 +185,6 @@
                                         });
                                     });
                                 });
-                                //After selecting voivode, this event listener appends cities from given range into city select
-                                // voivodeSelect.addEventListener('change', function(e) {
-                                //     voivodeSelect.setAttribute('data-eventlistener', '1');
-                                //     citySelect.innerHTML = ''; //cleaning previous insertions
-                                //     appendBasicOption(citySelect);
-                                //
-                                //     voivodeSet.forEach(voivode => {
-                                //         citySet.forEach(voivodeCity => {
-                                //             console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
-                                //             voivodeCity.forEach(city => {
-                                //                 if(city.id === voivode.id) {
-                                //                     appendCityOptions(citySelect, city);
-                                //                 }
-                                //             });
-                                //         });
-                                //     });
-                                // });
-
                             }
                         });
 
@@ -408,7 +389,7 @@
             function validateForm(element) {
                 console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
                 let citySelect = element.querySelector('.citySelect');
-                let cityValue = citySelect.options[citySelect.selectedIndex].value;
+                let cityValue = getSelectedValue(citySelect);
                 if(cityValue == 0) {
                     return false;
                 }
@@ -504,7 +485,7 @@
                         afterHeaderCol.appendChild(checkboxLabel);
                         afterHeaderRow.appendChild(afterHeaderCol);
                         formBox.appendChild(afterHeaderRow);
-                    };
+                    }
                     /*END CHECKBOX PART */
 
                     /*BODY PART*/
@@ -555,12 +536,6 @@
                             let voivodeId = e.target.value;
                             showWithoutDistanceAjax(voivodeId, secondSelect);
                         });
-                        // firstSelect.addEventListener('change', function thirdEventListenerFunction(e) {
-                        //     secondSelect.setAttribute('data-eventlistener', '3');
-                        //     secondSelect.setAttribute('data-distance', 'infinity');
-                        //     let voivodeId = e.target.value;
-                        //     showWithoutDistanceAjax(voivodeId, secondSelect);
-                        // });
                     }
                     else if((distance === 100 || distance === 30) && intersetion === false) { // adding show in the end
                         showInExtreme(distance, selectedCity, secondSelect, firstSelect);
@@ -568,10 +543,10 @@
                     else if((distance === 100 || distance === 30) && intersetion === true) { // adding show between some shows
                         const previousCitySelect = previousBox.querySelector('.citySelect');
                         const previousCityDistance = previousCitySelect.dataset.distance;
-                        const previousCityId = previousCitySelect.options[previousCitySelect.selectedIndex].value;
+                        const previousCityId = getSelectedValue(previousCitySelect);
                         const nextCitySelect = nextBox.querySelector('.citySelect');
                         const nextCityDistance = nextCitySelect.dataset.distance;
-                        const nextCityId = nextCitySelect.options[nextCitySelect.selectedIndex].value;
+                        const nextCityId = getSelectedValue(nextCitySelect);
 
                         showInTheMiddleAjax(previousCityDistance,previousCityId,nextCityDistance,nextCityId,secondSelect,firstSelect);
                     }
@@ -679,7 +654,7 @@
                     const lastSingleShowCOntainer = allSingleShowContainers[allSingleShowContainers.length - 1];
 
                     const selectedCity = thisShowContainer.querySelector('.citySelect');
-                    const selectedCityId = selectedCity.options[selectedCity.selectedIndex].value;
+                    const selectedCityId = getSelectedValue(selectedCity);
 
                     var validation = validateForm(thisShowContainer);
 
@@ -952,7 +927,7 @@
 
                         const allCitiesSelect = document.getElementsByClassName('citySelect');
                         const selectedCity = allCitiesSelect[allCitiesSelect.length - 1];
-                        const selectedCityId = selectedCity.options[selectedCity.selectedIndex].value;
+                        const selectedCityId = getSelectedValue(selectedCity);
 
                         let firstForm = new showBox();
                         firstForm.addRemoveShowButton();
@@ -1042,23 +1017,23 @@
                         }
                         else if(previousSingleShowContainer !== null && nextSingleShowContainer === null) { //case when show is last one
                             const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
-                            const previousCityId = previousCitySelect.options[previousCitySelect.selectedIndex].value;
+                            const previousCityId = getSelectedValue(previousCitySelect);
                             showInExtreme(citySelect.dataset.previousdistance, previousCityId, citySelect, voivodeSelect);
                         }
                         else if(previousSingleShowContainer === null && nextSingleShowContainer !== null) { //case when show is first one
                             const nextCitySelect = nextSingleShowContainer.querySelector('.citySelect');
-                            const nextCityId = nextCitySelect.options[nextCitySelect.selectedIndex].value;
+                            const nextCityId = getSelectedValue(nextCitySelect);
 
                             showInExtreme(30, nextCityId, citySelect, voivodeSelect);
                         }
                         else if(previousSingleShowContainer !== null && nextSingleShowContainer !== null) { //case when show is in the middle
                             const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
                             const previousCityDistance = previousCitySelect.dataset.distance;
-                            const previousCityId = previousCitySelect.options[previousCitySelect.selectedIndex].value;
+                            const previousCityId = getSelectedValue(previousCitySelect);
 
                             const nextCitySelect = nextSingleShowContainer.querySelector('.citySelect');
                             const nextCityDistance = nextCitySelect.dataset.distance;
-                            const nextCityId = nextCitySelect.options[nextCitySelect.selectedIndex].value;
+                            const nextCityId = getSelectedValue(nextCitySelect);
 
                             showInTheMiddleAjax(previousCityDistance, previousCityId, nextCityDistance, nextCityId, citySelect, voivodeSelect);
                         }
@@ -1199,7 +1174,7 @@
                 const grandNextShowContainerCityDistance = grandNextShowContainerCitySelect.dataset.distance;
                 let grandNextShowContainerCityId = null;
                 if(grandNextShowContainerCitySelect.options[grandNextShowContainerCitySelect.selectedIndex].value) {
-                    grandNextShowContainerCityId = grandNextShowContainerCitySelect.options[grandNextShowContainerCitySelect.selectedIndex].value;
+                    grandNextShowContainerCityId = getSelectedValue(grandNextShowContainerCitySelect);
                 }
                 else {
                     notify("Wybierz miasta i województwa we wszystkich listach");
@@ -1210,7 +1185,7 @@
                 const thisSingleShowContainerCitySelectCityDistance = thisSingleShowContainerCitySelect.dataset.distance;
                 let thisSingleShowContainerCityId = null;
                 if(thisSingleShowContainerCitySelect.options[thisSingleShowContainerCitySelect.selectedIndex].value) {
-                    thisSingleShowContainerCityId = thisSingleShowContainerCitySelect.options[thisSingleShowContainerCitySelect.selectedIndex].value;
+                    thisSingleShowContainerCityId = getSelectedValue(thisSingleShowContainerCitySelect);
                 }
                 else {
                     notify("Wybierz miasta i województwa we wszystkich listach");
@@ -1220,7 +1195,7 @@
                 const nextShowContainerCitySelect = nextShowContainer.querySelector('.citySelect');
                 let nextShowContainerCityid = null;
                 if(nextShowContainerCitySelect.options[nextShowContainerCitySelect.selectedIndex].value) {
-                    nextShowContainerCityid = nextShowContainerCitySelect.options[nextShowContainerCitySelect.selectedIndex].value;
+                    nextShowContainerCityid = getSelectedValue(nextShowContainerCitySelect);
                 }
                 else {
                     notify("Wybierz miasta i województwa we wszystkich listach");
@@ -1229,7 +1204,7 @@
                 let nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
                 let nextShowContainerVoivodeId = null;
                 if(nextShowContainerVoivodeSelect.options[nextShowContainerVoivodeSelect.selectedIndex].value) {
-                    nextShowContainerVoivodeId = nextShowContainerVoivodeSelect.options[nextShowContainerVoivodeSelect.selectedIndex].value;
+                    nextShowContainerVoivodeId = getSelectedValue(nextShowContainerVoivodeSelect);
                 }
                 else {
                     notify("Wybierz województwa we wszystkich listach");
@@ -1281,7 +1256,7 @@
                 let prevShowContainerVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
                 let prevShowVoivodeId = null;
                 if(prevShowContainerVoivodeSelect.options[prevShowContainerVoivodeSelect.selectedIndex].value) {
-                    prevShowVoivodeId = prevShowContainerVoivodeSelect.options[prevShowContainerVoivodeSelect.selectedIndex].value;
+                    prevShowVoivodeId = getSelectedValue(prevShowContainerVoivodeSelect);
                 }
                 else {
                     notify("Wybierz miasta i województwa we wszystkich listach");
@@ -1291,7 +1266,7 @@
                 let prevShowContainerCitySelect = previousShowContainer.querySelector('.citySelect');
                 let prevShowCityId = null;
                 if(prevShowContainerCitySelect.options[prevShowContainerCitySelect.selectedIndex].value) {
-                    prevShowCityId = prevShowContainerCitySelect.options[prevShowContainerCitySelect.selectedIndex].value;
+                    prevShowCityId = getSelectedValue(prevShowContainerCitySelect);
                 }
                 else {
                     notify("Wybierz miasta i województwa we wszystkich listach");
@@ -1301,7 +1276,8 @@
                 let nextShowContainerRelatedToPreviousShowContainerCitySelect = nextShowContainerRelatedToPreviousShowContainer.querySelector('.citySelect');
                 let nextShowContainerRelatedToPreviousShowContainerCityId = null;
                 if(nextShowContainerRelatedToPreviousShowContainerCitySelect.options[nextShowContainerRelatedToPreviousShowContainerCitySelect.selectedIndex].value) {
-                    nextShowContainerRelatedToPreviousShowContainerCityId = nextShowContainerRelatedToPreviousShowContainerCitySelect.options[nextShowContainerRelatedToPreviousShowContainerCitySelect.selectedIndex].value;
+                    nextShowContainerRelatedToPreviousShowContainerCityId = getSelectedValue(nextShowContainerRelatedToPreviousShowContainerCitySelect);
+
                 }
                 else {
                     notify("Wybierz miasta i województwa we wszystkich listach");
@@ -1376,7 +1352,11 @@
                 return checkArr;
             }
 
+            /**
+             * This method returns selected by user from list item's value.
+             */
             function getSelectedValue(element) {
+                console.assert(element.tagName === 'SELECT', 'Argument of getSelectedValue is not select element');
                 return element.options[element.selectedIndex].value;
             }
 
