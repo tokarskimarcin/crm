@@ -167,10 +167,10 @@
                                     setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
                                 }
 
-                                citySelect.setAttribute('data-distance', 30);
-                                //After selecting voivode, this event listener appends cities from given range into city select
-                                voivodeSelect.addEventListener('change', e => {
 
+                                citySelect.setAttribute('data-distance', 30);
+                                $(voivodeSelect).on('change', function(e) {
+                                    voivodeSelect.setAttribute('data-eventlistener', '1');
                                     citySelect.innerHTML = ''; //cleaning previous insertions
                                     appendBasicOption(citySelect);
 
@@ -185,6 +185,23 @@
                                         });
                                     });
                                 });
+                                //After selecting voivode, this event listener appends cities from given range into city select
+                                // voivodeSelect.addEventListener('change', function(e) {
+                                //     voivodeSelect.setAttribute('data-eventlistener', '1');
+                                //     citySelect.innerHTML = ''; //cleaning previous insertions
+                                //     appendBasicOption(citySelect);
+                                //
+                                //     voivodeSet.forEach(voivode => {
+                                //         citySet.forEach(voivodeCity => {
+                                //             console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
+                                //             voivodeCity.forEach(city => {
+                                //                 if(city.id === voivode.id) {
+                                //                     appendCityOptions(citySelect, city);
+                                //                 }
+                                //             });
+                                //         });
+                                //     });
+                                // });
 
                             }
                         });
@@ -201,14 +218,6 @@
                 console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInExtreme method is not voivode select');
                 console.assert(!isNaN(parseInt(limit)), 'limit in showInExtreme is not number!');
                 console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInExtreme is not number!');
-
-
-                // console.log('w showinextrem: ', voivodeSelect2);
-                console.log('city', citySelect);
-                let singleShowBox2 = citySelect.closest('.singleShowContainer');
-                console.log('singleshowbox2: ', singleShowBox2);
-                // let voivodeSelect2  = singleShowBox2.getElementById('voivodeSelect');
-                // console.log(voivodeSelect2);
                 $.ajax({
                     type: "POST",
                     url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
@@ -229,7 +238,6 @@
                         });
                         citySelect.setAttribute('data-distance', limit); //applaying old value
                         if(oldVoivodeArr) { //this is optional
-                            console.log('oldVoivodeArr', oldVoivodeArr);
                             console.assert(Array.isArray(oldVoivodeArr), "oldVoivodeArr in showInExtreme method is not array!");
                             for(Id in allCitiesGroupedByVoivodes) {
                                 if(oldVoivodeArr[1] == Id) {
@@ -241,8 +249,10 @@
                             setOldValues(oldVoivodeArr[0], oldVoivodeArr[1], oldVoivodeArr[2], oldVoivodeArr[3]);
 
                         }
+
                         //After selecting voivode, this event listener appends cities from given range into city select
-                        voivodeSelect.addEventListener('change', e => {
+                        $(voivodeSelect).on('change', function(e) {
+                            voivodeSelect.setAttribute('data-eventlistener', '2');
                             citySelect.innerHTML = ''; //cleaning previous insertions
                             appendBasicOption(citySelect);
 
@@ -255,6 +265,20 @@
                                 }
                             }
                         });
+                        // voivodeSelect.addEventListener('change', function(e) {
+                        //     voivodeSelect.setAttribute('data-eventlistener', '2');
+                        //     citySelect.innerHTML = ''; //cleaning previous insertions
+                        //     appendBasicOption(citySelect);
+                        //
+                        //     let voivodeId = e.target.value;
+                        //     for(Id in allCitiesGroupedByVoivodes) {
+                        //         if(voivodeId == Id) {
+                        //             allCitiesGroupedByVoivodes[Id].forEach(city => {
+                        //                 appendCityOptions(citySelect, city);
+                        //             });
+                        //         }
+                        //     }
+                        // });
                     }
                 });
             }
@@ -539,11 +563,18 @@
                             firstSelect.appendChild(singleVoivode);
                         @endforeach()
 
-                        firstSelect.addEventListener('change', e => {
+                        $(firstSelect).on('change', function(e) {
+                            secondSelect.setAttribute('data-eventlistener', '3');
                             secondSelect.setAttribute('data-distance', 'infinity');
                             let voivodeId = e.target.value;
                             showWithoutDistanceAjax(voivodeId, secondSelect);
                         });
+                        // firstSelect.addEventListener('change', function thirdEventListenerFunction(e) {
+                        //     secondSelect.setAttribute('data-eventlistener', '3');
+                        //     secondSelect.setAttribute('data-distance', 'infinity');
+                        //     let voivodeId = e.target.value;
+                        //     showWithoutDistanceAjax(voivodeId, secondSelect);
+                        // });
                     }
                     else if((distance === 100 || distance === 30) && intersetion === false) { // adding show in the end
                         showInExtreme(distance, selectedCity, secondSelect, firstSelect);
@@ -864,116 +895,123 @@
                     const changedCitySelect = e.target;
                     const thisSingleShowContainer = e.target.closest('.singleShowContainer');
                     const thisDayContainer = e.target.closest('.singleDayContainer');
-                    // const allDayContainers = document.getElementsByClassName('singleDayContainer');
-                    // const allSingleShowContainers = document.getElementsByClassName('singleShowContainer');
+                    const thisContainerCheckbox = thisSingleShowContainer.querySelector('.distance-checkbox');
+                    const isCheckedThisContainer = thisContainerCheckbox.checked;
 
                     let previousShowContainer = undefined;
                     let nextShowContainer = undefined;
 
                     let nextDayFlag = null; //indices that next show container is in the same day container (false - same day, true - another day)
                     let prevDayFlag = null; //indices that prev show container is in the same day container (false - same day, true - another day)
-                    let grandPrevDayFlag = null;
-                    let grandNextDayFlag = null;
+                    let grandPrevDayFlag = null; //indices that grandPrev show container is in the same day container (false - same day, true - another day)
+                    let grandNextDayFlag = null; //indices that grandNext show container is in the same day container (false - same day, true - another day)
 
                     let siblingShowContainersArr = [];
                     let siblingCheckboxArr = [];
 
                     siblingShowContainersArr = checkingExistenceOfPrevAndNextContainers(thisSingleShowContainer, 'singleShowContainer');
                     siblingCheckboxArr = checkboxFilter(siblingShowContainersArr);
-                    // console.log(siblingCheckboxArr);
 
                     previousShowContainer = siblingShowContainersArr[0] === null ? null : siblingShowContainersArr[0];
                     nextShowContainer = siblingShowContainersArr[1] === null ? null : siblingShowContainersArr[1];
 
 
-                    if(nextShowContainer) { //case when next show exist.
-                        if(siblingCheckboxArr[1] === false) { //next show container doesn't have checked distance checkbox
-                            let dayContainerOfNextShowContainer = nextShowContainer.closest('.singleDayContainer');
-                            nextDayFlag = dayContainerOfNextShowContainer == thisDayContainer ? false : true; //checking if next show is in the same day container
+                    if(isCheckedThisContainer) { //Distance checkbox is checked inside clicked container
 
-                            if(nextDayFlag) { //case when next show is in another day container
+                    }
+                    else { //distance checkbox is unchecked inside clicked container
+                        if(nextShowContainer) { //case when next show exist.
+                            if(siblingCheckboxArr[1] === false) { //next show container doesn't have checked distance checkbox
+                                let dayContainerOfNextShowContainer = nextShowContainer.closest('.singleDayContainer');
+                                nextDayFlag = dayContainerOfNextShowContainer == thisDayContainer ? false : true; //checking if next show is in the same day container
 
-                            }
-                            else { //case when next show is in the same day container
-                                let grandNextShowContainer = undefined;
-                                let prevShowContainerRelatedToNextShowContainer = thisSingleShowContainer;
-                                let siblingsOfNextShowContainerArr = checkingExistenceOfPrevAndNextContainers(nextShowContainer, 'singleShowContainer');
-                                let nextSiblingCheckboxArr = checkboxFilter(siblingsOfNextShowContainerArr);
-                                grandNextShowContainer = siblingsOfNextShowContainerArr[1] === null ? null : siblingsOfNextShowContainerArr[1];
+                                if(nextDayFlag) { //case when next show is in another day container
+                                    let prevShowContainerRelatedToNextShowContainer = thisSingleShowContainer;
+                                    let siblingsOfNextShowContainerArr = checkingExistenceOfPrevAndNextContainers(nextShowContainer, 'singleShowContainer');
+                                    let nextSiblingCheckboxArr = checkboxFilter(siblingsOfNextShowContainerArr);
+                                    let grandNextShowContainer = undefined; // previous show container of previous show container
+                                    grandNextShowContainer = siblingsOfNextShowContainerArr[1] === null ? null : siblingsOfNextShowContainerArr[1];
 
-                                if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
-                                    let dayContainerOfGrandNextShowContainer = grandNextShowContainer.closest('.singleDayContainer');
-                                    grandNextDayFlag = dayContainerOfGrandNextShowContainer == dayContainerOfNextShowContainer ? false : true; //checking if grandnext show is in the same day container as next show
-                                    if(grandNextDayFlag) { //grandnext show is in another day container related to next show
-
+                                    if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
+                                        let changeDistanceArr = [100];
+                                        limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
                                     }
-                                    else { //grandnext show is in the same day container as next show
-                                        limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer);
+                                    else { // there is no next container (related to prev show container)
+                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 100);
                                     }
                                 }
-                                else { // there is no next container (related to next show container)
-                                    limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
+                                else { //case when next show is in the same day container
+                                    let grandNextShowContainer = undefined;
+                                    let prevShowContainerRelatedToNextShowContainer = thisSingleShowContainer;
+                                    let siblingsOfNextShowContainerArr = checkingExistenceOfPrevAndNextContainers(nextShowContainer, 'singleShowContainer');
+                                    let nextSiblingCheckboxArr = checkboxFilter(siblingsOfNextShowContainerArr);
+                                    grandNextShowContainer = siblingsOfNextShowContainerArr[1] === null ? null : siblingsOfNextShowContainerArr[1];
+
+                                    if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
+                                        let dayContainerOfGrandNextShowContainer = grandNextShowContainer.closest('.singleDayContainer');
+                                        grandNextDayFlag = dayContainerOfGrandNextShowContainer == dayContainerOfNextShowContainer ? false : true; //checking if grandnext show is in the same day container as next show
+                                        if(grandNextDayFlag) { //grandnext show is in another day container related to next show
+                                            let changeDistanceArr = [100];
+                                            limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+                                        }
+                                        else { //grandnext show is in the same day container as next show
+                                            limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer);
+                                        }
+                                    }
+                                    else { // there is no next container (related to next show container)
+                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
+                                    }
+                                }
+                            }
+
+                        }
+
+                        //case when prev show exist.
+                        if(previousShowContainer) {
+                            if(siblingCheckboxArr[0] === false) { //prev show container doesn't have checked distance checkbox
+                                let dayContainerOfPreviousShowContainer = previousShowContainer.closest('.singleDayContainer');
+                                prevDayFlag = dayContainerOfPreviousShowContainer == thisDayContainer ? false : true; //checking if prev show is in the same day container
+
+                                if(prevDayFlag) { //case when prev show is in another day container
+                                    let nextShowContainerRelatedToPreviousShowContainer = thisSingleShowContainer;
+                                    let siblingsOfPreviousShowContainerArr = checkingExistenceOfPrevAndNextContainers(previousShowContainer, 'singleShowContainer');
+                                    let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
+                                    let grandPrevShowContainer = undefined; // previous show container of previous show container
+                                    grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
+                                    if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
+                                        let changeDistanceArr = [100];
+                                        limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
+                                    }
+                                    else { // there is no previous container (related to prev show container)
+                                        limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
+                                    }
+
+                                }
+                                else { //case when prev show is in the same day container
+                                    let nextShowContainerRelatedToPreviousShowContainer = thisSingleShowContainer;
+                                    let grandPrevShowContainer = undefined; // previous show container of previous show container
+                                    let siblingsOfPreviousShowContainerArr = checkingExistenceOfPrevAndNextContainers(previousShowContainer, 'singleShowContainer');
+                                    let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
+                                    grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
+
+                                    if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
+                                        let dayContainerOfGrandPrevShowContainer = grandPrevShowContainer.closest('.singleDayContainer');
+                                        grandPrevDayFlag = dayContainerOfGrandPrevShowContainer == dayContainerOfPreviousShowContainer ? false : true; //checking if grandprev show is in the same day container as prev show
+                                        if(grandPrevDayFlag) { //grandprev show is in another day container related to prev show
+                                            let changeDistanceArr = [100];
+                                            limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
+                                        }
+                                        else { //grandprev show is in the same day container as prev show
+                                            limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer);
+                                        }
+                                    }
+                                    else { // there is no previous container (related to prev show container)
+                                        limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 30);
+                                    }
                                 }
                             }
                         }
-
                     }
-
-                    //case when prev show exist.
-                    if(previousShowContainer) {
-                        if(siblingCheckboxArr[0] === false) { //prev show container doesn't have checked distance checkbox
-                            let dayContainerOfPreviousShowContainer = previousShowContainer.closest('.singleDayContainer');
-                            prevDayFlag = dayContainerOfPreviousShowContainer == thisDayContainer ? false : true; //checking if prev show is in the same day container
-
-                            if(prevDayFlag) { //case when prev show is in another day container
-                                let nextShowContainerRelatedToPreviousShowContainer = thisSingleShowContainer;
-                                let siblingsOfPreviousShowContainerArr = checkingExistenceOfPrevAndNextContainers(previousShowContainer, 'singleShowContainer');
-                                let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
-                                let grandPrevShowContainer = undefined; // previous show container of previous show container
-                                grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
-                                console.log(grandPrevShowContainer);
-                                if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
-
-                                }
-                                else { // there is no previous container (related to prev show container)
-                                    console.log(previousShowContainer);
-                                    console.log(nextShowContainerRelatedToPreviousShowContainer);
-                                    limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
-                                }
-
-                            }
-                            else { //case when prev show is in the same day container
-                                let nextShowContainerRelatedToPreviousShowContainer = thisSingleShowContainer;
-                                let grandPrevShowContainer = undefined; // previous show container of previous show container
-                                let siblingsOfPreviousShowContainerArr = checkingExistenceOfPrevAndNextContainers(previousShowContainer, 'singleShowContainer');
-                                let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
-                                grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
-
-                                if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
-                                    // if(prevSiblingCheckboxArr[0] === false) { //grand prev show container doesn't have checked distance checkbox
-                                    console.log('niezaznaczony');
-                                    let dayContainerOfGrandPrevShowContainer = grandPrevShowContainer.closest('.singleDayContainer');
-                                    grandPrevDayFlag = dayContainerOfGrandPrevShowContainer == dayContainerOfPreviousShowContainer ? false : true; //checking if grandprev show is in the same day container as prev show
-                                    if(grandPrevDayFlag) { //grandprev show is in another day container related to prev show
-
-                                    }
-                                    else { //grandprev show is in the same day container as prev show
-                                        limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer);
-                                    }
-
-                                    // }
-                                    // else { //grand prev show container have checked distance checkbox!
-                                    //     console.log('zaznaczony!');
-                                    // }
-                                }
-                                else { // there is no previous container (related to prev show container)
-                                    limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 30);
-                                }
-                            }
-                        }
-                    }
-
-
 
                 }
             }
@@ -981,7 +1019,7 @@
             document.addEventListener('click', globalClickHandler);
             document.addEventListener('change', globalChangeHandler);
 
-            function limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer) {
+            function limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr = null) {
                 const grandNextShowContainerCitySelect = grandNextShowContainer.querySelector('.citySelect');
                 const grandNextShowContainerCityDistance = grandNextShowContainerCitySelect.dataset.distance;
                 const grandNextShowContainerCityId = grandNextShowContainerCitySelect.options[grandNextShowContainerCitySelect.selectedIndex].value;
@@ -997,17 +1035,20 @@
 
                 let oldValuesArray = [nextShowContainerVoivodeSelect, nextShowContainerVoivodeId, nextShowContainerCitySelect, nextShowContainerCityid];
 
-                //this part remove all event listeners from this node
-                // var old_element = nextShowContainerVoivodeSelect;
-                // var new_element = old_element.cloneNode(true);
-                // old_element.parentNode.replaceChild(new_element, old_element);
-                //end remove all event listeners
+                $(nextShowContainerVoivodeSelect).off();
+
                 nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
 
                 nextShowContainerVoivodeSelect.innerHTML = '';
                 nextShowContainerCitySelect.innerHTML = '';
 
-                showInTheMiddleAjax(grandNextShowContainerCityDistance,grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
+                if(changeDistanceArr) {
+                    showInTheMiddleAjax(changeDistanceArr[0],grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
+                }
+                else {
+                    showInTheMiddleAjax(grandNextShowContainerCityDistance,grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
+                }
+
             }
 
             /**
@@ -1016,8 +1057,6 @@
             function limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, limit) {
                 let prevShowContainerVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
                 let prevShowVoivodeId = prevShowContainerVoivodeSelect.options[prevShowContainerVoivodeSelect.selectedIndex].value;
-                console.log(prevShowContainerVoivodeSelect);
-                console.log(prevShowVoivodeId);
 
                 let prevShowContainerCitySelect = previousShowContainer.querySelector('.citySelect');
                 let prevShowCityId = prevShowContainerCitySelect.options[prevShowContainerCitySelect.selectedIndex].value;
@@ -1026,20 +1065,7 @@
                 let nextShowContainerRelatedToPreviousShowContainerCityId = nextShowContainerRelatedToPreviousShowContainerCitySelect.options[nextShowContainerRelatedToPreviousShowContainerCitySelect.selectedIndex].value;
                 let oldValuesArray = [prevShowContainerVoivodeSelect, prevShowVoivodeId, prevShowContainerCitySelect, prevShowCityId];
 
-                //this part remove all event listeners from this node
-                // var old_element = prevShowContainerVoivodeSelect;
-                // var new_element = old_element.cloneNode(true);
-                // old_element.parentNode.replaceChild(new_element, old_element);
-                //end remove all event listeners
-                prevShowContainerVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
-
-                // let singleShowBox = prevShowContainerCitySelect.closest('.singleShowContainer');
-                // prevShowContainerVoivodeSelect  = singleShowBox.querySelector('.voivodeSelect');
-                // console.log('ssb: ', singleShowBox);
-
-                // prevShowContainerVoivodeSelect  = new_element;
-                // prevShowContainerVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
-                console.log('ponownie: ', prevShowContainerVoivodeSelect);
+                $(prevShowContainerVoivodeSelect).off();
 
                 prevShowContainerVoivodeSelect.innerHTML = '';
                 prevShowContainerCitySelect.innerHTML = '';
@@ -1106,7 +1132,6 @@
              * @param cityId
              */
             function setOldValues(voivodeSelect, voivodeId, citySelect, cityId) {
-                console.log('setOldvalues voivodeselect: ', voivodeSelect);
                 for(let i = 0; i < voivodeSelect.length; i++) {
                     if(voivodeSelect[i].value == voivodeId) {
                         voivodeSelect[i].selected = true;
@@ -1114,7 +1139,6 @@
                 }
                 for(let j = 0; j < citySelect.length; j++) {
                     if(citySelect[j].value == cityId) {
-                        console.log(citySelect[j]);
                         citySelect[j].selected = true;
                     }
                 }
