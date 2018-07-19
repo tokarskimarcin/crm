@@ -9,15 +9,18 @@
 @extends('layouts.main')
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-
-
-
 @endsection
 @section('content')
 
     <style>
-        .colorRow {
+        .colorComment {
+            background: #fffc8b !important;
+        }
+        .colorTurnedOff {
             background: #c500002e !important;
+        }
+        .dropdown-menu {
+            left: 0px !important;
         }
     </style>
 
@@ -44,7 +47,8 @@
                                 <span class="glyphicon glyphicon-plus"></span> <span>Dodaj Hotel</span>
                             </button>
                         </div>
-
+                    </div>
+                    <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="voivode">Województwo</label>
@@ -69,7 +73,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="city">Kod pocztowy</label>
+                                <label for="zipCode">Kod pocztowy</label>
                                 <select name="zipCode" id="zipCode" class="form-control" multiple="multiple">
                                     <option value="0">Wybierz</option>
                                     @foreach($zipCode as $item)
@@ -90,6 +94,7 @@
                                     <th>Ulica</th>
                                     <th>Kod Pocztowy</th>
                                     <th>Akcja</th>
+                                    <th>Podgląd</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -111,100 +116,184 @@
                 <h4 class="modal-title" id="modal_title">Dodaj Hotel<span id="modalHotel"></span></h4>
             </div>
             <div class="modal-body">
-
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        Formularz
-                    </div>
-                    <div class="panel-body">
-                        <div class="form-container">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="name">Nazwa Hotelu</label>
-                                                <input type="text" id="name" class="form-control" name="name" placeholder="Tutaj wprowadź nazwę hotelu" value="">
+                <form id="newHotelForm" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <div class="form-container">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="name">Nazwa Hotelu</label>
+                                    <input type="text" id="name" class="form-control" name="name" placeholder="Tutaj wprowadź nazwę hotelu" value="">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="voivode">Województwo</label>
+                                    <select name="voivodeAdd" id="voivodeAdd" class="form-control selectpicker" data-element="voivode" required>
+                                        <option value="0">Wybierz</option>
+                                        @foreach($voivodes as $voivode)
+                                            <option value ="{{$voivode->id}}">{{$voivode->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="city">Miasto</label>
+                                    <select name="cityAdd" id="cityAdd" class="form-control selectpicker" required>
+                                        <option value="0">Wybierz</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="street">Ulica</label>
+                                    <input type="text" name="street" id="street" class="form-control" placeholder="Nazwa Ulicy" value="">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <label class="myLabel">Kod pocztowy:</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="input-group">
+                                                <input type="text" id="zipCode1" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                <span class="input-group-addon" id="basic-addon1" style="padding: 0px"></span>
+                                                <input type="text" id="zipCode2" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                <span class="input-group-addon" id="basic-addon1" style="padding: 3px;">-</span>
+                                                <input type="text" id="zipCode3" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                <span class="input-group-addon" id="basic-addon1"style="padding: 0px"></span>
+                                                <input type="text" id="zipCode4" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                <span class="input-group-addon" id="basic-addon1"style="padding: 0px"></span>
+                                                <input type="text" id="zipCode5" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="voivode">Województwo</label>
-                                                <select name="voivodeAdd" id="voivodeAdd" class="form-control" data-element="voivode" required>
-                                                    <option value="0">Wybierz</option>
-                                                    @foreach($voivodes as $voivode)
-                                                        <option value ="{{$voivode->id}}">{{$voivode->name}}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="city">Miasto</label>
-                                                <select name="cityAdd" id="cityAdd" class="form-control" required>
-                                                    <option value="0">Wybierz</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="street">Ulica</label>
-                                                <input type="text" name="street" id="street" class="form-control" placeholder="Nazwa Ulicy" value="">
-                                            </div>
-                                        </div>
-                                        {{--<div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="price">Cena za salę</label>
-                                                <input type="number" step="0.01" min="0" name="price" id="price" class="form-control" placeholder="Cena w złotówkach np. 125,99" value="">
-                                            </div>
-                                        </div>--}}
-                                        <div class="col-md-2">
-                                            <div class="form-group">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <label class="myLabel">Kod pocztowy:</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="parking">Parking</label>
+                                    <select name="parking" id="parking" class="form-control selectpicker" required>
+                                        <option value="-1">Wybierz</option>
+                                        <option value="0">NIE</option>
+                                        <option value="1">TAK</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="clientsExceptions">Wykluczeni klienci</label>
+                                    <select name="clientsExceptions" id="clientsExceptions" class="selectpicker form-control"
+                                            multiple="multiple" title="Wybierz klientów..." data-width="100%" data-live-search=”true”>
+                                        @foreach($clients as $client)
+                                            <option value="{{$client->id}}">{{$client->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="hourBid">Stawka godzinowa</label>
+                                    <input type="number" name="hourBid" id="hourBid" class="form-control" placeholder="Stawka godzinowa (zł)" min="0" value="">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="dailyBid">Stawka dzienna</label>
+                                    <input type="number" name="dailyBid" id="dailyBid" class="form-control" placeholder="Stawka dzienna (zł)" min="0" value="">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="paymentMethod">Forma płatności</label>
+                                    <select name="paymentMethod" id="paymentMethod" class="form-control selectpicker" required>
+                                        <option value="0">Wybierz</option>
+                                        @foreach($paymentMethods as $paymentMethod)
+                                            <option value="{{$paymentMethod->id}}">{{$paymentMethod->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            {{--<div class="col-md-4">
+                                <label for="order">Zamówienie</label>
+                                <input type="file" name="order" id="order" class="form-control" style="padding-bottom: 3em">
+                            </div>--}}
+                            <div class="col-md-4">
+                                <label for="invoiceTemplate">Nowy szablon faktury</label>
+                                <input type="file" name="invoice_template" id="invoiceTemplate" class="form-control file" style="padding-bottom: 3em">
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="comment">Uwagi</label>
+                                    <input type="text" name="comment" id="comment" class="form-control" placeholder="Tutaj wprowadź krótki komentarz max 255 znaków" value="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 1em">
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        Kontakty
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="alert alert-info" role="alert">Zaznaczenie telefonu i adresu mailowego określa te kontakty jako sugerowane.</div>
+                                        <div class="contactsContainer">
+                                            <div class="row">
+                                                <div class="col-md-6 phonesContainer">
+                                                    <div class="row"  style="margin-top: 1em">
+                                                        <div class="col-md-12">
+                                                            <label>Numery telefonów</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row"  style="margin-top: 1em">
+                                                        <div class="col-md-10" style="text-align: right">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <button type="button" id="addPhoneNumberButton" class="btn btn-success btn-block"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="input-group">
-                                                            <input type="text" id="zipCode1" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
-                                                            <span class="input-group-addon" id="basic-addon1" style="padding: 0px"></span>
-                                                            <input type="text" id="zipCode2" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
-                                                            <span class="input-group-addon" id="basic-addon1" style="padding: 3px;">-</span>
-                                                            <input type="text" id="zipCode3" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
-                                                            <span class="input-group-addon" id="basic-addon1"style="padding: 0px"></span>
-                                                            <input type="text" id="zipCode4" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
-                                                            <span class="input-group-addon" id="basic-addon1"style="padding: 0px"></span>
-                                                            <input type="text" id="zipCode5" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
-                                                            {{--
-                                                            <input type="text" id="zipCode1" class="form-control col-md-4" placeholder="- -" aria-describedby="basic-addon1" style="text-align: center; letter-spacing: 8px">
-                                                            <span class="input-group-addon" id="basic-addon1">-</span>
-                                                            <input type="text" id="zipCode2" class="form-control col-md-7" placeholder="- - -" aria-describedby="basic-addon1" style="text-align: center; letter-spacing: 8px">--}}
+                                                <div class="col-md-6 mailsContainer">
+                                                    <div class="row"  style="margin-top: 1em">
+                                                        <div class="col-md-12">
+                                                            <label>Adresy mailowe</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row"  style="margin-top: 1em">
+                                                        <div class="col-md-10" style="text-align: right">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <button type="button" id="addEmailButton" class="btn btn-success btn-block"><span class="glyphicon glyphicon-plus"></span></button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="comment">Komentarz</label>
-                                                <input type="text" name="comment" id="comment" class="form-control" placeholder="Tutaj wprowadź krótki komentarz max 255 znaków" value="">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <button class="btn btn-default form-control"id="saveHotel">
-                                                <span class=’glyphicon glyphicon-plus’></span> Dodaj Hotel
-                                            </button>
-                                        </div>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button type='submit' class="btn btn-default form-control" id="saveHotel">
+                                    <span class='glyphicon glyphicon-plus'></span> Dodaj Hotel
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                </div>
-            </div>
+                </form>
+            </div>{{--modal-body end--}}
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
             </div>
@@ -215,13 +304,14 @@
 @endsection
 
 @section('script')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>s
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
 
         //flaga dodania nowego hotelu - po poprawnym wykonaniu ajaxa wyswietli sie komunikat
         var addNewHotelFlag = false;
         var editHotelFlag = false;
+        var saveHotelFlag = false;
         var hotelStatus = 1;
         var city = 0;/*
         let zipCode2 = document.getElementById('zipCode2');
@@ -231,38 +321,98 @@
             container.innerHTML = '';
         }
         // czyszczenie modalu
-        function clearModal() {
+        function clearModal(preview = false) {
             cityId = 0;
             addNewHotelFlag = false;
             editHotelFlag = false;
+
+            let nameInput = $("#name");
+            let streetInput = $('#street');
+            let voivodeAddInput = $('#voivodeAdd');
+            let cityAddInput = $('#cityAdd');
+            let commentInput = $('#comment');
+            let hotelIdInput = $('#hotelId');
+            let parkingInput = $('#parking');
+            let paymentMethodInput = $('#paymentMethod');
+            let invoiceTemplateInput = $('#invoiceTemplate');
+            let clientsExceptionsInput = $('#clientsExceptions');
+            let zipCodeInputs = $('.zipCode');
+            let hourBidInput = $('#hourBid');
+            let dailyBidInput = $('#dailyBid');
+            let contactInputs = $('.contactsContainer .contact');
+
+            let addPhoneNumberButton = $('#addPhoneNumberButton');
+            let addEmailButton = $('#addEmailButton');
+            let saveHotelButton = $('#HotelModal #saveHotel');
+
+            if(!preview){
+                invoiceTemplateInput.closest('div').css('display','block');
+                saveHotelButton.closest('div').css('display','block');
+                addPhoneNumberButton.closest('div').css('display','block');
+                addEmailButton.closest('div').css('display','block');
+                saveHotelButton.first().text('');
+                saveHotelButton.first().prop('class','btn btn-default form-control');
+                saveHotelButton.first().append($('<span class="glyphicon glyphicon-plus"></span>'));
+                saveHotelButton.first().append(' Dodaj Hotel');
+            }else{
+                invoiceTemplateInput.closest('div').css('display','none');
+                saveHotelButton.closest('div').css('display','none');
+                addPhoneNumberButton.closest('div').css('display','none');
+                addEmailButton.closest('div').css('display','none');
+            }
+            $('.invoiceTemplate_file').remove();
             $('#HotelModal .modal-title').first().text('Dodaj Hotel');
 
-            $('#HotelModal #saveHotel').first().text('');
-            $('#HotelModal #saveHotel').first().prop('class','btn btn-default form-control');
-            $('#HotelModal #saveHotel').first().append($('<span class="glyphicon glyphicon-plus"></span>'));
-            $('#HotelModal #saveHotel').first().append('Dodaj Hotel');
-            $("#name").val("");
-            //$('#price').val("");
-            $('#street').val("");
-            $('#voivodeAdd').val(0);
-            $('#cityAdd').val(0);
-            $('#comment').val("");
-            $('#hotelId').val(0);
-            $('.zipCode').val("");
-            /*
-            $('#zipCode2').val("");*/
+
+            nameInput.val("");
+            streetInput.val("");
+            voivodeAddInput.val(0);
+            cityAddInput.val(0);
+            commentInput.val("");
+            hotelIdInput.val(0);
+            parkingInput.val(-1);
+            paymentMethodInput.val(0);
+            invoiceTemplateInput.val("");
+            clientsExceptionsInput.val('');
+            zipCodeInputs.val("");
+            hourBidInput.val("");
+            dailyBidInput.val("");
+            contactInputs.remove();
+
+            nameInput.prop('readonly',preview);
+            streetInput.prop('readonly',preview);
+            voivodeAddInput.prop('disabled',preview);
+            cityAddInput.prop('disabled',preview);
+            commentInput.prop('readonly',preview);
+            parkingInput.prop('disabled',preview);
+            paymentMethodInput.prop('disabled',preview);
+            clientsExceptionsInput.prop('disabled',preview);
+            zipCodeInputs.prop('readonly',preview);
+            hourBidInput.prop('readonly',preview);
+            dailyBidInput.prop('readonly',preview);
+
+            voivodeAddInput.selectpicker('refresh');
+            cityAddInput.selectpicker('refresh');
+            parkingInput.selectpicker('refresh');
+            paymentMethodInput.selectpicker('refresh');
+            clientsExceptionsInput.selectpicker('refresh');
         }
 
         document.addEventListener('DOMContentLoaded', function(event) {
             $('#NewHotelModal').on('click',function () {
                 hotelStatus = 1;
                 clearModal();
+                $('#addPhoneNumberButton').closest('.row').before(createNewHotelContact('hotelPhoneNumber'));
+                $('#addEmailButton').closest('.row').before(createNewHotelContact('hotelEmail'));
                 addNewHotelFlag = true;
             });
 
             $('#HotelModal').on('hidden.bs.modal', function () {
                 hotelStatus = 1;
-                table.ajax.reload();
+                if(saveHotelFlag){
+                    table.ajax.reload();
+                    saveHotelFlag = false;
+                }
             });
             let voivodeeId = [];
             let cityId = [];
@@ -275,7 +425,10 @@
                 },
                 "rowCallback": function (row, data, index) {
                     if (data.status == 0) {
-                        $(row).addClass('colorRow');
+                        $(row).addClass('colorTurnedOff');
+                    }
+                    if(typeof data.comment === typeof '' && data.comment !== '' && data.comment !== null){
+                        $(row).addClass('colorComment');
                     }
                     return row;
                 },"fnDrawCallback": function (settings) {
@@ -291,45 +444,45 @@
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
                             data: {
-                                'hotelId': $(this).data('id')
+                                'hotelId': hotel_id
                             },
                             success: function (response) {
-                               clearModal();
-                               $('#hotelId').val(hotel_id);
-                               editHotelFlag = true;
-                               $('#HotelModal .modal-title').first().text('Edycja Hotelu');
+                                clearModal();
 
+                                $('#HotelModal .modal-title').first().text('Edycja Hotelu');
 
-                                $('#HotelModal #saveHotel').first().text('');
-                                $('#HotelModal #saveHotel').first().prop('class','btn btn-success form-control');
-                                $('#HotelModal #saveHotel').first().append($('<span class="glyphicon glyphicon-save"></span>'));
-                                $('#HotelModal #saveHotel').first().append(' Zapisz Hotel');
-                               $("#name").val(response.name);
-                               //$('#price').val(response.price);
-                                $('#street').val(response.street);
-                                hotelStatus = response.status;
-                               $('#voivodeAdd').val(response.voivode_id);
-                               $('#comment').val(response.comment);
+                                let saveHotelButton = $('#HotelModal #saveHotel');
+                                saveHotelButton.first().text('');
+                                saveHotelButton.first().prop('class', 'btn btn-success form-control');
+                                saveHotelButton.first().append($('<span class="glyphicon glyphicon-save"></span>'));
+                                saveHotelButton.first().append(' Zapisz Hotel');
 
-                                zipCode = String(response.zip_code);
-                                if(zipCode != "null") {
-                                    length = zipCode.length;
-                                    for(i = 0; i < 5-length; i++){
-                                        zipCode = "0".concat(zipCode);
-                                    }
-                                    zipCodeInputs = $('.zipCode');
-                                    for(i = 0; i < 5; i++)
-                                        $(zipCodeInputs.get(i)).val(zipCode.slice(i,i+1));
-                                    /*$('#zipCode1').val(zipCode.slice(0,2));
-                                    $('#zipCode2').val(zipCode.slice(2,5));*/
-                                }
-                                else {
-                                    $('.zipCode').val('');
-                                }
+                                fillHotelInformations(response);
 
-                                city = response.city_id;
-                               $('#voivodeAdd').trigger( "change" );
-                               $('#HotelModal').modal('show');
+                                $('#HotelModal').modal('show');
+                            }
+                        });
+                    });
+
+                    $('.button-preview-hotel').click(function () {
+                        let hotel_id = $(this).data('id');
+                        $.ajax({
+                            type: "POST",
+                            url: "{{ route('api.findHotel') }}", // do zamiany
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            data: {
+                                'hotelId': hotel_id
+                            },
+                            success: function (response) {
+                                clearModal(true);
+
+                                $('#HotelModal .modal-title').first().text('Podgląd Hotelu');
+
+                                fillHotelInformations(response,true);
+
+                                $('#HotelModal').modal('show');
                             }
                         });
                     });
@@ -381,14 +534,14 @@
                                             thisButton.text('Włącz');
                                             thisButton.prepend("<span class='glyphicon glyphicon-off'></span> ");
 
-                                            thisRow.classList.add('colorRow');
+                                            thisRow.classList.add('colorTurnedOff');
                                         }else {
                                             thisButton.removeClass('btn-success');
                                             thisButton.addClass('btn-danger');
                                             thisButton.data('status', 0);
                                             thisButton.text('Wyłącz');
                                             thisButton.prepend("<span class='glyphicon glyphicon-off'></span> ");
-                                            thisRow.classList.remove('colorRow');
+                                            thisRow.classList.remove('colorTurnedOff');
                                         }
                                         thisButton.prop('disabled', false);
                                     }
@@ -439,6 +592,12 @@
                                 returnButton += "<button class='button-status-hotel btn btn-success btn-block' data-id=" + data.id + " data-status=1 ><span class='glyphicon glyphicon-off'></span> Włącz</button>";
                             return returnButton;
                         },"orderable": false, "searchable": false
+                    },
+                    {"data" : function (data){
+                            let spanButton = $(document.createElement('span')).addClass('glyphicon glyphicon-search');
+                            let previewButton = $(document.createElement('button')).addClass('button-preview-hotel btn btn-default btn-block').attr('data-id', data.id).append(spanButton);
+                            return previewButton.prop('outerHTML');
+                        },"orderable": false, "searchable": false
                     }
                 ]
             });
@@ -470,110 +629,28 @@
                             }
                             cityInput.appendChild(optionC);
                         }
-
-                    },
-                    error: function(err, status, info) {
-                        console.log(err);
-                        console.log(status);
-                        console.log(info);
+                        $(cityInput).selectpicker('refresh');
+                        },
+                    error: function (jqXHR, textStatus, thrownError) {
+                        console.log(jqXHR);
+                        console.log('textStatus: ' + textStatus);
+                        console.log('hrownError: ' + thrownError);
+                        swal({
+                            type: 'error',
+                            title: 'Błąd ' + jqXHR.status,
+                            text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
+                        });
+                        $('#saveHotel').prop('disabled', false);
                     }
                 })
             });
 
-            //Walidacja Zapisu
-            $('#saveHotel').on('click', function() {
-                var name = $("#name").val();
-                //var price = $('#price').val();
-                var street = $('#street').val();
-                var voivode = $('#voivodeAdd').val();
-                var city = $('#cityAdd').val();
-                var comment = $('#comment').val();
-                var validate = true;
-                let hotelId = $('#hotelId').val();/*
-                let zipCode1 = $('#zipCode1').val();
-                let zipCode2 = $('#zipCode2').val();*/
-                let zipCode ='';
-                $('.zipCode').each(function( key, item ) {
-                    zipCode += item.value;
-                });
-                //let zipCode = zipCode1 + zipCode2;
-                if (zipCode.trim().length < 5) {
-                    validate = false;
-                    swal("Podaj kod pocztowy")
-                }
-
-                if (name.trim().length == 0) {
-                    swal('Wprowadź nazwę hotelu!')
-                    validate = false;
-                }
-                if (street.trim().length == 0) {
-                    swal('Wprowadź ulicę!')
-                    validate = false;
-                }
-                if (voivode == 0) {
-                    swal('Wybierz województwo!')
-                    validate = false;
-                }
-                if (city == 0 || city=='') {
-                    swal('Wybierz miasto!')
-                    validate = false;
-                }
-               /* if (price == 0) {
-                    swal('Wybierz cene za salę')
-                    validate = false;
-                }*/
-                if(validate) {
-                    $('#saveHotel').prop('disabled', true);
-                    $.ajax({
-                        type: "POST",
-                        url: "{{route('api.saveNewHotel')}}",
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        data: {
-                            'voivode': voivode,
-                            'name': name,
-                            //'price': price,
-                            'street': street,
-                            'city': city,
-                            'zipCode': zipCode,
-                            'hotelId': hotelId,
-                            'comment' : comment,
-                            'hotelStatus' : hotelStatus,
-                        },
-                        success: function (response) {
-                            $('#HotelModal').modal('hide');
-                            if (addNewHotelFlag) {
-                                $.notify({
-                                    icon: 'glyphicon glyphicon-ok',
-                                    message: 'Dodano nowy hotel <strong>' + name + '</strong>'
-                                }, {
-                                    type: "success"
-                                });
-                                addNewHotelFlag = false;
-                            }
-                            if (editHotelFlag) {
-                                $.notify({
-                                    icon: 'glyphicon glyphicon-ok',
-                                    message: 'Edytowano hotel <strong>' + name + '</strong>'
-                                }, {
-                                    type: "success"
-                                });
-                                editHotelFlag = false;
-                            }
-                            $('#saveHotel').prop('disabled', false);
-                        }
-                    })
-                }
-
-            });
 
             $('.zipCode').on('input', function(e){
-                console.log('input');
-                $thisZipCode = $(e.target);
-                $zipCodes = $('.zipCode');
-                $stringValue = String($thisZipCode.val()).replace('-', '');
-                $value = parseInt($stringValue);
+                let $thisZipCode = $(e.target);
+                let $zipCodes = $('.zipCode');
+                let $stringValue = String($thisZipCode.val()).replace('-', '');
+                let $value = parseInt($stringValue);
                 if (isNaN($value)) {
                         $thisZipCode.val('');
                 } else {
@@ -608,8 +685,8 @@
                 $(e.target).select();
             }).keyup(function (e) {
                 if(e.keyCode == 8 && $(e.target).val().length === 0){
-                    $zipCodes = $('.zipCode');
-                    $index = $zipCodes.index($(e.target)) - 1;
+                    let $zipCodes = $('.zipCode');
+                    let $index = $zipCodes.index($(e.target)) - 1;
                     if ($index >= 0) {
                         $($zipCodes.get($index)).focus();
                         $($zipCodes.get($index)).select();
@@ -617,61 +694,50 @@
                 }
             });
 
+            $('#addPhoneNumberButton').click(function (e) {
+                $(e.target).closest('.row').before(createNewHotelContact('hotelPhoneNumber'));
+            });
 
+            $('#addEmailButton').click(function (e) {
+                $(e.target).closest('.row').before(createNewHotelContact('hotelEmail'));
+            });
 
-            /**
-             * This function validate first zip code input
-             * @param e
-             */
-            function zipCode1Handler(e) {
-                let typedByUser = e.target.value;
-                let lastDigit = typedByUser.substr(typedByUser.length - 1, 1);
-                let wordUntilLastDigit = typedByUser.substr(0, typedByUser.length - 1);
-                let isANumber = !isNaN(lastDigit);
-                console.assert(isANumber === false || isANumber === true, "Variable isANumber is not boolean");
-
-                //check wether typed symbol is number, if false, cut value to previous state
-                if(isANumber === false) {
-                    e.target.value = wordUntilLastDigit;
+            $('#invoiceTemplate').change(function(e){
+                let allowedExtensions = <?php echo $validHotelInvoiceTemplatesExtensions; ?>;
+                console.log(allowedExtensions);
+                if(allowedExtensions.indexOf(getFileExtension($(e.target).prop('files')[0].name)) === -1){
+                    $(e.target).val('');
+                    swal({
+                        title: 'Zły format pliku',
+                        text: 'Dostępne formaty: '+allowedExtensions.toString(),
+                        type: 'warning'
+                    });
                 }
+            });
 
-                //check wether length = 2 and is only digit
-                if(typedByUser.length == 2 && isANumber === true) {
-                    zipCode2.focus();
-                }
-                else if(typedByUser.length > 2) { //if value is > 2, if true cut to only 2
-                    e.target.value = wordUntilLastDigit;
-                }
-            }
+            $('#newHotelForm').submit(function (e) {
+                e.preventDefault();
+                saveNewHotel().then(function(){
+                    //let orderFileInput = $('#order');
+                    let invoiceTemplateFileInput = $('#invoiceTemplate');
+                    /*if(orderFileInput.prop("files").length !== 0){
+                        formData.append(orderFileInput.prop('name'), orderFileInput.prop("files")[0]);
+                        uploadFiles = true;
+                    }*/
+                    let formData = new FormData();
+                    let uploadFiles = false;
+                    if(invoiceTemplateFileInput.prop("files").length !== 0){
+                        let fileNames = [];
+                        formData.append(invoiceTemplateFileInput.prop('name'), invoiceTemplateFileInput.prop("files")[0]);
+                        fileNames.push(invoiceTemplateFileInput.prop('name'));
+                        uploadFiles = true;
 
-            /**
-             * This function validate second zip code input
-             * @param e
-             */
-            function zipCode2Handler(e) {
-                let typedByUser = e.target.value;
-                let lastDigit = typedByUser.substr(typedByUser.length - 1, 1);
-                let wordUntilLastDigit = typedByUser.substr(0, typedByUser.length - 1);
-                let isANumber = !isNaN(lastDigit);
-                console.assert(isANumber === false || isANumber === true, "Variable isANumber is not boolean");
-
-                //check wether typed symbol is number, if false, cut value to previous state
-                if(isANumber === false) {
-                    e.target.value = wordUntilLastDigit;
-                }
-
-                //check wether length = 3 and is only digit
-                if(typedByUser.length == 3 && isANumber === true) {
-                    zipCode2.blur();
-                }
-                else if(typedByUser.length > 3) { //if value is > 3, if true cut to only 3
-                    e.target.value = wordUntilLastDigit;
-                }
-            }
-
-            /*
-            zipCode1.addEventListener('input', zipCode1Handler);
-            zipCode2.addEventListener('input', zipCode2Handler);*/
+                        formData.append('fileNames', JSON.stringify(fileNames));
+                    }
+                    if(uploadFiles)
+                        uploadFilesAjax(formData);
+                });
+            });
 
             $('#voivode').select2();
             $('#city').select2();
@@ -698,6 +764,171 @@
                 table.ajax.reload();
             });
 
+            function downloadFilesAjax(hotel_id){
+                swal({
+                    title: 'Wysyłanie żądania pobrania pliku...',
+                    text: 'To może chwilę potrwać',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    allowEnterKey: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                        $.ajax({
+                            type: "POST",
+                            url: "{{route('api.downloadHotelFilesAjax')}}",
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            data: {'hotel_id': hotel_id}
+                        }).done(function (response){
+                            console.log(response);
+                            swal.close();
+                        }).error(function (jqXHR, textStatus, thrownError) {
+                            swal.close();
+                            console.log(jqXHR);
+                            console.log('textStatus: ' + textStatus);
+                            console.log('hrownError: ' + thrownError);
+                            swal({
+                                type: 'error',
+                                title: 'Błąd ' + jqXHR.status,
+                                text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
+                            });
+                        });
+                    }
+                });
+            }
+
+            function uploadFilesAjax(formData, fileNames){
+                swal({
+                    title: 'Wysyłanie pliku...',
+                    text: 'To może chwilę potrwać',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    allowEnterKey: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                        $.ajax({
+                            type: "POST",
+                            url: "{{route('api.uploadHotelFilesAjax')}}",
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            contentType: false,
+                            processData: false,
+                            data: formData
+                        }).done(function (response){
+                            swal.close();
+                            if(response === 'success' ){
+                                $.notify({
+                                    icon: 'glyphicon glyphicon-ok',
+                                    message: 'Wysłano szablon faktury <strong>' + $("#name").val() + '</strong>'
+                                }, {
+                                    type: "success"
+                                });
+                            }else if(response === 'fail'){
+                                $.notify({
+                                    icon: 'glyphicon glyphicon-ok',
+                                    message: 'Nie udało się wysłać szablonu faktury <strong>' + $("#name").val() + '</strong>'
+                                }, {
+                                    type: "danger"
+                                });
+                            }
+                        }).error(function (jqXHR, textStatus, thrownError) {
+                            swal.close();
+                            console.log(jqXHR);
+                            console.log('textStatus: ' + textStatus);
+                            console.log('hrownError: ' + thrownError);
+                            swal({
+                                type: 'error',
+                                title: 'Błąd ' + jqXHR.status,
+                                text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
+                            });
+                            $('#saveHotel').prop('disabled', false);
+                        });
+                    }
+                    });
+            }
+
+            function fillHotelInformations(response, preview = false){
+                editHotelFlag = true;
+
+                let hotel = response.hotel;
+
+                $('#hotelId').val(hotel.id);
+                let invoiceTemplatePath = hotel.invoice_template_path;
+
+                //create container with invoice template filename if exists
+                if(invoiceTemplatePath !== ""){
+                    let fileLabel = $(document.createElement('label')).text('Szablon faktury');
+                    let fileSpan = $(document.createElement('span')).addClass('glyphicon glyphicon-file');
+                    //let buttonDownloadInvoice = $(document.createElement('button')).prop('type','button').addClass('btn btn-default').prop('id','downloadInvoiceTemplate').text(' Pobierz').prepend(fileSpan);
+                    let buttonDownloadInvoice = $(document.createElement('a')).attr('href','/downloadHotelFiles/'+hotel.id).addClass('btn btn-default').prop('id','downloadInvoiceTemplate').text(' Pobierz').prepend(fileSpan);
+
+                    let buttonSpanAddon = $(document.createElement('span')).addClass('input-group-btn').append(buttonDownloadInvoice);
+                    let fileInput = $(document.createElement('input')).addClass('form-control').prop('type','text').prop('readonly', true).val(invoiceTemplatePath);
+                    let inputGroup = $(document.createElement('div')).addClass('input-group').append(buttonSpanAddon).append(fileInput);
+                    let fileColumn = $(document.createElement('div')).addClass('col-md-4 invoiceTemplateFile').append(fileLabel).append(inputGroup);
+                    $('div.col-md-4').has('#invoiceTemplate').after(fileColumn);
+                }
+
+                $("#name").val(hotel.name);
+                //$('#price').val(response.price);
+                $('#street').val(hotel.street);
+                hotelStatus = hotel.status;
+                $('#voivodeAdd').val(hotel.voivode_id);
+                $('#comment').val(hotel.comment);
+                $('#paymentMethod').val(hotel.payment_method_id == null ? 0 : hotel.payment_method_id);
+                $('#parking').val(hotel.parking == null ? -1 : hotel.parking);
+                $('#hourBid').val(hotel.hour_bid);
+                $('#dailyBid').val(hotel.daily_bid);
+                $('#clientsExceptions').val(response.clientsExceptions);
+
+
+                $('#paymentMethod').selectpicker('refresh');
+                $('#parking').selectpicker('refresh');
+                $('#clientsExceptions').selectpicker('refresh');
+
+                zipCode = String(hotel.zip_code);
+                if (zipCode != "null") {
+                    length = zipCode.length;
+                    for (var i = 0; i < 5 - length; i++) {
+                        zipCode = "0".concat(zipCode);
+                    }
+                    let zipCodeInputs = $('.zipCode');
+                    for (var i = 0; i < 5; i++)
+                        $(zipCodeInputs.get(i)).val(zipCode.slice(i, i + 1));
+                }
+                else {
+                    $('.zipCode').val('');
+                }
+
+                let contacts = response.contacts;
+                let isPhoneNumber = false;
+                let isEmail = false;
+                $.each(contacts, function (index, contact) {
+                    var contactData = {
+                        id: contact.id,
+                        value: contact.contact,
+                        suggested: contact.suggested === 1
+                    };
+                    if (contact.type === 'mail') {
+                        $('#addEmailButton').closest('.row').before(createNewHotelContact('hotelEmail', contactData, preview));
+                        isEmail = true;
+                    }
+                    if (contact.type === 'phone') {
+                        $('#addPhoneNumberButton').closest('.row').before(createNewHotelContact('hotelPhoneNumber', contactData, preview));
+                        isPhoneNumber = true;
+                    }
+                });
+
+                if (!isEmail && !preview)
+                    $('#addEmailButton').closest('.row').before(createNewHotelContact('hotelEmail'));
+                if (!isPhoneNumber && !preview)
+                    $('#addPhoneNumberButton').closest('.row').before(createNewHotelContact('hotelPhoneNumber'));
+                city = hotel.city_id;
+                $('#voivodeAdd').trigger("change");
+            }
+
             function clearSelection(element) {
                 if(element == 'city') {
                     $('#city').val(null).trigger('change');
@@ -708,5 +939,264 @@
 
             }
         });
+
+        function getFileExtension(fname) {
+            return fname.slice((fname.lastIndexOf(".") - 1 >>> 0) + 2);
+        }
+
+        //Walidacja Zapisu
+        function saveNewHotel() {
+            var name = $("#name").val();
+            //var price = $('#price').val();
+            var street = $('#street').val();
+            var voivode = $('#voivodeAdd').val();
+            var city = $('#cityAdd').val();
+            var comment = $('#comment').val();
+            var validate = true;
+            let parking = $('#parking').val();
+            let paymentMethodId = $('#paymentMethod').val();
+            let dailyBid = $('#dailyBid').val();
+            let hourBid = $('#hourBid').val();
+            let hotelId = $('#hotelId').val();
+
+
+            let zipCode ='';
+            $('.zipCode').each(function( key, item ) {
+                zipCode += item.value;
+            });
+
+            if (zipCode.trim().length < 5) {
+                validate = false;
+                swal("Podaj kod pocztowy");
+            }
+
+            if(parking == -1){
+                swal('Wybierz pole z parkingiem');
+                validate = false;
+            }
+            if(paymentMethodId == 0){
+                swal('Wybierz formę płatności');
+                validate = false;
+            }
+            if (name.trim().length == 0) {
+                swal('Wprowadź nazwę hotelu!');
+                validate = false;
+            }
+            if (street.trim().length == 0) {
+                swal('Wprowadź ulicę!');
+                validate = false;
+            }
+            if (voivode == 0) {
+                swal('Wybierz województwo!');
+                validate = false;
+            }
+            if (city == 0 || city=='') {
+                swal('Wybierz miasto!');
+                validate = false;
+            }
+            if (dailyBid == 0) {
+                swal('Wybierz stawkę dzienną');
+                validate = false;
+            }
+
+            if (hourBid == 0) {
+                swal('Wybierz stawkę godzinową');
+                validate = false;
+            }
+
+            $('.hotelPhoneNumber').each(function(key, item){
+                if(item.value === ''){
+                    swal("Wpisz numery telefonów do wszystkich pól");
+                    validate = false;
+                    return false;
+                }else if(isNaN(item.value)){
+                    swal("Podane numery muszą być w formacie liczbowym");
+                    validate = false;
+                    return false;
+                }else if(String(item.value).length !== 9){
+                    swal("Numery muszą składać się z 9 cyfr");
+                    validate = false;
+                    return false;
+                }
+            });
+            $('input[name="hotelPhoneNumber"]').each(function(key, item){
+                if(item.checked == true){
+                    return false;
+                }
+                if(key == $('input[name="hotelPhoneNumber"]').size()-1) {
+                    swal("Zaznacz sugerowany numer telefonu");
+                    validate = false;
+                }
+            });
+
+            $('.hotelEmail').each(function(key, item){
+                if(item.value === ''){
+                    swal("Wpisz maile do wszystkich pól");
+                    validate = false;
+                    return false;
+                }else{
+                    var re = /\S+@\S+\.\S+/;
+                    if(! re.test(item.value)){
+                        swal("Podane maile muszą być w odpowiednim formacie");
+                        validate = false;
+                        return false;
+                    }
+                }
+            });
+
+            $('input[name="hotelEmail"]').each(function(key, item){
+                if(item.checked == true){
+                    return false;
+                }
+                if(key == $('input[name="hotelEmail"]').size()-1) {
+                    swal("Zaznacz sugerowany email");
+                    validate = false;
+                }
+            });
+
+            if(validate) {
+                saveHotelFlag = true;
+                $('#saveHotel').prop('disabled', true);
+                let phones = [];
+                let emails = [];
+                $('.mailsContainer .contact .input-group').each(function(key, item){
+                    let radio = $(item).find('input[name="hotelEmail"]');
+                    let email = $(item).find('.hotelEmail');
+                    emails.push({id:email.data('id'), new: email.data('new'), value: email.val(), suggested: radio.prop('checked')});
+                });
+                $('.phonesContainer .contact .input-group').each(function(key, item){
+                    let radio = $(item).find('input[name="hotelPhoneNumber"]');
+                    let phone = $(item).find('.hotelPhoneNumber');
+                    phones.push({id:phone.data('id'), new: phone.data('new'), value: phone.val(), suggested: radio.prop('checked')});
+                });
+
+                return $.ajax({
+                    type: "POST",
+                    url: "{{route('api.saveNewHotel')}}",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        'voivode':      voivode,
+                        'name':         name,
+                        //'price': price,
+                        'street':       street,
+                        'city':         city,
+                        'zipCode':      zipCode,
+                        'hotelId':      hotelId,
+                        'comment' :     comment,
+                        'hotelStatus' : hotelStatus,
+                        'dailyBid':     dailyBid,
+                        'hourBid' :     hourBid,
+                        'paymentMethodId': paymentMethodId,
+                        'parking' :     parking,
+                        phones : phones,
+                        emails : emails,
+                        clientsExceptions : $('#clientsExceptions').val()
+                    },
+                    error: function (jqXHR, textStatus, thrownError) {
+                        console.log(jqXHR);
+                        console.log('textStatus: ' + textStatus);
+                        console.log('hrownError: ' + thrownError);
+                        swal({
+                            type: 'error',
+                            title: 'Błąd ' + jqXHR.status,
+                            text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
+                        });
+                        $('#saveHotel').prop('disabled', false);
+                    }
+                }).done(function (response) {
+                    $('#HotelModal').modal('hide');
+                    if (addNewHotelFlag) {
+                        $.notify({
+                            icon: 'glyphicon glyphicon-ok',
+                            message: 'Dodano nowy hotel <strong>' + name + '</strong>'
+                        }, {
+                            type: "success"
+                        });
+                        addNewHotelFlag = false;
+                    }
+                    if (editHotelFlag) {
+                        $.notify({
+                            icon: 'glyphicon glyphicon-ok',
+                            message: 'Edytowano hotel <strong>' + name + '</strong>'
+                        }, {
+                            type: "success"
+                        });
+                        editHotelFlag = false;
+                    }
+                    $('#saveHotel').prop('disabled', false);
+                });
+            }
+        }
+
+        /**
+         * Method creates container with radio box, input and removal button
+         *
+         * @param className - class name of generated inputs
+         * @param data - data  example  { id:[val], value:[val], suggested:[val]}
+         * @returns {*|jQuery} DOM element
+         */
+        function createNewHotelContact(className, data = null, preview = false){
+            let placeHolder = '';
+            if(className == 'hotelPhoneNumber')
+                placeHolder = 'Wpisz numer telefonu';
+            if(className == 'hotelEmail')
+                placeHolder = 'Wpisz adres email';
+
+            var inputs = $('.'+className);
+
+            let radioInput = $(document.createElement('input')).prop('type','radio').prop('name',className);
+            let radioSpan = $(document.createElement('span')).addClass('input-group-addon').append(radioInput);
+            let newContactInput = $(document.createElement('input')).addClass('form-control').addClass(className).prop('placeholder', placeHolder);
+            let inputGroup = $(document.createElement('div')).addClass('input-group').append(radioSpan).append(newContactInput);
+
+            let newContactColumn = $(document.createElement('div')).addClass('col-md-10').append(inputGroup);
+
+            let newContainer = $(document.createElement('div')).addClass('row contact').css('margin-top','1em').append(newContactColumn);
+            if(inputs.size() === 0)
+                radioInput.prop('checked', true);
+            else if(!preview){
+                let span = $(document.createElement('span')).addClass('glyphicon glyphicon-minus');
+                let button = $(document.createElement('button')).addClass('btn btn-danger btn-block').prop('type','button').append(span).click(removeHotelContact);
+                let buttonColumn = $(document.createElement('div')).addClass('col-md-2').append(button);
+                newContainer.append(buttonColumn);
+            }
+            if(data !== null){
+                radioInput.data('id', data.id);
+                radioInput.prop('checked', data.suggested);
+                radioInput.prop('readonly', preview);
+                radioInput.attr('data-new', false);
+                newContactInput.data('id', data.id);
+                newContactInput.val(data.value);
+                newContactInput.attr('data-new', false);
+                newContactInput.prop('readonly', preview);
+
+            }else{
+                radioInput.data('id', 'new_'+(inputs.size()+1));
+                radioInput.attr('data-new', true);
+                newContactInput.data('id', 'new_'+(inputs.size()+1));
+                newContactInput.attr('data-new', true);
+            }
+
+            return newContainer;
+        }
+
+        /**
+         * Function remove contact inputs after alert confirmation
+         */
+        function removeHotelContact(){
+            swal({
+                title: 'Czy na pewno?',
+                text: "Wybrany kontakt zostanie usunięty",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Tak, usuń!'
+            }).then((result) => {
+                if (result.value) {
+                    $(this).closest('.row').remove();
+                }
+            });
+        }
     </script>
 @endsection
