@@ -31,7 +31,6 @@ class CandidateController extends Controller
      * Zwraca dane wszystkich kandydatow
      */
     public function datatableShowCandidates(Request $request) {
-
         $data = DB::table('candidate')
             ->select(DB::raw('
                 candidate.id,
@@ -42,29 +41,17 @@ class CandidateController extends Controller
                 users.first_name as cadre_name,
                 users.last_name as cadre_surname,
                 attempt_status.name as attempt_name,
-                0 as last_edit_user_name,
+                case when candidate.attempt_status_id = 1 then "Przygotowanie do rekrutacji" else Concat(infoHow.first_name," " ,infoHow.last_name) end as last_edit_user_name,
                 candidate.cadre_id
             '))
             ->join('users', 'users.id', 'candidate.cadre_id')
+            ->leftjoin('recruitment_attempt','recruitment_attempt.candidate_id','candidate.id')
+            ->leftjoin('users as infoHow', 'infoHow.id', 'recruitment_attempt.cadre_id')
             ->join('attempt_status', 'attempt_status.id', 'candidate.attempt_status_id')
             ->whereBetween('candidate.created_at', [$request->fromDate, $request->toDate . ' 23:59:59'])
             ->orderBy('candidate.last_name')
             ->get();
-        $allRecruitemtStory = RecruitmentAttempt::whereIn('candidate_id',$data->pluck('id')->toArray())->orderByDesc('created_at')->get();
-        $users = User::whereIn('id',$data->pluck('cadre_id')->toArray())->get();
-        $data->map(function ($item) use ($allRecruitemtStory,$users){
-            $userEdit = $allRecruitemtStory->where('candidate_id','=',$item->id)->first();
-            if(is_object($userEdit)){
-                $userEdit = $users->find($userEdit->cadre_id);
-                $item->last_edit_user_name = $userEdit->first_name.' '.$userEdit->last_name;
-            }
-            else{
-                $userEdit = 'Brak informacji';
-                $item->last_edit_user_name = $userEdit;
-            }
-            return $item;
-        });
-        return datatables($data)->make(true);
+        return datatables($data->sortbyDesc('id')->unique('id'))->make(true);
     }
 
     /**
@@ -76,32 +63,18 @@ class CandidateController extends Controller
 
         $data = DB::table('candidate')
             ->select(DB::raw('
-                candidate.*,
+               candidate.*,
                 attempt_status.name as attempt_name,
-                0 as last_edit_user_name
+                case when candidate.attempt_status_id = 1 then "Przygotowanie do rekrutacji" else Concat(infoHow.first_name," " ,infoHow.last_name) end as last_edit_user_name
             '))
+            ->join('users', 'users.id', 'candidate.cadre_id')
+            ->leftjoin('recruitment_attempt','recruitment_attempt.candidate_id','candidate.id')
+            ->leftjoin('users as infoHow', 'infoHow.id', 'recruitment_attempt.cadre_id')
             ->join('attempt_status', 'attempt_status.id', 'candidate.attempt_status_id')
-            ->orderBy('candidate.last_name')
             ->where('candidate.cadre_id', '=', $id)
+            ->orderBy('candidate.last_name')
             ->get();
-
-        $allRecruitemtStory = RecruitmentAttempt::whereIn('candidate_id',$data->pluck('id')->toArray())->orderByDesc('created_at')->get();
-        $users = User::all();
-
-        $data->map(function ($item) use ($allRecruitemtStory,$users){
-            $userEdit = $allRecruitemtStory->where('candidate_id','=',$item->id)->first();
-            if(is_object($userEdit)){
-                $userEdit = $users->find($userEdit->cadre_id);
-                $item->last_edit_user_name = $userEdit->first_name.' '.$userEdit->last_name;
-            }
-            else{
-                $userEdit = 'Brak informacji';
-                $item->last_edit_user_name = $userEdit;
-            }
-            return $item;
-        });
-
-        return datatables($data)->make(true);
+        return datatables($data->sortbyDesc('id')->unique('id'))->make(true);
     }
 
     /**

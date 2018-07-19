@@ -245,9 +245,23 @@ Route::post('/findCity', 'CrmRouteController@findCity')->name('api.findCity');
 Route::post('/findHotel', 'CrmRouteController@findHotel')->name('api.findHotel');
 Route::POST('/saveNewCity','CrmRouteController@saveNewCity')->name('api.saveNewCity');
 Route::POST('/saveNewHotel','CrmRouteController@saveNewHotel')->name('api.saveNewHotel');
+Route::POST('/uploadHotelFilesAjax', 'CrmRouteController@uploadHotelFilesAjax')->name('api.uploadHotelFilesAjax');
+Route::POST('/downloadHotelFilesAjax', 'CrmRouteController@downloadHotelFilesAjax')->name('api.downloadHotelFilesAjax');
 Route::POST('/changeStatusHotel','CrmRouteController@changeStatusHotel')->name('api.changeStatusHotel');
 
 Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
+Route::post('/getGiftType', 'ClientController@getGiftType')->name('api.getGiftType');
+Route::post('/getMeetingType', 'ClientController@getMeetingType')->name('api.getMeetingType');
+
+Route::post('/saveNewGift', 'ClientController@saveNewGift')->name('api.saveNewGift');
+Route::post('/saveNewMeeting', 'ClientController@saveNewMeeting')->name('api.saveNewMeeting');
+
+Route::post('/changeGiftStatus', 'ClientController@changeGiftStatus')->name('api.changeGiftStatus');
+Route::post('/changeMeetingStatus', 'ClientController@changeMeetingStatus')->name('api.changeMeetingStatus');
+
+Route::post('/editGift', 'ClientController@editGift')->name('api.editGift');
+Route::POST('/editMeeting','ClientController@editMeeting')->name('api.editMeeting');
+
 Route::post('/findClient', 'ClientController@findClient')->name('api.findClient');
 Route::POST('/changeStatusClient','ClientController@changeStatusClient')->name('api.changeStatusClient');
 
@@ -862,6 +876,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/addNewHotel', 'CrmRouteController@addNewHotelGet');
     Route::post('/addNewHotel', 'CrmRouteController@addNewHotelPost');
     Route::get('/showHotels', 'CrmRouteController@showHotelsGet')->name('showHotels');
+    Route::get('/downloadHotelFiles/{id}', 'CrmRouteController@downloadHotelFiles');
     Route::get('/hotel/{id}', 'CrmRouteController@hotelGet');
     Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
 
@@ -914,9 +929,9 @@ Route::get('/pbx_crm_info', 'PBXDataAPI@pbx_crm_info');
 ///
 ///
 //COACHINGS
-Route::get('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryGet'); //do usunięcia, stary
-Route::post('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryPost');//do usunięcia, stary
-Route::get('/ReportCoachingSummary', 'StatisticsController@MailReportCoachingSummary'); //do usunięcia, stary
+//Route::get('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryGet'); //do usunięcia, stary
+//Route::post('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryPost');//do usunięcia, stary
+//Route::get('/ReportCoachingSummary', 'StatisticsController@MailReportCoachingSummary'); //do usunięcia, stary
 
 Route::get('/ReportCoaching', 'StatisticsController@MailpageReportCoaching');
 Route::get('/MailToDirectors', 'StatisticsController@MailToEveryDirector');
@@ -929,6 +944,9 @@ Route::get('/progress_table_manager_for_all', 'CoachingController@progress_table
 
 Route::get('/addNewCampaigns', 'CampaignsController@addNewCampaignsGet');
 Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
+
+//Skrypty
+Route::get('/autoChangeRouteStatus', 'AutoScriptController@autoChangeRouteStatus');
 
 Route::get('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplateGet');
 Route::post('/getVoivodeshipRoundWithoutGracePeriodAjax', 'CrmRouteController@getVoivodeshipRoundWithoutGracePeriodAjax')->name('api.getVoivodeshipRoundWithoutGracePeriod');
