@@ -747,6 +747,138 @@
                     const removeShowButton = e.target;
                     const showContainer = removeShowButton.closest('.singleShowContainer');
                     const dayContainer = removeShowButton.closest('.singleDayContainer');
+                    const allDayContainers = document.getElementsByClassName('singleDayContainer');
+
+                    let prevDayFlag = undefined; //true - another day, false - same day
+                    let grandPrevDayFlag = undefined; //true - another day, false - same day
+                    let nextShowFlag = undefined; //true - another day, false - same day
+
+                    const dayExistenceArray = checkingExistenceOfPrevAndNextContainers(dayContainer, 'singleDayContainer');
+                    const showExistenceArray = checkingExistenceOfPrevAndNextContainers(showContainer, 'singleShowContainer');
+
+                    if(showExistenceArray[0]) { //case when previous container exist
+                        let prevShowContainer = showExistenceArray[0];
+                        let dayContOfPrevShowContainer = prevShowContainer.closest('.singleDayContainer');
+                        prevDayFlag = dayContainer == dayContOfPrevShowContainer ? false : true; //checking if next show is in the same day container
+
+                        let prevShowExistenceArr = checkingExistenceOfPrevAndNextContainers(prevShowContainer, 'singleShowContainer');
+                        let grandPrevCont = null;
+                        if(prevShowExistenceArr[0]) {
+                            grandPrevCont = prevShowExistenceArr[0];
+                        }
+
+                        if(grandPrevCont) { // grandprev container exist
+                            let dayContOfGrandPrevShowContainer = grandPrevCont.closest('.singleDayContainer');
+                            grandPrevDayFlag = dayContOfPrevShowContainer == dayContOfGrandPrevShowContainer ? false : true; //checking if next show is in the same day container
+                        }
+
+                        let nextShowContainer = null;
+
+                        if(showExistenceArray[1]) {
+                            nextShowContainer = showExistenceArray[1];
+                        }
+
+                        if(nextShowContainer) {
+                            let dayContOfNextShowContainer = nextShowContainer.closest('.singleDayContainer');
+                            nextShowFlag = dayContOfPrevShowContainer == dayContOfNextShowContainer ? false : true; //checking if next show is in the same day container
+                        }
+
+                        //main part
+                        if(prevDayFlag) { //prev container is in previous day
+                            if(grandPrevCont) { //grandprev container exist
+                                if(grandPrevDayFlag) { //grandprev is in grand previous day
+                                    if(nextShowContainer) { //next container exist
+                                        if(nextShowFlag) { //next container is in another day
+                                            console.log('prev exist & prev day, grandprev exist & grandprev is in grandprevday, nextshowcontaierExist & in another day');
+                                            removeBetween(grandPrevCont, nextShowContainer, prevShowContainer);
+                                        }
+                                        else { //next container is in the same day
+                                            console.log('prev exist & prev day, grandprev exist & grandprev is in grandprevday, nextshowcontaierExist & in same day');
+                                        }
+                                    }
+                                    else { //next container doesn't exist
+                                        console.log('prev exist & prev day, grandprev exist & grandprev is in grandprevday, nextshowcontaier doesnt exist');
+                                    }
+
+                                }
+                                else { //grandprev is in previous day(same as previousShowContainer)
+                                    if(nextShowContainer) { //next container exist
+                                        if(nextShowFlag) { //next container is in another day
+                                            console.log('prev exist & prev day, grandprev exist & grandprev is same day as prev, nextshowcontaier Exist & in another day');
+                                        }
+                                        else { //next container is in the same day
+                                            console.log('prev exist & prev day, grandprev exist & grandprev is same day as prev, nextshowcontaier Exist & in same day');
+                                        }
+                                    }
+                                    else { //next container doesn't exist
+                                        console.log('prev exist & prev day, grandprev exist & grandprev is same day as prev, nextshowcontaier doesnt Exist');
+                                    }
+                                }
+                            }
+                            else { //grandprev doesn't exist
+                                if(nextShowContainer) { //next container exist
+                                    if(nextShowFlag) { //next container is in another day
+                                        console.log('prev exist & prev day, grandprev doesnt exist, nextshowcontaier Exist & in another day');
+                                    }
+                                    else { //next container is in the same day
+                                        console.log('prev exist & prev day, grandprev doesnt exist, nextshowcontaier Exist & in same day');
+                                    }
+                                }
+                                else { //next container doesn't exist
+                                    console.log('prev exist & prev day, grandprev doesnt exist, nextshowcontaier doesnt Exist');
+                                }
+                            }
+                        }
+                        else { //prev container is in the same day
+                            if(grandPrevCont) { // grandprev container exist
+                                if(grandPrevDayFlag) { //grandprev is in grand previous day
+                                    if(nextShowContainer) { //next container exist
+                                        if(nextShowFlag) { //next container is in another day
+                                            console.log('prev exist & same day, grandprev exist & grandprev is in grandprevday, nextshowcontaier exist & in another day');
+                                        }
+                                        else { //next container is in the same day
+                                            console.log('prev exist & same day, grandprev exist & grandprev is in grandprevday, nextshowcontaier exist & in same day');
+                                        }
+                                    }
+                                    else { //next container doesn't exist
+                                        console.log('prev exist & same day, grandprev exist & grandprev is in grandprevday, nextshowcontaier doesnt exist');
+                                    }
+                                }
+                                else { //grandprev is in previous day(same as previousShowContainer)(all containers are in same day container case)
+                                    if(nextShowContainer) { //next container exist
+                                        if(nextShowFlag) { //next container is in another day
+                                            console.log('prev exist & same day, grandprev exist & grandprev is prev day, nextshowcontaier Exist & in another day');
+                                        }
+                                        else { //next container is in the same day
+                                            console.log('prev exist & same day, grandprev exist & grandprev is prev day, nextshowcontaier Exist & in same day');
+                                        }
+                                    }
+                                    else { //next container doesn't exist
+                                        console.log('prev exist & same day, grandprev exist & grandprev is prev day, nextshowcontaier doesnt exist');
+                                    }
+                                }
+                            }
+                            else { //grandprev container doesn't exist
+                                if(nextShowContainer) { //next container exist
+                                    if(nextShowFlag) { //next container is in another day
+                                        console.log('grandprev doesnt exist, next exist and another day');
+                                    }
+                                    else { //next container is in the same day
+                                        console.log('grandprev doesnt exist, next exist and same day');
+                                    }
+                                }
+                                else { //next container doesn't exist
+                                    console.log('grandprev doesnt exist, next doesnt exist');
+                                }
+                            }
+                        }
+
+                    }
+
+                    if(showExistenceArray[1]) { //case when next container exist
+
+                    }
+
                     const allRemoveButtons = dayContainer.getElementsByClassName('remove-button');
                     console.assert(allRemoveButtons, "Brak przycisków usuń");
                     if(allRemoveButtons.length > 1) { //delete only show box
@@ -1018,6 +1150,81 @@
 
             document.addEventListener('click', globalClickHandler);
             document.addEventListener('change', globalChangeHandler);
+
+
+            function removeBetween(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr = null) {
+                const grandNextShowContainerCitySelect = grandNextShowContainer.querySelector('.citySelect');
+                const grandNextShowContainerCityDistance = grandNextShowContainerCitySelect.dataset.distance;
+                let grandNextShowContainerCityId = null;
+                if(grandNextShowContainerCitySelect.options[grandNextShowContainerCitySelect.selectedIndex].value) {
+                    grandNextShowContainerCityId = grandNextShowContainerCitySelect.options[grandNextShowContainerCitySelect.selectedIndex].value;
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach");
+                    return false;
+                }
+
+                const thisSingleShowContainerCitySelect = thisSingleShowContainer.querySelector('.citySelect');
+                const thisSingleShowContainerCitySelectCityDistance = thisSingleShowContainerCitySelect.dataset.distance;
+                let thisSingleShowContainerCityId = null;
+                if(thisSingleShowContainerCitySelect.options[thisSingleShowContainerCitySelect.selectedIndex].value) {
+                    thisSingleShowContainerCityId = thisSingleShowContainerCitySelect.options[thisSingleShowContainerCitySelect.selectedIndex].value;
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach");
+                    return false;
+                }
+
+                const nextShowContainerCitySelect = nextShowContainer.querySelector('.citySelect');
+                let nextShowContainerCityid = null;
+                if(nextShowContainerCitySelect.options[nextShowContainerCitySelect.selectedIndex].value) {
+                    nextShowContainerCityid = nextShowContainerCitySelect.options[nextShowContainerCitySelect.selectedIndex].value;
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach");
+                    return false;
+                }
+                let nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
+                let nextShowContainerVoivodeId = null;
+                if(nextShowContainerVoivodeSelect.options[nextShowContainerVoivodeSelect.selectedIndex].value) {
+                    nextShowContainerVoivodeId = nextShowContainerVoivodeSelect.options[nextShowContainerVoivodeSelect.selectedIndex].value;
+                }
+                else {
+                    notify("Wybierz województwa we wszystkich listach");
+                    return false;
+                }
+
+                if((grandNextShowContainerCitySelect.length == 0 || grandNextShowContainerCityId == 0) ||
+                    (thisSingleShowContainerCitySelect.length == 0 || thisSingleShowContainerCityId == 0) ||
+                    (nextShowContainerCitySelect.length == 0  || nextShowContainerCityid == 0) ||
+                    (nextShowContainerVoivodeSelect.length == 0 || nextShowContainerVoivodeId == 0)) {
+                    notify("Wybierz miasta i województwa we wszystkich listach");
+                    return false;
+                }
+
+                let oldValuesArray = [nextShowContainerVoivodeSelect, nextShowContainerVoivodeId, nextShowContainerCitySelect, nextShowContainerCityid];
+
+                $(nextShowContainerVoivodeSelect).off();
+
+                // nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
+                nextShowContainerVoivodeSelect.innerHTML = '';
+                nextShowContainerCitySelect.innerHTML = '';
+
+                if(changeDistanceArr[0]) {
+                    if(changeDistanceArr[1]) {
+                        showInTheMiddleAjax(changeDistanceArr[0],grandNextShowContainerCityId,changeDistanceArr[1],thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
+
+                    }
+                    else {
+                        showInTheMiddleAjax(changeDistanceArr[0],grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
+                    }
+                }
+                else {
+                    showInTheMiddleAjax(grandNextShowContainerCityDistance,grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
+                }
+            }
+
+
 
             function limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr = null) {
                 const grandNextShowContainerCitySelect = grandNextShowContainer.querySelector('.citySelect');
