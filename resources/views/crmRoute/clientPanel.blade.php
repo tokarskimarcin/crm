@@ -2,8 +2,8 @@
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
     <style>
-        .button-edit-gift,.button-gift-status,.button-edit-meeting,.button-status-meeting{
-            width: max-content;
+        .nameHead{
+            width: 100%;
         }
     </style>
 @endsection
@@ -81,7 +81,7 @@
                                                 <table id="giftTable" class="thead-inverse table table-striped row-border" cellspacing="0" width="100%">
                                                     <thead>
                                                     <tr>
-                                                        <th>Nazwa</th>
+                                                        <th style="width: 100%">Nazwa</th>
                                                         <th>Edycja</th>
                                                         <th>Włącz/Wyłącz</th>
                                                     </tr>
@@ -113,7 +113,7 @@
                                                 <table id="meetingTable" class="thead-inverse table table-striped row-border" cellspacing="0" width="100%">
                                                     <thead>
                                                     <tr>
-                                                        <th>Nazwa</th>
+                                                        <th class="name">Nazwa</th>
                                                         <th>Edycja</th>
                                                         <th>Włącz/Wyłącz</th>
                                                     </tr>
@@ -294,7 +294,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+                <button type="button" class="btn btn-default" id="closeModalBTN" data-dismiss="modal">Zamknij</button>
             </div>
         </div>
     </div>
@@ -341,6 +341,7 @@
             if(type == 'Edit'){
                 $('#ModalClient .modal-title').first().text('Edycja klienta');
                 let saveClientModalButton = $('#ModalClient #saveClient');
+                $("#ModalClient :input").prop("disabled", false);
                 saveClientModalButton.first().show();
                 saveClientModalButton.first().prop('class','btn btn-success form-control');
                 saveClientModalButton.first().text('');
@@ -349,9 +350,13 @@
             }else if(type == 'Show'){
                 $('#ModalClient .modal-title').first().text('Informacje o kliencie');
                 let saveClientModalButton = $('#ModalClient #saveClient');
+                $("#ModalClient :input").prop("disabled", true);
+                $("#closeModalBTN").prop("disabled", false);
+
                 saveClientModalButton.first().hide();
             }else if (type == 'Add'){
                 $('#ModalClient .modal-title').first().text('Nowy klient');
+                $("#ModalClient :input").prop("disabled", false);
                 let saveClientModalButton = $('#ModalClient #saveClient');
                 saveClientModalButton.first().show();
                 saveClientModalButton.first().prop('class','btn btn-success form-control');
@@ -734,7 +739,7 @@
                 });
 
             },"columns":[
-                {"data":"name","width": "100%"},
+                {"data":"name",className: "nameHead"},
                 {
                     "data": function (data, type, dataToSet) {
                         return "<button class='button-edit-gift btn btn-info btn-block' data-id="+data.id+"  data-type='1' ><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
@@ -753,7 +758,6 @@
             });
              var meetingTable  = $('#meetingTable').DataTable({
                 "processing": true,
-                 "autoWidth": true,
                 "serverSide": true,
                 "drawCallback": function (settings) {
                 },
@@ -856,7 +860,7 @@
                      });
 
                  },"columns":[
-                    {"data":"name","width": "100%"},
+                    {"data":"name",className: "nameHead"},
                      {
                          "data": function (data, type, dataToSet) {
                             return "<button class='button-edit-meeting btn btn-info btn-block' data-id="+data.id+" data-type='1'><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
@@ -869,7 +873,7 @@
                             else
                                 returnButton += "<button class='button-status-meeting btn btn-success btn-block' data-id="+data.id+" data-status=1 ><span class='glyphicon glyphicon-off'></span> Włącz</button>";
                             return returnButton;
-                        },"orderable": false, "searchable": false, "width": "10%"
+                        },"orderable": false, "searchable": false, "width": "1%"
                     }
                 ]
             });
@@ -964,7 +968,7 @@
                     {"data":"comment"},
                     {
                         "data": function (data, type, dataToSet) {
-                            return "<button class='btn'><span  style='font-size: 30px;' class='glyphicon glyphicon-search show-client' data-id="+data.id+"></span></button>";
+                            return "<button class='btn btn-default'><span class='glyphicon glyphicon-search show-client' data-id="+data.id+"></span></button>";
                         },"orderable": false, "searchable": false,
                     },
                     {"data":function (data, type, dataToSet) {
