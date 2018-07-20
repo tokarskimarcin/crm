@@ -2384,4 +2384,45 @@ class CrmRouteController extends Controller
 
     }
 
+    /**
+     * This method saves new route template to database
+     */
+    public function addNewRouteTemplatePost(Request $request) {
+        if($request->has('alldata')) {
+            $allData = json_decode($request->alldata);
+            $routes = new Route();
+            $routes->status = 1;
+            $routes->save();
+
+            $allCities = Cities::select('id','name')->get();
+
+            $dayFlag = $allData[0]->day;
+            $name = '';
+
+            forEach($allData as $record) {
+                if($record->day != $dayFlag) {
+                    $name = substr($name, 0,strlen($name) - 3) .  ' | ';
+                }
+                $name .= $allCities->where('id', '=', $record->city)->first()->name . ' + ';
+                $dayFlag = $record->day;
+
+                $routes_info = new RouteInfo();
+                $routes_info->routes_id = $routes->id;
+                $routes_info->voivodeship_id = $record->voivode;
+                $routes_info->city_id = $record->city;
+                $routes_info->status = 1;
+                $routes_info->day = $record->day;
+                $routes_info->save();
+            }
+
+            $name = substr($name, 0,strlen($name) - 3); // removing last + in name
+            $routes->name = $name;
+            $routes->save();
+            return Redirect::back();
+        }
+        else {
+            dd(1);
+        }
+    }
+
 }

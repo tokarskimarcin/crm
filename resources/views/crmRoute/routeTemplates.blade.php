@@ -94,10 +94,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script>
 
-        document.addEventListener('DOMContentLoaded', function(event) {
+        document.addEventListener('DOMContentLoaded', function() {
 
             //GLOBAL VARIABLES
                 let panelBody = document.querySelector('.panel-body');
+                let flag = null;
+                let submitPlace = document.querySelector('.summaryButtonContainer');
             //END GLOBAL VARIABLES
 
 
@@ -110,7 +112,7 @@
                 let firstDayContainer = firstDay.getBox();
                 panelBody.insertAdjacentElement("afterbegin", firstDayContainer);
 
-                let firstForm = new showBox();
+                let firstForm = new ShowBox();
                 firstForm.addRemoveShowButton();
                 firstForm.addDistanceCheckbox();
                 firstForm.addNewShowButton();
@@ -136,6 +138,7 @@
 
                 $.ajax({
                     type: "POST",
+                    async: false,
                     url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
                     data: {
                         'limit': previousCityDistance,
@@ -149,6 +152,7 @@
                         console.assert(typeof(firstResponse) === "object", "firstResponse in showInTheMiddleAjax is not object!");
                         $.ajax({
                             type: "POST",
+                            async: false,
                             url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
                             data: {
                                 'limit': nextCityDistance,
@@ -190,7 +194,7 @@
                                 }
 
                                 citySelect.setAttribute('data-distance', 30);
-                                $(voivodeSelect).on('change', function(e) {
+                                $(voivodeSelect).on('change', function() {
                                     citySelect.innerHTML = ''; //cleaning previous insertions
                                     appendBasicOption(citySelect);
 
@@ -205,6 +209,7 @@
                                         });
                                     });
                                 });
+                                flag = true;
                             }
                         });
 
@@ -222,6 +227,7 @@
                 console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInExtreme is not number!');
                 $.ajax({
                     type: "POST",
+                    async: false,
                     url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
                     data: {
                         'limit': limit,
@@ -242,7 +248,7 @@
                         if(oldVoivodeArr) { //this is optional
                             appendBasicOption(citySelect);
                             console.assert(Array.isArray(oldVoivodeArr), "oldVoivodeArr in showInExtreme method is not array!");
-                            for(Id in allCitiesGroupedByVoivodes) {
+                            for(let Id in allCitiesGroupedByVoivodes) {
                                 if(oldVoivodeArr[1] == Id) {
                                     allCitiesGroupedByVoivodes[Id].forEach(city => {
                                         appendCityOptions(citySelect, city);
@@ -258,7 +264,7 @@
                             appendBasicOption(citySelect);
 
                             let voivodeId = e.target.value;
-                            for(Id in allCitiesGroupedByVoivodes) {
+                            for(let Id in allCitiesGroupedByVoivodes) {
                                 if(voivodeId == Id) {
                                     console.assert(Array.isArray(allCitiesGroupedByVoivodes[Id]), "allCitiesGroupedByVoivodes in showInExtreme method is not array!");
                                     allCitiesGroupedByVoivodes[Id].forEach(city => {
@@ -267,197 +273,12 @@
                                 }
                             }
                         });
+                        flag = true;
                     }
                 });
             }
 
-            /**
-             * This method is used in shows without distance limit
-             */
-            function showWithoutDistanceAjax(voivodeId, citySelect) {
-                console.assert(!isNaN(parseInt(voivodeId)) && voivodeId != 0, 'voivodeId in showWithoutDistanceAjax is not number!');
-                console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
-                $.ajax({
-                    type: "POST",
-                    url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
-                    data: {
-                        "id": voivodeId
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
-                        let placeToAppend = citySelect;
-                        placeToAppend.innerHTML = '';
-                        appendBasicOption(placeToAppend);
-                        for(var i = 0; i < response.length; i++) {
-                            let responseOption = document.createElement('option');
-                            responseOption.value = response[i].id;
-                            responseOption.textContent = response[i].name;
-                            placeToAppend.appendChild(responseOption);
-                        }
 
-                    }
-                });
-            }
-
-            function limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr = null) {
-                const grandNextShowContainerCitySelect = grandNextShowContainer.querySelector('.citySelect');
-                const grandNextShowContainerCityDistance = grandNextShowContainerCitySelect.dataset.distance;
-                let grandNextShowContainerCityId = null;
-                if(grandNextShowContainerCitySelect.options[grandNextShowContainerCitySelect.selectedIndex].value) {
-                    grandNextShowContainerCityId = getSelectedValue(grandNextShowContainerCitySelect);
-                }
-                else {
-                    notify("Wybierz miasta i województwa we wszystkich listach");
-                    return false;
-                }
-
-                const thisSingleShowContainerCitySelect = thisSingleShowContainer.querySelector('.citySelect');
-                const thisSingleShowContainerCitySelectCityDistance = thisSingleShowContainerCitySelect.dataset.distance;
-                let thisSingleShowContainerCityId = null;
-                if(thisSingleShowContainerCitySelect.options[thisSingleShowContainerCitySelect.selectedIndex].value) {
-                    thisSingleShowContainerCityId = getSelectedValue(thisSingleShowContainerCitySelect);
-                }
-                else {
-                    notify("Wybierz miasta i województwa we wszystkich listach");
-                    return false;
-                }
-
-                const nextShowContainerCitySelect = nextShowContainer.querySelector('.citySelect');
-                let nextShowContainerCityid = null;
-                if(nextShowContainerCitySelect.options[nextShowContainerCitySelect.selectedIndex].value) {
-                    nextShowContainerCityid = getSelectedValue(nextShowContainerCitySelect);
-                }
-                else {
-                    notify("Wybierz miasta i województwa we wszystkich listach");
-                    return false;
-                }
-                let nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
-                let nextShowContainerVoivodeId = null;
-                if(nextShowContainerVoivodeSelect.options[nextShowContainerVoivodeSelect.selectedIndex].value) {
-                    nextShowContainerVoivodeId = getSelectedValue(nextShowContainerVoivodeSelect);
-                }
-                else {
-                    notify("Wybierz województwa we wszystkich listach");
-                    return false;
-                }
-
-                if((grandNextShowContainerCitySelect.length == 0 || grandNextShowContainerCityId == 0) ||
-                    (thisSingleShowContainerCitySelect.length == 0 || thisSingleShowContainerCityId == 0) ||
-                    (nextShowContainerCitySelect.length == 0  || nextShowContainerCityid == 0) ||
-                    (nextShowContainerVoivodeSelect.length == 0 || nextShowContainerVoivodeId == 0)) {
-                    notify("Wybierz miasta i województwa we wszystkich listach");
-                    return false;
-                }
-
-                let oldValuesArray = [nextShowContainerVoivodeSelect, nextShowContainerVoivodeId, nextShowContainerCitySelect, nextShowContainerCityid];
-
-                $(nextShowContainerVoivodeSelect).off();
-
-                // nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
-                nextShowContainerVoivodeSelect.innerHTML = '';
-                nextShowContainerCitySelect.innerHTML = '';
-                console.log(grandNextShowContainerCitySelect);
-                console.log(thisSingleShowContainerCitySelect);
-
-                if(changeDistanceArr) {
-                    let helpArr = [];
-                    if(changeDistanceArr[0] != 'undefined') {
-                        helpArr.push(changeDistanceArr[0]);
-                    }
-                    else {
-                        helpArr.push(grandNextShowContainerCityDistance);
-                    }
-                    if(changeDistanceArr[1] != 'undefined') {
-                        helpArr.push(changeDistanceArr[1]);
-                    }
-                    else {
-                        helpArr.push(thisSingleShowContainerCitySelectCityDistance);
-                    }
-                    console.log(helpArr);
-                    showInTheMiddleAjax(helpArr[0],grandNextShowContainerCityId,helpArr[1],thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
-                }
-                else {
-                    showInTheMiddleAjax(grandNextShowContainerCityDistance,grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
-                }
-            }
-
-            /**
-             * This method handle refresh distance case when prev show is in the same day container and there is not previous container && case when next show is in the same day container and there is no next container
-             */
-            function limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, limit) {
-                let prevShowContainerVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
-                let prevShowVoivodeId = null;
-                if(prevShowContainerVoivodeSelect.options[prevShowContainerVoivodeSelect.selectedIndex].value) {
-                    prevShowVoivodeId = getSelectedValue(prevShowContainerVoivodeSelect);
-                }
-                else {
-                    notify("Wybierz miasta i województwa we wszystkich listach");
-                    return false;
-                }
-
-                let prevShowContainerCitySelect = previousShowContainer.querySelector('.citySelect');
-                let prevShowCityId = null;
-                if(prevShowContainerCitySelect.options[prevShowContainerCitySelect.selectedIndex].value) {
-                    prevShowCityId = getSelectedValue(prevShowContainerCitySelect);
-                }
-                else {
-                    notify("Wybierz miasta i województwa we wszystkich listach");
-                    return false;
-                }
-
-                let nextShowContainerRelatedToPreviousShowContainerCitySelect = nextShowContainerRelatedToPreviousShowContainer.querySelector('.citySelect');
-                let nextShowContainerRelatedToPreviousShowContainerCityId = null;
-                if(nextShowContainerRelatedToPreviousShowContainerCitySelect.options[nextShowContainerRelatedToPreviousShowContainerCitySelect.selectedIndex].value) {
-                    nextShowContainerRelatedToPreviousShowContainerCityId = getSelectedValue(nextShowContainerRelatedToPreviousShowContainerCitySelect);
-
-                }
-                else {
-                    notify("Wybierz miasta i województwa we wszystkich listach");
-                    return false;
-                }
-
-                let oldValuesArray = [prevShowContainerVoivodeSelect, prevShowVoivodeId, prevShowContainerCitySelect, prevShowCityId];
-
-                if((prevShowContainerVoivodeSelect.length == 0 || prevShowVoivodeId == 0) ||
-                    (prevShowContainerCitySelect.length == 0 || prevShowCityId == 0) ||
-                    (nextShowContainerRelatedToPreviousShowContainerCitySelect.length == 0 || nextShowContainerRelatedToPreviousShowContainerCityId == 0)) {
-                    notify("Wybierz miasta i województwa we wszystkich listach");
-                    return false;
-                }
-
-                $(prevShowContainerVoivodeSelect).off();
-
-                prevShowContainerVoivodeSelect.innerHTML = '';
-                appendBasicOption(prevShowContainerVoivodeSelect);
-                prevShowContainerCitySelect.innerHTML = '';
-                console.log('limit: ', limit);
-
-                showInExtreme(limit, nextShowContainerRelatedToPreviousShowContainerCityId, prevShowContainerCitySelect, prevShowContainerVoivodeSelect, oldValuesArray);
-            }
-
-            //This method is used when appending all voivodes and all cities
-            function allCitiesAndAllVoivodes(nextShowContainer) {
-                //all cities and all voivodes.
-                let nextContVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
-                nextContVoivodeSelect.innerHTML = '';
-                appendBasicOption(nextContVoivodeSelect);
-                let nextContCitySelect = nextShowContainer.querySelector('.citySelect');
-                $(nextContVoivodeSelect).off(); //remove all previous event listeners
-                @foreach($voivodes as $voivode)
-                    var singleVoivode = document.createElement('option');
-                    singleVoivode.value = {{$voivode->id}};
-                    singleVoivode.textContent = '{{$voivode->name}}';
-                    nextContVoivodeSelect.appendChild(singleVoivode);
-                @endforeach()
-                $(nextContVoivodeSelect).on('change', function(e) {
-                    nextContCitySelect.setAttribute('data-distance', 'infinity');
-                    let voivodeId = e.target.value;
-                    showWithoutDistanceAjax(voivodeId, nextContCitySelect);
-                });
-            }
 
             /**
              * This method appends basic option to voivode select
@@ -652,24 +473,19 @@
             }
 
             /**
-             * This method validate form
+             * This method validate form false - bad, true - good
              */
             function validateForm(element) {
                 console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
                 let citySelect = element.querySelector('.citySelect');
                 let cityValue = getSelectedValue(citySelect);
-                if(cityValue == 0) {
-                    return false;
-                }
-                else {
-                    return true;
-                }
+                return !(cityValue == 0);
             }
 
             /**
              * This constructor defines new show object
              * API:
-             * let variable = new showBox(); - we create new show object,
+             * let variable = new ShowBox(); - we create new show object,
              * variable.addNewShowButton() - indices that we want addNewShowButton(optional),
              * variable.addRemoveShowButton() - indices that we want removeShowButton(optional),
              * variable.addCheckboxFlag() - indices that we want checkbox(optional),
@@ -679,14 +495,14 @@
              * variable.createDOMBox(x, cityId, true, previousShowContainer, nextShowContainer) -
              * we create new DOM element with distance limit between previousShowContainer's limit and
              * nextShowContainer's limit.
-             * let DOMElement = variable.getForm(); - we obtain we obtain DOM representation of showBox
+             * let DOMElement = variable.getForm(); - we obtain we obtain DOM representation of ShowBox
              * ------------------------------------------------------------------------
              */
-            function showBox() {
+            function ShowBox() {
                 this.addNewShowButtonFlag = false; //indices whether add newShowButton
                 this.addRemoveShowButtonFlag = false; //indices whether add removeShowButton
                 this.addCheckboxFlag = false; //indices whether add refreshShowButton
-                this.DOMBox = null; //here is stored DOM representation of showBox
+                this.DOMBox = null; //here is stored DOM representation of ShowBox
                 this.addNewShowButton = function() {
                     this.addNewShowButtonFlag = true;
                 };
@@ -711,7 +527,7 @@
                         removeButton.classList.add('remove-button');
                         removeButtonContainer.appendChild(removeButton);
                         formBox.appendChild(removeButtonContainer);
-                    };
+                    }
                     /*END REMOVE BUTTON PART*/
 
                     /*HEADER PART*/
@@ -899,23 +715,23 @@
                 if(e.target.matches('.addNewShowButton')) { //user clicks on "add new show" button
                     e.preventDefault();
                     const newShowButton = e.target;
-                    const dayContainer = newShowButton.closest('.singleDayContainer');
+                    // const dayContainer = newShowButton.closest('.singleDayContainer');
                     const thisShowContainer = newShowButton.closest('.singleShowContainer');
                     const allSingleShowContainers = document.getElementsByClassName('singleShowContainer');
-                    const lastSingleShowCOntainer = allSingleShowContainers[allSingleShowContainers.length - 1];
+                    // const lastSingleShowCOntainer = allSingleShowContainers[allSingleShowContainers.length - 1];
 
                     const selectedCity = thisShowContainer.querySelector('.citySelect');
                     const selectedCityId = getSelectedValue(selectedCity);
 
-                    var validation = validateForm(thisShowContainer);
+                    let validation = validateForm(thisShowContainer);
 
                     if(validation) {
-                        let newForm = new showBox();
+                        let newForm = new ShowBox();
                         newForm.addRemoveShowButton();
                         newForm.addDistanceCheckbox();
                         newForm.addNewShowButton();
 
-                        lastOneFlag = true;
+                        let lastOneFlag = true;
                         let nextShowContainer = null;
                         //we are checking whether there is more single show containers
                         for(let i = 0; i < allSingleShowContainers.length; i++) {
@@ -931,7 +747,7 @@
                         //we are checking whether cliecked singleDayContainer is last one, or between others.
                         if(lastOneFlag === true) {
                             newForm.createDOMBox(30, selectedCityId);
-                            newFormDomElement = newForm.getForm();
+                            let newFormDomElement = newForm.getForm();
                             thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
                         }
                         else { //container is not last one
@@ -941,7 +757,7 @@
                             if(anextCitySelect.options[anextCitySelect.selectedIndex].value != 0 && apreviousCitySelect.options[apreviousCitySelect.selectedIndex].value != 0) {
                                 const previousShowContainer = thisShowContainer; // relative to newForm, this one is previousShowContainer
                                 newForm.createDOMBox(30, selectedCityId, true, previousShowContainer, nextShowContainer);
-                                newFormDomElement = newForm.getForm();
+                                let newFormDomElement = newForm.getForm();
                                 thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
                             }
                             else {
@@ -959,7 +775,7 @@
                     const removeShowButton = e.target;
                     const showContainer = removeShowButton.closest('.singleShowContainer');
                     const dayContainer = removeShowButton.closest('.singleDayContainer');
-                    const allDayContainers = document.getElementsByClassName('singleDayContainer');
+                    // const allDayContainers = document.getElementsByClassName('singleDayContainer');
 
                     let prevDayFlag = undefined; //true - another day, false - same day
                     let nextDayFlag = undefined;
@@ -968,11 +784,10 @@
                     let nextShowFlag = undefined; //true - another day, false - same day
                     let prevShowFlag = undefined;
 
-                    const dayExistenceArray = checkingExistenceOfPrevAndNextContainers(dayContainer, 'singleDayContainer');
+                    // const dayExistenceArray = checkingExistenceOfPrevAndNextContainers(dayContainer, 'singleDayContainer');
                     const showExistenceArray = checkingExistenceOfPrevAndNextContainers(showContainer, 'singleShowContainer');
 
                     let siblingsCheckboxArr = checkboxFilter(showExistenceArray);
-                    console.log(siblingsCheckboxArr);
 
                     if(showExistenceArray[0]) { //case when previous container exist
                         let prevShowContainer = showExistenceArray[0];
@@ -1118,9 +933,13 @@
                                 }
                             }
                         }
-
-
                     }
+
+                    // let setDelay = window.setInterval(function() {
+                    //     if(flag == true) {
+                    //
+                    //     }
+                    // }, 50);
 
                     if(showExistenceArray[1]) { //case when next container exist
                         let nextShowContainer = showExistenceArray[1];
@@ -1302,7 +1121,7 @@
                         const selectedCity = allCitiesSelect[allCitiesSelect.length - 1];
                         const selectedCityId = getSelectedValue(selectedCity);
 
-                        let firstForm = new showBox();
+                        let firstForm = new ShowBox();
                         firstForm.addRemoveShowButton();
                         firstForm.addDistanceCheckbox();
                         firstForm.addNewShowButton();
@@ -1316,7 +1135,62 @@
                     }
 
                 }
-            };
+                else if(e.target.matches('#save')) {
+                    const allSingleShowContainers = document.querySelectorAll('.singleShowContainer');
+                    const allSingleDayContainers = document.getElementsByClassName('singleDayContainer');
+                    let finalArray = [];
+
+                    let isOk = validateAllForms(allSingleShowContainers);
+
+                    if(isOk) {
+                        for(let i = 0; i < allSingleDayContainers.length; i++) {
+                            let singleShowContainersInsideGivenDay = allSingleDayContainers[i].querySelectorAll('.singleShowContainer');
+                            let dayNumber = i+1;
+
+                            singleShowContainersInsideGivenDay.forEach(show => {
+                                let voivodeSelect = show.querySelector('.voivodeSelect');
+                                let voivodeId = getSelectedValue(voivodeSelect);
+
+                                let citySelect = show.querySelector('.citySelect');
+                                let cityId = getSelectedValue(citySelect);
+
+                                let info = {
+                                day: dayNumber,
+                                voivode: voivodeId,
+                                city: cityId
+                                }
+                                finalArray.push(info);
+                            });
+                        }
+                        let JSONData = JSON.stringify(finalArray);
+                        let finalForm = document.createElement('form');
+                        finalForm.setAttribute('method', 'post');
+                        finalForm.setAttribute('action', "{{URL::to('/addNewRouteTemplate')}}");
+                        finalForm.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="alldata" value=' + JSONData + '>';
+                        submitPlace.appendChild(finalForm);
+                        finalForm.submit();
+
+                    }
+                    else {
+                        notify('Wybierz miasta we wszystkich polach');
+                    }
+                }
+            }
+
+            /**
+             * This method validate all single day forms
+             */
+            function validateAllForms(element) {
+                let flag = true;
+                element.forEach(day => {
+                    let validation = validateForm(day);
+                    if(validation === false) {
+                        flag = false;
+                    }
+                });
+
+                return flag;
+            }
 
                 /**
                  * This event listener is responsible for change event on document
@@ -1332,7 +1206,7 @@
                     let voivodeSelect = thisSingleShowContainer.querySelector('.voivodeSelect');
                     voivodeSelect.innerHTML = ''; //clear select
                     let citySelect = thisSingleShowContainer.querySelector('.citySelect');
-                    let cityDistance = citySelect.dataset.distance;
+                    // let cityDistance = citySelect.dataset.distance;
                     citySelect.innerHTML = ''; //clear select
 
                     //this part remove all event listeners from this node
@@ -1379,7 +1253,7 @@
                             var singleVoivode = document.createElement('option');
                             singleVoivode.value = {{$voivode->id}};
                             singleVoivode.textContent = '{{$voivode->name}}';
-                            voivodeSelect.appendChild(singleVoivode);
+                            voivodeSelect.appendChild(singleVoivode);password_date
                             @endforeach()
 
                             voivodeSelect.addEventListener('change', e => {
@@ -1414,7 +1288,7 @@
                     }
                 }
                 else if(e.target.matches('.citySelect')) { // user changes city
-                    const changedCitySelect = e.target;
+                    // const changedCitySelect = e.target;
                     const thisSingleShowContainer = e.target.closest('.singleShowContainer');
                     const thisDayContainer = e.target.closest('.singleDayContainer');
                     const thisContainerCheckbox = thisSingleShowContainer.querySelector('.distance-checkbox');
@@ -1450,7 +1324,7 @@
                                 if(nextDayFlag) { //case when next show is in another day container
                                     let prevShowContainerRelatedToNextShowContainer = thisSingleShowContainer;
                                     let siblingsOfNextShowContainerArr = checkingExistenceOfPrevAndNextContainers(nextShowContainer, 'singleShowContainer');
-                                    let nextSiblingCheckboxArr = checkboxFilter(siblingsOfNextShowContainerArr);
+                                    // let nextSiblingCheckboxArr = checkboxFilter(siblingsOfNextShowContainerArr);
                                     let grandNextShowContainer = undefined; // previous show container of previous show container
                                     grandNextShowContainer = siblingsOfNextShowContainerArr[1] === null ? null : siblingsOfNextShowContainerArr[1];
 
@@ -1466,7 +1340,7 @@
                                     let grandNextShowContainer = undefined;
                                     let prevShowContainerRelatedToNextShowContainer = thisSingleShowContainer;
                                     let siblingsOfNextShowContainerArr = checkingExistenceOfPrevAndNextContainers(nextShowContainer, 'singleShowContainer');
-                                    let nextSiblingCheckboxArr = checkboxFilter(siblingsOfNextShowContainerArr);
+                                    // let nextSiblingCheckboxArr = checkboxFilter(siblingsOfNextShowContainerArr);
                                     grandNextShowContainer = siblingsOfNextShowContainerArr[1] === null ? null : siblingsOfNextShowContainerArr[1];
 
                                     if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
@@ -1497,11 +1371,20 @@
                                 if(prevDayFlag) { //case when prev show is in another day container
                                     let nextShowContainerRelatedToPreviousShowContainer = thisSingleShowContainer;
                                     let siblingsOfPreviousShowContainerArr = checkingExistenceOfPrevAndNextContainers(previousShowContainer, 'singleShowContainer');
-                                    let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
+                                    // let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
                                     let grandPrevShowContainer = undefined; // previous show container of previous show container
                                     grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
                                     if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
-                                         let changeDistanceArr = ['undefined', 100];
+                                        let dayContainerOfGrandPrev = grandPrevShowContainer.closest('.singleDayContainer');
+                                        grandNextDayFlag = dayContainerOfGrandPrev === dayContainerOfPreviousShowContainer ? false : true;
+                                        let changeDistanceArr = [];
+                                        if(grandNextDayFlag) {// case when grand prev show is another day related to prev show
+                                            changeDistanceArr = [100, 100];
+                                        }
+                                        else { //case when grand prev show is in same day container as prev show
+                                            changeDistanceArr = [30, 100];
+                                        }
+
                                         limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                     }
                                     else { // there is no previous container (related to prev show container)
@@ -1513,7 +1396,7 @@
                                     let nextShowContainerRelatedToPreviousShowContainer = thisSingleShowContainer;
                                     let grandPrevShowContainer = undefined; // previous show container of previous show container
                                     let siblingsOfPreviousShowContainerArr = checkingExistenceOfPrevAndNextContainers(previousShowContainer, 'singleShowContainer');
-                                    let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
+                                    // let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
                                     grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
 
                                     if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
@@ -1538,6 +1421,206 @@
                     }
 
                 }
+            }
+
+
+            /**
+             * This method is used in shows without distance limit
+             */
+            function showWithoutDistanceAjax(voivodeId, citySelect) {
+                console.assert(!isNaN(parseInt(voivodeId)) && voivodeId != 0, 'voivodeId in showWithoutDistanceAjax is not number!');
+                console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
+                $.ajax({
+                    type: "POST",
+                    async: false,
+                    url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
+                    data: {
+                        "id": voivodeId
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
+                        let placeToAppend = citySelect;
+                        placeToAppend.innerHTML = '';
+                        appendBasicOption(placeToAppend);
+                        for(let i = 0; i < response.length; i++) {
+                            let responseOption = document.createElement('option');
+                            responseOption.value = response[i].id;
+                            responseOption.textContent = response[i].name;
+                            placeToAppend.appendChild(responseOption);
+                        }
+                        flag = true;
+                    }
+                });
+            }
+
+            function limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr = null) {
+                console.assert(grandNextShowContainer.matches('.singleShowContainer'), 'grandNextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                console.assert(thisSingleShowContainer.matches('.singleShowContainer'), 'thisSingleShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                console.assert(nextShowContainer.matches('.singleShowContainer'), 'nextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                const grandNextShowContainerCitySelect = grandNextShowContainer.querySelector('.citySelect');
+                const grandNextShowContainerCityDistance = grandNextShowContainerCitySelect.dataset.distance;
+                let grandNextShowContainerCityId = null;
+                // console.log('grandNextShowContainerCitySelect: ', grandNextShowContainerCitySelect);
+                if(grandNextShowContainerCitySelect.options[grandNextShowContainerCitySelect.selectedIndex]) {
+                    grandNextShowContainerCityId = getSelectedValue(grandNextShowContainerCitySelect);
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach 1");
+                    return false;
+                }
+
+                const thisSingleShowContainerCitySelect = thisSingleShowContainer.querySelector('.citySelect');
+                // console.log('thisSingleShowContainerCitySelect', thisSingleShowContainerCitySelect);
+                const thisSingleShowContainerCitySelectCityDistance = thisSingleShowContainerCitySelect.dataset.distance;
+                let thisSingleShowContainerCityId = null;
+                if(thisSingleShowContainerCitySelect.options[thisSingleShowContainerCitySelect.selectedIndex]) {
+                    thisSingleShowContainerCityId = getSelectedValue(thisSingleShowContainerCitySelect);
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach 2");
+                    return false;
+                }
+
+                const nextShowContainerCitySelect = nextShowContainer.querySelector('.citySelect');
+                // console.log('nextShowContainerCitySelect', nextShowContainerCitySelect);
+                let nextShowContainerCityid = null;
+                if(nextShowContainerCitySelect.options[nextShowContainerCitySelect.selectedIndex]) {
+                    nextShowContainerCityid = getSelectedValue(nextShowContainerCitySelect);
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach 3");
+                    return false;
+                }
+                let nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
+                // console.log('nextShowContainerVoivodeSelect', nextShowContainerVoivodeSelect);
+                let nextShowContainerVoivodeId = null;
+                if(nextShowContainerVoivodeSelect.options[nextShowContainerVoivodeSelect.selectedIndex]) {
+                    nextShowContainerVoivodeId = getSelectedValue(nextShowContainerVoivodeSelect);
+                }
+                else {
+                    notify("Wybierz województwa we wszystkich listach 4");
+                    return false;
+                }
+
+                if((grandNextShowContainerCitySelect.length == 0 || grandNextShowContainerCityId == 0) ||
+                    (thisSingleShowContainerCitySelect.length == 0 || thisSingleShowContainerCityId == 0) ||
+                    (nextShowContainerCitySelect.length == 0  || nextShowContainerCityid == 0) ||
+                    (nextShowContainerVoivodeSelect.length == 0 || nextShowContainerVoivodeId == 0)) {
+                    notify("Wybierz miasta i województwa we wszystkich listach 5");
+                    return false;
+                }
+
+                let oldValuesArray = [nextShowContainerVoivodeSelect, nextShowContainerVoivodeId, nextShowContainerCitySelect, nextShowContainerCityid];
+
+                $(nextShowContainerVoivodeSelect).off();
+
+                // nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
+                nextShowContainerVoivodeSelect.innerHTML = '';
+                nextShowContainerCitySelect.innerHTML = '';
+                console.log(grandNextShowContainerCitySelect);
+                console.log(thisSingleShowContainerCitySelect);
+
+                if(changeDistanceArr) {
+                    let helpArr = [];
+                    if(changeDistanceArr[0] != 'undefined') {
+                        helpArr.push(changeDistanceArr[0]);
+                    }
+                    else {
+                        helpArr.push(grandNextShowContainerCityDistance);
+                    }
+                    if(changeDistanceArr[1] != 'undefined') {
+                        helpArr.push(changeDistanceArr[1]);
+                    }
+                    else {
+                        helpArr.push(thisSingleShowContainerCitySelectCityDistance);
+                    }
+                    console.log(helpArr);
+                    showInTheMiddleAjax(helpArr[0],grandNextShowContainerCityId,helpArr[1],thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
+                }
+                else {
+                    showInTheMiddleAjax(grandNextShowContainerCityDistance,grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
+                }
+            }
+
+            /**
+             * This method handle refresh distance case when prev show is in the same day container and there is not previous container && case when next show is in the same day container and there is no next container
+             */
+            function limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, limit) {
+                let prevShowContainerVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
+                // console.log('prevShowContainerVoivodeSelect',prevShowContainerVoivodeSelect);
+                let prevShowVoivodeId = null;
+                if(prevShowContainerVoivodeSelect.options[prevShowContainerVoivodeSelect.selectedIndex]) {
+                    prevShowVoivodeId = getSelectedValue(prevShowContainerVoivodeSelect);
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach 6");
+                    return false;
+                }
+
+                let prevShowContainerCitySelect = previousShowContainer.querySelector('.citySelect');
+                // console.log('prevShowContainerCitySelect', prevShowContainerCitySelect);
+                let prevShowCityId = null;
+                if(prevShowContainerCitySelect.options[prevShowContainerCitySelect.selectedIndex]) {
+                    prevShowCityId = getSelectedValue(prevShowContainerCitySelect);
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach 7");
+                    return false;
+                }
+
+                let nextShowContainerRelatedToPreviousShowContainerCitySelect = nextShowContainerRelatedToPreviousShowContainer.querySelector('.citySelect');
+                // console.log('nextShowContainerRelatedToPreviousShowContainerCitySelect', nextShowContainerRelatedToPreviousShowContainerCitySelect);
+                let nextShowContainerRelatedToPreviousShowContainerCityId = null;
+                if(nextShowContainerRelatedToPreviousShowContainerCitySelect.options[nextShowContainerRelatedToPreviousShowContainerCitySelect.selectedIndex]) {
+                    nextShowContainerRelatedToPreviousShowContainerCityId = getSelectedValue(nextShowContainerRelatedToPreviousShowContainerCitySelect);
+
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach 8");
+                    return false;
+                }
+
+                let oldValuesArray = [prevShowContainerVoivodeSelect, prevShowVoivodeId, prevShowContainerCitySelect, prevShowCityId];
+
+                if((prevShowContainerVoivodeSelect.length == 0 || prevShowVoivodeId == 0) ||
+                    (prevShowContainerCitySelect.length == 0 || prevShowCityId == 0) ||
+                    (nextShowContainerRelatedToPreviousShowContainerCitySelect.length == 0 || nextShowContainerRelatedToPreviousShowContainerCityId == 0)) {
+                    notify("Wybierz miasta i województwa we wszystkich listach 9");
+                    return false;
+                }
+
+                $(prevShowContainerVoivodeSelect).off();
+
+                prevShowContainerVoivodeSelect.innerHTML = '';
+                appendBasicOption(prevShowContainerVoivodeSelect);
+                prevShowContainerCitySelect.innerHTML = '';
+                console.log('limit: ', limit);
+
+                showInExtreme(limit, nextShowContainerRelatedToPreviousShowContainerCityId, prevShowContainerCitySelect, prevShowContainerVoivodeSelect, oldValuesArray);
+            }
+
+            //This method is used when appending all voivodes and all cities
+            function allCitiesAndAllVoivodes(nextShowContainer) {
+                //all cities and all voivodes.
+                let nextContVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
+                nextContVoivodeSelect.innerHTML = '';
+                appendBasicOption(nextContVoivodeSelect);
+                let nextContCitySelect = nextShowContainer.querySelector('.citySelect');
+                $(nextContVoivodeSelect).off(); //remove all previous event listeners
+                        @foreach($voivodes as $voivode)
+                var singleVoivode = document.createElement('option');
+                singleVoivode.value = {{$voivode->id}};
+                singleVoivode.textContent = '{{$voivode->name}}';
+                nextContVoivodeSelect.appendChild(singleVoivode);
+                @endforeach()
+                $(nextContVoivodeSelect).on('change', function(e) {
+                    nextContCitySelect.setAttribute('data-distance', 'infinity');
+                    let voivodeId = e.target.value;
+                    showWithoutDistanceAjax(voivodeId, nextContCitySelect);
+                });
             }
 
             document.addEventListener('click', globalClickHandler);
