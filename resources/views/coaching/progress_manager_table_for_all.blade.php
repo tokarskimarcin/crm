@@ -119,6 +119,7 @@
                                         <th>Wynik Aktualny</th>
                                         <th>Cel</th>
                                         <th>Aktualne RBH</th>
+                                        <th>Zakończ</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -214,6 +215,10 @@
 
         $(document).ready(function(){
 
+            function isNumeric(n) {
+                return !isNaN(parseFloat(n)) && isFinite(n);
+            }
+
             $('#selected_dep').on('change',function () {
                 $.ajax({
                     type: "POST",
@@ -233,7 +238,6 @@
                                 response[i].id+'>'+response[i].first_name+' '+response[i].last_name+'</option>';
                         }
                         $('#coach_dep').append(option_select);
-                        //console.log(response);
                     }
                 });
             });
@@ -261,12 +265,56 @@
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-                    console.log(data);
                     if (parseInt(data.actual_rbh) >= parseInt(18)) {
                         $(row).hide();
                     }
                     $(row).attr('id', data.id);
                     return row;
+                },"fnDrawCallback": function (settings) {
+                    $('.btn-end_coaching').on('click',function () {
+                        let caochingIDToEnd = $(this).data('id');
+                       swal({
+                           title: 'Zakończenie coachingu osoby niepracującej (podaj aktualny wynik)',
+                           input: 'number',
+                           inputAttributes: {
+                               autocapitalize: 'off'
+                           },
+                           showCancelButton: true,
+                           confirmButtonText: 'Zapisz i zakończ',
+                           showLoaderOnConfirm: true,
+                           preConfirm: (actualScore) => {
+                               if(isNumeric(actualScore)){
+                                   $.ajax({
+                                       type: "POST",
+                                       url: "{{ route('api.endCoachingDirector') }}",
+                                       headers: {
+                                           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                       },
+                                       data:{
+                                           'coachingID'     : caochingIDToEnd,
+                                           'actualScore'    : actualScore
+                                       },
+                                       success: function (response) {
+                                           in_progress_table.ajax.reload();
+                                           $.notify({
+                                               icon: 'glyphicon glyphicon-ok',
+                                               message: '<strong>Coaching został zakończoy</strong>'
+                                           }, {
+                                               type: "success"
+                                           });
+                                       }
+                                   })
+                               }else{
+                                   $.notify({
+                                       icon: 'glyphicon glyphicon-ok',
+                                       message: '<strong>Błędna liczba</strong>'
+                                   }, {
+                                       type: "danger"
+                                   });
+                               }
+                           },
+                       })
+                    });
                 },
                 "columns":[
                     {data:function (data, type, dataToSet) {
@@ -345,6 +393,13 @@
                             //return Math.round(data.couching_rbh/3600,2);
                         },"name": "actual_rbh","searchable": false
                     },
+                    {"data": function (data, type,dataToSet) {
+                            if(data.statusWork == 0 && ($('#selected_dep').val() == 1 || $('#selected_dep').val() == 4) ){
+                                return "<button class='btn-end_coaching btn btn-success' data-id=" + data.id + " >Zakończ</button>";
+                            }else
+                                return "Brak opcji";
+                        },"searchable": false,"orderable":false
+                    }
                 ],
             });
 
@@ -377,7 +432,6 @@
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-                    console.log(data.actual_rbh);
                     if (parseInt(data.actual_rbh) < parseInt(18)) {
                         $(row).hide();
                     }
