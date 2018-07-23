@@ -658,7 +658,6 @@ class CrmRouteController extends Controller
                 }else
                     $route_name .= '+'.$client_routes[$i]->cityName;
         }
-
         return $route_name;
     }
     /**
@@ -2588,7 +2587,6 @@ class CrmRouteController extends Controller
         if($clientId>0){
             $clientRouteCampaigns->where('cr.client_id','=',$clientId);
         }
-
         if($invoiceStatusId>0){
             $clientRouteCampaigns->where('invoice_status_id','=',$invoiceStatusId);
         }
@@ -2637,5 +2635,98 @@ class CrmRouteController extends Controller
 
     public function getHotelContacts(Request $request){
         return HotelsContacts::where('hotel_id',$request->hotelId);
+    }
+
+
+public function clientReport(Request $request){
+            $data['infoClient'] = $this::getDataToCSV($request->clientID,$request->year
+                ,$request->selectedWeek,$request->state);
+            $data['distincRouteID'] = $data['infoClient']->groupby('clientRouteID');
+            return $data;
+    }
+
+    public function getDataToCSV($clientID,$year,$selectedWeek,$state){
+        if($year == 0)
+            $year = '%';
+        if($selectedWeek == 0)
+            $selectedWeek = '%';
+        if($state == -1)
+            $state = '%';
+        $data = ClientRouteInfo::
+        select(DB::raw('
+            client_route_info.client_route_id as clientRouteID,
+            client_route_info.date,
+            client_route_info.hour,
+            city.name as cityName,
+            hotels.name as hotelName,
+            hotels.street,
+            hotels.zip_code,
+            payment_methods.name as paymentMethod,
+            hotels.daily_bid,
+            hotels.hour_bid,
+            client.name as clientName,
+            client_gift_type.name as clientGiftName,
+            client_meeting_type.name clientMeetingName,
+            hotels.id as hotelID       
+        '))
+            ->join('client_route','client_route.id','client_route_info.client_route_id')
+            ->join('client','client.id','client_route.client_id')
+            ->leftjoin('client_gift_type','client_gift_type.id','client.gift_type_id')
+            ->leftjoin('client_meeting_type','client_meeting_type.id','client.meeting_type_id')
+            ->leftjoin('hotels','hotels.id','client_route_info.hotel_id')
+            ->leftjoin('payment_methods','payment_methods.id','hotels.payment_method_id')
+            ->leftjoin('city','city.id','hotels.city_id')
+            ->where('client_route.client_id','=',$clientID)
+            ->where('client_route.status','like',$state)
+            ->where('client_route_info.weekOfYear','like',$selectedWeek)
+            ->where(DB::raw('YEAR(client_route_info.date)'),'like',$year)
+            ->orderBy('date')
+            ->orderBy('cityName')
+            ->orderBy('hour')
+            ->get();
+        return $data;
+    }
+    public function hotelConfirmationGet(){
+        return view('crmRoute.hotelConfirmation');
+    }
+    /**
+     * This method saves new route template to database
+     */
+    public function addNewRouteTemplatePost(Request $request) {
+        if($request->has('alldata')) {
+            $allData = json_decode($request->alldata);
+            $routes = new Route();
+            $routes->status = 1;
+            $routes->save();
+
+            $allCities = Cities::select('id','name')->get();
+
+            $dayFlag = $allData[0]->day;
+            $name = '';
+
+            forEach($allData as $record) {
+                if($record->day != $dayFlag) {
+                    $name = substr($name, 0,strlen($name) - 3) .  ' | ';
+                }
+                $name .= $allCities->where('id', '=', $record->city)->first()->name . ' + ';
+                $dayFlag = $record->day;
+
+                $routes_info = new RouteInfo();
+                $routes_info->routes_id = $routes->id;
+                $routes_info->voivodeship_id = $record->voivode;
+                $routes_info->city_id = $record->city;
+                $routes_info->status = 1;
+                $routes_info->day = $record->day;
+                $routes_info->save();
+            }
+
+            $name = substr($name, 0,strlen($name) - 3); // removing last + in name
+            $routes->name = $name;
+            $routes->save();
+            return Redirect::back();
+        }
+        else {
+            dd(1);
+        }
     }
 }

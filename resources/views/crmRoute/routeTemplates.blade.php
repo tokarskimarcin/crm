@@ -94,11 +94,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script>
 
-        document.addEventListener('DOMContentLoaded', function(event) {
+        document.addEventListener('DOMContentLoaded', function() {
 
             //GLOBAL VARIABLES
                 let panelBody = document.querySelector('.panel-body');
+                let flag = null;
+                let submitPlace = document.querySelector('.summaryButtonContainer');
             //END GLOBAL VARIABLES
+
+
+            /**
+             * This method append first day container and first show container
+             */
+            (function pageOpen() {
+                let firstDay = new DayBox();
+                firstDay.createDOMDayBox();
+                let firstDayContainer = firstDay.getBox();
+                panelBody.insertAdjacentElement("afterbegin", firstDayContainer);
+
+                let firstForm = new ShowBox();
+                firstForm.addRemoveShowButton();
+                firstForm.addDistanceCheckbox();
+                firstForm.addNewShowButton();
+                firstForm.createDOMBox();
+                let firstFormDOM = firstForm.getForm();
+
+                firstDayContainer.appendChild(firstFormDOM);
+            })();
 
             /**
              * This method is used in shows appended between another ones
@@ -116,6 +138,7 @@
 
                 $.ajax({
                     type: "POST",
+                    async: false,
                     url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
                     data: {
                         'limit': previousCityDistance,
@@ -129,6 +152,7 @@
                         console.assert(typeof(firstResponse) === "object", "firstResponse in showInTheMiddleAjax is not object!");
                         $.ajax({
                             type: "POST",
+                            async: false,
                             url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
                             data: {
                                 'limit': nextCityDistance,
@@ -144,6 +168,7 @@
 
                                 let voivodeSet = intersectionArray[0];
                                 let citySet = intersectionArray[1];
+                                appendBasicOption(voivodeSelect);
 
                                 voivodeSet.forEach(voivode => {
                                     appendVoivodeOptions(voivodeSelect, voivode);
@@ -151,6 +176,7 @@
 
                                 if(oldValuesArray) { //this is optional
                                     console.assert(Array.isArray(oldValuesArray), "oldVoivodeArr in showInExtreme method is not array!");
+                                    appendBasicOption(citySelect);
                                     voivodeSet.forEach(voivode => {
                                         if(voivode.id == oldValuesArray[1]) {
                                             citySet.forEach(voivodeCity => {
@@ -167,10 +193,8 @@
                                     setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
                                 }
 
-
                                 citySelect.setAttribute('data-distance', 30);
-                                $(voivodeSelect).on('change', function(e) {
-                                    voivodeSelect.setAttribute('data-eventlistener', '1');
+                                $(voivodeSelect).on('change', function() {
                                     citySelect.innerHTML = ''; //cleaning previous insertions
                                     appendBasicOption(citySelect);
 
@@ -185,24 +209,7 @@
                                         });
                                     });
                                 });
-                                //After selecting voivode, this event listener appends cities from given range into city select
-                                // voivodeSelect.addEventListener('change', function(e) {
-                                //     voivodeSelect.setAttribute('data-eventlistener', '1');
-                                //     citySelect.innerHTML = ''; //cleaning previous insertions
-                                //     appendBasicOption(citySelect);
-                                //
-                                //     voivodeSet.forEach(voivode => {
-                                //         citySet.forEach(voivodeCity => {
-                                //             console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
-                                //             voivodeCity.forEach(city => {
-                                //                 if(city.id === voivode.id) {
-                                //                     appendCityOptions(citySelect, city);
-                                //                 }
-                                //             });
-                                //         });
-                                //     });
-                                // });
-
+                                flag = true;
                             }
                         });
 
@@ -220,6 +227,7 @@
                 console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInExtreme is not number!');
                 $.ajax({
                     type: "POST",
+                    async: false,
                     url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
                     data: {
                         'limit': limit,
@@ -238,8 +246,9 @@
                         });
                         citySelect.setAttribute('data-distance', limit); //applaying old value
                         if(oldVoivodeArr) { //this is optional
+                            appendBasicOption(citySelect);
                             console.assert(Array.isArray(oldVoivodeArr), "oldVoivodeArr in showInExtreme method is not array!");
-                            for(Id in allCitiesGroupedByVoivodes) {
+                            for(let Id in allCitiesGroupedByVoivodes) {
                                 if(oldVoivodeArr[1] == Id) {
                                     allCitiesGroupedByVoivodes[Id].forEach(city => {
                                         appendCityOptions(citySelect, city);
@@ -247,72 +256,29 @@
                                 }
                             }
                             setOldValues(oldVoivodeArr[0], oldVoivodeArr[1], oldVoivodeArr[2], oldVoivodeArr[3]);
-
                         }
 
                         //After selecting voivode, this event listener appends cities from given range into city select
                         $(voivodeSelect).on('change', function(e) {
-                            voivodeSelect.setAttribute('data-eventlistener', '2');
                             citySelect.innerHTML = ''; //cleaning previous insertions
                             appendBasicOption(citySelect);
 
                             let voivodeId = e.target.value;
-                            for(Id in allCitiesGroupedByVoivodes) {
+                            for(let Id in allCitiesGroupedByVoivodes) {
                                 if(voivodeId == Id) {
+                                    console.assert(Array.isArray(allCitiesGroupedByVoivodes[Id]), "allCitiesGroupedByVoivodes in showInExtreme method is not array!");
                                     allCitiesGroupedByVoivodes[Id].forEach(city => {
                                         appendCityOptions(citySelect, city);
                                     });
                                 }
                             }
                         });
-                        // voivodeSelect.addEventListener('change', function(e) {
-                        //     voivodeSelect.setAttribute('data-eventlistener', '2');
-                        //     citySelect.innerHTML = ''; //cleaning previous insertions
-                        //     appendBasicOption(citySelect);
-                        //
-                        //     let voivodeId = e.target.value;
-                        //     for(Id in allCitiesGroupedByVoivodes) {
-                        //         if(voivodeId == Id) {
-                        //             allCitiesGroupedByVoivodes[Id].forEach(city => {
-                        //                 appendCityOptions(citySelect, city);
-                        //             });
-                        //         }
-                        //     }
-                        // });
+                        flag = true;
                     }
                 });
             }
 
-            /**
-             * This method is used in shows without distance limit
-             */
-            function showWithoutDistanceAjax(voivodeId, citySelect) {
-                console.assert(!isNaN(parseInt(voivodeId)) && voivodeId != 0, 'voivodeId in showWithoutDistanceAjax is not number!');
-                console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
-                $.ajax({
-                    type: "POST",
-                    url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
-                    data: {
-                        "id": voivodeId
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
-                        let placeToAppend = citySelect;
-                        placeToAppend.innerHTML = '';
-                        appendBasicOption(placeToAppend);
-                        for(var i = 0; i < response.length; i++) {
-                            let responseOption = document.createElement('option');
-                            responseOption.value = response[i].id;
-                            responseOption.textContent = response[i].name;
-                            placeToAppend.appendChild(responseOption);
-                        }
 
-                    }
-                });
-            }
 
             /**
              * This method appends basic option to voivode select
@@ -398,6 +364,97 @@
             }
 
             /**
+             * @param thisContainer
+             * @param className
+             * This function return array of prev and next containers if exist.
+             */
+            function checkingExistenceOfPrevAndNextContainers(thisContainer, className) {
+                const allContainers = document.getElementsByClassName(className);
+                let nextCont = null;
+                let prevCont = null;
+                let finalArray = [];
+                //checking whether there is next and previous show container
+                for(let i = 0; i < allContainers.length; i++) {
+                    if(allContainers[i] == thisContainer) {
+                        if(allContainers[i+1]) { //exist next container
+                            nextCont = allContainers[i+1];
+                        }
+                        if(allContainers[i-1]) {
+                            prevCont = allContainers[i-1];
+                        }
+                    }
+                }
+                finalArray.push(prevCont);
+                finalArray.push(nextCont);
+                return finalArray;
+            }
+
+            /**
+             * This method check if in given contaiers there is checkbox checked or not
+             * @param arrayOfContainers
+             * @returns {Array} [undefined/true/false, undefined/true/false] - (undefined - no container given in arrayOfContainers, false - not checked, true - checked)
+             */
+            function checkboxFilter(arrayOfContainers) {
+                let prevCont = arrayOfContainers[0];
+                let nextCont = arrayOfContainers[1];
+                let isCheckedPrev = undefined;
+                let isCheckedNext = undefined;
+                let checkArr = [];
+                if(prevCont) {
+                    let checkboxPrevElement = prevCont.querySelector('.distance-checkbox');
+                    isCheckedPrev = checkboxPrevElement.checked;
+                }
+                if(nextCont) {
+                    let checkboxNextElement = nextCont.querySelector('.distance-checkbox');
+                    isCheckedNext = checkboxNextElement.checked;
+                }
+                checkArr.push(isCheckedPrev);
+                checkArr.push(isCheckedNext);
+
+                return checkArr;
+            }
+
+            /**
+             * This method returns selected by user from list item's value.
+             */
+            function getSelectedValue(element) {
+                console.assert(element.tagName === 'SELECT', 'Argument of getSelectedValue is not select element');
+                return element.options[element.selectedIndex].value;
+            }
+
+            /**
+             * This method sets old values for inputs.
+             * @param voivodeSelect
+             * @param voivodeId
+             * @param citySelect
+             * @param cityId
+             */
+            function setOldValues(voivodeSelect, voivodeId, citySelect, cityId) {
+                let voivodeFlag = true;
+                let cityFlag = true;
+                for(let i = 0; i < voivodeSelect.length; i++) {
+                    if(voivodeSelect[i].value == voivodeId) {
+                        voivodeSelect[i].selected = true;
+                        voivodeFlag = false;
+                    }
+                }
+                for(let j = 0; j < citySelect.length; j++) {
+                    if(citySelect[j].value == cityId) {
+                        citySelect[j].selected = true;
+                        cityFlag = false;
+                    }
+                }
+                if(voivodeFlag) {
+                    $(voivodeSelect).val('0');
+                    console.log('zmienilo na wartosc domyslna voivode');
+                }
+                if(cityFlag) {
+                    $(citySelect).val('0');
+                    console.log('zmienilo na wartosc domyslna city');
+                }
+            }
+
+            /**
              * This function shows notification.
              */
             function notify(htmltext$string, type$string = 'info', delay$miliseconds$number = 5000) {
@@ -416,24 +473,19 @@
             }
 
             /**
-             * This method validate form
+             * This method validate form false - bad, true - good
              */
             function validateForm(element) {
                 console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
                 let citySelect = element.querySelector('.citySelect');
-                let cityValue = citySelect.options[citySelect.selectedIndex].value;
-                if(cityValue == 0) {
-                    return false;
-                }
-                else {
-                    return true;
-                }
+                let cityValue = getSelectedValue(citySelect);
+                return !(cityValue == 0);
             }
 
             /**
              * This constructor defines new show object
              * API:
-             * let variable = new showBox(); - we create new show object,
+             * let variable = new ShowBox(); - we create new show object,
              * variable.addNewShowButton() - indices that we want addNewShowButton(optional),
              * variable.addRemoveShowButton() - indices that we want removeShowButton(optional),
              * variable.addCheckboxFlag() - indices that we want checkbox(optional),
@@ -443,14 +495,14 @@
              * variable.createDOMBox(x, cityId, true, previousShowContainer, nextShowContainer) -
              * we create new DOM element with distance limit between previousShowContainer's limit and
              * nextShowContainer's limit.
-             * let DOMElement = variable.getForm(); - we obtain we obtain DOM representation of showBox
+             * let DOMElement = variable.getForm(); - we obtain we obtain DOM representation of ShowBox
              * ------------------------------------------------------------------------
              */
-            function showBox() {
+            function ShowBox() {
                 this.addNewShowButtonFlag = false; //indices whether add newShowButton
                 this.addRemoveShowButtonFlag = false; //indices whether add removeShowButton
                 this.addCheckboxFlag = false; //indices whether add refreshShowButton
-                this.DOMBox = null; //here is stored DOM representation of showBox
+                this.DOMBox = null; //here is stored DOM representation of ShowBox
                 this.addNewShowButton = function() {
                     this.addNewShowButtonFlag = true;
                 };
@@ -475,7 +527,7 @@
                         removeButton.classList.add('remove-button');
                         removeButtonContainer.appendChild(removeButton);
                         formBox.appendChild(removeButtonContainer);
-                    };
+                    }
                     /*END REMOVE BUTTON PART*/
 
                     /*HEADER PART*/
@@ -517,7 +569,7 @@
                         afterHeaderCol.appendChild(checkboxLabel);
                         afterHeaderRow.appendChild(afterHeaderCol);
                         formBox.appendChild(afterHeaderRow);
-                    };
+                    }
                     /*END CHECKBOX PART */
 
                     /*BODY PART*/
@@ -536,9 +588,6 @@
                     let secondSelect = document.createElement('select');
                     secondSelect.classList.add('citySelect');
                     secondSelect.classList.add('form-control');
-
-                    // appendBasicOption(secondSelect);
-
 
                     let formBodyColLeftColumn = document.createElement('div');
                     formBodyColLeftColumn.classList.add('col-md-6');
@@ -564,17 +613,10 @@
                         @endforeach()
 
                         $(firstSelect).on('change', function(e) {
-                            secondSelect.setAttribute('data-eventlistener', '3');
                             secondSelect.setAttribute('data-distance', 'infinity');
                             let voivodeId = e.target.value;
                             showWithoutDistanceAjax(voivodeId, secondSelect);
                         });
-                        // firstSelect.addEventListener('change', function thirdEventListenerFunction(e) {
-                        //     secondSelect.setAttribute('data-eventlistener', '3');
-                        //     secondSelect.setAttribute('data-distance', 'infinity');
-                        //     let voivodeId = e.target.value;
-                        //     showWithoutDistanceAjax(voivodeId, secondSelect);
-                        // });
                     }
                     else if((distance === 100 || distance === 30) && intersetion === false) { // adding show in the end
                         showInExtreme(distance, selectedCity, secondSelect, firstSelect);
@@ -582,10 +624,10 @@
                     else if((distance === 100 || distance === 30) && intersetion === true) { // adding show between some shows
                         const previousCitySelect = previousBox.querySelector('.citySelect');
                         const previousCityDistance = previousCitySelect.dataset.distance;
-                        const previousCityId = previousCitySelect.options[previousCitySelect.selectedIndex].value;
+                        const previousCityId = getSelectedValue(previousCitySelect);
                         const nextCitySelect = nextBox.querySelector('.citySelect');
                         const nextCityDistance = nextCitySelect.dataset.distance;
-                        const nextCityId = nextCitySelect.options[nextCitySelect.selectedIndex].value;
+                        const nextCityId = getSelectedValue(nextCitySelect);
 
                         showInTheMiddleAjax(previousCityDistance,previousCityId,nextCityDistance,nextCityId,secondSelect,firstSelect);
                     }
@@ -661,24 +703,7 @@
                     }
             }
 
-            /**
-             * This method append first day container and first show container
-             */
-            (function pageOpen() {
-                let firstDay = new DayBox();
-                firstDay.createDOMDayBox();
-                let firstDayContainer = firstDay.getBox();
-                panelBody.insertAdjacentElement("afterbegin", firstDayContainer);
-
-                let firstForm = new showBox();
-                firstForm.addRemoveShowButton();
-                firstForm.addDistanceCheckbox();
-                firstForm.addNewShowButton();
-                firstForm.createDOMBox();
-                let firstFormDOM = firstForm.getForm();
-
-                firstDayContainer.appendChild(firstFormDOM);
-            })();
+            /****************************************EVENT LISTENERS FUNCTIONS******************************************/
 
             /**
              * Global click handler
@@ -687,23 +712,23 @@
                 if(e.target.matches('.addNewShowButton')) { //user clicks on "add new show" button
                     e.preventDefault();
                     const newShowButton = e.target;
-                    const dayContainer = newShowButton.closest('.singleDayContainer');
+                    // const dayContainer = newShowButton.closest('.singleDayContainer');
                     const thisShowContainer = newShowButton.closest('.singleShowContainer');
                     const allSingleShowContainers = document.getElementsByClassName('singleShowContainer');
-                    const lastSingleShowCOntainer = allSingleShowContainers[allSingleShowContainers.length - 1];
+                    // const lastSingleShowCOntainer = allSingleShowContainers[allSingleShowContainers.length - 1];
 
                     const selectedCity = thisShowContainer.querySelector('.citySelect');
-                    const selectedCityId = selectedCity.options[selectedCity.selectedIndex].value;
+                    const selectedCityId = getSelectedValue(selectedCity);
 
-                    var validation = validateForm(thisShowContainer);
+                    let validation = validateForm(thisShowContainer);
 
                     if(validation) {
-                        let newForm = new showBox();
+                        let newForm = new ShowBox();
                         newForm.addRemoveShowButton();
                         newForm.addDistanceCheckbox();
                         newForm.addNewShowButton();
 
-                        lastOneFlag = true;
+                        let lastOneFlag = true;
                         let nextShowContainer = null;
                         //we are checking whether there is more single show containers
                         for(let i = 0; i < allSingleShowContainers.length; i++) {
@@ -719,7 +744,7 @@
                         //we are checking whether cliecked singleDayContainer is last one, or between others.
                         if(lastOneFlag === true) {
                             newForm.createDOMBox(30, selectedCityId);
-                            newFormDomElement = newForm.getForm();
+                            let newFormDomElement = newForm.getForm();
                             thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
                         }
                         else { //container is not last one
@@ -729,7 +754,7 @@
                             if(anextCitySelect.options[anextCitySelect.selectedIndex].value != 0 && apreviousCitySelect.options[apreviousCitySelect.selectedIndex].value != 0) {
                                 const previousShowContainer = thisShowContainer; // relative to newForm, this one is previousShowContainer
                                 newForm.createDOMBox(30, selectedCityId, true, previousShowContainer, nextShowContainer);
-                                newFormDomElement = newForm.getForm();
+                                let newFormDomElement = newForm.getForm();
                                 thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
                             }
                             else {
@@ -747,6 +772,313 @@
                     const removeShowButton = e.target;
                     const showContainer = removeShowButton.closest('.singleShowContainer');
                     const dayContainer = removeShowButton.closest('.singleDayContainer');
+                    // const allDayContainers = document.getElementsByClassName('singleDayContainer');
+
+                    let prevDayFlag = undefined; //true - another day, false - same day
+                    let nextDayFlag = undefined;
+                    let grandPrevDayFlag = undefined; //true - another day, false - same day
+                    let grandNextDayFlag = undefined;
+                    let nextShowFlag = undefined; //true - another day, false - same day
+                    let prevShowFlag = undefined;
+
+                    // const dayExistenceArray = checkingExistenceOfPrevAndNextContainers(dayContainer, 'singleDayContainer');
+                    const showExistenceArray = checkingExistenceOfPrevAndNextContainers(showContainer, 'singleShowContainer');
+
+                    let siblingsCheckboxArr = checkboxFilter(showExistenceArray);
+
+                    if(showExistenceArray[0]) { //case when previous container exist
+                        let prevShowContainer = showExistenceArray[0];
+                        let dayContOfPrevShowContainer = prevShowContainer.closest('.singleDayContainer');
+                        prevDayFlag = dayContainer == dayContOfPrevShowContainer ? false : true; //checking if next show is in the same day container
+
+                        let prevShowExistenceArr = checkingExistenceOfPrevAndNextContainers(prevShowContainer, 'singleShowContainer');
+                        let grandPrevCont = null;
+                        if(prevShowExistenceArr[0]) {
+                            grandPrevCont = prevShowExistenceArr[0];
+                        }
+
+                        if(grandPrevCont) { // grandprev container exist
+                            let dayContOfGrandPrevShowContainer = grandPrevCont.closest('.singleDayContainer');
+                            grandPrevDayFlag = dayContOfPrevShowContainer == dayContOfGrandPrevShowContainer ? false : true; //checking if next show is in the same day container
+                        }
+
+                        let nextShowContainer = null;
+
+                        if(showExistenceArray[1]) {
+                            nextShowContainer = showExistenceArray[1];
+                        }
+
+                        if(nextShowContainer) {
+                            let dayContOfNextShowContainer = nextShowContainer.closest('.singleDayContainer');
+                            nextShowFlag = dayContainer == dayContOfNextShowContainer ? false : true; //checking if next show is in the same day container
+                        }
+
+                        //main part
+                        if(!siblingsCheckboxArr[0]) {
+                            if(prevDayFlag) { //prev container is in previous day
+                                if(grandPrevCont) { //grandprev container exist
+                                    if(grandPrevDayFlag) { //grandprev is in grand previous day
+                                        if(nextShowContainer) { //next container exist
+                                            if(nextShowFlag) { //next container is in another day
+                                                console.log('prev exist & prev day, grandprev exist & grandprev is in grandprevday, nextshowcontaierExist & in another day');
+                                                let changeDistanceArr = [100, 100];
+                                                limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
+                                            }
+                                            else { //next container is in the same day
+                                                console.log('prev exist & prev day, grandprev exist & grandprev is in grandprevday, nextshowcontaierExist & in same day');
+                                                let changeDistanceArr = [100, 100];
+                                                limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
+                                            }
+                                        }
+                                        else { //next container doesn't exist
+                                            console.log('prev exist & prev day, grandprev exist & grandprev is in grandprevday, nextshowcontaier doesnt exist');
+                                            limitSelectsWhenExtreme(prevShowContainer, grandPrevCont, 100);
+                                        }
+
+                                    }
+                                    else { //grandprev is in previous day(same as previousShowContainer)
+                                        if(nextShowContainer) { //next container exist
+                                            if(nextShowFlag) { //next container is in another day
+                                                console.log('prev exist & prev day, grandprev exist & grandprev is same day as prev, nextshowcontaier Exist & in another day');
+                                                let changeDistanceArr = ['undefined', 100];
+                                                limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
+
+                                            }
+                                            else { //next container is in the same day
+                                                console.log('prev exist & prev day, grandprev exist & grandprev is same day as prev, nextshowcontaier Exist & in same day');
+                                                let changeDistanceArr = ['undefined', 100];
+                                                limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
+                                            }
+                                        }
+                                        else { //next container doesn't exist
+                                            console.log('prev exist & prev day, grandprev exist & grandprev is same day as prev, nextshowcontaier doesnt Exist');
+                                            limitSelectsWhenExtreme(prevShowContainer, grandPrevCont, 30);
+                                        }
+                                    }
+                                }
+                                else { //grandprev doesn't exist
+                                    if(nextShowContainer) { //next container exist
+                                        if(nextShowFlag) { //next container is in another day
+                                            console.log('prev exist & prev day, grandprev doesnt exist, nextshowcontaier Exist & in another day');
+                                            //nic nie robie, ponieważ akcja ma miejsce w tym przypadku w przypadku dla nastepnego.
+                                        }
+                                        else { //next container is in the same day
+                                            console.log('prev exist & prev day, grandprev doesnt exist, nextshowcontaier Exist & in same day');
+                                            //nic nie robie, ponieważ akcja ma miejsce w tym przypadku w przypadku dla nastepnego.
+                                        }
+                                    }
+                                    else { //next container doesn't exist
+                                        console.log('prev exist & prev day, grandprev doesnt exist, nextshowcontaier doesnt Exist');
+                                        allCitiesAndAllVoivodes(prevShowContainer);
+                                    }
+                                }
+                            }
+                            else { //prev container is in the same day
+                                if(grandPrevCont) { // grandprev container exist
+                                    if(grandPrevDayFlag) { //grandprev is in grand previous day
+                                        if(nextShowContainer) { //next container exist
+                                            if(nextShowFlag) { //next container is in another day
+                                                console.log('prev exist & same day, grandprev exist & grandprev is in grandprevday, nextshowcontaier exist & in another day');
+                                                let changeDistanceArr = [100, 100];
+                                                limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
+                                            }
+                                            else { //next container is in the same day
+                                                console.log('prev exist & same day, grandprev exist & grandprev is in grandprevday, nextshowcontaier exist & in same day');
+                                                let changeDistanceArr = [100, 'undefined'];
+                                                limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
+                                            }
+                                        }
+                                        else { //next container doesn't exist
+                                            console.log('prev exist & same day, grandprev exist & grandprev is in grandprevday, nextshowcontaier doesnt exist');
+                                            limitSelectsWhenExtreme(prevShowContainer, grandPrevCont, 100);
+                                        }
+                                    }
+                                    else { //grandprev is in previous day(same as previousShowContainer)(all containers are in same day container case)
+                                        if(nextShowContainer) { //next container exist
+                                            if(nextShowFlag) { //next container is in another day
+                                                console.log('prev exist & same day, grandprev exist & grandprev is prev day, nextshowcontaier Exist & in another day');
+                                                let changeDistanceArr = ['undefined', 100];
+                                                limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
+                                            }
+                                            else { //next container is in the same day
+                                                console.log('prev exist & same day, grandprev exist & grandprev is prev day, nextshowcontaier Exist & in same day');
+                                                let changeDistanceArr = ['undefined', 'undefined'];
+                                                limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
+                                            }
+                                        }
+                                        else { //next container doesn't exist
+                                            console.log('prev exist & same day, grandprev exist & grandprev is prev day, nextshowcontaier doesnt exist');
+                                            limitSelectsWhenExtreme(prevShowContainer, grandPrevCont, 30);
+                                        }
+                                    }
+                                }
+                                else { //grandprev container doesn't exist
+                                    if(nextShowContainer) { //next container exist
+                                        if(nextShowFlag) { //next container is in another day
+                                            console.log('grandprev doesnt exist, next exist and another day');
+                                            ////nic nie robie, ponieważ akcja ma miejsce w tym przypadku w przypadku dla nastepnego.
+                                        }
+                                        else { //next container is in the same day
+                                            console.log('grandprev doesnt exist, next exist and same day');
+                                            //nic nie robie, ponieważ akcja ma miejsce w tym przypadku w przypadku dla nastepnego.
+                                        }
+                                    }
+                                    else { //next container doesn't exist
+                                        console.log('grandprev doesnt exist, next doesnt exist');
+                                        allCitiesAndAllVoivodes(prevShowContainer);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if(showExistenceArray[1]) { //case when next container exist
+                        let nextShowContainer = showExistenceArray[1];
+                        let dayContOfNextShowContainer = nextShowContainer.closest('.singleDayContainer');
+                        nextDayFlag = dayContainer == dayContOfNextShowContainer ? false : true; //checking if next show is in the same day container
+
+                        let nextShowExistenceArr = checkingExistenceOfPrevAndNextContainers(nextShowContainer, 'singleShowContainer');
+                        let grandNextCont = null;
+                        if(nextShowExistenceArr[1]) {
+                            grandNextCont = nextShowExistenceArr[1];
+                        }
+
+                        if(grandNextCont) { // grandprev container exist
+                            let dayContOfGrandNextShowContainer = grandNextCont.closest('.singleDayContainer');
+                            grandNextDayFlag = dayContOfNextShowContainer == dayContOfGrandNextShowContainer ? false : true; //checking if next show is in the same day container
+                        }
+
+                        let prevShowContainer = null;
+
+                        if(showExistenceArray[0]) {
+                            prevShowContainer = showExistenceArray[0];
+                        }
+
+                        if(prevShowContainer) {
+                            let dayContOfPrevShowContainer = prevShowContainer.closest('.singleDayContainer');
+                            prevShowFlag = dayContainer == dayContOfPrevShowContainer ? false : true; //checking if next show is in the same day container
+                        }
+
+                        //main part
+                        if(!siblingsCheckboxArr[1]) { //checkbox is not selected
+                            if(nextDayFlag) { //prev container is in previous day
+                                if(grandNextCont) { //grandprev container exist
+                                    if(grandNextDayFlag) { //grandprev is in grand previous day
+                                        if(prevShowContainer) { //next container exist
+                                            if(prevShowFlag) { //next container is in another day
+                                                console.log('next exist & next day, grandnext exist & grandnext is in grandnextday, prevshowcontaierExist & in another day');
+                                                let changeDistanceArr = [100, 100];
+                                                limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
+                                            }
+                                            else { //prev container is in the same day
+                                                console.log('next exist & next day, grandnext exist & grandnext in grandnextday, prevshowcontaierExist & in same day');
+                                                let changeDistanceArr = [100, 100];
+                                                limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
+                                            }
+                                        }
+                                        else { //prev container doesn't exist
+                                            console.log('next exist & next day, grandnext exist & grandnext is in grandnextday, prevshowcontaier doesnt exist');
+                                            limitSelectsWhenExtreme(nextShowContainer, grandNextCont, 100);
+                                        }
+
+                                    }
+                                    else { //grandnext is in next day(same as nextShowContainer)
+                                        if(prevShowContainer) { //prev container exist
+                                            if(prevShowFlag) { //prev container is in another day
+                                                console.log('next exist & next day, grandnext exist & grandnext is same day as next, prevshowcontaier Exist & in another day');
+                                                let changeDistanceArr = ['undefined', 100]; //[dalszy, blizszy]
+                                                limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
+
+                                            }
+                                            else { //prev container is in the same day
+                                                console.log('next exist & next day, grandnext exist & grandnext is same day as next, prevshowcontaier Exist & in same day');
+                                                let changeDistanceArr = ['undefined', 100];
+                                                limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
+                                            }
+                                        }
+                                        else { //prev container doesn't exist
+                                            console.log('next exist & next day, grandnext exist & grandnext is same day as prev, prevshowcontaier doesnt Exist');
+                                            limitSelectsWhenExtreme(nextShowContainer, grandNextCont, 30);
+                                        }
+                                    }
+                                }
+                                else { //grandNext doesn't exist
+                                    if(prevShowContainer) { //prev container exist
+                                        if(prevShowFlag) { //prev container is in another day
+                                            console.log('next exist & next day, grandnext doesnt exist, prevshowcontaier Exist & in another day');
+                                            limitSelectsWhenExtreme(nextShowContainer, prevShowContainer, 100);
+                                        }
+                                        else { //prev container is in the same day
+                                            console.log('next exist & next day, grandnext doesnt exist, prevshowcontaier Exist & in same day');
+                                            limitSelectsWhenExtreme(nextShowContainer, prevShowContainer, 100);
+                                        }
+                                    }
+                                    else { //prev container doesn't exist
+                                        console.log('next exist & next day, grandnext doesnt exist, prevshowcontaier doesnt Exist');
+                                        allCitiesAndAllVoivodes(nextShowContainer);
+                                    }
+                                }
+                            }
+                            else { //next container is in the same day
+                                if(grandNextCont) { // grandnext container exist
+                                    if(grandNextDayFlag) { //grandnext is in grand next day
+                                        if(prevShowContainer) { //prev container exist
+                                            if(prevShowFlag) { //prev container is in another day
+                                                console.log('next exist & same day, grandnext exist & grandnext is in grandnextday, prevshowcontaier exist & in another day');
+                                                let changeDistanceArr = [100, 100];
+                                                limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
+                                            }
+                                            else { //prev container is in the same day
+                                                console.log('next exist & same day, grandnext exist & grandnext is in grandnextday, prevshowcontaier exist & in same day');
+                                                let changeDistanceArr = [100, 'undefined'];
+                                                limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
+                                            }
+                                        }
+                                        else { //prev container doesn't exist
+                                            console.log('next exist & same day, grandnext exist & grandnext is in grandnextday, prevshowcontaier doesnt exist');
+                                            limitSelectsWhenExtreme(nextShowContainer, grandNextCont, 100);
+                                        }
+                                    }
+                                    else { //grandnext is in next day(same as nextShowContainer)(all containers are in same day container case)
+                                        if(prevShowContainer) { //prev container exist
+                                            if(prevShowFlag) { //prev container is in another day
+                                                console.log('next exist & same day, grandnext exist & grandnext is same day, prevshowcontaier Exist & in another day');
+                                                let changeDistanceArr = ['undefined', 100];
+                                                limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
+                                            }
+                                            else { //prev container is in the same day
+                                                console.log('next exist & same day, grandnext exist & grandnext is next day, prevshowcontaier Exist & in same day');
+                                                let changeDistanceArr = ['undefined', 'undefined'];
+                                                limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
+                                            }
+                                        }
+                                        else { //prev container doesn't exist
+                                            console.log('next exist & same day, grandnext exist & grandnext is same day, prevshowcontaier doesnt exist');
+                                            limitSelectsWhenExtreme(nextShowContainer, grandNextCont, 30);
+                                        }
+                                    }
+                                }
+                                else { //grandnext container doesn't exist
+                                    if(prevShowContainer) { //prev container exist
+                                        if(prevShowFlag) { //prev container is in another day
+                                            console.log('grandnext doesnt exist, next in same day, prev exist and another day');
+                                            limitSelectsWhenExtreme(nextShowContainer, prevShowContainer, 100);
+                                        }
+                                        else { //next container is in the same day
+                                            console.log('grandnext doesnt exist, prev exist and same day');
+                                            limitSelectsWhenExtreme(nextShowContainer, prevShowContainer, 30);
+                                        }
+                                    }
+                                    else { //prev container doesn't exist
+                                        allCitiesAndAllVoivodes(nextShowContainer);
+                                    }
+                                }
+                            }
+                        }
+
+
+                    }
+
                     const allRemoveButtons = dayContainer.getElementsByClassName('remove-button');
                     console.assert(allRemoveButtons, "Brak przycisków usuń");
                     if(allRemoveButtons.length > 1) { //delete only show box
@@ -756,6 +1088,7 @@
                         const allDayContainers = document.getElementsByClassName('singleDayContainer');
                         if(allDayContainers.length > 1) {
                             dayContainer.parentNode.removeChild(dayContainer);
+                            adjustDayNumbers();
                         }
                         else {
                             notify('Nie można usunąć pierwszego dnia!');
@@ -778,9 +1111,9 @@
 
                         const allCitiesSelect = document.getElementsByClassName('citySelect');
                         const selectedCity = allCitiesSelect[allCitiesSelect.length - 1];
-                        const selectedCityId = selectedCity.options[selectedCity.selectedIndex].value;
+                        const selectedCityId = getSelectedValue(selectedCity);
 
-                        let firstForm = new showBox();
+                        let firstForm = new ShowBox();
                         firstForm.addRemoveShowButton();
                         firstForm.addDistanceCheckbox();
                         firstForm.addNewShowButton();
@@ -794,7 +1127,72 @@
                     }
 
                 }
-            };
+                else if(e.target.matches('#save')) {
+                    const allSingleShowContainers = document.querySelectorAll('.singleShowContainer');
+                    const allSingleDayContainers = document.getElementsByClassName('singleDayContainer');
+                    let finalArray = [];
+
+                    let isOk = validateAllForms(allSingleShowContainers);
+
+                    if(isOk) {
+                        for(let i = 0; i < allSingleDayContainers.length; i++) {
+                            let singleShowContainersInsideGivenDay = allSingleDayContainers[i].querySelectorAll('.singleShowContainer');
+                            let dayNumber = i+1;
+
+                            singleShowContainersInsideGivenDay.forEach(show => {
+                                let voivodeSelect = show.querySelector('.voivodeSelect');
+                                let voivodeId = getSelectedValue(voivodeSelect);
+
+                                let citySelect = show.querySelector('.citySelect');
+                                let cityId = getSelectedValue(citySelect);
+
+                                let info = {
+                                day: dayNumber,
+                                voivode: voivodeId,
+                                city: cityId
+                                }
+                                finalArray.push(info);
+                            });
+                        }
+                        let JSONData = JSON.stringify(finalArray);
+                        let finalForm = document.createElement('form');
+                        finalForm.setAttribute('method', 'post');
+                        finalForm.setAttribute('action', "{{URL::to('/addNewRouteTemplate')}}");
+                        finalForm.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="alldata" value=' + JSONData + '>';
+                        submitPlace.appendChild(finalForm);
+                        finalForm.submit();
+
+                    }
+                    else {
+                        notify('Wybierz miasta we wszystkich polach');
+                    }
+                }
+            }
+
+            /**
+             * This method adjust day container numbers;
+             */
+            function adjustDayNumbers() {
+                let allDayNotations = document.getElementsByClassName('day-info');
+                for(let i = 0, max = allDayNotations.length; i < max; i++) {
+                    allDayNotations[i].textContent = 'Dzień ' + (i+1);
+                }
+            }
+
+            /**
+             * This method validate all single day forms
+             */
+            function validateAllForms(element) {
+                let flag = true;
+                element.forEach(day => {
+                    let validation = validateForm(day);
+                    if(validation === false) {
+                        flag = false;
+                    }
+                });
+
+                return flag;
+            }
 
                 /**
                  * This event listener is responsible for change event on document
@@ -810,7 +1208,7 @@
                     let voivodeSelect = thisSingleShowContainer.querySelector('.voivodeSelect');
                     voivodeSelect.innerHTML = ''; //clear select
                     let citySelect = thisSingleShowContainer.querySelector('.citySelect');
-                    let cityDistance = citySelect.dataset.distance;
+                    // let cityDistance = citySelect.dataset.distance;
                     citySelect.innerHTML = ''; //clear select
 
                     //this part remove all event listeners from this node
@@ -857,7 +1255,7 @@
                             var singleVoivode = document.createElement('option');
                             singleVoivode.value = {{$voivode->id}};
                             singleVoivode.textContent = '{{$voivode->name}}';
-                            voivodeSelect.appendChild(singleVoivode);
+                            voivodeSelect.appendChild(singleVoivode);password_date
                             @endforeach()
 
                             voivodeSelect.addEventListener('change', e => {
@@ -868,23 +1266,23 @@
                         }
                         else if(previousSingleShowContainer !== null && nextSingleShowContainer === null) { //case when show is last one
                             const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
-                            const previousCityId = previousCitySelect.options[previousCitySelect.selectedIndex].value;
+                            const previousCityId = getSelectedValue(previousCitySelect);
                             showInExtreme(citySelect.dataset.previousdistance, previousCityId, citySelect, voivodeSelect);
                         }
                         else if(previousSingleShowContainer === null && nextSingleShowContainer !== null) { //case when show is first one
                             const nextCitySelect = nextSingleShowContainer.querySelector('.citySelect');
-                            const nextCityId = nextCitySelect.options[nextCitySelect.selectedIndex].value;
+                            const nextCityId = getSelectedValue(nextCitySelect);
 
                             showInExtreme(30, nextCityId, citySelect, voivodeSelect);
                         }
                         else if(previousSingleShowContainer !== null && nextSingleShowContainer !== null) { //case when show is in the middle
                             const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
                             const previousCityDistance = previousCitySelect.dataset.distance;
-                            const previousCityId = previousCitySelect.options[previousCitySelect.selectedIndex].value;
+                            const previousCityId = getSelectedValue(previousCitySelect);
 
                             const nextCitySelect = nextSingleShowContainer.querySelector('.citySelect');
                             const nextCityDistance = nextCitySelect.dataset.distance;
-                            const nextCityId = nextCitySelect.options[nextCitySelect.selectedIndex].value;
+                            const nextCityId = getSelectedValue(nextCitySelect);
 
                             showInTheMiddleAjax(previousCityDistance, previousCityId, nextCityDistance, nextCityId, citySelect, voivodeSelect);
                         }
@@ -892,7 +1290,7 @@
                     }
                 }
                 else if(e.target.matches('.citySelect')) { // user changes city
-                    const changedCitySelect = e.target;
+                    // const changedCitySelect = e.target;
                     const thisSingleShowContainer = e.target.closest('.singleShowContainer');
                     const thisDayContainer = e.target.closest('.singleDayContainer');
                     const thisContainerCheckbox = thisSingleShowContainer.querySelector('.distance-checkbox');
@@ -915,99 +1313,104 @@
                     previousShowContainer = siblingShowContainersArr[0] === null ? null : siblingShowContainersArr[0];
                     nextShowContainer = siblingShowContainersArr[1] === null ? null : siblingShowContainersArr[1];
 
+                    if(nextShowContainer) { //case when next show exist.
+                        if(siblingCheckboxArr[1] === false) { //next show container doesn't have checked distance checkbox
+                            let dayContainerOfNextShowContainer = nextShowContainer.closest('.singleDayContainer');
+                            nextDayFlag = dayContainerOfNextShowContainer == thisDayContainer ? false : true; //checking if next show is in the same day container
 
-                    if(isCheckedThisContainer) { //Distance checkbox is checked inside clicked container
+                            if(nextDayFlag) { //case when next show is in another day container
+                                let prevShowContainerRelatedToNextShowContainer = thisSingleShowContainer;
+                                let siblingsOfNextShowContainerArr = checkingExistenceOfPrevAndNextContainers(nextShowContainer, 'singleShowContainer');
+                                // let nextSiblingCheckboxArr = checkboxFilter(siblingsOfNextShowContainerArr);
+                                let grandNextShowContainer = undefined; // previous show container of previous show container
+                                grandNextShowContainer = siblingsOfNextShowContainerArr[1] === null ? null : siblingsOfNextShowContainerArr[1];
 
-                    }
-                    else { //distance checkbox is unchecked inside clicked container
-                        if(nextShowContainer) { //case when next show exist.
-                            if(siblingCheckboxArr[1] === false) { //next show container doesn't have checked distance checkbox
-                                let dayContainerOfNextShowContainer = nextShowContainer.closest('.singleDayContainer');
-                                nextDayFlag = dayContainerOfNextShowContainer == thisDayContainer ? false : true; //checking if next show is in the same day container
-
-                                if(nextDayFlag) { //case when next show is in another day container
-                                    let prevShowContainerRelatedToNextShowContainer = thisSingleShowContainer;
-                                    let siblingsOfNextShowContainerArr = checkingExistenceOfPrevAndNextContainers(nextShowContainer, 'singleShowContainer');
-                                    let nextSiblingCheckboxArr = checkboxFilter(siblingsOfNextShowContainerArr);
-                                    let grandNextShowContainer = undefined; // previous show container of previous show container
-                                    grandNextShowContainer = siblingsOfNextShowContainerArr[1] === null ? null : siblingsOfNextShowContainerArr[1];
-
-                                    if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
-                                        let changeDistanceArr = [100];
-                                        limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
-                                    }
-                                    else { // there is no next container (related to prev show container)
-                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 100);
-                                    }
+                                if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
+                                    let changeDistanceArr = [100,'undefined'];
+                                    limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
                                 }
-                                else { //case when next show is in the same day container
-                                    let grandNextShowContainer = undefined;
-                                    let prevShowContainerRelatedToNextShowContainer = thisSingleShowContainer;
-                                    let siblingsOfNextShowContainerArr = checkingExistenceOfPrevAndNextContainers(nextShowContainer, 'singleShowContainer');
-                                    let nextSiblingCheckboxArr = checkboxFilter(siblingsOfNextShowContainerArr);
-                                    grandNextShowContainer = siblingsOfNextShowContainerArr[1] === null ? null : siblingsOfNextShowContainerArr[1];
-
-                                    if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
-                                        let dayContainerOfGrandNextShowContainer = grandNextShowContainer.closest('.singleDayContainer');
-                                        grandNextDayFlag = dayContainerOfGrandNextShowContainer == dayContainerOfNextShowContainer ? false : true; //checking if grandnext show is in the same day container as next show
-                                        if(grandNextDayFlag) { //grandnext show is in another day container related to next show
-                                            let changeDistanceArr = [100];
-                                            limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
-                                        }
-                                        else { //grandnext show is in the same day container as next show
-                                            limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer);
-                                        }
-                                    }
-                                    else { // there is no next container (related to next show container)
-                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
-                                    }
+                                else { // there is no next container (related to prev show container)
+                                    limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 100);
                                 }
                             }
+                            else { //case when next show is in the same day container
+                                let grandNextShowContainer = undefined;
+                                let prevShowContainerRelatedToNextShowContainer = thisSingleShowContainer;
+                                let siblingsOfNextShowContainerArr = checkingExistenceOfPrevAndNextContainers(nextShowContainer, 'singleShowContainer');
+                                // let nextSiblingCheckboxArr = checkboxFilter(siblingsOfNextShowContainerArr);
+                                grandNextShowContainer = siblingsOfNextShowContainerArr[1] === null ? null : siblingsOfNextShowContainerArr[1];
 
+                                if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
+                                    let dayContainerOfGrandNextShowContainer = grandNextShowContainer.closest('.singleDayContainer');
+                                    grandNextDayFlag = dayContainerOfGrandNextShowContainer == dayContainerOfNextShowContainer ? false : true; //checking if grandnext show is in the same day container as next show
+                                    if(grandNextDayFlag) { //grandnext show is in another day container related to next show
+                                        let changeDistanceArr = [100,'undefined'];
+                                        limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+                                    }
+                                    else { //grandnext show is in the same day container as next show
+                                        limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer);
+                                    }
+                                }
+                                else { // there is no next container (related to next show container)
+                                    limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
+                                }
+                            }
                         }
 
-                        //case when prev show exist.
-                        if(previousShowContainer) {
-                            if(siblingCheckboxArr[0] === false) { //prev show container doesn't have checked distance checkbox
-                                let dayContainerOfPreviousShowContainer = previousShowContainer.closest('.singleDayContainer');
-                                prevDayFlag = dayContainerOfPreviousShowContainer == thisDayContainer ? false : true; //checking if prev show is in the same day container
+                    }
 
-                                if(prevDayFlag) { //case when prev show is in another day container
-                                    let nextShowContainerRelatedToPreviousShowContainer = thisSingleShowContainer;
-                                    let siblingsOfPreviousShowContainerArr = checkingExistenceOfPrevAndNextContainers(previousShowContainer, 'singleShowContainer');
-                                    let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
-                                    let grandPrevShowContainer = undefined; // previous show container of previous show container
-                                    grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
-                                    if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
-                                        let changeDistanceArr = [100];
+                    //case when prev show exist.
+                    if(previousShowContainer) {
+                        if(siblingCheckboxArr[0] === false) { //prev show container doesn't have checked distance checkbox
+                            let dayContainerOfPreviousShowContainer = previousShowContainer.closest('.singleDayContainer');
+                            prevDayFlag = dayContainerOfPreviousShowContainer == thisDayContainer ? false : true; //checking if prev show is in the same day container
+
+                            if(prevDayFlag) { //case when prev show is in another day container
+                                let nextShowContainerRelatedToPreviousShowContainer = thisSingleShowContainer;
+                                let siblingsOfPreviousShowContainerArr = checkingExistenceOfPrevAndNextContainers(previousShowContainer, 'singleShowContainer');
+                                // let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
+                                let grandPrevShowContainer = undefined; // previous show container of previous show container
+                                grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
+                                if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
+                                    let dayContainerOfGrandPrev = grandPrevShowContainer.closest('.singleDayContainer');
+                                    grandNextDayFlag = dayContainerOfGrandPrev === dayContainerOfPreviousShowContainer ? false : true;
+                                    let changeDistanceArr = [];
+                                    if(grandNextDayFlag) {// case when grand prev show is another day related to prev show
+                                        changeDistanceArr = [100, 100];
+                                    }
+                                    else { //case when grand prev show is in same day container as prev show
+                                        changeDistanceArr = [30, 100];
+                                    }
+
+                                    limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
+                                }
+                                else { // there is no previous container (related to prev show container)
+                                    limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
+                                }
+
+                            }
+                            else { //case when prev show is in the same day container
+                                let nextShowContainerRelatedToPreviousShowContainer = thisSingleShowContainer;
+                                let grandPrevShowContainer = undefined; // previous show container of previous show container
+                                let siblingsOfPreviousShowContainerArr = checkingExistenceOfPrevAndNextContainers(previousShowContainer, 'singleShowContainer');
+                                // let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
+                                grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
+
+                                if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
+                                    let dayContainerOfGrandPrevShowContainer = grandPrevShowContainer.closest('.singleDayContainer');
+                                    grandPrevDayFlag = dayContainerOfGrandPrevShowContainer == dayContainerOfPreviousShowContainer ? false : true; //checking if grandprev show is in the same day container as prev show
+                                    if(grandPrevDayFlag) { //grandprev show is in another day container related to prev show
+                                        // let changeDistanceArr = [100,'undefined'];
+                                        // console.log('Tu wchodzi warunek');
+                                        let changeDistanceArr = [100, 'undefined'];
                                         limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                     }
-                                    else { // there is no previous container (related to prev show container)
-                                        limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
+                                    else { //grandprev show is in the same day container as prev show
+                                        limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer);
                                     }
-
                                 }
-                                else { //case when prev show is in the same day container
-                                    let nextShowContainerRelatedToPreviousShowContainer = thisSingleShowContainer;
-                                    let grandPrevShowContainer = undefined; // previous show container of previous show container
-                                    let siblingsOfPreviousShowContainerArr = checkingExistenceOfPrevAndNextContainers(previousShowContainer, 'singleShowContainer');
-                                    let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
-                                    grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
-
-                                    if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
-                                        let dayContainerOfGrandPrevShowContainer = grandPrevShowContainer.closest('.singleDayContainer');
-                                        grandPrevDayFlag = dayContainerOfGrandPrevShowContainer == dayContainerOfPreviousShowContainer ? false : true; //checking if grandprev show is in the same day container as prev show
-                                        if(grandPrevDayFlag) { //grandprev show is in another day container related to prev show
-                                            let changeDistanceArr = [100];
-                                            limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
-                                        }
-                                        else { //grandprev show is in the same day container as prev show
-                                            limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer);
-                                        }
-                                    }
-                                    else { // there is no previous container (related to prev show container)
-                                        limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 30);
-                                    }
+                                else { // there is no previous container (related to prev show container)
+                                    limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 30);
                                 }
                             }
                         }
@@ -1016,39 +1419,126 @@
                 }
             }
 
-            document.addEventListener('click', globalClickHandler);
-            document.addEventListener('change', globalChangeHandler);
+
+            /**
+             * This method is used in shows without distance limit
+             */
+            function showWithoutDistanceAjax(voivodeId, citySelect) {
+                console.assert(!isNaN(parseInt(voivodeId)) && voivodeId != 0, 'voivodeId in showWithoutDistanceAjax is not number!');
+                console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
+                $.ajax({
+                    type: "POST",
+                    async: false,
+                    url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
+                    data: {
+                        "id": voivodeId
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
+                        let placeToAppend = citySelect;
+                        placeToAppend.innerHTML = '';
+                        appendBasicOption(placeToAppend);
+                        for(let i = 0; i < response.length; i++) {
+                            let responseOption = document.createElement('option');
+                            responseOption.value = response[i].id;
+                            responseOption.textContent = response[i].name;
+                            placeToAppend.appendChild(responseOption);
+                        }
+                        flag = true;
+                    }
+                });
+            }
 
             function limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr = null) {
+                console.assert(grandNextShowContainer.matches('.singleShowContainer'), 'grandNextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                console.assert(thisSingleShowContainer.matches('.singleShowContainer'), 'thisSingleShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                console.assert(nextShowContainer.matches('.singleShowContainer'), 'nextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
                 const grandNextShowContainerCitySelect = grandNextShowContainer.querySelector('.citySelect');
                 const grandNextShowContainerCityDistance = grandNextShowContainerCitySelect.dataset.distance;
-                const grandNextShowContainerCityId = grandNextShowContainerCitySelect.options[grandNextShowContainerCitySelect.selectedIndex].value;
+                let grandNextShowContainerCityId = null;
+                // console.log('grandNextShowContainerCitySelect: ', grandNextShowContainerCitySelect);
+                if(grandNextShowContainerCitySelect.options[grandNextShowContainerCitySelect.selectedIndex]) {
+                    grandNextShowContainerCityId = getSelectedValue(grandNextShowContainerCitySelect);
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach 1");
+                    return false;
+                }
 
                 const thisSingleShowContainerCitySelect = thisSingleShowContainer.querySelector('.citySelect');
+                // console.log('thisSingleShowContainerCitySelect', thisSingleShowContainerCitySelect);
                 const thisSingleShowContainerCitySelectCityDistance = thisSingleShowContainerCitySelect.dataset.distance;
-                const thisSingleShowContainerCityId = thisSingleShowContainerCitySelect.options[thisSingleShowContainerCitySelect.selectedIndex].value;
+                let thisSingleShowContainerCityId = null;
+                if(thisSingleShowContainerCitySelect.options[thisSingleShowContainerCitySelect.selectedIndex]) {
+                    thisSingleShowContainerCityId = getSelectedValue(thisSingleShowContainerCitySelect);
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach 2");
+                    return false;
+                }
 
                 const nextShowContainerCitySelect = nextShowContainer.querySelector('.citySelect');
-                const nextShowContainerCityid = nextShowContainerCitySelect.options[nextShowContainerCitySelect.selectedIndex].value;
+                // console.log('nextShowContainerCitySelect', nextShowContainerCitySelect);
+                let nextShowContainerCityid = null;
+                if(nextShowContainerCitySelect.options[nextShowContainerCitySelect.selectedIndex]) {
+                    nextShowContainerCityid = getSelectedValue(nextShowContainerCitySelect);
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach 3");
+                    return false;
+                }
                 let nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
-                const nextShowContainerVoivodeId = nextShowContainerVoivodeSelect.options[nextShowContainerVoivodeSelect.selectedIndex].value;
+                // console.log('nextShowContainerVoivodeSelect', nextShowContainerVoivodeSelect);
+                let nextShowContainerVoivodeId = null;
+                if(nextShowContainerVoivodeSelect.options[nextShowContainerVoivodeSelect.selectedIndex]) {
+                    nextShowContainerVoivodeId = getSelectedValue(nextShowContainerVoivodeSelect);
+                }
+                else {
+                    notify("Wybierz województwa we wszystkich listach 4");
+                    return false;
+                }
+
+                if((grandNextShowContainerCitySelect.length == 0 || grandNextShowContainerCityId == 0) ||
+                    (thisSingleShowContainerCitySelect.length == 0 || thisSingleShowContainerCityId == 0) ||
+                    (nextShowContainerCitySelect.length == 0  || nextShowContainerCityid == 0) ||
+                    (nextShowContainerVoivodeSelect.length == 0 || nextShowContainerVoivodeId == 0)) {
+                    notify("Wybierz miasta i województwa we wszystkich listach 5");
+                    return false;
+                }
 
                 let oldValuesArray = [nextShowContainerVoivodeSelect, nextShowContainerVoivodeId, nextShowContainerCitySelect, nextShowContainerCityid];
 
                 $(nextShowContainerVoivodeSelect).off();
 
-                nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
-
+                // nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
                 nextShowContainerVoivodeSelect.innerHTML = '';
                 nextShowContainerCitySelect.innerHTML = '';
+                console.log(grandNextShowContainerCitySelect);
+                console.log(thisSingleShowContainerCitySelect);
 
                 if(changeDistanceArr) {
-                    showInTheMiddleAjax(changeDistanceArr[0],grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
+                    let helpArr = [];
+                    if(changeDistanceArr[0] != 'undefined') {
+                        helpArr.push(changeDistanceArr[0]);
+                    }
+                    else {
+                        helpArr.push(grandNextShowContainerCityDistance);
+                    }
+                    if(changeDistanceArr[1] != 'undefined') {
+                        helpArr.push(changeDistanceArr[1]);
+                    }
+                    else {
+                        helpArr.push(thisSingleShowContainerCitySelectCityDistance);
+                    }
+                    console.log(helpArr);
+                    showInTheMiddleAjax(helpArr[0],grandNextShowContainerCityId,helpArr[1],thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
                 }
                 else {
                     showInTheMiddleAjax(grandNextShowContainerCityDistance,grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
                 }
-
             }
 
             /**
@@ -1056,93 +1546,81 @@
              */
             function limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, limit) {
                 let prevShowContainerVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
-                let prevShowVoivodeId = prevShowContainerVoivodeSelect.options[prevShowContainerVoivodeSelect.selectedIndex].value;
+                // console.log('prevShowContainerVoivodeSelect',prevShowContainerVoivodeSelect);
+                let prevShowVoivodeId = null;
+                if(prevShowContainerVoivodeSelect.options[prevShowContainerVoivodeSelect.selectedIndex]) {
+                    prevShowVoivodeId = getSelectedValue(prevShowContainerVoivodeSelect);
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach 6");
+                    return false;
+                }
 
                 let prevShowContainerCitySelect = previousShowContainer.querySelector('.citySelect');
-                let prevShowCityId = prevShowContainerCitySelect.options[prevShowContainerCitySelect.selectedIndex].value;
+                // console.log('prevShowContainerCitySelect', prevShowContainerCitySelect);
+                let prevShowCityId = null;
+                if(prevShowContainerCitySelect.options[prevShowContainerCitySelect.selectedIndex]) {
+                    prevShowCityId = getSelectedValue(prevShowContainerCitySelect);
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach 7");
+                    return false;
+                }
 
                 let nextShowContainerRelatedToPreviousShowContainerCitySelect = nextShowContainerRelatedToPreviousShowContainer.querySelector('.citySelect');
-                let nextShowContainerRelatedToPreviousShowContainerCityId = nextShowContainerRelatedToPreviousShowContainerCitySelect.options[nextShowContainerRelatedToPreviousShowContainerCitySelect.selectedIndex].value;
+                // console.log('nextShowContainerRelatedToPreviousShowContainerCitySelect', nextShowContainerRelatedToPreviousShowContainerCitySelect);
+                let nextShowContainerRelatedToPreviousShowContainerCityId = null;
+                if(nextShowContainerRelatedToPreviousShowContainerCitySelect.options[nextShowContainerRelatedToPreviousShowContainerCitySelect.selectedIndex]) {
+                    nextShowContainerRelatedToPreviousShowContainerCityId = getSelectedValue(nextShowContainerRelatedToPreviousShowContainerCitySelect);
+
+                }
+                else {
+                    notify("Wybierz miasta i województwa we wszystkich listach 8");
+                    return false;
+                }
+
                 let oldValuesArray = [prevShowContainerVoivodeSelect, prevShowVoivodeId, prevShowContainerCitySelect, prevShowCityId];
+
+                if((prevShowContainerVoivodeSelect.length == 0 || prevShowVoivodeId == 0) ||
+                    (prevShowContainerCitySelect.length == 0 || prevShowCityId == 0) ||
+                    (nextShowContainerRelatedToPreviousShowContainerCitySelect.length == 0 || nextShowContainerRelatedToPreviousShowContainerCityId == 0)) {
+                    notify("Wybierz miasta i województwa we wszystkich listach 9");
+                    return false;
+                }
 
                 $(prevShowContainerVoivodeSelect).off();
 
                 prevShowContainerVoivodeSelect.innerHTML = '';
+                appendBasicOption(prevShowContainerVoivodeSelect);
                 prevShowContainerCitySelect.innerHTML = '';
+                console.log('limit: ', limit);
 
                 showInExtreme(limit, nextShowContainerRelatedToPreviousShowContainerCityId, prevShowContainerCitySelect, prevShowContainerVoivodeSelect, oldValuesArray);
             }
 
-            /**
-             * @param thisContainer
-             * @param className
-             * This function return array of prev and next containers if exist.
-             */
-            function checkingExistenceOfPrevAndNextContainers(thisContainer, className) {
-                const allContainers = document.getElementsByClassName(className);
-                let nextCont = null;
-                let prevCont = null;
-                let finalArray = [];
-                //checking whether there is next and previous show container
-                for(let i = 0; i < allContainers.length; i++) {
-                    if(allContainers[i] == thisContainer) {
-                        if(allContainers[i+1]) { //exist next container
-                            nextCont = allContainers[i+1];
-                        }
-                        if(allContainers[i-1]) {
-                            prevCont = allContainers[i-1];
-                        }
-                    }
-                }
-                finalArray.push(prevCont);
-                finalArray.push(nextCont);
-                return finalArray;
+            //This method is used when appending all voivodes and all cities
+            function allCitiesAndAllVoivodes(nextShowContainer) {
+                //all cities and all voivodes.
+                let nextContVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
+                nextContVoivodeSelect.innerHTML = '';
+                appendBasicOption(nextContVoivodeSelect);
+                let nextContCitySelect = nextShowContainer.querySelector('.citySelect');
+                $(nextContVoivodeSelect).off(); //remove all previous event listeners
+                        @foreach($voivodes as $voivode)
+                var singleVoivode = document.createElement('option');
+                singleVoivode.value = {{$voivode->id}};
+                singleVoivode.textContent = '{{$voivode->name}}';
+                nextContVoivodeSelect.appendChild(singleVoivode);
+                @endforeach()
+                $(nextContVoivodeSelect).on('change', function(e) {
+                    nextContCitySelect.setAttribute('data-distance', 'infinity');
+                    let voivodeId = e.target.value;
+                    showWithoutDistanceAjax(voivodeId, nextContCitySelect);
+                });
             }
 
-            /**
-             * This method check if in given contaiers there is checkbox checked or not
-             * @param arrayOfContainers
-             * @returns {Array} [undefined/true/false, undefined/true/false] - (undefined - no container given in arrayOfContainers, false - not checked, true - checked)
-             */
-            function checkboxFilter(arrayOfContainers) {
-                let prevCont = arrayOfContainers[0];
-                let nextCont = arrayOfContainers[1];
-                let isCheckedPrev = undefined;
-                let isCheckedNext = undefined;
-                let checkArr = [];
-                if(prevCont) {
-                    let checkboxPrevElement = prevCont.querySelector('.distance-checkbox');
-                    isCheckedPrev = checkboxPrevElement.checked;
-                }
-                if(nextCont) {
-                    let checkboxNextElement = nextCont.querySelector('.distance-checkbox');
-                    isCheckedNext = checkboxNextElement.checked;
-                }
-                checkArr.push(isCheckedPrev);
-                checkArr.push(isCheckedNext);
-
-                return checkArr;
-            }
-
-            /**
-             * This method sets old values for inputs.
-             * @param voivodeSelect
-             * @param voivodeId
-             * @param citySelect
-             * @param cityId
-             */
-            function setOldValues(voivodeSelect, voivodeId, citySelect, cityId) {
-                for(let i = 0; i < voivodeSelect.length; i++) {
-                    if(voivodeSelect[i].value == voivodeId) {
-                        voivodeSelect[i].selected = true;
-                    }
-                }
-                for(let j = 0; j < citySelect.length; j++) {
-                    if(citySelect[j].value == cityId) {
-                        citySelect[j].selected = true;
-                    }
-                }
-            }
+            document.addEventListener('click', globalClickHandler);
+            document.addEventListener('change', globalChangeHandler);
 
         });
 
