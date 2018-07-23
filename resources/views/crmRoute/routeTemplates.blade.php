@@ -98,10 +98,8 @@
 
             //GLOBAL VARIABLES
                 let panelBody = document.querySelector('.panel-body');
-                let flag = null;
                 let submitPlace = document.querySelector('.summaryButtonContainer');
             //END GLOBAL VARIABLES
-
 
             /**
              * This method append first day container and first show container
@@ -209,7 +207,6 @@
                                         });
                                     });
                                 });
-                                flag = true;
                             }
                         });
 
@@ -273,12 +270,156 @@
                                 }
                             }
                         });
-                        flag = true;
                     }
                 });
             }
 
+            /**
+             * This method is used in shows without distance limit
+             */
+            function showWithoutDistanceAjax(voivodeId, citySelect) {
+                console.assert(!isNaN(parseInt(voivodeId)) && voivodeId != 0, 'voivodeId in showWithoutDistanceAjax is not number!');
+                console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
+                $.ajax({
+                    type: "POST",
+                    async: false,
+                    url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
+                    data: {
+                        "id": voivodeId
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
+                        let placeToAppend = citySelect;
+                        placeToAppend.innerHTML = '';
+                        appendBasicOption(placeToAppend);
+                        for(let i = 0; i < response.length; i++) {
+                            let responseOption = document.createElement('option');
+                            responseOption.value = response[i].id;
+                            responseOption.textContent = response[i].name;
+                            placeToAppend.appendChild(responseOption);
+                        }
+                    }
+                });
+            }
 
+            function limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr = null) {
+                console.assert(grandNextShowContainer.matches('.singleShowContainer'), 'grandNextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                console.assert(thisSingleShowContainer.matches('.singleShowContainer'), 'thisSingleShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                console.assert(nextShowContainer.matches('.singleShowContainer'), 'nextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                const grandNextShowContainerCitySelect = grandNextShowContainer.querySelector('.citySelect');
+                const grandNextShowContainerCityDistance = grandNextShowContainerCitySelect.dataset.distance;
+                let grandNextShowContainerCityId = getSelectedValue(grandNextShowContainerCitySelect);
+
+                const thisSingleShowContainerCitySelect = thisSingleShowContainer.querySelector('.citySelect');
+                const thisSingleShowContainerCitySelectCityDistance = thisSingleShowContainerCitySelect.dataset.distance;
+                let thisSingleShowContainerCityId = getSelectedValue(thisSingleShowContainerCitySelect);
+
+                const nextShowContainerCitySelect = nextShowContainer.querySelector('.citySelect');
+                let nextShowContainerCityid = getSelectedValue(nextShowContainerCitySelect);
+
+                let nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
+                let nextShowContainerVoivodeId = getSelectedValue(nextShowContainerVoivodeSelect);
+
+                if((grandNextShowContainerCitySelect.length == 0 || grandNextShowContainerCityId == 0) ||
+                    (thisSingleShowContainerCitySelect.length == 0 || thisSingleShowContainerCityId == 0) ||
+                    (nextShowContainerCitySelect.length == 0  || nextShowContainerCityid == 0) ||
+                    (nextShowContainerVoivodeSelect.length == 0 || nextShowContainerVoivodeId == 0) ||
+                    (!thisSingleShowContainerCityId) || (!nextShowContainerCityid) || (!nextShowContainerVoivodeId) || (!grandNextShowContainerCityId)) {
+                    notify("Wybierz miasta i województwa we wszystkich listach 5");
+                    return false;
+                }
+
+                let oldValuesArray = [nextShowContainerVoivodeSelect, nextShowContainerVoivodeId, nextShowContainerCitySelect, nextShowContainerCityid];
+
+                $(nextShowContainerVoivodeSelect).off();
+
+                // nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
+                nextShowContainerVoivodeSelect.innerHTML = '';
+                nextShowContainerCitySelect.innerHTML = '';
+                console.log(grandNextShowContainerCitySelect);
+                console.log(thisSingleShowContainerCitySelect);
+
+                if(changeDistanceArr) {
+                    let helpArr = [];
+                    if(changeDistanceArr[0] != 'undefined') {
+                        helpArr.push(changeDistanceArr[0]);
+                    }
+                    else {
+                        helpArr.push(grandNextShowContainerCityDistance);
+                    }
+                    if(changeDistanceArr[1] != 'undefined') {
+                        helpArr.push(changeDistanceArr[1]);
+                    }
+                    else {
+                        helpArr.push(thisSingleShowContainerCitySelectCityDistance);
+                    }
+                    console.log(helpArr);
+                    showInTheMiddleAjax(helpArr[0],grandNextShowContainerCityId,helpArr[1],thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
+                }
+                else {
+                    showInTheMiddleAjax(grandNextShowContainerCityDistance,grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
+                }
+            }
+
+            /**
+             * This method handle refresh distance case when prev show is in the same day container and there is not previous container && case when next show is in the same day container and there is no next container
+             */
+            function limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, limit) {
+                let prevShowContainerVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
+                let prevShowVoivodeId = getSelectedValue(prevShowContainerVoivodeSelect);
+
+                let prevShowContainerCitySelect = previousShowContainer.querySelector('.citySelect');
+                let prevShowCityId = getSelectedValue(prevShowContainerCitySelect);
+
+                let nextShowContainerRelatedToPreviousShowContainerCitySelect = nextShowContainerRelatedToPreviousShowContainer.querySelector('.citySelect');
+                let nextShowContainerRelatedToPreviousShowContainerCityId = getSelectedValue(nextShowContainerRelatedToPreviousShowContainerCitySelect);
+
+                let oldValuesArray = [prevShowContainerVoivodeSelect, prevShowVoivodeId, prevShowContainerCitySelect, prevShowCityId];
+
+                if((prevShowContainerVoivodeSelect.length == 0 || prevShowVoivodeId == 0) ||
+                    (prevShowContainerCitySelect.length == 0 || prevShowCityId == 0) ||
+                    (nextShowContainerRelatedToPreviousShowContainerCitySelect.length == 0 || nextShowContainerRelatedToPreviousShowContainerCityId == 0) ||
+                    (!prevShowCityId) || (!prevShowVoivodeId) || (!nextShowContainerRelatedToPreviousShowContainerCityId)) {
+                    notify("Wybierz miasta i województwa we wszystkich listach 9");
+                    return false;
+                }
+
+                $(prevShowContainerVoivodeSelect).off();
+
+                prevShowContainerVoivodeSelect.innerHTML = '';
+                appendBasicOption(prevShowContainerVoivodeSelect);
+                prevShowContainerCitySelect.innerHTML = '';
+                console.log('limit: ', limit);
+
+                showInExtreme(limit, nextShowContainerRelatedToPreviousShowContainerCityId, prevShowContainerCitySelect, prevShowContainerVoivodeSelect, oldValuesArray);
+            }
+
+            //This method is used when appending all voivodes and all cities
+            function allCitiesAndAllVoivodes(nextShowContainer, defaults = null) {
+                //all cities and all voivodes.
+                let nextContVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
+                nextContVoivodeSelect.innerHTML = '';
+                appendBasicOption(nextContVoivodeSelect);
+                let nextContCitySelect = nextShowContainer.querySelector('.citySelect');
+                $(nextContVoivodeSelect).off(); //remove all previous event listeners
+                        @foreach($voivodes as $voivode)
+                var singleVoivode = document.createElement('option');
+                singleVoivode.value = {{$voivode->id}};
+                singleVoivode.textContent = '{{$voivode->name}}';
+                nextContVoivodeSelect.appendChild(singleVoivode);
+                @endforeach()
+                $(nextContVoivodeSelect).on('change', function(e) {
+                    nextContCitySelect.setAttribute('data-distance', 'infinity');
+                    let voivodeId = e.target.value;
+                    showWithoutDistanceAjax(voivodeId, nextContCitySelect);
+                });
+                if(defaults) {
+                    showWithoutDistanceAjax(defaults.voivode, nextContCitySelect);
+                }
+            }
 
             /**
              * This method appends basic option to voivode select
@@ -289,6 +430,16 @@
                 basicVoivodeOption.value = '0';
                 basicVoivodeOption.textContent = 'Wybierz';
                 element.appendChild(basicVoivodeOption);
+            }
+
+            /**
+             * This method adjust day container numbers;
+             */
+            function adjustDayNumbers() {
+                let allDayNotations = document.getElementsByClassName('day-info');
+                for(let i = 0, max = allDayNotations.length; i < max; i++) {
+                    allDayNotations[i].textContent = 'Dzień ' + (i+1);
+                }
             }
 
             /**
@@ -395,6 +546,7 @@
              * @returns {Array} [undefined/true/false, undefined/true/false] - (undefined - no container given in arrayOfContainers, false - not checked, true - checked)
              */
             function checkboxFilter(arrayOfContainers) {
+                console.assert(Array.isArray(arrayOfContainers), "arrayOfContainers in checkboxFilter method is not array!");
                 let prevCont = arrayOfContainers[0];
                 let nextCont = arrayOfContainers[1];
                 let isCheckedPrev = undefined;
@@ -412,6 +564,22 @@
                 checkArr.push(isCheckedNext);
 
                 return checkArr;
+            }
+
+            /**
+             * This method validate all single day forms
+             */
+            function validateAllForms(element) {
+                console.assert(element.matches('.singleShowContainer'), 'element in validateAllForms is not single show container');
+                let flag = true;
+                element.forEach(day => {
+                    let validation = validateForm(day);
+                    if(validation === false) {
+                        flag = false;
+                    }
+                });
+
+                return flag;
             }
 
             /**
@@ -435,6 +603,10 @@
              * @param cityId
              */
             function setOldValues(voivodeSelect, voivodeId, citySelect, cityId) {
+                console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in setOldValues method is not voivode select');
+                console.assert((!isNaN(parseInt(voivodeId))) && (voivodeId != 0), 'voivodeId in setOldValues is not number!');
+                console.assert(citySelect.matches('.citySelect'), 'citySelect in setOldValues method is not city select');
+                console.assert((!isNaN(parseInt(cityId))) && (cityId != 0), 'cityId in setOldValues is not number!');
                 let voivodeFlag = true;
                 let cityFlag = true;
                 for(let i = 0; i < voivodeSelect.length; i++) {
@@ -451,11 +623,11 @@
                 }
                 if(voivodeFlag) {
                     $(voivodeSelect).val('0');
-                    console.log('zmienilo na wartosc domyslna voivode');
+                    // console.log('zmienilo na wartosc domyslna voivode');
                 }
                 if(cityFlag) {
                     $(citySelect).val('0');
-                    console.log('zmienilo na wartosc domyslna city');
+                    // console.log('zmienilo na wartosc domyslna city');
                 }
             }
 
@@ -746,7 +918,6 @@
                         }
 
                         if(isChecked) { //when clicked singleDayContainer has checkbox checked
-                            console.log('tutaj');
                             newForm.createDOMBox();
                             let newFormDomElement = newForm.getForm();
                             thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
@@ -763,8 +934,7 @@
                                 const anextCitySelect = nextShowContainer.querySelector('.citySelect');
                                 //we are checking if user selected any city in upper and lower show container
                                 if(anextCitySelect.options[anextCitySelect.selectedIndex].value != 0 && apreviousCitySelect.options[apreviousCitySelect.selectedIndex].value != 0) {
-                                    const previousShowContainer = thisShowContainer; // relative to newForm, this one is previousShowContainer
-                                    newForm.createDOMBox(30, selectedCityId, true, previousShowContainer, nextShowContainer);
+                                    newForm.createDOMBox(30, selectedCityId, true, thisShowContainer, nextShowContainer);
                                     let newFormDomElement = newForm.getForm();
                                     thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
                                 }
@@ -785,7 +955,6 @@
                     const removeShowButton = e.target;
                     const showContainer = removeShowButton.closest('.singleShowContainer');
                     const dayContainer = removeShowButton.closest('.singleDayContainer');
-                    // const allDayContainers = document.getElementsByClassName('singleDayContainer');
 
                     let prevDayFlag = undefined; //true - another day, false - same day
                     let nextDayFlag = undefined;
@@ -794,9 +963,7 @@
                     let nextShowFlag = undefined; //true - another day, false - same day
                     let prevShowFlag = undefined;
 
-                    // const dayExistenceArray = checkingExistenceOfPrevAndNextContainers(dayContainer, 'singleDayContainer');
                     const showExistenceArray = checkingExistenceOfPrevAndNextContainers(showContainer, 'singleShowContainer');
-
                     let siblingsCheckboxArr = checkboxFilter(showExistenceArray);
 
                     if(showExistenceArray[0]) { //case when previous container exist
@@ -1088,8 +1255,6 @@
                                 }
                             }
                         }
-
-
                     }
 
                     const allRemoveButtons = dayContainer.getElementsByClassName('remove-button');
@@ -1118,9 +1283,7 @@
                     const allSingleShowContainers = document.getElementsByClassName('singleShowContainer');
                     const allSingleShowContainersInsideLastDayContainer = lastDayContainer.querySelectorAll('.singleShowContainer');
                     const lastShowContainerInsideLastDay = allSingleShowContainersInsideLastDayContainer[allSingleShowContainersInsideLastDayContainer.length - 1];
-                    console.log(lastShowContainerInsideLastDay);
                     const isChecked = lastShowContainerInsideLastDay.querySelector('.distance-checkbox').checked;
-                    console.log(isChecked);
 
                     let validate = validateForm(allSingleShowContainers[allSingleShowContainers.length - 1]);
 
@@ -1183,37 +1346,11 @@
                         finalForm.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="alldata" value=' + JSONData + '>';
                         submitPlace.appendChild(finalForm);
                         finalForm.submit();
-
                     }
                     else {
                         notify('Wybierz miasta we wszystkich polach');
                     }
                 }
-            }
-
-            /**
-             * This method adjust day container numbers;
-             */
-            function adjustDayNumbers() {
-                let allDayNotations = document.getElementsByClassName('day-info');
-                for(let i = 0, max = allDayNotations.length; i < max; i++) {
-                    allDayNotations[i].textContent = 'Dzień ' + (i+1);
-                }
-            }
-
-            /**
-             * This method validate all single day forms
-             */
-            function validateAllForms(element) {
-                let flag = true;
-                element.forEach(day => {
-                    let validation = validateForm(day);
-                    if(validation === false) {
-                        flag = false;
-                    }
-                });
-
-                return flag;
             }
 
                 /**
@@ -1336,7 +1473,6 @@
                     }
                 }
                 else if(e.target.matches('.citySelect')) { // user changes city
-                    // const changedCitySelect = e.target;
                     const thisSingleShowContainer = e.target.closest('.singleShowContainer');
                     const thisDayContainer = e.target.closest('.singleDayContainer');
                     const thisContainerCheckbox = thisSingleShowContainer.querySelector('.distance-checkbox');
@@ -1464,155 +1600,6 @@
                     }
 
 
-                }
-            }
-
-
-            /**
-             * This method is used in shows without distance limit
-             */
-            function showWithoutDistanceAjax(voivodeId, citySelect) {
-                console.assert(!isNaN(parseInt(voivodeId)) && voivodeId != 0, 'voivodeId in showWithoutDistanceAjax is not number!');
-                console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
-                $.ajax({
-                    type: "POST",
-                    async: false,
-                    url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
-                    data: {
-                        "id": voivodeId
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
-                        let placeToAppend = citySelect;
-                        placeToAppend.innerHTML = '';
-                        appendBasicOption(placeToAppend);
-                        for(let i = 0; i < response.length; i++) {
-                            let responseOption = document.createElement('option');
-                            responseOption.value = response[i].id;
-                            responseOption.textContent = response[i].name;
-                            placeToAppend.appendChild(responseOption);
-                        }
-                        flag = true;
-                    }
-                });
-            }
-
-            function limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr = null) {
-                console.assert(grandNextShowContainer.matches('.singleShowContainer'), 'grandNextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
-                console.assert(thisSingleShowContainer.matches('.singleShowContainer'), 'thisSingleShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
-                console.assert(nextShowContainer.matches('.singleShowContainer'), 'nextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
-                const grandNextShowContainerCitySelect = grandNextShowContainer.querySelector('.citySelect');
-                const grandNextShowContainerCityDistance = grandNextShowContainerCitySelect.dataset.distance;
-                let grandNextShowContainerCityId = getSelectedValue(grandNextShowContainerCitySelect);
-
-                const thisSingleShowContainerCitySelect = thisSingleShowContainer.querySelector('.citySelect');
-                const thisSingleShowContainerCitySelectCityDistance = thisSingleShowContainerCitySelect.dataset.distance;
-                let thisSingleShowContainerCityId = getSelectedValue(thisSingleShowContainerCitySelect);
-
-                const nextShowContainerCitySelect = nextShowContainer.querySelector('.citySelect');
-                let nextShowContainerCityid = getSelectedValue(nextShowContainerCitySelect);
-
-                let nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
-                let nextShowContainerVoivodeId = getSelectedValue(nextShowContainerVoivodeSelect);
-
-                if((grandNextShowContainerCitySelect.length == 0 || grandNextShowContainerCityId == 0) ||
-                    (thisSingleShowContainerCitySelect.length == 0 || thisSingleShowContainerCityId == 0) ||
-                    (nextShowContainerCitySelect.length == 0  || nextShowContainerCityid == 0) ||
-                    (nextShowContainerVoivodeSelect.length == 0 || nextShowContainerVoivodeId == 0) ||
-                    (!thisSingleShowContainerCityId) || (!nextShowContainerCityid) || (!nextShowContainerVoivodeId) || (!grandNextShowContainerCityId)) {
-                    notify("Wybierz miasta i województwa we wszystkich listach 5");
-                    return false;
-                }
-
-                let oldValuesArray = [nextShowContainerVoivodeSelect, nextShowContainerVoivodeId, nextShowContainerCitySelect, nextShowContainerCityid];
-
-                $(nextShowContainerVoivodeSelect).off();
-
-                // nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
-                nextShowContainerVoivodeSelect.innerHTML = '';
-                nextShowContainerCitySelect.innerHTML = '';
-                console.log(grandNextShowContainerCitySelect);
-                console.log(thisSingleShowContainerCitySelect);
-
-                if(changeDistanceArr) {
-                    let helpArr = [];
-                    if(changeDistanceArr[0] != 'undefined') {
-                        helpArr.push(changeDistanceArr[0]);
-                    }
-                    else {
-                        helpArr.push(grandNextShowContainerCityDistance);
-                    }
-                    if(changeDistanceArr[1] != 'undefined') {
-                        helpArr.push(changeDistanceArr[1]);
-                    }
-                    else {
-                        helpArr.push(thisSingleShowContainerCitySelectCityDistance);
-                    }
-                    console.log(helpArr);
-                    showInTheMiddleAjax(helpArr[0],grandNextShowContainerCityId,helpArr[1],thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
-                }
-                else {
-                    showInTheMiddleAjax(grandNextShowContainerCityDistance,grandNextShowContainerCityId,thisSingleShowContainerCitySelectCityDistance,thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
-                }
-            }
-
-            /**
-             * This method handle refresh distance case when prev show is in the same day container and there is not previous container && case when next show is in the same day container and there is no next container
-             */
-            function limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, limit) {
-                let prevShowContainerVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
-                let prevShowVoivodeId = getSelectedValue(prevShowContainerVoivodeSelect);
-
-                let prevShowContainerCitySelect = previousShowContainer.querySelector('.citySelect');
-                let prevShowCityId = getSelectedValue(prevShowContainerCitySelect);
-
-                let nextShowContainerRelatedToPreviousShowContainerCitySelect = nextShowContainerRelatedToPreviousShowContainer.querySelector('.citySelect');
-                let nextShowContainerRelatedToPreviousShowContainerCityId = getSelectedValue(nextShowContainerRelatedToPreviousShowContainerCitySelect);
-
-                let oldValuesArray = [prevShowContainerVoivodeSelect, prevShowVoivodeId, prevShowContainerCitySelect, prevShowCityId];
-
-                if((prevShowContainerVoivodeSelect.length == 0 || prevShowVoivodeId == 0) ||
-                    (prevShowContainerCitySelect.length == 0 || prevShowCityId == 0) ||
-                    (nextShowContainerRelatedToPreviousShowContainerCitySelect.length == 0 || nextShowContainerRelatedToPreviousShowContainerCityId == 0) ||
-                    (!prevShowCityId) || (!prevShowVoivodeId) || (!nextShowContainerRelatedToPreviousShowContainerCityId)) {
-                    notify("Wybierz miasta i województwa we wszystkich listach 9");
-                    return false;
-                }
-
-                $(prevShowContainerVoivodeSelect).off();
-
-                prevShowContainerVoivodeSelect.innerHTML = '';
-                appendBasicOption(prevShowContainerVoivodeSelect);
-                prevShowContainerCitySelect.innerHTML = '';
-                console.log('limit: ', limit);
-
-                showInExtreme(limit, nextShowContainerRelatedToPreviousShowContainerCityId, prevShowContainerCitySelect, prevShowContainerVoivodeSelect, oldValuesArray);
-            }
-
-            //This method is used when appending all voivodes and all cities
-            function allCitiesAndAllVoivodes(nextShowContainer, defaults = null) {
-                //all cities and all voivodes.
-                let nextContVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
-                nextContVoivodeSelect.innerHTML = '';
-                appendBasicOption(nextContVoivodeSelect);
-                let nextContCitySelect = nextShowContainer.querySelector('.citySelect');
-                $(nextContVoivodeSelect).off(); //remove all previous event listeners
-                @foreach($voivodes as $voivode)
-                    var singleVoivode = document.createElement('option');
-                    singleVoivode.value = {{$voivode->id}};
-                    singleVoivode.textContent = '{{$voivode->name}}';
-                    nextContVoivodeSelect.appendChild(singleVoivode);
-                @endforeach()
-                $(nextContVoivodeSelect).on('change', function(e) {
-                    nextContCitySelect.setAttribute('data-distance', 'infinity');
-                    let voivodeId = e.target.value;
-                    showWithoutDistanceAjax(voivodeId, nextContCitySelect);
-                });
-                if(defaults) {
-                    showWithoutDistanceAjax(defaults.voivode, nextContCitySelect);
                 }
             }
 
