@@ -589,9 +589,6 @@
                     secondSelect.classList.add('citySelect');
                     secondSelect.classList.add('form-control');
 
-                    // appendBasicOption(secondSelect);
-
-
                     let formBodyColLeftColumn = document.createElement('div');
                     formBodyColLeftColumn.classList.add('col-md-6');
 
@@ -935,12 +932,6 @@
                         }
                     }
 
-                    // let setDelay = window.setInterval(function() {
-                    //     if(flag == true) {
-                    //
-                    //     }
-                    // }, 50);
-
                     if(showExistenceArray[1]) { //case when next container exist
                         let nextShowContainer = showExistenceArray[1];
                         let dayContOfNextShowContainer = nextShowContainer.closest('.singleDayContainer');
@@ -1097,6 +1088,7 @@
                         const allDayContainers = document.getElementsByClassName('singleDayContainer');
                         if(allDayContainers.length > 1) {
                             dayContainer.parentNode.removeChild(dayContainer);
+                            adjustDayNumbers();
                         }
                         else {
                             notify('Nie można usunąć pierwszego dnia!');
@@ -1174,6 +1166,16 @@
                     else {
                         notify('Wybierz miasta we wszystkich polach');
                     }
+                }
+            }
+
+            /**
+             * This method adjust day container numbers;
+             */
+            function adjustDayNumbers() {
+                let allDayNotations = document.getElementsByClassName('day-info');
+                for(let i = 0, max = allDayNotations.length; i < max; i++) {
+                    allDayNotations[i].textContent = 'Dzień ' + (i+1);
                 }
             }
 
@@ -1311,110 +1313,104 @@
                     previousShowContainer = siblingShowContainersArr[0] === null ? null : siblingShowContainersArr[0];
                     nextShowContainer = siblingShowContainersArr[1] === null ? null : siblingShowContainersArr[1];
 
+                    if(nextShowContainer) { //case when next show exist.
+                        if(siblingCheckboxArr[1] === false) { //next show container doesn't have checked distance checkbox
+                            let dayContainerOfNextShowContainer = nextShowContainer.closest('.singleDayContainer');
+                            nextDayFlag = dayContainerOfNextShowContainer == thisDayContainer ? false : true; //checking if next show is in the same day container
 
-                    if(isCheckedThisContainer) { //Distance checkbox is checked inside clicked container
+                            if(nextDayFlag) { //case when next show is in another day container
+                                let prevShowContainerRelatedToNextShowContainer = thisSingleShowContainer;
+                                let siblingsOfNextShowContainerArr = checkingExistenceOfPrevAndNextContainers(nextShowContainer, 'singleShowContainer');
+                                // let nextSiblingCheckboxArr = checkboxFilter(siblingsOfNextShowContainerArr);
+                                let grandNextShowContainer = undefined; // previous show container of previous show container
+                                grandNextShowContainer = siblingsOfNextShowContainerArr[1] === null ? null : siblingsOfNextShowContainerArr[1];
 
-                    }
-                    else { //distance checkbox is unchecked inside clicked container
-                        if(nextShowContainer) { //case when next show exist.
-                            if(siblingCheckboxArr[1] === false) { //next show container doesn't have checked distance checkbox
-                                let dayContainerOfNextShowContainer = nextShowContainer.closest('.singleDayContainer');
-                                nextDayFlag = dayContainerOfNextShowContainer == thisDayContainer ? false : true; //checking if next show is in the same day container
+                                if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
+                                    let changeDistanceArr = [100,'undefined'];
+                                    limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+                                }
+                                else { // there is no next container (related to prev show container)
+                                    limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 100);
+                                }
+                            }
+                            else { //case when next show is in the same day container
+                                let grandNextShowContainer = undefined;
+                                let prevShowContainerRelatedToNextShowContainer = thisSingleShowContainer;
+                                let siblingsOfNextShowContainerArr = checkingExistenceOfPrevAndNextContainers(nextShowContainer, 'singleShowContainer');
+                                // let nextSiblingCheckboxArr = checkboxFilter(siblingsOfNextShowContainerArr);
+                                grandNextShowContainer = siblingsOfNextShowContainerArr[1] === null ? null : siblingsOfNextShowContainerArr[1];
 
-                                if(nextDayFlag) { //case when next show is in another day container
-                                    let prevShowContainerRelatedToNextShowContainer = thisSingleShowContainer;
-                                    let siblingsOfNextShowContainerArr = checkingExistenceOfPrevAndNextContainers(nextShowContainer, 'singleShowContainer');
-                                    // let nextSiblingCheckboxArr = checkboxFilter(siblingsOfNextShowContainerArr);
-                                    let grandNextShowContainer = undefined; // previous show container of previous show container
-                                    grandNextShowContainer = siblingsOfNextShowContainerArr[1] === null ? null : siblingsOfNextShowContainerArr[1];
-
-                                    if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
+                                if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
+                                    let dayContainerOfGrandNextShowContainer = grandNextShowContainer.closest('.singleDayContainer');
+                                    grandNextDayFlag = dayContainerOfGrandNextShowContainer == dayContainerOfNextShowContainer ? false : true; //checking if grandnext show is in the same day container as next show
+                                    if(grandNextDayFlag) { //grandnext show is in another day container related to next show
                                         let changeDistanceArr = [100,'undefined'];
                                         limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
                                     }
-                                    else { // there is no next container (related to prev show container)
-                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 100);
+                                    else { //grandnext show is in the same day container as next show
+                                        limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer);
                                     }
                                 }
-                                else { //case when next show is in the same day container
-                                    let grandNextShowContainer = undefined;
-                                    let prevShowContainerRelatedToNextShowContainer = thisSingleShowContainer;
-                                    let siblingsOfNextShowContainerArr = checkingExistenceOfPrevAndNextContainers(nextShowContainer, 'singleShowContainer');
-                                    // let nextSiblingCheckboxArr = checkboxFilter(siblingsOfNextShowContainerArr);
-                                    grandNextShowContainer = siblingsOfNextShowContainerArr[1] === null ? null : siblingsOfNextShowContainerArr[1];
-
-                                    if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
-                                        let dayContainerOfGrandNextShowContainer = grandNextShowContainer.closest('.singleDayContainer');
-                                        grandNextDayFlag = dayContainerOfGrandNextShowContainer == dayContainerOfNextShowContainer ? false : true; //checking if grandnext show is in the same day container as next show
-                                        if(grandNextDayFlag) { //grandnext show is in another day container related to next show
-                                            let changeDistanceArr = [100,'undefined'];
-                                            limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
-                                        }
-                                        else { //grandnext show is in the same day container as next show
-                                            limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer);
-                                        }
-                                    }
-                                    else { // there is no next container (related to next show container)
-                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
-                                    }
+                                else { // there is no next container (related to next show container)
+                                    limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
                                 }
                             }
-
                         }
 
-                        //case when prev show exist.
-                        if(previousShowContainer) {
-                            if(siblingCheckboxArr[0] === false) { //prev show container doesn't have checked distance checkbox
-                                let dayContainerOfPreviousShowContainer = previousShowContainer.closest('.singleDayContainer');
-                                prevDayFlag = dayContainerOfPreviousShowContainer == thisDayContainer ? false : true; //checking if prev show is in the same day container
+                    }
 
-                                if(prevDayFlag) { //case when prev show is in another day container
-                                    let nextShowContainerRelatedToPreviousShowContainer = thisSingleShowContainer;
-                                    let siblingsOfPreviousShowContainerArr = checkingExistenceOfPrevAndNextContainers(previousShowContainer, 'singleShowContainer');
-                                    // let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
-                                    let grandPrevShowContainer = undefined; // previous show container of previous show container
-                                    grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
-                                    if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
-                                        let dayContainerOfGrandPrev = grandPrevShowContainer.closest('.singleDayContainer');
-                                        grandNextDayFlag = dayContainerOfGrandPrev === dayContainerOfPreviousShowContainer ? false : true;
-                                        let changeDistanceArr = [];
-                                        if(grandNextDayFlag) {// case when grand prev show is another day related to prev show
-                                            changeDistanceArr = [100, 100];
-                                        }
-                                        else { //case when grand prev show is in same day container as prev show
-                                            changeDistanceArr = [30, 100];
-                                        }
+                    //case when prev show exist.
+                    if(previousShowContainer) {
+                        if(siblingCheckboxArr[0] === false) { //prev show container doesn't have checked distance checkbox
+                            let dayContainerOfPreviousShowContainer = previousShowContainer.closest('.singleDayContainer');
+                            prevDayFlag = dayContainerOfPreviousShowContainer == thisDayContainer ? false : true; //checking if prev show is in the same day container
 
+                            if(prevDayFlag) { //case when prev show is in another day container
+                                let nextShowContainerRelatedToPreviousShowContainer = thisSingleShowContainer;
+                                let siblingsOfPreviousShowContainerArr = checkingExistenceOfPrevAndNextContainers(previousShowContainer, 'singleShowContainer');
+                                // let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
+                                let grandPrevShowContainer = undefined; // previous show container of previous show container
+                                grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
+                                if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
+                                    let dayContainerOfGrandPrev = grandPrevShowContainer.closest('.singleDayContainer');
+                                    grandNextDayFlag = dayContainerOfGrandPrev === dayContainerOfPreviousShowContainer ? false : true;
+                                    let changeDistanceArr = [];
+                                    if(grandNextDayFlag) {// case when grand prev show is another day related to prev show
+                                        changeDistanceArr = [100, 100];
+                                    }
+                                    else { //case when grand prev show is in same day container as prev show
+                                        changeDistanceArr = [30, 100];
+                                    }
+
+                                    limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
+                                }
+                                else { // there is no previous container (related to prev show container)
+                                    limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
+                                }
+
+                            }
+                            else { //case when prev show is in the same day container
+                                let nextShowContainerRelatedToPreviousShowContainer = thisSingleShowContainer;
+                                let grandPrevShowContainer = undefined; // previous show container of previous show container
+                                let siblingsOfPreviousShowContainerArr = checkingExistenceOfPrevAndNextContainers(previousShowContainer, 'singleShowContainer');
+                                // let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
+                                grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
+
+                                if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
+                                    let dayContainerOfGrandPrevShowContainer = grandPrevShowContainer.closest('.singleDayContainer');
+                                    grandPrevDayFlag = dayContainerOfGrandPrevShowContainer == dayContainerOfPreviousShowContainer ? false : true; //checking if grandprev show is in the same day container as prev show
+                                    if(grandPrevDayFlag) { //grandprev show is in another day container related to prev show
+                                        // let changeDistanceArr = [100,'undefined'];
+                                        // console.log('Tu wchodzi warunek');
+                                        let changeDistanceArr = [100, 'undefined'];
                                         limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                     }
-                                    else { // there is no previous container (related to prev show container)
-                                        limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
+                                    else { //grandprev show is in the same day container as prev show
+                                        limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer);
                                     }
-
                                 }
-                                else { //case when prev show is in the same day container
-                                    let nextShowContainerRelatedToPreviousShowContainer = thisSingleShowContainer;
-                                    let grandPrevShowContainer = undefined; // previous show container of previous show container
-                                    let siblingsOfPreviousShowContainerArr = checkingExistenceOfPrevAndNextContainers(previousShowContainer, 'singleShowContainer');
-                                    // let prevSiblingCheckboxArr = checkboxFilter(siblingsOfPreviousShowContainerArr);
-                                    grandPrevShowContainer = siblingsOfPreviousShowContainerArr[0] === null ? null : siblingsOfPreviousShowContainerArr[0];
-
-                                    if(grandPrevShowContainer) { // there is previous container and next container (related to prev show container)
-                                        let dayContainerOfGrandPrevShowContainer = grandPrevShowContainer.closest('.singleDayContainer');
-                                        grandPrevDayFlag = dayContainerOfGrandPrevShowContainer == dayContainerOfPreviousShowContainer ? false : true; //checking if grandprev show is in the same day container as prev show
-                                        if(grandPrevDayFlag) { //grandprev show is in another day container related to prev show
-                                            // let changeDistanceArr = [100,'undefined'];
-                                            // console.log('Tu wchodzi warunek');
-                                            let changeDistanceArr = [100, 'undefined'];
-                                            limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
-                                        }
-                                        else { //grandprev show is in the same day container as prev show
-                                            limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer);
-                                        }
-                                    }
-                                    else { // there is no previous container (related to prev show container)
-                                        limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 30);
-                                    }
+                                else { // there is no previous container (related to prev show container)
+                                    limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 30);
                                 }
                             }
                         }
