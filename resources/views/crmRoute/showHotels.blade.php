@@ -200,19 +200,29 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="hourBid">Typ stawki</label>
+                                    <select name="bidType" id="bidType" class="form-control selectpicker" required>
+                                        <option value="0">Wybierz</option>
+                                        <option value="1">Godzinowa</option>
+                                        <option value="2">Dzienna</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="hourBid">Stawka godzinowa</label>
-                                    <input type="number" name="hourBid" id="hourBid" class="form-control" placeholder="Stawka godzinowa (zł)" min="0" value="">
+                                    <input type="number" name="hourBid" id="hourBid" class="form-control" placeholder="Stawka godzinowa (zł)" min="0" value="" disabled>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="dailyBid">Stawka dzienna</label>
-                                    <input type="number" name="dailyBid" id="dailyBid" class="form-control" placeholder="Stawka dzienna (zł)" min="0" value="">
+                                    <input type="number" name="dailyBid" id="dailyBid" class="form-control" placeholder="Stawka dzienna (zł)" min="0" value="" disabled>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="paymentMethod">Forma płatności</label>
                                     <select name="paymentMethod" id="paymentMethod" class="form-control selectpicker" required>
@@ -405,6 +415,18 @@
                 $('#addPhoneNumberButton').closest('.row').before(createNewHotelContact('hotelPhoneNumber'));
                 $('#addEmailButton').closest('.row').before(createNewHotelContact('hotelEmail'));
                 addNewHotelFlag = true;
+            });
+            $('#bidType').on('change',function () {
+               if($(this).val() == 0){
+                   $('#hourBid').prop('disabled',true);
+                   $('#dailyBid').prop('disabled',true);
+               }else if($(this).val() == 1){
+                   $('#hourBid').prop('disabled',false);
+                   $('#dailyBid').prop('disabled',true);
+               }else{
+                   $('#hourBid').prop('disabled',true);
+                   $('#dailyBid').prop('disabled',false);
+               }
             });
 
             $('#HotelModal').on('hidden.bs.modal', function () {
@@ -879,8 +901,14 @@
                 $('#comment').val(hotel.comment);
                 $('#paymentMethod').val(hotel.payment_method_id == null ? 0 : hotel.payment_method_id);
                 $('#parking').val(hotel.parking == null ? -1 : hotel.parking);
+                $('#bidType').val(hotel.bidType).trigger('change');
+                if(preview)
+                    $('#bidType').prop('disabled',true);
+                else
+                    $('#bidType').prop('disabled',false);
                 $('#hourBid').val(hotel.hour_bid);
                 $('#dailyBid').val(hotel.daily_bid);
+
                 $('#clientsExceptions').val(response.clientsExceptions);
 
 
@@ -958,18 +986,28 @@
             let dailyBid = $('#dailyBid').val();
             let hourBid = $('#hourBid').val();
             let hotelId = $('#hotelId').val();
-
-
+            let bidType = $('#bidType').val();
             let zipCode ='';
             $('.zipCode').each(function( key, item ) {
                 zipCode += item.value;
             });
 
+            if(bidType == 0){
+                swal('Wybierz typ stawki')
+                validate = false;
+            }else{
+                if(bidType == 2 && (dailyBid == 0 || dailyBid.trim().length == 0 || dailyBid == '')){
+                    swal('Wybierz stawkę dzienną');
+                    validate = false;
+                }else if (bidType == 1 && (hourBid == 0 || hourBid.trim().length == 0 || hourBid == '')){
+                    swal('Wybierz stawkę godzinową');
+                    validate = false;
+                }
+            }
             if (zipCode.trim().length < 5) {
                 validate = false;
                 swal("Podaj kod pocztowy");
             }
-
             if(parking == -1){
                 swal('Wybierz pole z parkingiem');
                 validate = false;
@@ -994,16 +1032,6 @@
                 swal('Wybierz miasto!');
                 validate = false;
             }
-            if (dailyBid == 0) {
-                swal('Wybierz stawkę dzienną');
-                validate = false;
-            }
-
-            if (hourBid == 0) {
-                swal('Wybierz stawkę godzinową');
-                validate = false;
-            }
-
             $('.hotelPhoneNumber').each(function(key, item){
                 if(item.value === ''){
                     swal("Wpisz numery telefonów do wszystkich pól");
@@ -1090,6 +1118,7 @@
                         'hourBid' :     hourBid,
                         'paymentMethodId': paymentMethodId,
                         'parking' :     parking,
+                        bidType: bidType,
                         phones : phones,
                         emails : emails,
                         clientsExceptions : $('#clientsExceptions').val()
