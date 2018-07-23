@@ -150,6 +150,7 @@ Route::POST('/datatableCoachingTableDirector', 'CoachingController@datatableCoac
 Route::POST('/deleteCoachingTableDirector', 'CoachingController@deleteCoachingTableDirector')->name('api.deleteCoachingTableDirector');
 Route::POST('/getCoachingDirector', 'CoachingController@getCoachingDirector')->name('api.getCoachingDirector');
 Route::POST('/acceptCoachingDirector', 'CoachingController@acceptCoachingDirector')->name('api.acceptCoachingDirector');
+Route::POST('/endCoachingDirector', 'CoachingController@endCoachingDirector')->name('api.endCoachingDirector');
 
 Route::POST('/getManagerId', 'CoachingController@getManagerId')->name('api.getManagerId');
 
