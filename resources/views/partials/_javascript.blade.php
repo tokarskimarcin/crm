@@ -16,6 +16,7 @@
 <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
+<script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/mouse0270-bootstrap-notify/3.1.5/bootstrap-notify.min.js"></script>
 
 {{-- Here go includes from folder js_includes --}}
@@ -162,5 +163,17 @@ setInterval(function () {
 $(document).ready(function(){
     countNotifications();
 });
+
+/**
+ * Resize every datatable in given array on menu toggle
+ * @param datatables Array()
+ */
+function resizeDatatablesOnMenuToggle(datatables) {
+    $('#menu-toggle').change(function() {
+       $.each(datatables,function (index, datatable) {
+           datatable.columns.adjust().draw();
+       });
+    });
+}
 
 </script>

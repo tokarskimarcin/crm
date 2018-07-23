@@ -2,7 +2,7 @@
 {{--*@category: CRM,--}}
 {{--*@info: This view shows list of available hotels (DB table: "hotels"),--}}
 {{--*@controller: CrmRouteController,--}}
-{{--*@methods: showHotelsAjax, showHotelsGet--}}
+{{--*@methods: showHotelsAjax, showHotelsGet, findHotel, uploadHotelFilesAjax, downloadHotelFiles--}}
 {{--*/--}}
 
 
@@ -827,7 +827,7 @@
                                 });
                             }else if(response === 'fail'){
                                 $.notify({
-                                    icon: 'glyphicon glyphicon-ok',
+                                    icon: 'glyphicon glyphicon-remove',
                                     message: 'Nie udało się wysłać szablonu faktury <strong>' + $("#name").val() + '</strong>'
                                 }, {
                                     type: "danger"

@@ -6,6 +6,7 @@ use App\ActivityRecorder;
 use App\AuditCriterions;
 use App\AuditHeaders;
 use App\Cities;
+use App\ClientRouteCampaigns;
 use App\Clients;
 use App\ClientRoute;
 use App\ClientRouteInfo;
@@ -13,6 +14,7 @@ use App\Department_info;
 use App\Hotel;
 use App\HotelsClientsExceptions;
 use App\HotelsContacts;
+use App\InvoiceStatus;
 use App\PaymentMethod;
 use App\PbxCrmInfo;
 use App\Route;
@@ -34,6 +36,7 @@ use Symfony\Component\HttpKernel\Client;
 class CrmRouteController extends Controller
 {
     private $validHotelInvoiceTemplatesExtensions = ['pdf'];
+    private $validCampaignInvoiceExtensions = ['pdf'];
 
     public function index()
     {
@@ -612,10 +615,23 @@ class CrmRouteController extends Controller
         return datatables($full_clients_routes)->make(true);
     }
 
+    private function fillClientRouteNames(){
+        $clientRoutes = ClientRoute::all();
+        $clientRoutes->each(function ($clientRoute, $key) {
+            $clientRouteInfo = $this->getClientRouteGroupedByDateSortedByHour($clientRoute->id);
+            $clientRoute->route_name = $this->createRouteName($clientRouteInfo);
+            $clientRoute->save();
+        });
+
+    }
     private function getClientRouteGroupedByDateSortedByHour($client_route_id, $client_route_info = null){
         $grouped_by_day_client_routes= [];
         if($client_route_info === null){
-            foreach (ClientRouteInfo::where('client_route_id', '=', $client_route_id)->sortBy('date')->groupBy('date') as $client_route_day) {
+            $client_route_info = ClientRouteInfo::select( 'client_route_info.id as id', 'city.name as cityName','client_route_info.hour as hour' , 'client_route_info.date as date')
+                ->join('city', 'city.id', '=', 'client_route_info.city_id')
+                ->where('client_route_id', '=', $client_route_id)
+                ->get();
+            foreach ($client_route_info->sortBy('date')->groupBy('date') as $client_route_day) {
                 array_push($grouped_by_day_client_routes, $client_route_day);
             }
         }else {
@@ -625,7 +641,7 @@ class CrmRouteController extends Controller
         }
         $client_routes = [];
         foreach($grouped_by_day_client_routes as $client_route_day){
-            foreach ($client_route_day->sortBy('hour') as $client_route){
+            foreach ($client_route_day->sortBy('id') as $client_route){
                 array_push($client_routes, $client_route);
             }
         }
@@ -1478,6 +1494,7 @@ class CrmRouteController extends Controller
                         $hotel = Hotel::find($hotelId);
                         $hotel->invoice_template_path = $file->storeAs($hotelInvoiceTemplatesPath, rand(1000,100000).'_'.$fileName.'_'.$hotelId.'.'. $ext);
                         $hotel->save();
+                        new ActivityRecorder(array_merge(['T'=>'Dodanie szablonu faktury do hotelu'],$hotel->toArray()),198, 1);
                         session()->remove('savedHotelId');
                         return 'success';
                     } else {
@@ -2510,11 +2527,118 @@ class CrmRouteController extends Controller
 
             return $allCitiesFromGivenVoivode;
         }
+    }
 
+    public function getCampaignsInvoices($id = 0){
+        if($id <= 0) {
+            $clients = Clients::all();
+            $invoiceStatuses = InvoiceStatus::all();
+            return view('crmRoute.campaignsInvoices')
+                ->with('routeId', $id)
+                ->with('clients', $clients)
+                ->with('invoiceStatuses', $invoiceStatuses)
+                ->with('firstDate', date('Y-m-d',strtotime('-7 Days')))
+                ->with('lastDate', ClientRouteInfo::select('date')->orderBy('date','desc')->limit(1)->get()[0]->date)
+                ->with('validCampaignInvoiceExtensions',json_encode($this->validCampaignInvoiceExtensions));
+        }else{
+            $client = ClientRoute::find($id);
+            return view('crmRoute.campaignsInvoices')
+                ->with('routeId', $id)
+                ->with('client', $client)
+                ->with('validCampaignInvoiceExtensions',json_encode($this->validCampaignInvoiceExtensions));
+        }
+    }
+
+    public function getCampaignsInvoicesDatatableAjax(Request $request){
+        $routeId = $request->routeId;
+        $clientId = $request->clientId;
+        $invoiceStatusId = $request->invoiceStatusId;
+        $firstDate = $request->firstDate;
+        $lastDate = $request->lastDate;
+        $clientRouteCampaigns = ClientRouteCampaigns::select('client_route_campaigns.id',
+            'invoice_path',
+            'is.id as invoice_status_id',
+            'is.name_pl',
+            'penalty',
+            'route_name',
+            'invoice_send_date',
+            'invoice_payment_date',
+            'h.name as hotel_name',
+            'cri.hotel_id',
+            'cri.date',
+            'c.name as client_name')
+            ->join('client_route_info as cri','cri.id','=','client_route_campaigns.client_route_info_id')
+            ->join('invoice_status as is','client_route_campaigns.invoice_status_id','=','is.id')
+            ->join('hotels as h','cri.hotel_id','=','h.id')
+            ->join('client_route as cr','cri.client_route_id','=','cr.id')
+            ->join('client as c','cr.client_id','=','c.id');
+        if ($routeId > 0) {
+            $clientRouteCampaigns->where('cri.client_route_id', '=', $routeId);
+        } else if ($firstDate !== null || $lastDate !== null) {
+            if ($firstDate !== null && $lastDate !== null) {
+                $clientRouteCampaigns->whereBetween('cri.date', [$firstDate, $lastDate]);
+            } else {
+                if ($firstDate !== null)
+                    $clientRouteCampaigns->where('cri.date', '>=', $firstDate);
+                if ($lastDate !== null)
+                    $clientRouteCampaigns->where('cri.date', '<=', $lastDate);
+            }
+        }
+        if($clientId>0){
+            $clientRouteCampaigns->where('cr.client_id','=',$clientId);
+        }
+        if($invoiceStatusId>0){
+            $clientRouteCampaigns->where('invoice_status_id','=',$invoiceStatusId);
+        }
+        //dd($clientRouteCampaigns->get(),$firstDate,$lastDate);
+
+        return datatables($clientRouteCampaigns->get())->make(true);
+    }
+
+    /**
+     * Upload campaign invoice
+     */
+    public function uploadCampaignInvoiceAjax(Request $request){
+        $fileNames = json_decode($request->fileNames);
+        foreach ($fileNames as $fileName) {
+            $campaignInvoicePath =  $fileName.'_files';
+
+            $file = $request->file($fileName);
+            if ($file !== null) {
+                $img = $file->getClientOriginalName();
+
+                // get uploaded file's extension
+                $ext = strtolower(pathinfo($img, PATHINFO_EXTENSION));
+
+                // check's valid format
+                if (in_array($ext, $this->validCampaignInvoiceExtensions)) {
+                    if (!in_array($campaignInvoicePath, Storage::allDirectories())) {
+                        Storage::makeDirectory($campaignInvoicePath);
+                    }
+                    $campaignId = json_decode($request->campaignId);
+                    //insert $path in the database
+                    $campaign = ClientRouteCampaigns::find($campaignId);
+                    if($campaign !== null) {
+                        $campaign->invoice_path = $file->storeAs($campaignInvoicePath, rand(1000, 100000) . '_' . $fileName . '_' . $campaignId . '.' . $ext);
+                        $campaign->invoice_status_id = 2;
+                        $campaign->save();
+                        new ActivityRecorder(array_merge(['T'=>'Dodanie szablonu faktury do hotelu'],$campaign->toArray()),198, 1);
+                    }
+                    return 'success';
+                } else {
+                    return 'error';
+                }
+            }
+        }
+        return 'fail';
+    }
+
+    public function getHotelContacts(Request $request){
+        return HotelsContacts::where('hotel_id',$request->hotelId);
     }
 
 
-    public function clientReport(Request $request){
+public function clientReport(Request $request){
             $data['infoClient'] = $this::getDataToCSV($request->clientID,$request->year
                 ,$request->selectedWeek,$request->state);
             $data['distincRouteID'] = $data['infoClient']->groupby('clientRouteID');
@@ -2605,5 +2729,4 @@ class CrmRouteController extends Controller
             dd(1);
         }
     }
-
 }

@@ -11,10 +11,22 @@
     <link href="{{ asset('/css/dataTables.bootstrap.min.css')}}" rel="stylesheet">
 @endsection
 @section('content')
+    <div class="page-header">
+        <div class="alert gray-nav "></div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+        </div>
+        <div class="panel-body">
+
+        </div>
+    </div>
 @endsection
 
 @section('script')
-    <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
+
+        resizeDatatablesOnMenuToggle();
     </script>
 @endsection
