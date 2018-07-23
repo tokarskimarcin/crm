@@ -248,6 +248,8 @@ Route::POST('/saveNewHotel','CrmRouteController@saveNewHotel')->name('api.saveNe
 Route::POST('/uploadHotelFilesAjax', 'CrmRouteController@uploadHotelFilesAjax')->name('api.uploadHotelFilesAjax');
 Route::POST('/downloadHotelFilesAjax', 'CrmRouteController@downloadHotelFilesAjax')->name('api.downloadHotelFilesAjax');
 Route::POST('/changeStatusHotel','CrmRouteController@changeStatusHotel')->name('api.changeStatusHotel');
+Route::POST('/getCampaignsInvoicesDatatableAjax','CrmRouteController@getCampaignsInvoicesDatatableAjax')->name('api.getCampaignsInvoicesDatatableAjax');
+Route::POST('/uploadCampaignInvoiceAjax','CrmRouteController@uploadCampaignInvoiceAjax')->name('api.uploadCampaignInvoiceAjax');
 
 Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
 Route::post('/getGiftType', 'ClientController@getGiftType')->name('api.getGiftType');
@@ -892,6 +894,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::post('/presentationStatistics', 'CrmRouteController@presentationStatisticsPost');
 
     Route::get('/showClientRouteInfo', 'CrmRouteController@getClientRouteInfo');
+
+    Route::get('/getCampaignsInvoices', 'CrmRouteController@getCampaignsInvoices');
+    Route::get('/getCampaignsInvoices/{id}', 'CrmRouteController@getCampaignsInvoices');
     /** KONIEC CRM **/
 
 });
