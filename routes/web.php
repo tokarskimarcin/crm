@@ -949,6 +949,7 @@ Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
 Route::get('/autoChangeRouteStatus', 'AutoScriptController@autoChangeRouteStatus');
 
 Route::get('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplateGet');
+Route::post('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplatePost');
 Route::post('/getVoivodeshipRoundWithoutGracePeriodAjax', 'CrmRouteController@getVoivodeshipRoundWithoutGracePeriodAjax')->name('api.getVoivodeshipRoundWithoutGracePeriod');
 Route::post('/allCitiesInGivenVoivodeAjax', 'CrmRouteController@allCitiesInGivenVoivodeAjax')->name('api.allCitiesInGivenVoivodeAjax');
 Route::get('/hotelConfirmationGet', 'CrmRouteController@hotelConfirmationGet');
