@@ -161,6 +161,8 @@
                             },
                             success: function (response2) {
                                 secondResponse = response2;
+                                voivodeSelect.innerHTML = '';
+                                citySelect.innerHTML = '';
                                 console.assert(typeof(secondResponse) === "object", "secondResponse in showInTheMiddleAjax is not object!");
                                 intersectionArray = getIntersection(firstResponse, secondResponse);
 
@@ -1438,7 +1440,7 @@
                             var singleVoivode = document.createElement('option');
                             singleVoivode.value = {{$voivode->id}};
                             singleVoivode.textContent = '{{$voivode->name}}';
-                            voivodeSelect.appendChild(singleVoivode);password_date
+                            voivodeSelect.appendChild(singleVoivode); //password_date
                             @endforeach()
 
                             voivodeSelect.addEventListener('change', e => {
@@ -1447,7 +1449,7 @@
                                 showWithoutDistanceAjax(voivodeId, citySelect);
                             });
                         }
-                        else if(previousSingleShowContainer !== null && nextSingleShowContainer === null) { //case when show is last one
+                        else if(previousSingleShowContainer !== null && nextSingleShowContainer === null) { //case when show is last one dziala
                             const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
                             const previousCityId = getSelectedValue(previousCitySelect);
                             showInExtreme(citySelect.dataset.previousdistance, previousCityId, citySelect, voivodeSelect);
@@ -1508,9 +1510,27 @@
 
                                 if(nextDayFlag) { //case when next show is in another day container
                                     if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
-                                        if(!nextSiblingCheckboxArr[1]) { //grand is not checked
-                                            let changeDistanceArr = [100,'undefined'];
-                                            limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+                                        let dayContainerOfGrandNextShowContainer = grandNextShowContainer.closest('.singleDayContainer');
+                                        grandNextDayFlag = dayContainerOfGrandNextShowContainer == dayContainerOfNextShowContainer ? false : true; //checking if grandnext show is in the same day container as next show
+                                        if(grandNextDayFlag) { //case when grand show is another day
+                                            if(!nextSiblingCheckboxArr[1]) { //grand is not checked
+                                                let changeDistanceArr = [100,'undefined'];
+                                                limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+                                            }
+                                            else { //grand is checked
+                                                let changeDistanceArr = ['infinity','undefined'];
+                                                limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+                                            }
+                                        }
+                                        else { //grand is same day
+                                            if(!nextSiblingCheckboxArr[1]) { //grand is not checked
+                                                let changeDistanceArr = [30,'undefined'];
+                                                limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+                                            }
+                                            else { //grand is checked
+                                                let changeDistanceArr = ['infinity','undefined'];
+                                                limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+                                            }
                                         }
                                     }
                                     else { // there is no next container (related to prev show container)
@@ -1518,7 +1538,6 @@
                                     }
                                 }
                                 else { //case when next show is in the same day container
-
                                     if(grandNextShowContainer) { // there is prev container and next container (related to next show container)
                                         let dayContainerOfGrandNextShowContainer = grandNextShowContainer.closest('.singleDayContainer');
                                         grandNextDayFlag = dayContainerOfGrandNextShowContainer == dayContainerOfNextShowContainer ? false : true; //checking if grandnext show is in the same day container as next show
@@ -1527,10 +1546,18 @@
                                                 let changeDistanceArr = [100, 'undefined'];
                                                 limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
                                             }
+                                            else {
+                                                let changeDistanceArr = ['infinity', 'undefined'];
+                                                limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+                                            }
                                         }
                                         else { //grandnext show is in the same day container as next show
                                             if(!nextSiblingCheckboxArr[1]) { //grand is not checked
                                                 limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer);
+                                            }
+                                            else {
+                                                let changeDistanceArr = ['infinity', 'undefined'];
+                                                limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
                                             }
                                         }
                                     }
@@ -1562,10 +1589,18 @@
                                                 changeDistanceArr = [100, 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                             }
+                                            else {
+                                                changeDistanceArr = ['infinity', 100];
+                                                limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
+                                            }
                                         }
                                         else { //case when grand prev show is in same day container as prev show
                                             if(!prevSiblingCheckboxArr[0]) { //grand is not checked
                                                 changeDistanceArr = [30, 100];
+                                                limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
+                                            }
+                                            else {
+                                                changeDistanceArr = ['infinity', 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                             }
                                         }
@@ -1584,10 +1619,18 @@
                                                 let changeDistanceArr = [100, 'undefined'];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                             }
+                                            else {
+                                                let changeDistanceArr = ['infinity', 'undefined'];
+                                                limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
+                                            }
                                         }
                                         else { //grandprev show is in the same day container as prev show
                                             if(!prevSiblingCheckboxArr[0]) { //grand is not checked
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer);
+                                            }
+                                            else {
+                                                let changeDistanceArr = ['infinity', 'undefined'];
+                                                limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                             }
                                         }
                                     }

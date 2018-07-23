@@ -1101,7 +1101,7 @@ class CrmRouteController extends Controller
     /**
      * This method returns view showHotels
      */
-    public function showHotelsGet() {
+    public function showHotelsGet($hotelId = 0) {
         $voivodes = Voivodes::all()->sortByDesc('name');
         $cities = Cities::all()->sortBy('name');
         $paymentMethods = PaymentMethod::all();
@@ -1118,7 +1118,8 @@ class CrmRouteController extends Controller
             ->with('zipCode',$zipCode)
             ->with('paymentMethods', $paymentMethods)
             ->with('clients', $clients)
-            ->with('validHotelInvoiceTemplatesExtensions',json_encode($this->validHotelInvoiceTemplatesExtensions));
+            ->with('validHotelInvoiceTemplatesExtensions',json_encode($this->validHotelInvoiceTemplatesExtensions))
+            ->with('hotelId', $hotelId);
     }
 
     /**
@@ -1129,6 +1130,8 @@ class CrmRouteController extends Controller
         $cityIdArr = $request->city;
         $zipCode = $request->zipCode;
         $status = $request->status;
+
+        $hotelId = $request->hotelId;
 
         if(is_null($voivodeIdArr) && is_null($cityIdArr)) {
             $hotels = Hotel::whereIn('hotels.status', $status);
@@ -1158,8 +1161,13 @@ class CrmRouteController extends Controller
          city.name as cityName
         '))
             ->join('city','city.id','city_id')
-            ->join('voivodeship','voivodeship.id','voivode_id')->orderBy('id')
-            ->get();
+            ->join('voivodeship','voivodeship.id','voivode_id')->orderBy('id');
+
+        if($hotelId != 0){
+            $hotels->where('hotels.id','=',$hotelId);
+        }
+
+        $hotels = $hotels->get();
         $hotels->map(function ($item){
                 $item->zip_code = $this::zipCodeNumberToString($item->zip_code);
             return $item;
@@ -2565,7 +2573,7 @@ class CrmRouteController extends Controller
             'invoice_send_date',
             'invoice_payment_date',
             'h.name as hotel_name',
-            'cri.hotel_id',
+            'c.id as client_id',
             'cri.date',
             'c.name as client_name')
             ->join('client_route_info as cri','cri.id','=','client_route_campaigns.client_route_info_id')
@@ -2634,10 +2642,28 @@ class CrmRouteController extends Controller
         return 'fail';
     }
 
-    public function getHotelContacts(Request $request){
-        return HotelsContacts::where('hotel_id',$request->hotelId);
+    public function getClientInfoAjax(Request $request){
+        return Clients::find($request->clientId);
     }
 
+    public function confirmPaymentAjax(Request $request)
+    {
+        $campaignId = $request->campaignId;
+        $dateTime = $request->dateTime;
+        $date = date_create_from_format('Y-m-d G:i', $dateTime);
+        if ($date !== false) {
+            $clientRouteCampaign = ClientRouteCampaigns::find($campaignId);
+            if ($clientRouteCampaign !== null) {
+                $clientRouteCampaign->invoice_payment_date = $date;
+                $clientRouteCampaign->invoice_status_id = 4;
+                $clientRouteCampaign->save();
+                return 'success';
+            }
+            return 'error';
+        }else{
+            return 'error';
+        }
+    }
 
 public function clientReport(Request $request){
     $request->clientID = 1;

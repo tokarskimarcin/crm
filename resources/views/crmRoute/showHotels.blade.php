@@ -39,6 +39,7 @@
                    Wybierz hotel
                 </div>
                 <div class="panel-body">
+                    @if($hotelId == 0)
                     <div class="row">
                         <div class="col-md-12">
                             <button data-toggle="modal" class="btn btn-default hotelToModal" id="NewHotelModal"
@@ -83,7 +84,15 @@
                             </div>
                         </div>
                     </div>
-
+                    @else
+                    <div class="row">
+                        <div class="col-md-4">
+                            <form action="/showHotels" method="get">
+                                <button type="submit" class="btn btn-block btn-info">Pokaż wszystkie hotele</button>
+                            </form>
+                        </div>
+                    </div>
+                    @endif
                         <div class="col-mg-12">
                             <table id="datatable" class="thead-inverse table row-border table-striped" cellspacing="0" width="100%">
                                 <thead>
@@ -314,7 +323,7 @@
 @endsection
 
 @section('script')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>s
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
 
@@ -576,6 +585,7 @@
                     'url': "{{ route('api.showHotelsAjax') }}",
                     'type': 'POST',
                     'data': function (d) {
+                        d.hotelId = '{{$hotelId}}';
                         d.voivode = voivodeeId;
                         d.zipCode = zipCode;
                         d.city = cityId;
