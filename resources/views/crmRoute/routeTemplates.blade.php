@@ -717,10 +717,9 @@
                 if(e.target.matches('.addNewShowButton')) { //user clicks on "add new show" button
                     e.preventDefault();
                     const newShowButton = e.target;
-                    // const dayContainer = newShowButton.closest('.singleDayContainer');
                     const thisShowContainer = newShowButton.closest('.singleShowContainer');
                     const allSingleShowContainers = document.getElementsByClassName('singleShowContainer');
-                    // const lastSingleShowCOntainer = allSingleShowContainers[allSingleShowContainers.length - 1];
+                    const isChecked = thisShowContainer.querySelector('.distance-checkbox').checked;
 
                     const selectedCity = thisShowContainer.querySelector('.citySelect');
                     const selectedCityId = getSelectedValue(selectedCity);
@@ -746,26 +745,35 @@
                             }
                         }
 
-                        //we are checking whether cliecked singleDayContainer is last one, or between others.
-                        if(lastOneFlag === true) {
-                            newForm.createDOMBox(30, selectedCityId);
+                        if(isChecked) { //when clicked singleDayContainer has checkbox checked
+                            console.log('tutaj');
+                            newForm.createDOMBox();
                             let newFormDomElement = newForm.getForm();
                             thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
                         }
-                        else { //container is not last one
-                            const apreviousCitySelect = thisShowContainer.querySelector('.citySelect');
-                            const anextCitySelect = nextShowContainer.querySelector('.citySelect');
-                            //we are checking if user selected any city in upper and lower show container
-                            if(anextCitySelect.options[anextCitySelect.selectedIndex].value != 0 && apreviousCitySelect.options[apreviousCitySelect.selectedIndex].value != 0) {
-                                const previousShowContainer = thisShowContainer; // relative to newForm, this one is previousShowContainer
-                                newForm.createDOMBox(30, selectedCityId, true, previousShowContainer, nextShowContainer);
+                        else {
+                            //we are checking whether cliecked singleDayContainer is last one, or between others.
+                            if(lastOneFlag === true) {
+                                newForm.createDOMBox(30, selectedCityId);
                                 let newFormDomElement = newForm.getForm();
                                 thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
                             }
-                            else {
-                                notify('Wybierz miasta w pokazach powyżej i poniżej');
+                            else { //container is not last one
+                                const apreviousCitySelect = thisShowContainer.querySelector('.citySelect');
+                                const anextCitySelect = nextShowContainer.querySelector('.citySelect');
+                                //we are checking if user selected any city in upper and lower show container
+                                if(anextCitySelect.options[anextCitySelect.selectedIndex].value != 0 && apreviousCitySelect.options[apreviousCitySelect.selectedIndex].value != 0) {
+                                    const previousShowContainer = thisShowContainer; // relative to newForm, this one is previousShowContainer
+                                    newForm.createDOMBox(30, selectedCityId, true, previousShowContainer, nextShowContainer);
+                                    let newFormDomElement = newForm.getForm();
+                                    thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                                }
+                                else {
+                                    notify('Wybierz miasta w pokazach powyżej i poniżej');
+                                }
                             }
                         }
+
 
                     }
                     else { //validation failed
@@ -1108,23 +1116,32 @@
                     const allDayContainers = document.getElementsByClassName('singleDayContainer');
                     const lastDayContainer = allDayContainers[allDayContainers.length - 1];
                     const allSingleShowContainers = document.getElementsByClassName('singleShowContainer');
+                    const allSingleShowContainersInsideLastDayContainer = lastDayContainer.querySelectorAll('.singleShowContainer');
+                    const lastShowContainerInsideLastDay = allSingleShowContainersInsideLastDayContainer[allSingleShowContainersInsideLastDayContainer.length - 1];
+                    console.log(lastShowContainerInsideLastDay);
+                    const isChecked = lastShowContainerInsideLastDay.querySelector('.distance-checkbox').checked;
+                    console.log(isChecked);
 
                     let validate = validateForm(allSingleShowContainers[allSingleShowContainers.length - 1]);
 
                     if(validate) {
-                        lastDayContainer.insertAdjacentElement("afterend", firstDayContainer);
-
-                        const allCitiesSelect = document.getElementsByClassName('citySelect');
-                        const selectedCity = allCitiesSelect[allCitiesSelect.length - 1];
-                        const selectedCityId = getSelectedValue(selectedCity);
-
                         let firstForm = new ShowBox();
                         firstForm.addRemoveShowButton();
                         firstForm.addDistanceCheckbox();
                         firstForm.addNewShowButton();
-                        firstForm.createDOMBox(100, selectedCityId);
-                        let firstFormDOM = firstForm.getForm();
+                        lastDayContainer.insertAdjacentElement("afterend", firstDayContainer);
+                        if(isChecked) { // case when last single show container has checked checkbox;
+                            firstForm.createDOMBox();
+                        }
+                        else {
 
+                            const allCitiesSelect = document.getElementsByClassName('citySelect');
+                            const selectedCity = allCitiesSelect[allCitiesSelect.length - 1];
+                            const selectedCityId = getSelectedValue(selectedCity);
+                            firstForm.createDOMBox(100, selectedCityId);
+
+                        }
+                        let firstFormDOM = firstForm.getForm();
                         firstDayContainer.appendChild(firstFormDOM);
                     }
                     else {
@@ -1386,7 +1403,6 @@
                                     }
                                 }
                             }
-
                         }
 
                         //case when prev show exist.
@@ -1408,15 +1424,15 @@
                                         if(grandNextDayFlag) {// case when grand prev show is another day related to prev show
                                             if(!prevSiblingCheckboxArr[0]) { //grand is not checked
                                                 changeDistanceArr = [100, 100];
+                                                limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                             }
                                         }
                                         else { //case when grand prev show is in same day container as prev show
                                             if(!prevSiblingCheckboxArr[0]) { //grand is not checked
                                                 changeDistanceArr = [30, 100];
+                                                limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                             }
                                         }
-
-                                        limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                     }
                                     else { // there is no previous container (related to prev show container)
                                         limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
