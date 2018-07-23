@@ -230,8 +230,8 @@
                                 <input type="file" name="order" id="order" class="form-control" style="padding-bottom: 3em">
                             </div>--}}
                             <div class="col-md-4">
-                                <label for="invoice_template">Nowy szablon faktury</label>
-                                <input type="file" name="invoice_template" id="invoice_template" class="form-control file" style="padding-bottom: 3em">
+                                <label for="invoiceTemplate">Nowy szablon faktury</label>
+                                <input type="file" name="invoice_template" id="invoiceTemplate" class="form-control file" style="padding-bottom: 3em">
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
@@ -334,7 +334,7 @@
             let hotelIdInput = $('#hotelId');
             let parkingInput = $('#parking');
             let paymentMethodInput = $('#paymentMethod');
-            let invoice_templateInput = $('#invoice_template');
+            let invoiceTemplateInput = $('#invoiceTemplate');
             let clientsExceptionsInput = $('#clientsExceptions');
             let zipCodeInputs = $('.zipCode');
             let hourBidInput = $('#hourBid');
@@ -346,7 +346,7 @@
             let saveHotelButton = $('#HotelModal #saveHotel');
 
             if(!preview){
-                invoice_templateInput.closest('div').css('display','block');
+                invoiceTemplateInput.closest('div').css('display','block');
                 saveHotelButton.closest('div').css('display','block');
                 addPhoneNumberButton.closest('div').css('display','block');
                 addEmailButton.closest('div').css('display','block');
@@ -355,12 +355,12 @@
                 saveHotelButton.first().append($('<span class="glyphicon glyphicon-plus"></span>'));
                 saveHotelButton.first().append(' Dodaj Hotel');
             }else{
-                invoice_templateInput.closest('div').css('display','none');
+                invoiceTemplateInput.closest('div').css('display','none');
                 saveHotelButton.closest('div').css('display','none');
                 addPhoneNumberButton.closest('div').css('display','none');
                 addEmailButton.closest('div').css('display','none');
             }
-            $('.invoice_template_file').remove();
+            $('.invoiceTemplate_file').remove();
             $('#HotelModal .modal-title').first().text('Dodaj Hotel');
 
 
@@ -372,7 +372,7 @@
             hotelIdInput.val(0);
             parkingInput.val(-1);
             paymentMethodInput.val(0);
-            invoice_templateInput.val("");
+            invoiceTemplateInput.val("");
             clientsExceptionsInput.val('');
             zipCodeInputs.val("");
             hourBidInput.val("");
@@ -449,6 +449,14 @@
                             success: function (response) {
                                 clearModal();
 
+                                $('#HotelModal .modal-title').first().text('Edycja Hotelu');
+
+                                let saveHotelButton = $('#HotelModal #saveHotel');
+                                saveHotelButton.first().text('');
+                                saveHotelButton.first().prop('class', 'btn btn-success form-control');
+                                saveHotelButton.first().append($('<span class="glyphicon glyphicon-save"></span>'));
+                                saveHotelButton.first().append(' Zapisz Hotel');
+
                                 fillHotelInformations(response);
 
                                 $('#HotelModal').modal('show');
@@ -469,6 +477,8 @@
                             },
                             success: function (response) {
                                 clearModal(true);
+
+                                $('#HotelModal .modal-title').first().text('Podgląd Hotelu');
 
                                 fillHotelInformations(response,true);
 
@@ -587,7 +597,7 @@
                             let spanButton = $(document.createElement('span')).addClass('glyphicon glyphicon-search');
                             let previewButton = $(document.createElement('button')).addClass('button-preview-hotel btn btn-default btn-block').attr('data-id', data.id).append(spanButton);
                             return previewButton.prop('outerHTML');
-                        }
+                        },"orderable": false, "searchable": false
                     }
                 ]
             });
@@ -692,7 +702,7 @@
                 $(e.target).closest('.row').before(createNewHotelContact('hotelEmail'));
             });
 
-            $('#invoice_template').change(function(e){
+            $('#invoiceTemplate').change(function(e){
                 let allowedExtensions = <?php echo $validHotelInvoiceTemplatesExtensions; ?>;
                 console.log(allowedExtensions);
                 if(allowedExtensions.indexOf(getFileExtension($(e.target).prop('files')[0].name)) === -1){
@@ -709,7 +719,7 @@
                 e.preventDefault();
                 saveNewHotel().then(function(){
                     //let orderFileInput = $('#order');
-                    let invoiceTemplateFileInput = $('#invoice_template');
+                    let invoiceTemplateFileInput = $('#invoiceTemplate');
                     /*if(orderFileInput.prop("files").length !== 0){
                         formData.append(orderFileInput.prop('name'), orderFileInput.prop("files")[0]);
                         uploadFiles = true;
@@ -722,9 +732,7 @@
                         fileNames.push(invoiceTemplateFileInput.prop('name'));
                         uploadFiles = true;
 
-                        formData.append('file_names', JSON.stringify(fileNames));
-                        formData.append('hotel_id', $('#hotelId').val());
-
+                        formData.append('fileNames', JSON.stringify(fileNames));
                     }
                     if(uploadFiles)
                         uploadFilesAjax(formData);
@@ -843,13 +851,6 @@
 
             function fillHotelInformations(response, preview = false){
                 editHotelFlag = true;
-                $('#HotelModal .modal-title').first().text('Edycja Hotelu');
-
-                let saveHotelButton = $('#HotelModal #saveHotel');
-                saveHotelButton.first().text('');
-                saveHotelButton.first().prop('class', 'btn btn-success form-control');
-                saveHotelButton.first().append($('<span class="glyphicon glyphicon-save"></span>'));
-                saveHotelButton.first().append(' Zapisz Hotel');
 
                 let hotel = response.hotel;
 
@@ -866,8 +867,8 @@
                     let buttonSpanAddon = $(document.createElement('span')).addClass('input-group-btn').append(buttonDownloadInvoice);
                     let fileInput = $(document.createElement('input')).addClass('form-control').prop('type','text').prop('readonly', true).val(invoiceTemplatePath);
                     let inputGroup = $(document.createElement('div')).addClass('input-group').append(buttonSpanAddon).append(fileInput);
-                    let fileColumn = $(document.createElement('div')).addClass('col-md-4 invoice_template_file').append(fileLabel).append(inputGroup);
-                    $('div.col-md-4').has('#invoice_template').after(fileColumn);
+                    let fileColumn = $(document.createElement('div')).addClass('col-md-4 invoiceTemplateFile').append(fileLabel).append(inputGroup);
+                    $('div.col-md-4').has('#invoiceTemplate').after(fileColumn);
                 }
 
                 $("#name").val(hotel.name);
