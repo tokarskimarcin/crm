@@ -250,6 +250,8 @@ Route::POST('/downloadHotelFilesAjax', 'CrmRouteController@downloadHotelFilesAja
 Route::POST('/changeStatusHotel','CrmRouteController@changeStatusHotel')->name('api.changeStatusHotel');
 Route::POST('/getCampaignsInvoicesDatatableAjax','CrmRouteController@getCampaignsInvoicesDatatableAjax')->name('api.getCampaignsInvoicesDatatableAjax');
 Route::POST('/uploadCampaignInvoiceAjax','CrmRouteController@uploadCampaignInvoiceAjax')->name('api.uploadCampaignInvoiceAjax');
+Route::POST('/getClientInfoAjax','CrmRouteController@getClientInfoAjax')->name('api.getClientInfoAjax');
+Route::POST('/confirmPaymentAjax','CrmRouteController@confirmPaymentAjax')->name('api.confirmPaymentAjax');
 
 Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
 Route::post('/getGiftType', 'ClientController@getGiftType')->name('api.getGiftType');
@@ -878,6 +880,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/addNewHotel', 'CrmRouteController@addNewHotelGet');
     Route::post('/addNewHotel', 'CrmRouteController@addNewHotelPost');
     Route::get('/showHotels', 'CrmRouteController@showHotelsGet')->name('showHotels');
+    Route::get('/showHotels/{hotelId}', 'CrmRouteController@showHotelsGet')->name('showHotels');
     Route::get('/downloadHotelFiles/{id}', 'CrmRouteController@downloadHotelFiles');
     Route::get('/hotel/{id}', 'CrmRouteController@hotelGet');
     Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
