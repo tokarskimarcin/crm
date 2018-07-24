@@ -2676,10 +2676,6 @@ class CrmRouteController extends Controller
     }
 
 public function clientReport(Request $request){
-    $request->clientID = 1;
-    $request->year = 0;
-    $request->selectedWeek = 0;
-    $request->state = -1;
             $data['infoClient'] = $this::getDataToCSV($request->clientID,$request->year
                 ,$request->selectedWeek,$request->state);
             $data['distincRouteID'] = $data['infoClient']->groupby('clientRouteID');
@@ -2705,8 +2701,12 @@ public function clientReport(Request $request){
             payment_methods.name as paymentMethod,
             0 as hotelContact,
             0 as toPay,
-            hotels.daily_bid,            
-            hotels.hour_bid,
+            hotels.bidType,
+            case 
+                when bidType = 1 then hotels.hour_bid 
+                when bidType = 2 then hotels.daily_bid
+                else 0
+            end as bid,
             client.name as clientName,
             client_gift_type.name as clientGiftName,
             client_meeting_type.name clientMeetingName,
@@ -2723,13 +2723,61 @@ public function clientReport(Request $request){
             ->where('client_route.status','like',$state)
             ->where('client_route_info.weekOfYear','like',$selectedWeek)
             ->where(DB::raw('YEAR(client_route_info.date)'),'like',$year)
+            ->where('hotels.id','!=',null)
             ->orderBy('date')
             ->orderBy('cityName')
             ->orderBy('hour')
             ->get();
-        $data->map(function ($item){
+        $onlyHotel = Hotel::select(DB::raw('
+            hotels.id as hotelID,
+            hotels_contacts.*
+            '))
+            ->leftjoin('hotels_contacts','hotels_contacts.hotel_id','hotels.id')
+            ->whereIn('hotels.id',$data->pluck('hotelID')->toArray())
+            ->get();
+        $routeAllreadySetBil = array();
+        $data->map(function ($item) use ($onlyHotel,&$routeAllreadySetBil,$data){
+            $item->hour = substr($item->hour,0,5);
+            $item->zip_code = $this::zipCodeNumberToString($item->zip_code);
+            //Sprawczenie czy hotel jest wpisany do trasy
+            if($item->hotelID != null){
+                if(!in_array([$item->clientRouteID => $item->hotelID],$routeAllreadySetBil)){
+                    array_push($routeAllreadySetBil,[$item->clientRouteID => $item->hotelID]);
+                    if($item->bidType == 2){
+                        $item->toPay = $item->bid;
+                    }else  if($item->bidType == 1){
+                        $eventCount = $data->where('clientRouteID','=',$item->clientRouteID)
+                            ->where('hotelID','=',$item->hotelID)
+                            ->count();
+                        $item->toPay = $eventCount*$item->bid;
+                    }else{
+                        $item->paymentMethod = 'Brak danych';
+                        $item->toPay = 'Brak danych';
+                    }
+                }else{
+                    $item->paymentMethod = '';
+                    $item->toPay = '';
+                }
+            }
 
-            dd($item);
+            //Bil
+
+            //Hotel contact
+            $contact = $onlyHotel->where('hotelID','=',$item->hotelID)->where('type','like','phone');
+            if(!$contact->isEmpty()){
+                $concat_phone = $contact->pluck('contact')->toarray();
+                if(count($concat_phone) != 0){
+                    $concatStr = '';
+                    foreach($concat_phone as $phone)
+                        $concatStr .= ' '.$phone;
+                    $item->hotelContact = $concatStr;
+                }else{
+                    $item->hotelContact = 'Brak Danych';
+                }
+            }else{
+                $item->hotelContact = 'Brak Danych';
+            }
+
         });
         return $data;
     }
