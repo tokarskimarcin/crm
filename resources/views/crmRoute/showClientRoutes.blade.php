@@ -51,7 +51,7 @@
         </div>
     </div>
 
-    <table class="table table-bordered table-striped thead-inverse" id="tabelka" >
+    <table class="table table-bordered table-striped thead-inverse" id="tabelka" hidden>
         <thead>
             <tr>
                 <th>Nazwa Klienta</th>
