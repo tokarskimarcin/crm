@@ -49,11 +49,11 @@
                     </div>
                     <div class="col-md-2">
                         <label class="">Od</label>
-                        <input id="firstDate" type="date" class="form-control">
+                        <input id="firstDateInputFilter" type="date" class="form-control">
                     </div>
                     <div class="col-md-2">
                         <label class="">Do</label>
-                        <input id="lastDate" type="date" class="form-control">
+                        <input id="lastDateInputFilter" type="date" class="form-control">
                     </div>
                 </div>
             @endif
@@ -88,15 +88,19 @@
         $(document).ready(() => {
             let clientSelect = $('#clientSelect');
             let invoiceStatusSelect = $('#invoiceStatusSelect');
-            let firstDate = $('#firstDate');
-            let lastDate = $('#lastDate');
+            let firstDateInputFilter = $('#firstDateInputFilter');
+            let lastDateInputFilter = $('#lastDateInputFilter');
+
             @if(isset($routeId))
                 @if($routeId == 0)
-                    firstDate.val('{{$firstDate}}');
-                    lastDate.val('{{$lastDate}}');
+                    let firstDate = new Date('{{$firstDate}}');
+                    let lastDate = new Date('{{$lastDate}}');
+                    if(firstDate>lastDate)
+                        lastDate=firstDate;
+                    firstDateInputFilter.val(getFormatedDate(firstDate));
+                    lastDateInputFilter.val(getFormatedDate(lastDate));
                 @endif
             @endif
-
             let invoiceDatatable = $('#invoicesDatatable').DataTable({
                     width: '100%',
                 autoWidth: true,
@@ -112,8 +116,8 @@
                         data.routeId = "{{$routeId}}";
                         data.clientId = clientSelect.val();
                         data.invoiceStatusId = invoiceStatusSelect.val();
-                        data.firstDate = firstDate.val();
-                        data.lastDate = lastDate.val();
+                        data.firstDateInputFilter = firstDateInputFilter.val();
+                        data.lastDateInputFilter = lastDateInputFilter.val();
                     },
                     headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -158,7 +162,7 @@
                     },
                     {
                         data: function (data, type, val) {
-                            let divStatus = $(document.createElement('div')).text(data.name_pl);
+                            let divStatus = $(document.createElement('div')).text(data.name_pl).css('text-align','center');
                             let color = '';
                             if (data.invoice_status_id == 1) {
                                 color = '#d9534f';
@@ -236,10 +240,10 @@
                             if (data.invoice_status_id == 4) {
                                 return '';
                                // actionButton.addClass('btn-default');
-                                actionButton.attr('id', 'noAction');
-                                actionSpan.addClass('glyphicon glyphicon-check');
-                                actionButton.text('Opłacone');
-                                actionButton.prop('disabled', true);
+                                //actionButton.attr('id', 'noAction');
+                                //actionSpan.addClass('glyphicon glyphicon-check');
+                                //actionButton.text('Opłacone');
+                                //actionButton.prop('disabled', true);
                             }
                             return actionButton.prepend(actionSpan).prop('outerHTML');
                         }, orderable: false, searchable: false, name: 'action'
@@ -430,10 +434,10 @@
             invoiceStatusSelect.change(function () {
                 invoiceDatatable.ajax.reload();
             });
-            firstDate.change(function () {
+            firstDateInputFilter.change(function () {
                 invoiceDatatable.ajax.reload();
             });
-            lastDate.change(function () {
+            lastDateInputFilter.change(function () {
                 invoiceDatatable.ajax.reload();
             });
 
@@ -659,6 +663,22 @@
                     text: 'Wystąpił błąd: ' + thrownError + ' "' + jqXHR.responseJSON.message + '"',
                 });
             });
+        }
+
+
+        function  getFormatedDate(date) {
+            let day = date.getDate();
+            let month = date.getMonth()+1;
+            let dateString = date.getFullYear()+'-';
+            if(month < 10){
+                dateString += '0'
+            }
+            dateString += month+'-';
+            if(day < 10){
+                dateString += '0'
+            }
+            dateString += day;
+            return dateString;
         }
     </script>
 @endsection
