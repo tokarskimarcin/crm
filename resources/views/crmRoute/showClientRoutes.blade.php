@@ -51,7 +51,7 @@
         </div>
     </div>
 
-    <table class="table table-bordered table-striped thead-inverse" id="tabelka" hidden>
+    <table class="table table-bordered table-striped thead-inverse" id="tabelka" >
         <thead>
             <tr>
                 <th>Nazwa Klienta</th>
@@ -325,6 +325,13 @@
             var o = Math.round, r = Math.random, s = 255;
             return 'rgb(' + o(r()*s) + ',' + o(r()*s) + ',' + o(r()*s) +')';
         }
+        function returnblank(item){
+            if(item == null){
+                return "";
+            }else{
+                return item;
+            }
+        }
         document.addEventListener('DOMContentLoaded', function (event) {
 
 
@@ -360,18 +367,20 @@
                             $.each(response['infoClient'],function (key,value) {
                                 var color = random_rgba();
                                 trHTML +=
-                                    '<tr><td>' + value.clientName +
-                                    '</td><td>' + value.clientMeetingName +
-                                    '</td><td>' + value.clientGiftName+
-                                    '</td><td style="background-color: '+clientColorObj.find(o => o.key == value.clientRouteID).color+'">' + value.date +
-                                    '</td><td>' + value.cityName +
-                                    '</td><td>' + value.zip_code +
-                                    '</td><td>' + value.hotelName +
-                                    '</td><td>' + value.street +
-                                    '</td><td>' + value.hour +
-                                    '</td><td>' +
-                                    '</td><td>' + value.daily_bid +
-                                    '</td><td>' + value.paymentMethod;
+                                    '<tr>' +
+                                        '<td>' + value.clientName +
+                                        '</td><td>' + returnblank(value.clientMeetingName) +
+                                        '</td><td>' + returnblank(value.clientGiftName)+
+                                        '</td><td style="background-color: '+clientColorObj.find(o => o.key == value.clientRouteID).color+'">' + value.date +
+                                        '</td><td>' + returnblank(value.cityName) +
+                                        '</td><td>' + returnblank(value.zip_code) +
+                                        '</td><td>' + returnblank(value.hotelName) +
+                                        '</td><td>' + returnblank(value.street) +
+                                        '</td><td>' + returnblank(value.hour) +
+                                        '</td><td>' + returnblank(value.hotelContact) +
+                                        '</td><td>' + returnblank(value.toPay) +
+                                        '</td><td>' + returnblank(value.paymentMethod)+
+                                    '</td></tr>';
                             });
                             $('#tabelka tbody').empty();
                             $('#tabelka tbody').append(trHTML);
