@@ -1201,6 +1201,7 @@
                 let buttonColumn = $(document.createElement('div')).addClass('col-md-2').append(button);
                 newContainer.append(buttonColumn);
             }
+
             if(data !== null){
                 radioInput.data('id', data.id);
                 radioInput.prop('checked', data.suggested);
@@ -1210,6 +1211,19 @@
                 newContactInput.val(data.value);
                 newContactInput.attr('data-new', false);
                 newContactInput.prop('readonly', preview);
+
+                if(preview && className == 'hotelEmail'){
+                    let inputView = $(document.createElement('input')).attr('type','hidden').attr('name','view').val('cm');
+                    let inputFs = $(document.createElement('input')).attr('type','hidden').attr('name','fs').val('1');
+                    let inputTo = $(document.createElement('input')).attr('type','hidden').attr('name','to').val(data.value);
+                    let span = $(document.createElement('span')).addClass('glyphicon glyphicon-envelope');
+                    let button = $(document.createElement('button')).addClass('btn btn-info btn-block').prop('type','submit').append(span);
+                    let form = $(document.createElement('form')).attr('action','https://mail.google.com/mail').attr('target','_blank').attr('method','get')
+                        .append(inputView).append(inputFs).append(inputTo).append(button);
+                    //let link = $(document.createElement('a')).attr('href','https://mail.google.com/mail/?view=cm&fs=1&to='+data.value).append(button);
+                    let buttonColumn = $(document.createElement('div')).addClass('col-md-2').append(form);
+                    newContainer.append(buttonColumn);
+                }
 
             }else{
                 radioInput.data('id', 'new_'+(inputs.size()+1));
