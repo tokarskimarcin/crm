@@ -1398,6 +1398,7 @@ class CrmRouteController extends Controller
                 $data = ['T' => 'Edycja hotelu'];
                 $action = 2;
             }
+            $newHotel->bidType = $request->bidType;
             $newHotel->city_id = $request->city;
             $newHotel->street = $request->street;
             //$newHotel->price    = $request->price;
@@ -2664,11 +2665,15 @@ class CrmRouteController extends Controller
         }
     }
 
-    public function clientReport(Request $request){
-        $data['infoClient'] = $this::getDataToCSV($request->clientID,$request->year
-            ,$request->selectedWeek,$request->state);
-        $data['distincRouteID'] = $data['infoClient']->groupby('clientRouteID');
-        return $data;
+public function clientReport(Request $request){
+    $request->clientID = 1;
+    $request->year = 0;
+    $request->selectedWeek = 0;
+    $request->state = -1;
+            $data['infoClient'] = $this::getDataToCSV($request->clientID,$request->year
+                ,$request->selectedWeek,$request->state);
+            $data['distincRouteID'] = $data['infoClient']->groupby('clientRouteID');
+            return $data;
     }
 
     public function getDataToCSV($clientID,$year,$selectedWeek,$state){
@@ -2688,7 +2693,9 @@ class CrmRouteController extends Controller
             hotels.street,
             hotels.zip_code,
             payment_methods.name as paymentMethod,
-            hotels.daily_bid,
+            0 as hotelContact,
+            0 as toPay,
+            hotels.daily_bid,            
             hotels.hour_bid,
             client.name as clientName,
             client_gift_type.name as clientGiftName,
@@ -2710,6 +2717,10 @@ class CrmRouteController extends Controller
             ->orderBy('cityName')
             ->orderBy('hour')
             ->get();
+        $data->map(function ($item){
+
+            dd($item);
+        });
         return $data;
     }
     public function hotelConfirmationGet(){
