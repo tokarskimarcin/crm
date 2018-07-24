@@ -829,8 +829,16 @@ class CoachingController extends Controller
                     ->where('department_info.id', $item)
                     ->groupBy('pbx_dkj_team.department_info_id')
                     ->get();
-                $janky = $janky_reports->first()->actual_janky;
-                $succes = $janky_reports->first()->sum_success;
+                if(!$janky_reports->isEmpty()){
+                    $janky = $janky_reports->first()->actual_janky;
+                    $succes = $janky_reports->first()->sum_success;
+                }
+                else{
+                    $succes = 0;
+                    $janky = 0;
+                }
+
+
                 if($isHr){
                     $columnName = 'hr_id';
                 }else{
