@@ -197,6 +197,7 @@
                                     <th>Edycja (Hoteli i godzin)</th>
                                     <th>Edycja (Trasy)</th>
                                     <th>Edycja parametrów (Kampanii)</th>
+                                    <th>Faktury trasy</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -541,6 +542,7 @@
                         test = $(this).closest('table');
                         if ($(this).hasClass('check')) {
                             $(this).removeClass('check');
+                            showAllClientsInput.prop('checked', true);
                             id = -1;
                         }
                         else {
@@ -754,6 +756,14 @@
                             if(data.status == 2)
                                 type = 'disabled';
                             return '<button class="btn btn-info btn-block show-modal-with-data" '+type+'><span class="glyphicon glyphicon-edit " data-route_id ="' + data.client_route_id + '" ></span> Edytuj</button>';
+                        }, "name": "link", width: '10%', searchable: false, orderable: false
+
+                    },{
+                        "data": function (data, type, dataToSet) {
+                            let spanButton = $(document.createElement('span')).addClass('glyphicon glyphicon-search');
+                            let button = $(document.createElement('button')).addClass('btn btn-block btn-default').append(spanButton);
+                            let form = $(document.createElement('form')).attr('method','GET').attr('action','/getCampaignsInvoices/'+data.client_route_id).attr('target','_blank').append(button);
+                            return form.prop('outerHTML');
                         }, "name": "link", width: '10%', searchable: false, orderable: false
 
                     }

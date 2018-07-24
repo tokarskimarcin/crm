@@ -570,13 +570,17 @@ class CrmRouteController extends Controller
         $state = $request->state;
         $state = $state == '-1' ? '%' : $state;
 
-        //SELECT weekOfYear, client.name as clientName, city.name as cityName, date, client_route.status FROM client_route_info
-        //  JOIN client_route ON client_route.id = client_route_id
-        //  JOIN client ON client.id = client_route.client_id
-        //  JOIN city ON city.id = city_id
-
         $client_route_info = DB::table('client_route_info')
-            ->select('client_route_info.id','weekOfYear','hour', 'hotel_id', 'client.name as clientName', 'city.name as cityName', 'date', 'client_route.status', 'client_route.type', 'client_route_id')
+            ->select('route_name',
+                'client_route_info.id',
+                'weekOfYear','hour',
+                'hotel_id',
+                'client.name as clientName',
+                'city.name as cityName',
+                'date',
+                'client_route.status',
+                'client_route.type',
+                'client_route_id')
             ->join('client_route' ,'client_route.id','=','client_route_id')
             ->join('client' ,'client.id','=','client_route.client_id')
             ->join('city' ,'city.id','=', 'city_id')
@@ -595,7 +599,7 @@ class CrmRouteController extends Controller
 
             $client_routes = $this->getClientRouteGroupedByDateSortedByHour($client_route_id, $client_route_info);
 
-            $route_name = $this->createRouteName($client_routes);
+            //$route_name = $this->createRouteName($client_routes);
             $hourOrHotelAssigned = $client_routes[0]->hour == null || $client_routes[0]->hotel_id == null ? false : true;
             for($i = 1; $i < count($client_routes);$i++){
                 if($hourOrHotelAssigned && ($client_routes[$i]->hotel_id == null || $client_routes[$i]->hour == null) )
@@ -603,7 +607,7 @@ class CrmRouteController extends Controller
             }
 
             $client_routes[0]->hotelOrHour = $hourOrHotelAssigned;
-            $client_routes[0]->route_name = $route_name;
+            //$client_routes[0]->route_name = $route_name;
             array_push($fullArray, $client_routes[0]);
         }
         $full_clients_routes = collect($fullArray);
@@ -615,7 +619,7 @@ class CrmRouteController extends Controller
         return datatables($full_clients_routes)->make(true);
     }
 
-    private function fillClientRouteNames(){
+    private function fillClientsRouteNames(){
         $clientRoutes = ClientRoute::all();
         $clientRoutes->each(function ($clientRoute, $key) {
             $clientRouteInfo = $this->getClientRouteGroupedByDateSortedByHour($clientRoute->id);
@@ -2609,6 +2613,8 @@ class CrmRouteController extends Controller
      */
     public function uploadCampaignInvoiceAjax(Request $request){
         $fileNames = json_decode($request->fileNames);
+
+        $success = true;
         foreach ($fileNames as $fileName) {
             $campaignInvoicePath =  $fileName.'_files';
 
@@ -2633,13 +2639,17 @@ class CrmRouteController extends Controller
                         $campaign->save();
                         new ActivityRecorder(array_merge(['T'=>'Dodanie szablonu faktury do hotelu'],$campaign->toArray()),198, 1);
                     }
-                    return 'success';
                 } else {
-                    return 'error';
+                    $success = false;
                 }
+            } else{
+                $success = false;
             }
         }
-        return 'fail';
+        if($success)
+            return 'success';
+        else
+            return 'error';
     }
 
     public function getClientInfoAjax(Request $request){
