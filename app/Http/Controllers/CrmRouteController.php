@@ -2762,15 +2762,25 @@ public function clientReport(Request $request){
         });
         return $data;
     }
-
-
     public function hotelConfirmationGet(){
-        return view('crmRoute.hotelConfirmation');
+        $allClients = ClientRouteCampaigns::select(DB::raw('distinct(client.id),client.name'))
+            ->join('client_route_info','client_route_info.id','client_route_campaigns.client_route_info_id')
+            ->join('client_route','client_route.id','client_route_info.client_route_id')
+            ->join('client','client.id','client_route.client_id')
+            ->get();
+        return view('crmRoute.hotelConfirmation')
+            ->with('allClients',$allClients);
     }
 
     public function getConfirmHotelInfo(Request $request){
-        $dayPlus = date('Y-m-d',strtotime(' + 1 days'));
-        $dayPlus = '2018-06-05';
+        $dayPlus = date("Y-m-d",strtotime($request->dataStart.' + 1 days'));
+        $clientID = $request->clientInfo;
+        $confirmStatus = $request->confirmStatus;
+
+        if($clientID == 0)
+            $clientID = '%';
+        if($confirmStatus == -1)
+            $confirmStatus = '%';
         $hotelToConfirm = ClientRouteCampaigns::
            select(DB::raw('
            client_route_campaigns.id as campainID,
@@ -2788,7 +2798,8 @@ public function clientReport(Request $request){
             ->leftjoin('hotels','hotels.id','client_route_info.hotel_id')
             ->leftjoin('city','city.id','hotels.city_id')
             ->where('client_route_info.date','like',$dayPlus)
-            ->where('client.id','=',1)
+            ->where('client.id','like',$clientID)
+            ->where('client_route_campaigns.hotel_confirm_status','like',$confirmStatus)
             ->groupBy('client_route_info.client_route_id')
             ->groupBy('client_route_info.hotel_id')
             ->get();
