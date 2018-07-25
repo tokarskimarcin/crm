@@ -14,6 +14,7 @@ use App\Department_info;
 use App\Hotel;
 use App\HotelsClientsExceptions;
 use App\HotelsContacts;
+use App\Http\StaticMemory;
 use App\InvoiceStatus;
 use App\PaymentMethod;
 use App\PbxCrmInfo;
@@ -2560,6 +2561,12 @@ class CrmRouteController extends Controller
                 ->with('client', $client)
                 ->with('validCampaignInvoiceExtensions',json_encode($this->validCampaignInvoiceExtensions));
         }
+    }
+
+    public function downloadCampaignInvoicePDF($id){
+        $clientRouteCampaign = ClientRouteCampaigns::find($id);
+        $url = $clientRouteCampaign->invoice_path;
+        return Storage::download($url);
     }
 
     public function getCampaignsInvoicesDatatableAjax(Request $request){

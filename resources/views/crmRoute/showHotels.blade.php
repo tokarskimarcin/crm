@@ -356,6 +356,7 @@
             let invoiceTemplateInput = $('#invoiceTemplate');
             let clientsExceptionsInput = $('#clientsExceptions');
             let zipCodeInputs = $('.zipCode');
+            let bidType = $('#bidType');
             let hourBidInput = $('#hourBid');
             let dailyBidInput = $('#dailyBid');
             let contactInputs = $('.contactsContainer .contact');
@@ -400,6 +401,7 @@
 
             nameInput.prop('readonly',preview);
             streetInput.prop('readonly',preview);
+            bidType.prop('disabled',preview);
             voivodeAddInput.prop('disabled',preview);
             cityAddInput.prop('disabled',preview);
             commentInput.prop('readonly',preview);
@@ -410,6 +412,7 @@
             hourBidInput.prop('readonly',preview);
             dailyBidInput.prop('readonly',preview);
 
+            bidType.selectpicker('refresh');
             voivodeAddInput.selectpicker('refresh');
             cityAddInput.selectpicker('refresh');
             parkingInput.selectpicker('refresh');
@@ -912,10 +915,10 @@
                 $('#paymentMethod').val(hotel.payment_method_id == null ? 0 : hotel.payment_method_id);
                 $('#parking').val(hotel.parking == null ? -1 : hotel.parking);
                 $('#bidType').val(hotel.bidType).trigger('change');
-                if(preview)
+                /*if(preview)
                     $('#bidType').prop('disabled',true);
                 else
-                    $('#bidType').prop('disabled',false);
+                    $('#bidType').prop('disabled',false);*/
                 $('#hourBid').val(hotel.hour_bid);
                 $('#dailyBid').val(hotel.daily_bid);
 

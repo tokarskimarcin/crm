@@ -906,6 +906,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/getCampaignsInvoices', 'CrmRouteController@getCampaignsInvoices');
     Route::get('/getCampaignsInvoices/{id}', 'CrmRouteController@getCampaignsInvoices');
+    Route::GET('/downloadCampaignInvoicePDF/{id}', 'CrmRouteController@downloadCampaignInvoicePDF');
 
     Route::get('/hotelConfirmationGet', 'CrmRouteController@hotelConfirmationGet');
     /** KONIEC CRM **/
@@ -968,4 +969,3 @@ Route::get('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplateGet');
 Route::post('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplatePost');
 Route::post('/getVoivodeshipRoundWithoutGracePeriodAjax', 'CrmRouteController@getVoivodeshipRoundWithoutGracePeriodAjax')->name('api.getVoivodeshipRoundWithoutGracePeriod');
 Route::post('/allCitiesInGivenVoivodeAjax', 'CrmRouteController@allCitiesInGivenVoivodeAjax')->name('api.allCitiesInGivenVoivodeAjax');
-

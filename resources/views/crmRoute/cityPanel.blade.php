@@ -81,109 +81,102 @@
                     <h4 class="modal-title" id="modal_title">Dodawanie Miasta<span id="modalCity"></span></h4>
                 </div>
                 <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="myLabel">Województwo:</label>
+                                    <select class="form-control" id="voiovedshipID">
+                                        @foreach($allVoivodeship as $item)
+                                            <option value="{{$item->id}}">{{$item->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="myLabel">Miasto:</label>
+                                    <input class="form-control" id="cityName" name="cityName"
+                                           placeholder="Miasto" type="text">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="myLabel">Ilość pokazów:</label>
+                                    <input class="form-control" id="eventCount" name="eventCount"
+                                           placeholder="Ilość pokazów" type="number" min="0">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="myLabel">Karencja:</label>
+                                    <input class="form-control" id="gracePeriod" name="gracePeriod"
+                                           placeholder="Karencja" type="number" min="-1">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <label class="myLabel">Kod pocztowy:</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="input-group">
+                                                <input type="text" id="zipCode1" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                <span class="input-group-addon" id="basic-addon1" style="padding: 0px"></span>
+                                                <input type="text" id="zipCode2" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                <span class="input-group-addon" id="basic-addon1" style="padding: 3px;">-</span>
+                                                <input type="text" id="zipCode3" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                <span class="input-group-addon" id="basic-addon1"style="padding: 0px"></span>
+                                                <input type="text" id="zipCode4" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
+                                                <span class="input-group-addon" id="basic-addon1"style="padding: 0px"></span>
+                                                <input type="text" id="zipCode5" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
 
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            Formularz
-                        </div>
-                        <div class="panel-body">
-
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label class="myLabel">Województwo:</label>
-                                            <select class="form-control" id="voiovedshipID">
-                                                @foreach($allVoivodeship as $item)
-                                                    <option value="{{$item->id}}">{{$item->name}}</option>
-                                                @endforeach
-                                            </select>
+                                                {{-- <input type="text" id="zipCode1" class="form-control col-md-4" placeholder="- -" aria-describedby="basic-addon1" style="text-align: center; letter-spacing: 8px">
+                                                 <span class="input-group-addon" id="basic-addon1">-</span>
+                                                 <input type="text" id="zipCode2" class="form-control col-md-7" placeholder="- - -" aria-describedby="basic-addon1" style="text-align: center; letter-spacing: 8px">
+                                             --}}</div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label class="myLabel">Miasto:</label>
-                                            <input class="form-control" id="cityName" name="cityName"
-                                                   placeholder="Miasto" type="text">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label class="myLabel">Ilość pokazów:</label>
-                                            <input class="form-control" id="eventCount" name="eventCount"
-                                                   placeholder="Ilość pokazów" type="number" min="0">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label class="myLabel">Karencja:</label>
-                                            <input class="form-control" id="gracePeriod" name="gracePeriod"
-                                                   placeholder="Karencja" type="number" min="-1">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label class="myLabel">Kod pocztowy:</label>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <div class="input-group">
-                                                        <input type="text" id="zipCode1" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
-                                                        <span class="input-group-addon" id="basic-addon1" style="padding: 0px"></span>
-                                                        <input type="text" id="zipCode2" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
-                                                        <span class="input-group-addon" id="basic-addon1" style="padding: 3px;">-</span>
-                                                        <input type="text" id="zipCode3" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
-                                                        <span class="input-group-addon" id="basic-addon1"style="padding: 0px"></span>
-                                                        <input type="text" id="zipCode4" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
-                                                        <span class="input-group-addon" id="basic-addon1"style="padding: 0px"></span>
-                                                        <input type="text" id="zipCode5" class="form-control zipCode" placeholder="_" aria-describedby="basic-addon1" style="text-align: center; padding: 1px">
-
-                                                        {{-- <input type="text" id="zipCode1" class="form-control col-md-4" placeholder="- -" aria-describedby="basic-addon1" style="text-align: center; letter-spacing: 8px">
-                                                         <span class="input-group-addon" id="basic-addon1">-</span>
-                                                         <input type="text" id="zipCode2" class="form-control col-md-7" placeholder="- - -" aria-describedby="basic-addon1" style="text-align: center; letter-spacing: 8px">
-                                                     --}}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label class="myLabel">Szerokość geograficzna:</label>
-                                            <input class="form-control" id="latitude" name="latitude"
-                                                   placeholder="Szerokość geograficzna" type="number">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label class="myLabel">Długość geograficzna:</label>
-                                            <input class="form-control" id="longitude" name="longitude"
-                                                   placeholder="Długość geograficzna" type="number">
-                                        </div>
-                                    </div>
-                                    {{--<div class="col-md-3">--}}
-                                        {{--<div class="form-group">--}}
-                                            {{--<label class="myLabel">Max pokazów tygodniowo</label>--}}
-                                            {{--<input class="form-control" id="weekGrace" name="weekGrace" placeholder="Maksymalna ilość pokazów tygodniowo"--}}
-                                                   {{--type="number" min="0" step="1" disabled>--}}
-                                        {{--</div>--}}
-                                    {{--</div>--}}
-                                    <div class="col-md-3" style="visibility: hidden; display:inline;">
-                                        <div class="form-group">
-                                            <label class="myLabel">Status</label>
-                                            <input class="form-control" id="status" name="status" placeholder="Status"
-                                                   type="number">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <button class="btn btn-default form-control" id="saveCityModal"
-                                                onclick="saveCity(this)"><span class=’glyphicon glyphicon-plus’></span> Dodaj Miasto
-                                        </button>
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="myLabel">Szerokość geograficzna:</label>
+                                    <input class="form-control" id="latitude" name="latitude"
+                                           placeholder="Szerokość geograficzna" type="number">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="myLabel">Długość geograficzna:</label>
+                                    <input class="form-control" id="longitude" name="longitude"
+                                           placeholder="Długość geograficzna" type="number">
+                                </div>
+                            </div>
+                            {{--<div class="col-md-3">--}}
+                                {{--<div class="form-group">--}}
+                                    {{--<label class="myLabel">Max pokazów tygodniowo</label>--}}
+                                    {{--<input class="form-control" id="weekGrace" name="weekGrace" placeholder="Maksymalna ilość pokazów tygodniowo"--}}
+                                           {{--type="number" min="0" step="1" disabled>--}}
+                                {{--</div>--}}
+                            {{--</div>--}}
+                            <div class="col-md-3" style="visibility: hidden; display:inline;">
+                                <div class="form-group">
+                                    <label class="myLabel">Status</label>
+                                    <input class="form-control" id="status" name="status" placeholder="Status"
+                                           type="number">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <button class="btn btn-default form-control" id="saveCityModal"
+                                        onclick="saveCity(this)"><span class=’glyphicon glyphicon-plus’></span> Dodaj Miasto
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                             {{--<div class="alert alert-success">--}}
                             {{--<h4>--}}
                             {{--<p>Aktualny wynik wyliczany jest na podstawie ostatnich ~18 RBH danego konsultanta.</p>--}}
@@ -192,10 +185,6 @@
                             {{--</h4>--}}
                             {{--</div>--}}
 
-                        </div>
-                    </div>
-                    <div class="row">
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
