@@ -117,9 +117,18 @@ class ScheduleController extends Controller
         $dayOfWeekArray= array('monday' ,'tuesday','wednesday','thursday','friday','saturday','sunday');
         if($schedule_id == 'null')
         {
-            $schedule = new Schedule();
-            $schedule->id_user = $id_user;
-            $schedule->id_manager = Auth::user()->id;
+            $result = Schedule::where('id_user', '=', $id_user)
+                ->where('year','=',$year)
+                ->where('week_num','=',$number_week)->get();
+            //dd($result->first());
+            if($result->first() !== null){
+                $schedule = $result->first();
+                $schedule->id_manager = Auth::user()->id;
+            }else {
+                $schedule = new Schedule();
+                $schedule->id_user = $id_user;
+                $schedule->id_manager = Auth::user()->id;
+            }
         }else{
             $schedule = Schedule::find($schedule_id);
             $schedule->id_manager_edit = Auth::user()->id;

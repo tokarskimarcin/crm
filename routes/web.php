@@ -901,6 +901,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/getCampaignsInvoices', 'CrmRouteController@getCampaignsInvoices');
     Route::get('/getCampaignsInvoices/{id}', 'CrmRouteController@getCampaignsInvoices');
+    Route::GET('/downloadCampaignInvoicePDF/{id}', 'CrmRouteController@downloadCampaignInvoicePDF');
     /** KONIEC CRM **/
 
 });

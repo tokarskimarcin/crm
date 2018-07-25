@@ -37,6 +37,11 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <div class="panel-body">
+                                    @if($status == -1)
+                                        <div class="alert alert-danger" role="alert">
+                                            Wewnętrzy błąd serwera. Odswież stronę. Jeżeli błąd sie powtarza, spróbuj ponownie później.
+                                        </div>
+                                        @else
                                             <div class="alert alert-danger" style="border: 1px solid #222;" role="alert">
                                                @if(Auth::user()->user_type_id == 1 ||  Auth::user()->user_type_id == 2)
                                                 <strong>Podstawowa obsługa systemu!</strong></br></br>
@@ -53,22 +58,20 @@
                                                     Po zakończeniu pracy należy zarejestrować godzin pracy, używając przycisku <b>Rejestracja Godzin</b>
                                                 @endif
                                             </div>
-                                            <!--Ładowanie przycisku start stop do div  -->
-                                            <div id="startstopdiv"></div>
+                                        @endif
                                     </div>
-
-                                    <?php if($status == 0): ?>
+                                    @if($status == 0)
                                     <button id="start" class="btn btn-success"> Zaczynam pracę </button>
-                                    <?php elseif($status == 1): ?>
+                                    @elseif($status == 1)
                                     <button id="stop" class="btn btn-danger"> Kończę Pracę </button>
-                                    <?php elseif($status == 2): ?>
+                                    @elseif($status == 2)
                                     <button id="done" class="btn btn-info" data-toggle="modal" data-target="#registerModal">Rejestracja Godzin</button>
-                                     <?php elseif($status >=3): ?>
+                                    @elseif($status >=3)
                                        <div class="alert alert-success">
                                            Godziny zostały zarejestrowane w przedziale: <span id="register_hour_done_start">{{substr($register_start,0,-3)}}</span> - <span id="register_hour_done_stop">{{substr($register_stop,0,-3)}}</span>
                                        </div>
                                     <button id="done" class="btn btn-info" data-toggle="modal" data-target="#registerModal">Edytuj godziny pracy</button>
-                                    <?php endif?>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -84,7 +87,7 @@
 @section('script')
 
 <script>
-    var $status_work = <?php echo $status ?>;
+
     $("#start_stop").on('click', '#start',function () {
             $.ajax({
                 type: "POST",
@@ -93,12 +96,26 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
+                    if( response === 'success'){
                     server = response;
                     $("#start").text('Zakończ pracę');
                     $("#start").attr('id', 'stop');
                     $("#stop").removeClass('btn-success');
                     $("#stop").addClass('btn-danger');
+                    }else if(response === 'fail'){
+                        location.reload();
+                    }
                 }
+            }).error(function (jqXHR, textStatus, thrownError) {
+                swal.close();
+                console.log(jqXHR);
+                console.log('textStatus: ' + textStatus);
+                console.log('hrownError: ' + thrownError);
+                swal({
+                    type: 'error',
+                    title: 'Błąd ' + jqXHR.status,
+                    text: 'Wystąpił błąd: ' + thrownError + ' "' + jqXHR.responseJSON.message + '"',
+                });
             });
         });
     $("#start_stop").on('click', '#stop',function () {
@@ -121,24 +138,36 @@
                   'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
               },
               success: function(response) {
-                  server = response;
-                  $("#stop").attr('data-toggle','modal');
-                  $("#stop").attr('data-target','#registerModal');
-                  $("#stop").text('Rejestracja Godzin');
-                  $("#stop").attr('id', 'done');
-                  $("#done").removeClass('btn-danger');
-                  $("#done").addClass('btn-default');
+                  if(response === 'success'){
+                      server = response;
+                      $("#stop").attr('data-toggle','modal');
+                      $("#stop").attr('data-target','#registerModal');
+                      $("#stop").text('Rejestracja Godzin');
+                      $("#stop").attr('id', 'done');
+                      $("#done").removeClass('btn-danger');
+                      $("#done").addClass('btn-default');
+                      swal(
+                          'Sukces',
+                          'Zakończyłeś pracę!',
+                          'success'
+                      )
+                  }else if(response === 'fail'){
+                      location.reload();
+                  }
               }
+          }).error(function (jqXHR, textStatus, thrownError) {
+              swal.close();
+              console.log(jqXHR);
+              console.log('textStatus: ' + textStatus);
+              console.log('hrownError: ' + thrownError);
+              swal({
+                  type: 'error',
+                  title: 'Błąd ' + jqXHR.status,
+                  text: 'Wystąpił błąd: ' + thrownError + ' "' + jqXHR.responseJSON.message + '"',
+              });
           });
-          swal(
-            'Sukces',
-            'Zakończyłeś pracę!',
-            'success'
-          )
         }
       })
-
-
     });
 
 </script>

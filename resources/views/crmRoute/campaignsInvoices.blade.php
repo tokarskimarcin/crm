@@ -84,6 +84,7 @@
 @endsection
 
 @section('script')
+    <script src="https://cdnjs.com/libraries/pdf.js"></script>
     <script>
         $(document).ready(() => {
             let clientSelect = $('#clientSelect');
@@ -152,12 +153,13 @@
                     },
                     {
                         data: function (data, type, val) {
-                            let invoiceSpan = $(document.createElement('span')).addClass('glyphicon glyphicon-search');
-                            let invoiceButton = $(document.createElement('button')).addClass('btn btn-default btn-block').append(invoiceSpan);
+                            let invoiceSpan = $(document.createElement('span')).addClass('glyphicon glyphicon-cloud-download');
+                            let invoiceButton = $(document.createElement('button')).addClass('btn btn-primary btn-block').append(invoiceSpan);
+                            let form = $(document.createElement('form')).attr('action','/downloadCampaignInvoicePDF/'+data.id).attr('method','get').append(invoiceButton);
                             if (data.invoice_path === null || data.invoice_path === '') {
                                 invoiceButton.prop('disabled', true);
                             }
-                            return invoiceButton.prop('outerHTML');
+                            return form.prop('outerHTML');
                         }, name: 'invoice'
                     },
                     {
@@ -219,14 +221,29 @@
                                 .attr('data-hotel_name',data.hotel_name)
                                 .prop('type', 'button').addClass('btn btn-block');//.attr('data-toggle', 'modal').attr('data-target', '#myModal');
                             actionButton.addClass('btn-info');
+
+                            let buttonGroup = $(document.createElement('div'));
                             if (data.invoice_status_id == 1) {
                                 //actionButton.addClass('btn-danger');
                                 actionButton.attr('id', 'uploadInvoice');
                                 actionButton.text(' Wrzuć fakturę');
-                                actionSpan.addClass('glyphicon glyphicon-export');
+                                actionSpan.addClass('glyphicon glyphicon-cloud-upload');
                             }
                             if (data.invoice_status_id == 2) {
                                 //actionButton.addClass('btn-warning');
+                                let actionSpan2 = $(document.createElement('span'));
+                                let actionButton2 = $(document.createElement('button'))
+                                    .attr('data-campaign_id', data.id)
+                                    .attr('data-client_id', data.client_id)
+                                    .attr('data-client_name', data.client_name)
+                                    .attr('data-hotel_name',data.hotel_name)
+                                    .prop('type', 'button').addClass('btn btn-block btn-info');
+                                actionButton2.attr('id', 'uploadInvoice');
+                                actionButton2.text(' Wrzuć fakturę');
+                                actionSpan2.addClass('glyphicon glyphicon-cloud-upload');
+                                actionButton2.prepend(actionSpan2);
+                                buttonGroup.append(actionButton2);
+
                                 actionButton.attr('id', 'sendInvoice');
                                 actionButton.text(' Wyślij fakturę');
                                 actionSpan.addClass('glyphicon glyphicon-envelope');
@@ -245,7 +262,8 @@
                                 //actionButton.text('Opłacone');
                                 //actionButton.prop('disabled', true);
                             }
-                            return actionButton.prepend(actionSpan).prop('outerHTML');
+                            actionButton.prepend(actionSpan);
+                            return buttonGroup.append(actionButton).prop('outerHTML');
                         }, orderable: false, searchable: false, name: 'action'
                     }
                 ],
@@ -267,7 +285,7 @@
                             let inputColumn = $(document.createElement('div')).addClass('col-md-12').append(inputLabel).append(input);
                             let row1 = $(document.createElement('div')).addClass('row').append(inputColumn);
 
-                            let uploadSpan = $(document.createElement('span')).addClass('glyphicon glyphicon-export');
+                            let uploadSpan = $(document.createElement('span')).addClass('glyphicon glyphicon-cloud-upload');
                             let uploadButton = $(document.createElement('button')).addClass('btn btn-block btn-info')
                                 .click(function () {
                                     handleUploadInvoiceButtonClick($(e.target).data('campaign_id'));

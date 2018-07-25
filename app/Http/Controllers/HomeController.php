@@ -44,7 +44,6 @@ class HomeController extends Controller
             $register_stop = 0;
         }
 
-
         return view('home.index')
         ->with('status',$this->checkStatusWork())
         ->with('register_start', $register_start)
@@ -64,8 +63,12 @@ class HomeController extends Controller
             $work_hour->id_user = Auth::id();
             $work_hour->created_at = date('Y-m-d H:i:s');
             $work_hour->save();
+            return 'success';
+        }else{
+            return 'fail';
         }
     }
+
     public function stopWork(Request $request)
     {
         if($request->ajax() && $this->checkStatusWork() == 1)
@@ -73,18 +76,26 @@ class HomeController extends Controller
             Work_Hour::where('id_user', Auth::id())
                 ->where('date',$this->actuall_date)
                 ->update(['status' => 2,'click_stop' => $this->actuall_hour, 'updated_at' => date('Y-m-d H:i:s')]);
+            return 'success';
+        }else{
+            return 'fail';
         }
     }
+
     public function checkStatusWork()
     {
-        $status = Work_Hour::where('date',$this->actuall_date)
-            ->where('id_user',Auth::id())
-            ->pluck('status')
-            ->first();
-        if(empty($status))
-        {
-            return 0;
-        } return $status;
+        try{
+            $status = Work_Hour::where('date',$this->actuall_date)
+                ->where('id_user',Auth::id())
+                ->pluck('status')
+                ->first();
+            if(empty($status)){
+                return 0;
+            }
+            return $status;
+        }catch(\Exception $e){
+            return -1;
+        }
     }
     public function admin()
     {

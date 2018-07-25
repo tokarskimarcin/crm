@@ -98,6 +98,16 @@
                             window.location.reload(true);
                         }
                     }
+                }).error(function (jqXHR, textStatus, thrownError) {
+                    swal.close();
+                    console.log(jqXHR);
+                    console.log('textStatus: ' + textStatus);
+                    console.log('hrownError: ' + thrownError);
+                    swal({
+                        type: 'error',
+                        title: 'Błąd ' + jqXHR.status,
+                        text: 'Wystąpił błąd: ' + thrownError + ' "' + jqXHR.responseJSON.message + '"',
+                    });
                 });
             }
         });
