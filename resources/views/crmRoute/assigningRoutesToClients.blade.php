@@ -436,51 +436,12 @@
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 }, "rowCallback": function (row, data, index) {
-                    if (data.status == 1) {
+                    if (data.status == 0) {
                         $(row).css('background', '#c500002e')
                     }
                     $(row).attr('id', "clientId_" + data.id);
                     return row;
                 }, "fnDrawCallback": function (settings) {
-                    /**
-                     * Zmiana statusu klienta
-                     */
-                    $('.button-status-client').on('click', function () {
-                        let clientId = $(this).data('id');
-                        let clienStatus = $(this).data('status');
-                        let nameOfAction = "";
-                        if (clienStatus == 0)
-                            nameOfAction = "Tak, wyłącz Klienta";
-                        else
-                            nameOfAction = "Tak, włącz Klienta";
-                        swal({
-                            title: 'Jesteś pewien?',
-                            type: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: nameOfAction
-                        }).then((result) => {
-                            if (result.value) {
-
-                                $.ajax({
-                                    type: "POST",
-                                    async: false,
-                                    url: "{{ route('api.changeStatusClient') }}", // do zamiany
-                                    headers: {
-                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                    },
-                                    data: {
-                                        'clientId': clientId
-                                    },
-                                    success: function (response) {
-                                        notify("<strong>Status klienta został zmieniony</strong>", 'info');
-                                        table_client.ajax.reload();
-                                    }
-                                });
-                            }
-                        })
-                    });
 
                     //Zaznaczenie kolumny
                     $('#table_client tbody tr').on('click', function (e) {
