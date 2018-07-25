@@ -254,6 +254,9 @@ Route::POST('/uploadCampaignInvoiceAjax','CrmRouteController@uploadCampaignInvoi
 Route::POST('/getClientInfoAjax','CrmRouteController@getClientInfoAjax')->name('api.getClientInfoAjax');
 Route::POST('/confirmPaymentAjax','CrmRouteController@confirmPaymentAjax')->name('api.confirmPaymentAjax');
 
+Route::post('/getConfirmHotelInfo','CrmRouteController@getConfirmHotelInfo')->name('api.getConfirmHotelInfo');
+Route::post('/changeConfirmStatus','CrmRouteController@changeConfirmStatus')->name('api.changeConfirmStatus');
+
 Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
 Route::post('/getGiftType', 'ClientController@getGiftType')->name('api.getGiftType');
 Route::post('/getMeetingType', 'ClientController@getMeetingType')->name('api.getMeetingType');
