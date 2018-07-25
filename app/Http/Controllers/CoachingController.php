@@ -295,6 +295,7 @@ class CoachingController extends Controller
             $coaching_consultant_inprogres = DB::table('coaching_director')
                 ->select(DB::raw('coaching_director.*,
                             user.id as user_id,
+                            user.status_work as statusWork,
                             user.login_phone as login_phone,
                             user.first_name as user_first_name,
                             user.last_name as user_last_name,
@@ -828,8 +829,16 @@ class CoachingController extends Controller
                     ->where('department_info.id', $item)
                     ->groupBy('pbx_dkj_team.department_info_id')
                     ->get();
-                $janky = $janky_reports->first()->actual_janky;
-                $succes = $janky_reports->first()->sum_success;
+                if(!$janky_reports->isEmpty()){
+                    $janky = $janky_reports->first()->actual_janky;
+                    $succes = $janky_reports->first()->sum_success;
+                }
+                else{
+                    $succes = 0;
+                    $janky = 0;
+                }
+
+
                 if($isHr){
                     $columnName = 'hr_id';
                 }else{
@@ -1352,6 +1361,36 @@ class CoachingController extends Controller
         return datatables($coachDirectorChanges)->make(true);
     }
 
+    public function endCoachingDirector(Request $request){
+        if($request->ajax()){
+            $coaching = CoachingDirector::find($request->coachingID);
+            if($coaching->coaching_type == 1){
+                if (floatval($coaching->average_goal) > floatval($request->actualScore)) {
+                    $coaching->status = 2; // Coaching niezaliczony
+                } else {
+                    $coaching->status = 1; // Coaching zaliczony
+                }
+                $coaching->average_end = $request->actualScore;
+            }else if ($coaching->coaching_type == 2){
+                if (floatval($coaching->janky_goal) < floatval($request->actualScore)) {
+                    $coaching->status = 2;// Coaching niezaliczony
+                } else {
+                    $coaching->status = 1; // Coaching zaliczony
+                }
+                $coaching->janky_end = $request->actualScore;
+            }else{
+                if (floatval($coaching->rbh_goal) > floatval($request->actualScore)) {
+                    $coaching->status = 2;// Coaching niezaliczony
+                } else {
+                    $coaching->status = 1; // Coaching zaliczony
+                }
+                $coaching->rbh_end = $request->actualScore;
+            }
+            $coaching->save();
+            new ActivityRecorder('T : Zakończenie coachingu:'.$request->coachingID,175,1);
+            return 200;
+        }
+    }
     public function saveLogInfo($collect,$actionType,$coaching_id = null){
         if($collect->coaching_level == 1)
             $link_id = 175;

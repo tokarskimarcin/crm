@@ -237,7 +237,7 @@ class RecruitmentStory extends Model
 
         $all_candidate = Candidate::where('cadre_id','=',$item->id)
             ->get();
-        $all_hire_candidate_new = User::whereIn('candidate_id',$all_candidate->pluck('id')->toArray())
+        $all_hire_candidate_new = User::where('created_by','=',$item->id)
                     ->whereBetween('start_work',[$date_start,$date_stop])
                     ->where('department_info_id','=',$item->departmentInfoId)
                     ->count();

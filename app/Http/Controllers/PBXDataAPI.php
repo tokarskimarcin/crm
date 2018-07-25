@@ -230,11 +230,13 @@ class PBXDataAPI extends Controller
                                 if(User::where('login_phone', '=', $rowItem)
                                     ->where('status_work','=',1)
                                     ->first()){
-                                    $userWithThisPbxNumber = User::where('login_phone', '=', $rowItem)->first()->id;
-                                    $data_to_insert[$temp_key]['user_id'] = $userWithThisPbxNumber;
+                                    $userWithThisPbxNumber = User::where('login_phone', '=', $rowItem)->first();
+                                    $data_to_insert[$temp_key]['user_id'] = $userWithThisPbxNumber->id;
+                                    $data_to_insert[$temp_key]['actual_coach_id'] = $userWithThisPbxNumber->coach_id;
                                 }
                                 else {
                                     $data_to_insert[$temp_key]['user_id'] = null;
+                                    $data_to_insert[$temp_key]['actual_coach_id'] = null;
                                 }
                             }
                             else

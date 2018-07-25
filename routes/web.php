@@ -150,6 +150,7 @@ Route::POST('/datatableCoachingTableDirector', 'CoachingController@datatableCoac
 Route::POST('/deleteCoachingTableDirector', 'CoachingController@deleteCoachingTableDirector')->name('api.deleteCoachingTableDirector');
 Route::POST('/getCoachingDirector', 'CoachingController@getCoachingDirector')->name('api.getCoachingDirector');
 Route::POST('/acceptCoachingDirector', 'CoachingController@acceptCoachingDirector')->name('api.acceptCoachingDirector');
+Route::POST('/endCoachingDirector', 'CoachingController@endCoachingDirector')->name('api.endCoachingDirector');
 
 Route::POST('/getManagerId', 'CoachingController@getManagerId')->name('api.getManagerId');
 
@@ -250,7 +251,14 @@ Route::POST('/downloadHotelFilesAjax', 'CrmRouteController@downloadHotelFilesAja
 Route::POST('/changeStatusHotel','CrmRouteController@changeStatusHotel')->name('api.changeStatusHotel');
 Route::POST('/getCampaignsInvoicesDatatableAjax','CrmRouteController@getCampaignsInvoicesDatatableAjax')->name('api.getCampaignsInvoicesDatatableAjax');
 Route::POST('/uploadCampaignInvoiceAjax','CrmRouteController@uploadCampaignInvoiceAjax')->name('api.uploadCampaignInvoiceAjax');
+Route::POST('/getClientInfoAjax','CrmRouteController@getClientInfoAjax')->name('api.getClientInfoAjax');
+Route::POST('/confirmPaymentAjax','CrmRouteController@confirmPaymentAjax')->name('api.confirmPaymentAjax');
 
+Route::post('/getConfirmHotelInfo','CrmRouteController@getConfirmHotelInfo')->name('api.getConfirmHotelInfo');
+Route::post('/changeConfirmStatus','CrmRouteController@changeConfirmStatus')->name('api.changeConfirmStatus');
+
+
+Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clientReport');
 Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
 Route::post('/getGiftType', 'ClientController@getGiftType')->name('api.getGiftType');
 Route::post('/getMeetingType', 'ClientController@getMeetingType')->name('api.getMeetingType');
@@ -878,6 +886,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/addNewHotel', 'CrmRouteController@addNewHotelGet');
     Route::post('/addNewHotel', 'CrmRouteController@addNewHotelPost');
     Route::get('/showHotels', 'CrmRouteController@showHotelsGet')->name('showHotels');
+    Route::get('/showHotels/{hotelId}', 'CrmRouteController@showHotelsGet')->name('showHotels');
     Route::get('/downloadHotelFiles/{id}', 'CrmRouteController@downloadHotelFiles');
     Route::get('/hotel/{id}', 'CrmRouteController@hotelGet');
     Route::post('/hotel/{id}', 'CrmRouteController@hotelPost');
@@ -897,6 +906,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/getCampaignsInvoices', 'CrmRouteController@getCampaignsInvoices');
     Route::get('/getCampaignsInvoices/{id}', 'CrmRouteController@getCampaignsInvoices');
+    Route::GET('/downloadCampaignInvoicePDF/{id}', 'CrmRouteController@downloadCampaignInvoicePDF');
+
+    Route::get('/hotelConfirmationGet', 'CrmRouteController@hotelConfirmationGet');
     /** KONIEC CRM **/
 
 });
@@ -957,7 +969,6 @@ Route::get('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplateGet');
 Route::post('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplatePost');
 Route::post('/getVoivodeshipRoundWithoutGracePeriodAjax', 'CrmRouteController@getVoivodeshipRoundWithoutGracePeriodAjax')->name('api.getVoivodeshipRoundWithoutGracePeriod');
 Route::post('/allCitiesInGivenVoivodeAjax', 'CrmRouteController@allCitiesInGivenVoivodeAjax')->name('api.allCitiesInGivenVoivodeAjax');
-Route::get('/hotelConfirmationGet', 'CrmRouteController@hotelConfirmationGet');
 
 Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clientReport');
 

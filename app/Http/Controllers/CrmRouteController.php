@@ -14,6 +14,7 @@ use App\Department_info;
 use App\Hotel;
 use App\HotelsClientsExceptions;
 use App\HotelsContacts;
+use App\Http\StaticMemory;
 use App\InvoiceStatus;
 use App\PaymentMethod;
 use App\PbxCrmInfo;
@@ -570,13 +571,17 @@ class CrmRouteController extends Controller
         $state = $request->state;
         $state = $state == '-1' ? '%' : $state;
 
-        //SELECT weekOfYear, client.name as clientName, city.name as cityName, date, client_route.status FROM client_route_info
-        //  JOIN client_route ON client_route.id = client_route_id
-        //  JOIN client ON client.id = client_route.client_id
-        //  JOIN city ON city.id = city_id
-
         $client_route_info = DB::table('client_route_info')
-            ->select('client_route_info.id','weekOfYear','hour', 'hotel_id', 'client.name as clientName', 'city.name as cityName', 'date', 'client_route.status', 'client_route.type', 'client_route_id')
+            ->select('route_name',
+                'client_route_info.id',
+                'weekOfYear','hour',
+                'hotel_id',
+                'client.name as clientName',
+                'city.name as cityName',
+                'date',
+                'client_route.status',
+                'client_route.type',
+                'client_route_id')
             ->join('client_route' ,'client_route.id','=','client_route_id')
             ->join('client' ,'client.id','=','client_route.client_id')
             ->join('city' ,'city.id','=', 'city_id')
@@ -595,7 +600,7 @@ class CrmRouteController extends Controller
 
             $client_routes = $this->getClientRouteGroupedByDateSortedByHour($client_route_id, $client_route_info);
 
-            $route_name = $this->createRouteName($client_routes);
+            //$route_name = $this->createRouteName($client_routes);
             $hourOrHotelAssigned = $client_routes[0]->hour == null || $client_routes[0]->hotel_id == null ? false : true;
             for($i = 1; $i < count($client_routes);$i++){
                 if($hourOrHotelAssigned && ($client_routes[$i]->hotel_id == null || $client_routes[$i]->hour == null) )
@@ -603,7 +608,7 @@ class CrmRouteController extends Controller
             }
 
             $client_routes[0]->hotelOrHour = $hourOrHotelAssigned;
-            $client_routes[0]->route_name = $route_name;
+            //$client_routes[0]->route_name = $route_name;
             array_push($fullArray, $client_routes[0]);
         }
         $full_clients_routes = collect($fullArray);
@@ -615,7 +620,7 @@ class CrmRouteController extends Controller
         return datatables($full_clients_routes)->make(true);
     }
 
-    private function fillClientRouteNames(){
+    private function fillClientsRouteNames(){
         $clientRoutes = ClientRoute::all();
         $clientRoutes->each(function ($clientRoute, $key) {
             $clientRouteInfo = $this->getClientRouteGroupedByDateSortedByHour($clientRoute->id);
@@ -1101,7 +1106,7 @@ class CrmRouteController extends Controller
     /**
      * This method returns view showHotels
      */
-    public function showHotelsGet() {
+    public function showHotelsGet($hotelId = 0) {
         $voivodes = Voivodes::all()->sortByDesc('name');
         $cities = Cities::all()->sortBy('name');
         $paymentMethods = PaymentMethod::all();
@@ -1118,7 +1123,8 @@ class CrmRouteController extends Controller
             ->with('zipCode',$zipCode)
             ->with('paymentMethods', $paymentMethods)
             ->with('clients', $clients)
-            ->with('validHotelInvoiceTemplatesExtensions',json_encode($this->validHotelInvoiceTemplatesExtensions));
+            ->with('validHotelInvoiceTemplatesExtensions',json_encode($this->validHotelInvoiceTemplatesExtensions))
+            ->with('hotelId', $hotelId);
     }
 
     /**
@@ -1129,6 +1135,8 @@ class CrmRouteController extends Controller
         $cityIdArr = $request->city;
         $zipCode = $request->zipCode;
         $status = $request->status;
+
+        $hotelId = $request->hotelId;
 
         if(is_null($voivodeIdArr) && is_null($cityIdArr)) {
             $hotels = Hotel::whereIn('hotels.status', $status);
@@ -1158,8 +1166,13 @@ class CrmRouteController extends Controller
          city.name as cityName
         '))
             ->join('city','city.id','city_id')
-            ->join('voivodeship','voivodeship.id','voivode_id')->orderBy('id')
-            ->get();
+            ->join('voivodeship','voivodeship.id','voivode_id')->orderBy('id');
+
+        if($hotelId != 0){
+            $hotels->where('hotels.id','=',$hotelId);
+        }
+
+        $hotels = $hotels->get();
         $hotels->map(function ($item){
                 $item->zip_code = $this::zipCodeNumberToString($item->zip_code);
             return $item;
@@ -1390,6 +1403,7 @@ class CrmRouteController extends Controller
                 $data = ['T' => 'Edycja hotelu'];
                 $action = 2;
             }
+            $newHotel->bidType = $request->bidType;
             $newHotel->city_id = $request->city;
             $newHotel->street = $request->street;
             //$newHotel->price    = $request->price;
@@ -2665,6 +2679,12 @@ class CrmRouteController extends Controller
         }
     }
 
+    public function downloadCampaignInvoicePDF($id){
+        $clientRouteCampaign = ClientRouteCampaigns::find($id);
+        $url = $clientRouteCampaign->invoice_path;
+        return Storage::download($url);
+    }
+
     public function getCampaignsInvoicesDatatableAjax(Request $request){
         $routeId = $request->routeId;
         $clientId = $request->clientId;
@@ -2680,7 +2700,7 @@ class CrmRouteController extends Controller
             'invoice_send_date',
             'invoice_payment_date',
             'h.name as hotel_name',
-            'cri.hotel_id',
+            'c.id as client_id',
             'cri.date',
             'c.name as client_name')
             ->join('client_route_info as cri','cri.id','=','client_route_campaigns.client_route_info_id')
@@ -2716,6 +2736,8 @@ class CrmRouteController extends Controller
      */
     public function uploadCampaignInvoiceAjax(Request $request){
         $fileNames = json_decode($request->fileNames);
+
+        $success = true;
         foreach ($fileNames as $fileName) {
             $campaignInvoicePath =  $fileName.'_files';
 
@@ -2740,19 +2762,41 @@ class CrmRouteController extends Controller
                         $campaign->save();
                         new ActivityRecorder(array_merge(['T'=>'Dodanie szablonu faktury do hotelu'],$campaign->toArray()),198, 1);
                     }
-                    return 'success';
                 } else {
-                    return 'error';
+                    $success = false;
                 }
+            } else{
+                $success = false;
             }
         }
-        return 'fail';
+        if($success)
+            return 'success';
+        else
+            return 'error';
     }
 
-    public function getHotelContacts(Request $request){
-        return HotelsContacts::where('hotel_id',$request->hotelId);
+    public function getClientInfoAjax(Request $request){
+        return Clients::find($request->clientId);
     }
 
+    public function confirmPaymentAjax(Request $request)
+    {
+        $campaignId = $request->campaignId;
+        $dateTime = $request->dateTime;
+        $date = date_create_from_format('Y-m-d G:i', $dateTime);
+        if ($date !== false) {
+            $clientRouteCampaign = ClientRouteCampaigns::find($campaignId);
+            if ($clientRouteCampaign !== null) {
+                $clientRouteCampaign->invoice_payment_date = $date;
+                $clientRouteCampaign->invoice_status_id = 4;
+                $clientRouteCampaign->save();
+                return 'success';
+            }
+            return 'error';
+        }else{
+            return 'error';
+        }
+    }
 
 public function clientReport(Request $request){
             $data['infoClient'] = $this::getDataToCSV($request->clientID,$request->year
@@ -2778,8 +2822,14 @@ public function clientReport(Request $request){
             hotels.street,
             hotels.zip_code,
             payment_methods.name as paymentMethod,
-            hotels.daily_bid,
-            hotels.hour_bid,
+            0 as hotelContact,
+            0 as toPay,
+            hotels.bidType,
+            case 
+                when bidType = 1 then hotels.hour_bid 
+                when bidType = 2 then hotels.daily_bid
+                else 0
+            end as bid,
             client.name as clientName,
             client_gift_type.name as clientGiftName,
             client_meeting_type.name clientMeetingName,
@@ -2800,10 +2850,121 @@ public function clientReport(Request $request){
             ->orderBy('cityName')
             ->orderBy('hour')
             ->get();
+        $onlyHotel = Hotel::select(DB::raw('
+            hotels.id as hotelID,
+            hotels_contacts.*
+            '))
+            ->leftjoin('hotels_contacts','hotels_contacts.hotel_id','hotels.id')
+            ->whereIn('hotels.id',$data->pluck('hotelID')->toArray())
+            ->get();
+        $routeAllreadySetBil = array();
+        $data->map(function ($item) use ($onlyHotel,&$routeAllreadySetBil,$data){
+            $item->hour = substr($item->hour,0,5);
+            $item->zip_code = $this::zipCodeNumberToString($item->zip_code);
+            //Sprawczenie czy hotel jest wpisany do trasy
+            if($item->hotelID != null){
+                if(!in_array([$item->clientRouteID => $item->hotelID],$routeAllreadySetBil)){
+                    array_push($routeAllreadySetBil,[$item->clientRouteID => $item->hotelID]);
+                    if($item->bidType == 2){
+                        $item->toPay = $item->bid;
+                    }else  if($item->bidType == 1){
+                        $eventCount = $data->where('clientRouteID','=',$item->clientRouteID)
+                            ->where('hotelID','=',$item->hotelID)
+                            ->count();
+                        $item->toPay = $eventCount*$item->bid;
+                    }else{
+                        $item->paymentMethod = 'Brak danych';
+                        $item->toPay = 'Brak danych';
+                    }
+                }else{
+                    $item->paymentMethod = '';
+                    $item->toPay = '';
+                }
+            }
+            $item->hotelContact = $this::getHotelContact($onlyHotel,$item->hotelID);
+        });
         return $data;
     }
     public function hotelConfirmationGet(){
-        return view('crmRoute.hotelConfirmation');
+        $allClients = ClientRouteCampaigns::select(DB::raw('distinct(client.id),client.name'))
+            ->join('client_route_info','client_route_info.id','client_route_campaigns.client_route_info_id')
+            ->join('client_route','client_route.id','client_route_info.client_route_id')
+            ->join('client','client.id','client_route.client_id')
+            ->get();
+        return view('crmRoute.hotelConfirmation')
+            ->with('allClients',$allClients);
+    }
+
+    public function getConfirmHotelInfo(Request $request){
+        $dayPlus = date("Y-m-d",strtotime($request->dataStart.' + 1 days'));
+        $clientID = $request->clientInfo;
+        $confirmStatus = $request->confirmStatus;
+
+        if($clientID == 0)
+            $clientID = '%';
+        if($confirmStatus == -1)
+            $confirmStatus = '%';
+        $hotelToConfirm = ClientRouteCampaigns::
+           select(DB::raw('
+           client_route_campaigns.id as campainID,
+            client_route_info.hotel_id as hotelID,
+            hotels.name as hotelName,
+            city.name as cityName,
+            0 as contact,
+            client.name as clientName,
+            client_route_campaigns.hotel_confirm_status as confirmStatus,
+            client_route_info.date as eventDate
+           '))
+            ->join('client_route_info','client_route_info.id','client_route_campaigns.client_route_info_id')
+            ->join('client_route','client_route.id','client_route_info.client_route_id')
+            ->join('client','client.id','client_route.client_id')
+            ->leftjoin('hotels','hotels.id','client_route_info.hotel_id')
+            ->leftjoin('city','city.id','hotels.city_id')
+            ->where('client_route_info.date','like',$dayPlus)
+            ->where('client.id','like',$clientID)
+            ->where('client_route_campaigns.hotel_confirm_status','like',$confirmStatus)
+            ->groupBy('client_route_info.client_route_id')
+            ->groupBy('client_route_info.hotel_id')
+            ->get();
+        $onlyHotel = Hotel::select(DB::raw('
+            hotels.id as hotelID,
+            hotels_contacts.*
+            '))
+            ->leftjoin('hotels_contacts','hotels_contacts.hotel_id','hotels.id')
+            ->whereIn('hotels.id',$hotelToConfirm->pluck('hotelID')->toArray())
+            ->get();
+        $hotelToConfirm->map(function ($item) use ($onlyHotel){
+            $item->contact =$this::getHotelContact($onlyHotel,$item->hotelID);
+           return $item;
+        });
+        return datatables($hotelToConfirm)->make(true);
+    }
+
+    public function changeConfirmStatus(Request $request){
+        if($request->ajax()){
+            $campaign = ClientRouteCampaigns::find($request->campaignID);
+            $campaign->hotel_confirm_status = $request->confirmStatus;
+            $campaign->save();
+            return 200;
+        }else return 500;
+
+    }
+
+    public function getHotelContact($hotelGroup,$hotelID){
+        $contact = $hotelGroup->where('hotelID','=',$hotelID)->where('type','like','phone');
+        if(!$contact->isEmpty()){
+            $concat_phone = $contact->pluck('contact')->toarray();
+            if(count($concat_phone) != 0){
+                $concatStr = '';
+                foreach($concat_phone as $phone)
+                    $concatStr .= ' '.$phone;
+                return $concatStr;
+            }else{
+                return 'Brak Danych';
+            }
+        }else{
+            return 'Brak Danych';
+        }
     }
     /**
      * This method saves new route template to database
