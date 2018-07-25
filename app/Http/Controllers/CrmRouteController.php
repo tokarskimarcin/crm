@@ -2723,7 +2723,6 @@ public function clientReport(Request $request){
             ->where('client_route.status','like',$state)
             ->where('client_route_info.weekOfYear','like',$selectedWeek)
             ->where(DB::raw('YEAR(client_route_info.date)'),'like',$year)
-            ->where('hotels.id','!=',null)
             ->orderBy('date')
             ->orderBy('cityName')
             ->orderBy('hour')
@@ -2759,30 +2758,79 @@ public function clientReport(Request $request){
                     $item->toPay = '';
                 }
             }
-
-            //Bil
-
-            //Hotel contact
-            $contact = $onlyHotel->where('hotelID','=',$item->hotelID)->where('type','like','phone');
-            if(!$contact->isEmpty()){
-                $concat_phone = $contact->pluck('contact')->toarray();
-                if(count($concat_phone) != 0){
-                    $concatStr = '';
-                    foreach($concat_phone as $phone)
-                        $concatStr .= ' '.$phone;
-                    $item->hotelContact = $concatStr;
-                }else{
-                    $item->hotelContact = 'Brak Danych';
-                }
-            }else{
-                $item->hotelContact = 'Brak Danych';
-            }
-
+            $item->hotelContact = $this::getHotelContact($onlyHotel,$item->hotelID);
         });
         return $data;
     }
+
+
     public function hotelConfirmationGet(){
         return view('crmRoute.hotelConfirmation');
+    }
+
+    public function getConfirmHotelInfo(Request $request){
+        $dayPlus = date('Y-m-d',strtotime(' + 1 days'));
+        $dayPlus = '2018-06-05';
+        $hotelToConfirm = ClientRouteCampaigns::
+           select(DB::raw('
+           client_route_campaigns.id as campainID,
+            client_route_info.hotel_id as hotelID,
+            hotels.name as hotelName,
+            city.name as cityName,
+            0 as contact,
+            client.name as clientName,
+            client_route_campaigns.hotel_confirm_status as confirmStatus,
+            client_route_info.date as eventDate
+           '))
+            ->join('client_route_info','client_route_info.id','client_route_campaigns.client_route_info_id')
+            ->join('client_route','client_route.id','client_route_info.client_route_id')
+            ->join('client','client.id','client_route.client_id')
+            ->leftjoin('hotels','hotels.id','client_route_info.hotel_id')
+            ->leftjoin('city','city.id','hotels.city_id')
+            ->where('client_route_info.date','like',$dayPlus)
+            ->where('client.id','=',1)
+            ->groupBy('client_route_info.client_route_id')
+            ->groupBy('client_route_info.hotel_id')
+            ->get();
+        $onlyHotel = Hotel::select(DB::raw('
+            hotels.id as hotelID,
+            hotels_contacts.*
+            '))
+            ->leftjoin('hotels_contacts','hotels_contacts.hotel_id','hotels.id')
+            ->whereIn('hotels.id',$hotelToConfirm->pluck('hotelID')->toArray())
+            ->get();
+        $hotelToConfirm->map(function ($item) use ($onlyHotel){
+            $item->contact =$this::getHotelContact($onlyHotel,$item->hotelID);
+           return $item;
+        });
+        return datatables($hotelToConfirm)->make(true);
+    }
+
+    public function changeConfirmStatus(Request $request){
+        if($request->ajax()){
+            $campaign = ClientRouteCampaigns::find($request->campaignID);
+            $campaign->hotel_confirm_status = $request->confirmStatus;
+            $campaign->save();
+            return 200;
+        }else return 500;
+
+    }
+
+    public function getHotelContact($hotelGroup,$hotelID){
+        $contact = $hotelGroup->where('hotelID','=',$hotelID)->where('type','like','phone');
+        if(!$contact->isEmpty()){
+            $concat_phone = $contact->pluck('contact')->toarray();
+            if(count($concat_phone) != 0){
+                $concatStr = '';
+                foreach($concat_phone as $phone)
+                    $concatStr .= ' '.$phone;
+                return $concatStr;
+            }else{
+                return 'Brak Danych';
+            }
+        }else{
+            return 'Brak Danych';
+        }
     }
     /**
      * This method saves new route template to database
