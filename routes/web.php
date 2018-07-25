@@ -960,3 +960,7 @@ Route::post('/allCitiesInGivenVoivodeAjax', 'CrmRouteController@allCitiesInGiven
 Route::get('/hotelConfirmationGet', 'CrmRouteController@hotelConfirmationGet');
 
 Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clientReport');
+
+Route::get('/assigningRoutesToClients', 'CrmRouteController@assigningRoutesToClientsGet');
+Route::post('/getRouteTemplate', 'CrmRouteController@getRouteTemplate')->name('api.getRouteTemplate');
+Route::post('/getVoivodeshipRoundWithDistanceLimit', 'CrmRouteController@getVoivodeshipRoundWithDistanceLimit')->name('api.getVoivodeshipRoundWithDistanceLimit');

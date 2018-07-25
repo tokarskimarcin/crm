@@ -1375,11 +1375,12 @@
                     let citySelect = thisSingleShowContainer.querySelector('.citySelect');
                     citySelect.innerHTML = ''; //clear select
 
-                    //this part remove all event listeners from this node
-                    var old_element = voivodeSelect;
-                    var new_element = old_element.cloneNode(true);
-                    old_element.parentNode.replaceChild(new_element, old_element);
-                    //end remove all event listeners
+                    // //this part remove all event listeners from this node
+                    // var old_element = voivodeSelect;
+                    // var new_element = old_element.cloneNode(true);
+                    // old_element.parentNode.replaceChild(new_element, old_element);
+                    // //end remove all event listeners
+                    $(voivodeSelect).off();
 
                     voivodeSelect = thisSingleShowContainer.querySelector('.voivodeSelect');
 

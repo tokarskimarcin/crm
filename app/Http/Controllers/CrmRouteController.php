@@ -2867,7 +2867,7 @@ public function clientReport(Request $request){
         $posOfId = strpos($idNotTrimmed,'_');
         $id = substr($idNotTrimmed, $posOfId + 1);
 
-        $route = RouteInfo::select('voivodeship.id as voivodeId', 'voivodeship.name as voivodeName', 'city.id as cityId', 'city.name as cityName', 'routes_info.day as day')
+        $route = RouteInfo::select('voivodeship.id as voivodeId', 'voivodeship.name as voivodeName', 'city.id as cityId', 'city.name as cityName', 'routes_info.day as day', 'routes_info.checkbox')
         ->where([
             ['routes_id', '=', $id],
             ['routes_info.status', '=', 1]
