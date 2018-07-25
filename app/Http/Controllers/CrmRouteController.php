@@ -2847,6 +2847,69 @@ public function clientReport(Request $request){
         }
     }
 
+    /**
+     * This method saves new routes connected with client
+     */
+    public function assigningRoutesToClientsPost(Request $request) {
+        if($request->has('alldata') && $request->has('clientInfo')) {
+            $allData = json_decode($request->alldata);
+            $clientInfo = json_decode($request->clientInfo);
+
+            $clientType = $clientInfo->clientType; // 1 - badania, 2 - wysyłka
+            $clientId = $clientInfo->clientId;
+
+            $loggedUser = Auth::user();
+
+            //New insertion into ClientRoute table
+            $clientRoute = new ClientRoute();
+            $clientRoute->client_id = $clientId;
+            $clientRoute->user_id = $loggedUser->id;
+            $clientRoute->status = 1;
+            $clientRoute->type = $clientType; // 1 - badania, 2 - wysyłka
+            $clientRoute->save();
+
+            $dateFlag = $allData[0]->date;
+            $name = '';
+            $allCities = Cities::select('id','name')->get();
+
+            foreach($allData as $show) {
+                if($show->date != $dateFlag) {
+                    $name = substr($name, 0,strlen($name) - 3) .  ' | ';
+                }
+                $name .= $allCities->where('id', '=', $show->city)->first()->name . ' + ';
+                $dateFlag = $show->date;
+
+                $clientRouteInfo = new ClientRouteInfo();
+                $clientRouteInfo->client_route_id = $clientRoute->id;
+                $clientRouteInfo->city_id = $show->city;
+                $clientRouteInfo->voivode_id = $show->voivode;
+                $clientRouteInfo->date = $show->date;
+                $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
+
+                $dateArr = explode('-', $show->date);
+                $day = $dateArr[2]; $month = $dateArr[1]; $year = $dateArr[0];
+                $date = mktime(0, 0, 0, $month, $day, $year);
+                $weekOfYear = date('W',$date);
+
+                $clientRouteInfo->weekOfYear = $weekOfYear;
+                $clientRouteInfo->checkbox = $show->checkbox;
+                $clientRouteInfo->save();
+            }
+
+            $name = substr($name, 0,strlen($name) - 3); // removing last + in name
+            $clientRoute->route_name = $name;
+            $clientRoute->save();
+
+            new ActivityRecorder(array_merge(['T'=>'Dodanie trasy dla klienta'],$clientRoute->toArray()),209,1);
+            $request->session()->flash('adnotation', 'Trasa została pomyślnie przypisana dla klienta');
+        }
+        else {
+            $request->session()->flash('adnotation', 'Błąd, trasa nie została przypisana do klienta');
+        }
+
+        return Redirect::back();
+    }
+
     public function assigningRoutesToClientsGet() {
         $departments = Department_info::all();
         $today = date('Y-m-d');

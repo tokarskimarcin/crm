@@ -150,7 +150,7 @@
                             <header>Klient</header>
                             <div class="alert alert-info">
                                 Wybierz klienta z listy. Jeśli nie ma klienta na liście, należy przejść do zakładki
-                                <strong>lista klientów</strong> i go dodać.
+                                <strong><a href="{{URL::to('/clientPanel')}}"> lista klientów</a></strong> i go dodać.
                                 Wiersze zaznaczone na czerwono wskazują na klienta, który został wyłączony.
                             </div>
                             <div class="col-md-12">
@@ -162,7 +162,6 @@
                                             <th>Priorytet</th>
                                             <th>Typ</th>
                                             <th style="text-align: center">Akcja</th>
-                                            <th></th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -517,16 +516,6 @@
                     {"data": "type", "className": "client_type"},
                     {
                         "data": function (data, type, dataToSet) {
-                            let returnButton = "<button class='button-edit-client btn btn-block btn-info' data-id=" + data.id + " data-noaction='1'><span class='glyphicon glyphicon-edit'></span> Edycja</button>";
-                            if (data.status == 0)
-                                returnButton += "<button class='button-status-client btn btn-block btn-danger' data-id=" + data.id + " data-status=0 data-noaction='1'><span class='glyphicon glyphicon-off'></span> Wyłącz</button>";
-                            else
-                                returnButton += "<button class='button-status-client btn btn-block btn-success' data-id=" + data.id + " data-status=1 data-noaction='1'><span class='glyphicon glyphicon-off'></span> Włącz</button>";
-                            return returnButton;
-                        }, "orderable": false, "searchable": false, width: '10%'
-                    },
-                    {
-                        "data": function (data, type, dataToSet) {
                             return ' <input style="display: inline-block;" type="checkbox" class="client_check"/>';
                         }, "orderable": false, "searchable": false
                     }
@@ -607,14 +596,13 @@
                                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                         },
                                         success: function (response) {
-                                                console.log(response);
                                             let placeToAppend = document.querySelector('.route-here');
-                                            let dayFlag = null;
+                                            placeToAppend.innerHTML = '';
+                                            let dayFlag = null; //indices day change
                                             let dayBox = null;
                                             let dayContainer = null;
                                             for (let i = 0, respLength = response.length; i < respLength; i++) {
-
-                                                if (i === 0) {
+                                                if (i === 0) { //first iteration
                                                     console.log('warunek na raz');
                                                     dayBox = new DayBox();
                                                     dayBox.createDOMDayBox();
@@ -636,13 +624,12 @@
                                                     let voivodeSelect = firstFormDOM.querySelector('.voivodeSelect');
                                                     const voivodeId = response[i].voivodeId;
                                                     const cityId = response[i].cityId;
-                                                    console.log('cityId', cityId);
 
                                                     showWithoutDistanceAjax(voivodeId, citySelect, correctDate);
 
                                                     dayContainer.appendChild(firstFormDOM);
 
-                                                    if(response[i].checkbox == 1) {
+                                                    if(response[i].checkbox == 1) { //case when checkbox need to be checked
                                                         let checkboxElement = firstFormDOM.querySelector('.distance-checkbox');
                                                         if(!checkboxElement.checked) {
                                                             $(checkboxElement).trigger('click');
@@ -651,19 +638,17 @@
 
                                                     $(voivodeSelect).val(voivodeId).trigger('change');
                                                     $(citySelect).val(cityId).trigger('change');
+
                                                     dayFlag = response[i].day;
 
+                                                    //Adding button section
                                                     let buttonSection = new ButtonBox();
                                                     buttonSection.appendAddNewDayButton();
-                                                    buttonSection.appendSaveButton();
                                                     let elButtonSection = buttonSection.getBox();
 
                                                     placeToAppend.insertAdjacentElement('beforeend', elButtonSection);
-
-                                                    // continue;
                                                 }
-                                                else if (dayFlag !== response[i].day && i !== 0) {
-                                                    console.log('warunek gdy zmienia sie dzien');
+                                                else if (dayFlag !== response[i].day && i !== 0) { //case when next container is in the next day
                                                     let addNewDayButton = $('#addNewDay');
                                                     addNewDayButton.trigger('click');
 
@@ -680,7 +665,7 @@
                                                     const voivodeId = response[i].voivodeId;
                                                     const cityId = response[i].cityId;
 
-                                                    if(response[i].checkbox == 1) {
+                                                    if(response[i].checkbox == 1) { //case when checkbox need to be checked
                                                         let prevShowContainer = lastShowExistenceArr[0];
                                                         let previousShowVoivodeSelect = prevShowContainer.querySelector('.voivodeSelect');
                                                         const previousShowVoivodeId = getSelectedValue(previousShowVoivodeSelect);
@@ -692,52 +677,11 @@
                                                         previousShowVoivodeSelect = prevShowContainer.querySelector('.voivodeSelect');
                                                         setOldValues(previousShowVoivodeSelect, previousShowVoivodeId, previousShowCitySelect, previousShowCityId);
                                                     }
-
                                                     $(voivodeSelect).val(voivodeId).trigger('change');
                                                     $(citySelect).val(cityId).trigger('change');
                                                     dayFlag = response[i].day;
-
-                                                    {{--if (lastShowExistenceArr[0]) { //prev show exist--}}
-                                                        {{--let prevShow = lastShowExistenceArr[0];--}}
-                                                        {{--let prevShowCitySelect = prevShow.querySelector('.citySelect');--}}
-                                                        {{--let prevShowCityId = getSelectedValue(prevShowCitySelect);--}}
-                                                        {{--let prevShowDay = prevShow.closest('.singleDayContainer');--}}
-
-                                                            {{--$.ajax({--}}
-                                                                {{--type: "POST",--}}
-                                                                {{--async: false,--}}
-                                                                {{--url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',--}}
-                                                                {{--data: {--}}
-                                                                    {{--'limit': 100,--}}
-                                                                    {{--"cityId": prevShowCityId--}}
-                                                                {{--},--}}
-                                                                {{--headers: {--}}
-                                                                    {{--'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
-                                                                {{--},--}}
-                                                                {{--success: function (response2) {--}}
-                                                                    {{--let cityInfo = response2['cityInfo'];--}}
-                                                                    {{--for (let id in cityInfo) {--}}
-                                                                        {{--if (id == voivodeId) {--}}
-                                                                            {{--let allCities = cityInfo[id];--}}
-                                                                            {{--allCities.forEach(city => {--}}
-                                                                                {{--appendCityOptions(citySelect, city);--}}
-                                                                            {{--});--}}
-                                                                        {{--}--}}
-                                                                    {{--}--}}
-
-                                                                    {{--setOldValues(voivodeSelect, voivodeId, citySelect, cityId);--}}
-                                                                {{--}--}}
-                                                            {{--});--}}
-
-                                                        {{--dayFlag = response[i].day;--}}
-                                                        {{--continue;--}}
-                                                    {{--}--}}
-                                                    {{--else {--}}
-                                                        {{--console.log('nie powinno sie zdarzyc');--}}
-                                                    {{--}--}}
                                                 }
-                                                else {
-                                                    console.log('warunek na ten sam dzien');
+                                                else { // case when next show is in the same day container
                                                     let allDayContainers = document.getElementsByClassName('singleDayContainer');
                                                     let lastDayContainer = allDayContainers[allDayContainers.length - 1];
                                                     let allShowContainersInsideLastDayContainer = lastDayContainer.getElementsByClassName('singleShowContainer');
@@ -746,28 +690,23 @@
                                                     let addNextShowButton = lastShowContainer.querySelector('.addNewShowButton');
                                                     $(addNextShowButton).trigger('click');
 
-
-
                                                     //we need to select new container, which appear after triggering click
                                                     allDayContainers = document.getElementsByClassName('singleDayContainer');
                                                     lastDayContainer = allDayContainers[allDayContainers.length - 1];
                                                     allShowContainersInsideLastDayContainer = lastDayContainer.getElementsByClassName('singleShowContainer');
                                                     lastShowContainer = allShowContainersInsideLastDayContainer[allShowContainersInsideLastDayContainer.length - 1];
 
-                                                    if(response[i].checkbox == 1) {
-                                                        const previousShowContainer = allShowContainersInsideLastDayContainer[allShowContainersInsideLastDayContainer.length - 2];;
+                                                    if(response[i].checkbox == 1) { //case when checkbox need to be checked
+                                                        const previousShowContainer = allShowContainersInsideLastDayContainer[allShowContainersInsideLastDayContainer.length - 2];
                                                         let previousShowVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
                                                         const previousShowVoivodeId = getSelectedValue(previousShowVoivodeSelect);
-                                                        console.log(previousShowVoivodeId);
                                                         const previousShowCitySelect = previousShowContainer.querySelector('.citySelect');
                                                         const previousShowCityId = getSelectedValue(previousShowCitySelect);
-                                                        console.log(previousShowCityId);
 
                                                         let checkboxElement = lastShowContainer.querySelector('.distance-checkbox');
                                                         $(checkboxElement).trigger('click');
 
                                                         previousShowVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
-                                                        console.log(previousShowVoivodeSelect);
                                                         setOldValues(previousShowVoivodeSelect, previousShowVoivodeId, previousShowCitySelect, previousShowCityId);
                                                     }
 
@@ -776,48 +715,9 @@
                                                     const voivodeId = response[i].voivodeId;
                                                     const cityId = response[i].cityId;
 
-                                                    let lastShowExistenceArr = checkingExistenceOfPrevAndNextContainers(lastShowContainer, 'singleShowContainer');
-
-
                                                     $(voivodeSelect).val(voivodeId).trigger('change');
                                                     $(citySelect).val(cityId).trigger('change');
                                                     dayFlag = response[i].day;
-                                                    {{--if (lastShowExistenceArr[0]) { //prev show exist--}}
-                                                        {{--console.log('w tym warunku powinienem sie znalezc');--}}
-                                                        {{--let prevShow = lastShowExistenceArr[0];--}}
-                                                        {{--let prevShowCitySelect = prevShow.querySelector('.citySelect');--}}
-                                                        {{--let prevShowCityId = getSelectedValue(prevShowCitySelect);--}}
-
-                                                        {{--$.ajax({--}}
-                                                            {{--type: "POST",--}}
-                                                            {{--async: false,--}}
-                                                            {{--url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',--}}
-                                                            {{--data: {--}}
-                                                                {{--'limit': 30,--}}
-                                                                {{--"cityId": prevShowCityId--}}
-                                                            {{--},--}}
-                                                            {{--headers: {--}}
-                                                                {{--'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
-                                                            {{--},--}}
-                                                            {{--success: function (response2) {--}}
-                                                                {{--let cityInfo = response2['cityInfo'];--}}
-                                                                {{--for (let id in cityInfo) {--}}
-                                                                    {{--if (id == voivodeId) {--}}
-                                                                        {{--let allCities = cityInfo[id];--}}
-                                                                        {{--allCities.forEach(city => {--}}
-                                                                            {{--appendCityOptions(citySelect, city);--}}
-                                                                        {{--});--}}
-                                                                    {{--}--}}
-                                                                {{--}--}}
-
-                                                                {{--setOldValues(voivodeSelect, voivodeId, citySelect, cityId);--}}
-                                                            {{--}--}}
-                                                        {{--});--}}
-                                                        {{--dayFlag = response[i].day;--}}
-                                                    {{--}--}}
-                                                    {{--else {--}}
-                                                        {{--console.log('tu nie powininem byc');--}}
-                                                    {{--}--}}
                                                 }
 
 
@@ -827,13 +727,11 @@
 
                                     })
                                 }
-                        })
+                            })
                                 }
                             });
 
                         },
-                    // });
-                // },
                 "columns": [
                     {
                         "data": function (data, type, dataToSet) {
@@ -864,7 +762,6 @@
 
                 const givenDayContainer = dayContainer.closest('.singleDayContainer');
                 const date = givenDayContainer.querySelector('.day-info').textContent;
-                // console.log('date pobrane: ', date);
 
                 $.ajax({
                     type: "POST",
@@ -958,9 +855,6 @@
                 console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInExtreme method is not voivode select');
                 console.assert(!isNaN(parseInt(limit)), 'limit in showInExtreme is not number!');
                 console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInExtreme is not number!');
-                // console.log('date w: ', date);
-                // console.log('limit w: ', limit);
-                // console.log('nextCityId w: ', nextCityId);
                 $.ajax({
                     type: "POST",
                     async: false,
@@ -974,7 +868,6 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function (response) {
-                        // console.log('response: ', response);
                         let allVoivodes = response['voievodeInfo'];
                         console.assert(Array.isArray(allVoivodes), "allVoivodes in showInExtreme method is not array!");
                         let allCitiesGroupedByVoivodes = response['cityInfo'];
@@ -1033,7 +926,6 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        console.log('resp: ', response);
                         console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
                         let placeToAppend = citySelect;
                         placeToAppend.innerHTML = '';
@@ -1045,17 +937,17 @@
                             if(response[i].block == 1) {
                                 if(response[i].exceeded == 0) {
                                     responseOption.textContent = response[i].name + " [dostępne jeszcze " + response[i].used_hours + " godzin]";
-                                    responseOption.setAttribute('data-max_hours', response[i].used_hours); //needed for auto setting hours
+                                    responseOption.setAttribute('data-max_hours', `${response[i].used_hours}`); //needed for auto setting hours
                                 }
                                 else {
                                     responseOption.textContent = response[i].name + " (KARENCJA do " + response[i].available_date + ") [przekroczono o " + response[i].used_hours + " godzin]";
-                                    responseOption.setAttribute('data-max_hours', 0); //needed for auto setting hours
+                                    responseOption.setAttribute('data-max_hours', '0'); //needed for auto setting hours
                                 }
                             }
                             else {
                                 responseOption.textContent = response[i].name;
                                 if (response[i].max_hour > 0) {
-                                    responseOption.setAttribute('data-max_hours', response[i].max_hour); //needed for auto setting hours
+                                    responseOption.setAttribute('data-max_hours', `${response[i].max_hour}`); //needed for auto setting hours
                                 }
                             }
                             placeToAppend.appendChild(responseOption);
@@ -1095,11 +987,8 @@
 
                 $(nextShowContainerVoivodeSelect).off();
 
-                // nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
                 nextShowContainerVoivodeSelect.innerHTML = '';
                 nextShowContainerCitySelect.innerHTML = '';
-                // console.log(grandNextShowContainerCitySelect);
-                // console.log(thisSingleShowContainerCitySelect);
 
                 if(changeDistanceArr) {
                     let helpArr = [];
@@ -1115,7 +1004,6 @@
                     else {
                         helpArr.push(thisSingleShowContainerCitySelectCityDistance);
                     }
-                    // console.log(helpArr);
                     showInTheMiddleAjax(helpArr[0],grandNextShowContainerCityId,helpArr[1],thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, nextShowContainer, oldValuesArray);
                 }
                 else {
@@ -1151,11 +1039,9 @@
                 prevShowContainerVoivodeSelect.innerHTML = '';
                 appendBasicOption(prevShowContainerVoivodeSelect);
                 prevShowContainerCitySelect.innerHTML = '';
-                console.log('limit: ', limit);
 
                 const previousShowDayContainer = nextShowContainerRelatedToPreviousShowContainer.closest('.singleDayContainer');
                 const date = previousShowDayContainer.querySelector('.day-info').textContent;
-                console.log('date ', date);
 
                 showInExtreme(limit, nextShowContainerRelatedToPreviousShowContainerCityId, date, prevShowContainerCitySelect, prevShowContainerVoivodeSelect, oldValuesArray);
             }
@@ -1178,7 +1064,6 @@
                 const dayContainer = nextShowContainer.closest('.singleDayContainer');
                 const fullDate = dayContainer.querySelector('.day-info').textContent;
                 let correctDate = fullDate.substr(6); //YYYY-MM-DD
-                console.log('correctDate: ', correctDate);
 
                 $(nextContVoivodeSelect).on('change', function(e) {
                     nextContCitySelect.setAttribute('data-distance', 'infinity');
@@ -1199,16 +1084,6 @@
                 basicVoivodeOption.value = '0';
                 basicVoivodeOption.textContent = 'Wybierz';
                 element.appendChild(basicVoivodeOption);
-            }
-
-            /**
-             * This method adjust day container numbers;
-             */
-            function adjustDayNumbers() {
-                let allDayNotations = document.getElementsByClassName('day-info');
-                for(let i = 0, max = allDayNotations.length; i < max; i++) {
-                    allDayNotations[i].textContent = 'Dzień ' + (i+1);
-                }
             }
 
             /**
@@ -1233,16 +1108,16 @@
 
                 if(data.block == 1) {
                     if(data.exceeded == 0) {
-                        cityOpt.setAttribute('data-max_hours', data.used_hours);
+                        cityOpt.setAttribute('data-max_hours', `${data.used_hours}`);
                         cityOpt.textContent = data.city_name + ' [dostępne jeszcze ' + data.used_hours + ' godzin]';
                     }
                     else {
-                        cityOpt.setAttribute('data-max_hours', 0);
+                        cityOpt.setAttribute('data-max_hours', '0');
                         cityOpt.textContent = data.city_name + '(KARENCJA do ' + data.available_date + ') [przekroczono o ' + data.used_hours + ' godzin]';
                     }
                 }
                 else {
-                    cityOpt.setAttribute('data-max_hours', data.max_hour);
+                    cityOpt.setAttribute('data-max_hours', `${data.max_hour}`);
                 }
 
                 element.appendChild(cityOpt);
@@ -1352,12 +1227,21 @@
 
             /**
              * This method validate all single day forms
+             * If withHour = true, validate with show-hour input, else - without
              */
-            function validateAllForms(element) {
-                console.assert(element.matches('.singleShowContainer'), 'element in validateAllForms is not single show container');
+            function validateAllForms(element, withHour = null) {
+                // console.assert(element.matches('.singleShowContainer'), 'element in validateAllForms is not single show container');
                 let flag = true;
                 element.forEach(day => {
-                    let validation = validateForm(day);
+                    let validation
+                    if(withHour) {
+                        validation = validateForm(day, true);
+                    }
+                    else {
+                        validation = validateForm(day);
+                    }
+
+                    console.log(validation);
                     if(validation === false) {
                         flag = false;
                     }
@@ -1407,11 +1291,9 @@
                 }
                 if(voivodeFlag) {
                     $(voivodeSelect).val('0');
-                    // console.log('zmienilo na wartosc domyslna voivode');
                 }
                 if(cityFlag) {
                     $(citySelect).val('0');
-                    // console.log('zmienilo na wartosc domyslna city');
                 }
             }
 
@@ -1435,12 +1317,54 @@
 
             /**
              * This method validate form false - bad, true - good
+             * if withHours - true, check whether hour input has != 0 value.
              */
-            function validateForm(element) {
+            function validateForm(element, withHours = null) {
                 console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
+                let flag = true;
                 let citySelect = element.querySelector('.citySelect');
                 let cityValue = getSelectedValue(citySelect);
-                return !(cityValue == 0);
+                let voivodeSelect = element.querySelector('.voivodeSelect');
+                let voivodeId = getSelectedValue(voivodeSelect);
+                let hourInput = element.querySelector('.show-hours');
+                let hourValue = hourInput.value;
+                if(withHours) {
+                    if((cityValue == null || cityValue == 0) || (voivodeId == null || voivodeId == 0) || (hourValue == 0 || hourValue == null)) {
+                        flag = false;
+                    }
+                }
+                else {
+                    if((cityValue == null || cityValue == 0) || (voivodeId == null || voivodeId == 0)) {
+                        flag = false;
+                    }
+                }
+
+                return flag;
+            }
+
+            /**
+             * This function return date in YYYY-MM-DD format.
+             * if number is given, it add days to date.
+             */
+            function getCorrectDate(number = 0) {
+                console.assert(!isNaN(parseInt(number)), 'number in getCorrectDate is not number!');
+                let userDate = $('#date').val();
+
+                let firstShowDate = new Date(userDate);
+                firstShowDate.setDate(firstShowDate.getDate() + number);
+                let day = firstShowDate.getDate();
+                let month = firstShowDate.getMonth() + 1; //January is 0!
+
+                let year = firstShowDate.getFullYear();
+                if (day < 10) {
+                    day = '0' + day;
+                }
+                if (month < 10) {
+                    month = '0' + month;
+                }
+
+                let correctDate = year + '-' + month + '-' + day;
+                return correctDate;
             }
 
             /**
@@ -1660,7 +1584,6 @@
                         formBox.appendChild(buttonRow);
                     }
                     /* END NEW SHOW BUTTON */
-                    // console.log('duu');
                     this.DOMBox = formBox;
                 };
                 this.getForm = function() {
@@ -1687,22 +1610,7 @@
                     let dayInfoContainer = document.createElement('div');
                     dayInfoContainer.classList.add('day-info');
 
-                    let userDate = $('#date').val();
-
-                    let firstShowDate = new Date(userDate)
-                    firstShowDate.setDate(firstShowDate.getDate() + numberOfAllDayContainers);
-                    let day = firstShowDate.getDate();
-                    let month = firstShowDate.getMonth() + 1; //January is 0!
-
-                    let year = firstShowDate.getFullYear();
-                    if (day < 10) {
-                        day = '0' + day;
-                    }
-                    if (month < 10) {
-                        month = '0' + month;
-                    }
-
-                    let correctDate = year + '-' + month + '-' + day;
+                    let correctDate = getCorrectDate(numberOfAllDayContainers);
 
                     dayInfoContainer.textContent = "Data: " + correctDate;
                     globalDateIndicator = correctDate;
@@ -1783,7 +1691,6 @@
                     const thisShowContainer = newShowButton.closest('.singleShowContainer');
                     const thisSingleDayContainer = newShowButton.closest('.singleDayContainer');
                     const containerDate = thisSingleDayContainer.querySelector('.day-info').textContent;
-                    // console.log(containerDate);
                     const allSingleShowContainers = document.getElementsByClassName('singleShowContainer');
                     const isChecked = thisShowContainer.querySelector('.distance-checkbox').checked;
 
@@ -2160,7 +2067,6 @@
                         const allDayContainers = document.getElementsByClassName('singleDayContainer');
                         if(allDayContainers.length > 1) {
                             dayContainer.parentNode.removeChild(dayContainer);
-                            // adjustDayNumbers();
                         }
                         else {
                             notify('Nie można usunąć pierwszego dnia!');
@@ -2179,22 +2085,23 @@
                     const lastShowContainerInsideLastDay = allSingleShowContainersInsideLastDayContainer[allSingleShowContainersInsideLastDayContainer.length - 1];
                     const isChecked = lastShowContainerInsideLastDay.querySelector('.distance-checkbox').checked;
 
-                    let userDate = $('#date').val();
-
-                    let firstShowDate = new Date(userDate)
-                    firstShowDate.setDate(firstShowDate.getDate() + allDayContainers.length);
-                    let day = firstShowDate.getDate();
-                    let month = firstShowDate.getMonth() + 1; //January is 0!
-
-                    let year = firstShowDate.getFullYear();
-                    if (day < 10) {
-                        day = '0' + day;
-                    }
-                    if (month < 10) {
-                        month = '0' + month;
-                    }
-
-                    let correctDate = year + '-' + month + '-' + day;
+                    // let userDate = $('#date').val();
+                    //
+                    // let firstShowDate = new Date(userDate)
+                    // firstShowDate.setDate(firstShowDate.getDate() + allDayContainers.length);
+                    // let day = firstShowDate.getDate();
+                    // let month = firstShowDate.getMonth() + 1; //January is 0!
+                    //
+                    // let year = firstShowDate.getFullYear();
+                    // if (day < 10) {
+                    //     day = '0' + day;
+                    // }
+                    // if (month < 10) {
+                    //     month = '0' + month;
+                    // }
+                    //
+                    // let correctDate = year + '-' + month + '-' + day;
+                    let correctDate = getCorrectDate(allDayContainers.length);
 
 
                     let validate = validateForm(allSingleShowContainers[allSingleShowContainers.length - 1]);
@@ -2238,7 +2145,7 @@
                         if(allDayContainers.length === 1) {
                             let buttonSection = new ButtonBox();
                             buttonSection.appendAddNewDayButton();
-                            buttonSection.appendSaveButton();
+                            // buttonSection.appendSaveButton();
                             let elButtonSection = buttonSection.getBox();
                             placeToAppend.insertAdjacentElement('beforeend', elButtonSection);
                         }
@@ -2246,28 +2153,29 @@
                     else {
                         let buttonSection = new ButtonBox();
                         buttonSection.appendAddNewDayButton();
-                        buttonSection.appendSaveButton();
+                        // buttonSection.appendSaveButton();
                         let elButtonSection = buttonSection.getBox();
                         // console.log(elButtonSection);
                         placeToAppend.insertAdjacentElement('afterend', elButtonSection);
                     }
 
-                    let userDate = $('#date').val();
-
-                    let firstShowDate = new Date(userDate)
-                    firstShowDate.setDate(firstShowDate.getDate());
-                    let day = firstShowDate.getDate();
-                    let month = firstShowDate.getMonth() + 1; //January is 0!
-
-                    let year = firstShowDate.getFullYear();
-                    if (day < 10) {
-                        day = '0' + day;
-                    }
-                    if (month < 10) {
-                        month = '0' + month;
-                    }
-
-                    let correctDate = year + '-' + month + '-' + day;
+                    // let userDate = $('#date').val();
+                    //
+                    // let firstShowDate = new Date(userDate)
+                    // firstShowDate.setDate(firstShowDate.getDate());
+                    // let day = firstShowDate.getDate();
+                    // let month = firstShowDate.getMonth() + 1; //January is 0!
+                    //
+                    // let year = firstShowDate.getFullYear();
+                    // if (day < 10) {
+                    //     day = '0' + day;
+                    // }
+                    // if (month < 10) {
+                    //     month = '0' + month;
+                    // }
+                    //
+                    // let correctDate = year + '-' + month + '-' + day;
+                    let correctDate = getCorrectDate();
 
                     let firstForm = new ShowBox();
                     firstForm.addRemoveShowButton();
@@ -2278,9 +2186,69 @@
 
                     firstDayContainer.appendChild(firstFormDOM);
                 }
+                else if(e.target.matches('#save')) {
+                    let submitPlace = document.querySelector('.client-container');
+                    const allSingleShowContainers = document.querySelectorAll('.singleShowContainer');
+                    const allSingleDayContainers = document.getElementsByClassName('singleDayContainer');
+                    let finalArray = [];
 
+                    let isOk = validateAllForms(allSingleShowContainers, true); //validation(hours != 0, selected city, selected voivode)
+
+                    if(isOk) {
+                        const clientTypeValue = $('#client_choice_type option:selected').val();
+                        const clientTable = document.querySelector('#table_client');
+                        const selectedCheckbox = clientTable.querySelector('input[type="checkbox"]:checked');
+                        const selectedTr = selectedCheckbox.closest('tr');
+                        let clientId = selectedTr.id;
+                        clientId = clientId.substr(9);
+
+                        const clientInfo = {
+                            clientId: clientId,
+                            clientType: clientTypeValue
+                        };
+
+                        for(let i = 0; i < allSingleDayContainers.length; i++) {
+                            let singleShowContainersInsideGivenDay = allSingleDayContainers[i].querySelectorAll('.singleShowContainer');
+                            let fullDate = allSingleDayContainers[i].querySelector('.day-info').textContent;
+                            let date = fullDate.substr(6);
+
+                            singleShowContainersInsideGivenDay.forEach(show => {
+                                let voivodeSelect = show.querySelector('.voivodeSelect');
+                                let voivodeId = getSelectedValue(voivodeSelect);
+
+                                let citySelect = show.querySelector('.citySelect');
+                                let cityId = getSelectedValue(citySelect);
+
+                                let checkboxElement = show.querySelector('.distance-checkbox');
+                                let checkboxVal = checkboxElement.checked ? 1 : 0;
+
+                                let hourElement = show.querySelector('.show-hours');
+                                let hourNumber = hourElement.value;
+
+                                let info = {
+                                    date: date,
+                                    hours: hourNumber,
+                                    voivode: voivodeId,
+                                    city: cityId,
+                                    checkbox: checkboxVal
+                                }
+                                finalArray.push(info);
+                            });
+                        }
+                        let JSONData = JSON.stringify(finalArray);
+                        let JSONClientInfo = JSON.stringify(clientInfo);
+                        let finalForm = document.createElement('form');
+                        finalForm.setAttribute('method', 'post');
+                        finalForm.setAttribute('action', "{{URL::to('/assigningRoutesToClients')}}");
+                        finalForm.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="alldata" value=' + JSONData + '> <input type="hidden" name="clientInfo" value=' + JSONClientInfo + '>';
+                        submitPlace.appendChild(finalForm);
+                        // finalForm.submit();
+                    }
+                    else {
+                        notify('Wypełnij wszystkie pola');
+                    }
+                }
             }
-
 
             /**
              * This event listener is responsible for change event on document
@@ -2303,11 +2271,6 @@
                     let citySelect = thisSingleShowContainer.querySelector('.citySelect');
                     citySelect.innerHTML = ''; //clear select
 
-                    // //this part remove all event listeners from this node
-                    // var old_element = voivodeSelect;
-                    // var new_element = old_element.cloneNode(true);
-                    // old_element.parentNode.replaceChild(new_element, old_element);
-                    // //end remove all event listeners
                     $(voivodeSelect).off();
 
                     voivodeSelect = thisSingleShowContainer.querySelector('.voivodeSelect');
@@ -2330,10 +2293,6 @@
                             let voivodeId = e.target.value;
                             showWithoutDistanceAjax(voivodeId, citySelect, correctDate);
                         });
-                        // voivodeSelect.addEventListener('change', e => {
-                        //     let voivodeId = e.target.value;
-                        //     showWithoutDistanceAjax(voivodeId, citySelect);
-                        // });
 
                         if(existenceArr[0]) {
                             let prevVoivodeSelect = existenceArr[0].querySelector('.voivodeSelect');
@@ -2385,11 +2344,6 @@
                                 let voivodeId = e.target.value;
                                 showWithoutDistanceAjax(voivodeId, citySelect, correctDate);
                             });
-                            // voivodeSelect.addEventListener('change', e => {
-                            //     citySelect.setAttribute('data-distance', 'infinity');
-                            //     let voivodeId = e.target.value;
-                            //     showWithoutDistanceAjax(voivodeId, citySelect);
-                            // });
                         }
                         else if(previousSingleShowContainer !== null && nextSingleShowContainer === null) { //case when show is last one dziala
                             const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
@@ -2404,7 +2358,6 @@
                             const nextCityId = getSelectedValue(nextCitySelect);
                             const nextShowDayContainer = nextCitySelect.closest('.singleDayContainer');
                             const date = nextShowDayContainer.querySelector('.day-info').textContent;
-                            // console.log('date ', date);
                             showInExtreme(30, nextCityId, date, citySelect, voivodeSelect);
                         }
                         else if(previousSingleShowContainer !== null && nextSingleShowContainer !== null) { //case when show is in the middle
