@@ -971,6 +971,7 @@
                                             for (var i = 0; i < response.length; i++) {
                                                 //Pobranie miast dla danego wojew
                                                 var city = getCitiesNamesByVoievodeship(response[i].voivodeship_id);
+                                                console.log('city: ', city);
                                                 //Generowanie Div'a
                                                 if (i == 0)
                                                     generateRouteDiv(false, false, false, response[i], city, voievodes, placeToAppend);

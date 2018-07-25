@@ -2514,6 +2514,122 @@ class CrmRouteController extends Controller
         }
     }
 
+    /**
+     *  Return Round Voievodeship and city
+     */
+    public function getVoivodeshipRoundWithDistanceLimit(Request $request){
+        if($request->ajax()) {
+            $cityId = $request->cityId;
+            if(strlen($request->currentDate) > 10) {
+               $currentDate = substr($request->currentDate, 6);
+            }
+            else {
+                $currentDate = $request->currentDate;
+            }
+
+            $limit = $request->limit;
+
+            $cities = Cities::all();
+            $city = Cities::where('id', '=', $cityId)->first();
+            //part responsible for grace period
+            $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
+                ->join('city','city.id','client_route_info.city_id')->get();
+            $voievodeshipRound = $this::findCityByDistanceWithDistanceLimit($city, $currentDate, $clientRouteInfoAll, $cities, $limit);
+
+            $voievodeshipRound = $voievodeshipRound->groupBy('id');
+            $voievodeshipDistinc = array();
+            foreach ($voievodeshipRound as $item){
+                array_push($voievodeshipDistinc,$item->first());
+            }
+            $responseArray['voievodeInfo'] = $voievodeshipDistinc;
+            $responseArray['cityInfo'] = $voievodeshipRound;
+            return $responseArray;
+        }
+    }
+
+    public function findCityByDistanceWithDistanceLimit($city, $currentDate,$clientRoutesInfoWithUsedCities,$cities, $limit){
+        if($limit == 'infinity'){
+            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour'))
+                ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
+                ->get();
+        }else {
+            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
+            ( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
+             * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
+              * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
+                ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
+                ->having('distance', '<', $limit)
+                ->get();
+        }
+        //part responsible for grace period
+        if($currentDate != 0) {
+            $checkedCities = array(); //In this array we indices cities that should not be in route
+            foreach($clientRoutesInfoWithUsedCities as $item) {
+                $properDate = date_create($currentDate);
+                $properDatePom = date_create($currentDate);
+                //wartość karencji dla danego miasta
+                $gracePeriod = $item->grace_period;
+//                $gracePeriod = null;
+//                if($item->city_id == $city->id){
+//                    $gracePeriod = $city->grace_period;
+//                }else{
+//                    $gracePeriod = null;
+//                }
+                $goodDate = date_create($item->date);
+                $dateDifference = date_diff($properDate,$goodDate, true);
+                $dateDifference = $dateDifference->format('%a');
+                $dateString = $dateDifference . " days";
+                $availableAtDate = date_add($properDatePom,date_interval_create_from_date_string($dateString));
+                $availableAtDate = date_format($availableAtDate, "Y-m-d");
+                if($dateDifference <= $gracePeriod) {
+                    $cityInfoObject = new \stdClass();
+                    $cityInfoObject->city_id = $item->city_id;
+                    $cityInfoObject->available_date =  date_format(date_add($goodDate,date_interval_create_from_date_string(($gracePeriod).' days') ), "Y-m-d");
+                    array_push($checkedCities, $cityInfoObject);
+                }
+            }
+            $voievodeshipRound->map(function($item) use($checkedCities){
+                $hourNumber = 0; //This variable counts how many times city was used in grace period
+                foreach($checkedCities as $cityRecords) {
+                    if ($cityRecords->city_id == $item->city_id) {
+                        $hourNumber++;
+                    }
+                }
+                $blockFlag = false;
+                foreach($checkedCities as $blockedCity) {
+                    if($blockedCity->city_id == $item->city_id) {
+                        $blockFlag = true;
+                        $item->block = 1;
+                        $item->available_date = $blockedCity->available_date;
+                        if($item->max_hour > $hourNumber) { // limit of hours isn't exceeded
+                            $hourDifference = $item->max_hour - $hourNumber;
+                            $item->exceeded = 0; // indices that this city is still available for couple of hours
+                            $item->used_hours = $hourDifference;
+//                            $item->used_hours = $hourNumber;
+                        }
+                        else {
+                            $hourDifference = $hourNumber - $item->max_hour;
+                            $item->used_hours = $hourDifference;
+                            $item->exceeded = 1; // indices that this city is not available.
+                        }
+                    }
+                }
+
+                if($blockFlag == false) {
+                    $item->block = 0;
+                    $item->available_date = 0;
+                    $item->used_hours = 0;
+                    $item->exceeded = 0;
+                }
+
+                return $item;
+            });
+
+        }
+
+        return $voievodeshipRound;
+    }
+
     public function findCityByDistanceWithoutGracePeriod($city, $limit){
         if($limit == 'infinity'){
             $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour'))
@@ -2878,6 +2994,7 @@ public function clientReport(Request $request){
                 $routes_info->city_id = $record->city;
                 $routes_info->status = 1;
                 $routes_info->day = $record->day;
+                $routes_info->checkbox = $record->checkbox;
                 $routes_info->save();
             }
 
@@ -2889,5 +3006,100 @@ public function clientReport(Request $request){
         else {
             dd(1);
         }
+    }
+
+    /**
+     * This method saves new routes connected with client
+     */
+    public function assigningRoutesToClientsPost(Request $request) {
+        if($request->has('alldata') && $request->has('clientInfo')) {
+            $allData = json_decode($request->alldata);
+            $clientInfo = json_decode($request->clientInfo);
+
+            $clientType = $clientInfo->clientType; // 1 - badania, 2 - wysyłka
+            $clientId = $clientInfo->clientId;
+
+            $loggedUser = Auth::user();
+
+            //New insertion into ClientRoute table
+            $clientRoute = new ClientRoute();
+            $clientRoute->client_id = $clientId;
+            $clientRoute->user_id = $loggedUser->id;
+            $clientRoute->status = 1;
+            $clientRoute->type = $clientType; // 1 - badania, 2 - wysyłka
+            $clientRoute->save();
+
+            $dateFlag = $allData[0]->date;
+            $name = '';
+            $allCities = Cities::select('id','name')->get();
+
+            foreach($allData as $show) {
+                if($show->date != $dateFlag) {
+                    $name = substr($name, 0,strlen($name) - 3) .  ' | ';
+                }
+                $name .= $allCities->where('id', '=', $show->city)->first()->name . ' + ';
+                $dateFlag = $show->date;
+
+                $clientRouteInfo = new ClientRouteInfo();
+                $clientRouteInfo->client_route_id = $clientRoute->id;
+                $clientRouteInfo->city_id = $show->city;
+                $clientRouteInfo->voivode_id = $show->voivode;
+                $clientRouteInfo->date = $show->date;
+                $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
+
+                $dateArr = explode('-', $show->date);
+                $day = $dateArr[2]; $month = $dateArr[1]; $year = $dateArr[0];
+                $date = mktime(0, 0, 0, $month, $day, $year);
+                $weekOfYear = date('W',$date);
+
+                $clientRouteInfo->weekOfYear = $weekOfYear;
+                $clientRouteInfo->checkbox = $show->checkbox;
+                $clientRouteInfo->save();
+            }
+
+            $name = substr($name, 0,strlen($name) - 3); // removing last + in name
+            $clientRoute->route_name = $name;
+            $clientRoute->save();
+
+            new ActivityRecorder(array_merge(['T'=>'Dodanie trasy dla klienta'],$clientRoute->toArray()),209,1);
+            $request->session()->flash('adnotation', 'Trasa została pomyślnie przypisana dla klienta');
+        }
+        else {
+            $request->session()->flash('adnotation', 'Błąd, trasa nie została przypisana do klienta');
+        }
+
+        return Redirect::back();
+    }
+
+    public function assigningRoutesToClientsGet() {
+        $departments = Department_info::all();
+        $today = date('Y-m-d');
+        $today .= '';
+        $voivodes = Voivodes::all();
+        $year = date('Y',strtotime("this year"));
+        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
+        return view('crmRoute.assigningRoutesToClients')
+            ->with('departments', $departments)
+            ->with('voivodes', $voivodes)
+            ->with('lastWeek', $numberOfLastYearsWeek)
+            ->with('today', $today);
+    }
+
+
+    public function getRouteTemplate(Request $request) {
+        $idNotTrimmed = $request->route_id;
+        $posOfId = strpos($idNotTrimmed,'_');
+        $id = substr($idNotTrimmed, $posOfId + 1);
+
+        $route = RouteInfo::select('voivodeship.id as voivodeId', 'voivodeship.name as voivodeName', 'city.id as cityId', 'city.name as cityName', 'routes_info.day as day', 'routes_info.checkbox')
+        ->where([
+            ['routes_id', '=', $id],
+            ['routes_info.status', '=', 1]
+        ])
+            ->join('city', 'routes_info.city_id', '=', 'city.id')
+            ->join('voivodeship', 'routes_info.voivodeship_id', '=', 'voivodeship.id')
+            ->orderBy('routes_info.day')
+            ->get();
+        return $route;
     }
 }
