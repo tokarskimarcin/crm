@@ -3310,6 +3310,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
      * Metoda pobierająca dane na temat wynikow tydogniowych- miesięcznych dla danego trenera
      */
     private function getWeekMonthCoachData($date_start, $date_stop, $coach_id) {
+        dd(1);
         $leader = User::find($coach_id);
         $pbx_department_id = $leader->department_info->pbx_id;
         //Pobranie użytkowników którzy kiedykolwiek byli pod wskazanym trenerem
