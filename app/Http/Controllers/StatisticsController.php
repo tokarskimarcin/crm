@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\CandidateSource;
+use App\CoachChange;
+use App\CoachHistory;
 use App\DisableAccountInfo;
 use App\HourReport;
 use App\Pbx_report_extension;
@@ -3308,13 +3310,20 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
      * Metoda pobierająca dane na temat wynikow tydogniowych- miesięcznych dla danego trenera
      */
     private function getWeekMonthCoachData($date_start, $date_stop, $coach_id) {
+        dd(1);
         $leader = User::find($coach_id);
         $pbx_department_id = $leader->department_info->pbx_id;
-
+        //Pobranie użytkowników którzy kiedykolwiek byli pod wskazanym trenerem
+        $allCoachUserStory = CoachHistory::
+                leftjoin('coach_change','coach_change.id','coach_history.coach_change_id')
+                ->where('coach_change.prev_coach_id','=',$coach_id)
+                ->get()
+                ->pluck('user_id')
+                ->toArray();
         $coachConsultants = $leader->trainerConsultants;
         $consultantsId = $coachConsultants->pluck('id')->toArray();
+        $consultantsId = array_merge($consultantsId,$allCoachUserStory);
         $consultantsLoginPhone = $coachConsultants->pluck('login_phone')->toArray();
-
         $max_from_day = DB::table('pbx_report_extension')
             ->select(DB::raw('
                 MAX(id) as id
@@ -3325,6 +3334,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 $max_from_day = $max_from_day
                             ->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id)
                             ->whereIn('user_id', $consultantsId);
+                if($date_start > '2018-07-13')
+                    $max_from_day = $max_from_day->where('actual_coach_id','=',$coach_id);
             }else{
                 //Niedokładnie po pbx_id
                 $max_from_day = $max_from_day->whereIn('pbx_id', $consultantsLoginPhone);
@@ -3339,13 +3350,14 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                  $pbx_data = $pbx_data->whereIn('pbx_id', $consultantsLoginPhone);
             }else{
                  $pbx_data = $pbx_data->whereIn('user_id', $consultantsId);
+                 if($date_start > '2018-07-13')
+                     $pbx_data = $pbx_data->where('actual_coach_id','=',$coach_id);
              }
         $pbx_data = $pbx_data->get();
 
         $total_data = $pbx_data->groupBy('pbx_id');
 
         $days_in_month = intval(date('t', strtotime($date_start)));
-
         $terefere = $total_data->map(function($item, $key) use ($days_in_month, $date_start, $leader) {
             $allUniceUserId = array();
             //Wysłuskanie wszystkich user_id
@@ -3367,7 +3379,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                         ->get();
                 } else {
                     $consultant = User::where('id', '=', $user)
-                        ->where('coach_id', '=', $leader->id)
+//                        ->where('coach_id', '=', $leader->id)
                         ->get();
                 }
 
@@ -3413,7 +3425,10 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                             ->count();
                     }else{
                         $question = $item->where('report_date', '=', $actual_loop_day)
-                            ->where('user_id','=',$user)->count();
+                            ->where('user_id','=',$user);
+                        if($date_start > '2018-07-13')
+                            $question = $question->where('actual_coach_id','=',$leader->id);
+                        $question =$question ->count();
                     }
                     if ($question > 0) {
                         //Wyłuskanie informacji o konsultanciee
@@ -3421,7 +3436,10 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                             $report = $item->where('report_date', '=', $actual_loop_day)->first();
                         }else{
                             $report = $item->where('report_date', '=', $actual_loop_day)
-                                ->where('user_id','=',$user)->first();
+                                ->where('user_id','=',$user);
+                            if($date_start > '2018-07-13')
+                                $report = $report->where('actual_coach_id','=',$leader->id);
+                            $report = $report->first();
                         }
                         $work_time_array = explode(":", $report->login_time);
                         $work_time = round((($work_time_array[0] * 3600) + ($work_time_array[1] * 60) + $work_time_array[2]) / 3600, 2);
