@@ -65,7 +65,7 @@
         document.addEventListener('DOMContentLoaded', function (event) {
             const addNewRouteInput = document.querySelector('#addNewRoute');
             addNewRouteInput.addEventListener('click', (e) => {
-                window.location.href = '{{URL::to('/addNewRoute')}}';
+                window.location.href = '{{URL::to('/addNewRouteTemplate')}}';
             });
             table = $('#datatable').DataTable({
                 "autoWidth": true,
