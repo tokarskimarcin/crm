@@ -102,7 +102,7 @@
                     lastDateInputFilter.val(getFormatedDate(lastDate));
                 @endif
             @endif
-            let invoiceDatatable = $('#invoicesDatatable').DataTable({
+            var invoiceDatatable = $('#invoicesDatatable').DataTable({
                     width: '100%',
                 autoWidth: true,
                 processing: true,
@@ -225,7 +225,7 @@
                             let buttonGroup = $(document.createElement('div'));
                             if (data.invoice_status_id == 1) {
                                 //actionButton.addClass('btn-danger');
-                                actionButton.attr('id', 'uploadInvoice');
+                                actionButton.addClass('uploadInvoice');
                                 actionButton.text(' Wrzuć fakturę');
                                 actionSpan.addClass('glyphicon glyphicon-cloud-upload');
                             }
@@ -238,13 +238,13 @@
                                     .attr('data-client_name', data.client_name)
                                     .attr('data-hotel_name',data.hotel_name)
                                     .prop('type', 'button').addClass('btn btn-block btn-info');
-                                actionButton2.attr('id', 'uploadInvoice');
+                                actionButton2.addClass('uploadInvoice');
                                 actionButton2.text(' Wrzuć fakturę');
                                 actionSpan2.addClass('glyphicon glyphicon-cloud-upload');
                                 actionButton2.prepend(actionSpan2);
                                 buttonGroup.append(actionButton2);
 
-                                actionButton.attr('id', 'sendInvoice');
+                                actionButton.addClass('sendInvoice');
                                 actionButton.text(' Wyślij fakturę');
                                 actionSpan.addClass('glyphicon glyphicon-envelope');
                             }
@@ -270,7 +270,7 @@
                     fnDrawCallback: function () {
 
                     //handle uploadInvoiceButton
-                        $('#uploadInvoice').click(function (e) {
+                        $('.uploadInvoice').click(function (e) {
                             let modalContent = $('#' + modalIdString + ' .modal-content');
                             setModalSize(modalIdString, 2);
                             clearModalContent(modalContent);
@@ -320,7 +320,7 @@
                             actualCampaignID = 0;
                         });
                         //handle sendInvoiceButton
-                        $('#sendInvoice').click(function (e) {
+                        $('.sendInvoice').click(function (e) {
                             let hotelId = $(e.target).data('client_id');
                             actualCampaignID =  $(e.target).data('campaign_id');
                             getHotelInfoAjax(hotelId).then(function (data) {
@@ -496,6 +496,7 @@
                             }
                             if (uploadFiles)
                                 uploadFilesAjax(formData);
+                                invoiceDatatable.ajax.reload();
                         }
                     });
                 }
