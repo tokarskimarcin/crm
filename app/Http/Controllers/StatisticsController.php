@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\CandidateSource;
 use App\CoachChange;
 use App\CoachHistory;
+use App\Departments;
 use App\DisableAccountInfo;
 use App\HourReport;
 use App\Pbx_report_extension;
@@ -5171,5 +5172,60 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ->groupBy('campaign_pbx_id')
             ->get();
         return datatables($pbxReport)->make(true);
+    }
+
+    public function autoConsultantsLoginsChecking($dep_id)
+    {
+        $usersLastLoginsTwoWeeksAgo = User::select('users.id', 'first_name', 'last_name', 'last_login')->where([
+            ['status_work', '=', '1'],
+            ['last_login', '<', date('Y-m-d', strtotime('-14 Days'))],
+            ['di.id_dep','=',$dep_id]
+        ])->join('department_info as di','di.id','=','department_info_id')->whereIn('user_type_id',[1,2])
+            ->get();
+
+        $usersLastLoginsOneMonthAgo = $usersLastLoginsTwoWeeksAgo->where('last_login', '<', date('Y-m-d', strtotime('-1 Month')));
+
+        //User::whereIn('id',$usersLastLoginsOneMonthAgo->pluck('id')->toArray())->update(['status_work' => 0]);
+
+        return ['afterTwoWeeks' =>[ 'data' => $usersLastLoginsTwoWeeksAgo->map(function($user) {
+            return collect($user->toArray())->only(['first_name','last_name'])->all(); }),
+            'dep_name' => Departments::find($dep_id)->name],
+            'blockedCount' =>  $usersLastLoginsOneMonthAgo->count()
+        ];
+    }
+
+    public function MailAutoConsultantsLoginsChecking(){
+        $departments = Departments::all();
+        //do kierwoników oddziału
+        $blockedData = [];
+        foreach($departments as $department){
+            $data = $this->autoConsultantsLoginsChecking($department->id);
+            //$this->sendMailByVerona('autoConsultantsLoginsChecking',$data['afterTwoWeeks'], 'Lista osób z ostatnim logowaniem dłużej niż 2 tygodnie');
+
+            array_push($blockedData, ['dep_name'=> $department->name, 'count'=> $data['blockedCount']]);
+        }
+        //do Pawla
+        //$this->sendMailByVerona('autoConsultantsLoginsBlock',$blockedData, 'Automatycznie zablokowane konta');
+    }
+    public function autoConsultantsLoginsCheckingGet(){
+        $data = $this->autoConsultantsLoginsChecking(1);
+        return view('mail.autoConsultantsLoginsChecking')
+            ->with('data',$data['afterTwoWeeks']['data'])
+            ->with('dep_name', $data['afterTwoWeeks']['dep_name'])
+            ->with('date',date('Y-m-d'));
+    }
+
+    public function autoConsultantsLoginsBlockedGet(){
+        $departments = Departments::all();
+        //do kierwoników oddziału
+        $blockedData = [];
+        foreach($departments as $department){
+            $data = $this->autoConsultantsLoginsChecking($department->id);
+
+            array_push($blockedData, ['dep_name'=> $department->name, 'count'=> $data['blockedCount']]);
+        }
+        return view('mail.autoConsultantsLoginsBlocked')
+            ->with('data',$blockedData)
+            ->with('date',date('Y-m-d'));
     }
 }
