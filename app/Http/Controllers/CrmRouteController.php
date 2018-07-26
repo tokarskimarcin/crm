@@ -2581,7 +2581,7 @@ class CrmRouteController extends Controller
                 $users->username = $item;
                 $users->first_name = '';
                 $users->last_name = '';
-                $users->push($users);
+                $accepted_users->push($users);
             }
             $this::sendMail($mail_type,$data,$accepted_users,$messageTitle);
             return 200;
