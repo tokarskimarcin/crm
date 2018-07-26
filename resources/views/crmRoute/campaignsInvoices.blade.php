@@ -351,15 +351,14 @@
                                     sendButton.prop('disabled',true);
                                 }else{
                                     if(!(data.payment_mail  == null || data.payment_mail == '')) {
-                                        let option = $(document.createElement('option')).val(1).text(data.payment_mail);
+                                        let option = $(document.createElement('option')).val(data.payment_mail).text(data.payment_mail);
                                         option.attr('data-subtext', 'Mail płatności');
                                         contactsSelect.append(option);
                                         contactsSelect.val(1);
                                     }
                                     if(!(data.payment_mail  == null || data.payment_mail == '')) {
-                                        let option = $(document.createElement('option')).val(2).text(data.payment_mail);
+                                        let option = $(document.createElement('option')).val(data.manager_mail).text(data.manager_mail);
                                         option.attr('data-subtext', 'Mail szefa');
-
                                         contactsSelect.append(option);
                                     }
                                     contactsSelect.selectpicker('refresh');
@@ -378,7 +377,7 @@
                                 let messageColumn = $(document.createElement('div')).addClass('col-md-12').append(messageInput);
                                 let row4 = $(document.createElement('div')).addClass('row').append(messageColumn).css('margin-top','1em');
 
-                                let inovoiceColumn = $(document.createElement('div')).addClass('col-md-12').text('Załącznik/faktura: ...');
+                                let inovoiceColumn = $(document.createElement('div')).addClass('col-md-12').text('');
                                 let row5 = $(document.createElement('div')).addClass('row').append(inovoiceColumn).css('margin-top','1em');
 
                                 let modalBody = $(document.createElement('div')).addClass('modal-body')
@@ -500,6 +499,8 @@
 
             function handleSendInvoiceButtonClick(e) {
                 let selectedEmails = $('#emailSelect').val();
+                let messageTitle = $('#messageTitleInput').val();
+                let messageBody = $('#messageTitlemailSelecteInput').val();
                 if(selectedEmails == null){
                     swal('Wybierz adresy mailowe');
                 }else{
@@ -510,7 +511,23 @@
                         showCancelButton: true,
                         type: 'warning'
                     }).then((result) => {
-                        myModal.modal('hide');
+
+                        console.log(selectedEmails);
+                        $.ajax({
+                           type: 'POST',
+                           url: "{{ route('api.sendMailWithInvoice') }}",
+                           headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                           data:{
+                               selectedEmails: selectedEmails,
+                               messageTitle: messageTitle,
+                               messageBody: messageBody
+                           },
+                           success: function (response) {
+
+                               myModal.modal('hide');
+                           } 
+                        });
+
                     });
                 }
             }

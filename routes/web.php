@@ -285,6 +285,8 @@ Route::post('/showRoutesDetailedUpdateAjax', 'CrmRouteController@showRoutesDetai
 Route::post('/getClientRouteInfoRecords', 'CrmRouteController@getClientRouteInfoRecords')->name('api.getClientRouteInfoRecords');
 Route::post('/getaHeadPlanningInfo', 'CrmRouteController@getaHeadPlanningInfo')->name('api.getaHeadPlanningInfo');
 
+Route::post('/sendMailWithInvoice', 'CrmRouteController@sendMailWithInvoice')->name('api.sendMailWithInvoice');
+
 Route::get('/getPresentationInfo', 'CrmRouteController@getPresentationInfo')->name('api.getPresentationInfo');
 Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->name('api.saveCampaignOption');
 Route::post('/presentationStatisticsAjax', 'CrmRouteController@presentationStatisticsAjax')->name('getPresentationWeeks');
@@ -323,7 +325,7 @@ Route::get('/weekReportTelemarketing', 'StatisticsController@MailweekReportTelem
 Route::get('/monthReportTelemarketing', 'StatisticsController@MailmonthReportTelemarketing'); // ok
 Route::get('/dayReportTelemarketing', 'StatisticsController@MailDayReportTelemarketing'); // tutaj dodac
 
-
+Route::get('/invoices', 'CrmRouteController@invoicesMail');
 //Gniezno
 Route::get('/hourReportTelemarketingGniezno', 'OtherCompanyStatisticsController@MailhourReportTelemarketing'); // ok
 Route::get('/weekReportTelemarketingGniezno', 'OtherCompanyStatisticsController@MailweekReportTelemarketing'); // ok
