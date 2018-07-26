@@ -3040,6 +3040,8 @@ public function clientReport(Request $request){
                 $name .= $allCities->where('id', '=', $show->city)->first()->name . ' + ';
                 $dateFlag = $show->date;
 
+                $clientRouteCampaigns = new ClientRouteCampaigns();
+
                 for($i = 0; $i < $show->hours; $i++) { // for example if user type 2 hours, method will insert 2 insertions with given row.
                     $clientRouteInfo = new ClientRouteInfo();
                     $clientRouteInfo->client_route_id = $clientRoute->id;
@@ -3056,6 +3058,11 @@ public function clientReport(Request $request){
                     $clientRouteInfo->weekOfYear = $weekOfYear;
                     $clientRouteInfo->checkbox = $show->checkbox;
                     $clientRouteInfo->save();
+
+                    if($i == 0) {
+                        $clientRouteCampaigns->client_route_info_id = $clientRouteInfo->id;
+                        $clientRouteCampaigns->save();
+                    }
                 }
 
             }
@@ -3066,6 +3073,7 @@ public function clientReport(Request $request){
 
             new ActivityRecorder(array_merge(['T'=>'Dodanie trasy dla klienta'],$clientRoute->toArray()),209,1);
             $request->session()->flash('adnotation', 'Trasa została pomyślnie przypisana dla klienta');
+
         }
         else {
             $request->session()->flash('adnotation', 'Błąd, trasa nie została przypisana do klienta');
@@ -3089,15 +3097,36 @@ public function clientReport(Request $request){
     }
 
     public function editAssignedRouteGet($id) {
-        $client_route = ClientRoute::where('id', '=', $id)->first();
+        $voivodes = Voivodes::all();
+        $client_route = ClientRoute::select('client.name as name', 'client.id as clientId', 'client_route.type as clientType')
+            ->join('client', 'client_route.client_id', '=', 'client.id')
+            ->where('client_route.id', '=', $id)
+            ->first();
 //        dd($client_route);
-        $client_route_info = ClientRouteInfo::select('client_route_info.city_id as cityId', 'client_route_info.voivode_id as voivodeId', '')
-        ->where('client_route_id', '=', $id)->get();
-        dd($client_route_info);
 
-        return view('crmRoute.editAssignedRoute');
+        $client_route_info = ClientRouteInfo::select(DB::raw(
+        'client_route_info.city_id as cityId,
+         COUNT(*) as hours,
+         client_route_info.voivode_id as voivodeId,
+         client_route_info.checkbox as checkbox,
+         client_route_info.date as date
+         '))
+        ->where('client_route_id', '=', $id)
+        ->groupBy('date', 'client_route_info.city_id')
+        ->orderBy('date')
+        ->get();
+
+        return view('crmRoute.editAssignedRoute')
+            ->with('voivodes', $voivodes)
+            ->with('clientRouteInfo', $client_route_info)
+            ->with('client_route', $client_route);
     }
 
+    public function editAssignedRoutePost($id, Request $request) {
+        dd(1);
+
+        return Redirect::back();
+    }
 
     public function getRouteTemplate(Request $request) {
         $idNotTrimmed = $request->route_id;
