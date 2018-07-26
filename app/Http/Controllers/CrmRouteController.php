@@ -2569,7 +2569,10 @@ class CrmRouteController extends Controller
         return view('mail.invoices');
     }
     public function sendMailWithInvoice(Request $request){
-        //if($request->ajax()){
+        if($request->ajax()){
+            $campaignID =  $request->actualCampaignID;
+            $filePath = ClientRouteCampaigns::find($campaignID)->invoice_path;
+            $storageURL = Storage::get($filePath);
             $selectedMail = $request->selectedEmails;
             $messageTitle = $request->messageTitle;
             $messageBody  = $request->messageBody;
@@ -2583,19 +2586,23 @@ class CrmRouteController extends Controller
                 $users->last_name = '';
                 $accepted_users->push($users);
             }
-            $this::sendMail($mail_type,$data,$accepted_users,$messageTitle);
+            $this::sendMail($mail_type,$data,$accepted_users,$messageTitle,$storageURL);
             return 200;
-        //}
-       // return 500;
+        }
+        return 500;
     }
-    public function sendMail($mail_type,$data,$accepted_users,$mail_title){
+    public function sendMail($mail_type,$data,$accepted_users,$mail_title,$storageURL){
         /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
-        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
+        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title,$storageURL)
         {
             $message->from('noreply.verona@gmail.com', 'Verona Consulting');
             foreach($accepted_users as $user) {
                 if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
                     $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
+                    $message->attach($storageURL, array(
+                            'as' => 'JedenJedne', // If you want you can chnage original name to custom name
+                            'mime' => 'application/pdf')
+                    );
                 }
             }
         });

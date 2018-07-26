@@ -91,7 +91,7 @@
             let invoiceStatusSelect = $('#invoiceStatusSelect');
             let firstDateInputFilter = $('#firstDateInputFilter');
             let lastDateInputFilter = $('#lastDateInputFilter');
-
+            let actualCampaignID = 0;
             @if(isset($routeId))
                 @if($routeId == 0)
                     let firstDate = new Date('{{$firstDate}}');
@@ -315,10 +315,14 @@
 
                             myModal.modal('show');
                         });
-
+                        //set zero actualCampaignID
+                        $('#myModal').on('hidden.bs.modal',function(){
+                            actualCampaignID = 0;
+                        });
                         //handle sendInvoiceButton
                         $('#sendInvoice').click(function (e) {
                             let hotelId = $(e.target).data('client_id');
+                            actualCampaignID =  $(e.target).data('campaign_id');
                             getHotelInfoAjax(hotelId).then(function (data) {
                                 let modalContent = $('#' + modalIdString + ' .modal-content');
                                 setModalSize(modalIdString, 3);
@@ -512,7 +516,6 @@
                         type: 'warning'
                     }).then((result) => {
 
-                        console.log(selectedEmails);
                         $.ajax({
                            type: 'POST',
                            url: "{{ route('api.sendMailWithInvoice') }}",
@@ -520,10 +523,10 @@
                            data:{
                                selectedEmails: selectedEmails,
                                messageTitle: messageTitle,
-                               messageBody: messageBody
+                               messageBody: messageBody,
+                               actualCampaignID: actualCampaignID
                            },
                            success: function (response) {
-
                                myModal.modal('hide');
                            } 
                         });
@@ -531,6 +534,7 @@
                     });
                 }
             }
+
 
             function handleConfirmPaymentButtonClick(e) {
                 let dateTime = $('#datetimepicker').val();
