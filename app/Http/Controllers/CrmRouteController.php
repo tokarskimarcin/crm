@@ -2575,7 +2575,6 @@ class CrmRouteController extends Controller
             $fileName = explode("/",$campaing->invoice_path);
             $fileName = $fileName[1];
             $storageURL = $request->root().'/api/getInvoice/'.$fileName;
-            return $storageURL;
             $selectedMail = $request->selectedEmails;
             $messageTitle = $request->messageTitle;
             $messageBody  = $request->messageBody;
