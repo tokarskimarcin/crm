@@ -2604,6 +2604,7 @@ class CrmRouteController extends Controller
                     'as' => 'faktura.pdf',
                     'mime' => 'application/pdf')
             );
+
         });
     }
     public function downloadCampaignInvoicePDF($id){
