@@ -1,6 +1,5 @@
 <table>
     <tr>
-        <td>Treść: {{$messageBody}}</td>
+        <td>{{$messageBody}}</td>
     </tr>
-
 </table>
