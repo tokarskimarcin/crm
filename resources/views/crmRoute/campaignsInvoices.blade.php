@@ -528,6 +528,7 @@
                                actualCampaignID: actualCampaignID
                            },
                            success: function (response) {
+                               console.log(response);
                                myModal.modal('hide');
                            } 
                         });
