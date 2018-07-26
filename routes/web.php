@@ -974,5 +974,9 @@ Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clien
 
 Route::get('/assigningRoutesToClients', 'CrmRouteController@assigningRoutesToClientsGet');
 Route::post('/assigningRoutesToClients', 'CrmRouteController@assigningRoutesToClientsPost');
+
+Route::get('/editAssignedRoute/{id}', 'CrmRouteController@editAssignedRouteGet');
+Route::post('/editAssignedRoute/{id}', 'CrmRouteController@editAssignedRoutePost');
+
 Route::post('/getRouteTemplate', 'CrmRouteController@getRouteTemplate')->name('api.getRouteTemplate');
 Route::post('/getVoivodeshipRoundWithDistanceLimit', 'CrmRouteController@getVoivodeshipRoundWithDistanceLimit')->name('api.getVoivodeshipRoundWithDistanceLimit');

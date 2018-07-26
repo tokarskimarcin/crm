@@ -1321,6 +1321,61 @@
             }
 
             /**
+             * This method creates on fly table with clientRouteInfo records
+             * @param placeToAppend - modal body
+             * @param data - mostly clientRouteInfo records
+             */
+            function createModalTable(placeToAppend, data) {
+                if (data.length != 0) {
+                    const infoTable = document.createElement('table');
+                    infoTable.classList.add('table', 'table-striped');
+
+                    const theadElement = document.createElement('thead');
+                    const tbodyElement = document.createElement('tbody');
+                    const tr1Element = document.createElement('tr');
+                    const th1Element = document.createElement('th');
+                    const th2Element = document.createElement('th');
+
+                    th1Element.textContent = 'Miasto';
+                    tr1Element.appendChild(th1Element);
+
+                    th2Element.textContent = 'Data';
+                    tr1Element.appendChild(th2Element);
+
+                    theadElement.appendChild(tr1Element);
+                    infoTable.appendChild(theadElement);
+
+                    let dateFlag = null;
+                    if(data[0].date) {
+                        dateFlag = data[0].date;
+                    }
+
+                    for (let i = 0; i < data.length; i++) {
+
+                        if(dateFlag != data[i].date) { //this part add row if there is date change
+                            const additionalTRelement = document.createElement('tr');
+                            const additionaltd1Element = document.createElement('td');
+                            const additionaltd2Element = document.createElement('td');
+                            additionalTRelement.appendChild(additionaltd1Element);
+                            additionalTRelement.appendChild(additionaltd2Element);
+                            tbodyElement.appendChild(additionalTRelement);
+                        }
+                        dateFlag = data[i].date;
+                        const trElement = document.createElement('tr');
+                        const td1Element = document.createElement('td');
+                        const td2Element = document.createElement('td');
+                        td1Element.textContent = data[i].cityName;
+                        td2Element.textContent = data[i].date;
+                        trElement.appendChild(td1Element);
+                        trElement.appendChild(td2Element);
+                        tbodyElement.appendChild(trElement);
+                    }
+                    infoTable.appendChild(tbodyElement);
+                    placeToAppend.appendChild(infoTable);
+                }
+            }
+
+            /**
              * This constructor defines new show object
              * API:
              * let variable = new ShowBox(); - we create new show object,
@@ -1415,7 +1470,7 @@
                     formBodyRow.classList.add('row');
 
                     let formBodyColRightColumn = document.createElement('div');
-                    formBodyColRightColumn.classList.add('col-md-6');
+                    formBodyColRightColumn.classList.add('col-md-5');
 
                     let formBodyRightColumnGroup = document.createElement('div');
                     formBodyRightColumnGroup.classList.add('form-group');
@@ -1426,6 +1481,14 @@
                     let secondSelect = document.createElement('select');
                     secondSelect.classList.add('citySelect');
                     secondSelect.classList.add('form-control');
+
+                    let formBodyMaxRightColumn = document.createElement('div');
+                    formBodyMaxRightColumn.classList.add('col-md-1');
+
+                    let loopIcon = document.createElement('span');
+                    loopIcon.classList.add('glyphicon');
+                    loopIcon.classList.add('glyphicon-search');
+                    loopIcon.classList.add('show-cities-statistics');
 
                     let formBodyColLeftColumn = document.createElement('div');
                     formBodyColLeftColumn.classList.add('col-md-6');
@@ -1480,6 +1543,9 @@
                     formBodyRightColumnGroup.appendChild(secondSelect);
                     formBodyColRightColumn.appendChild(formBodyRightColumnGroup);
                     formBodyRow.appendChild(formBodyColRightColumn);
+
+                    formBodyMaxRightColumn.appendChild(loopIcon);
+                    formBodyRow.appendChild(formBodyMaxRightColumn);
 
                     formBox.appendChild(formBodyRow);
                     /*END BODY PART*/
@@ -2197,6 +2263,57 @@
                     else {
                         notify('Wypełnij wszystkie pola');
                     }
+                }
+                else if (e.target.matches('.show-cities-statistics')) { //after clicking on search glyphicon, open modal with cities.
+                    const thisSingleShowContainer = e.target.closest('.singleShowContainer');
+                    const thisSingleDayContainer = e.target.closest('.singleDayContainer');
+                    const citySelect = thisSingleShowContainer.querySelector('.citySelect');
+                    const selectedCity = getSelectedValue(citySelect);
+
+                    const dateContainer = thisSingleDayContainer.querySelector('.day-info');
+                    const fullDate = dateContainer.textContent;
+
+                    const selectedDate = fullDate.substr(6);
+
+                    const url = `{{route('api.getClientRouteInfoRecord')}}`;
+                    const ourHeaders = new Headers();
+                    ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+
+                    const ajaxData = new FormData();
+                    ajaxData.append('city_id', selectedCity);
+                    ajaxData.append('date', selectedDate);
+
+                    fetch(url, {
+                        method: 'post',
+                        headers: ourHeaders,
+                        body: ajaxData,
+                        credentials: "same-origin"
+                    })
+                        .then(resp => resp.json())
+                        .then(resp => {
+                            const modalBody = document.querySelector('.modal2-body');
+                            modalBody.innerHTML = '';
+                            createModalTable(modalBody, resp);
+                            return resp.length;
+                        })
+                        .then(numberOfElements => {
+                            const modalBody = document.querySelector('.modal2-body');
+                            const info = document.createElement('div');
+                            info.classList.add('alert', 'alert-info', 'loadedMessage');
+                            if(selectedCity == 0) {
+                                info.textContent = "Miasto nie zostało wybrane";
+                            }
+                            else if (numberOfElements === 0) {
+                                info.textContent = "Miasto nie zostało wykorzystane w przeciągu ostatniego miesiąca";
+                            }
+                            else {
+                                info.textContent = "Wykorzystanie miasta w ciągu miesiąca wstecz i w przód";
+                            }
+
+                            modalBody.appendChild(info);
+                            $('#showRecords').modal('show');
+                        })
+
                 }
             }
 

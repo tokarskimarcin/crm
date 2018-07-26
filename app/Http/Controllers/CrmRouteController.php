@@ -299,6 +299,7 @@ class CrmRouteController extends Controller
             ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
             ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
             ->where('client_route_id', '=', $id)
+            ->where('client_route_info.status', '=', 1)
             ->get();
 
         $clientRoute = $this->getClientRouteGroupedByDateSortedByHour($id, $clientRouteInfo);
@@ -372,7 +373,9 @@ class CrmRouteController extends Controller
 
         $clientRouteInfo = $clientRouteInfo->sortByDesc('date');
         $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
-            ->join('city','city.id','client_route_info.city_id')->get();
+            ->join('city','city.id','client_route_info.city_id')
+            ->where('client_route_info.status', '=', 1)
+            ->get();
         $clientRouteInfo->map(function($item) use($cities,$clientRouteInfoAll) {
             $cityObject = $cities->where('id','=',$item[0]->city_id)->first();
             $item[0]->cities = $this::findCityByDistance($cityObject, $item[0]->date,$clientRouteInfoAll,$cities);
@@ -894,7 +897,9 @@ class CrmRouteController extends Controller
 
             //Rekordy clientRoutesInfo w których były użyte miasta
             $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
-                ->join('city','city.id','client_route_info.city_id')->get();
+                ->join('city','city.id','client_route_info.city_id')
+                ->where('client_route_info.status', '=', 1)
+                ->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
                 //wartość karencji dla danego miasta
@@ -994,7 +999,10 @@ class CrmRouteController extends Controller
                 ->toArray();
 
             //Rekordy clientRoutesInfo w których były użyte miasta
-            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')->whereIn('city_id', $citiesAvailable)->get();
+            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')
+                ->whereIn('city_id', $citiesAvailable)
+                ->where('client_route_info.status', '=', 1)
+                ->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
                 //wartość karencji dla danego miasta
@@ -1048,7 +1056,9 @@ class CrmRouteController extends Controller
         ])->get();
         $cities = Cities::all();
         $clientRouteInfo = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
-            ->join('city','city.id','client_route_info.city_id')->get();
+            ->join('city','city.id','client_route_info.city_id')
+            ->where('client_route_info.status', '=', 1)
+            ->get();
         $routeInfo->map(function ($item) use($clientRouteInfo,$cities){
             $city = Cities::find($item->city_id);
             $item->cities = $this::findCityByDistance($city,'2000-01-01',$clientRouteInfo,$cities);
@@ -1370,7 +1380,9 @@ class CrmRouteController extends Controller
             $city = Cities::where('id', '=', $cityId)->first();
             //part responsible for grace period
             $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
-                ->join('city','city.id','client_route_info.city_id')->get();
+                ->join('city','city.id','client_route_info.city_id')
+                ->where('client_route_info.status', '=', 1)
+                ->get();
             $voievodeshipRound = $this::    findCityByDistance($city, $currentDate, $clientRouteInfoAll, $cities, $removeLimit);
 
             $voievodeshipRound = $voievodeshipRound->groupBy('id');
@@ -2533,7 +2545,9 @@ class CrmRouteController extends Controller
             $city = Cities::where('id', '=', $cityId)->first();
             //part responsible for grace period
             $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
-                ->join('city','city.id','client_route_info.city_id')->get();
+                ->join('city','city.id','client_route_info.city_id')
+                ->where('client_route_info.status', '=', 1)
+                ->get();
             $voievodeshipRound = $this::findCityByDistanceWithDistanceLimit($city, $currentDate, $clientRouteInfoAll, $cities, $limit);
 
             $voievodeshipRound = $voievodeshipRound->groupBy('id');
@@ -3048,6 +3062,7 @@ public function clientReport(Request $request){
                     $clientRouteInfo->city_id = $show->city;
                     $clientRouteInfo->voivode_id = $show->voivode;
                     $clientRouteInfo->date = $show->date;
+                    $clientRouteInfo->status = 1;
                     $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
 
                     $dateArr = explode('-', $show->date);
@@ -3112,6 +3127,7 @@ public function clientReport(Request $request){
          client_route_info.date as date
          '))
         ->where('client_route_id', '=', $id)
+        ->where('status', '=', 1)
         ->groupBy('date', 'client_route_info.city_id')
         ->orderBy('date')
         ->get();
@@ -3123,7 +3139,121 @@ public function clientReport(Request $request){
     }
 
     public function editAssignedRoutePost($id, Request $request) {
-        dd(1);
+        if($request->has('alldata') && $request->has('clientInfo')) {
+            $allData = json_decode($request->alldata);
+            $clientInfo = json_decode($request->clientInfo);
+
+            $client_route_info = ClientRouteInfo::select(DB::raw(
+                'client_route_info.city_id as cityId,
+                 COUNT(*) as hours,
+                 client_route_info.voivode_id as voivodeId,
+                 client_route_info.checkbox as checkbox,
+                 client_route_info.date as date
+         '))
+                ->where('client_route_id', '=', $id)
+                ->where('status', '=', 1)
+                ->groupBy('date', 'client_route_info.city_id')
+                ->orderBy('date')
+                ->get();
+
+            //assigning toAdd as 1, for every record.
+            foreach($allData as $show) {
+                $show->toAdd = 1;
+            }
+
+            $client_route_info_with_flag = $client_route_info->map(function($item) use($allData) {
+                $item->toChange = 1;
+                //if foreach loop finds same object, it change flag "toChange" to 0. it means, it should not be modified
+                foreach($allData as $show) {
+                    if(($item->cityId == $show->city) && ($item->voivodeId == $show->voivode) && ($item->date == $show->date) && ($item->hours == $show->hours)) {
+                        $item->toChange = 0;
+                        $show->toAdd = 0;
+                    }
+                }
+               return $item;
+            });
+
+
+            $staticRecords = $client_route_info_with_flag->where('toChange', '=', 0);
+            //all records which should not be changed at all. (to see, required adding ->get() to variable after foreach)
+            $recordsNotToDelete = ClientRouteInfo::select('id');
+            foreach($staticRecords as $staticRecord) {
+                $recordsNotToDelete->orWhere([
+                    ['city_id', '=', $staticRecord->cityId],
+                    ['voivode_id', '=', $staticRecord->voivodeId],
+                    ['date', '=', $staticRecord->date]
+                    ]);
+            }
+
+            //changing status for all records which should be removed to 0
+            DB::table('client_route_info')->where('client_route_id', '=', $id)->whereNotIn('id', $recordsNotToDelete->pluck('id')->toArray())->update(['status' => 0]);
+
+            $clientRoute = ClientRoute::find($id);
+
+            //This part add modified shows or new shows
+            foreach($allData as $show) {
+                $clientRouteCampaigns = new ClientRouteCampaigns();
+
+                for($i = 0; $i < $show->hours; $i++) { // for example if user type 2 hours, method will insert 2 insertions with given row.
+                    if(!($show->toAdd == 0)) { // only for those, which should be added(without toAdd == 0)
+                        $clientRouteInfo = new ClientRouteInfo();
+                        $clientRouteInfo->client_route_id = $clientRoute->id;
+                        $clientRouteInfo->city_id = $show->city;
+                        $clientRouteInfo->voivode_id = $show->voivode;
+                        $clientRouteInfo->date = $show->date;
+                        $clientRouteInfo->status = 1;
+                        $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
+
+                        $dateArr = explode('-', $show->date);
+                        $day = $dateArr[2]; $month = $dateArr[1]; $year = $dateArr[0];
+                        $date = mktime(0, 0, 0, $month, $day, $year);
+                        $weekOfYear = date('W',$date);
+
+                        $clientRouteInfo->weekOfYear = $weekOfYear;
+                        $clientRouteInfo->checkbox = $show->checkbox;
+                        $clientRouteInfo->save();
+
+                        if($i == 0) {
+                            $clientRouteCampaigns->client_route_info_id = $clientRouteInfo->id;
+                            $clientRouteCampaigns->save();
+                        }
+                    }
+
+                }
+
+            }
+
+            //this part create route name
+            $client_route_info2 = ClientRouteInfo::select(DB::raw(
+                'client_route_info.city_id as cityId,
+                 COUNT(*) as hours,
+                 client_route_info.voivode_id as voivodeId,
+                 client_route_info.checkbox as checkbox,
+                 client_route_info.date as date
+         '))
+                ->where('client_route_id', '=', $id)
+                ->where('status', '=', 1)
+                ->groupBy('date', 'client_route_info.city_id')
+                ->orderBy('date')
+                ->get();
+
+            $dateFlag = $client_route_info2[0]->date;
+            $name = '';
+            $allCities = Cities::select('id','name')->get();
+
+            foreach($client_route_info2 as $show) {
+                if($show->date != $dateFlag) {
+                    $name = substr($name, 0,strlen($name) - 3) .  ' | ';
+                }
+
+                $name .= $allCities->where('id', '=', $show->cityId)->first()->name . ' + ';
+                $dateFlag = $show->date;
+            }
+
+            $name = substr($name, 0,strlen($name) - 3); // removing last + in name
+            $clientRoute->route_name = $name;
+            $clientRoute->save();
+        }
 
         return Redirect::back();
     }
