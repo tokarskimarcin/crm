@@ -537,158 +537,150 @@
                             let placeToAppend = document.querySelector('.route-here');
                             placeToAppend.innerHTML = '';
 
-                            swal({
-                                title: 'Ładowawnie...',
-                                text: 'To może chwilę zająć',
-                                allowOutsideClick: false,
-                                allowEscapeKey: false,
-                                allowEnterKey: false,
-                                onOpen: () => {
-                                    // swal.showLoading();
-                                    // Pobranie informacji o zaznaczonej trasie
-                                    $.ajax({
-                                        type: "POST",
-                                        async: false,
-                                        url: '{{ route('api.getRouteTemplate') }}',
-                                        data: {
-                                            "route_id": route_id
-                                        },
-                                        headers: {
-                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                        },
-                                        success: function (response) {
-                                            let placeToAppend = document.querySelector('.route-here');
-                                            placeToAppend.innerHTML = '';
-                                            let dayFlag = null; //indices day change
-                                            let dayBox = null;
-                                            let dayContainer = null;
-                                            for (let i = 0, respLength = response.length; i < respLength; i++) {
-                                                if (i === 0) { //first iteration
-                                                    console.log('warunek na raz');
-                                                    dayBox = new DayBox();
-                                                    dayBox.createDOMDayBox();
-                                                    dayContainer = dayBox.getBox();
-                                                    placeToAppend.insertAdjacentElement("beforeend", dayContainer);
+                            // Pobranie informacji o zaznaczonej trasie
+                            $.ajax({
+                                type: "POST",
+                                async: false,
+                                url: '{{ route('api.getRouteTemplate') }}',
+                                data: {
+                                    "route_id": route_id
+                                },
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                success: function (response) {
+                                    let placeToAppend = document.querySelector('.route-here');
+                                    placeToAppend.innerHTML = '';
+                                    let dayFlag = null; //indices day change
+                                    let dayBox = null;
+                                    let dayContainer = null;
+                                    for (let i = 0, respLength = response.length; i < respLength; i++) {
+                                        if (i === 0) { //first iteration
+                                            console.log('warunek na raz');
+                                            dayBox = new DayBox();
+                                            dayBox.createDOMDayBox();
+                                            dayContainer = dayBox.getBox();
+                                            placeToAppend.insertAdjacentElement("beforeend", dayContainer);
 
-                                                    let dateInfo = dayContainer.querySelector('.day-info');
-                                                    let fulldate = dateInfo.textContent;
-                                                    let correctDate = fulldate.substr(6); //YYYY-MM-DD
+                                            let dateInfo = dayContainer.querySelector('.day-info');
+                                            let fulldate = dateInfo.textContent;
+                                            let correctDate = fulldate.substr(6); //YYYY-MM-DD
 
-                                                    let formEl = new ShowBox();
-                                                    formEl.addRemoveShowButton();
-                                                    formEl.addDistanceCheckbox();
-                                                    formEl.addNewShowButton();
-                                                    formEl.createDOMBox(correctDate);
-                                                    let firstFormDOM = formEl.getForm();
+                                            let formEl = new ShowBox();
+                                            formEl.addRemoveShowButton();
+                                            formEl.addDistanceCheckbox();
+                                            formEl.addNewShowButton();
+                                            formEl.createDOMBox(correctDate);
+                                            let firstFormDOM = formEl.getForm();
 
-                                                    let citySelect = firstFormDOM.querySelector('.citySelect');
-                                                    let voivodeSelect = firstFormDOM.querySelector('.voivodeSelect');
-                                                    const voivodeId = response[i].voivodeId;
-                                                    const cityId = response[i].cityId;
+                                            let citySelect = firstFormDOM.querySelector('.citySelect');
+                                            let voivodeSelect = firstFormDOM.querySelector('.voivodeSelect');
+                                            const voivodeId = response[i].voivodeId;
+                                            const cityId = response[i].cityId;
 
-                                                    showWithoutDistanceAjax(voivodeId, citySelect, correctDate);
+                                            showWithoutDistanceAjax(voivodeId, citySelect, correctDate);
 
-                                                    dayContainer.appendChild(firstFormDOM);
+                                            dayContainer.appendChild(firstFormDOM).scrollIntoView({behavior: "smooth"});
 
-                                                    if(response[i].checkbox == 1) { //case when checkbox need to be checked
-                                                        let checkboxElement = firstFormDOM.querySelector('.distance-checkbox');
-                                                        if(!checkboxElement.checked) {
-                                                            $(checkboxElement).trigger('click');
-                                                        }
-                                                    }
-
-                                                    $(voivodeSelect).val(voivodeId).trigger('change');
-                                                    $(citySelect).val(cityId).trigger('change');
-
-                                                    dayFlag = response[i].day;
-
-                                                    //Adding button section
-                                                    let buttonSection = new ButtonBox();
-                                                    buttonSection.appendAddNewDayButton();
-                                                    let elButtonSection = buttonSection.getBox();
-
-                                                    placeToAppend.insertAdjacentElement('beforeend', elButtonSection);
+                                            if(response[i].checkbox == 1) { //case when checkbox need to be checked
+                                                let checkboxElement = firstFormDOM.querySelector('.distance-checkbox');
+                                                if(!checkboxElement.checked) {
+                                                    $(checkboxElement).trigger('click');
                                                 }
-                                                else if (dayFlag !== response[i].day && i !== 0) { //case when next container is in the next day
-                                                    let addNewDayButton = $('#addNewDay');
-                                                    addNewDayButton.trigger('click');
-
-                                                    let allDayContainers2 = document.getElementsByClassName('singleDayContainer');
-                                                    let lastDayContainer = allDayContainers2[allDayContainers2.length - 1];
-
-                                                    let allShowContainersInsideLastDayContainer = lastDayContainer.getElementsByClassName('singleShowContainer');
-                                                    let lastShowContainer = allShowContainersInsideLastDayContainer[allShowContainersInsideLastDayContainer.length - 1];
-
-                                                    let lastShowExistenceArr = checkingExistenceOfPrevAndNextContainers(lastShowContainer, 'singleShowContainer');
-
-                                                    const citySelect = lastShowContainer.querySelector('.citySelect');
-                                                    const voivodeSelect = lastShowContainer.querySelector('.voivodeSelect');
-                                                    const voivodeId = response[i].voivodeId;
-                                                    const cityId = response[i].cityId;
-
-                                                    if(response[i].checkbox == 1) { //case when checkbox need to be checked
-                                                        let prevShowContainer = lastShowExistenceArr[0];
-                                                        let previousShowVoivodeSelect = prevShowContainer.querySelector('.voivodeSelect');
-                                                        const previousShowVoivodeId = getSelectedValue(previousShowVoivodeSelect);
-                                                        const previousShowCitySelect = prevShowContainer.querySelector('.citySelect');
-                                                        const previousShowCityId = getSelectedValue(previousShowCitySelect);
-
-                                                        let checkboxElement = lastShowContainer.querySelector('.distance-checkbox');
-                                                        $(checkboxElement).trigger('click');
-                                                        previousShowVoivodeSelect = prevShowContainer.querySelector('.voivodeSelect');
-                                                        setOldValues(previousShowVoivodeSelect, previousShowVoivodeId, previousShowCitySelect, previousShowCityId);
-                                                    }
-                                                    $(voivodeSelect).val(voivodeId).trigger('change');
-                                                    $(citySelect).val(cityId).trigger('change');
-                                                    dayFlag = response[i].day;
-                                                }
-                                                else { // case when next show is in the same day container
-                                                    let allDayContainers = document.getElementsByClassName('singleDayContainer');
-                                                    let lastDayContainer = allDayContainers[allDayContainers.length - 1];
-                                                    let allShowContainersInsideLastDayContainer = lastDayContainer.getElementsByClassName('singleShowContainer');
-                                                    let lastShowContainer = allShowContainersInsideLastDayContainer[allShowContainersInsideLastDayContainer.length - 1];
-
-                                                    let addNextShowButton = lastShowContainer.querySelector('.addNewShowButton');
-                                                    $(addNextShowButton).trigger('click');
-
-                                                    //we need to select new container, which appear after triggering click
-                                                    allDayContainers = document.getElementsByClassName('singleDayContainer');
-                                                    lastDayContainer = allDayContainers[allDayContainers.length - 1];
-                                                    allShowContainersInsideLastDayContainer = lastDayContainer.getElementsByClassName('singleShowContainer');
-                                                    lastShowContainer = allShowContainersInsideLastDayContainer[allShowContainersInsideLastDayContainer.length - 1];
-
-                                                    if(response[i].checkbox == 1) { //case when checkbox need to be checked
-                                                        const previousShowContainer = allShowContainersInsideLastDayContainer[allShowContainersInsideLastDayContainer.length - 2];
-                                                        let previousShowVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
-                                                        const previousShowVoivodeId = getSelectedValue(previousShowVoivodeSelect);
-                                                        const previousShowCitySelect = previousShowContainer.querySelector('.citySelect');
-                                                        const previousShowCityId = getSelectedValue(previousShowCitySelect);
-
-                                                        let checkboxElement = lastShowContainer.querySelector('.distance-checkbox');
-                                                        $(checkboxElement).trigger('click');
-
-                                                        previousShowVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
-                                                        setOldValues(previousShowVoivodeSelect, previousShowVoivodeId, previousShowCitySelect, previousShowCityId);
-                                                    }
-
-                                                    const citySelect = lastShowContainer.querySelector('.citySelect');
-                                                    const voivodeSelect = lastShowContainer.querySelector('.voivodeSelect');
-                                                    const voivodeId = response[i].voivodeId;
-                                                    const cityId = response[i].cityId;
-
-                                                    $(voivodeSelect).val(voivodeId).trigger('change');
-                                                    $(citySelect).val(cityId).trigger('change');
-                                                    dayFlag = response[i].day;
-                                                }
-
-
                                             }
 
+                                            $(voivodeSelect).val(voivodeId).trigger('change');
+                                            $(citySelect).val(cityId).trigger('change');
+
+                                            dayFlag = response[i].day;
+
+                                            //Adding button section
+                                            let buttonSection = new ButtonBox();
+                                            buttonSection.appendAddNewDayButton();
+                                            let elButtonSection = buttonSection.getBox();
+
+                                            placeToAppend.insertAdjacentElement('beforeend', elButtonSection);
+                                        }
+                                        else if (dayFlag !== response[i].day && i !== 0) { //case when next container is in the next day
+                                            let addNewDayButton = $('#addNewDay');
+                                            addNewDayButton.trigger('click');
+
+                                            let allDayContainers2 = document.getElementsByClassName('singleDayContainer');
+                                            let lastDayContainer = allDayContainers2[allDayContainers2.length - 1];
+
+                                            let allShowContainersInsideLastDayContainer = lastDayContainer.getElementsByClassName('singleShowContainer');
+                                            let lastShowContainer = allShowContainersInsideLastDayContainer[allShowContainersInsideLastDayContainer.length - 1];
+
+                                            let lastShowExistenceArr = checkingExistenceOfPrevAndNextContainers(lastShowContainer, 'singleShowContainer');
+
+                                            const citySelect = lastShowContainer.querySelector('.citySelect');
+                                            const voivodeSelect = lastShowContainer.querySelector('.voivodeSelect');
+                                            const voivodeId = response[i].voivodeId;
+                                            const cityId = response[i].cityId;
+
+                                            if(response[i].checkbox == 1) { //case when checkbox need to be checked
+                                                let prevShowContainer = lastShowExistenceArr[0];
+                                                let previousShowVoivodeSelect = prevShowContainer.querySelector('.voivodeSelect');
+                                                const previousShowVoivodeId = getSelectedValue(previousShowVoivodeSelect);
+                                                const previousShowCitySelect = prevShowContainer.querySelector('.citySelect');
+                                                const previousShowCityId = getSelectedValue(previousShowCitySelect);
+
+                                                let checkboxElement = lastShowContainer.querySelector('.distance-checkbox');
+                                                $(checkboxElement).trigger('click');
+                                                previousShowVoivodeSelect = prevShowContainer.querySelector('.voivodeSelect');
+                                                setOldValues(previousShowVoivodeSelect, previousShowVoivodeId, previousShowCitySelect, previousShowCityId);
+                                            }
+                                            $(voivodeSelect).val(voivodeId).trigger('change');
+                                            $(citySelect).val(cityId).trigger('change');
+                                            dayFlag = response[i].day;
+                                        }
+                                        else { // case when next show is in the same day container
+                                            let allDayContainers = document.getElementsByClassName('singleDayContainer');
+                                            let lastDayContainer = allDayContainers[allDayContainers.length - 1];
+                                            let allShowContainersInsideLastDayContainer = lastDayContainer.getElementsByClassName('singleShowContainer');
+                                            let lastShowContainer = allShowContainersInsideLastDayContainer[allShowContainersInsideLastDayContainer.length - 1];
+
+                                            let addNextShowButton = lastShowContainer.querySelector('.addNewShowButton');
+                                            $(addNextShowButton).trigger('click');
+
+                                            //we need to select new container, which appear after triggering click
+                                            allDayContainers = document.getElementsByClassName('singleDayContainer');
+                                            lastDayContainer = allDayContainers[allDayContainers.length - 1];
+                                            allShowContainersInsideLastDayContainer = lastDayContainer.getElementsByClassName('singleShowContainer');
+                                            lastShowContainer = allShowContainersInsideLastDayContainer[allShowContainersInsideLastDayContainer.length - 1];
+
+                                            if(response[i].checkbox == 1) { //case when checkbox need to be checked
+                                                const previousShowContainer = allShowContainersInsideLastDayContainer[allShowContainersInsideLastDayContainer.length - 2];
+                                                let previousShowVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
+                                                const previousShowVoivodeId = getSelectedValue(previousShowVoivodeSelect);
+                                                const previousShowCitySelect = previousShowContainer.querySelector('.citySelect');
+                                                const previousShowCityId = getSelectedValue(previousShowCitySelect);
+
+                                                let checkboxElement = lastShowContainer.querySelector('.distance-checkbox');
+                                                $(checkboxElement).trigger('click');
+
+                                                previousShowVoivodeSelect = previousShowContainer.querySelector('.voivodeSelect');
+                                                setOldValues(previousShowVoivodeSelect, previousShowVoivodeId, previousShowCitySelect, previousShowCityId);
+                                            }
+
+                                            const citySelect = lastShowContainer.querySelector('.citySelect');
+                                            const voivodeSelect = lastShowContainer.querySelector('.voivodeSelect');
+                                            const voivodeId = response[i].voivodeId;
+                                            const cityId = response[i].cityId;
+
+                                            $(voivodeSelect).val(voivodeId).trigger('change');
+                                            $(citySelect).val(cityId).trigger('change');
+                                            dayFlag = response[i].day;
                                         }
 
-                                    })
+
+                                    }
+
                                 }
+
                             })
+
+
                                 }
                             });
 
@@ -1679,14 +1671,14 @@
                         if(isChecked) { //when clicked singleDayContainer has checkbox checked
                             newForm.createDOMBox(containerDate);
                             let newFormDomElement = newForm.getForm();
-                            thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                            thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
                         }
                         else {
                             //we are checking whether cliecked singleDayContainer is last one, or between others.
                             if(lastOneFlag === true) {
                                 newForm.createDOMBox(containerDate, 30, selectedCityId);
                                 let newFormDomElement = newForm.getForm();
-                                thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                                thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
                             }
                             else { //container is not last one
                                 const apreviousCitySelect = thisShowContainer.querySelector('.citySelect');
@@ -1695,7 +1687,7 @@
                                 if(anextCitySelect.options[anextCitySelect.selectedIndex].value != 0 && apreviousCitySelect.options[apreviousCitySelect.selectedIndex].value != 0) {
                                     newForm.createDOMBox(containerDate, 30, selectedCityId, true, thisShowContainer, nextShowContainer);
                                     let newFormDomElement = newForm.getForm();
-                                    thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                                    thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
                                 }
                                 else {
                                     notify('Wybierz miasta w pokazach powyżej i poniżej');
