@@ -373,7 +373,7 @@
                                 let messageTitleColumn = $(document.createElement('div')).addClass('col-md-6').append(messageTitleInput);
                                 let row3 = $(document.createElement('div')).addClass('row').append(messageTitleColumn).css('margin-top','1em');
 
-                                let messageInput = $(document.createElement('textarea')).attr('id','messageTitleInput').addClass('form-control').attr('placeholder','Treść wiadomości')
+                                let messageInput = $(document.createElement('textarea')).attr('id','messageTitlemailSelecteInput').addClass('form-control').attr('placeholder','Treść wiadomości')
                                     .css({
                                         'resize':'none',
                                         'height':'45vh'
@@ -528,6 +528,7 @@
                                actualCampaignID: actualCampaignID
                            },
                            success: function (response) {
+                               console.log(response);
                                myModal.modal('hide');
                            } 
                         });

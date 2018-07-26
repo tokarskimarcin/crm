@@ -2687,12 +2687,17 @@ class CrmRouteController extends Controller
     public function sendMailWithInvoice(Request $request){
         if($request->ajax()){
             $campaignID =  $request->actualCampaignID;
-            $storageURL = $request->root().'/downloadCampaignInvoicePDF/'.$campaignID;
+            $campaing = ClientRouteCampaigns::find($campaignID);
+            $fileName = explode("/",$campaing->invoice_path);
+            $fileName = $fileName[1];
+            $storageURL = $request->root().'/api/getInvoice/'.$fileName;
             $selectedMail = $request->selectedEmails;
             $messageTitle = $request->messageTitle;
             $messageBody  = $request->messageBody;
             $mail_type = 'invoices';
-            $data['messageBody'] = $messageBody;
+            $data = [
+                'messageBody' => $messageBody
+                ];
             $accepted_users = collect();
             foreach($selectedMail as $item){
                 $users = new User();
