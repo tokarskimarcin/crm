@@ -2572,7 +2572,6 @@ class CrmRouteController extends Controller
         if($request->ajax()){
             $campaignID =  $request->actualCampaignID;
             $storageURL = $request->root().'/downloadCampaignInvoicePDF/'.$campaignID;
-            return $storageURL;
             $selectedMail = $request->selectedEmails;
             $messageTitle = $request->messageTitle;
             $messageBody  = $request->messageBody;
