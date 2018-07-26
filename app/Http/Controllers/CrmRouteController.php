@@ -2572,7 +2572,7 @@ class CrmRouteController extends Controller
         if($request->ajax()){
             $campaignID =  $request->actualCampaignID;
             $filePath = ClientRouteCampaigns::find($campaignID)->invoice_path;
-            $storageURL = Storage::get($filePath);
+            $storageURL = Storage::url($filePath);
             $selectedMail = $request->selectedEmails;
             $messageTitle = $request->messageTitle;
             $messageBody  = $request->messageBody;
@@ -2599,8 +2599,7 @@ class CrmRouteController extends Controller
             foreach($accepted_users as $user) {
                 if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
                     $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
-                    $message->attach('https://www.adobe.com/content/dam/acom/en/devnet/acrobat/pdfs/pdf_open_parameters.pdf', array(
-                            'as' => 'JedenJedne.pdf', // If you want you can chnage original name to custom name
+                    $message->attach($storageURL, array(
                             'mime' => 'application/pdf')
                     );
                 }
