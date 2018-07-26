@@ -5185,7 +5185,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         $usersLastLoginsOneMonthAgo = $usersLastLoginsTwoWeeksAgo->where('last_login', '<', date('Y-m-d', strtotime('-1 Month')));
 
-        User::whereIn('id',$usersLastLoginsOneMonthAgo->pluck('id')->toArray())->update(['status_work' => 0]);
+        //User::whereIn('id',$usersLastLoginsOneMonthAgo->pluck('id')->toArray())->update(['status_work' => 0]);
 
         return ['afterTwoWeeks' =>[ 'data' => $usersLastLoginsTwoWeeksAgo->map(function($user) {
             return collect($user->toArray())->only(['first_name','last_name'])->all(); }),
@@ -5200,12 +5200,12 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $blockedData = [];
         foreach($departments as $department){
             $data = $this->autoConsultantsLoginsChecking($department->id);
-            $this->sendMailByVerona('autoConsultantsLoginsChecking',$data['afterTwoWeeks'], 'Lista osób z ostatnim logowaniem dłużej niż 2 tygodnie');
+            //$this->sendMailByVerona('autoConsultantsLoginsChecking',$data['afterTwoWeeks'], 'Lista osób z ostatnim logowaniem dłużej niż 2 tygodnie');
 
             array_push($blockedData, ['dep_name'=> $department->name, 'count'=> $data['blockedCount']]);
         }
         //do Pawla
-        $this->sendMailByVerona('autoConsultantsLoginsBlock',$blockedData, 'Automatycznie zablokowane konta');
+        //$this->sendMailByVerona('autoConsultantsLoginsBlock',$blockedData, 'Automatycznie zablokowane konta');
     }
     public function autoConsultantsLoginsCheckingGet(){
         $data = $this->autoConsultantsLoginsChecking(1);
