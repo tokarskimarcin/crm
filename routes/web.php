@@ -957,6 +957,10 @@ Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
 
 //Skrypty
 Route::get('/autoChangeRouteStatus', 'AutoScriptController@autoChangeRouteStatus');
+Route::get('/autoConsultantsLoginsChecking', 'StatisticsController@MailAutoConsultantsLoginsChecking');
+
+Route::get('/autoConsultantsLoginsCheckingGet', 'StatisticsController@autoConsultantsLoginsCheckingGet');
+Route::get('/autoConsultantsLoginsBlockedGet', 'StatisticsController@autoConsultantsLoginsBlockedGet');
 
 Route::get('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplateGet');
 Route::post('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplatePost');
