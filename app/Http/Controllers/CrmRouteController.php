@@ -2598,11 +2598,11 @@ class CrmRouteController extends Controller
             foreach($accepted_users as $user) {
                 if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
                     $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
-                    $message->attach($storageURL, array(
-                            'as' => 'faktura.pdf',
-                            'mime' => 'application/pdf')
-                    );
-                }
+                 }
+                $message->attach($storageURL, array(
+                        'as' => 'faktura.pdf',
+                        'mime' => 'application/pdf')
+                );
             }
         });
     }
