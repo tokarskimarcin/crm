@@ -91,7 +91,7 @@
             let invoiceStatusSelect = $('#invoiceStatusSelect');
             let firstDateInputFilter = $('#firstDateInputFilter');
             let lastDateInputFilter = $('#lastDateInputFilter');
-
+            let actualCampaignID = 0;
             @if(isset($routeId))
                 @if($routeId == 0)
                     let firstDate = new Date('{{$firstDate}}');
@@ -102,7 +102,7 @@
                     lastDateInputFilter.val(getFormatedDate(lastDate));
                 @endif
             @endif
-            let invoiceDatatable = $('#invoicesDatatable').DataTable({
+            var invoiceDatatable = $('#invoicesDatatable').DataTable({
                     width: '100%',
                 autoWidth: true,
                 processing: true,
@@ -225,7 +225,7 @@
                             let buttonGroup = $(document.createElement('div'));
                             if (data.invoice_status_id == 1) {
                                 //actionButton.addClass('btn-danger');
-                                actionButton.attr('id', 'uploadInvoice');
+                                actionButton.addClass('uploadInvoice');
                                 actionButton.text(' Wrzuć fakturę');
                                 actionSpan.addClass('glyphicon glyphicon-cloud-upload');
                             }
@@ -238,13 +238,13 @@
                                     .attr('data-client_name', data.client_name)
                                     .attr('data-hotel_name',data.hotel_name)
                                     .prop('type', 'button').addClass('btn btn-block btn-info');
-                                actionButton2.attr('id', 'uploadInvoice');
+                                actionButton2.addClass('uploadInvoice');
                                 actionButton2.text(' Wrzuć fakturę');
                                 actionSpan2.addClass('glyphicon glyphicon-cloud-upload');
                                 actionButton2.prepend(actionSpan2);
                                 buttonGroup.append(actionButton2);
 
-                                actionButton.attr('id', 'sendInvoice');
+                                actionButton.addClass('sendInvoice');
                                 actionButton.text(' Wyślij fakturę');
                                 actionSpan.addClass('glyphicon glyphicon-envelope');
                             }
@@ -270,7 +270,7 @@
                     fnDrawCallback: function () {
 
                     //handle uploadInvoiceButton
-                        $('#uploadInvoice').click(function (e) {
+                        $('.uploadInvoice').click(function (e) {
                             let modalContent = $('#' + modalIdString + ' .modal-content');
                             setModalSize(modalIdString, 2);
                             clearModalContent(modalContent);
@@ -315,10 +315,14 @@
 
                             myModal.modal('show');
                         });
-
+                        //set zero actualCampaignID
+                        $('#myModal').on('hidden.bs.modal',function(){
+                            actualCampaignID = 0;
+                        });
                         //handle sendInvoiceButton
-                        $('#sendInvoice').click(function (e) {
+                        $('.sendInvoice').click(function (e) {
                             let hotelId = $(e.target).data('client_id');
+                            actualCampaignID =  $(e.target).data('campaign_id');
                             getHotelInfoAjax(hotelId).then(function (data) {
                                 let modalContent = $('#' + modalIdString + ' .modal-content');
                                 setModalSize(modalIdString, 3);
@@ -351,15 +355,14 @@
                                     sendButton.prop('disabled',true);
                                 }else{
                                     if(!(data.payment_mail  == null || data.payment_mail == '')) {
-                                        let option = $(document.createElement('option')).val(1).text(data.payment_mail);
+                                        let option = $(document.createElement('option')).val(data.payment_mail).text(data.payment_mail);
                                         option.attr('data-subtext', 'Mail płatności');
                                         contactsSelect.append(option);
                                         contactsSelect.val(1);
                                     }
                                     if(!(data.payment_mail  == null || data.payment_mail == '')) {
-                                        let option = $(document.createElement('option')).val(2).text(data.payment_mail);
+                                        let option = $(document.createElement('option')).val(data.manager_mail).text(data.manager_mail);
                                         option.attr('data-subtext', 'Mail szefa');
-
                                         contactsSelect.append(option);
                                     }
                                     contactsSelect.selectpicker('refresh');
@@ -378,7 +381,7 @@
                                 let messageColumn = $(document.createElement('div')).addClass('col-md-12').append(messageInput);
                                 let row4 = $(document.createElement('div')).addClass('row').append(messageColumn).css('margin-top','1em');
 
-                                let inovoiceColumn = $(document.createElement('div')).addClass('col-md-12').text('Załącznik/faktura: ...');
+                                let inovoiceColumn = $(document.createElement('div')).addClass('col-md-12').text('');
                                 let row5 = $(document.createElement('div')).addClass('row').append(inovoiceColumn).css('margin-top','1em');
 
                                 let modalBody = $(document.createElement('div')).addClass('modal-body')
@@ -493,6 +496,7 @@
                             }
                             if (uploadFiles)
                                 uploadFilesAjax(formData);
+                                invoiceDatatable.ajax.reload();
                         }
                     });
                 }
@@ -500,6 +504,8 @@
 
             function handleSendInvoiceButtonClick(e) {
                 let selectedEmails = $('#emailSelect').val();
+                let messageTitle = $('#messageTitleInput').val();
+                let messageBody = $('#messageTitlemailSelecteInput').val();
                 if(selectedEmails == null){
                     swal('Wybierz adresy mailowe');
                 }else{
@@ -510,10 +516,26 @@
                         showCancelButton: true,
                         type: 'warning'
                     }).then((result) => {
-                        myModal.modal('hide');
+
+                        $.ajax({
+                           type: 'POST',
+                           url: "{{ route('api.sendMailWithInvoice') }}",
+                           headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                           data:{
+                               selectedEmails: selectedEmails,
+                               messageTitle: messageTitle,
+                               messageBody: messageBody,
+                               actualCampaignID: actualCampaignID
+                           },
+                           success: function (response) {
+                               myModal.modal('hide');
+                           } 
+                        });
+
                     });
                 }
             }
+
 
             function handleConfirmPaymentButtonClick(e) {
                 let dateTime = $('#datetimepicker').val();

@@ -20,9 +20,11 @@ use App\PaymentMethod;
 use App\PbxCrmInfo;
 use App\Route;
 use App\RouteInfo;
+use App\User;
 use App\Voivodes;
 use DateTime;
 use function foo\func;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -2679,6 +2681,48 @@ class CrmRouteController extends Controller
         }
     }
 
+    public function invoicesMail(){
+        return view('mail.invoices');
+    }
+    public function sendMailWithInvoice(Request $request){
+        if($request->ajax()){
+            $campaignID =  $request->actualCampaignID;
+            $storageURL = $request->root().'/downloadCampaignInvoicePDF/'.$campaignID;
+            $selectedMail = $request->selectedEmails;
+            $messageTitle = $request->messageTitle;
+            $messageBody  = $request->messageBody;
+            $mail_type = 'invoices';
+            $data['messageBody'] = $messageBody;
+            $accepted_users = collect();
+            foreach($selectedMail as $item){
+                $users = new User();
+                $users->username = $item;
+                $users->first_name = '';
+                $users->last_name = '';
+                $accepted_users->push($users);
+            }
+            $this::sendMail($mail_type,$data,$accepted_users,$messageTitle,$storageURL);
+            return 200;
+        }
+        return 500;
+    }
+    public function sendMail($mail_type,$data,$accepted_users,$mail_title,$storageURL){
+        /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
+        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title,$storageURL)
+        {
+            $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+            foreach($accepted_users as $user) {
+                if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
+                    $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
+                 }
+            }
+            $message->attach($storageURL, array(
+                    'as' => 'faktura.pdf',
+                    'mime' => 'application/pdf')
+            );
+
+        });
+    }
     public function downloadCampaignInvoicePDF($id){
         $clientRouteCampaign = ClientRouteCampaigns::find($id);
         $url = $clientRouteCampaign->invoice_path;
