@@ -1450,7 +1450,6 @@
 
                     appendBasicOption(firstSelect);
                     if(distance === Infinity && intersetion === false) { //every voivodeship and every city
-                        // console.log('tt');
                         @foreach($voivodes as $voivode)
                             var singleVoivode = document.createElement('option');
                             singleVoivode.value = {{$voivode->id}};
@@ -1466,11 +1465,9 @@
                         });
                     }
                     else if((distance === 100 || distance === 30) && intersetion === false) { // adding show in the end
-                        // console.log('jestem gdzie trzeba');
                         showInExtreme(distance, selectedCity, date, secondSelect, firstSelect);
                     }
                     else if((distance === 100 || distance === 30) && intersetion === true) { // adding show between some shows
-                        // console.log('uu');
                         const previousCitySelect = previousBox.querySelector('.citySelect');
                         const previousCityDistance = previousCitySelect.dataset.distance;
                         const previousCityId = getSelectedValue(previousCitySelect);
@@ -2507,8 +2504,6 @@
                             }
                         }
                     }
-
-
                 }
             }
 
@@ -2519,7 +2514,6 @@
                 currentDate = e.target.value;
                 table.ajax.reload();
             });
-
 
         });
 
