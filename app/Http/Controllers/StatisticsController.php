@@ -25,7 +25,7 @@ use App\User;
 class StatisticsController extends Controller
 {
     private $firstJune = '2018-06-01';
-    private $firstAugust = '2018-07-01';
+    private $firstAugust = '2018-08-01';
     // Dane do raportu godzinnego Telemarketing
     private function hourReportTelemarketing()
     {
