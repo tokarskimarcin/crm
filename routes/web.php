@@ -253,6 +253,10 @@ Route::POST('/getCampaignsInvoicesDatatableAjax','CrmRouteController@getCampaign
 Route::POST('/uploadCampaignInvoiceAjax','CrmRouteController@uploadCampaignInvoiceAjax')->name('api.uploadCampaignInvoiceAjax');
 Route::POST('/getClientInfoAjax','CrmRouteController@getClientInfoAjax')->name('api.getClientInfoAjax');
 Route::POST('/confirmPaymentAjax','CrmRouteController@confirmPaymentAjax')->name('api.confirmPaymentAjax');
+Route::post('/getRouteTemplate', 'CrmRouteController@getRouteTemplate')->name('api.getRouteTemplate');
+Route::post('/getVoivodeshipRoundWithDistanceLimit', 'CrmRouteController@getVoivodeshipRoundWithDistanceLimit')->name('api.getVoivodeshipRoundWithDistanceLimit');
+Route::post('/getVoivodeshipRoundWithoutGracePeriodAjax', 'CrmRouteController@getVoivodeshipRoundWithoutGracePeriodAjax')->name('api.getVoivodeshipRoundWithoutGracePeriod');
+Route::post('/allCitiesInGivenVoivodeAjax', 'CrmRouteController@allCitiesInGivenVoivodeAjax')->name('api.allCitiesInGivenVoivodeAjax');
 
 Route::post('/getConfirmHotelInfo','CrmRouteController@getConfirmHotelInfo')->name('api.getConfirmHotelInfo');
 Route::post('/changeConfirmStatus','CrmRouteController@changeConfirmStatus')->name('api.changeConfirmStatus');
@@ -878,6 +882,13 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 //    Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet');
 //    Route::post('/addNewRoute', 'CrmRouteController@addNewRoutePost');
 
+    Route::get('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplateGet');
+    Route::post('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplatePost');
+    Route::get('/assigningRoutesToClients', 'CrmRouteController@assigningRoutesToClientsGet');
+    Route::post('/assigningRoutesToClients', 'CrmRouteController@assigningRoutesToClientsPost');
+    Route::get('/editAssignedRoute/{id}', 'CrmRouteController@editAssignedRouteGet');
+    Route::post('/editAssignedRoute/{id}', 'CrmRouteController@editAssignedRoutePost');
+
     Route::post('/editRoute', 'CrmRouteController@editRoute');
     Route::get('/route/{id}', 'CrmRouteController@routeGet');
 
@@ -965,18 +976,4 @@ Route::post('/addNewCampaigns', 'CampaignsController@addNewCampaignsPost');
 //Skrypty
 Route::get('/autoChangeRouteStatus', 'AutoScriptController@autoChangeRouteStatus');
 
-Route::get('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplateGet');
-Route::post('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplatePost');
-Route::post('/getVoivodeshipRoundWithoutGracePeriodAjax', 'CrmRouteController@getVoivodeshipRoundWithoutGracePeriodAjax')->name('api.getVoivodeshipRoundWithoutGracePeriod');
-Route::post('/allCitiesInGivenVoivodeAjax', 'CrmRouteController@allCitiesInGivenVoivodeAjax')->name('api.allCitiesInGivenVoivodeAjax');
-
 Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clientReport');
-
-Route::get('/assigningRoutesToClients', 'CrmRouteController@assigningRoutesToClientsGet');
-Route::post('/assigningRoutesToClients', 'CrmRouteController@assigningRoutesToClientsPost');
-
-Route::get('/editAssignedRoute/{id}', 'CrmRouteController@editAssignedRouteGet');
-Route::post('/editAssignedRoute/{id}', 'CrmRouteController@editAssignedRoutePost');
-
-Route::post('/getRouteTemplate', 'CrmRouteController@getRouteTemplate')->name('api.getRouteTemplate');
-Route::post('/getVoivodeshipRoundWithDistanceLimit', 'CrmRouteController@getVoivodeshipRoundWithDistanceLimit')->name('api.getVoivodeshipRoundWithDistanceLimit');
