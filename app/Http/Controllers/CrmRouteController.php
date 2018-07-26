@@ -2572,7 +2572,7 @@ class CrmRouteController extends Controller
         if($request->ajax()){
             $campaignID =  $request->actualCampaignID;
             $campaing = ClientRouteCampaigns::find($campaignID);
-            $storageURL = $request->root().'api/getInvoice/'.$campaing->invoice_path;
+            $storageURL = $request->root().'/api/getInvoice/'.$campaing->invoice_path;
             $selectedMail = $request->selectedEmails;
             $messageTitle = $request->messageTitle;
             $messageBody  = $request->messageBody;
