@@ -866,17 +866,17 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::post('/userPrivilages', 'AdminController@userPrivilagesPOST');
 
     /** CRM **/
-    Route::get('/crmRoute_index', 'CrmRouteController@index');
-    Route::post('/crmRoute_index', 'CrmRouteController@indexPost');
-    Route::post('/crmRoute_indexEdit', 'CrmRouteController@indexEditPost');
+//    Route::get('/crmRoute_index', 'CrmRouteController@index');
+//    Route::post('/crmRoute_index', 'CrmRouteController@indexPost');
+//    Route::post('/crmRoute_indexEdit', 'CrmRouteController@indexEditPost');
 
     Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet');
-    Route::get('/specificRouteEdit/{id}', 'CrmRouteController@specificRouteEditGet');
+//    Route::get('/specificRouteEdit/{id}', 'CrmRouteController@specificRouteEditGet');
 
     Route::get('/showClientRoutes', 'CrmRouteController@showClientRoutesGet');
 
-    Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet');
-    Route::post('/addNewRoute', 'CrmRouteController@addNewRoutePost');
+//    Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet');
+//    Route::post('/addNewRoute', 'CrmRouteController@addNewRoutePost');
 
     Route::post('/editRoute', 'CrmRouteController@editRoute');
     Route::get('/route/{id}', 'CrmRouteController@routeGet');
