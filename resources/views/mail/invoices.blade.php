@@ -1,8 +1,6 @@
 <table>
     <tr>
-
-        {{--<td>{{$data['messageBody']}}</td>--}}
-
+        <td>{{$messageBody}}</td>
     </tr>
 
 </table>

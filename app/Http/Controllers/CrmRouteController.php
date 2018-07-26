@@ -2579,7 +2579,9 @@ class CrmRouteController extends Controller
             $messageTitle = $request->messageTitle;
             $messageBody  = $request->messageBody;
             $mail_type = 'invoices';
-            $data['messageBody'] = $messageBody;
+            $data = [
+                'messageBody' => $messageBody
+                ];
             $accepted_users = collect();
             foreach($selectedMail as $item){
                 $users = new User();
