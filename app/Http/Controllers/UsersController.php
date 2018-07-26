@@ -7,6 +7,7 @@ use App\CoachChange;
 use App\CoachHistory;
 use App\Department_info;
 use App\DisableAccountInfo;
+use App\Pbx_report_extension;
 use Exception;
 use App\PrivilageRelation;
 use App\User;
@@ -1272,9 +1273,10 @@ class UsersController extends Controller
                     ['coach_id', '=', $coachId],
                     ['status_work', '=', 1]
                 ])->get();
+
             } catch (Exception $e) {
                 report($e);
-                $error = true;
+                return ['type' => 'warning', 'msg' => 'Coś poszło nie tak, spróbuj później', 'title' => "Nie udało się!"];
             }
 
         } else {
@@ -1285,6 +1287,8 @@ class UsersController extends Controller
         $error = !$this->coachChange($coachId, $newCoachId, $consultantsWithPrevCoach);
 
         if ($request->has('action')) {
+            if ($error)
+                return ['type' => 'warning', 'msg' => 'Coś poszło nie tak, spróbuj później', 'title' => "Nie udało się!"];
             //ponizszy if nie ma znaczenia, to jest tylko flaga oznaczenia wykonania ajax
             if ($request->action == "coachChange") {
                 $log = array(
@@ -1296,9 +1300,6 @@ class UsersController extends Controller
                 return ['type' => 'success', 'msg' => 'Pomyślna zmiana trenera grupy', 'title' => "Udało się!"];
                 }
 
-
-            if ($error)
-                return ['type' => 'warning', 'msg' => 'Coś poszło nie tak, spróbuj później', 'title' => "Nie udało się!"];
 
             return ['type' => 'success', 'msg' => 'Pomyślna zmiana trenera grupy', 'title' => "Udało się!"];
         } else {
@@ -1312,6 +1313,7 @@ class UsersController extends Controller
 
     public function coachChange($coachId, $newCoachId, $consultantsWithPrevCoach)
     {
+        //dd($consultantsWithPrevCoach->pluck('id')->toArray());
         try {
             CoachChange::create([
                 'coach_id' => $newCoachId,
@@ -1328,9 +1330,12 @@ class UsersController extends Controller
                 $consultant->coach_id = $newCoachId;
                 $consultant->save();
             }
+            Pbx_report_extension::where([
+                ['report_date','=',date('Y-m-d')],
+                ['actual_coach_id','=', $coachId]
+            ])->whereIn('user_id',$consultantsWithPrevCoach->pluck('id')->toArray())
+                ->update(['actual_coach_id' => $newCoachId]);
         } catch (Exception $e) {
-            report($e);
-
             return false;
         }
         return true;
@@ -1348,7 +1353,7 @@ class UsersController extends Controller
             $allConsultantsBeforeChange = User::whereIn('id', $allConsultantsIdsWithSelectedCoachingChange)->get();
         } catch (Exception $e) {
             report($e);
-            $error = true;
+            return ['type' => 'warning', 'msg' => 'Coś poszło nie tak, spróbuj później', 'title' => "Nie udało się!"];
         }
 
         $error = !$this->coachChange($coachChange->coach_id,
@@ -1359,6 +1364,8 @@ class UsersController extends Controller
             $coachChange->save();
         }
         if ($request->has('action')) {
+            if ($error)
+                return ['type' => 'warning', 'msg' => 'Coś poszło nie tak, spróbuj później', 'title' => "Nie udało się!"];
             //ponizszy if nie ma znaczenia, to jest tylko flaga oznaczenia wykonania ajax
             if ($request->action == "coachChangeRevert") {
                 $log = array(
@@ -1369,8 +1376,6 @@ class UsersController extends Controller
                 new ActivityRecorder($log,206,4);
                 return ['type' => 'success', 'msg' => 'Pomyślne cofnięcie zmiany', 'title' => "Udało się!"];
             }
-            if ($error)
-                return ['type' => 'warning', 'msg' => 'Coś poszło nie tak, spróbuj później', 'title' => "Nie udało się!"];
             return ['type' => 'success', 'msg' => 'Pomyślne cofnięcie zmiany', 'title' => "Udało się!"];
         } else {
             return Redirect::back();
