@@ -3040,21 +3040,24 @@ public function clientReport(Request $request){
                 $name .= $allCities->where('id', '=', $show->city)->first()->name . ' + ';
                 $dateFlag = $show->date;
 
-                $clientRouteInfo = new ClientRouteInfo();
-                $clientRouteInfo->client_route_id = $clientRoute->id;
-                $clientRouteInfo->city_id = $show->city;
-                $clientRouteInfo->voivode_id = $show->voivode;
-                $clientRouteInfo->date = $show->date;
-                $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
+                for($i = 0; $i < $show->hours; $i++) { // for example if user type 2 hours, method will insert 2 insertions with given row.
+                    $clientRouteInfo = new ClientRouteInfo();
+                    $clientRouteInfo->client_route_id = $clientRoute->id;
+                    $clientRouteInfo->city_id = $show->city;
+                    $clientRouteInfo->voivode_id = $show->voivode;
+                    $clientRouteInfo->date = $show->date;
+                    $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
 
-                $dateArr = explode('-', $show->date);
-                $day = $dateArr[2]; $month = $dateArr[1]; $year = $dateArr[0];
-                $date = mktime(0, 0, 0, $month, $day, $year);
-                $weekOfYear = date('W',$date);
+                    $dateArr = explode('-', $show->date);
+                    $day = $dateArr[2]; $month = $dateArr[1]; $year = $dateArr[0];
+                    $date = mktime(0, 0, 0, $month, $day, $year);
+                    $weekOfYear = date('W',$date);
 
-                $clientRouteInfo->weekOfYear = $weekOfYear;
-                $clientRouteInfo->checkbox = $show->checkbox;
-                $clientRouteInfo->save();
+                    $clientRouteInfo->weekOfYear = $weekOfYear;
+                    $clientRouteInfo->checkbox = $show->checkbox;
+                    $clientRouteInfo->save();
+                }
+
             }
 
             $name = substr($name, 0,strlen($name) - 3); // removing last + in name
@@ -3083,6 +3086,16 @@ public function clientReport(Request $request){
             ->with('voivodes', $voivodes)
             ->with('lastWeek', $numberOfLastYearsWeek)
             ->with('today', $today);
+    }
+
+    public function editAssignedRouteGet($id) {
+        $client_route = ClientRoute::where('id', '=', $id)->first();
+//        dd($client_route);
+        $client_route_info = ClientRouteInfo::select('client_route_info.city_id as cityId', 'client_route_info.voivode_id as voivodeId', '')
+        ->where('client_route_id', '=', $id)->get();
+        dd($client_route_info);
+
+        return view('crmRoute.editAssignedRoute');
     }
 
 

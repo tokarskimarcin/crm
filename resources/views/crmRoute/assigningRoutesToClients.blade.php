@@ -2192,7 +2192,7 @@
                         finalForm.setAttribute('action', "{{URL::to('/assigningRoutesToClients')}}");
                         finalForm.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="alldata" value=' + JSONData + '> <input type="hidden" name="clientInfo" value=' + JSONClientInfo + '>';
                         submitPlace.appendChild(finalForm);
-                        // finalForm.submit();
+                        finalForm.submit();
                     }
                     else {
                         notify('Wypełnij wszystkie pola');
