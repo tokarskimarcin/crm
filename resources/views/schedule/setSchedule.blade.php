@@ -403,7 +403,7 @@ function getStartAndEndDate($week, $year) {
                                     } else {
                                         $('#show_week_grafik_send').trigger('click');
                                     }});
-                        }show
+                        }
                     });
                 }else {
                     if(time == false)
