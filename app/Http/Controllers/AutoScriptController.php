@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\ClientRoute;
+use App\ClientRouteCampaigns;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AutoScriptController extends Controller
 {
