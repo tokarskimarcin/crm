@@ -528,7 +528,7 @@
                                actualCampaignID: actualCampaignID
                            },
                            success: function (response) {
-                               console.log(response);
+                               invoiceDatatable.ajax.reload();
                                myModal.modal('hide');
                            } 
                         });
