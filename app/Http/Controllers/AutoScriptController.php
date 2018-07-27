@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\ClientRoute;
+use App\ClientRouteCampaigns;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AutoScriptController extends Controller
 {
@@ -15,5 +17,23 @@ class AutoScriptController extends Controller
         ->where('client_route.status','=','1')
         ->where('client_route_info.date','<=',$toDay)
         ->update(['client_route.status' => 2]);
+    }
+    //Auto invoice penalty
+    public function checkPenatly(){
+        $allSendInvoice = ClientRouteCampaigns::
+            select(DB::raw('
+                    id,
+                    TIME_TO_SEC( TIMEDIFF ( now(), invoice_send_date) ) as waitSeconds
+                '))
+                ->where('invoice_status_id','=',3)
+                ->get();
+        foreach ($allSendInvoice as $item){
+            if($item->waitSeconds > 172800){
+                $waitSeconds = $item->waitSeconds - 172800;
+                $penalty = intval($waitSeconds/86400) * 50;
+                $item->penalty = $penalty;
+                $item->save();
+            }
+        }
     }
 }
