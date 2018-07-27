@@ -84,7 +84,6 @@
 @endsection
 
 @section('script')
-    <script src="https://cdnjs.com/libraries/pdf.js"></script>
     <script>
         $(document).ready(() => {
             let clientSelect = $('#clientSelect');
@@ -193,12 +192,12 @@
                     {
                         data: function (data, type, val) {
                             let divPenalty = $(document.createElement('div')).text(data.penalty + ' zł');
-                            if(data.penalty < 0 ){
+                            if(data.penalty > 0 ){
                                 divPenalty.css('color','red');
                                 divPenalty.css('font-weight', 'bold');
                             }
                             return divPenalty.prop('outerHTML');
-                        }, name: 'penalty'
+                        }, name: 'penalty',className:'penaltyCoast'
                     },
                     {
                         data: function (data, type, val) {
@@ -250,7 +249,7 @@
                             }
                             if (data.invoice_status_id == 3) {
                                // actionButton.addClass('btn-success');
-                                actionButton.attr('id', 'confirmPayment');
+                                actionButton.addClass('confirmPayment');
                                 actionSpan.addClass('glyphicon glyphicon-unchecked');
                                 actionButton.text(' Potwierdź zapłatę');
                             }
@@ -395,8 +394,9 @@
                             });
                         });
 
-                        $('#confirmPayment').click(function (e) {
+                        $('.confirmPayment').click(function (e) {
                             let modalContent = $('#' + modalIdString + ' .modal-content');
+                            let campaignID =  $(e.target).data('campaign_id');
                             setModalSize(modalIdString, 2);
                             clearModalContent(modalContent);
 
@@ -414,7 +414,15 @@
                             let formGroup = $(document.createElement('div')).addClass('form-group').append(inputGroupDate);
                             let dateTimeColumn = $(document.createElement('div')).addClass('col-md-12').append(dateTimeLabel).append(formGroup);
                             let row1 = $(document.createElement('div')).addClass('row').append(dateTimeColumn).css('margin-top','1em');
-
+                            let penalty = $(this).closest('tr').find('.penaltyCoast').text().split(" ");
+                            penalty = parseInt(penalty[0]);
+                            let row2 = '';
+                            if(penalty > 0){
+                                let penaltyLabel = $(document.createElement('label')).text('Naliczono karę na kworę');
+                                let penaltyInput = $(document.createElement('input')).addClass('form-control').attr('id','penaltyInput').attr('type','number').attr('value',penalty);
+                                let inputPenaltyGroup = $(document.createElement('div')).addClass('col-md-12').append(penaltyLabel).append(penaltyInput);
+                                 row2 = $(document.createElement('div')).addClass('row').append(inputPenaltyGroup).css('margin-top','1em');
+                            }
 
                             let confirmSpan = $(document.createElement('span')).addClass('glyphicon glyphicon-check');
                             let confirmButton = $(document.createElement('button')).addClass('btn btn-block btn-info')
@@ -427,6 +435,7 @@
                             let modalBody = $(document.createElement('div')).addClass('modal-body')
                                 .append(getCampaignInfoRow(e))
                                 .append(row1)
+                                .append(row2)
                                 .append(buttonRow);
                             modalContent.prepend(modalBody).prepend(modalHeader);
                             //--------- end creating modal content -------------//
@@ -528,7 +537,7 @@
                                actualCampaignID: actualCampaignID
                            },
                            success: function (response) {
-                               console.log(response);
+                               invoiceDatatable.ajax.reload();
                                myModal.modal('hide');
                            } 
                         });
@@ -540,6 +549,9 @@
 
             function handleConfirmPaymentButtonClick(e) {
                 let dateTime = $('#datetimepicker').val();
+                let penalty = $('#penaltyInput').val();
+                if(penalty == undefined)
+                    penalty = 0;
                 if(dateTime==""){
                     swal('Podaj czas opłacenia faktury');
                 }else{
@@ -552,7 +564,7 @@
                         showCancelButton: true,
                         type: 'warning'
                     }).then((result) => {
-                        confirmPaymentAjax(button.data('campaign_id'), dateTime)
+                        confirmPaymentAjax(button.data('campaign_id'), dateTime,penalty)
                             .then(function (result) {
                                 myModal.modal('hide');
                                 if(result === 'success'){
@@ -680,7 +692,7 @@
             });
         }
 
-        function confirmPaymentAjax(campaignId, dateTime){
+        function confirmPaymentAjax(campaignId, dateTime, penalty){
             return $.ajax({
                 type: "POST",
                 url: "{{route('api.confirmPaymentAjax')}}",
@@ -689,7 +701,8 @@
                 },
                 data: {
                     campaignId: campaignId,
-                    dateTime: dateTime
+                    dateTime: dateTime,
+                    penalty : penalty
                 }
             }).done((response)=>{
                 return response;

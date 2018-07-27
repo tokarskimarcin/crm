@@ -981,5 +981,6 @@ Route::get('/autoConsultantsLoginsChecking', 'StatisticsController@MailAutoConsu
 
 Route::get('/autoConsultantsLoginsCheckingGet', 'StatisticsController@autoConsultantsLoginsCheckingGet');
 Route::get('/autoConsultantsLoginsBlockedGet', 'StatisticsController@autoConsultantsLoginsBlockedGet');
+Route::get('/checkPenatly', 'AutoScriptController@checkPenatly');
 
 Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clientReport');
