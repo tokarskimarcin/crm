@@ -2707,7 +2707,7 @@ class CrmRouteController extends Controller
                 $accepted_users->push($users);
             }
             $this::sendMail($mail_type,$data,$accepted_users,$messageTitle,$storageURL);
-            $campaing->invoice_status = 3;
+            $campaing->invoice_status_id = 3;
             $campaing->invoice_send_date = date('Y-m-d G:i');
             $campaing->save();
             return 200;
