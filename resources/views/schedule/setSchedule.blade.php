@@ -18,6 +18,9 @@
     .reason{
         width: 70px;
     }
+    .reason > *{
+        width: 100% !important;
+    }
 </style>
 <?php
 
