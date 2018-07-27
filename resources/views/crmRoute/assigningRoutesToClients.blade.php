@@ -161,7 +161,7 @@
                                             <th>Nazwa</th>
                                             <th>Priorytet</th>
                                             <th>Typ</th>
-                                            <th style="text-align: center">Akcja</th>
+                                            <th style="text-align: center;">Akcja</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -202,7 +202,7 @@
                         <div class="client-container">
                             <div class="alert alert-info">
                                 Wybierz szablon trasy z listy. Jeśli nie ma odpowiedniej trasy na liście, stwórz ją
-                                naciskając na przycisk <strong>Dodaj trasę ręcznie</strong> </br>
+                                naciskając na przycisk <strong>Dodaj trasę ręcznie</strong> <br>
                                 Wiersze pokolorowane na czerwono wskazują na szablon trasy, w którym co najmniej 1
                                 miasto przekroczyło karencję, względem
                                 daty pierwszego pokazu.
@@ -283,43 +283,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
-
-
-        let saveClientClicked = false;
-
-        function activateDatepicker() {
-            $('.form_date').datetimepicker({
-                language: 'pl',
-                autoclose: 1,
-                minView: 2,
-                calendarWeeks: 'true',
-                pickTime: false
-            });
-        }
-
-        let editFlag = false;
-        let saveButton = document.querySelector('#saveClient');
-
-        /**
-         * This function shows notification.
-         */
-        function notify(htmltext$string, type$string = info, delay$miliseconds$number = 5000) {
-            $.notify({
-                // options
-                message: htmltext$string
-            }, {
-                // settings
-                type: type$string,
-                delay: delay$miliseconds$number,
-                animate: {
-                    enter: 'animated fadeInRight',
-                    exit: 'animated fadeOutRight'
-                }
-            });
-        }
-
-        activateDatepicker();
-
         $(document).ready(function () {
 
             let globalDateIndicator = null;
@@ -334,16 +297,9 @@
                 });
             }
 
-            let modalTitle = document.querySelector('#modal_title');
+            activateDatepicker();
 
             $('#client_choice_type').attr('disabled', true).val(0);
-            $('.city').select2();
-            $('.voivodeship').select2();
-            $('.voivodeship').off('select2:select'); //remove previous event listeners
-            $('.voivodeship').on('select2:select', function (e) {
-                getCitiesNameFromAjax(e); // Pobranie Miast bez ograniczenia 100KM
-            });
-
 
             let today = new Date();
             let dd = today.getDate();
@@ -374,7 +330,7 @@
             const lastWeekOfYear ={{$lastWeek}};
             const weekSelect = document.querySelector('#weekNumber');
             if (weekSelect) {
-                for (var i = 1; i <= lastWeekOfYear; i++) {
+                for (let i = 1; i <= lastWeekOfYear; i++) {
                     let optionElement = document.createElement('option');
                     optionElement.value = i;
                     optionElement.innerHTML = `${i}`;
@@ -382,8 +338,6 @@
                 }
             }
 
-
-            let iterator = 1;
             let mainContainer = document.querySelector('.routes-wrapper'); //zaznaczamy główny container
             let route_id = 0;
             let client_id = 0;
@@ -393,10 +347,10 @@
             let finalClientId = null; //This variable is needed for form submit
 
             function writeCheckedClientInfo() {
-                tr_line = document.getElementsByClassName('check')[0];
-                var tr_line_name = tr_line.getElementsByClassName('client_name')[0].textContent;
-                var tr_line_phone = tr_line.getElementsByClassName('client_priority')[0].textContent;
-                var tr_line_type = tr_line.getElementsByClassName('client_type')[0].textContent;
+                let tr_line = document.getElementsByClassName('check')[0];
+                let tr_line_name = tr_line.getElementsByClassName('client_name')[0].textContent;
+                let tr_line_phone = tr_line.getElementsByClassName('client_priority')[0].textContent;
+                let tr_line_type = tr_line.getElementsByClassName('client_type')[0].textContent;
                 document.getElementById('client_choice_name').textContent = tr_line_name;
                 document.getElementById('client_choice_priority').textContent = tr_line_phone;
 
@@ -418,7 +372,7 @@
             }
 
 
-                table_client = $('#table_client').DataTable({
+                let table_client = $('#table_client').DataTable({
                 "autoWidth": true,
                 scrollY: '40vh',
                 "processing": true,
@@ -491,9 +445,8 @@
 
 //*********************START ROUTE(ROUND) SECTON***************************
 
-            let addNewRouteButton = document.getElementById('add-new-route');
             // Tabela zawierająca szablony tras
-            table = $('#datatable').DataTable({
+            let table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,
                 "serverSide": true,
@@ -675,7 +628,7 @@
 
 
                                     }
-
+                                notify('Szablon trasy został w pełni załadowany!');
                                 }
 
                             })
@@ -899,8 +852,11 @@
                             }
                             else {
                                 responseOption.textContent = response[i].name;
-                                if (response[i].max_hour > 0) {
+                                if (response[i].max_hour >= 0) {
                                     responseOption.setAttribute('data-max_hours', `${response[i].max_hour}`); //needed for auto setting hours
+                                }
+                                else {
+                                    responseOption.setAttribute('data-max_hours', `3`); //needed for auto setting hours
                                 }
                             }
                             placeToAppend.appendChild(responseOption);
@@ -1070,8 +1026,14 @@
                     }
                 }
                 else {
-                    cityOpt.setAttribute('data-max_hours', `${data.max_hour}`);
+                    if(data.max_hour >= 0) {
+                        cityOpt.setAttribute('data-max_hours', `${data.max_hour}`);
+                    }
+                    else {
+                        cityOpt.setAttribute('data-max_hours', `3`);
+                    }
                 }
+
 
                 element.appendChild(cityOpt);
             }
@@ -1316,8 +1278,7 @@
                     month = '0' + month;
                 }
 
-                let correctDate = year + '-' + month + '-' + day;
-                return correctDate;
+                return (year + '-' + month + '-' + day);
             }
 
             /**
@@ -2101,24 +2062,7 @@
                     const lastShowContainerInsideLastDay = allSingleShowContainersInsideLastDayContainer[allSingleShowContainersInsideLastDayContainer.length - 1];
                     const isChecked = lastShowContainerInsideLastDay.querySelector('.distance-checkbox').checked;
 
-                    // let userDate = $('#date').val();
-                    //
-                    // let firstShowDate = new Date(userDate)
-                    // firstShowDate.setDate(firstShowDate.getDate() + allDayContainers.length);
-                    // let day = firstShowDate.getDate();
-                    // let month = firstShowDate.getMonth() + 1; //January is 0!
-                    //
-                    // let year = firstShowDate.getFullYear();
-                    // if (day < 10) {
-                    //     day = '0' + day;
-                    // }
-                    // if (month < 10) {
-                    //     month = '0' + month;
-                    // }
-                    //
-                    // let correctDate = year + '-' + month + '-' + day;
                     let correctDate = getCorrectDate(allDayContainers.length);
-
 
                     let validate = validateForm(allSingleShowContainers[allSingleShowContainers.length - 1]);
 
@@ -2127,7 +2071,7 @@
                         firstForm.addRemoveShowButton();
                         firstForm.addDistanceCheckbox();
                         firstForm.addNewShowButton();
-                        lastDayContainer.insertAdjacentElement("afterend", firstDayContainer);
+                        lastDayContainer.insertAdjacentElement("afterend", firstDayContainer).scrollIntoView({behavior: "smooth"});
                         if(isChecked) { // case when last single show container has checked checkbox;
                             firstForm.createDOMBox(correctDate);
                         }
@@ -2140,7 +2084,7 @@
 
                         }
                         let firstFormDOM = firstForm.getForm();
-                        firstDayContainer.appendChild(firstFormDOM);
+                        firstDayContainer.appendChild(firstFormDOM).scrollIntoView({behavior: "smooth"});
                     }
                     else {
                         notify('Uzupełnij miasto');
@@ -2154,7 +2098,7 @@
                     let firstDay = new DayBox();
                     firstDay.createDOMDayBox();
                     let firstDayContainer = firstDay.getBox();
-                    placeToAppend.insertAdjacentElement("afterbegin", firstDayContainer);
+                    placeToAppend.insertAdjacentElement("afterbegin", firstDayContainer).scrollIntoView({behavior: "smooth"});
 
                     if(document.getElementsByClassName('singleDayContainer')) {
                         let allDayContainers = document.getElementsByClassName('singleDayContainer');
@@ -2163,7 +2107,7 @@
                             buttonSection.appendAddNewDayButton();
                             // buttonSection.appendSaveButton();
                             let elButtonSection = buttonSection.getBox();
-                            placeToAppend.insertAdjacentElement('beforeend', elButtonSection);
+                            placeToAppend.insertAdjacentElement('beforeend', elButtonSection).scrollIntoView({behavior: "smooth"});
                         }
                     }
                     else {
@@ -2172,25 +2116,9 @@
                         // buttonSection.appendSaveButton();
                         let elButtonSection = buttonSection.getBox();
                         // console.log(elButtonSection);
-                        placeToAppend.insertAdjacentElement('afterend', elButtonSection);
+                        placeToAppend.insertAdjacentElement('afterend', elButtonSection).scrollIntoView({behavior: "smooth"});
                     }
 
-                    // let userDate = $('#date').val();
-                    //
-                    // let firstShowDate = new Date(userDate)
-                    // firstShowDate.setDate(firstShowDate.getDate());
-                    // let day = firstShowDate.getDate();
-                    // let month = firstShowDate.getMonth() + 1; //January is 0!
-                    //
-                    // let year = firstShowDate.getFullYear();
-                    // if (day < 10) {
-                    //     day = '0' + day;
-                    // }
-                    // if (month < 10) {
-                    //     month = '0' + month;
-                    // }
-                    //
-                    // let correctDate = year + '-' + month + '-' + day;
                     let correctDate = getCorrectDate();
 
                     let firstForm = new ShowBox();
@@ -2200,7 +2128,7 @@
                     firstForm.createDOMBox(correctDate);
                     let firstFormDOM = firstForm.getForm();
 
-                    firstDayContainer.appendChild(firstFormDOM);
+                    firstDayContainer.appendChild(firstFormDOM).scrollIntoView({behavior: "smooth"});
                 }
                 else if(e.target.matches('#save')) {
                     let submitPlace = document.querySelector('.client-container');
@@ -2228,7 +2156,8 @@
                             let fullDate = allSingleDayContainers[i].querySelector('.day-info').textContent;
                             let date = fullDate.substr(6);
 
-                            singleShowContainersInsideGivenDay.forEach(show => {
+
+                            singleShowContainersInsideGivenDay.forEach((show, index) => {
                                 let voivodeSelect = show.querySelector('.voivodeSelect');
                                 let voivodeId = getSelectedValue(voivodeSelect);
 
@@ -2242,6 +2171,7 @@
                                 let hourNumber = hourElement.value;
 
                                 let info = {
+                                    order: index,
                                     date: date,
                                     hours: hourNumber,
                                     voivode: voivodeId,
@@ -2258,6 +2188,7 @@
                         finalForm.setAttribute('action', "{{URL::to('/assigningRoutesToClients')}}");
                         finalForm.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="alldata" value=' + JSONData + '> <input type="hidden" name="clientInfo" value=' + JSONClientInfo + '>';
                         submitPlace.appendChild(finalForm);
+                        console.log(finalArray);
                         finalForm.submit();
                     }
                     else {
