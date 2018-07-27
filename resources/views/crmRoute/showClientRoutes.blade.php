@@ -97,8 +97,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <button id="addNewClientRoute" class="btn btn-info"
-                                    style="margin-bottom: 1em; font-weight: bold;">Przejdź do przypisywania tras
-                                klientom
+                                    style="margin-bottom: 1em; font-weight: bold;">Przejdź do przypisywania tras klientom
                             </button>
                         </div>
                     </div>
@@ -425,7 +424,7 @@
             //this part is responsible for redirect button
             const addNewClientRouteInput = $('#addNewClientRoute');
             addNewClientRouteInput.click((e) => {
-                window.location.href = '{{URL::to('/crmRoute_index')}}';
+                window.location.href = '{{URL::to('/assigningRoutesToClients')}}';
             });
 
             const showOnlyAssignedInput = $('#showOnlyAssigned');
@@ -706,7 +705,7 @@
                         "data": function (data, type, dataToSet) {
                             disabledOption = '';
                             if(!data.hotelOrHour){
-                                disabledOption = 'disabled';
+                                disabledOption = '';
                             }
                             option1 = '<option value="0" '+disabledOption+' >Niegotowa</option>\n';
                             option2 = '<option value="1" '+disabledOption+'>Aktywna</option>\n';
@@ -725,7 +724,7 @@
                             }else {
                                 option3 = '<option value="2" selected="selected" '+disabledOption+'>Zakończona</option>\n';
                                 color = 'deactivated';
-                                type = 'disabled';
+                                type = '';
                             }
                             select  ='<select class="form-control '+ color+'" data-status="'+data.status+'" data-clientRouteId="'+ data.client_route_id+'" '+type+'>' +
                                 option1 +
@@ -757,7 +756,7 @@
                         "data": function (data, type, dataToSet) {
                             if(data.status == 2)
                                 type = 'disabled';
-                            return '<a href="{{URL::to("/specificRouteEdit")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block" data-type="2" '+type+'><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
+                            return '<a href="{{URL::to("/editAssignedRoute")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block" data-type="2" '+type+'><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
                         }, "name": "link", width: '10%', searchable: false, orderable: false
                     },
                     {
