@@ -705,7 +705,7 @@
                         "data": function (data, type, dataToSet) {
                             disabledOption = '';
                             if(!data.hotelOrHour){
-                                disabledOption = 'disabled';
+                                disabledOption = '';
                             }
                             option1 = '<option value="0" '+disabledOption+' >Niegotowa</option>\n';
                             option2 = '<option value="1" '+disabledOption+'>Aktywna</option>\n';
@@ -724,7 +724,7 @@
                             }else {
                                 option3 = '<option value="2" selected="selected" '+disabledOption+'>Zakończona</option>\n';
                                 color = 'deactivated';
-                                type = 'disabled';
+                                type = '';
                             }
                             select  ='<select class="form-control '+ color+'" data-status="'+data.status+'" data-clientRouteId="'+ data.client_route_id+'" '+type+'>' +
                                 option1 +
