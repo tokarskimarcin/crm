@@ -2710,6 +2710,7 @@ class CrmRouteController extends Controller
             $campaing->invoice_status_id = 3;
             $campaing->invoice_send_date = date('Y-m-d G:i');
             $campaing->save();
+            new ActivityRecorder(array_merge(['T'=>'Wysłanie faktury mailem'],$campaing->toArray()),225, 2);
             return 200;
         }
         return 500;
@@ -2842,6 +2843,7 @@ class CrmRouteController extends Controller
                 $clientRouteCampaign->invoice_payment_date = $date;
                 $clientRouteCampaign->invoice_status_id = 4;
                 $clientRouteCampaign->save();
+                new ActivityRecorder(array_merge(['T'=>'Akceptacja zapłacenia fakury'],$clientRouteCampaign->toArray()),225, 2);
                 return 'success';
             }
             return 'error';
