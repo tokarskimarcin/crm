@@ -296,6 +296,7 @@ class CrmRouteController extends Controller
     public function addNewRouteTemplatePost(Request $request) {
         if($request->has('alldata')) {
             $allData = json_decode($request->alldata);
+            $allData = array_reverse($allData);
             $routes = new Route();
             $routes->status = 1;
             $routes->save();
@@ -303,13 +304,16 @@ class CrmRouteController extends Controller
             $allCities = Cities::select('id','name')->get();
 
             $dayFlag = $allData[0]->day;
-            $name = '';
+
+            $reverseNameArr = [];
 
             forEach($allData as $record) {
+                $name = '';
+                $name .=  $allCities->where('id', '=', $record->city)->first()->name . ' + ';
                 if($record->day != $dayFlag) {
-                    $name = substr($name, 0,strlen($name) - 3) .  ' | ';
+                    $name = substr($name, 0,strlen($name) - 3) . ' | ';
                 }
-                $name .= $allCities->where('id', '=', $record->city)->first()->name . ' + ';
+                array_push($reverseNameArr, $name);
                 $dayFlag = $record->day;
 
                 $routes_info = new RouteInfo();
@@ -322,8 +326,17 @@ class CrmRouteController extends Controller
                 $routes_info->save();
             }
 
-            $name = substr($name, 0,strlen($name) - 3); // removing last + in name
-            $routes->name = $name;
+
+            $fullName = '';
+            $nameArr = array_reverse($reverseNameArr);
+
+            foreach($nameArr as $key => $value) {
+                $fullName .= $value;
+            }
+
+            $fullName = substr($fullName, 0,strlen($fullName) - 3); // removing last | in name
+
+            $routes->name = $fullName;
             $routes->save();
             $request->session()->flash('adnotation', 'Szablon trasy został dodany pomyślnie!');
         }
@@ -334,11 +347,85 @@ class CrmRouteController extends Controller
     }
 
     /**
+     * This method return view editRouteTemplates
+     */
+    public function editRouteTemplatesGet($id) {
+        $voivodes = Voivodes::all();
+        if(isset($id) && $id > 0) {
+            $route = $this::prepareRouteTemplate($id);
+        }
+
+        return view('crmRoute.editRouteTemplates')
+            ->with('voivodes', $voivodes)
+            ->with('routeTemplate', $route);
+    }
+
+    public function editRouteTemplatesPost($id, Request $request) {
+        if($request->has('alldata')) {
+            $allData = json_decode($request->alldata);
+
+            $allData = array_reverse($allData);
+            $routes = new Route();
+            $routes->status = 1;
+            $routes->save();
+
+            $allCities = Cities::select('id','name')->get();
+
+            $dayFlag = $allData[0]->day;
+            $reverseNameArr = [];
+
+
+            forEach($allData as $record) {
+                $name = '';
+                $name .=  $allCities->where('id', '=', $record->city)->first()->name . ' + ';
+                if($record->day != $dayFlag) {
+                    $name = substr($name, 0,strlen($name) - 3) . ' | ';
+                }
+                array_push($reverseNameArr, $name);
+                $dayFlag = $record->day;
+
+                $routes_info = new RouteInfo();
+                $routes_info->routes_id = $routes->id;
+                $routes_info->voivodeship_id = $record->voivode;
+                $routes_info->city_id = $record->city;
+                $routes_info->status = 1;
+                $routes_info->day = $record->day;
+                $routes_info->checkbox = $record->checkbox;
+                $routes_info->save();
+            }
+
+
+            $fullName = '';
+            $nameArr = array_reverse($reverseNameArr);
+
+            foreach($nameArr as $key => $value) {
+                $fullName .= $value;
+            }
+
+            $fullName = substr($fullName, 0,strlen($fullName) - 3); // removing last | in name
+
+            $routes->name = $fullName;
+            $routes->save();
+            $request->session()->flash('adnotation', 'Szablon trasy został dodany pomyślnie!');
+
+        }
+
+        //changing status to inactive for old records
+        RouteInfo::where('routes_id', '=', $id)->update(['status' => 0]);
+        Route::where('id', '=', $id)->update(['status' => 0]);
+
+        $redirectRoute = 'editRouteTemplates/' . $routes->id;
+
+        return Redirect::to($redirectRoute);
+    }
+
+    /**
      * This method saves new routes connected with client
      */
     public function assigningRoutesToClientsPost(Request $request) {
         if($request->has('alldata') && $request->has('clientInfo')) {
             $allData = json_decode($request->alldata);
+            $allData = array_reverse($allData);
             $clientInfo = json_decode($request->clientInfo);
 
             $clientType = $clientInfo->clientType; // 1 - badania, 2 - wysyłka
@@ -357,23 +444,27 @@ class CrmRouteController extends Controller
             $dateFlag = $allData[0]->date;
             $name = '';
             $allCities = Cities::select('id','name')->get();
+            $reverseNameArr = [];
 
             foreach($allData as $show) {
+                $name = '';
+                $name .=  $allCities->where('id', '=', $show->city)->first()->name . ' + ';
                 if($show->date != $dateFlag) {
-                    $name = substr($name, 0,strlen($name) - 3) .  ' | ';
+                    $name = substr($name, 0,strlen($name) - 3) . ' | ';
                 }
-                $name .= $allCities->where('id', '=', $show->city)->first()->name . ' + ';
+                array_push($reverseNameArr, $name);
                 $dateFlag = $show->date;
 
                 $clientRouteCampaigns = new ClientRouteCampaigns();
 
-                for($i = 0; $i < $show->hours; $i++) { // for example if user type 2 hours, method will insert 2 insertions with given row.
+                for($i = $show->hours - 1; $i >= 0; $i--) { // for example if user type 2 hours, method will insert 2 insertions with given row.
                     $clientRouteInfo = new ClientRouteInfo();
                     $clientRouteInfo->client_route_id = $clientRoute->id;
                     $clientRouteInfo->city_id = $show->city;
                     $clientRouteInfo->voivode_id = $show->voivode;
                     $clientRouteInfo->date = $show->date;
                     $clientRouteInfo->status = 1;
+                    $clientRouteInfo->order = $show->order;
                     $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
 
                     $dateArr = explode('-', $show->date);
@@ -385,21 +476,26 @@ class CrmRouteController extends Controller
                     $clientRouteInfo->checkbox = $show->checkbox;
                     $clientRouteInfo->save();
 
-                    if($i == 0) {
+                    if($i == $show->hours - 1) {
                         $clientRouteCampaigns->client_route_info_id = $clientRouteInfo->id;
                         $clientRouteCampaigns->save();
                     }
                 }
-
             }
 
-            $name = substr($name, 0,strlen($name) - 3); // removing last + in name
-            $clientRoute->route_name = $name;
+            $fullName = '';
+            $nameArr = array_reverse($reverseNameArr);
+
+            foreach($nameArr as $key => $value) {
+                $fullName .= $value;
+            }
+
+            $fullName = substr($fullName, 0,strlen($fullName) - 3); // removing last | in name
+            $clientRoute->route_name = $fullName;
             $clientRoute->save();
 
             new ActivityRecorder(array_merge(['T'=>'Dodanie trasy dla klienta'],$clientRoute->toArray()),209,1);
             $request->session()->flash('adnotation', 'Trasa została pomyślnie przypisana dla klienta');
-
         }
         else {
             $request->session()->flash('adnotation', 'Błąd, trasa nie została przypisana do klienta');
@@ -439,8 +535,11 @@ class CrmRouteController extends Controller
             ->where('client_route_id', '=', $id)
             ->where('status', '=', 1)
             ->groupBy('date', 'client_route_info.city_id')
-            ->orderBy('date', 'id')
+            ->orderBy('date')
+            ->orderBy('order')
             ->get();
+
+//        dd($client_route_info);
 
         return view('crmRoute.editAssignedRoute')
             ->with('voivodes', $voivodes)
@@ -451,10 +550,12 @@ class CrmRouteController extends Controller
     public function editAssignedRoutePost($id, Request $request) {
         if($request->has('alldata') && $request->has('clientInfo')) {
             $allData = json_decode($request->alldata);
+            $allData = array_reverse($allData);
             $clientInfo = json_decode($request->clientInfo);
 
             $client_route_info = ClientRouteInfo::select(DB::raw(
                 'client_route_info.city_id as cityId,
+                client_route_info.id as id,
                  COUNT(*) as hours,
                  client_route_info.voivode_id as voivodeId,
                  client_route_info.checkbox as checkbox,
@@ -477,12 +578,14 @@ class CrmRouteController extends Controller
                 foreach($allData as $show) {
                     if(($item->cityId == $show->city) && ($item->voivodeId == $show->voivode) && ($item->date == $show->date) && ($item->hours == $show->hours)) {
                         $item->toChange = 0;
+                        $thisRecord = ClientRouteInfo::where('id', '=', $item->id)->first(); //we are updating static records about order value
+                        $thisRecord->update(['order' => $show->order]);
+                        $item->order = $show->order;
                         $show->toAdd = 0;
                     }
                 }
                 return $item;
             });
-
 
             $staticRecords = $client_route_info_with_flag->where('toChange', '=', 0);
             //all records which should not be changed at all. (to see, required adding ->get() to variable after foreach)
@@ -504,7 +607,7 @@ class CrmRouteController extends Controller
             foreach($allData as $show) {
                 $clientRouteCampaigns = new ClientRouteCampaigns();
 
-                for($i = 0; $i < $show->hours; $i++) { // for example if user type 2 hours, method will insert 2 insertions with given row.
+                for($i = $show->hours - 1; $i >= 0; $i--) { // for example if user type 2 hours, method will insert 2 insertions with given row.
                     if(!($show->toAdd == 0)) { // only for those, which should be added(without toAdd == 0)
                         $clientRouteInfo = new ClientRouteInfo();
                         $clientRouteInfo->client_route_id = $clientRoute->id;
@@ -512,6 +615,7 @@ class CrmRouteController extends Controller
                         $clientRouteInfo->voivode_id = $show->voivode;
                         $clientRouteInfo->date = $show->date;
                         $clientRouteInfo->status = 1;
+                        $clientRouteInfo->order = $show->order;
                         $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
 
                         $dateArr = explode('-', $show->date);
@@ -523,14 +627,12 @@ class CrmRouteController extends Controller
                         $clientRouteInfo->checkbox = $show->checkbox;
                         $clientRouteInfo->save();
 
-                        if($i == 0) {
+                        if($i == $show->hours - 1) {
                             $clientRouteCampaigns->client_route_info_id = $clientRouteInfo->id;
                             $clientRouteCampaigns->save();
                         }
                     }
-
                 }
-
             }
 
             //this part create route name
@@ -545,6 +647,7 @@ class CrmRouteController extends Controller
                 ->where('status', '=', 1)
                 ->groupBy('date', 'client_route_info.city_id')
                 ->orderBy('date')
+                ->orderBy('order')
                 ->get();
 
             $dateFlag = $client_route_info2[0]->date;
@@ -573,6 +676,16 @@ class CrmRouteController extends Controller
         $posOfId = strpos($idNotTrimmed,'_');
         $id = substr($idNotTrimmed, $posOfId + 1);
 
+        $route = $this::prepareRouteTemplate($id);
+        return $route;
+    }
+
+    /**
+     * @param $id
+     * @return This method return collection of route_info records ready to send to view.
+     */
+    private function prepareRouteTemplate($id) {
+
         $route = RouteInfo::select('voivodeship.id as voivodeId', 'voivodeship.name as voivodeName', 'city.id as cityId', 'city.name as cityName', 'routes_info.day as day', 'routes_info.checkbox')
             ->where([
                 ['routes_id', '=', $id],
@@ -580,7 +693,7 @@ class CrmRouteController extends Controller
             ])
             ->join('city', 'routes_info.city_id', '=', 'city.id')
             ->join('voivodeship', 'routes_info.voivodeship_id', '=', 'voivodeship.id')
-            ->orderBy('routes_info.id', 'routes_info.day')
+            ->orderBy('routes_info.id','routes_info.day')
             ->get();
         return $route;
     }

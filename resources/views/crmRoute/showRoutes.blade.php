@@ -91,7 +91,7 @@
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("route")}}/' + data.id + '" style="text-decoration:none;" class="links"><button class="btn btn-block btn-info"><span class="glyphicon glyphicon-edit"></span> Edycja</button></a>';
+                            return '<a href="{{URL::to("editRouteTemplates")}}/' + data.id + '" style="text-decoration:none;" class="links"><button class="btn btn-block btn-info"><span class="glyphicon glyphicon-edit"></span> Edycja</button></a>';
                         }, "orderable": false, "searchable": false, "width": "20%"
                     }
                 ]

@@ -976,3 +976,6 @@ Route::get('/autoConsultantsLoginsCheckingGet', 'StatisticsController@autoConsul
 Route::get('/autoConsultantsLoginsBlockedGet', 'StatisticsController@autoConsultantsLoginsBlockedGet');
 
 Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clientReport');
+
+Route::get('/editRouteTemplates/{id}', 'CrmRouteController@editRouteTemplatesGet');
+Route::post('/editRouteTemplates/{id}', 'CrmRouteController@editRouteTemplatesPost');

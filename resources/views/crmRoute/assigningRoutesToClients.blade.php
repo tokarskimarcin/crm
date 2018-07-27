@@ -2156,7 +2156,8 @@
                             let fullDate = allSingleDayContainers[i].querySelector('.day-info').textContent;
                             let date = fullDate.substr(6);
 
-                            singleShowContainersInsideGivenDay.forEach(show => {
+
+                            singleShowContainersInsideGivenDay.forEach((show, index) => {
                                 let voivodeSelect = show.querySelector('.voivodeSelect');
                                 let voivodeId = getSelectedValue(voivodeSelect);
 
@@ -2170,6 +2171,7 @@
                                 let hourNumber = hourElement.value;
 
                                 let info = {
+                                    order: index,
                                     date: date,
                                     hours: hourNumber,
                                     voivode: voivodeId,
@@ -2186,6 +2188,7 @@
                         finalForm.setAttribute('action', "{{URL::to('/assigningRoutesToClients')}}");
                         finalForm.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="alldata" value=' + JSONData + '> <input type="hidden" name="clientInfo" value=' + JSONClientInfo + '>';
                         submitPlace.appendChild(finalForm);
+                        console.log(finalArray);
                         finalForm.submit();
                     }
                     else {
