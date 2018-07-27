@@ -902,10 +902,11 @@ $(document).ready(() => {
         if (candidate_phone == '' || (candidate_phone.trim().length == 0)) {
             swal('Podaj telefon kandydata!')
             return false;
-        } else if (isNaN(candidate_phone) || (candidate_phone.length < 9)) {
+        } else if (isNaN(candidate_phone) || (candidate_phone.length != 9) ) {
             swal('Podaj prawidłowy numer telefonu!')
             return false;
         }
+
 
         if (candidate_department == 'Wybierz') {
             swal('Wybierz oddział!')
