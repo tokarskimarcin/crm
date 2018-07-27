@@ -3930,6 +3930,9 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             }
             if($request->day_select > $this->firstAugust){
                 $data = $data->where('actual_coach_id','=',$request->coach_id);
+            }else{
+                $data = $data->where('users.coach_id', '=', $request->coach_id)
+                    ->where('report_date', '=', $request->day_select);
             }
 
             $data = $data->where('report_date', '=', $request->day_select);
