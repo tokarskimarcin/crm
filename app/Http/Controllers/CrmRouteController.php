@@ -325,11 +325,12 @@ class CrmRouteController extends Controller
             $name = substr($name, 0,strlen($name) - 3); // removing last + in name
             $routes->name = $name;
             $routes->save();
-            return Redirect::back();
+            $request->session()->flash('adnotation', 'Szablon trasy został dodany pomyślnie!');
         }
         else {
-            dd(1);
+            $request->session()->flash('adnotation', 'Błąd nie udało się dodać szablonu trasy, spróbuj ponownie!');
         }
+        return Redirect::back();
     }
 
     /**
@@ -427,10 +428,9 @@ class CrmRouteController extends Controller
             ->join('client', 'client_route.client_id', '=', 'client.id')
             ->where('client_route.id', '=', $id)
             ->first();
-//        dd($client_route);
 
         $client_route_info = ClientRouteInfo::select(DB::raw(
-            'client_route_info.city_id as cityId,
+        'client_route_info.city_id as cityId,
          COUNT(*) as hours,
          client_route_info.voivode_id as voivodeId,
          client_route_info.checkbox as checkbox,
@@ -439,7 +439,7 @@ class CrmRouteController extends Controller
             ->where('client_route_id', '=', $id)
             ->where('status', '=', 1)
             ->groupBy('date', 'client_route_info.city_id')
-            ->orderBy('date')
+            ->orderBy('date', 'id')
             ->get();
 
         return view('crmRoute.editAssignedRoute')
@@ -580,7 +580,7 @@ class CrmRouteController extends Controller
             ])
             ->join('city', 'routes_info.city_id', '=', 'city.id')
             ->join('voivodeship', 'routes_info.voivodeship_id', '=', 'voivodeship.id')
-            ->orderBy('routes_info.day')
+            ->orderBy('routes_info.id', 'routes_info.day')
             ->get();
         return $route;
     }

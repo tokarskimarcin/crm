@@ -872,22 +872,15 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::post('/userPrivilages', 'AdminController@userPrivilagesPOST');
 
     /** CRM **/
-//    Route::get('/crmRoute_index', 'CrmRouteController@index');
-//    Route::post('/crmRoute_index', 'CrmRouteController@indexPost');
-//    Route::post('/crmRoute_indexEdit', 'CrmRouteController@indexEditPost');
-
     Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet');
-//    Route::get('/specificRouteEdit/{id}', 'CrmRouteController@specificRouteEditGet');
-
     Route::get('/showClientRoutes', 'CrmRouteController@showClientRoutesGet');
-
-//    Route::get('/addNewRoute', 'CrmRouteController@addNewRouteGet');
-//    Route::post('/addNewRoute', 'CrmRouteController@addNewRoutePost');
 
     Route::get('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplateGet');
     Route::post('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplatePost');
+
     Route::get('/assigningRoutesToClients', 'CrmRouteController@assigningRoutesToClientsGet');
     Route::post('/assigningRoutesToClients', 'CrmRouteController@assigningRoutesToClientsPost');
+
     Route::get('/editAssignedRoute/{id}', 'CrmRouteController@editAssignedRouteGet');
     Route::post('/editAssignedRoute/{id}', 'CrmRouteController@editAssignedRoutePost');
 

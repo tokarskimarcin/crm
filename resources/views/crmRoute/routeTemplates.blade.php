@@ -62,7 +62,11 @@
         </div>
     </div>
 </div>
-
+@if(Session::has('adnotation'))
+    <div class="alert alert-success">
+        {{\Illuminate\Support\Facades\Session::get('adnotation')}}
+    </div>
+@endif
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
@@ -70,7 +74,6 @@
                    Utwórz nową trasę
                 </div>
                 <div class="panel-body">
-
                     <div class="summaryButtonContainer">
                         <div class="row">
                             <div class="col-md-12">
@@ -922,14 +925,14 @@
                         if(isChecked) { //when clicked singleDayContainer has checkbox checked
                             newForm.createDOMBox();
                             let newFormDomElement = newForm.getForm();
-                            thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                            thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
                         }
                         else {
                             //we are checking whether cliecked singleDayContainer is last one, or between others.
                             if(lastOneFlag === true) {
                                 newForm.createDOMBox(30, selectedCityId);
                                 let newFormDomElement = newForm.getForm();
-                                thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                                thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
                             }
                             else { //container is not last one
                                 const apreviousCitySelect = thisShowContainer.querySelector('.citySelect');
@@ -938,7 +941,7 @@
                                 if(anextCitySelect.options[anextCitySelect.selectedIndex].value != 0 && apreviousCitySelect.options[apreviousCitySelect.selectedIndex].value != 0) {
                                     newForm.createDOMBox(30, selectedCityId, true, thisShowContainer, nextShowContainer);
                                     let newFormDomElement = newForm.getForm();
-                                    thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                                    thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
                                 }
                                 else {
                                     notify('Wybierz miasta w pokazach powyżej i poniżej');
@@ -1294,7 +1297,7 @@
                         firstForm.addRemoveShowButton();
                         firstForm.addDistanceCheckbox();
                         firstForm.addNewShowButton();
-                        lastDayContainer.insertAdjacentElement("afterend", firstDayContainer);
+                        lastDayContainer.insertAdjacentElement("afterend", firstDayContainer).scrollIntoView({behavior: "smooth"});
                         if(isChecked) { // case when last single show container has checked checkbox;
                             firstForm.createDOMBox();
                         }
@@ -1307,7 +1310,7 @@
 
                         }
                         let firstFormDOM = firstForm.getForm();
-                        firstDayContainer.appendChild(firstFormDOM);
+                        firstDayContainer.appendChild(firstFormDOM).scrollIntoView({behavior: "smooth"});
                     }
                     else {
                         notify('Uzupełnij miasto');
