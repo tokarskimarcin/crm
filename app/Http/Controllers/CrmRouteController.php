@@ -343,7 +343,7 @@ class CrmRouteController extends Controller
         else {
             $request->session()->flash('adnotation', 'Błąd nie udało się dodać szablonu trasy, spróbuj ponownie!');
         }
-        return Redirect::back();
+        return Redirect::to('/showRoutes');
     }
 
     /**
@@ -602,6 +602,10 @@ class CrmRouteController extends Controller
             DB::table('client_route_info')->where('client_route_id', '=', $id)->whereNotIn('id', $recordsNotToDelete->pluck('id')->toArray())->update(['status' => 0]);
 
             $clientRoute = ClientRoute::find($id);
+            $clientRoute->update([
+                'client_id' => $clientInfo->clientId,
+                'type' => $clientInfo->clientType
+            ]);
 
             //This part add modified shows or new shows
             foreach($allData as $show) {
