@@ -3144,12 +3144,15 @@ class CrmRouteController extends Controller
     {
         $campaignId = $request->campaignId;
         $dateTime = $request->dateTime;
+        $penalty = $request->penalty;
         $date = date_create_from_format('Y-m-d G:i', $dateTime);
+        $date = $date->format('Y-m-d G:i');
         if ($date !== false) {
             $clientRouteCampaign = ClientRouteCampaigns::find($campaignId);
             if ($clientRouteCampaign !== null) {
                 $clientRouteCampaign->invoice_payment_date = $date;
                 $clientRouteCampaign->invoice_status_id = 4;
+                $clientRouteCampaign->penalty = $penalty;
                 $clientRouteCampaign->save();
                 new ActivityRecorder(array_merge(['T'=>'Akceptacja zapłacenia fakury'],$clientRouteCampaign->toArray()),225, 2);
                 return 'success';
