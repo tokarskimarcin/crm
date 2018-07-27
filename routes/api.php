@@ -35,3 +35,8 @@ Route::get('getAuditScan/{name}', function($name){
     $path = storage_path('app/auditFiles/' . $name);
     return response()->download($path);
 });
+
+Route::get('getInvoice/{name}', function($name){
+    $path = storage_path('app/campaign_invoice_files/' . $name);
+    return response()->file($path);
+});
