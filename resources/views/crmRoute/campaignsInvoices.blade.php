@@ -125,7 +125,7 @@
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },
                 rowCallback: function( row, data ) {
-                    if(data.penalty < 0){
+                    if(data.penalty > 0){
                         $(row).css('background','#c500002e');
                     }
                 },
