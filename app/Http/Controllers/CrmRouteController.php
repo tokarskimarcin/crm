@@ -534,7 +534,7 @@ class CrmRouteController extends Controller
          '))
             ->where('client_route_id', '=', $id)
             ->where('status', '=', 1)
-            ->groupBy('date', 'client_route_info.city_id')
+            ->groupBy('date', 'client_route_info.city_id', 'show_order')
             ->orderBy('date')
             ->orderBy('show_order')
             ->get();
@@ -551,6 +551,7 @@ class CrmRouteController extends Controller
         if($request->has('alldata') && $request->has('clientInfo')) {
             $allData = json_decode($request->alldata);
             $allData = array_reverse($allData);
+
             $clientInfo = json_decode($request->clientInfo);
 
             $client_route_info = ClientRouteInfo::select(DB::raw( //We are grouping records because we want to have similar grouping as in $allData.
@@ -559,11 +560,12 @@ class CrmRouteController extends Controller
                  COUNT(*) as hours,
                  client_route_info.voivode_id as voivodeId,
                  client_route_info.checkbox as checkbox,
-                 client_route_info.date as date
+                 client_route_info.date as date,
+                 client_route_info.show_order as show_order
          '))
                 ->where('client_route_id', '=', $id)
                 ->where('status', '=', 1)
-                ->groupBy('date', 'client_route_info.city_id')
+                ->groupBy('date', 'client_route_info.city_id', 'show_order')
                 ->orderBy('date')
                 ->get();
 
@@ -573,25 +575,35 @@ class CrmRouteController extends Controller
             }
 
             $client_route_info_with_flag = $client_route_info->map(function($item) use($allData) {
+
                 $item->toChange = 1; // indices whether records should be updated
                 //if foreach loop finds same object, it change flag "toChange" to 0. it means, it should not be modified
                 foreach($allData as $show) {
                     if(($item->cityId == $show->city) && ($item->voivodeId == $show->voivode) && ($item->date == $show->date) && ($item->hours == $show->hours)) {
-                        $item->toChange = 0; //this group should not be updated about status
-                        ClientRouteInfo::where('city_id', '=', $item->cityId) //we are updating static records about order value
+                        if($item->show_order == $show->order) {
+                            $item->toChange = 0; //this group should not be updated about status
+
+                            ClientRouteInfo::where('city_id', '=', $item->cityId) //we are updating static records about order value
                             ->where('voivode_id', '=', $item->voivodeId)
-                            ->where('date', '=', $item->date)
-                            ->where('status', '=', 1)
-                            ->update(['show_order' => $show->order]);
-                        $item->show_order = $show->order;
-                        $show->toAdd = 0;
+                                ->where('date', '=', $item->date)
+                                ->where('status', '=', 1)
+                                ->where('show_order', '=', $item->show_order)
+                                ->update(['show_order' => $show->order]);
+
+                            $item->show_order = $show->order;
+                            $show->toAdd = 0;
+                            break;
+                        }
                     }
+
                 }
+
                 if($item->toChange == 1) { // we are updating all records from group of records
                     $allRecordsToUpdate = ClientRouteInfo::where('city_id', '=', $item->cityId)
                         ->where('voivode_id', '=', $item->voivodeId)
                         ->where('date', '=', $item->date)
                         ->where('status', '=', 1)
+                        ->where('show_order', '=', $item->show_order)
                         ->update(['status' => 0]);
                 }
                     return $item;
