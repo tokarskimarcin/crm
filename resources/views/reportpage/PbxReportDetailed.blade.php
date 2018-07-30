@@ -33,6 +33,12 @@
                                         <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                                     </div>
                                 </div>
+                                <div class="col-md-6 form-group">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">Mediana wykorzystania bazy</span>
+                                        <input id="mediana" type="text" class="form-control" name="mediana" placeholder="Wartość miediany" disabled>
+                                    </div>
+                                </div>
                                 <div>
                                     <table id="datatable" class="thead-inverse table row-border table-striped" cellspacing="0" width="100%">
                                         <thead>
@@ -67,6 +73,14 @@
     <script src="{{ asset('/js/buttons.html5.min.js')}}"></script>
     <script>
 
+
+        function getMedian(args) {
+            if (!args.length) {return 0};
+            var numbers = args.slice(0).sort((a,b) => a - b);
+            var middle = Math.floor(numbers.length / 2);
+            var isEven = numbers.length % 2 === 0;
+            return isEven ? (numbers[middle] + numbers[middle - 1]) / 2 : numbers[middle];
+        }
         document.addEventListener('DOMContentLoaded', function(mainEvent) {
 
             $('.form_date').datetimepicker({
@@ -75,7 +89,7 @@
                 minView : 2,
                 pickTime: false,
             });
-
+            var arrayOfResault = [];
             table = $('#datatable').DataTable({
                 paginate: false,
                 "autoWidth": true,
@@ -88,14 +102,28 @@
                 buttons: [
                     'excel',
                 ],
-                "footerCallBack": function ( row, data, start, end, display) {
+                "footerCallback": function ( row, data, start, end, display ) {
                     var api = this.api(), data;
-                    var sum = api
+                    arrayOfResault = [];
+                    total = api
                         .column( 4 )
                         .data()
                         .reduce( function (a, b) {
-                            console.log(1);
+
+                            if(typeof(b) != "undefined"){
+                                let secondVal = b.split(" ");
+                                secondVal = parseFloat(secondVal[0]);
+                                if(secondVal!=0) arrayOfResault.push(parseFloat(secondVal));
+                            }
+                            // if(a != null || b != nu)
+                            // let fistVal = a.split(" ");
+                            // fistVal = fistVal[0];
+                            // let secondVal = b.split(" ");
+                            // secondVal = secondVal[0];
+                            // return fistVal + secondVal;
                         }, 0 );
+                    console.log( getMedian(arrayOfResault));
+                    $('#mediana').val(getMedian(arrayOfResault));
                 },
                 "rowCallback": function( row, data, index ) {
 
