@@ -42,6 +42,7 @@
         }
     </style>
 
+    <div id="hiddeCSV" hidden></div>
     {{--Header page --}}
     <div class="row">
         <div class="col-md-12">
@@ -264,6 +265,7 @@
                 var link = document.createElement("a");
                 link.download = name+" "+toDay+".xls";
                 link.href = uri + base64(format(template, ctx));
+                document.getElementById('hiddeCSV').appendChild(link);
                 link.click();
             }
         })();
