@@ -721,7 +721,7 @@
 
                     let header = document.createElement('div'); // creation of form title
                     header.classList.add('singleShowHeader');
-                    header.textContent = 'Pokaz';
+                    header.textContent = 'Kampania';
 
                     headerCol.appendChild(header);
                     headerRow.appendChild(headerCol);
