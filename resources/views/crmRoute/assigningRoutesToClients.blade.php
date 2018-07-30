@@ -1883,7 +1883,13 @@
                                     }
                                     else { //next container doesn't exist
                                         console.log('grandprev doesnt exist, next doesnt exist');
+                                        let prevShowVoivodeSelect = prevShowContainer.querySelector('.voivodeSelect');
+                                        let prevVoivode = getSelectedValue(prevShowVoivodeSelect);
+                                        let prevShowCitySelect = prevShowContainer.querySelector('.citySelect');
+                                        let prevCity = getSelectedValue(prevShowCitySelect);
                                         allCitiesAndAllVoivodes(prevShowContainer);
+                                        setOldValues(prevShowVoivodeSelect, prevVoivode, prevShowCitySelect, prevCity);
+                                        // allCitiesAndAllVoivodes(prevShowContainer);
                                     }
                                 }
                             }
@@ -2028,7 +2034,13 @@
                                         }
                                     }
                                     else { //prev container doesn't exist
+                                        let nextShowVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
+                                        let nextVoivode = getSelectedValue(nextShowVoivodeSelect);
+                                        let nextShowCitySelect = nextShowContainer.querySelector('.citySelect');
+                                        let nextCity = getSelectedValue(nextShowCitySelect);
                                         allCitiesAndAllVoivodes(nextShowContainer);
+                                        setOldValues(nextShowVoivodeSelect, nextVoivode, nextShowCitySelect, nextCity);
+                                        // allCitiesAndAllVoivodes(nextShowContainer);
                                     }
                                 }
                             }

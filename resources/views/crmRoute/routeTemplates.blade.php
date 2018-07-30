@@ -1260,7 +1260,13 @@
                                         }
                                     }
                                     else { //prev container doesn't exist
+                                        // allCitiesAndAllVoivodes(nextShowContainer);
+                                        let nextShowVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
+                                        let nextVoivode = getSelectedValue(nextShowVoivodeSelect);
+                                        let nextShowCitySelect = nextShowContainer.querySelector('.citySelect');
+                                        let nextCity = getSelectedValue(nextShowCitySelect);
                                         allCitiesAndAllVoivodes(nextShowContainer);
+                                        setOldValues(nextShowVoivodeSelect, nextVoivode, nextShowCitySelect, nextCity);
                                     }
                                 }
                             }

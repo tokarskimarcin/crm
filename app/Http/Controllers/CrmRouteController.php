@@ -414,9 +414,7 @@ class CrmRouteController extends Controller
         RouteInfo::where('routes_id', '=', $id)->update(['status' => 0]);
         Route::where('id', '=', $id)->update(['status' => 0]);
 
-        $redirectRoute = 'editRouteTemplates/' . $routes->id;
-
-        return Redirect::to($redirectRoute);
+        return Redirect::to('/showRoutes');
     }
 
     /**

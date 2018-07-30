@@ -111,7 +111,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">
-                <div class="alert gray-nav ">Tworzenie Tras</div>
+                <div class="alert gray-nav ">Edycja trasy przypisanej do klienta</div>
             </div>
         </div>
     </div>
@@ -120,7 +120,7 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Tworzenie Tras
+                    Edycja trasy przypisanej do klienta
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -1879,7 +1879,14 @@
                                     }
                                     else { //next container doesn't exist
                                         console.log('grandprev doesnt exist, next doesnt exist');
+
+                                        let prevShowVoivodeSelect = prevShowContainer.querySelector('.voivodeSelect');
+                                        let prevVoivode = getSelectedValue(prevShowVoivodeSelect);
+                                        let prevShowCitySelect = prevShowContainer.querySelector('.citySelect');
+                                        let prevCity = getSelectedValue(prevShowCitySelect);
                                         allCitiesAndAllVoivodes(prevShowContainer);
+                                        setOldValues(prevShowVoivodeSelect, prevVoivode, prevShowCitySelect, prevCity);
+                                        // allCitiesAndAllVoivodes(prevShowContainer);
                                     }
                                 }
                             }
@@ -2024,7 +2031,13 @@
                                         }
                                     }
                                     else { //prev container doesn't exist
+                                        let nextShowVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
+                                        let nextVoivode = getSelectedValue(nextShowVoivodeSelect);
+                                        let nextShowCitySelect = nextShowContainer.querySelector('.citySelect');
+                                        let nextCity = getSelectedValue(nextShowCitySelect);
                                         allCitiesAndAllVoivodes(nextShowContainer);
+                                        setOldValues(nextShowVoivodeSelect, nextVoivode, nextShowCitySelect, nextCity);
+                                        // allCitiesAndAllVoivodes(nextShowContainer);
                                     }
                                 }
                             }

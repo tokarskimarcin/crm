@@ -1110,7 +1110,13 @@
                                     }
                                     else { //next container doesn't exist
                                         console.log('grandprev doesnt exist, next doesnt exist');
+                                        let prevShowVoivodeSelect = prevShowContainer.querySelector('.voivodeSelect');
+                                        let prevVoivode = getSelectedValue(prevShowVoivodeSelect);
+                                        let prevShowCitySelect = prevShowContainer.querySelector('.citySelect');
+                                        let prevCity = getSelectedValue(prevShowCitySelect);
                                         allCitiesAndAllVoivodes(prevShowContainer);
+                                        setOldValues(prevShowVoivodeSelect, prevVoivode, prevShowCitySelect, prevCity);
+                                        // allCitiesAndAllVoivodes(prevShowContainer);
                                     }
                                 }
                             }
@@ -1255,7 +1261,13 @@
                                         }
                                     }
                                     else { //prev container doesn't exist
+                                        // allCitiesAndAllVoivodes(nextShowContainer);
+                                        let nextShowVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
+                                        let nextVoivode = getSelectedValue(nextShowVoivodeSelect);
+                                        let nextShowCitySelect = nextShowContainer.querySelector('.citySelect');
+                                        let nextCity = getSelectedValue(nextShowCitySelect);
                                         allCitiesAndAllVoivodes(nextShowContainer);
+                                        setOldValues(nextShowVoivodeSelect, nextVoivode, nextShowCitySelect, nextCity);
                                     }
                                 }
                             }
@@ -1595,7 +1607,7 @@
                                         let dayContainerOfGrandPrev = grandPrevShowContainer.closest('.singleDayContainer');
                                         grandNextDayFlag = dayContainerOfGrandPrev === dayContainerOfPreviousShowContainer ? false : true;
                                         let changeDistanceArr = [];
-                                        if(grandNextDayFlag) {// case when grand prev show is another day related to prev show
+                                        if(grandNextDayFlag) { // case when grand prev show is another day related to prev show
                                             if(!prevSiblingCheckboxArr[0]) { //grand is not checked
                                                 changeDistanceArr = [100, 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
@@ -1617,6 +1629,7 @@
                                         }
                                     }
                                     else { // there is no previous container (related to prev show container)
+                                        console.log('tutej');
                                         limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
                                     }
 
