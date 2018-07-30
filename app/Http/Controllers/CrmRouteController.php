@@ -1050,7 +1050,7 @@ class CrmRouteController extends Controller
                 $clientRoadInfo->save();
                 $clientRouteIds .= $item['id'] .', ';
             }
-            new ActivityRecorder(array_merge(['T'=>'Edycja parametrów kampanii'],$clientRouteIds->toArray()),213,2);
+            new ActivityRecorder(array_merge(['T'=>'Edycja parametrów kampanii'],$objectOfChange[0]),213,2);
 
             return 200;
         }else
