@@ -257,6 +257,7 @@ Route::post('/getRouteTemplate', 'CrmRouteController@getRouteTemplate')->name('a
 Route::post('/getVoivodeshipRoundWithDistanceLimit', 'CrmRouteController@getVoivodeshipRoundWithDistanceLimit')->name('api.getVoivodeshipRoundWithDistanceLimit');
 Route::post('/getVoivodeshipRoundWithoutGracePeriodAjax', 'CrmRouteController@getVoivodeshipRoundWithoutGracePeriodAjax')->name('api.getVoivodeshipRoundWithoutGracePeriod');
 Route::post('/allCitiesInGivenVoivodeAjax', 'CrmRouteController@allCitiesInGivenVoivodeAjax')->name('api.allCitiesInGivenVoivodeAjax');
+Route::post('/deleteRouteTemplate', 'CrmRouteController@deleteRouteTemplate')->name('api.deleteRouteTemplate');
 
 Route::post('/getConfirmHotelInfo','CrmRouteController@getConfirmHotelInfo')->name('api.getConfirmHotelInfo');
 Route::post('/changeConfirmStatus','CrmRouteController@changeConfirmStatus')->name('api.changeConfirmStatus');
@@ -875,6 +876,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet');
     Route::get('/showClientRoutes', 'CrmRouteController@showClientRoutesGet');
 
+    Route::get('/editRouteTemplates/{id}', 'CrmRouteController@editRouteTemplatesGet');
+    Route::post('/editRouteTemplates/{id}', 'CrmRouteController@editRouteTemplatesPost');
+
     Route::get('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplateGet');
     Route::post('/addNewRouteTemplate', 'CrmRouteController@addNewRouteTemplatePost');
 
@@ -977,8 +981,3 @@ Route::get('/autoConsultantsLoginsBlockedGet', 'StatisticsController@autoConsult
 Route::get('/checkPenatly', 'AutoScriptController@checkPenatly');
 
 Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clientReport');
-
-Route::get('/editRouteTemplates/{id}', 'CrmRouteController@editRouteTemplatesGet');
-Route::post('/editRouteTemplates/{id}', 'CrmRouteController@editRouteTemplatesPost');
-
-Route::post('/deleteRouteTemplate', 'CrmRouteController@deleteRouteTemplate')->name('api.deleteRouteTemplate');

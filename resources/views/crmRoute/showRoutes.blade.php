@@ -35,7 +35,7 @@
                     <div class="row" >
                             <div class="col-md-12">
                                 <button id="addNewRoute" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span>
-                                    Przejdz do dodawania tras</button>
+                                    Przejdz do tworzenia szablonów tras</button>
                             </div>
                     </div>
                     <div class="row" style="margin-top: 1em;">
