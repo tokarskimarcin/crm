@@ -680,6 +680,23 @@ class CrmRouteController extends Controller
     }
 
     /**
+     * @param {String} templateId
+     * @return {String} status
+     */
+    public function deleteRouteTemplate(Request $request) {
+        if($request->has('templateId')) {
+            $templateId = $request->templateId;
+            RouteInfo::where('routes_id', '=', $templateId)->update(['status' => 0]);
+            Route::where('id', '=', $templateId)->update(['status' => 0]);
+            $info = 'Szablon został usunięty pomyślnie';
+        }
+        else {
+            $info = 'Szablon nie został usunięty';
+        }
+        return $info;
+    }
+
+    /**
      * @param $id
      * @return This method return collection of route_info records ready to send to view.
      */

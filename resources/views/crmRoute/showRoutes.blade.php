@@ -91,11 +91,55 @@
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("editRouteTemplates")}}/' + data.id + '" style="text-decoration:none;" class="links"><button class="btn btn-block btn-info"><span class="glyphicon glyphicon-edit"></span> Edycja</button></a>';
+                            return '<a href="{{URL::to("editRouteTemplates")}}/' + data.id + '" style="text-decoration:none;" class="links"><button class="btn btn-block btn-info" style="width: 40%; display: inline !important;"><span class="glyphicon glyphicon-edit"></span> Edycja</button></a>  <button id="removeTemplateButton" class="btn btn-block btn-danger" data-templateid="' + data.id + '" style="width: 40%; display: inline !important;"><span class="glyphicon glyphicon-delete"></span> Usuń</button>';
                         }, "orderable": false, "searchable": false, "width": "20%"
                     }
                 ]
             });
+
+            function globalClickHandler(e) {
+                if(e.target.matches('#removeTemplateButton')) { //remove route template
+                    swal({
+                        title: 'Jesteś pewien?',
+                        text: "Brak możliwości cofnięcia zmian!",
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Tak, usuń!'
+                    }).then((result) => {
+                        if (result.value) {
+                            let templateId = e.target.dataset.templateid;
+                            const ourHeaders = new Headers();
+                            ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                            ourHeaders.set('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+
+                            let sendData = new FormData();
+                            sendData.append('templateId', templateId);
+
+                            fetch('{{route('api.deleteRouteTemplate')}}', {
+                                method: 'post',
+                                headers: ourHeaders,
+                                body: sendData,
+                                credentials: "same-origin"
+                            })
+                                .then(resp => resp.text())
+                                .then(resp => {
+                                    swal(
+                                        'Usunięto!',
+                                        resp,
+                                        'success'
+                                    )
+                                    table.ajax.reload();
+                                })
+                        }
+                    })
+                }
+            }
+
+            document.addEventListener('click', globalClickHandler);
         });
+
+
     </script>
 @endsection

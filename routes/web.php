@@ -979,3 +979,5 @@ Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clien
 
 Route::get('/editRouteTemplates/{id}', 'CrmRouteController@editRouteTemplatesGet');
 Route::post('/editRouteTemplates/{id}', 'CrmRouteController@editRouteTemplatesPost');
+
+Route::post('/deleteRouteTemplate', 'CrmRouteController@deleteRouteTemplate')->name('api.deleteRouteTemplate');
