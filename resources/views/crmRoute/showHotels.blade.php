@@ -22,6 +22,9 @@
         .dropdown-menu {
             left: 0px !important;
         }
+        .select2-container {
+            width: 100% !important;
+        }
     </style>
 
 {{--Header page --}}
@@ -53,7 +56,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="voivode">Województwo</label>
-                                <select name="voivode" id="voivode" class="form-control" multiple="multiple">
+                                <select name="voivode" id="voivode" class="form-control select2-container" multiple="multiple">
                                     <option value="0">Wybierz</option>
                                     @foreach($voivodes as $voivode)
                                         <option value="{{$voivode->id}}">{{$voivode->name}}</option>
@@ -64,7 +67,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="city">Miasto</label>
-                                <select name="city" id="city" class="form-control" multiple="multiple">
+                                <select name="city" id="city" class="form-control select2-container" multiple="multiple">
                                     <option value="0">Wybierz</option>
                                     @foreach($cities as $city)
                                         <option value="{{$city->id}}">{{$city->name}}</option>
@@ -75,7 +78,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="zipCode">Kod pocztowy</label>
-                                <select name="zipCode" id="zipCode" class="form-control" multiple="multiple">
+                                <select name="zipCode" id="zipCode" class="form-control select2-container" multiple="multiple">
                                     <option value="0">Wybierz</option>
                                     @foreach($zipCode as $item)
                                         <option>{{$item->zip_code}}</option>

@@ -97,14 +97,14 @@
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Typy pokazów
+                        Rodzaje spotkań
                     </div>
                     <div class="panel-body">
                         <div class="col-md-12">
                             <div class="newGift">
                                 <div class="col-md-12">
                                     <div class="form-inline">
-                                        <label>Dodaj nowy typ trasy do listy</label>
+                                        <label>Dodaj nowy rodzaj spotkania do listy</label>
                                         <input type="text" class="form-control"
                                                name="NewMeetingTypeName" id="NewMeetingTypeName"
                                                placeholder="Typ trasy..."/>
@@ -279,6 +279,7 @@
                         </div>
                     </div>
                 </div>
+                @if(0)
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         Limity
@@ -310,6 +311,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
@@ -642,7 +644,7 @@
                 }
                 if (validate) {
                     swal({
-                        title: 'Chcesz zapisać nowy typ pokazu?',
+                        title: 'Chcesz zapisać nowy rodzaj spotkania?',
                         type: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#3085d6',
@@ -661,7 +663,7 @@
                                 },
                                 success: function (response) {
                                     $('#NewMeetingTypeName').val("");
-                                    notify("<strong>Nowy typ pokazu zostałdodany</strong>", 'success');
+                                    notify("<strong>Nowy rodzaj spotkania został dodany</strong>", 'success');
                                     meetingTable.ajax.reload();
                                 }
                             });
@@ -829,9 +831,9 @@
                         let meetingStatus = $(this).data('status');
                         let nameOfAction = "";
                         if (meetingStatus == 0)
-                            nameOfAction = "Tak, wyłącz upominek";
+                            nameOfAction = "Tak, wyłącz rodzaj spotkania";
                         else
-                            nameOfAction = "Tak, włącz upominek";
+                            nameOfAction = "Tak, włącz rodzaj spotkania";
                         swal({
                             title: 'Jesteś pewien?',
                             type: 'warning',
