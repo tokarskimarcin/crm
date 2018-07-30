@@ -58,7 +58,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
-            <div class="alert gray-nav ">Tworzenie Tras</div>
+            <div class="alert gray-nav ">Edycja szablonów tras</div>
         </div>
     </div>
 </div>
@@ -71,7 +71,7 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                   Utwórz nową trasę
+                   Edytuj szablon trasy
                 </div>
                 <div class="panel-body">
                     <div class="summaryButtonContainer">
