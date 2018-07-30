@@ -464,7 +464,7 @@ class CrmRouteController extends Controller
                     $clientRouteInfo->voivode_id = $show->voivode;
                     $clientRouteInfo->date = $show->date;
                     $clientRouteInfo->status = 1;
-                    $clientRouteInfo->order = $show->order;
+                    $clientRouteInfo->show_order = $show->order;
                     $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
 
                     $dateArr = explode('-', $show->date);
@@ -536,7 +536,7 @@ class CrmRouteController extends Controller
             ->where('status', '=', 1)
             ->groupBy('date', 'client_route_info.city_id')
             ->orderBy('date')
-            ->orderBy('order')
+            ->orderBy('show_order')
             ->get();
 
 //        dd($client_route_info);
@@ -582,8 +582,8 @@ class CrmRouteController extends Controller
                             ->where('voivode_id', '=', $item->voivodeId)
                             ->where('date', '=', $item->date)
                             ->where('status', '=', 1)
-                            ->update(['order' => $show->order]);
-                        $item->order = $show->order;
+                            ->update(['show_order' => $show->order]);
+                        $item->show_order = $show->order;
                         $show->toAdd = 0;
                     }
                 }
@@ -614,7 +614,7 @@ class CrmRouteController extends Controller
                         $clientRouteInfo->voivode_id = $show->voivode;
                         $clientRouteInfo->date = $show->date;
                         $clientRouteInfo->status = 1;
-                        $clientRouteInfo->order = $show->order;
+                        $clientRouteInfo->show_order = $show->order;
                         $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
 
                         $dateArr = explode('-', $show->date);
@@ -646,8 +646,9 @@ class CrmRouteController extends Controller
                 ->where('status', '=', 1)
                 ->groupBy('date', 'client_route_info.city_id')
                 ->orderBy('date')
-                ->orderBy('order')
+                ->orderBy('show_order')
                 ->get();
+
 
             $dateFlag = $client_route_info2[0]->date;
             $name = '';
