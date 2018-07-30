@@ -386,7 +386,10 @@
                             });
                             $('#tabelka tbody').empty();
                             $('#tabelka tbody').append(trHTML);
-                            tableToExcel('tabelka', 'Raport klienta '+clientColorObj[0].clientName)
+                            if(clientColorObj[0] != undefined)
+                                tableToExcel('tabelka', 'Raport klienta '+clientColorObj[0].clientName)
+                            else
+                                swal('Brak danych do wygenerowania');
                         }
                     });
                 }
