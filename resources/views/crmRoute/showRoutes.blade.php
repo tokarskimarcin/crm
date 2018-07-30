@@ -38,7 +38,7 @@
                                     Przejdz do dodawania tras</button>
                             </div>
                     </div>
-                    <div class="row" style="margin-top: 1em">
+                    <div class="row" style="margin-top: 1em;">
                         <div class="col-md-12">
                             <table id="datatable" class="thead-inverse table table-striped row-border"
                                    cellspacing="0" width="100%">
@@ -67,7 +67,7 @@
             addNewRouteInput.addEventListener('click', (e) => {
                 window.location.href = '{{URL::to('/addNewRouteTemplate')}}';
             });
-            table = $('#datatable').DataTable({
+            let table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,
                 "serverSide": true,

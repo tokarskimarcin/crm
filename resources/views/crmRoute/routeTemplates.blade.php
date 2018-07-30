@@ -1110,7 +1110,12 @@
                                     }
                                     else { //next container doesn't exist
                                         console.log('grandprev doesnt exist, next doesnt exist');
+                                        let prevShowVoivodeSelect = prevShowContainer.querySelector('.voivodeSelect');
+                                        let prevVoivode = getSelectedValue(prevShowVoivodeSelect);
+                                        let prevShowCitySelect = prevShowContainer.querySelector('.citySelect');
+                                        let prevCity = getSelectedValue(prevShowCitySelect);
                                         allCitiesAndAllVoivodes(prevShowContainer);
+                                        setOldValues(prevShowVoivodeSelect, prevVoivode, prevShowCitySelect, prevCity);
                                     }
                                 }
                             }

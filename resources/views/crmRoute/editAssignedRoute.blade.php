@@ -2135,7 +2135,14 @@
                     if(isOk) {
                         const clientTypeValue = $('#client_choice_type option:selected').val();
                         const clientTable = document.querySelector('#table_client');
-                        const selectedCheckbox = clientTable.querySelector('input[type="checkbox"]:checked');
+                        let selectedCheckbox;
+                        if(clientTable.querySelector('input[type="checkbox"]:checked')) {
+                            selectedCheckbox = clientTable.querySelector('input[type="checkbox"]:checked');
+                        }
+                        else {
+                            notify('Wybierz klienta!');
+                            return false;
+                        }
                         const selectedTr = selectedCheckbox.closest('tr');
                         let clientId = selectedTr.id;
                         clientId = clientId.substr(9);
