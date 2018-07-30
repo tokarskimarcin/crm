@@ -553,9 +553,9 @@ class CrmRouteController extends Controller
             $allData = array_reverse($allData);
             $clientInfo = json_decode($request->clientInfo);
 
-            $client_route_info = ClientRouteInfo::select(DB::raw(
+            $client_route_info = ClientRouteInfo::select(DB::raw( //We are grouping records because we want to have similar grouping as in $allData.
                 'client_route_info.city_id as cityId,
-                client_route_info.id as id,
+                 client_route_info.id as id,
                  COUNT(*) as hours,
                  client_route_info.voivode_id as voivodeId,
                  client_route_info.checkbox as checkbox,
@@ -567,46 +567,41 @@ class CrmRouteController extends Controller
                 ->orderBy('date')
                 ->get();
 
-            //assigning toAdd as 1, for every record.
+            //assigning toAdd as 1, for every record as initial value.
             foreach($allData as $show) {
                 $show->toAdd = 1;
             }
 
             $client_route_info_with_flag = $client_route_info->map(function($item) use($allData) {
-                $item->toChange = 1;
+                $item->toChange = 1; // indices whether records should be updated
                 //if foreach loop finds same object, it change flag "toChange" to 0. it means, it should not be modified
                 foreach($allData as $show) {
                     if(($item->cityId == $show->city) && ($item->voivodeId == $show->voivode) && ($item->date == $show->date) && ($item->hours == $show->hours)) {
-                        $item->toChange = 0;
-                        $thisRecord = ClientRouteInfo::where('id', '=', $item->id)->first(); //we are updating static records about order value
-                        $thisRecord->update(['order' => $show->order]);
+                        $item->toChange = 0; //this group should not be updated about status
+                        ClientRouteInfo::where('city_id', '=', $item->cityId) //we are updating static records about order value
+                            ->where('voivode_id', '=', $item->voivodeId)
+                            ->where('date', '=', $item->date)
+                            ->where('status', '=', 1)
+                            ->update(['order' => $show->order]);
                         $item->order = $show->order;
                         $show->toAdd = 0;
                     }
                 }
-                return $item;
+                if($item->toChange == 1) { // we are updating all records from group of records
+                    $allRecordsToUpdate = ClientRouteInfo::where('city_id', '=', $item->cityId)
+                        ->where('voivode_id', '=', $item->voivodeId)
+                        ->where('date', '=', $item->date)
+                        ->where('status', '=', 1)
+                        ->update(['status' => 0]);
+                }
+                    return $item;
             });
-
-            $staticRecords = $client_route_info_with_flag->where('toChange', '=', 0);
-            //all records which should not be changed at all. (to see, required adding ->get() to variable after foreach)
-            $recordsNotToDelete = ClientRouteInfo::select('id');
-            foreach($staticRecords as $staticRecord) {
-                $recordsNotToDelete->orWhere([
-                    ['city_id', '=', $staticRecord->cityId],
-                    ['voivode_id', '=', $staticRecord->voivodeId],
-                    ['date', '=', $staticRecord->date]
-                ]);
-            }
-
-            //changing status for all records which should be removed to 0
-            DB::table('client_route_info')->where('client_route_id', '=', $id)->whereNotIn('id', $recordsNotToDelete->pluck('id')->toArray())->update(['status' => 0]);
 
             $clientRoute = ClientRoute::find($id);
             $clientRoute->update([
                 'client_id' => $clientInfo->clientId,
                 'type' => $clientInfo->clientType
             ]);
-
             //This part add modified shows or new shows
             foreach($allData as $show) {
                 $clientRouteCampaigns = new ClientRouteCampaigns();
@@ -639,7 +634,7 @@ class CrmRouteController extends Controller
                 }
             }
 
-            //this part create route name
+            //this part from now is responsible for creating route name
             $client_route_info2 = ClientRouteInfo::select(DB::raw(
                 'client_route_info.city_id as cityId,
                  COUNT(*) as hours,
