@@ -4,8 +4,6 @@
 @endsection
 @section('content')
 
-
-
     {{--Header page --}}
     <div class="row">
         <div class="col-md-12">
@@ -32,6 +30,12 @@
                             Session::forget('adnotation');
                         @endphp
                     @endif
+                    <div class="alert alert-info">
+                        Moduł <strong>Szablony tras</strong> służy do edycji, podglądu oraz tworzenia szablonów tras, które później mogą być wykorzystane
+                        w zakładkach <strong>Przypisanie trasy do klienta</strong> oraz przy <strong>Edycji trasy przypisanej do klienta</strong>.
+                        Nazwa trasy posiada specjalne znaczniki: <br><strong>|</strong> - oznaczający, że pomiędzy kolejnymi miastami jest <i>jeden</i> dzień różnicy.
+                        <br><strong>+</strong>  - oznaczający, że miasta są odwiedzane <i>tego samego</i> dnia.
+                    </div>
                     <div class="row" >
                             <div class="col-md-12">
                                 <button id="addNewRoute" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span>
