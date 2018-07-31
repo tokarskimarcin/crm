@@ -42,6 +42,11 @@
                    Wybierz hotel
                 </div>
                 <div class="panel-body">
+                    <div class="alert alert-info">
+                        Moduł <strong>Podgląd hoteli</strong> pozwala dodawać oraz edytować hotele. Każdy hotel może zostać włączony/wyłączony przyciskami <button class='btn btn-danger'><span class='glyphicon glyphicon-off'></span> Wyłącz</button> <button class='btn btn-success'><span class='glyphicon glyphicon-off'></span> Włącz</button>
+                        Po naciśnieciu przycisku <button class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button> można podejżeć wszystkie informacje dotyczące hotelu. <br>
+                        Listy <strong>Województwo</strong>, <strong>Miasto</strong> oraz <strong>Kod pocztowy</strong> są listami wielokrotnego wyboru.
+                    </div>
                     @if($hotelId == 0)
                     <div class="row">
                         <div class="col-md-12">
