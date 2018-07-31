@@ -159,7 +159,7 @@
                                 invoiceButton.prop('disabled', true);
                             }
                             return form.prop('outerHTML');
-                        }, name: 'invoice'
+                        }, orderable: false, searchable: false, name: 'invoice'
                     },
                     {
                         data: function (data, type, val) {

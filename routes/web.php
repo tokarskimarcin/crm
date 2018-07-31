@@ -231,7 +231,7 @@ Route::post('getBootstrapNotifications', 'HomeController@getBootstrapNotificatio
 /* CRM-ROUTES AJAX */
 Route::post('/crmRoute_index_ajax', 'CrmRouteController@getSelectedRoute')->name('api.getRoute');
 Route::post('/getReadyRoute', 'CrmRouteController@getReadyRoute')->name('api.getReadyRoute');
-Route::post('/specificRoute', 'CrmRouteController@specificRoutePost')->name('api.getJSONRoute');
+Route::post('/updateClientRouteInfoHotelsAndHours', 'CrmRouteController@updateClientRouteInfoHotelsAndHours')->name('api.updateClientRouteInfoHotelsAndHours');
 Route::post('/showClientRoutesAjax', 'CrmRouteController@showClientRoutesAjax')->name('api.getClientRoutes');
 Route::post('/showClientRoutesInfoAjax', 'CrmRouteController@showClientRoutesInfoAjax')->name('api.getClientRouteInfo');
 Route::post('/showClientRoutesStatus', 'CrmRouteController@showClientRoutesStatus')->name('api.showClientRoutesStatus');
