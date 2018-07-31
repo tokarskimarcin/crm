@@ -858,7 +858,7 @@ class CrmRouteController extends Controller
     /**
      * This method shows specific route
      */
-    public function specificRouteGet($id, $onlyResult = null) {
+    /*public function specificRouteGetOld($id, $onlyResult = null) {
         $clientRouteInfo = ClientRouteInfo::select('client_route_info.user_reservation as user_reservation','client_route_info.hotel_price as hotel_price','client_route_info.limits as limits', 'client_route_info.department_info_id as department_info_id', 'client_route_info.id as id', 'city.name as cityName', 'voivodeship.name as voivodeName', 'client_route.id as client_route_id', 'city.id as city_id', 'voivodeship.id as voivode_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour', 'client_route.client_id as client_id', 'client_route_info.weekOfYear as weekOfYear')
             ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
@@ -964,12 +964,103 @@ class CrmRouteController extends Controller
 
         else
             return $clientRouteInfo->sortByDesc('date');
+    }*/
+
+    public function specificRouteGet($id) {
+        $clientRouteCampaigns = ClientRouteCampaigns::join('client_route_info as cri', 'client_route_info_id', '=', 'cri.id')
+            ->select('client_route_info_id', 'hour_count')
+            ->where('client_route_id', '=', $id)->get();
+
+        $clientRouteInfo = ClientRouteInfo::join('client_route as cr', 'cr.id', '=', 'client_route_id')
+            ->join('client as c', 'c.id', '=', 'cr.client_id')
+            ->join('city','city.id','=','city_id')
+            ->join('voivodeship','voivodeship.id','=','voivode_id')
+            ->select(
+                'client_route_info.id',
+                'cr.route_name',
+                'date',
+                'weekOfYear as week',
+                'c.name as client_name',
+                'user_reservation',
+                'hotel_id',
+                'hour',
+                'city.name as city_name',
+                'voivodeship.name as voivode_name'
+            )
+            ->where('cr.id', '=', $id)->where('client_route_info.status', '=', 1)
+            ->orderBy('date')->orderBy('show_order')->orderBy('client_route_info.id')->get();
+        $routeInfo = [];
+        $pageInfo = [];
+        if (!empty($clientRouteInfo)) {
+            $pageInfo = (object)[
+                'clientName' => $clientRouteInfo[0]->client_name,
+                'routeName' => $clientRouteInfo[0]->route_name,
+                'week' => $clientRouteInfo[0]->week,
+                'date' => $clientRouteInfo[0]->date,
+                'userReservation' => $clientRouteInfo[0]->user_reservation
+            ];
+            for ($i = 0; $i < $clientRouteInfo->count(); $i++) {
+                $campaign = [];
+                if (!empty($campaignHour = $clientRouteCampaigns->where('client_route_info_id', '=', $clientRouteInfo[$i]->id)->first()->hour_count)) {
+                    for (; $campaignHour > 0; $campaignHour--) {
+                        array_push($campaign, $clientRouteInfo[$i]);
+                        $i++;
+                    }
+                    $i--;
+                    array_push($routeInfo, $campaign);
+                }
+            }
+        }
+        $status = [1];
+        $hotels = Hotel::whereIn('status', $status)->orderBy('id')->get();
+        foreach( $routeInfo as $campaign){
+            $campaign[0]->hotel_page = 0;
+            if(!empty($campaign[0]->hotel_id)){
+                $hotels->each(function ($hotel, $key) use ($campaign) {
+                    if($hotel->id == $campaign[0]->hotel_id){
+                        $campaign[0]->hotel_page = intval(floor($key/10));
+                        return false;
+                    }
+                });
+            }
+        }
+
+        return view('crmRoute.specificRoute')
+            ->with('routeInfo', $routeInfo)
+            ->with('pageInfo', $pageInfo);
     }
 
     /**
      * This method saves changes about specific route
      */
-    public function specificRoutePost(Request $request) {
+    public function updateClientRouteInfoHotelsAndHours(Request $request){
+        $all_data = json_decode($request->JSONData); //we obtain 3 dimensional array
+        //dd($all_data);
+        $clientRouteInfoIds = 'clientRouteInfoIds: ';
+        foreach($all_data as $campaign) {
+            foreach ($campaign->timeHotelArr as $clientRouteInfo){
+                try{
+                    ClientRouteInfo::where([
+                        ['id', '=', $clientRouteInfo->clientRouteInfoId]
+                    ])->update([
+                        'hotel_id' => $clientRouteInfo->hotelId,
+                        'hour' => $clientRouteInfo->time == "" ? null : $clientRouteInfo->time,
+                        'user_reservation' => $campaign->userReservation
+                    ]);
+                    $clientRouteInfoIds .= $clientRouteInfo->clientRouteInfoId . ', ';
+                }catch(\Exception $e){
+                    return $e;
+                }
+            }
+        }
+        new ActivityRecorder(['T'=>'Edycja hoteli i godzin trasy','clientRouteInfoIds:' => $clientRouteInfoIds], 211,2);
+        return 'success';
+    }
+
+    /**
+     * This method saves changes about specific route
+     */
+   /* public function specificRoutePost(Request $request) {
         $all_data = json_decode($request->JSONData); //we obtain 2 dimensional array
         $clientRouteInfoIds = 'clientRouteInfoIds: ';
         foreach($all_data as $city) {
@@ -1006,7 +1097,7 @@ class CrmRouteController extends Controller
         new ActivityRecorder(['T'=>'Edycja hoteli i godzin trasy','clientRouteInfoIds:' => $clientRouteInfoIds], 211,2);
 
         return $all_data;
-    }
+    }*/
 
     /**
      * Return ready route with info
@@ -3180,16 +3271,17 @@ class CrmRouteController extends Controller
             ->join('invoice_status as is','client_route_campaigns.invoice_status_id','=','is.id')
             ->join('hotels as h','cri.hotel_id','=','h.id')
             ->join('client_route as cr','cri.client_route_id','=','cr.id')
-            ->join('client as c','cr.client_id','=','c.id');
+            ->join('client as c','cr.client_id','=','c.id')
+            ->where('cri.status','=', 1);
         if ($routeId > 0) {
             $clientRouteCampaigns->where('cri.client_route_id', '=', $routeId);
-        } else if ($firstDate !== null || $lastDate !== null) {
-            if ($firstDate !== null && $lastDate !== null) {
+        } else if (!is_null($firstDate) || !is_null($lastDate)) {
+            if (!is_null($firstDate) && !is_null($lastDate)) {
                 $clientRouteCampaigns->whereBetween('cri.date', [$firstDate, $lastDate]);
             } else {
-                if ($firstDate !== null)
+                if (!is_null($firstDate))
                     $clientRouteCampaigns->where('cri.date', '>=', $firstDate);
-                if ($lastDate !== null)
+                if (!is_null($lastDate))
                     $clientRouteCampaigns->where('cri.date', '<=', $lastDate);
             }
         }
