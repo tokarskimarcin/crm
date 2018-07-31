@@ -886,176 +886,181 @@ class CrmRouteController extends Controller
     /**
      * This method shows specific route
      */
-    /*public function specificRouteGetOld($id, $onlyResult = null) {
-        $clientRouteInfo = ClientRouteInfo::select('client_route_info.user_reservation as user_reservation','client_route_info.hotel_price as hotel_price','client_route_info.limits as limits', 'client_route_info.department_info_id as department_info_id', 'client_route_info.id as id', 'city.name as cityName', 'voivodeship.name as voivodeName', 'client_route.id as client_route_id', 'city.id as city_id', 'voivodeship.id as voivode_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour', 'client_route.client_id as client_id', 'client_route_info.weekOfYear as weekOfYear')
-            ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
-            ->join('city', 'city.id', '=', 'client_route_info.city_id')
-            ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
-            ->where('client_route_id', '=', $id)
-            ->get();
-        $userReservation = $clientRouteInfo->first()->user_reservation;
+    public function specificRouteGet($id, $onlyResult = null) {
+        if($onlyResult == null) {
+            $clientRouteCampaigns = ClientRouteCampaigns::join('client_route_info as cri', 'client_route_info_id', '=', 'cri.id')
+                ->select('client_route_info_id', 'hour_count')
+                ->where('client_route_id', '=', $id)->get();
 
-        $clientRoute = $this->getClientRouteGroupedByDateSortedByHour($id, $clientRouteInfo);
-        $routeInfo = new \stdClass;
-        $routeInfo->routeName = $this->createRouteName($clientRoute);
-        $routeInfo->firstDate = $clientRoute[0]->date;
-        $routeInfo->week =  $clientRoute[0]->weekOfYear;
-        $clients = Clients::all();
+            $clientRouteInfo = ClientRouteInfo::join('client_route as cr', 'cr.id', '=', 'client_route_id')
+                ->join('client as c', 'c.id', '=', 'cr.client_id')
+                ->join('city', 'city.id', '=', 'city_id')
+                ->join('voivodeship', 'voivodeship.id', '=', 'voivode_id')
+                ->select(
+                    'client_route_info.id',
+                    'cr.route_name',
+                    'date',
+                    'weekOfYear as week',
+                    'c.name as client_name',
+                    'user_reservation',
+                    'hotel_id',
+                    'hour',
+                    'city.name as city_name',
+                    'voivodeship.name as voivode_name'
+                )
+                ->where('cr.id', '=', $id)->where('client_route_info.status', '=', 1)
+                ->orderBy('date')->orderBy('show_order')->orderBy('client_route_info.id')->get();
+            $routeInfo = [];
+            $pageInfo = [];
+            if (!empty($clientRouteInfo)) {
+                $pageInfo = (object)[
+                    'clientName' => $clientRouteInfo[0]->client_name,
+                    'routeName' => $clientRouteInfo[0]->route_name,
+                    'week' => $clientRouteInfo[0]->week,
+                    'date' => $clientRouteInfo[0]->date,
+                    'userReservation' => $clientRouteInfo[0]->user_reservation
+                ];
+                for ($i = 0; $i < $clientRouteInfo->count(); $i++) {
+                    $campaign = [];
+                    $campaignHour = $clientRouteCampaigns->where('client_route_info_id', '=', $clientRouteInfo[$i]->id)->first();
 
-        $status = [1];
-
-        $hotels = Hotel::whereIn('status', $status)->orderBy('id')->get();
-
-        $clientRouteInfoExtended = array();
-        $insideArr = array();
-        $cityId = null;
-        $flag = 0; //indices whether $insideArr push into $clientRouteInfoExtended 1 - push, 0 - don't push
-        $iterator = 0; //It count loops of foreach
-        $iteratorFinish = count($clientRouteInfo); // indices when condition inside foreach should push array into $clientRouteInfoExtended array.
-        $clientName = null;
-
-        foreach($clientRouteInfo as $info) {
-            if($cityId == null) {
-                $flag = 0;
-                $cityId = $info->city_id;
-            }
-            else if($info->city_id == $cityId) {
-                $flag = 0;
-                $cityId = $info->city_id;
-            }
-            else {
-                array_push($clientRouteInfoExtended, $insideArr);
-                $insideArr = [];
-                $flag = 1;
-                $cityId = $info->city_id;
-            }
-
-            if($clientName == null) {
-                $clientRId = $info->client_id;
-                $clientName = Clients::find($clientRId)->name;
-            }
-
-            $stdClass = new \stdClass();
-
-            foreach($clients as $client) {
-                if($info->client_route_id == $client->id) {
-                    $stdClass->clientName = $client->name;
+                    $campaignHour = empty($campaignHour) ? 0 : $campaignHour->hour_count;
+                    if($campaignHour != 0 ){
+                        for (; $campaignHour > 0; $campaignHour--) {
+                            array_push($campaign, $clientRouteInfo[$i]);
+                            $i++;
+                        }
+                        $i--;
+                        array_push($routeInfo, $campaign);
+                    }
                 }
             }
 
-            $stdClass->id = $info->id;
-            $stdClass->client_route_id = $info->client_route_id;
-            $stdClass->city_id = $info->city_id;
-            $stdClass->cityName = $info->cityName;
-            $stdClass->voivode_id = $info->voivode_id;
-            $stdClass->voivodeName = $info->voivodeName;
-            $stdClass->date = $info->date;
-            $stdClass->hotel_id = $info->hotel_id;
-            $stdClass->hotel_info = Hotel::find($info->hotel_id);
-            $stdClass->hour = $info->hour;
-            $stdClass->hotel_price = $info->hotel_price;
-            $stdClass->limit = $info->limits == null ? 0 : $info->limits;
-            $stdClass->department_info_id = $info->department_info_id;
-            $stdClass->weekNumber = $info->weekOfYear;
-            array_push($insideArr, $stdClass);
-            if($flag == 1) {
-                $flag = 0;
+            $status = [1];
+            $hotels = Hotel::whereIn('status', $status)->orderBy('id')->get();
+            foreach ($routeInfo as $campaign) {
+                $campaign[0]->hotel_page = 0;
+                if (!empty($campaign[0]->hotel_id)) {
+                    $hotels->each(function ($hotel, $key) use ($campaign) {
+                        if ($hotel->id == $campaign[0]->hotel_id) {
+                            $campaign[0]->hotel_page = intval(floor($key / 10));
+                            return false;
+                        }
+                    });
+                }
             }
-            if($iterator == ($iteratorFinish - 1)) {
-                array_push($clientRouteInfoExtended, $insideArr);
-            }
-            $iterator++;
-        }
-
-        $clientRouteInfo = collect($clientRouteInfoExtended);
-
-        $clientRouteInfo->each(function ($city, $key) use ($hotels, &$ddArray) {
-            foreach($city as $showHour){
-                $hotels->each(function ($hotel, $key) use ($showHour, &$ddArray) {
-                    if($hotel->id == $showHour->hotel_id){
-                        $showHour->hotel_page = intval(floor($key/10));
-                        return false;
-                    }else{
-                        $showHour->hotel_page = 0;
-                    }
-                });
-            }
-        });
-
-        if($onlyResult == null){
-            return view('crmRoute.specificInfo')
-                ->with('clientRouteInfo', $clientRouteInfoExtended)
-                ->with('user_reservation', $userReservation)
+            return view('crmRoute.specificRoute')
                 ->with('routeInfo', $routeInfo)
-                ->with('clientName', $clientName);
-        }
+                ->with('pageInfo', $pageInfo);
+        }else{
+            $clientRouteInfo = ClientRouteInfo::select(
+                'client_route_info.user_reservation as user_reservation',
+                'client_route_info.hotel_price as hotel_price',
+                'client_route_info.limits as limits',
+                'client_route_info.department_info_id as department_info_id',
+                'client_route_info.id as id', 'city.name as cityName',
+                'voivodeship.name as voivodeName',
+                'client_route.id as client_route_id',
+                'city.id as city_id', 'voivodeship.id as voivode_id',
+                'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id',
+                'client_route_info.hour as hour',
+                'client_route.client_id as client_id',
+                'client_route_info.weekOfYear as weekOfYear')
+                ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
+                ->join('city', 'city.id', '=', 'client_route_info.city_id')
+                ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
+                ->where('client_route_id', '=', $id)
+                ->get();
+            $userReservation = $clientRouteInfo->first()->user_reservation;
 
-        else
-            return $clientRouteInfo->sortByDesc('date');
-    }*/
+            $clientRoute = $this->getClientRouteGroupedByDateSortedByHour($id, $clientRouteInfo);
+            $routeInfo = new \stdClass;
+            $routeInfo->routeName = $this->createRouteName($clientRoute);
+            $routeInfo->firstDate = $clientRoute[0]->date;
+            $routeInfo->week =  $clientRoute[0]->weekOfYear;
+            $clients = Clients::all();
 
-    public function specificRouteGet($id) {
-        $clientRouteCampaigns = ClientRouteCampaigns::join('client_route_info as cri', 'client_route_info_id', '=', 'cri.id')
-            ->select('client_route_info_id', 'hour_count')
-            ->where('client_route_id', '=', $id)->get();
+            $status = [1];
 
-        $clientRouteInfo = ClientRouteInfo::join('client_route as cr', 'cr.id', '=', 'client_route_id')
-            ->join('client as c', 'c.id', '=', 'cr.client_id')
-            ->join('city','city.id','=','city_id')
-            ->join('voivodeship','voivodeship.id','=','voivode_id')
-            ->select(
-                'client_route_info.id',
-                'cr.route_name',
-                'date',
-                'weekOfYear as week',
-                'c.name as client_name',
-                'user_reservation',
-                'hotel_id',
-                'hour',
-                'city.name as city_name',
-                'voivodeship.name as voivode_name'
-            )
-            ->where('cr.id', '=', $id)->where('client_route_info.status', '=', 1)
-            ->orderBy('date')->orderBy('show_order')->orderBy('client_route_info.id')->get();
-        $routeInfo = [];
-        $pageInfo = [];
-        if (!empty($clientRouteInfo)) {
-            $pageInfo = (object)[
-                'clientName' => $clientRouteInfo[0]->client_name,
-                'routeName' => $clientRouteInfo[0]->route_name,
-                'week' => $clientRouteInfo[0]->week,
-                'date' => $clientRouteInfo[0]->date,
-                'userReservation' => $clientRouteInfo[0]->user_reservation
-            ];
-            for ($i = 0; $i < $clientRouteInfo->count(); $i++) {
-                $campaign = [];
-                if (!empty($campaignHour = $clientRouteCampaigns->where('client_route_info_id', '=', $clientRouteInfo[$i]->id)->first()->hour_count)) {
-                    for (; $campaignHour > 0; $campaignHour--) {
-                        array_push($campaign, $clientRouteInfo[$i]);
-                        $i++;
-                    }
-                    $i--;
-                    array_push($routeInfo, $campaign);
+            $hotels = Hotel::whereIn('status', $status)->orderBy('id')->get();
+
+            $clientRouteInfoExtended = array();
+            $insideArr = array();
+            $cityId = null;
+            $flag = 0; //indices whether $insideArr push into $clientRouteInfoExtended 1 - push, 0 - don't push
+            $iterator = 0; //It count loops of foreach
+            $iteratorFinish = count($clientRouteInfo); // indices when condition inside foreach should push array into $clientRouteInfoExtended array.
+            $clientName = null;
+
+            foreach($clientRouteInfo as $info) {
+                if($cityId == null) {
+                    $flag = 0;
+                    $cityId = $info->city_id;
                 }
-            }
-        }
-        $status = [1];
-        $hotels = Hotel::whereIn('status', $status)->orderBy('id')->get();
-        foreach( $routeInfo as $campaign){
-            $campaign[0]->hotel_page = 0;
-            if(!empty($campaign[0]->hotel_id)){
-                $hotels->each(function ($hotel, $key) use ($campaign) {
-                    if($hotel->id == $campaign[0]->hotel_id){
-                        $campaign[0]->hotel_page = intval(floor($key/10));
-                        return false;
-                    }
-                });
-            }
-        }
+                else if($info->city_id == $cityId) {
+                    $flag = 0;
+                    $cityId = $info->city_id;
+                }
+                else {
+                    array_push($clientRouteInfoExtended, $insideArr);
+                    $insideArr = [];
+                    $flag = 1;
+                    $cityId = $info->city_id;
+                }
 
-        return view('crmRoute.specificRoute')
-            ->with('routeInfo', $routeInfo)
-            ->with('pageInfo', $pageInfo);
+                if($clientName == null) {
+                    $clientRId = $info->client_id;
+                    $clientName = Clients::find($clientRId)->name;
+                }
+
+                $stdClass = new \stdClass();
+
+                foreach($clients as $client) {
+                    if($info->client_route_id == $client->id) {
+                        $stdClass->clientName = $client->name;
+                    }
+                }
+
+                $stdClass->id = $info->id;
+                $stdClass->client_route_id = $info->client_route_id;
+                $stdClass->city_id = $info->city_id;
+                $stdClass->cityName = $info->cityName;
+                $stdClass->voivode_id = $info->voivode_id;
+                $stdClass->voivodeName = $info->voivodeName;
+                $stdClass->date = $info->date;
+                $stdClass->hotel_id = $info->hotel_id;
+                $stdClass->hotel_info = Hotel::find($info->hotel_id);
+                $stdClass->hour = $info->hour;
+                $stdClass->hotel_price = $info->hotel_price;
+                $stdClass->limit = $info->limits == null ? 0 : $info->limits;
+                $stdClass->department_info_id = $info->department_info_id;
+                $stdClass->weekNumber = $info->weekOfYear;
+                array_push($insideArr, $stdClass);
+                if($flag == 1) {
+                    $flag = 0;
+                }
+                if($iterator == ($iteratorFinish - 1)) {
+                    array_push($clientRouteInfoExtended, $insideArr);
+                }
+                $iterator++;
+            }
+
+            $clientRouteInfo = collect($clientRouteInfoExtended);
+
+            $clientRouteInfo->each(function ($city, $key) use ($hotels, &$ddArray) {
+                foreach($city as $showHour){
+                    $hotels->each(function ($hotel, $key) use ($showHour, &$ddArray) {
+                        if($hotel->id == $showHour->hotel_id){
+                            $showHour->hotel_page = intval(floor($key/10));
+                            return false;
+                        }else{
+                            $showHour->hotel_page = 0;
+                        }
+                    });
+                }
+            });
+            return $clientRouteInfo->sortByDesc('date');
+        }
     }
 
     /**
