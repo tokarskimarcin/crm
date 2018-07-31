@@ -137,86 +137,99 @@
                 let secondResponse = null;
                 let intersectionArray = null;
 
-                $.ajax({
-                    type: "POST",
-                    async: false,
-                    url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
-                    data: {
-                        'limit': previousCityDistance,
-                        "cityId": previousCityId
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function (response) {
-                        firstResponse = response;
-                        console.assert(typeof(firstResponse) === "object", "firstResponse in showInTheMiddleAjax is not object!");
+                swal({
+                    title: 'Ładowawnie...',
+                    text: 'To może chwilę zająć',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    allowEnterKey: false,
+                    onOpen: () => {
+                        swal.showLoading();
                         $.ajax({
                             type: "POST",
                             async: false,
                             url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
                             data: {
-                                'limit': nextCityDistance,
-                                "cityId": nextCityId
+                                'limit': previousCityDistance,
+                                "cityId": previousCityId
                             },
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
-                            success: function (response2) {
-                                secondResponse = response2;
-                                voivodeSelect.innerHTML = '';
-                                citySelect.innerHTML = '';
-                                console.assert(typeof(secondResponse) === "object", "secondResponse in showInTheMiddleAjax is not object!");
-                                intersectionArray = getIntersection(firstResponse, secondResponse);
+                            success: function (response) {
+                                firstResponse = response;
+                                console.assert(typeof(firstResponse) === "object", "firstResponse in showInTheMiddleAjax is not object!");
+                                $.ajax({
+                                    type: "POST",
+                                    async: false,
+                                    url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
+                                    data: {
+                                        'limit': nextCityDistance,
+                                        "cityId": nextCityId
+                                    },
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    success: function (response2) {
+                                        secondResponse = response2;
+                                        voivodeSelect.innerHTML = '';
+                                        citySelect.innerHTML = '';
+                                        console.assert(typeof(secondResponse) === "object", "secondResponse in showInTheMiddleAjax is not object!");
+                                        intersectionArray = getIntersection(firstResponse, secondResponse);
 
-                                let voivodeSet = intersectionArray[0];
-                                let citySet = intersectionArray[1];
-                                appendBasicOption(voivodeSelect);
+                                        let voivodeSet = intersectionArray[0];
+                                        let citySet = intersectionArray[1];
+                                        appendBasicOption(voivodeSelect);
 
-                                voivodeSet.forEach(voivode => {
-                                    appendVoivodeOptions(voivodeSelect, voivode);
-                                });
+                                        voivodeSet.forEach(voivode => {
+                                            appendVoivodeOptions(voivodeSelect, voivode);
+                                        });
 
-                                if(oldValuesArray) { //this is optional
-                                    console.assert(Array.isArray(oldValuesArray), "oldVoivodeArr in showInExtreme method is not array!");
-                                    appendBasicOption(citySelect);
-                                    voivodeSet.forEach(voivode => {
-                                        if(voivode.id == oldValuesArray[1]) {
-                                            citySet.forEach(voivodeCity => {
-                                                console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
-                                                voivodeCity.forEach(city => {
-                                                    if(city.id === voivode.id) {
-                                                        appendCityOptions(citySelect, city);
-                                                    }
-                                                });
+                                        if(oldValuesArray) { //this is optional
+                                            console.assert(Array.isArray(oldValuesArray), "oldVoivodeArr in showInExtreme method is not array!");
+                                            appendBasicOption(citySelect);
+                                            voivodeSet.forEach(voivode => {
+                                                if(voivode.id == oldValuesArray[1]) {
+                                                    citySet.forEach(voivodeCity => {
+                                                        console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
+                                                        voivodeCity.forEach(city => {
+                                                            if(city.id === voivode.id) {
+                                                                appendCityOptions(citySelect, city);
+                                                            }
+                                                        });
+                                                    });
+                                                }
+
                                             });
+                                            setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
                                         }
 
-                                    });
-                                    setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
-                                }
+                                        citySelect.setAttribute('data-distance', 30);
+                                        $(voivodeSelect).on('change', function() {
+                                            citySelect.innerHTML = ''; //cleaning previous insertions
+                                            appendBasicOption(citySelect);
 
-                                citySelect.setAttribute('data-distance', 30);
-                                $(voivodeSelect).on('change', function() {
-                                    citySelect.innerHTML = ''; //cleaning previous insertions
-                                    appendBasicOption(citySelect);
-
-                                    voivodeSet.forEach(voivode => {
-                                        citySet.forEach(voivodeCity => {
-                                            console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
-                                            voivodeCity.forEach(city => {
-                                                if(city.id === voivode.id) {
-                                                    appendCityOptions(citySelect, city);
-                                                }
+                                            voivodeSet.forEach(voivode => {
+                                                citySet.forEach(voivodeCity => {
+                                                    console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
+                                                    voivodeCity.forEach(city => {
+                                                        if(city.id === voivode.id) {
+                                                            appendCityOptions(citySelect, city);
+                                                        }
+                                                    });
+                                                });
                                             });
                                         });
-                                    });
+                                    }
                                 });
-                            }
-                        });
 
+                            }
+                        }).done((response) => {
+                            swal.close();
+                        });
                     }
                 });
+
             }
 
             /**
@@ -227,53 +240,66 @@
                 console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInExtreme method is not voivode select');
                 console.assert(!isNaN(parseInt(limit)), 'limit in showInExtreme is not number!');
                 console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInExtreme is not number!');
-                $.ajax({
-                    type: "POST",
-                    async: false,
-                    url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
-                    data: {
-                        'limit': limit,
-                        "cityId": nextCityId
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function (response) {
-                        let allVoivodes = response['voievodeInfo'];
-                        console.assert(Array.isArray(allVoivodes), "allVoivodes in showInExtreme method is not array!");
-                        let allCitiesGroupedByVoivodes = response['cityInfo'];
-                        console.assert(typeof(allCitiesGroupedByVoivodes) === "object", "allCitiesGroupedByVoivodes in showInExtreme method is not object!");
-                        allVoivodes.forEach(voivode => {
-                            appendVoivodeOptions(voivodeSelect, voivode)
-                        });
-                        citySelect.setAttribute('data-distance', limit); //applaying old value
-                        if(oldVoivodeArr) { //this is optional
-                            appendBasicOption(citySelect);
-                            console.assert(Array.isArray(oldVoivodeArr), "oldVoivodeArr in showInExtreme method is not array!");
-                            for(let Id in allCitiesGroupedByVoivodes) {
-                                if(oldVoivodeArr[1] == Id) {
-                                    allCitiesGroupedByVoivodes[Id].forEach(city => {
-                                        appendCityOptions(citySelect, city);
-                                    });
-                                }
-                            }
-                            setOldValues(oldVoivodeArr[0], oldVoivodeArr[1], oldVoivodeArr[2], oldVoivodeArr[3]);
-                        }
 
-                        //After selecting voivode, this event listener appends cities from given range into city select
-                        $(voivodeSelect).on('change', function(e) {
-                            citySelect.innerHTML = ''; //cleaning previous insertions
-                            appendBasicOption(citySelect);
-
-                            let voivodeId = e.target.value;
-                            for(let Id in allCitiesGroupedByVoivodes) {
-                                if(voivodeId == Id) {
-                                    console.assert(Array.isArray(allCitiesGroupedByVoivodes[Id]), "allCitiesGroupedByVoivodes in showInExtreme method is not array!");
-                                    allCitiesGroupedByVoivodes[Id].forEach(city => {
-                                        appendCityOptions(citySelect, city);
-                                    });
+                swal({
+                    title: 'Ładowawnie...',
+                    text: 'To może chwilę zająć',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    allowEnterKey: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                        $.ajax({
+                            type: "POST",
+                            async: false,
+                            url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
+                            data: {
+                                'limit': limit,
+                                "cityId": nextCityId
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function (response) {
+                                let allVoivodes = response['voievodeInfo'];
+                                console.assert(Array.isArray(allVoivodes), "allVoivodes in showInExtreme method is not array!");
+                                let allCitiesGroupedByVoivodes = response['cityInfo'];
+                                console.assert(typeof(allCitiesGroupedByVoivodes) === "object", "allCitiesGroupedByVoivodes in showInExtreme method is not object!");
+                                allVoivodes.forEach(voivode => {
+                                    appendVoivodeOptions(voivodeSelect, voivode)
+                                });
+                                citySelect.setAttribute('data-distance', limit); //applaying old value
+                                if(oldVoivodeArr) { //this is optional
+                                    appendBasicOption(citySelect);
+                                    console.assert(Array.isArray(oldVoivodeArr), "oldVoivodeArr in showInExtreme method is not array!");
+                                    for(let Id in allCitiesGroupedByVoivodes) {
+                                        if(oldVoivodeArr[1] == Id) {
+                                            allCitiesGroupedByVoivodes[Id].forEach(city => {
+                                                appendCityOptions(citySelect, city);
+                                            });
+                                        }
+                                    }
+                                    setOldValues(oldVoivodeArr[0], oldVoivodeArr[1], oldVoivodeArr[2], oldVoivodeArr[3]);
                                 }
+
+                                //After selecting voivode, this event listener appends cities from given range into city select
+                                $(voivodeSelect).on('change', function(e) {
+                                    citySelect.innerHTML = ''; //cleaning previous insertions
+                                    appendBasicOption(citySelect);
+
+                                    let voivodeId = e.target.value;
+                                    for(let Id in allCitiesGroupedByVoivodes) {
+                                        if(voivodeId == Id) {
+                                            console.assert(Array.isArray(allCitiesGroupedByVoivodes[Id]), "allCitiesGroupedByVoivodes in showInExtreme method is not array!");
+                                            allCitiesGroupedByVoivodes[Id].forEach(city => {
+                                                appendCityOptions(citySelect, city);
+                                            });
+                                        }
+                                    }
+                                });
                             }
+                        }).done((response) => {
+                            swal.close();
                         });
                     }
                 });
@@ -285,27 +311,40 @@
             function showWithoutDistanceAjax(voivodeId, citySelect) {
                 console.assert(!isNaN(parseInt(voivodeId)) && voivodeId != 0, 'voivodeId in showWithoutDistanceAjax is not number!');
                 console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
-                $.ajax({
-                    type: "POST",
-                    async: false,
-                    url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
-                    data: {
-                        "id": voivodeId
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
-                        let placeToAppend = citySelect;
-                        placeToAppend.innerHTML = '';
-                        appendBasicOption(placeToAppend);
-                        for(let i = 0; i < response.length; i++) {
-                            let responseOption = document.createElement('option');
-                            responseOption.value = response[i].id;
-                            responseOption.textContent = response[i].name;
-                            placeToAppend.appendChild(responseOption);
-                        }
+
+                swal({
+                    title: 'Ładowawnie...',
+                    text: 'To może chwilę zająć',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    allowEnterKey: false,
+                    onOpen: () => {
+                        swal.showLoading();
+                        $.ajax({
+                            type: "POST",
+                            async: false,
+                            url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
+                            data: {
+                                "id": voivodeId
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
+                                let placeToAppend = citySelect;
+                                placeToAppend.innerHTML = '';
+                                appendBasicOption(placeToAppend);
+                                for(let i = 0; i < response.length; i++) {
+                                    let responseOption = document.createElement('option');
+                                    responseOption.value = response[i].id;
+                                    responseOption.textContent = response[i].name;
+                                    placeToAppend.appendChild(responseOption);
+                                }
+                            }
+                        }).done((response) => {
+                            swal.close();
+                        });
                     }
                 });
             }
