@@ -116,8 +116,8 @@
                         data.routeId = "{{$routeId}}";
                         data.clientId = clientSelect.val();
                         data.invoiceStatusId = invoiceStatusSelect.val();
-                        data.firstDateInputFilter = firstDateInputFilter.val();
-                        data.lastDateInputFilter = lastDateInputFilter.val();
+                        data.firstDate = firstDateInputFilter.val();
+                        data.lastDate = lastDateInputFilter.val();
                     },
                     headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
