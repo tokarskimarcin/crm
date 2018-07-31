@@ -57,6 +57,10 @@
             border-style: dashed !important;
             border-width: 1px !important;
         }
+
+        .alert-info {
+            font-size: 1.2em;
+        }
     </style>
 
     {{--Header page --}}
@@ -74,6 +78,10 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     Planowanie wyprzedzenia
+                </div>
+                <div class="alert alert-info">
+                    Moduł planowanie wyprzedzenia zawiera tabelę pokazującą różnicę pomiędzy ustalonymi <i>limitami</i> a <i>zaproszeniami live</i> z zakładki <strong>informacje o kampaniach</strong> dla poszczególnych oddziałów dla określonych dni.
+                    Kolumny można sumować w następujący sposób: Po pierwsze należy zaznaczyć pierwszą komórkę z sumy, przytrzymać lewy shift a następnie kliknąć ostatnią komórkę sumy.
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -200,7 +208,7 @@
 
             /*********************DataTable FUNCTUONS****************************/
 
-            table = $('#datatable').DataTable({
+            let table = $('#datatable').DataTable({
                 serverSide: true,
                 scrollY: '60vh',
                 scrollX: true,
