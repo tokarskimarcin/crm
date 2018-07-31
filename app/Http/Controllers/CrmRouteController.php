@@ -3419,6 +3419,7 @@ class CrmRouteController extends Controller
     }
 
     public function getConfirmHotelInfo(Request $request){
+
         $dayPlus = date("Y-m-d",strtotime($request->dataStart.' + 1 days'));
         $clientID = $request->clientInfo;
         $confirmStatus = $request->confirmStatus;
@@ -3429,9 +3430,10 @@ class CrmRouteController extends Controller
             $confirmStatus = '%';
         $hotelToConfirm = ClientRouteCampaigns::
            select(DB::raw('
-           client_route_campaigns.id as campainID,
+            client_route_campaigns.id as campainID,
             client_route_info.hotel_id as hotelID,
             hotels.name as hotelName,
+            client_route.route_name as route_name,
             city.name as cityName,
             0 as contact,
             client.name as clientName,
@@ -3448,7 +3450,7 @@ class CrmRouteController extends Controller
             ->where('client.id','like',$clientID)
             ->where('client_route_campaigns.hotel_confirm_status','like',$confirmStatus)
             ->groupBy('client_route_info.client_route_id')
-            ->groupBy('client_route_info.hotel_id')
+            ->groupBy('client_route_info.show_order')
             ->get();
         $onlyHotel = Hotel::select(DB::raw('
             hotels.id as hotelID,
@@ -3458,6 +3460,9 @@ class CrmRouteController extends Controller
             ->whereIn('hotels.id',$hotelToConfirm->pluck('hotelID')->toArray())
             ->get();
         $hotelToConfirm->map(function ($item) use ($onlyHotel){
+            if($item->hotelID == null){
+                $item->hotelName = 'Hotel nie został przypisany !';
+            }
             $item->contact =$this::getHotelContact($onlyHotel,$item->hotelID);
            return $item;
         });

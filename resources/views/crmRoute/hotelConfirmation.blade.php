@@ -51,6 +51,20 @@
                     Statusy Hoteli
                 </div>
                 <div class="panel-body">
+                    <div class="alert alert-info page-info">
+                        Moduł <span style="font-weight: bold;">Potwierdzanie hoteli</span>
+                        wyświetla informacje o statusie potwierdzenia hotelu na daną kapmanię.
+                        W tabeli znajdują się hotele, których pokaz jest dzień później niż wybrana data.
+                        <br>
+                        Status <span style="font-weight: bold;">Oczekuje na akceptacje</span>
+                        oznacza iż hotel nie został jeszcze potwierdzony.
+                        <br>
+                        Status <span style="font-weight: bold;">Zaakceptopwano</span>
+                        oznacz, iż hotel został potwierdzony i zaakceptowany. Aby hotel został zaakceptowany, uprzednio musi posiadać przypisany hotel do kampanii.
+                        <br>
+                        Status <span style="font-weight: bold;">Anulowany</span>
+                        oznacza, iż hotel został anulowany.
+                    </div>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
@@ -101,6 +115,7 @@
                                         <th>Nazwa</th>
                                         <th>Kontakt</th>
                                         <th>Klient</th>
+                                        <th>Miasto</th>
                                         <th>Trasa</th>
                                         <th>Data pokazu</th>
                                         <th>Status</th>
@@ -164,10 +179,11 @@
                processing: true,
                paging: false,
                dom: 'Bfrtip',
+               order: [[ 2, "desc" ]],
                buttons: [{
                    extend: 'excelHtml5',
                    exportOptions: {
-                       columns: [0,1,2,3,4,5]
+                       columns: [0,1,2,3,4,5,6]
                    }
                },
                ],
@@ -255,13 +271,14 @@
                    });
                },
                "columnDefs": [
-                   { "visible": false, "targets": 5 }
+                   { "visible": false, "targets": 6 }
                ],
                columns: [
                    {"data": "hotelName"},
                    {"data": "contact"},
                    {"data": "clientName"},
                    {"data": "cityName"},
+                   {"data": "route_name"},
                    {"data": "eventDate"},
                    {
                        "data": function (data, type, dataToSet) {
@@ -274,12 +291,18 @@
                            select.name = 'statusConfirm';
                            select.className = 'statusConfirm form-control';
                            let optionsStr = "";
+                           let hotelID = data.hotelID;
+                           let distabledAccept = false;
+                           if(hotelID == null) distabledAccept = true;
                            optionArray.forEach(function (item) {
                                 if(data.confirmStatus == item.id){
                                     optionsStr += '<option value ='+item.id+' selected>'+item.name+'</option>';
                                 }
                                 else{
-                                    optionsStr += '<option value ='+item.id+'>'+item.name+'</option>';
+                                    if(distabledAccept && item.id == 1)
+                                        optionsStr += '<option value ='+item.id+' disabled>'+item.name+'</option>';
+                                    else
+                                        optionsStr += '<option value ='+item.id+'>'+item.name+'</option>';
                                 }
                            });
                            select.innerHTML = optionsStr;
