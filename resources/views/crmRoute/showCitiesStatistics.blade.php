@@ -50,16 +50,8 @@
                     Podgląd informacji o wykorzystanych miastach
                 </div>
                 <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="heading-container">
-                                Statystyki miast
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-container" style="margin-bottom:4em;">
                         <div class="row">
-                            <div class="alert alert-info" style="font-size:2em; margin:1em;">
+                            <div class="alert alert-info" style="font-size:2em;">
                                 W module statystyki miast znajduję się lista miast użytych w kampaniach, w określonym przedziale czasu. Przycisk podgląd pozwala podejrzeć szczegóły.
                             </div>
                         </div>
@@ -87,7 +79,7 @@
                         </div>
 
 
-                        </div>
+
                     <div class="row" style="padding-left: 2em;padding-right:2em;">
                         <table id="datatable" class="thead-inverse table table-striped row-border" cellspacing="0" width="100%">
                             <thead>
