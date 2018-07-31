@@ -414,9 +414,7 @@ class CrmRouteController extends Controller
         RouteInfo::where('routes_id', '=', $id)->update(['status' => 0]);
         Route::where('id', '=', $id)->update(['status' => 0]);
 
-        $redirectRoute = 'editRouteTemplates/' . $routes->id;
-
-        return Redirect::to($redirectRoute);
+        return Redirect::to('/showRoutes');
     }
 
     /**
@@ -464,7 +462,7 @@ class CrmRouteController extends Controller
                     $clientRouteInfo->voivode_id = $show->voivode;
                     $clientRouteInfo->date = $show->date;
                     $clientRouteInfo->status = 1;
-                    $clientRouteInfo->order = $show->order;
+                    $clientRouteInfo->show_order = $show->order;
                     $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
 
                     $dateArr = explode('-', $show->date);
@@ -534,9 +532,9 @@ class CrmRouteController extends Controller
          '))
             ->where('client_route_id', '=', $id)
             ->where('status', '=', 1)
-            ->groupBy('date', 'client_route_info.city_id')
+            ->groupBy('date', 'client_route_info.city_id', 'show_order')
             ->orderBy('date')
-            ->orderBy('order')
+            ->orderBy('show_order')
             ->get();
 
 //        dd($client_route_info);
@@ -551,6 +549,7 @@ class CrmRouteController extends Controller
         if($request->has('alldata') && $request->has('clientInfo')) {
             $allData = json_decode($request->alldata);
             $allData = array_reverse($allData);
+
             $clientInfo = json_decode($request->clientInfo);
 
             $client_route_info = ClientRouteInfo::select(DB::raw( //We are grouping records because we want to have similar grouping as in $allData.
@@ -559,11 +558,12 @@ class CrmRouteController extends Controller
                  COUNT(*) as hours,
                  client_route_info.voivode_id as voivodeId,
                  client_route_info.checkbox as checkbox,
-                 client_route_info.date as date
+                 client_route_info.date as date,
+                 client_route_info.show_order as show_order
          '))
                 ->where('client_route_id', '=', $id)
                 ->where('status', '=', 1)
-                ->groupBy('date', 'client_route_info.city_id')
+                ->groupBy('date', 'client_route_info.city_id', 'show_order')
                 ->orderBy('date')
                 ->get();
 
@@ -573,25 +573,35 @@ class CrmRouteController extends Controller
             }
 
             $client_route_info_with_flag = $client_route_info->map(function($item) use($allData) {
+
                 $item->toChange = 1; // indices whether records should be updated
                 //if foreach loop finds same object, it change flag "toChange" to 0. it means, it should not be modified
                 foreach($allData as $show) {
                     if(($item->cityId == $show->city) && ($item->voivodeId == $show->voivode) && ($item->date == $show->date) && ($item->hours == $show->hours)) {
-                        $item->toChange = 0; //this group should not be updated about status
-                        ClientRouteInfo::where('city_id', '=', $item->cityId) //we are updating static records about order value
+                        if($item->show_order == $show->order) {
+                            $item->toChange = 0; //this group should not be updated about status
+
+                            ClientRouteInfo::where('city_id', '=', $item->cityId) //we are updating static records about order value
                             ->where('voivode_id', '=', $item->voivodeId)
-                            ->where('date', '=', $item->date)
-                            ->where('status', '=', 1)
-                            ->update(['order' => $show->order]);
-                        $item->order = $show->order;
-                        $show->toAdd = 0;
+                                ->where('date', '=', $item->date)
+                                ->where('status', '=', 1)
+                                ->where('show_order', '=', $item->show_order)
+                                ->update(['show_order' => $show->order]);
+
+                            $item->show_order = $show->order;
+                            $show->toAdd = 0;
+                            break;
+                        }
                     }
+
                 }
+
                 if($item->toChange == 1) { // we are updating all records from group of records
                     $allRecordsToUpdate = ClientRouteInfo::where('city_id', '=', $item->cityId)
                         ->where('voivode_id', '=', $item->voivodeId)
                         ->where('date', '=', $item->date)
                         ->where('status', '=', 1)
+                        ->where('show_order', '=', $item->show_order)
                         ->update(['status' => 0]);
                 }
                     return $item;
@@ -614,7 +624,7 @@ class CrmRouteController extends Controller
                         $clientRouteInfo->voivode_id = $show->voivode;
                         $clientRouteInfo->date = $show->date;
                         $clientRouteInfo->status = 1;
-                        $clientRouteInfo->order = $show->order;
+                        $clientRouteInfo->show_order = $show->order;
                         $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
 
                         $dateArr = explode('-', $show->date);
@@ -646,8 +656,9 @@ class CrmRouteController extends Controller
                 ->where('status', '=', 1)
                 ->groupBy('date', 'client_route_info.city_id')
                 ->orderBy('date')
-                ->orderBy('order')
+                ->orderBy('show_order')
                 ->get();
+
 
             $dateFlag = $client_route_info2[0]->date;
             $name = '';
@@ -677,6 +688,23 @@ class CrmRouteController extends Controller
 
         $route = $this::prepareRouteTemplate($id);
         return $route;
+    }
+
+    /**
+     * @param {String} templateId
+     * @return {String} status
+     */
+    public function deleteRouteTemplate(Request $request) {
+        if($request->has('templateId')) {
+            $templateId = $request->templateId;
+            RouteInfo::where('routes_id', '=', $templateId)->update(['status' => 0]);
+            Route::where('id', '=', $templateId)->update(['status' => 0]);
+            $info = 'Szablon został usunięty pomyślnie';
+        }
+        else {
+            $info = 'Szablon nie został usunięty';
+        }
+        return $info;
     }
 
     /**
@@ -1117,13 +1145,13 @@ class CrmRouteController extends Controller
             $clientRouteIds = 'ClientRouteInfoIds: ';
             $objectOfChange = $request->objectOfChange;
             foreach ($objectOfChange as $item){
-                $clientRoadInfo = ClientRouteInfo::find($item['id']);
+                $clientRoadInfo = ClientRouteInfo::where('status', '=', 1)->where('client_route_info.id', '=', $item['id'])->first();
                 $clientRoadInfo->limits = $item['limit'];
                 $clientRoadInfo->department_info_id = $item['department_info_id'];
                 $clientRoadInfo->save();
                 $clientRouteIds .= $item['id'] .', ';
             }
-            new ActivityRecorder(array_merge(['T'=>'Edycja parametrów kampanii'],$clientRouteIds->toArray()),213,2);
+            new ActivityRecorder(array_merge(['T'=>'Edycja parametrów kampanii'],$objectOfChange[0]),213,2);
 
             return 200;
         }else
@@ -1252,6 +1280,7 @@ class CrmRouteController extends Controller
             ->join('client' ,'client.id','=','client_route.client_id')
             ->join('city' ,'city.id','=', 'city_id')
             ->where('client_route.client_id','like',$clientId)
+            ->where('client_route_info.status', '=', 1)
             ->where('date', 'like', $year . '%')
             ->where('weekOfYear', 'like', $selectedWeek)
             ->where('client_route.type', 'like', $typ)
@@ -1301,6 +1330,7 @@ class CrmRouteController extends Controller
             $client_route_info = ClientRouteInfo::select( 'client_route_info.id as id', 'city.name as cityName','client_route_info.hour as hour' , 'client_route_info.date as date')
                 ->join('city', 'city.id', '=', 'client_route_info.city_id')
                 ->where('client_route_id', '=', $client_route_id)
+                ->where('client_route_info.status', '=', 1)
                 ->get();
             foreach ($client_route_info->sortBy('date')->groupBy('date') as $client_route_day) {
                 array_push($grouped_by_day_client_routes, $client_route_day);
@@ -1350,7 +1380,7 @@ class CrmRouteController extends Controller
             }
             if($checkedFlag == false) {
                 $clientRouteId = $info->client_route_id;
-                $allClientRouteIdInsertions = ClientRouteInfo::where('client_route_id', '=', $clientRouteId)->get();
+                $allClientRouteIdInsertions = ClientRouteInfo::where('client_route_id', '=', $clientRouteId)->where('client_route_info.status', '=', 1)->get();
 
                 if($allClientRouteIdInsertions->where('hotel_id', '!=', null)->count() > 0) {
                     $hasHotel++;
@@ -2351,7 +2381,7 @@ class CrmRouteController extends Controller
      * @return This method send to datatable info about client_route_info records.
      */
     public function showRoutesDetailedAjax(Request $request) {
-        $detailedInfo = ClientRouteInfo::all();
+        $detailedInfo = ClientRouteInfo::where('status', '=', 1)->get();
         $cities = Cities::all();
 //        $detailedInfo->map(function($item) {
 //
@@ -2400,6 +2430,7 @@ class CrmRouteController extends Controller
         ->leftjoin('department_info','department_info.id','client_route_info.department_info_id')
         ->leftjoin('departments','departments.id','department_info.id_dep')
         ->leftjoin('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+        ->where('client_route_info.status', '=', 1) //now it's important
         ->whereIn('client_route.status',[1,2]);
 
         if($years[0] != '0') {
@@ -2441,7 +2472,7 @@ class CrmRouteController extends Controller
         $verification = $request->verification;
         $liveInvitations = $request->liveInvitation;
 
-        $clientRouteInfoRecords = ClientRouteInfo::whereIn('id', $ids)->get();
+        $clientRouteInfoRecords = ClientRouteInfo::where('status', '=', 1)->whereIn('id', $ids)->get();
 
         if($nrPBX !=''){
             foreach($clientRouteInfoRecords as $record) {
@@ -2538,6 +2569,7 @@ class CrmRouteController extends Controller
         '))
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
             ->join('voivodeship', 'voivodeship.id', '=', 'city.voivodeship_id')
+            ->where('client_route_info.status', '=', 1)
             ->whereBetween('client_route_info.date', [$dateStart, $dateStop])
             ->groupBy('voivodeship.name', 'city.name')
             ->get();
@@ -2556,6 +2588,7 @@ class CrmRouteController extends Controller
         $clientRouteInfoRecords = ClientRouteInfo::select('city.name as cityName', 'client_route_info.date as date')
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
             ->where('city_id', '=', $cityId)
+            ->where('client_route_info.status', '=', 1)
             ->whereBetween('date', [$dateStart, $dateStop])
             ->orderBy('date')
             ->get();
@@ -2612,6 +2645,7 @@ class CrmRouteController extends Controller
             SUM(limits) as sumOfLimits,
             SUM(actual_success) as sumOfActualSuccess
         '))
+            ->where('client_route_info.status', '=', 1)
             ->groupBy('date', 'department_info_id')
             ->get();
 
@@ -2637,6 +2671,7 @@ class CrmRouteController extends Controller
             }
             $isSet = ClientRouteInfo::where('date','=',$actualDate)
                 ->where('department_info_id','=',null)
+                ->where('status', '=', 1)
                 ->get()
                 ->count();
             if($isSet != 0)
@@ -2677,6 +2712,7 @@ class CrmRouteController extends Controller
         $actualClientsId = ClientRouteInfo::
             join('client_route','client_route.id','client_route_info.client_route_id')
             ->where('date','like',$actualMonth.'%')
+            ->where('client_route_info.status', '=', 1)
             ->groupBy('client_route.client_id')
             ->get()
             ->pluck('client_id')->toArray();
@@ -2693,6 +2729,7 @@ class CrmRouteController extends Controller
                 '))
             ->join('client_route','client_route.client_id','client.id')
             ->join('client_route_info','client_route_info.client_route_id','client_route.id')
+            ->where('client_route_info.status', '=', 1)
             ->whereIn('client.id',$actualClientsId)
             ->whereBetween('client_route_info.date',[$split_month[0]->date,$split_month[count($split_month)-1]->date])
             ->groupBy('id','date')
@@ -2846,6 +2883,7 @@ class CrmRouteController extends Controller
         $actualClientsId = ClientRouteInfo::
         join('client_route','client_route.id','client_route_info.client_route_id')
             ->where('date','like',$actualMonth.'%')
+            ->where('client_route_info.status', '=', 1)
             ->groupBy('client_route.client_id')
             ->get()
             ->pluck('client_id')->toArray();
@@ -2862,6 +2900,7 @@ class CrmRouteController extends Controller
                 '))
             ->join('client_route','client_route.client_id','client.id')
             ->join('client_route_info','client_route_info.client_route_id','client_route.id')
+            ->where('client_route_info.status', '=', 1)
             ->whereIn('client.id',$actualClientsId)
             ->whereBetween('client_route_info.date',[$split_month[0]->date,$split_month[count($split_month)-1]->date])
             ->groupBy('id','date')
@@ -3133,6 +3172,7 @@ class CrmRouteController extends Controller
             ->join('client','client.id','=','client_route.client_id')
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
             ->join('hotels', 'hotels.id','=','hotel_id')
+            ->where('client_route_info.status', '=', 1)
             ->whereBetween('client_route_info.date', [$request->dateStart, $request->dateStop]);
 
         if($request->clients[0] != 0) {
@@ -3154,6 +3194,7 @@ class CrmRouteController extends Controller
         $clientRouteInfoRecords = ClientRouteInfo::select('city.name as cityName', 'client_route_info.date as date')
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
             ->where('city_id', '=', $cityId)
+            ->where('client_route_info.status', '=', 1)
             ->whereBetween('date', [$dateStop, $dateStart])
             ->orderBy('date')
             ->get();
@@ -3181,7 +3222,7 @@ class CrmRouteController extends Controller
                 ->with('clients', $clients)
                 ->with('invoiceStatuses', $invoiceStatuses)
                 ->with('firstDate', date('Y-m-d',strtotime('-7 Days')))
-                ->with('lastDate', ClientRouteInfo::select('date')->orderBy('date','desc')->limit(1)->get()[0]->date)
+                ->with('lastDate', ClientRouteInfo::select('date')->where('client_route_info.status', '=', 1)->orderBy('date','desc')->limit(1)->get()[0]->date)
                 ->with('validCampaignInvoiceExtensions',json_encode($this->validCampaignInvoiceExtensions));
         }else{
             $client = ClientRoute::find($id);
@@ -3272,7 +3313,7 @@ class CrmRouteController extends Controller
             ->join('hotels as h','cri.hotel_id','=','h.id')
             ->join('client_route as cr','cri.client_route_id','=','cr.id')
             ->join('client as c','cr.client_id','=','c.id')
-            ->where('cri.status','=', 1);
+            ->where('cri.status', '=', 1);
         if ($routeId > 0) {
             $clientRouteCampaigns->where('cri.client_route_id', '=', $routeId);
         } else if (!is_null($firstDate) || !is_null($lastDate)) {
@@ -3414,6 +3455,7 @@ class CrmRouteController extends Controller
             ->where('client_route.client_id','=',$clientID)
             ->where('client_route.status','like',$state)
             ->where('client_route_info.weekOfYear','like',$selectedWeek)
+            ->where('client_route_info.status', '=', 1)
             ->where(DB::raw('YEAR(client_route_info.date)'),'like',$year)
             ->orderBy('date')
             ->orderBy('cityName')
@@ -3459,12 +3501,14 @@ class CrmRouteController extends Controller
             ->join('client_route_info','client_route_info.id','client_route_campaigns.client_route_info_id')
             ->join('client_route','client_route.id','client_route_info.client_route_id')
             ->join('client','client.id','client_route.client_id')
+            ->where('client_route_info.status', '=', 1)
             ->get();
         return view('crmRoute.hotelConfirmation')
             ->with('allClients',$allClients);
     }
 
     public function getConfirmHotelInfo(Request $request){
+
         $dayPlus = date("Y-m-d",strtotime($request->dataStart.' + 1 days'));
         $clientID = $request->clientInfo;
         $confirmStatus = $request->confirmStatus;
@@ -3475,9 +3519,10 @@ class CrmRouteController extends Controller
             $confirmStatus = '%';
         $hotelToConfirm = ClientRouteCampaigns::
            select(DB::raw('
-           client_route_campaigns.id as campainID,
+            client_route_campaigns.id as campainID,
             client_route_info.hotel_id as hotelID,
             hotels.name as hotelName,
+            client_route.route_name as route_name,
             city.name as cityName,
             0 as contact,
             client.name as clientName,
@@ -3490,10 +3535,11 @@ class CrmRouteController extends Controller
             ->leftjoin('hotels','hotels.id','client_route_info.hotel_id')
             ->leftjoin('city','city.id','hotels.city_id')
             ->where('client_route_info.date','like',$dayPlus)
+            ->where('client_route_info.status', '=', 1)
             ->where('client.id','like',$clientID)
             ->where('client_route_campaigns.hotel_confirm_status','like',$confirmStatus)
             ->groupBy('client_route_info.client_route_id')
-            ->groupBy('client_route_info.hotel_id')
+            ->groupBy('client_route_info.show_order')
             ->get();
         $onlyHotel = Hotel::select(DB::raw('
             hotels.id as hotelID,
@@ -3503,6 +3549,9 @@ class CrmRouteController extends Controller
             ->whereIn('hotels.id',$hotelToConfirm->pluck('hotelID')->toArray())
             ->get();
         $hotelToConfirm->map(function ($item) use ($onlyHotel){
+            if($item->hotelID == null){
+                $item->hotelName = 'Hotel nie został przypisany !';
+            }
             $item->contact =$this::getHotelContact($onlyHotel,$item->hotelID);
            return $item;
         });

@@ -516,8 +516,7 @@
                                 formData.append('campaignId', campaignId.toString());
                             }
                             if (uploadFiles)
-                                uploadFilesAjax(formData);
-                                invoiceDatatable.ajax.reload();
+                                uploadFilesAjax(formData,invoiceDatatable);
                         }
                     });
                 }
@@ -629,7 +628,7 @@
             return fname.slice((fname.lastIndexOf(".") - 1 >>> 0) + 2);
         }
 
-        function uploadFilesAjax(formData) {
+        function uploadFilesAjax(formData,datatable) {
             swal({
                 title: 'Wysyłanie pliku...',
                 text: 'To może chwilę potrwać',
@@ -648,6 +647,7 @@
                         processData: false,
                         data: formData
                     }).done(function (response) {
+                        reloadDataTable(datatable);
                         swal.close();
                         if (response === 'success') {
                             $.notify({
@@ -732,6 +732,9 @@
         }
 
 
+        function reloadDataTable(datataTable) {
+            datataTable.ajax.reload();
+        }
         function  getFormatedDate(date) {
             let day = date.getDate();
             let month = date.getMonth()+1;

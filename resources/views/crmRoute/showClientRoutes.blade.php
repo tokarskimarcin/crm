@@ -42,6 +42,7 @@
         }
     </style>
 
+    <div id="hiddeCSV" hidden></div>
     {{--Header page --}}
     <div class="row">
         <div class="col-md-12">
@@ -264,6 +265,7 @@
                 var link = document.createElement("a");
                 link.download = name+" "+toDay+".xls";
                 link.href = uri + base64(format(template, ctx));
+                document.getElementById('hiddeCSV').appendChild(link);
                 link.click();
             }
         })();
@@ -384,7 +386,10 @@
                             });
                             $('#tabelka tbody').empty();
                             $('#tabelka tbody').append(trHTML);
-                            tableToExcel('tabelka', 'Raport klienta '+clientColorObj[0].clientName)
+                            if(clientColorObj[0] != undefined)
+                                tableToExcel('tabelka', 'Raport klienta '+clientColorObj[0].clientName)
+                            else
+                                swal('Brak danych do wygenerowania');
                         }
                     });
                 }
