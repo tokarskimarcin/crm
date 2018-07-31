@@ -137,9 +137,6 @@
 @section('script')
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
-        const tableNumber = document.querySelectorAll('table').length;
-        let lastEach = false;
-        let lp = 1;
         let hotelInfoArr =[];
         let campaignInfoArray = [];
 
@@ -188,11 +185,9 @@
                             }
                             return row;
                         },"fnDrawCallback": function(settings) {
-                            if(lp == tableNumber || lastEach){
-                                lastEach = true;
-                                $('table tbody tr').off('click');
+                                $(this).find('tr').off('click');
 
-                                $('table tbody tr').on('click', function() {
+                                $(this).find('tr').on('click', function() {
                                     let datatables = $('.datatable');
                                     let test = $(this).closest('table');
                                     if($(this).hasClass('check')) {
@@ -209,9 +204,7 @@
                                         $(this).find('.checkbox_info').prop('checked', true);
                                         hotelInfoArr[key].hotel_id = $(this).data('hotel_id');
                                     }
-                                })
-                            }
-                            lp++;
+                                });
                             checkedInput = $(this).closest('table').find('input[type="checkbox"]:checked');
                             closestTr = checkedInput.closest('tr');
                             closestTr.addClass('check');
@@ -295,11 +288,12 @@
 
                 });
                 if(isValid === true) {
-                    submitForm();
+                    $(e.target).prop('disabled',true);
+                    submitForm(e);
                 }
             }
 
-            function submitForm() {
+            function submitForm(e) {
                 let JSONData = JSON.stringify(campaignInfoArray);
                 $.ajax({
                     type: "POST",
@@ -317,6 +311,7 @@
                         }else{
                             console.log(response);
                             swal('Błąd!','Wewnętrzny błąd serwera. Spróbuj ponownie później','error');
+                            $(e.target).prop('disabled',false);
                         }
                     }
                 });
