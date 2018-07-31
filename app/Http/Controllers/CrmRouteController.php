@@ -476,6 +476,7 @@ class CrmRouteController extends Controller
 
                     if($i == $show->hours - 1) {
                         $clientRouteCampaigns->client_route_info_id = $clientRouteInfo->id;
+                        $clientRouteCampaigns->hour_count = $show->hours;
                         $clientRouteCampaigns->save();
                     }
                 }
@@ -638,6 +639,7 @@ class CrmRouteController extends Controller
 
                         if($i == $show->hours - 1) {
                             $clientRouteCampaigns->client_route_info_id = $clientRouteInfo->id;
+                            $clientRouteCampaigns->hour_count = $show->hours;
                             $clientRouteCampaigns->save();
                         }
                     }
@@ -872,14 +874,13 @@ class CrmRouteController extends Controller
                 ->get();
         }else {
             $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
-            ( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
-             * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
-              * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
+        ( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
+         * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
+          * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
                 ->having('distance', '<', $limit)
                 ->get();
         }
-
         return $voievodeshipRound;
     }
 
