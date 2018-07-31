@@ -179,7 +179,7 @@
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function (mainEvent) {
+        document.addEventListener('DOMContentLoaded', function () {
 
             (function activateDatepicker() {
                 $('.form_date').datetimepicker({
@@ -198,9 +198,9 @@
             };
             let sumOfSelectedCells = 0;
             const now = new Date();
-            const day = ("0" + now.getDate()).slice(-2);
+            // const day = ("0" + now.getDate()).slice(-2);
             const month = ("0" + (now.getMonth() + 1)).slice(-2);
-            const today = now.getFullYear() + "-" + (month) + "-" + (day);
+            // const today = now.getFullYear() + "-" + (month) + "-" + (day);
             const firstDayOfThisMonth = now.getFullYear() + "-" + (month) + "-01";
             /*******END OF GLOBAL VARIABLES*********/
 
@@ -263,7 +263,7 @@
             /*********************EVENT LISTENERS FUNCTIONS****************************/
 
 
-            $('#date_start, #date_stop').on('change', function (e) {
+            $('#date_start, #date_stop').on('change', function () {
                 table.ajax.reload();
             });
 
