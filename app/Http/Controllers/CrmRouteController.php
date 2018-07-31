@@ -656,7 +656,7 @@ class CrmRouteController extends Controller
          '))
                 ->where('client_route_id', '=', $id)
                 ->where('status', '=', 1)
-                ->groupBy('date', 'client_route_info.city_id')
+                ->groupBy('date', 'client_route_info.city_id', 'show_order')
                 ->orderBy('date')
                 ->orderBy('show_order')
                 ->get();
