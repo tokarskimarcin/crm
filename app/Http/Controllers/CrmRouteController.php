@@ -3224,7 +3224,7 @@ class CrmRouteController extends Controller
             ->join('hotels as h','cri.hotel_id','=','h.id')
             ->join('client_route as cr','cri.client_route_id','=','cr.id')
             ->join('client as c','cr.client_id','=','c.id')
-            ->where('client_route_info.status', '=', 1);
+            ->where('cri.status', '=', 1);
         if ($routeId > 0) {
             $clientRouteCampaigns->where('cri.client_route_id', '=', $routeId);
         } else if ($firstDate !== null || $lastDate !== null) {
