@@ -39,6 +39,11 @@
                     Miasta
                 </div>
                 <div class="panel-body">
+                    <div class="alert alert-info">
+                        Panel <strong>zarządzania miastami</strong> pozwala dodawać oraz edytować miasta. Każde miasto może zostać wyłączone/włączone przyciskami <button class='btn btn-danger' style="width: inherit;"><span class='glyphicon glyphicon-off'></span> Wyłącz</button> <button class='btn btn-success'><span class='glyphicon glyphicon-off'></span> Włącz</button>.
+                        Miasta wyłączone nie wyświetlają się w zakładkach <strong>Tworzenie szablonów tras</strong> oraz <strong>Przypisanie trasy do klienta</strong>.
+                        Szczegółowe informacje o mieście można wyświetlić oraz edytować po naciśnięciu przycisku <button class='btn btn-info' style="width: inherit;"><span class='glyphicon glyphicon-edit'></span> Edycja</button>
+                    </div>
                     <div class="row">
                         <div class="col-md-12">
                             <button data-toggle="modal" class="btn btn-default cityToModal" id="NewCityModal"
