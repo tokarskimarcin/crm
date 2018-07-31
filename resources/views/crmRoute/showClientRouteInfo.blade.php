@@ -22,8 +22,12 @@
         <div class="panel-heading">
             Panel z informacjami
         </div>
+        <div class="alert alert-info">
+            Moduł <strong>Baza miejscowości/hotele</strong> prezentuje informacje o miastach i hotelach przypisanych do tras dla poszczególnych klientów.
+            Lista <strong>klienci </strong> jest wielokrotnego wyboru. Tryb pełnoekranowy, można go opuścić naciskająć przycisk "ESC" na klawiaturze.
+        </div>
 
-        <div class="row">
+            <div class="row">
 
                 <div class="col-md-3">
                     <div class="form-group" style="margin-left: 1em;">
@@ -46,41 +50,42 @@
                 </div>
 
 
-            <div class="col-md-3">
-                <label for="clients">Klienci</label>
-                <select class="selectpicker form-control" id="clients" name="link_privilages[]" title="Brak wybranych użytkowników" multiple data-actions-box="true">
-                    @if(isset($clients))
-                        @foreach($clients as $client)
-                            <option value="{{$client->id}}">{{$client->name}}</option>
-                        @endforeach
-                    @endif
-                </select>
+                <div class="col-md-3">
+                    <label for="clients">Klienci</label>
+                    <select class="selectpicker form-control" id="clients" name="link_privilages[]" title="Brak wybranych użytkowników" multiple data-actions-box="true">
+                        @if(isset($clients))
+                            @foreach($clients as $client)
+                                <option value="{{$client->id}}">{{$client->name}}</option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button id="fullscreen" class="btn btn-info"><span class="glyphicon glyphicon-fullscreen"></span> Tryb pełnoekranowy</button>
+                </div>
             </div>
-            <div class="col-md-3">
-                <button id="fullscreen" class="btn btn-info"><span class="glyphicon glyphicon-fullscreen"></span> Tryb pełnoekranowy</button>
+
+
+            <div class="panel-body">
+
+                <table id="datatable" class="thead-inverse table row-border table-striped">
+                    <thead>
+                    <tr>
+                        <th>Klient</th>
+                        <th>Tydzień</th>
+                        <th>Data</th>
+                        <th>Miasto</th>
+                        <th>Hotel</th>
+                        <th>Os. rezerwująca</th>
+                        <th>Cena za salę</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
             </div>
-        </div>
 
-
-        <div class="panel-body">
-
-            <table id="datatable" class="thead-inverse table row-border table-striped">
-                <thead>
-                <tr>
-                    <th>Klient</th>
-                    <th>Tydzień</th>
-                    <th>Data</th>
-                    <th>Miasto</th>
-                    <th>Hotel</th>
-                    <th>Os. rezerwująca</th>
-                    <th>Cena za salę</th>
-                </tr>
-                </thead>
-                <tbody>
-
-                </tbody>
-            </table>
-        </div>
     </div>
 @endsection
 @section('script')
@@ -90,6 +95,7 @@
     <script>
         let datatableHeight = '45vh'; //this variable defines height of table
         let fullscreen = document.getElementById('fullscreen'); // fullscreen button
+        const legendBar = document.querySelector('.alert-info');
 
         const now = new Date();
         const day = ("0" + now.getDate()).slice(-2);
@@ -163,17 +169,20 @@
             if(elem.mozRequestFullScreen) {
                 datatableHeight = '65vh';
                 $('div.dataTables_scrollBody').css('height',datatableHeight);
+                legendBar.style.display = 'none';
                 elem.mozRequestFullScreen();
             }
             if(elem.webkitRequestFullscreen) {
                 datatableHeight = '65vh';
                 $('div.dataTables_scrollBody').css('height',datatableHeight);
+                legendBar.style.display = 'none';
                 elem.webkitRequestFullscreen();
             }
 
             if(elem.msRequestFullscreen) {
                 datatableHeight = '65vh';
                 $('div.dataTables_scrollBody').css('height',datatableHeight);
+                legendBar.style.display = 'none';
                 elem.msRequestFullscreen();
             }
 
@@ -186,6 +195,7 @@
             if ( document.mozFullScreenElement === null ) {
                 datatableHeight = '45vh';
                 $('div.dataTables_scrollBody').css('height',datatableHeight);
+                legendBar.style.display = 'block';
             }
         });
 
@@ -193,6 +203,7 @@
             if ( document.webkitFullscreenElement === null ) {
                 datatableHeight = '45vh';
                 $('div.dataTables_scrollBody').css('height',datatableHeight);
+                legendBar.style.display = 'block';
             }
         });
 
@@ -200,6 +211,7 @@
             if ( document.msFullscreenElement === null ) {
                 datatableHeight = '45vh';
                 $('div.dataTables_scrollBody').css('height',datatableHeight);
+                legendBar.style.display = 'block';
             }
         });
 
