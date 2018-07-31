@@ -26,7 +26,11 @@ class ClientController extends Controller
      */
     public function getClient(Request $request){
         if($request->ajax()){
-           $clients = Clients::all();
+            if(isset($request->showDisabledClient) && $request->showDisabledClient == 'false')
+                $showClient = 1;
+            else
+                $showClient = '%';
+           $clients = Clients::where('status','like',$showClient)->get();
             $clientExtended = $clients->map(function($item) {
                 if($item->priority == 1) {
                     $item->priorityName = "Niski";

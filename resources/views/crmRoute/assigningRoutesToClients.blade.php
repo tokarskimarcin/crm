@@ -384,7 +384,7 @@
                     'url': "{{ route('api.getClient') }}",
                     'type': 'POST',
                     'data': function (d) {
-                        // d.date_start = $('#date_start').val();
+                        d.showDisabledClient = false;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },

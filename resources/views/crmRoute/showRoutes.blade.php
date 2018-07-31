@@ -91,7 +91,7 @@
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<a href="{{URL::to("editRouteTemplates")}}/' + data.id + '" style="text-decoration:none;" class="links"><button class="btn btn-block btn-info" style="width: 40%; display: inline !important;"><span class="glyphicon glyphicon-edit"></span> Edycja</button></a>  <button id="removeTemplateButton" class="btn btn-block btn-danger" data-templateid="' + data.id + '" style="width: 40%; display: inline !important;"><span class="glyphicon glyphicon-delete"></span> Usuń</button>';
+                            return '<a href="{{URL::to("editRouteTemplates")}}/' + data.id + '" style="text-decoration:none;" class="links"><button class="btn btn-block btn-info" style="width: 50%; display: inline !important;"><span class="glyphicon glyphicon-edit"></span> Edycja</button></a>  <button id="removeTemplateButton" class="btn btn-block btn-danger" data-templateid="' + data.id + '" style="width: 40%; display: inline !important;"><span class="glyphicon glyphicon-delete"></span> Usuń</button>';
                         }, "orderable": false, "searchable": false, "width": "20%"
                     }
                 ]
