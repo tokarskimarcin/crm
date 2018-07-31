@@ -476,6 +476,7 @@ class CrmRouteController extends Controller
 
                     if($i == $show->hours - 1) {
                         $clientRouteCampaigns->client_route_info_id = $clientRouteInfo->id;
+                        $clientRouteCampaigns->hour_count = $show->hours;
                         $clientRouteCampaigns->save();
                     }
                 }
@@ -638,6 +639,7 @@ class CrmRouteController extends Controller
 
                         if($i == $show->hours - 1) {
                             $clientRouteCampaigns->client_route_info_id = $clientRouteInfo->id;
+                            $clientRouteCampaigns->hour_count = $show->hours;
                             $clientRouteCampaigns->save();
                         }
                     }
