@@ -151,7 +151,8 @@
                             url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
                             data: {
                                 'limit': previousCityDistance,
-                                "cityId": previousCityId
+                                "cityId": previousCityId,
+                                "onlyActiveCities": true
                             },
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -165,7 +166,8 @@
                                     url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
                                     data: {
                                         'limit': nextCityDistance,
-                                        "cityId": nextCityId
+                                        "cityId": nextCityId,
+                                        "onlyActiveCities": true
                                     },
                                     headers: {
                                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -255,7 +257,8 @@
                             url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
                             data: {
                                 'limit': limit,
-                                "cityId": nextCityId
+                                "cityId": nextCityId,
+                                "onlyActiveCities": true
                             },
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -325,7 +328,8 @@
                             async: false,
                             url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
                             data: {
-                                "id": voivodeId
+                                "id": voivodeId,
+                                "onlyActiveCities": true
                             },
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

@@ -732,9 +732,13 @@ class CrmRouteController extends Controller
         if($request->ajax()) {
             $cityId = $request->cityId;
             $limit = $request->limit;
+            $onlyActiveCities = false;
+            if($request->has('onlyActiveCities')) {
+                $onlyActiveCities = $request->onlyActiveCities;
+            }
 
             $city = Cities::where('id', '=', $cityId)->first();
-            $voievodeshipRound = $this::findCityByDistanceWithoutGracePeriod($city, $limit);
+            $voievodeshipRound = $this::findCityByDistanceWithoutGracePeriod($city, $limit, $onlyActiveCities);
 
             $voievodeshipRound = $voievodeshipRound->groupBy('id');
             $voievodeshipDistinc = array();
@@ -865,21 +869,39 @@ class CrmRouteController extends Controller
         return $voievodeshipRound;
     }
 
-    public function findCityByDistanceWithoutGracePeriod($city, $limit){
-        if($limit == 'infinity'){
-            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour'))
-                ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
-                ->get();
-        }else {
-            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
+    public function findCityByDistanceWithoutGracePeriod($city, $limit, $onlyActiveCities = false){
+        if($onlyActiveCities) {
+            if($limit == 'infinity'){
+                $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour'))
+                    ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
+                    ->where('city.status', '=', 0)
+                    ->get();
+            }else {
+                $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
             ( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
              * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
               * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
-                ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
-                ->having('distance', '<', $limit)
-                ->get();
+                    ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
+                    ->where('city.status', '=', 0)
+                    ->having('distance', '<', $limit)
+                    ->get();
+            }
         }
-
+        else {
+            if($limit == 'infinity'){
+                $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour'))
+                    ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
+                    ->get();
+            }else {
+                $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
+            ( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
+             * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
+              * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
+                    ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
+                    ->having('distance', '<', $limit)
+                    ->get();
+            }
+        }
         return $voievodeshipRound;
     }
 
@@ -3116,9 +3138,23 @@ class CrmRouteController extends Controller
     public function allCitiesInGivenVoivodeAjax(Request $request) {
         if($request->ajax()) {
             $voivodeId = $request->id;
-            $allCitiesFromGivenVoivode = Cities::select('id', 'name')
-                ->where('voivodeship_id', '=', $voivodeId)
-                ->get();
+            $onlyActiveCities = false;
+            if($request->has('onlyActiveCities')) {
+                $onlyActiveCities = $request->onlyActiveCities;
+            }
+
+            if($onlyActiveCities) { //display only active cities.
+                $allCitiesFromGivenVoivode = Cities::select('id', 'name')
+                    ->where('voivodeship_id', '=', $voivodeId)
+                    ->where('status', '=', 0)
+                    ->get();
+            }
+            else { //display all cities.
+                $allCitiesFromGivenVoivode = Cities::select('id', 'name')
+                    ->where('voivodeship_id', '=', $voivodeId)
+                    ->get();
+            }
+
 
             return $allCitiesFromGivenVoivode;
         }
