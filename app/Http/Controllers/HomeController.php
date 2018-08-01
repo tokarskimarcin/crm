@@ -85,14 +85,15 @@ class HomeController extends Controller
     public function checkStatusWork()
     {
         try{
-            $status = Work_Hour::where('date',$this->actuall_date)
-                ->where('id_user',Auth::id())
-                ->pluck('status')
+            $status = Work_Hour::
+                select('status')
+                ->where('date','like',$this->actuall_date)
+                ->where('id_user','=',Auth::user()->id)
                 ->first();
             if(empty($status)){
                 return 0;
             }
-            return $status;
+            return $status->status;
         }catch(\Exception $e){
             return -1;
         }
