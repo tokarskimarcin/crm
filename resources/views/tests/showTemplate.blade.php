@@ -100,7 +100,7 @@
                 'Wybrany test został usuniety.',
                 'success'
             )
-            window.location.replace('{{ URL::to('/deleteTemplate') }}'+'/'+id);
+            window.location.replace('{{ URL::to('/deleteshowTestTemplateTemplate') }}'+'/'+id);
         }
     })
     });
