@@ -28,25 +28,14 @@
         </div>
 
             <div class="row">
-
                 <div class="col-md-3">
-                    <div class="form-group" style="margin-left: 1em;">
-                        <label for="date" class="myLabel">Data początkowa:</label>
-                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                            <input class="form-control" name="date_start" id="date_start" type="text" value="{{date("Y-m-d")}}">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                        </div>
-                    </div>
+                    <label for="date_start">Data początkowa:</label>
+                    <input type="date" id="date_start" style="width: 100%;" class="form-control">
                 </div>
 
                 <div class="col-md-3">
-                    <div class="form-group"style="margin-left: 1em;">
-                        <label for="date_stop" class="myLabel">Data końcowa:</label>
-                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
-                            <input class="form-control" name="date_stop" id="date_stop" type="text" value="{{date("Y-m-d")}}">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                        </div>
-                    </div>
+                    <label for="date_stop">Data końcowa:</label>
+                    <input type="date" id="date_stop" style="width: 100%;" class="form-control">
                 </div>
 
 
@@ -110,14 +99,9 @@
                 deselectAllText: 'Odznacz wszystkie'
             });
 
-            $('.form_date').datetimepicker({
-                language:  'pl',
-                autoclose: 1,
-                minView : 2,
-                pickTime: false,
-            });
-
             $('#date_start').val(firstDayOfThisMonth);
+            $('#date_stop').val(today);
+
         })();
 
         let table = $('#datatable').DataTable({
