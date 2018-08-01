@@ -12,7 +12,9 @@
     <!-- Bootstrap Core CSS -->
     <link href="{{ asset('/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.2.3/animate.min.css"  rel="stylesheet"/>
+    {{--<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.2.3/animate.min.css"  rel="stylesheet"/>--}}
+    <link href="{{ asset('/css/animate.min.css')}}" rel="stylesheet">
+
     <!-- MetisMenu CSS -->
     <link href="{{ asset('/vendor/metisMenu/metisMenu.min.css')}}" rel="stylesheet">
 
@@ -180,4 +182,5 @@
     <script src="{{ asset('/js/sweetAlert.js')}}"></script>
 
 
-    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    {{--<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">--}}
+    <link href="{{ asset('/css/bootstrap-toggle.min.css')}}" rel="stylesheet">
