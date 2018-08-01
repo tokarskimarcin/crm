@@ -38,7 +38,6 @@
                     <input type="date" id="date_stop" style="width: 100%;" class="form-control">
                 </div>
 
-
                 <div class="col-md-3">
                     <label for="clients">Klienci</label>
                     <select class="selectpicker form-control" id="clients" name="link_privilages[]" title="Brak wybranych użytkowników" multiple data-actions-box="true">
@@ -53,7 +52,6 @@
                     <button id="fullscreen" class="btn btn-info"><span class="glyphicon glyphicon-fullscreen"></span> Tryb pełnoekranowy</button>
                 </div>
             </div>
-
 
             <div class="panel-body">
 
