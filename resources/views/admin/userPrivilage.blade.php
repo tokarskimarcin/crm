@@ -213,7 +213,7 @@
                                swal(
                                    'Usunięte!',
                                    'Kryterium zostało usunięte',
-                                   'Sukces'
+                                   'success'
                                )
                            }
                        });

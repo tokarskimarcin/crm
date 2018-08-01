@@ -287,7 +287,6 @@ function dataEdit(e) {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         success: function(response) {
-            console.log(response);
 
             $('#medical_scan_link a').remove();
 
