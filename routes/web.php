@@ -402,6 +402,8 @@ Route::get('/mailDayReportCampaign', 'StatisticsController@mailDayReportCampaign
 Route::get('/mailWeekReportCampaign', 'StatisticsController@mailWeekReportCampaign');
 Route::get('/mailMonthReportCampaign', 'StatisticsController@mailMonthReportCampaign');
 
+
+
 //Maila dotyczące wyłączonych kont
 //Raport Usunietych kont
 Route::get('/weekReportUnuserdAccount', 'StatisticsController@MailWeekReportUnuserdAccount');
@@ -612,8 +614,12 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageDayReportMissedRepo', 'StatisticsController@dayReportMissedRepo');
 
     //Campaign reports
-    Route::get('/dayReportCampaign', 'StatisticsController@dayReportCampaignGet');
-    Route::post('/dayReportCampaign', 'StatisticsController@dayReportCampaignPost');
+    Route::get('/dayReportCampaign', 'StatisticsRBHController@dayReportCampaignGet');
+    Route::post('/dayReportCampaign', 'StatisticsRBHController@dayReportCampaignPost');
+
+    //PlanningRBH Rerpot
+    Route::get('/weekReportPlanningRBH', 'StatisticsController@weekReportPlanningRBHGet');
+    Route::post('/weekReportPlanningRBH', 'StatisticsController@weekReportPlanningRBHPost');
 
     Route::get('/weekReportCampaign', 'StatisticsController@weekReportCampaignGet');
     Route::post('/weekReportCampaign', 'StatisticsController@weekReportCampaignPost');
