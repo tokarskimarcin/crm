@@ -14,6 +14,8 @@ class Schedule extends Model
      *
      * @var array
      */
+
+    public static $polishDate = ['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'];
     protected $fillable = [
         'id', 'id_user', 'id_manager', 'year', 'week_num', 'monday_comment',
         'monday_hour', 'tuesday_comment', 'tuesday_hour', 'wednesday_comment',
@@ -43,7 +45,8 @@ class Schedule extends Model
                 time_to_sec(`thursday_stop`)-time_to_sec(`thursday_start`) as sec_thursday,
                 time_to_sec(`friday_stop`)-time_to_sec(`friday_start`) as sec_friday,
                 time_to_sec(`saturday_stop`)-time_to_sec(`saturday_start`) as sec_saturday,
-                time_to_sec(`sunday_stop`)-time_to_sec(`sunday_start`) as sec_sunday'))
+                time_to_sec(`sunday_stop`)-time_to_sec(`sunday_start`) as sec_sunday,
+                 0 as sec_sum'))
                 ->join('users','users.id','schedule.id_user')
                 ->leftjoin('department_info','department_info.id','users.department_info_id')
                 ->join('departments','departments.id','department_info.id_dep')
@@ -67,13 +70,22 @@ class Schedule extends Model
     public static function groupUsersRBHbyDepartments($CsheduleInfo) : Collection{
         $CsheduleInfo = $CsheduleInfo->groupBy('department_info_id')->map(function ($row){
             $CfirstCollect = $row->first();
-            $CfirstCollect->sec_monday      =   $row->sum('sec_monday');
-            $CfirstCollect->sec_tuesday     =   $row->sum('sec_tuesday');
-            $CfirstCollect->sec_wednesday   =   $row->sum('sec_wednesday');
-            $CfirstCollect->sec_thursday    =   $row->sum('sec_thursday');
-            $CfirstCollect->sec_friday      =   $row->sum('sec_friday');
-            $CfirstCollect->sec_saturday    =   $row->sum('sec_saturday');
-            $CfirstCollect->sec_sunday      =   $row->sum('sec_sunday');
+            $CfirstCollect->sec_sum         =  gmdate('H:i:s',($CfirstCollect->sec_monday +
+                $CfirstCollect->sec_tuesday     +
+                $CfirstCollect->sec_wednesday   +
+                $CfirstCollect->sec_thursday    +
+                $CfirstCollect->sec_friday      +
+                $CfirstCollect->sec_saturday));
+            $CfirstCollect->sec_monday      =   gmdate('H:i:s', $row->sum('sec_monday'));
+            $CfirstCollect->sec_tuesday     =   gmdate('H:i:s', $row->sum('sec_tuesday'));
+            $CfirstCollect->sec_wednesday   =   gmdate('H:i:s', $row->sum('sec_wednesday'));
+            $CfirstCollect->sec_thursday    =   gmdate('H:i:s', $row->sum('sec_thursday'));
+            $CfirstCollect->sec_friday      =   gmdate('H:i:s', $row->sum('sec_friday'));
+            $CfirstCollect->sec_saturday    =   gmdate('H:i:s', $row->sum('sec_saturday'));
+            $CfirstCollect->sec_sunday      =   gmdate('H:i:s', $row->sum('sec_sunday'));
+
+
+
             return $row->first();
         });
         return $CsheduleInfo;
@@ -99,15 +111,18 @@ class Schedule extends Model
      * @return Collection
      */
     public static function addDepartmentToSheduleCollect($Cdepartment,$Ccollect) : Collection{
-        $CnewItemToCollect = collect(['department_info_id' => $Cdepartment->id,
-            'sec_monday'            => 0,
-            'sec_tuesday'           => 0,
-            'sec_wednesday'         => 0,
-            'sec_thursday'          => 0,
-            'sec_friday'            => 0,
-            'sec_saturday'          => 0,
-            'sec_sunday'            => 0,
-            'departmentConcatName'  => $Cdepartment->departments->name.' '.$Cdepartment->department_type->name]);
+        $CnewItemToCollect =  new Schedule();
+        $CnewItemToCollect->offsetSet('department_info_id',$Cdepartment->id);
+        $CnewItemToCollect->offsetSet('sec_monday',0);
+        $CnewItemToCollect->offsetSet('sec_tuesday',0);
+        $CnewItemToCollect->offsetSet('sec_wednesday',0);
+        $CnewItemToCollect->offsetSet('sec_thursday',0);
+        $CnewItemToCollect->offsetSet('sec_friday',0);
+        $CnewItemToCollect->offsetSet('sec_friday',0);
+        $CnewItemToCollect->offsetSet('sec_saturday',0);
+        $CnewItemToCollect->offsetSet('sec_sunday',0);
+        $CnewItemToCollect->offsetSet('sec_sum',0);
+        $CnewItemToCollect->offsetSet('departmentConcatName',$Cdepartment->departments->name.' '.$Cdepartment->department_type->name);
         $Ccollect->push($CnewItemToCollect);
         return $Ccollect;
     }
