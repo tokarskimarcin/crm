@@ -614,12 +614,12 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageDayReportMissedRepo', 'StatisticsController@dayReportMissedRepo');
 
     //Campaign reports
-    Route::get('/dayReportCampaign', 'StatisticsRBHController@dayReportCampaignGet');
-    Route::post('/dayReportCampaign', 'StatisticsRBHController@dayReportCampaignPost');
+    Route::get('/dayReportCampaign', 'StatisticsController@dayReportCampaignGet');
+    Route::post('/dayReportCampaign', 'StatisticsController@dayReportCampaignPost');
 
     //PlanningRBH Rerpot
-    Route::get('/weekReportPlanningRBH', 'StatisticsController@weekReportPlanningRBHGet');
-    Route::post('/weekReportPlanningRBH', 'StatisticsController@weekReportPlanningRBHPost');
+    Route::get('/weekReportPlanningRBH', 'StatisticsRBHController@weekReportPlanningRBHGet');
+    Route::post('/weekReportPlanningRBH', 'StatisticsRBHController@weekReportPlanningRBHPost');
 
     Route::get('/weekReportCampaign', 'StatisticsController@weekReportCampaignGet');
     Route::post('/weekReportCampaign', 'StatisticsController@weekReportCampaignPost');
