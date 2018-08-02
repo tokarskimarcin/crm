@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="page-header">
-                <div class="alert gray-nav">Raport Dzienny Zużycia Bazy</div>
+                <div class="alert gray-nav">Raport Dzienny 30 RBH</div>
             </div>
         </div>
     </div>
@@ -31,7 +31,7 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <div class="panel-body">
-                                        @include('mail.dayReportCampaign')
+                                    @include('mail.statisticsRBH.dayReport30RBH');
                                     </div>
                                 </div>
                             </div>
