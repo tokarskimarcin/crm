@@ -330,6 +330,8 @@ Route::get('/weekReportTelemarketing', 'StatisticsController@MailweekReportTelem
 Route::get('/monthReportTelemarketing', 'StatisticsController@MailmonthReportTelemarketing'); // ok
 Route::get('/dayReportTelemarketing', 'StatisticsController@MailDayReportTelemarketing'); // tutaj dodac
 
+Route::get('/weekReportPlanningRBH', 'StatisticsRBHController@WeekReportPlanningRBHMail');
+
 Route::get('/invoices', 'CrmRouteController@invoicesMail');
 //Gniezno
 Route::get('/hourReportTelemarketingGniezno', 'OtherCompanyStatisticsController@MailhourReportTelemarketing'); // ok
@@ -401,6 +403,8 @@ Route::get('/hourReportCoaches', 'StatisticsController@MailHourReportCoaches');
 Route::get('/mailDayReportCampaign', 'StatisticsController@mailDayReportCampaign');
 Route::get('/mailWeekReportCampaign', 'StatisticsController@mailWeekReportCampaign');
 Route::get('/mailMonthReportCampaign', 'StatisticsController@mailMonthReportCampaign');
+
+
 
 //Maila dotyczące wyłączonych kont
 //Raport Usunietych kont
@@ -614,6 +618,10 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     //Campaign reports
     Route::get('/dayReportCampaign', 'StatisticsController@dayReportCampaignGet');
     Route::post('/dayReportCampaign', 'StatisticsController@dayReportCampaignPost');
+
+    //PlanningRBH Rerpot
+    Route::get('/pageWeekReportPlanningRBH', 'StatisticsRBHController@weekReportPlanningRBHGet');
+    Route::post('/pageWeekReportPlanningRBH', 'StatisticsRBHController@weekReportPlanningRBHPost');
 
     Route::get('/weekReportCampaign', 'StatisticsController@weekReportCampaignGet');
     Route::post('/weekReportCampaign', 'StatisticsController@weekReportCampaignPost');
