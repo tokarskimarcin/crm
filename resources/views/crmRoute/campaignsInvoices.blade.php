@@ -59,7 +59,7 @@
             @endif
             <div class="row" style="margin-top: 1em">
                 <div class="col-md-12">
-                    <table id="invoicesDatatable" class="thead-inverse table table-striped row-border">
+                    <table id="invoicesDatatable" class="thead-inverse table table-striped row-border" style="width: 100%">
                         <thead>
                         <tr>
                             <th>Klient</th>
@@ -463,7 +463,9 @@
                         });
                     }
             });
-
+            invoiceDatatable.on( 'init.dt', function () {
+                resizeDatatablesOnMenuToggle([invoiceDatatable]);
+            });
             function getCampaignInfoRow(e){
                 let clientName = $(document.createElement('h3')).text($(e.target).data('client_name'));
                 let hotelName = $(document.createElement('h4')).text($(e.target).data('hotel_name'));
@@ -591,7 +593,6 @@
             let myModal = createModal(modalIdString);
             $('.panel.panel-default').append(myModal);
 
-            resizeDatatablesOnMenuToggle([invoiceDatatable]);
         });
 
         let modalIdString = 'myModal';
