@@ -63,6 +63,20 @@ class Schedule extends Model
     }
 
     /**
+     * Convert second to Hour
+     * @param $Ssecond
+     * @return string
+     */
+    private static function secondToHour($Ssecond) : string{
+        $hours = floor($Ssecond / 3600);
+        $minutes = floor(($Ssecond / 60) % 60);
+        $seconds = $Ssecond % 60;
+        $hours = strlen($hours) == 1 ? '0'.$hours : $hours;
+        $minutes = strlen($minutes) == 1 ? '0'.$minutes : $minutes;
+        $seconds = strlen($seconds) == 1 ? '0'.$seconds : $seconds;
+        return "$hours:$minutes:$seconds";
+    }
+    /**
      * Group schedule collection to department and sum
      * @param $CsheduleInfo
      * @return Collection
@@ -70,20 +84,23 @@ class Schedule extends Model
     public static function groupUsersRBHbyDepartments($CsheduleInfo) : Collection{
         $CsheduleInfo = $CsheduleInfo->groupBy('department_info_id')->map(function ($row){
             $CfirstCollect = $row->first();
-            $CfirstCollect->sec_sum         =  gmdate('H:i:s',($CfirstCollect->sec_monday +
-                $CfirstCollect->sec_tuesday     +
-                $CfirstCollect->sec_wednesday   +
-                $CfirstCollect->sec_thursday    +
-                $CfirstCollect->sec_friday      +
-                $CfirstCollect->sec_saturday));
-            $CfirstCollect->sec_monday      =   gmdate('H:i:s', $row->sum('sec_monday'));
-            $CfirstCollect->sec_tuesday     =   gmdate('H:i:s', $row->sum('sec_tuesday'));
-            $CfirstCollect->sec_wednesday   =   gmdate('H:i:s', $row->sum('sec_wednesday'));
-            $CfirstCollect->sec_thursday    =   gmdate('H:i:s', $row->sum('sec_thursday'));
-            $CfirstCollect->sec_friday      =   gmdate('H:i:s', $row->sum('sec_friday'));
-            $CfirstCollect->sec_saturday    =   gmdate('H:i:s', $row->sum('sec_saturday'));
-            $CfirstCollect->sec_sunday      =   gmdate('H:i:s', $row->sum('sec_sunday'));
-
+            $CfirstCollect->sec_sum         = self::secondToHour(
+                $row->sum('sec_monday') +
+                $row->sum('sec_tuesday')         +
+                $row->sum('sec_wednesday')       +
+                $row->sum('sec_thursday')        +
+                $row->sum('sec_friday')          +
+                $row->sum('sec_saturday')        +
+                $row->sum('sec_sunday')
+            );
+            //21600 + 16200 + 21600/
+            $CfirstCollect->sec_monday      =   self::secondToHour( $row->sum('sec_monday'));
+            $CfirstCollect->sec_tuesday     =   self::secondToHour( $row->sum('sec_tuesday'));
+            $CfirstCollect->sec_wednesday   =   self::secondToHour( $row->sum('sec_wednesday'));
+            $CfirstCollect->sec_thursday    =   self::secondToHour( $row->sum('sec_thursday'));
+            $CfirstCollect->sec_friday      =   self::secondToHour( $row->sum('sec_friday'));
+            $CfirstCollect->sec_saturday    =   self::secondToHour( $row->sum('sec_saturday'));
+            $CfirstCollect->sec_sunday      =   self::secondToHour( $row->sum('sec_sunday'));
 
 
             return $row->first();
