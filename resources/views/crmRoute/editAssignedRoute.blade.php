@@ -2551,6 +2551,7 @@
                         });
 
                         if(existenceArr[0]) {
+                            globalSwalFlag = true;
                             let prevVoivodeSelect = existenceArr[0].querySelector('.voivodeSelect');
                             let prevVoivodeId = getSelectedValue(prevVoivodeSelect);
                             let prevCitySelect = existenceArr[0].querySelector('.citySelect');
@@ -2560,8 +2561,10 @@
                             let defaults = {voivode: prevVoivodeId};
                             allCitiesAndAllVoivodes(existenceArr[0], defaults);
                             setOldValues(prevVoivodeSelect, prevVoivodeId, prevCitySelect, prevCityId);
+                            globalSwalFlag = false;
                         }
                         if(existenceArr[1]) {
+                            globalSwalFlag = true;
                             let nextVoivodeSelect = existenceArr[1].querySelector('.voivodeSelect');
                             let nextVoivodeId = getSelectedValue(nextVoivodeSelect);
                             let nextCitySelect = existenceArr[1].querySelector('.citySelect');
@@ -2571,6 +2574,7 @@
                             let defaults = {voivode: nextVoivodeId};
                             allCitiesAndAllVoivodes(existenceArr[1], defaults);
                             setOldValues(nextVoivodeSelect, nextVoivodeId, nextCitySelect, nextCityId);
+                            globalSwalFlag = false;
                         }
 
                     }
