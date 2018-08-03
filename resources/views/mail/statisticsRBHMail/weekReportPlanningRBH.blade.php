@@ -12,7 +12,17 @@
         <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Lp.</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Oddział</th>
         @for($i=1;$i<=7;$i++)
-            <th style="border:1px solid #231f20;padding:3px;background:#231f20;">{{\App\Schedule::$polishDate[$i-1]}} {{date('m-d', strtotime($SfirstDate. ' + 1 days'))}}</th>
+            @if($i == 1)
+                @php
+                    $SfirstDatepom = date('m-d', strtotime($SfirstDate))
+                @endphp
+            @else
+                @php
+                    $SfirstDate = date('Y-m-d', strtotime($SfirstDate. ' + 1 days'));
+                    $SfirstDatepom = date('m-d', strtotime($SfirstDate))
+                @endphp
+            @endif
+            <th style="border:1px solid #231f20;padding:3px;background:#231f20;">{{\App\Schedule::$polishDate[$i-1]}} {{$SfirstDatepom}}</th>
         @endfor
         <th style="border:1px solid #231f20;padding:3px;background:#231f20;">Suma</th>
     </tr>

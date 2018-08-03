@@ -42,11 +42,9 @@
                         @endfor
                     </select>
                 </div>
-
                 <div class="form-group">
-                    <input type="submit" class="btn btn-info form-control" value="Generuj" style="width:50%;">
+                    <input type="submit" class="btn btn-info form-control" value="Generuj">
                 </div>
-
             </form>
         </div>
         <div class="col-lg-12">
