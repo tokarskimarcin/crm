@@ -111,7 +111,7 @@ class StatisticsRBHController extends Controller
         $data = [
           'CsheduleInfo' => $CsheduleInfo, 'SfirstDate' => $SfirstDate, 'SlastDate' => $SlastDate,
         ];
-        $preperMail = new VeronaMail('statisticsRBHMail.weekReportPlanningRBH',$data,$title,User::where('id',1364)->get());
+        $preperMail = new VeronaMail('statisticsRBHMail.weekReportPlanningRBH',$data,$title);
         if($preperMail->sendMail()){
             return 'Mail wysłano';
         }else{

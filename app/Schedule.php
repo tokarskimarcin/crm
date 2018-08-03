@@ -73,8 +73,7 @@ class Schedule extends Model
         $seconds = $Ssecond % 60;
         $hours = strlen($hours) == 1 ? '0'.$hours : $hours;
         $minutes = strlen($minutes) == 1 ? '0'.$minutes : $minutes;
-        $seconds = strlen($seconds) == 1 ? '0'.$seconds : $seconds;
-        return "$hours:$minutes:$seconds";
+        return "$hours:$minutes";
     }
     /**
      * Group schedule collection to department and sum
