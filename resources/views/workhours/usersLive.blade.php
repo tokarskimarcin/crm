@@ -34,6 +34,7 @@
                                         <tr>
                                             <th style="width: 6%;">Lp.</th>
                                             <th style="width: 19.6%;">Pracownik</th>
+                                            <th style="width: 5;">Nowy</th>
                                             <th style="width: 19.6%;">Telefon</th>
                                             <th style="width: 19.6%;">Grafik</th>
                                             <th style="width: 19.6%;">Start/Stop</th>
@@ -63,6 +64,7 @@
                                         <tr id={{$item->id.'w'}}>
                                             <td>{{$lp++}}</td>
                                             <td>{{$item->user->first_name.' '.$item->user->last_name}}</td>
+                                            <td>@if($item->newUser == 0)Nie @else Tak @endif</td>
                                             <td>{{$phone}}</td>
                                             @if($day_number == 0)
                                                <td>

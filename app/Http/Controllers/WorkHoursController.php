@@ -60,6 +60,22 @@ class WorkHoursController extends Controller
             ->where($dayOfWeekArray[$day_number].'_start','!=',null)
             ->orderby($dayOfWeekArray[$day_number].'_start')
             ->get();
+
+        $workingLessThan30RBH = Work_Hour::usersWorkingLessThan(30);
+
+        //we are adding field newUser with value 1 if user is new, otherwise 0.
+        $sheduleWithNewUsers = $shedule->map(function($item) use($workingLessThan30RBH) {
+            $item->newUser = 0;
+
+            foreach($workingLessThan30RBH as $newUser) {
+                if($item->id_user == $newUser->id_user) { //user from schedule is in set of users that work less than 30 RBH
+                    $item->newUser = 1;
+                }
+            }
+
+            return $item;
+        });
+
         // $shedule = DB::table('schedule')
         //     ->select(DB::raw('
         //         schedule.*
@@ -72,7 +88,7 @@ class WorkHoursController extends Controller
         //     ->get();
 
         return view('workhours.usersLive')
-            ->with('shedule',$shedule)
+            ->with('shedule',$sheduleWithNewUsers)
             ->with('day_number',$day_number);
     }
 
