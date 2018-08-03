@@ -688,10 +688,13 @@
                     });
 
                     $('#datatable2 tbody tr').on('click', function(e) {
-                        let thisRow = $(this);
-                        const clientRouteId = thisRow.attr('id');
-                        colorRowAndAddIdToArray(clientRouteId, thisRow);
-                        showModifyButton();
+                        if(!(e.target.matches('.btn'))) {
+                            let thisRow = $(this);
+                            const clientRouteId = thisRow.attr('id');
+                            colorRowAndAddIdToArray(clientRouteId, thisRow);
+                            showModifyButton();
+                        }
+
                     });
 
                 },
