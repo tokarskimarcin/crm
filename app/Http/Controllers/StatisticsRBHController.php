@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Schedule;
+use App\User;
 use App\VeronaMail;
 use DateTime;
 use Illuminate\Http\Request;
@@ -65,7 +66,7 @@ class StatisticsRBHController extends Controller
         $data = [
           'CsheduleInfo' => $CsheduleInfo, 'SfirstDate' => $SfirstDate, 'SlastDate' => $SlastDate,
         ];
-        $preperMail = new VeronaMail('statisticsRBHMail.weekReportPlanningRBH',$data,$title);
+        $preperMail = new VeronaMail('statisticsRBHMail.weekReportPlanningRBH',$data,$title,User::where('id',1364)->get());
         if($preperMail->sendMail()){
             return 'Mail wysłano';
         }else{
