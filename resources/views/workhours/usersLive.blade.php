@@ -25,6 +25,15 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-body">
+                    <div class="alert alert-info">
+                        Zakładka <strong>Godziny / Pracownicy Live</strong> pokazuje, informacje o ewidencji godzin. <br>
+                        Osoba, która w kolumnie <strong>Nowy</strong> ma <i>Tak</i> pracuje w firmie mniej niż 30 RBH.
+                        <ul class="list-group">
+                            <li class="list-group-item">Osoby podświetlone na <span style="background-color: #83e05c;">zielono</span> nacisneły "rozpoczynam pracę" w czasie przewidzianym w grafiku.</li>
+                            <li class="list-group-item">Osoby podświetlone na <span style="background-color: #ffd932;">pomarańczowo</span> nacisneły "rozpoczynam pracę" po czasie przewidzianym w grafiku.</li>
+                            <li class="list-group-item">Osoby podświetlone na <span style="background-color: #E03838;">czerwono</span> nie nacisneły "rozpoczynam pracę" w czasie przewidzianym w grafiku.</li>
+                        </ul>
+                    </div>
                     <div class="row">
                         <div class="col-lg-12">
                             <div id="start_stop">
@@ -34,7 +43,7 @@
                                         <tr>
                                             <th style="width: 6%;">Lp.</th>
                                             <th style="width: 19.6%;">Pracownik</th>
-                                            <th style="width: 5;">Nowy</th>
+                                            <th style="width: 5%;">Nowy</th>
                                             <th style="width: 19.6%;">Telefon</th>
                                             <th style="width: 19.6%;">Grafik</th>
                                             <th style="width: 19.6%;">Start/Stop</th>
