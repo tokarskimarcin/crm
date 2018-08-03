@@ -8,7 +8,6 @@ use App\Schedule;
 use App\VeronaMail;
 use DateTime;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class StatisticsRBHController extends Controller
 {
