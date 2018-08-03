@@ -49,6 +49,10 @@ class StatisticsRBHController extends Controller
             ->with('SactualWeekNumber',$SactualWeekNumber);
     }
 
+    /**
+     * Send mail with statistics
+     * @return string
+     */
     public function WeekReportPlanningRBHMail(){
         $SactualYear = date('Y');
         $SactualWeekNumber = date('W');
