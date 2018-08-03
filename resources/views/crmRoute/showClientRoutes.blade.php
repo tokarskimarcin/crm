@@ -434,7 +434,7 @@
 
             const showOnlyAssignedInput = $('#showOnlyAssigned');
             const showAllClientsInput = $('#showAllClients');
-            const selectedWeekInput = $('#weekNumber');
+            let selectedWeekInput = $('#weekNumber');
             let id = -1; //after user click on 1st table row, it assing clientRouteId to this variable
             let rowIterator = null;
             // let colorIterator = 0;
@@ -1004,12 +1004,13 @@
                             const basicOptionElement = document.createElement('option');
                             basicOptionElement.value = 0;
                             basicOptionElement.textContent = 'Wybierz';
-                            selectedWeekInput.appendChild(basicOptionElement);
+                            selectedWeekInput.append(basicOptionElement);
+
                             for (let i = 1; i <= weeksInYear + 1; i++) { //we are iterating to weeksInYear+1 because we are getting week number for 30.12, and in 31.12 can be monday(additional week)
                                 const optionElement = document.createElement('option');
                                 optionElement.value = i;
                                 optionElement.textContent = i;
-                                selectedWeekInput.appendChild(optionElement);
+                                selectedWeekInput.append(optionElement);
                             }
                         })
                         .catch(err => console.log(err));
