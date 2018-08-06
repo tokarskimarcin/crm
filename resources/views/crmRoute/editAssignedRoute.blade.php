@@ -2329,7 +2329,6 @@
                             firstForm.createDOMBox(correctDate);
                         }
                         else {
-                            console.log('dodaje nowy dzien');
                             const allCitiesSelect = document.getElementsByClassName('citySelect');
                             const selectedCity = allCitiesSelect[allCitiesSelect.length - 1];
                             const selectedCityId = getSelectedValue(selectedCity);
@@ -2447,7 +2446,6 @@
                         finalForm.setAttribute('action', `{{url()->current()}}`);
                         finalForm.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="alldata" value=' + JSONData + '> <input type="hidden" name="clientInfo" value=' + JSONClientInfo + '>';
                         submitPlace.appendChild(finalForm);
-                        console.log(finalArray);
                         finalForm.submit();
                     }
                     else {
@@ -2700,7 +2698,9 @@
                                         }
                                     }
                                     else { // there is no next container (related to prev show container)
-                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 100);
+                                        let changeDistanceArr = [100,100];
+                                        limitSelectsWhenBetweenSameDayContainer(nextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+                                        // limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 100);
                                     }
                                 }
                                 else { //case when next show is in the same day container
@@ -2728,7 +2728,10 @@
                                         }
                                     }
                                     else { // there is no next container (related to next show container)
-                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
+                                        let changeDistanceArr = [30,30];
+                                        limitSelectsWhenBetweenSameDayContainer(nextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+
+                                        // limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
                                     }
                                 }
                             }
@@ -2752,31 +2755,26 @@
                                         let changeDistanceArr = [];
                                         if(grandNextDayFlag) {// case when grand prev show is another day related to prev show
                                             if(!prevSiblingCheckboxArr[0]) { //grand is not checked
-                                                console.log('c1');
                                                 changeDistanceArr = [100, 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                             }
                                             else {
-                                                console.log('c2');
                                                 changeDistanceArr = ['infinity', 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                             }
                                         }
                                         else { //case when grand prev show is in same day container as prev show
                                             if(!prevSiblingCheckboxArr[0]) { //grand is not checked
-                                                console.log('c3');
                                                 changeDistanceArr = [30, 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                             }
                                             else {
-                                                console.log('c4');
                                                 changeDistanceArr = ['infinity', 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                             }
                                         }
                                     }
                                     else { // there is no previous container (related to prev show container)
-                                        console.log('ta sytuacja');
                                         let changeDistanceArr = [100, 100];
                                         limitSelectsWhenBetweenSameDayContainer(previousShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                         //
@@ -2791,30 +2789,25 @@
                                         grandPrevDayFlag = dayContainerOfGrandPrevShowContainer == dayContainerOfPreviousShowContainer ? false : true; //checking if grandprev show is in the same day container as prev show
                                         if(grandPrevDayFlag) { //grandprev show is in another day container related to prev show
                                             if(!prevSiblingCheckboxArr[0]) { //grand is not checked
-                                                console.log('c5');
                                                 let changeDistanceArr = [100, 'undefined'];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                             }
                                             else {
-                                                console.log('c6');
                                                 let changeDistanceArr = ['infinity', 'undefined'];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                             }
                                         }
                                         else { //grandprev show is in the same day container as prev show
-                                            console.log('c7');
                                             if(!prevSiblingCheckboxArr[0]) { //grand is not checked
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer);
                                             }
                                             else {
-                                                console.log('c8');
                                                 let changeDistanceArr = ['infinity', 'undefined'];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                             }
                                         }
                                     }
                                     else { // there is no previous container (related to prev show container)
-                                        console.log('tutaj jestem');
                                         let changeDistanceArr = [30, 30];
                                         limitSelectsWhenBetweenSameDayContainer(previousShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                         // limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 30);
@@ -2850,7 +2843,6 @@
 
                 //route generation part
                 const response = @json($clientRouteInfo);
-                console.log(response);
                 let placeToAppend = document.querySelector('.route-here');
                 placeToAppend.innerHTML = '';
                 let dateFlag = null; //indices day change

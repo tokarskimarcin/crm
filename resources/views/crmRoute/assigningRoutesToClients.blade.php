@@ -681,9 +681,6 @@
                 const givenDayContainer = dayContainer.closest('.singleDayContainer');
                 const date = givenDayContainer.querySelector('.day-info').textContent;
 
-                console.log(previousCityDistance);
-                console.log(nextCityDistance);
-
                 if(globalSwalFlag) {
                     $.ajax({
                         type: "POST",
@@ -746,8 +743,6 @@
                                         setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
                                     }
 
-                                    console.log(citySelect);
-                                    console.log(voivodeSelect);
                                     citySelect.setAttribute('data-distance', 30);
                                     $(voivodeSelect).on('change', function() {
                                         citySelect.innerHTML = ''; //cleaning previous insertions
@@ -839,9 +834,6 @@
                                                 });
                                                 setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
                                             }
-
-                                            console.log(citySelect);
-                                            console.log(voivodeSelect);
 
                                             citySelect.setAttribute('data-distance', 30);
                                             $(voivodeSelect).on('change', function() {
@@ -1729,7 +1721,6 @@
                         $(firstSelect).on('change', function(e) {
                             secondSelect.setAttribute('data-distance', 'infinity');
                             let voivodeId = e.target.value;
-                            console.log('globalDateIndicator: ', globalDateIndicator);
                             showWithoutDistanceAjax(voivodeId, secondSelect, globalDateIndicator);
                         });
                     }
@@ -2713,7 +2704,10 @@
                                         }
                                     }
                                     else { // there is no next container (related to prev show container)
-                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 100);
+                                        let changeDistanceArr = [100,100];
+                                        limitSelectsWhenBetweenSameDayContainer(nextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+
+                                        // limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 100);
                                     }
                                 }
                                 else { //case when next show is in the same day container
@@ -2741,7 +2735,10 @@
                                         }
                                     }
                                     else { // there is no next container (related to next show container)
-                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
+                                        let changeDistanceArr = [30,30];
+                                        limitSelectsWhenBetweenSameDayContainer(nextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+
+                                        // limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
                                     }
                                 }
                             }
@@ -2785,7 +2782,6 @@
                                         }
                                     }
                                     else { // there is no previous container (related to prev show container)
-                                        console.log('ta sytuacja');
                                         let changeDistanceArr = [100, 100];
                                         limitSelectsWhenBetweenSameDayContainer(previousShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                         // limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
@@ -2817,7 +2813,6 @@
                                         }
                                     }
                                     else { // there is no previous container (related to prev show container)
-                                        console.log('tutaj jestem');
                                         let changeDistanceArr = [30, 30];
                                         limitSelectsWhenBetweenSameDayContainer(previousShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
 
