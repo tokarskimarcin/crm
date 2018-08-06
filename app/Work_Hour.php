@@ -41,6 +41,7 @@ class Work_Hour extends Model
         id_user,
         Concat(users.first_name," ",users.last_name) as userNameInfo,
         SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))) as sec_sum,
+        sum(success) as success,
         departments.name as dep_city,
         department_type.name as dep_type,
         department_info.id as dep_id
