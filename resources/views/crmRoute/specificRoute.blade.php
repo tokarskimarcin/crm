@@ -141,8 +141,8 @@
         </div>
 
         <div class="client-container placeToAppendForm">
-            <button class="btn btn-info" style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;" id="redirect">Powrót</button>
-            <button id="submit-button" class="btn btn-success" type="button" style="font-weight:bold;">Zapisz</button>
+            <button class="btn btn-primary" style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;" id="redirect"><span class='glyphicon glyphicon-repeat'></span> Powrót</button>
+            <button id="submit-button" class="btn btn-success" type="button" style="font-weight:bold;"><span class='glyphicon glyphicon-save'></span> Zapisz</button>
         </div>
     </div>
 
