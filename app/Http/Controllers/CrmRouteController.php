@@ -911,7 +911,9 @@ class CrmRouteController extends Controller
         if($onlyResult == null) {
             $clientRouteCampaigns = ClientRouteCampaigns::join('client_route_info as cri', 'client_route_info_id', '=', 'cri.id')
                 ->select('client_route_info_id', 'hour_count')
-                ->where('client_route_id', '=', $id)->get();
+                ->where('client_route_id', '=', $id)
+                ->where('cri.status', '=', 1)
+                ->get();
 
             $clientRouteInfo = ClientRouteInfo::join('client_route as cr', 'cr.id', '=', 'client_route_id')
                 ->join('client as c', 'c.id', '=', 'cr.client_id')
@@ -929,7 +931,8 @@ class CrmRouteController extends Controller
                     'city.name as city_name',
                     'voivodeship.name as voivode_name'
                 )
-                ->where('cr.id', '=', $id)->where('client_route_info.status', '=', 1)
+                ->where('cr.id', '=', $id)
+                ->where('client_route_info.status', '=', 1)
                 ->orderBy('date')->orderBy('show_order')->orderBy('client_route_info.id')->get();
             $routeInfo = [];
             $pageInfo = [];
@@ -991,6 +994,7 @@ class CrmRouteController extends Controller
                 ->join('city', 'city.id', '=', 'client_route_info.city_id')
                 ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
                 ->where('client_route_id', '=', $id)
+                ->where('client_route_info.status', '=', 1)
                 ->get();
             $userReservation = $clientRouteInfo->first()->user_reservation;
 
@@ -3609,6 +3613,44 @@ class CrmRouteController extends Controller
         }else{
             return 'Brak Danych';
         }
+    }
+
+    /*
+     * This method changes limits for given set of clientRoute ids
+     */
+    public function changeLimitsAjax(Request $request) {
+        $limit1 = $request->limit1;
+        $limit2 = $request->limit2;
+        $limit3 = $request->limit3;
+
+        $ids = json_decode($request->ids);
+        $onlyIds = []; // here we have only client_route id's [120, 130, 132]
+        foreach($ids as $id) {
+            $tempArr = explode('_', $id);
+            array_push($onlyIds, $tempArr[1]);
+        }
+
+        $campaignRecords = ClientRouteCampaigns::ActiveCampaigns($onlyIds)->get();
+
+        foreach($campaignRecords as $campaignRecord) { //mamy pierwszy rekord client_route_info.
+            $idArr = [];
+            $basicId = $campaignRecord->client_route_info_id;
+
+            $numberOfHours = $campaignRecord->hour_count;
+            if($numberOfHours == 1) {
+                ClientRouteInfo::where('id', '=', $basicId)->update(['limits' => $limit1]);
+            }
+            if($numberOfHours == 2) {
+                ClientRouteInfo::where('id', '=', $basicId)->update(['limits' => $limit1]);
+                ClientRouteInfo::where('id', '=', $basicId + 1)->update(['limits' => $limit2]);
+            }
+            if($numberOfHours == 3) {
+                ClientRouteInfo::where('id', '=', $basicId)->update(['limits' => $limit1]);
+                ClientRouteInfo::where('id', '=', $basicId + 1)->update(['limits' => $limit2]);
+                ClientRouteInfo::where('id', '=', $basicId + 2)->update(['limits' => $limit3]);
+            }
+        }
+        return $campaignRecords;
     }
 
 }

@@ -2329,7 +2329,6 @@
                             firstForm.createDOMBox(correctDate);
                         }
                         else {
-
                             const allCitiesSelect = document.getElementsByClassName('citySelect');
                             const selectedCity = allCitiesSelect[allCitiesSelect.length - 1];
                             const selectedCityId = getSelectedValue(selectedCity);
@@ -2447,7 +2446,6 @@
                         finalForm.setAttribute('action', `{{url()->current()}}`);
                         finalForm.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="alldata" value=' + JSONData + '> <input type="hidden" name="clientInfo" value=' + JSONClientInfo + '>';
                         submitPlace.appendChild(finalForm);
-                        console.log(finalArray);
                         finalForm.submit();
                     }
                     else {
@@ -2700,7 +2698,9 @@
                                         }
                                     }
                                     else { // there is no next container (related to prev show container)
-                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 100);
+                                        let changeDistanceArr = [100,100];
+                                        limitSelectsWhenBetweenSameDayContainer(nextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+                                        // limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 100);
                                     }
                                 }
                                 else { //case when next show is in the same day container
@@ -2728,7 +2728,10 @@
                                         }
                                     }
                                     else { // there is no next container (related to next show container)
-                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
+                                        let changeDistanceArr = [30,30];
+                                        limitSelectsWhenBetweenSameDayContainer(nextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+
+                                        // limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
                                     }
                                 }
                             }
@@ -2772,7 +2775,11 @@
                                         }
                                     }
                                     else { // there is no previous container (related to prev show container)
-                                        limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
+                                        let changeDistanceArr = [100, 100];
+                                        limitSelectsWhenBetweenSameDayContainer(previousShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
+                                        //
+                                        // console.log('c45');
+                                        // limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
                                     }
 
                                 }
@@ -2801,7 +2808,9 @@
                                         }
                                     }
                                     else { // there is no previous container (related to prev show container)
-                                        limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 30);
+                                        let changeDistanceArr = [30, 30];
+                                        limitSelectsWhenBetweenSameDayContainer(previousShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
+                                        // limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 30);
                                     }
                                 }
                             }
@@ -2834,7 +2843,6 @@
 
                 //route generation part
                 const response = @json($clientRouteInfo);
-                console.log(response);
                 let placeToAppend = document.querySelector('.route-here');
                 placeToAppend.innerHTML = '';
                 let dateFlag = null; //indices day change

@@ -50,8 +50,16 @@ class CoachingController extends Controller
     public function progress_table_managerAllGET()
     {
         $departments = Department_info::whereIn('id_dep_type', [1, 2])->get();
-        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+
+
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+        $directorsHRIds = Department_info::select('director_hr_id')->where('director_hr_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+        $regionalManagersIds = Department_info::select('regionalManager_id')->where('regionalManager_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+
         $directors = User::whereIn('id', $directorsIds)->get();
+        $directorsHR = User::whereIn('id', $directorsHRIds)->get();
+        $regionalManagers = User::whereIn('id', $regionalManagersIds)->get();
+
         $dep_id = Auth::user()->department_info_id;
         $coach = User::where('status_work', '=', '1')
             ->where('department_info_id', '=', $dep_id)
@@ -62,6 +70,8 @@ class CoachingController extends Controller
             'directorsIds' => $directorsIds,
             'wiev_type' => 'department',
             'directors' => $directors,
+            'directorsHR' => $directorsHR,
+            'regionalManagers' => $regionalManagers,
             'dep_id' => $dep_id,
             'coach' => $coach,
         ]);
@@ -70,18 +80,24 @@ class CoachingController extends Controller
     public function progress_adminGET()
     {
         $departments = Department_info::whereIn('id_dep_type', [1, 2])->get();
-        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
-        $directorsIdHR = Department_info::select('director_hr_id')->where('director_hr_id', '!=', null)->distinct()->get();
-        foreach($directorsIdHR as $item){
-            $directorsIds->push($item);
-        };
+
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+        $directorsHRIds = Department_info::select('director_hr_id')->where('director_hr_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+        $regionalManagersIds = Department_info::select('regionalManager_id')->where('regionalManager_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+
         $directors = User::whereIn('id', $directorsIds)->get();
+        $directorsHR = User::whereIn('id', $directorsHRIds)->get();
+        $regionalManagers = User::whereIn('id', $regionalManagersIds)->get();
+
+
         $dep_id = Auth::user()->department_info_id;
         $coach = User::where('status_work', '=', '1')
             ->where('department_info_id', '=', $dep_id)
             ->whereIn('user_type_id', [4, 12])
             ->get();
         return view('coaching.progress_table_admin')->with([
+            'directorsHR' => $directorsHR,
+            'regionalManagers' => $regionalManagers,
             'departments' => $departments,
             'directorsIds' => $directorsIds,
             'wiev_type' => 'department',
@@ -103,10 +119,20 @@ class CoachingController extends Controller
                         ->get();
                 } else {
                     $dirId = substr($request->department_info_id, 2);
-                    $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
+                    $typeUser = User::find($dirId);
+                    if($typeUser->user_type_id == 14)
+                        $userTypeId = [5];
+                    else
+                        $userTypeId = [4,12];
+                    $director_departments =
+                        Department_info::where(function($querry) use ($dirId) {
+                            $querry->orwhere('director_id', '=', $dirId)
+                                ->orwhere('regionalManager_id', '=', $dirId)
+                                ->orwhere('director_hr_id', '=', $dirId);
+                        })->get();
                     $coach = User::where('status_work', '=', '1')
                         ->whereIn('department_info_id', $director_departments->pluck('id')->toArray())
-                        ->whereIn('user_type_id', [4, 12])
+                        ->whereIn('user_type_id',$userTypeId )
                         ->get();
                 }
             } else if ($request->coaching_level == 2) {
@@ -322,7 +348,17 @@ class CoachingController extends Controller
                     $coaching_consultant_inprogres = $coaching_consultant_inprogres->where('manager.department_info_id', '=', $request->department_info);
                 } else { // Wybrany dyrektor
                     $dirId = substr($request->department_info, 2);
-                    $director_departments = Department_info::where('director_id', '=', $dirId)->get()->pluck('id')->toArray();
+                    $userType = User::find($dirId);
+                    if($userType->user_type_id == 14)
+                        $userTypeId = [5];
+                    else
+                        $userTypeId = [4,12];
+                    $coaching_consultant_inprogres = $coaching_consultant_inprogres->whereIn('manager.user_type_id',$userTypeId);
+                    $director_departments = Department_info::where(function($querry) use ($dirId) {
+                        $querry->orwhere('director_id', '=', $dirId)
+                            ->orwhere('regionalManager_id', '=', $dirId)
+                            ->orwhere('director_hr_id', '=', $dirId);
+                    })->get()->pluck('id')->toArray();
                     $coaching_consultant_inprogres = $coaching_consultant_inprogres->whereIn('manager.department_info_id', $director_departments);
                 }
                 if ($request->coach_id != 'Wszyscy') {
@@ -914,9 +950,12 @@ class CoachingController extends Controller
         $manager_id = Auth::user()->id;
 
         $manager_departments = Department_info::
-        where('menager_id', '=', $manager_id)
-            ->orwhere('director_id', '=', $manager_id)
-            ->get();
+            where(function($querry) use ($manager_id) {
+                $querry->orwhere('director_id', '=', $manager_id)
+                    ->orwhere('menager_id', '=', $manager_id)
+                    ->orwhere('regionalManager_id', '=', $manager_id)
+                    ->orwhere('director_hr_id', '=', $manager_id);
+            })->get();
         // gdy koching chce zrobić osoba która nie jest kierownikiem lub dyrektorem
         if ($manager_departments->isempty()) {
             $manager_departments = Department_info::

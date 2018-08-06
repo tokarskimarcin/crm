@@ -27,11 +27,19 @@ class Work_Hour extends Model
         return $this->belongsTo('App\User', 'id_user');
     }
 
-    public static function usersWorkingLessThan($iNumberOfHours): Collection {
+    /**
+     * Return users who work less than 30H
+     * @param $iNumberOfHours
+     * @param null $SactualMonth
+     * @return Collection
+     */
+    public static function usersWorkingLessThan($iNumberOfHours,$SactualMonth = null): Collection {
+        if($SactualMonth == null) $SactualMonth = date('Y-m');
         $iNumberOfSeconds = $iNumberOfHours * 60 * 60;
 
         $cAllUsers = Work_Hour::select(DB::raw('
         id_user,
+        Concat(users.first_name," ",users.last_name) as userNameInfo,
         SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))) as sec_sum,
         departments.name as dep_city,
         department_type.name as dep_type,
@@ -41,7 +49,11 @@ class Work_Hour extends Model
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
             ->join('departments', 'department_info.id_dep', '=', 'departments.id')
             ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
-            ->where('users.status_work', '=', 1)
+            ->where(function ($querry) use ($SactualMonth){
+                $querry->orwhere('users.status_work',1)
+                    ->orwhere('users.end_work','like',$SactualMonth.'%');
+            })
+            ->whereIn('users.user_type_id', [1,2])
             ->groupBy('id_user')
             ->having(DB::raw('SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start)))'), '<', $iNumberOfSeconds)
             ->get();
@@ -49,9 +61,40 @@ class Work_Hour extends Model
         return $cAllUsers;
     }
 
-    public static function usersWhoStartedWorkThisMonth($sThisMonth, $sThisYear) {
+
+    /**
+     * Pobranie tablicy z miesiącami
+     */
+    public  static function getMonthsNames() {
+        $months = [
+            '01' => 'Styczeń',
+            '02' => 'Luty',
+            '03' => 'Marzec',
+            '04' => 'Kwiecień',
+            '05' => 'Maj',
+            '06' => 'Czerwiec',
+            '07' => 'Lipiec',
+            '08' => 'Sierpień',
+            '09' => 'Wrzesień',
+            '10' => 'Październik',
+            '11' => 'Listopad',
+            '12' => 'Grudzień'
+        ];
+        return $months;
+    }
+
+    /**
+     * Return Users who start work on report month
+     * @param $sThisMonth
+     * @param $sThisYear
+     * @param null $SactualMonth
+     * @return Collection
+     */
+    public static function usersWhoStartedWorkThisMonth($sThisMonth, $sThisYear,$SactualMonth = null) : Collection {
+        if($SactualMonth == null) $SactualMonth = date('Y-m');
         $cThisMonthUsers = Work_Hour::select(DB::raw('
         id_user,
+        Concat(users.first_name," ",users.last_name) as userNameInfo,
         date,
         SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))) as sec_sum,
         MONTH(MIN(date)) as minMonth,
@@ -64,7 +107,11 @@ class Work_Hour extends Model
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
             ->join('departments', 'department_info.id_dep', '=', 'departments.id')
             ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
-            ->where('users.status_work', '=', 1)
+            ->where(function ($querry) use ($SactualMonth){
+                $querry->orwhere('users.status_work',1)
+                    ->orwhere('users.end_work','like',$SactualMonth.'%');
+            })
+            ->whereIn('users.user_type_id', [1,2])
             ->groupBy('id_user')
             ->get();
         $cThisMonthUsers = $cThisMonthUsers->where('minMonth', $sThisMonth)->where('minYear', $sThisYear)->where('sec_sum', '!=', null);
@@ -72,7 +119,12 @@ class Work_Hour extends Model
         return $cThisMonthUsers;
     }
 
-    public static function getWorkHoursRecordsGroupedByDate($id) {
+    /**
+     * Get info work haours, about user by id
+     * @param $id
+     * @return Collection
+     */
+    public static function getWorkHoursRecordsGroupedByDate($id) : Collection {
         $allUserRecords = Work_Hour::select(DB::raw('
                 id_user,
                 date,
@@ -90,6 +142,42 @@ class Work_Hour extends Model
             ->get();
 
         return $allUserRecords;
+    }
+
+    /**
+     * @param $allUsersThisMonth
+     * @param $iTimeInSeconds
+     * @return Collection
+     */
+    public static function mergeCollection($allUsersThisMonth,$iTimeInSeconds) : Collection{
+
+       return $allUsersThisMonth->map(function($item) use($iTimeInSeconds) {
+            if($item->sec_sum > $iTimeInSeconds) { // case when user works over 30 hours
+                //Teraz chce uzyskać daty od kiedy zaczą pracować do kiedy liczyć mu wyniki.
+
+                $allUserRecords = Work_Hour::getWorkHoursRecordsGroupedByDate($item->id_user);
+                $iSecondSum = 0;
+                $sDateStart = null;
+                $sDateStop = null;
+
+                foreach($allUserRecords as $key => $value) {
+                    if($iSecondSum < $iTimeInSeconds) {
+                        if($key == 0) {
+                            $sDateStart = $value->date;
+                        }
+
+                        $iSecondSum += $value->sec_sum;
+                    }
+
+                    if($iSecondSum >= $iTimeInSeconds) {
+                        $sDateStop = $value->date;
+                    }
+                }
+                $item->dateStart = $sDateStart;
+                $item->dateStop = $sDateStop;
+            }
+            return $item;
+        });
     }
 
 }

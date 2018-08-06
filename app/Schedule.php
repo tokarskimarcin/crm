@@ -67,7 +67,7 @@ class Schedule extends Model
      * @param $Ssecond
      * @return string
      */
-    private static function secondToHour($Ssecond) : string{
+    public static function secondToHour($Ssecond) : string{
         $hours = floor($Ssecond / 3600);
         $minutes = floor(($Ssecond / 60) % 60);
         $seconds = $Ssecond % 60;
