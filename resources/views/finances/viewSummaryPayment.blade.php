@@ -92,6 +92,7 @@
                                                         <th>Liczba Dok.</th>
                                                         <th>Liczba Stu.</th>
                                                         <th>Liczba pracowników</th>
+                                                        <th>Średnie RBH</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -117,6 +118,7 @@
                                                         <td>0</td>
                                                         <td>0</td>
                                                         <td>0</td>
+                                                        <td>0</td>
                                                     </tr>
                                                 @endif
                                                 @foreach($summary_month as $item)
@@ -131,6 +133,8 @@
                                                         $total_documents += $item->documents;
                                                         $total_students += $item->students;
                                                         $total_employee += $item->employee_count;
+
+                                                        $averageRBH = $item->employee_count != 0 ? round(round($item->hours/3600,2) / $item->employee_count, 2) : 0;
                                                     @endphp
                                                     <tr>
                                                         <td>{{$lp++}}</td>
@@ -141,11 +145,14 @@
                                                         <td>{{$item->documents}}</td>
                                                         <td>{{$item->students}}</td>
                                                         <td>{{$item->employee_count}}</td>
+                                                        <td>{{$averageRBH}} h</td>
                                                     </tr>
                                                 @endif
                                                 @endforeach
                                             @endforeach
                                                     @php
+                                                        $total_avg_RBH = $total_employee != 0 ? round(round($total_hours/3600,2) / $total_employee, 2) : 0;
+
                                                         if($total_hours == 0)
                                                             $total_avg_per_hour = 0;
                                                         else
@@ -159,6 +166,7 @@
                                                         <td>{{$total_documents}}</td>
                                                         <td>{{$total_students}}</td>
                                                         <td>{{$total_employee}}</td>
+                                                        <td>{{$total_avg_RBH}}</td>
                                                     </tr>
                                                     </tbody>
                                                 </table>
