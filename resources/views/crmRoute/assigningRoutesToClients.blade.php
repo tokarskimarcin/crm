@@ -681,6 +681,9 @@
                 const givenDayContainer = dayContainer.closest('.singleDayContainer');
                 const date = givenDayContainer.querySelector('.day-info').textContent;
 
+                console.log(previousCityDistance);
+                console.log(nextCityDistance);
+
                 if(globalSwalFlag) {
                     $.ajax({
                         type: "POST",
@@ -743,6 +746,8 @@
                                         setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
                                     }
 
+                                    console.log(citySelect);
+                                    console.log(voivodeSelect);
                                     citySelect.setAttribute('data-distance', 30);
                                     $(voivodeSelect).on('change', function() {
                                         citySelect.innerHTML = ''; //cleaning previous insertions
@@ -834,6 +839,9 @@
                                                 });
                                                 setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
                                             }
+
+                                            console.log(citySelect);
+                                            console.log(voivodeSelect);
 
                                             citySelect.setAttribute('data-distance', 30);
                                             $(voivodeSelect).on('change', function() {
@@ -2777,7 +2785,10 @@
                                         }
                                     }
                                     else { // there is no previous container (related to prev show container)
-                                        limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
+                                        console.log('ta sytuacja');
+                                        let changeDistanceArr = [100, 100];
+                                        limitSelectsWhenBetweenSameDayContainer(previousShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
+                                        // limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
                                     }
 
                                 }
@@ -2806,7 +2817,11 @@
                                         }
                                     }
                                     else { // there is no previous container (related to prev show container)
-                                        limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 30);
+                                        console.log('tutaj jestem');
+                                        let changeDistanceArr = [30, 30];
+                                        limitSelectsWhenBetweenSameDayContainer(previousShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
+
+                                        // limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 30);
                                     }
                                 }
                             }
