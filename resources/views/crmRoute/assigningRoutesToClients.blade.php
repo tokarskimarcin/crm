@@ -743,7 +743,8 @@
                                         setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
                                     }
 
-                                    citySelect.setAttribute('data-distance', 30);
+                                    console.log('nextCityDistance', nextCityDistance);
+                                    citySelect.setAttribute('data-distance', nextCityDistance);
                                     $(voivodeSelect).on('change', function() {
                                         citySelect.innerHTML = ''; //cleaning previous insertions
                                         appendBasicOption(citySelect);
@@ -835,7 +836,9 @@
                                                 setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
                                             }
 
-                                            citySelect.setAttribute('data-distance', 30);
+                                            console.log('nextCityDistance', nextCityDistance);
+
+                                            citySelect.setAttribute('data-distance', nextCityDistance);
                                             $(voivodeSelect).on('change', function() {
                                                 citySelect.innerHTML = ''; //cleaning previous insertions
                                                 appendBasicOption(citySelect);
@@ -1735,6 +1738,13 @@
                         const nextCityDistance = nextCitySelect.dataset.distance;
                         const nextCityId = getSelectedValue(nextCitySelect);
 
+                        console.log('previousCitySelect', previousCitySelect);
+                        console.log('previousCityDistance', previousCityDistance);
+                        console.log('previousCityId', previousCityId);
+                        console.log('nextCitySelect', nextCitySelect);
+                        console.log('nextCityDistance', nextCityDistance);
+                        console.log('nextCityId', nextCityId);
+
                         showInTheMiddleAjax(previousCityDistance,previousCityId,nextCityDistance,nextCityId,secondSelect,firstSelect,previousCitySelect);
                     }
 
@@ -1956,6 +1966,7 @@
                                 const anextCitySelect = nextShowContainer.querySelector('.citySelect');
                                 //we are checking if user selected any city in upper and lower show container
                                 if(anextCitySelect.options[anextCitySelect.selectedIndex].value != 0 && apreviousCitySelect.options[apreviousCitySelect.selectedIndex].value != 0) {
+                                    apreviousCitySelect.dataset.distance = 30;
                                     newForm.createDOMBox(containerDate, 30, selectedCityId, true, thisShowContainer, nextShowContainer);
                                     let newFormDomElement = newForm.getForm();
                                     thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
@@ -2218,7 +2229,12 @@
                                         }
                                         else { //prev container is in the same day
                                             console.log('next exist & next day, grandnext doesnt exist, prevshowcontaier Exist & in same day');
-                                            limitSelectsWhenExtreme(nextShowContainer, prevShowContainer, 100);
+                                            let changeDistanceArr = [100, 100];
+                                            console.log('nextShowContainer', nextShowContainer);
+                                            console.log('prevShowContainer', prevShowContainer);
+                                            limitSelectsWhenBetweenSameDayContainer(nextShowContainer, prevShowContainer, nextShowContainer, changeDistanceArr);
+
+                                            // limitSelectsWhenExtreme(nextShowContainer, prevShowContainer, 100);
                                         }
                                     }
                                     else { //prev container doesn't exist
@@ -2782,6 +2798,7 @@
                                         }
                                     }
                                     else { // there is no previous container (related to prev show container)
+                                        console.log('tutej');
                                         let changeDistanceArr = [100, 100];
                                         limitSelectsWhenBetweenSameDayContainer(previousShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                         // limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);

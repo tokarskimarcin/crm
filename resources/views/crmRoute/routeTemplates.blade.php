@@ -204,7 +204,7 @@
                                             setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
                                         }
 
-                                        citySelect.setAttribute('data-distance', 30);
+                                        citySelect.setAttribute('data-distance', nextCityDistance);
                                         $(voivodeSelect).on('change', function() {
                                             citySelect.innerHTML = ''; //cleaning previous insertions
                                             appendBasicOption(citySelect);
@@ -978,6 +978,7 @@
                                 const anextCitySelect = nextShowContainer.querySelector('.citySelect');
                                 //we are checking if user selected any city in upper and lower show container
                                 if(anextCitySelect.options[anextCitySelect.selectedIndex].value != 0 && apreviousCitySelect.options[apreviousCitySelect.selectedIndex].value != 0) {
+                                    apreviousCitySelect.dataset.distance = 30;
                                     newForm.createDOMBox(30, selectedCityId, true, thisShowContainer, nextShowContainer);
                                     let newFormDomElement = newForm.getForm();
                                     thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});

@@ -198,7 +198,7 @@
                                         setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
                                     }
 
-                                    citySelect.setAttribute('data-distance', 30);
+                                    citySelect.setAttribute('data-distance', nextCityDistance);
                                     $(voivodeSelect).on('change', function() {
                                         citySelect.innerHTML = ''; //cleaning previous insertions
                                         appendBasicOption(citySelect);
@@ -288,7 +288,7 @@
                                                 setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
                                             }
 
-                                            citySelect.setAttribute('data-distance', 30);
+                                            citySelect.setAttribute('data-distance', nextCityDistance);
                                             $(voivodeSelect).on('change', function() {
                                                 citySelect.innerHTML = ''; //cleaning previous insertions
                                                 appendBasicOption(citySelect);
@@ -1152,6 +1152,7 @@
                                 const anextCitySelect = nextShowContainer.querySelector('.citySelect');
                                 //we are checking if user selected any city in upper and lower show container
                                 if(anextCitySelect.options[anextCitySelect.selectedIndex].value != 0 && apreviousCitySelect.options[apreviousCitySelect.selectedIndex].value != 0) {
+                                    apreviousCitySelect.dataset.distance = 30;
                                     newForm.createDOMBox(30, selectedCityId, true, thisShowContainer, nextShowContainer);
                                     let newFormDomElement = newForm.getForm();
                                     thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
@@ -1770,7 +1771,10 @@
                                         }
                                     }
                                     else { // there is no next container (related to prev show container)
-                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 100);
+                                        let changeDistanceArr = [100,100];
+                                        limitSelectsWhenBetweenSameDayContainer(nextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+
+                                        // limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 100);
                                     }
                                 }
                                 else { //case when next show is in the same day container
@@ -1798,7 +1802,10 @@
                                         }
                                     }
                                     else { // there is no next container (related to next show container)
-                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
+
+                                        let changeDistanceArr = [30,30];
+                                        limitSelectsWhenBetweenSameDayContainer(nextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+                                        // limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
                                     }
                                 }
                             }
@@ -1843,7 +1850,10 @@
                                     }
                                     else { // there is no previous container (related to prev show container)
                                         console.log('tutej');
-                                        limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
+                                        let changeDistanceArr = [100, 100];
+                                        limitSelectsWhenBetweenSameDayContainer(previousShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
+
+                                        // limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
                                     }
 
                                 }
@@ -1872,7 +1882,10 @@
                                         }
                                     }
                                     else { // there is no previous container (related to prev show container)
-                                        limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 30);
+                                        let changeDistanceArr = [30, 30];
+                                        limitSelectsWhenBetweenSameDayContainer(previousShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
+
+                                        // limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 30);
                                     }
                                 }
                             }
