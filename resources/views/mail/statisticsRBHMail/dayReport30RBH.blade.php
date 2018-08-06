@@ -1,4 +1,4 @@
-<font size="6" face="Calibri">RAPORT RBH Dzień: {{$SreportDate}}</font></td>
+<font size="6" face="Calibri">RAPORT RBH Dzień: {{$sDayToHeader}}</font></td>
 
 @foreach($allUsersForReport as $item)
     @php

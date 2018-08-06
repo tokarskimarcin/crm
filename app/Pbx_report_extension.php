@@ -30,7 +30,7 @@ class Pbx_report_extension extends Model
             $userInfo = $pbx_data->where('user_id',$item['id_user']);
             if(!$userInfo->isEmpty()){
                 if(isset($item['dateStart'])){
-                    dd($item['dateStart']);
+
                     $userInfo = $userInfo->where('report_date','>=',$item['dateStart'])
                     ->where('report_date','>=',$item['dateStop']);
 

@@ -11,7 +11,7 @@
     </div>
     <div class="row">
         <div class="col-lg-12">
-            <form action="{{URL::to('/dayReport30RBH')}}" method="post">
+            <form action="{{URL::to('/pageDayReport30RBH')}}" method="post">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <div class="form-group">
                     <label class="myLabel">Data:</label>

@@ -331,6 +331,7 @@ Route::get('/monthReportTelemarketing', 'StatisticsController@MailmonthReportTel
 Route::get('/dayReportTelemarketing', 'StatisticsController@MailDayReportTelemarketing'); // tutaj dodac
 
 Route::get('/weekReportPlanningRBH', 'StatisticsRBHController@WeekReportPlanningRBHMail');
+Route::get('/dayReport30RBH', 'StatisticsRBHController@WeekReportPlanningRBHMail');
 
 Route::get('/invoices', 'CrmRouteController@invoicesMail');
 //Gniezno
@@ -622,6 +623,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     //PlanningRBH Rerpot
     Route::get('/pageWeekReportPlanningRBH', 'StatisticsRBHController@weekReportPlanningRBHGet');
     Route::post('/pageWeekReportPlanningRBH', 'StatisticsRBHController@weekReportPlanningRBHPost');
+    //New Users RBH Rerpot
+    Route::get('/pageDayReport30RBH', 'StatisticsRBHController@dayReport30RBHGet');
+    Route::Post('/pageDayReport30RBH', 'StatisticsRBHController@dayReport30RBHPost');
 
     Route::get('/weekReportCampaign', 'StatisticsController@weekReportCampaignGet');
     Route::post('/weekReportCampaign', 'StatisticsController@weekReportCampaignPost');
@@ -990,7 +994,4 @@ Route::get('/checkPenatly', 'AutoScriptController@checkPenatly');
 
 Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clientReport');
 
-Route::get('/dayReport30RBH', 'StatisticsRBHController@dayReport30RBHGet');
-
 Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.changeLimits');
-Route::Post('/dayReport30RBH', 'StatisticsRBHController@dayReport30RBHPost');
