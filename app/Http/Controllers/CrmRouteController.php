@@ -817,7 +817,7 @@ class CrmRouteController extends Controller
              * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
               * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
-                ->having('distance', '<', $limit)
+                ->having('distance', '<=', $limit)
                 ->orderBy('city.name')
                 ->get();
         }
@@ -902,7 +902,7 @@ class CrmRouteController extends Controller
          * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
           * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
-                ->having('distance', '<', $limit)
+                ->having('distance', '<=', $limit)
                 ->orderBy('city.name')
                 ->get();
         }
@@ -2022,7 +2022,7 @@ class CrmRouteController extends Controller
              * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
               * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
-                ->having('distance', '<', $distance)
+                ->having('distance', '<=', $distance)
                 ->get();
         }
         //part responsible for grace period
