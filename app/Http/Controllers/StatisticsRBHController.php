@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Pbx_report_extension;
 use App\User;
 use App\Work_Hour;
 use App\Schedule;
@@ -13,47 +14,47 @@ class StatisticsRBHController extends Controller
 {
     public function dayReport30RBHGet() {
         $sThisMonth = date('n');
+        $sThisMonthToView  = $sThisMonth <10 ? '0'.$sThisMonth : $sThisMonth;
         $sThisYear = date('Y');
-
+        $SreportDate = date('Y-m-d');
         $iTimeInSHours = 30;
         $iTimeInSeconds = $iTimeInSHours * 60 * 60;
 
-        $usersWorkingLessThan30RBH = Work_Hour::usersWorkingLessThan($iTimeInSHours);
-        $allUsersThisMonth = Work_Hour::usersWhoStartedWorkThisMonth($sThisMonth, $sThisYear);
+        $CusersWorkingLessThan30RBH = Work_Hour::usersWorkingLessThan($iTimeInSHours);
+        $CallUsersThisMonth = Work_Hour::usersWhoStartedWorkThisMonth($sThisMonth, $sThisYear);
 
-        $allUsersThisMonthExtended = $allUsersThisMonth->map(function($item) use($iTimeInSeconds) {
-           if($item->sec_sum > 7600) { // case when user works over 30 hours
-               //Teraz chce uzyskać daty od kiedy zaczą pracować do kiedy liczyć mu wyniki.
+        $CallUsersThisMonthExtended = Work_Hour::mergeCollection($CallUsersThisMonth,$iTimeInSeconds);
 
-              $allUserRecords = Work_Hour::getWorkHoursRecordsGroupedByDate($item->id_user);
-              $iSecondSum = 0;
-              $sDateStart = null;
-              $sDateStop = null;
+        $CallUsersForReport = collect(array_merge($CusersWorkingLessThan30RBH->toArray(), $CallUsersThisMonthExtended->toArray()));
 
-              foreach($allUserRecords as $key => $value) {
-                  if($iSecondSum < 7600) {
-                      if($key == 0) {
-                          $sDateStart = $value->date;
-                      }
-
-                      $iSecondSum += $value->sec_sum;
-                  }
-
-                  if($iSecondSum >= 7600) {
-                      $sDateStop = $value->date;
-                  }
-              }
-              $item->dateStart = $sDateStart;
-              $item->dateStop = $sDateStop;
-           }
-            return $item;
-        });
-
-        $allUsersForReport = collect(array_merge($usersWorkingLessThan30RBH->toArray(), $allUsersThisMonthExtended->toArray()));
-        dd($allUsersForReport);
-
-
-        return view('reportpage/statisticsRBH/DayReport30RBH');
+        $CallUsersForReport = Pbx_report_extension::getPbxUserStatistics($CallUsersForReport);
+        $aCllUsersForReport = $CallUsersForReport->groupBy('dep_id')->sortBy('dep_id');
+        $sMonths = Work_Hour::getMonthsNames();
+        return view('reportpage.statisticsRBH.DayReport30RBH')
+            ->with('allUsersForReport',$aCllUsersForReport)
+            ->with('SreportDate',$SreportDate)
+            ->with('sMonths',$sMonths)
+            ->with('Smonth_selected',$sThisMonthToView);
+    }
+    public function dayReport30RBHPost(Request $request) {
+        $sThisMonth = date('n',strtotime(date('Y').'-'.$request->month_selected));
+        $sThisMonthToView  = $sThisMonth <10 ? '0'.$sThisMonth : $sThisMonth;
+        $sThisYear = date('Y');
+        $sActualMonth = date('Y').'-'.$request->month_selected;
+        $iTimeInSHours = 30;
+        $iTimeInSeconds = $iTimeInSHours * 60 * 60;
+        $CusersWorkingLessThan30RBH = Work_Hour::usersWorkingLessThan($iTimeInSHours,$sActualMonth);
+        $CallUsersThisMonth = Work_Hour::usersWhoStartedWorkThisMonth($sThisMonth, $sThisYear,$sActualMonth);
+        $CallUsersThisMonthExtended = Work_Hour::mergeCollection($CallUsersThisMonth,$iTimeInSeconds);
+        $CallUsersForReport = collect(array_merge($CusersWorkingLessThan30RBH->toArray(), $CallUsersThisMonthExtended->toArray()));
+        $CallUsersForReport = Pbx_report_extension::getPbxUserStatistics($CallUsersForReport);
+        $aCllUsersForReport = $CallUsersForReport->groupBy('dep_id')->sortBy('dep_id');
+        $sMonths = Work_Hour::getMonthsNames();
+        return view('reportpage.statisticsRBH.DayReport30RBH')
+            ->with('allUsersForReport',$aCllUsersForReport)
+            ->with('SreportDate',$sActualMonth)
+            ->with('sMonths',$sMonths)
+            ->with('Smonth_selected',$sThisMonthToView);
     }
     /**
      * GET Report Planing RBH

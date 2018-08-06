@@ -2597,15 +2597,20 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
-        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+        $directorsHRIds = Department_info::select('director_hr_id')->where('director_hr_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+        $regionalManagersIds = Department_info::select('regionalManager_id')->where('regionalManager_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
         $directors = User::whereIn('id', $directorsIds)->get();
-
+        $directorsHR = User::whereIn('id', $directorsHRIds)->get();
+        $regionalManagers = User::whereIn('id', $regionalManagersIds)->get();
         $dep_id =  Auth::user()->department_info_id;//$departments->first()->id;
 
         $data = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep_id, $days_in_month);
 
         return view('reportpage.ReportDepartments')
             ->with([
+                'regionalManagers'  => $regionalManagers,
+                'directorsHR'       => $directorsHR,
                 'date_start'        => $data['date_start'],
                 'date_stop'         => $data['date_stop'],
                 'month'             => $data['month'],
@@ -2630,8 +2635,14 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $last_day = date('Y').'-'.$request->month_selected.'-'. date('t', strtotime(date('Y').'-'.$request->month_selected));
         $month = $request->month_selected;
         $year = date('Y');
-        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->distinct()->get();
+
+        $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+        $directorsHRIds = Department_info::select('director_hr_id')->where('director_hr_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+        $regionalManagersIds = Department_info::select('regionalManager_id')->where('regionalManager_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
         $directors = User::whereIn('id', $directorsIds)->get();
+        $directorsHR = User::whereIn('id', $directorsHRIds)->get();
+        $regionalManagers = User::whereIn('id', $regionalManagersIds)->get();
+
         // Pojedyńczy Raport
         if ($request->selected_dep < 100) {
             $dep_id = $request->selected_dep;
@@ -2642,6 +2653,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
             return view('reportpage.ReportDepartments')
                 ->with([
+                    'regionalManagers'  => $regionalManagers,
+                    'directorsHR'       => $directorsHR,
                     'date_start'        => $data['date_start'],
                     'date_stop'         => $data['date_stop'],
                     'month'             => $data['month'],
@@ -2665,6 +2678,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
             return view('reportpage.ReportDepartments')
                 ->with([
+                    'regionalManagers'  => $regionalManagers,
+                    'directorsHR'       => $directorsHR,
                     'date_start'        => $data['date_start'],
                     'date_stop'         => $data['date_stop'],
                     'month'             => $data['month'],
@@ -2683,13 +2698,19 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 ]);
         } else { // Zbiorczy Raport Dyrektorów
             $dirId = substr($request->selected_dep, 2);
-            $director_departments = Department_info::select('id')->where('director_id', '=', $dirId)->get();
+            $director_departments = Department_info::select('id')->where(function($querry) use ($dirId) {
+               $querry->orwhere('director_id', '=', $dirId)
+                   ->orwhere('regionalManager_id', '=', $dirId)
+                   ->orwhere('director_hr_id', '=', $dirId);
+            })
+                ->where('id_dep_type', '=', 2)->get();
             $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
             $data = $this->getMultiDepartmentData($first_day, $last_day, $month, $year, $director_departments->pluck('id')->toArray(), $days_in_month);
-
             return view('reportpage.ReportDepartments')
                 ->with([
+                    'regionalManagers'  => $regionalManagers,
+                    'directorsHR'       => $directorsHR,
                     'date_start'        => $data['date_start'],
                     'date_stop'         => $data['date_stop'],
                     'month'             => $data['month'],

@@ -991,3 +991,4 @@ Route::get('/checkPenatly', 'AutoScriptController@checkPenatly');
 Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clientReport');
 
 Route::get('/dayReport30RBH', 'StatisticsRBHController@dayReport30RBHGet');
+Route::Post('/dayReport30RBH', 'StatisticsRBHController@dayReport30RBHPost');

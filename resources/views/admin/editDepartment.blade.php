@@ -75,6 +75,16 @@
             </div>
 
             <div class="form-group">
+                <label for="director">Wybierz kierownika Regionalnego oddziału</label>
+                <select class="form-control" name="regionalManager" id="regionalManager">
+                    <option value="0">Wybierz</option>
+                    @foreach($regionalManagers as $m)
+                        <option value="{{$m->id}}" @if(isset($selected_department->regionalManager_id) && $selected_department->regionalManager_id == $m->id) selected @endif>{{$m->first_name . ' ' . $m->last_name}}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label for="director">Dyrektor oddziału</label>
                 <select class="form-control" name="director" id="director">
                     <option value=0>Wybierz</option>

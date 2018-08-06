@@ -50,6 +50,20 @@
                                 <option value="{{$dep->id}}" @if(($wiev_type == 'department') && $dep->id == $dep_id) selected @endif>{{$dep->departments->name . ' ' . $dep->department_type->name}}</option>
                             @endforeach
                         </optgroup>
+                        <optgroup label="Dyrektor Regionalny HR">
+                            @foreach($directorsHR as $director)
+                                <option
+                                        @if($wiev_type == 'director' && ('10' . $director->id == $dep_id)) selected @endif
+                                value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
+                            @endforeach
+                        </optgroup>
+                        <optgroup label="Kierownik Regionalny">
+                            @foreach($regionalManagers as $director)
+                                <option
+                                        @if($wiev_type == 'director' && ('10' . $director->id == $dep_id)) selected @endif
+                                value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
+                            @endforeach
+                        </optgroup>
                         <optgroup label="Dyrektorzy">
                             @foreach($directors as $director)
                                 <option
