@@ -12,6 +12,11 @@ use Illuminate\Http\Request;
 
 class StatisticsRBHController extends Controller
 {
+    /**
+     * Generate Day report 30 RBH GET
+     * @param Request $request
+     * @return mixed
+     */
     public function dayReport30RBHGet() {
         $sThisMonth = date('n');
         $sThisMonthToView  = $sThisMonth <10 ? '0'.$sThisMonth : $sThisMonth;
@@ -34,8 +39,15 @@ class StatisticsRBHController extends Controller
             ->with('allUsersForReport',$aCllUsersForReport)
             ->with('SreportDate',$SreportDate)
             ->with('sMonths',$sMonths)
+            ->with('sDayToHeader',date('Y-m-d'))
             ->with('Smonth_selected',$sThisMonthToView);
     }
+
+    /**
+     * Generate Day report 30 RBH POST
+     * @param Request $request
+     * @return mixed
+     */
     public function dayReport30RBHPost(Request $request) {
         $sThisMonth = date('n',strtotime(date('Y').'-'.$request->month_selected));
         $sThisMonthToView  = $sThisMonth <10 ? '0'.$sThisMonth : $sThisMonth;
@@ -54,8 +66,48 @@ class StatisticsRBHController extends Controller
             ->with('allUsersForReport',$aCllUsersForReport)
             ->with('SreportDate',$sActualMonth)
             ->with('sMonths',$sMonths)
+            ->with('sDayToHeader',$sActualMonth)
             ->with('Smonth_selected',$sThisMonthToView);
     }
+
+    /**
+     * Send mail with statistics
+     * @return string
+     */
+    public function  DayReport30RBHMail(){
+        $sThisMonth = date('n');
+        $sThisMonthToView  = $sThisMonth <10 ? '0'.$sThisMonth : $sThisMonth;
+        $sThisYear = date('Y');
+        $SreportDate = date('Y-m-d');
+        $iTimeInSHours = 30;
+        $iTimeInSeconds = $iTimeInSHours * 60 * 60;
+
+        $CusersWorkingLessThan30RBH = Work_Hour::usersWorkingLessThan($iTimeInSHours);
+        $CallUsersThisMonth = Work_Hour::usersWhoStartedWorkThisMonth($sThisMonth, $sThisYear);
+
+        $CallUsersThisMonthExtended = Work_Hour::mergeCollection($CallUsersThisMonth,$iTimeInSeconds);
+
+        $CallUsersForReport = collect(array_merge($CusersWorkingLessThan30RBH->toArray(), $CallUsersThisMonthExtended->toArray()));
+
+        $CallUsersForReport = Pbx_report_extension::getPbxUserStatistics($CallUsersForReport);
+        $aCllUsersForReport = $CallUsersForReport->groupBy('dep_id')->sortBy('dep_id');
+        $sMonths = Work_Hour::getMonthsNames();
+
+        $title = 'Dzienny raport nowych osób '. date('Y-m-d');
+        $data = [
+            'allUsersForReport' => $aCllUsersForReport, 'SreportDate' => $SreportDate, 'sMonths' => $sMonths,
+            'sDayToHeader' => date('Y-m-d'), 'Smonth_selected' => $sThisMonthToView,
+        ];
+
+        $preperMail = new VeronaMail('statisticsRBHMail.dayReport30RBH.blade',$data,$title,User::find(1363)->first());
+        if($preperMail->sendMail()){
+            return 'Mail wysłano';
+        }else{
+            return 'Błąd podczas wysyłania maila';
+        }
+
+    }
+
     /**
      * GET Report Planing RBH
      * @return mixed
