@@ -272,6 +272,19 @@
                             </div>
                         @endif
                         <div class="row">
+                            @if(Auth::user()->user_type_id == 10 OR Auth::user()->user_type_id == 3 OR isset($user->payment_type))
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="myLabel">Typ wynagrodzenia:</label>
+                                        <select class="form-control" style="font-size:18px;" name="payment_type" id="payment_type">
+                                            <option value="0" @if($user->payment_type == 0) selected @endif >Konsultant</option>
+                                            <option value="1" @if($user->payment_type == 1) selected @endif >Kadra</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="row">
                             @if($type == 1)
                                 <div class="col-md-4">
                                     <div class="form-group">
@@ -518,25 +531,25 @@
             $('#add_submit').click((e) => {
 
 //Pobranie danych z inputów
-                var first_name = $('#first_name').val();
-            var last_name = $('#last_name').val();
-            var username = $('#username').val();
-            var private_phone = $('#private_phone').val();
-            var password = $('#password').val();
-            var trainer = $('#responsible_for').val();
-            var documents = $('#documents').val();
-            var student = $('#student').val();
-            var agency_id = $('#agency_id').val();
-            var salary_to_account = $('#salary_to_account').val();
-            var start_date = $('#start_date').val();
-            var stop_date = $('#stop_date').val();
-            var status_work = $('#status_work').val();
-            var email = $('#email').val();
-            var phone = $('#phone').val();
-            var user_type = $('#user_type').val();
-            var department_info = $('#department_info').val();
-            var login_phone = $('#login_phone').val();
-            var description = $('#description').val();
+            let first_name = $('#first_name').val();
+            let last_name = $('#last_name').val();
+            let username = $('#username').val();
+            let private_phone = $('#private_phone').val();
+            let password = $('#password').val();
+            let trainer = $('#responsible_for').val();
+            let documents = $('#documents').val();
+            let student = $('#student').val();
+            let agency_id = $('#agency_id').val();
+            let salary_to_account = $('#salary_to_account').val();
+            let start_date = $('#start_date').val();
+            let stop_date = $('#stop_date').val();
+            let status_work = $('#status_work').val();
+            let email = $('#email').val();
+            let phone = $('#phone').val();
+            let user_type = $('#user_type').val();
+            let department_info = $('#department_info').val();
+            let login_phone = $('#login_phone').val();
+            let description = $('#description').val();
 
             if (first_name.trim().length == 0) {
                 swal('Podaj imie!');

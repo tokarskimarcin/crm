@@ -284,6 +284,13 @@ class UsersController extends Controller
         if (Auth::user()->user_type->all_departments == 1) {
 
             $user = User::find($id);
+            $promotionDateFloatYearhMonth = (float) date('Y.n', strtotime($user->promotion_date));
+            $nowDataeFloatYearhMonth = (float) date('Y.n');
+            if($user->promotion_date == null OR $promotionDateFloatYearhMonth < $nowDataeFloatYearhMonth){
+                $user->payment_type = 1;
+            }else{
+                $user->payment_type = 0;
+            }
             $agencies = Agencies::all();
             $department_info = Department_info::all();
             $month = date('m');
@@ -566,6 +573,16 @@ class UsersController extends Controller
                 ->where('deleted', '=', 0)
                 ->where('month_stop', '=', null)
                 ->update(['deleted' => 1, 'month_stop' => $month_to_end]);
+        }
+
+        $promotionDateFloatYearhMonth = (float) date('Y.n', strtotime($user->promotion_date));
+        $nowDataeFloatYearhMonth = (float) date('Y.n');
+        if($request->payment_type == 0){
+            if($promotionDateFloatYearhMonth < $nowDataeFloatYearhMonth)
+                $user->promotion_date = date('Y-m-d');
+        }else if($request->payment_type == 1){
+            if($promotionDateFloatYearhMonth >= $nowDataeFloatYearhMonth)
+                $user->promotion_date = date('Y-m-d',strtotime('last day of previous month'));
         }
         $user->save();
 //        dd($user->toArray());
