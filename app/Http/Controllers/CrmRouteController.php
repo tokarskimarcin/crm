@@ -790,6 +790,7 @@ class CrmRouteController extends Controller
             $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
                 ->join('city','city.id','client_route_info.city_id')
                 ->where('client_route_info.status', '=', 1)
+                ->orderBy('city.name')
                 ->get();
             $voievodeshipRound = $this::findCityByDistanceWithDistanceLimit($city, $currentDate, $clientRouteInfoAll, $cities, $limit);
 
@@ -808,6 +809,7 @@ class CrmRouteController extends Controller
         if($limit == 'infinity'){
             $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
+                ->orderBy('city.name')
                 ->get();
         }else {
             $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
@@ -815,7 +817,8 @@ class CrmRouteController extends Controller
              * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
               * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
-                ->having('distance', '<', $limit)
+                ->having('distance', '<=', $limit)
+                ->orderBy('city.name')
                 ->get();
         }
         //part responsible for grace period
@@ -891,6 +894,7 @@ class CrmRouteController extends Controller
         if($limit == 'infinity'){
             $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
+                ->orderBy('city.name')
                 ->get();
         }else {
             $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
@@ -898,7 +902,8 @@ class CrmRouteController extends Controller
          * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
           * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
-                ->having('distance', '<', $limit)
+                ->having('distance', '<=', $limit)
+                ->orderBy('city.name')
                 ->get();
         }
         return $voievodeshipRound;
@@ -1608,7 +1613,7 @@ class CrmRouteController extends Controller
         $currentDate = $request->currentDate;
         $cities = Cities::all();
         if($currentDate != 0) {
-            $all_cities = Cities::where('voivodeship_id', '=', $voivodeId)->get();
+            $all_cities = Cities::where('voivodeship_id', '=', $voivodeId)->orderBy('name')->get();
             $properDate = date_create($currentDate);
             $properDatePom = date_create($currentDate);
 
@@ -1623,6 +1628,7 @@ class CrmRouteController extends Controller
             $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
                 ->join('city','city.id','client_route_info.city_id')
                 ->where('client_route_info.status', '=', 1)
+                ->orderBy('city.name')
                 ->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
@@ -1694,7 +1700,7 @@ class CrmRouteController extends Controller
             });
         }
         else {
-            $all_cities = Cities::where('voivodeship_id', '=', $voivodeId)->get();
+            $all_cities = Cities::where('voivodeship_id', '=', $voivodeId)->orderBy('name')->get();
         }
 //        $all_cities = Cities::where('voivodeship_id', '=', $voivodeId)->get();
         return $all_cities;
@@ -2016,7 +2022,7 @@ class CrmRouteController extends Controller
              * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
               * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
-                ->having('distance', '<', $distance)
+                ->having('distance', '<=', $distance)
                 ->get();
         }
         //part responsible for grace period

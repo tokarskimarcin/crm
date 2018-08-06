@@ -28,6 +28,12 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-12">
+            <input id="all-coaches" type="checkbox" style="display: inline-block;">
+            <label for="all-coaches" style="display: inline-block;">Pokaż również niepracujacych Coachów</label>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-md-4">
@@ -70,7 +76,9 @@
                 <select class="form-control" id="coach_dep" name="coach_dep">
                     <option>Wszyscy</option>
                     @foreach($coach as  $item)
+                        @if($item->status_work == 1)
                         <option value={{$item->id}}>{{$item->first_name.' '.$item->last_name}}</option>
+                        @endif
                      @endforeach
                 </select>
             </div>
@@ -637,6 +645,67 @@
                 minView : 2,
                 pickTime: false,
             });
+
+            const allCoachesCheckbox = document.querySelector('.all-coaches');
+
+            /**
+             * This method append basic option to select
+             * @param placeToAppend
+             */
+            function appendBasicOption(placeToAppend) {
+                console.assert(placeToAppend.matches('#coach_dep'), 'placeToAppend in method appendBasicOption is not coaches select');
+                let basicOption = document.createElement('option');
+                basicOption.textContent = "Wszyscy";
+                placeToAppend.appendChild(basicOption);
+            }
+
+            function globalChangeHandler(e) {
+                if(e.target.matches('#all-coaches')) {
+                    const thisSelect = e.target;
+                    let isChecked = thisSelect.checked;
+                    let coachSelect = document.querySelector('#coach_dep');
+
+                    @if(isset($coach))
+                        let allCoaches = @json($coach);
+                    @else
+                        let allCoaches = [];
+                    @endif
+
+                    coachSelect.options.length = 0;
+
+                    if(isChecked) { //true or false
+                        appendBasicOption(coachSelect)
+
+                        allCoaches.forEach(item => {
+                            let optionElement = document.createElement('option');
+                            optionElement.value = item.id;
+                            if(item.status_work == 0) {
+                                optionElement.textContent = `${item.first_name} ${item.last_name} (Niepracujący[a])`;
+                            }
+                            else {
+                                optionElement.textContent = `${item.first_name} ${item.last_name}`;
+                            }
+                            coachSelect.appendChild(optionElement);
+                        });
+                    }
+                    if(!isChecked) {
+                        appendBasicOption(coachSelect)
+
+                        allCoaches.forEach(item => {
+                            if(item.status_work == 1) {
+                                let optionElement = document.createElement('option');
+                                optionElement.value = item.id;
+                                optionElement.textContent = `${item.first_name} ${item.last_name}`;
+                                coachSelect.appendChild(optionElement);
+                            }
+                        });
+                    }
+                }
+
+            }
+
+            document.addEventListener('change', globalChangeHandler);
+
         })
     </script>
 @endsection

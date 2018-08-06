@@ -61,10 +61,15 @@ class CoachingController extends Controller
         $regionalManagers = User::whereIn('id', $regionalManagersIds)->get();
 
         $dep_id = Auth::user()->department_info_id;
-        $coach = User::where('status_work', '=', '1')
-            ->where('department_info_id', '=', $dep_id)
+
+        $coach = User::where('department_info_id', '=', $dep_id)
             ->whereIn('user_type_id', [4, 12])
             ->get();
+
+//        $coach = User::where('status_work', '=', '1')
+//            ->where('department_info_id', '=', $dep_id)
+//            ->whereIn('user_type_id', [4, 12])
+//            ->get();
         return view('coaching.progress_manager_table_for_all')->with([
             'departments' => $departments,
             'directorsIds' => $directorsIds,
