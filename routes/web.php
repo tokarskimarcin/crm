@@ -993,3 +993,4 @@ Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clien
 Route::get('/dayReport30RBH', 'StatisticsRBHController@dayReport30RBHGet');
 
 Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.changeLimits');
+Route::Post('/dayReport30RBH', 'StatisticsRBHController@dayReport30RBHPost');
