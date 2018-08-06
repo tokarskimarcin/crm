@@ -327,7 +327,6 @@
                    success: function(response) {
                        if(response == 1){
                            document.getElementById('audio_'+e.id).classList.add('inactive');
-                           document.getElementById('aud_'+e.id).classList.add('inactive');
                            document.getElementById(e.id).classList.add('inactive');
 
                            e.classList.add('inactive');
