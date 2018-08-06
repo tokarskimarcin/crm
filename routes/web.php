@@ -994,3 +994,4 @@ Route::get('/checkPenatly', 'AutoScriptController@checkPenatly');
 
 Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clientReport');
 
+Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.changeLimits');

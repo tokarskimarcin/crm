@@ -40,6 +40,18 @@
             color: white !important;
             font-weight: bold;
         }
+
+        .colorRow {
+            /*background-color: #565fff !important;*/
+            animation-name: example;
+            animation-duration: 1s;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes example {
+            from {background-color: white;}
+            to {background-color: #565fff ;}
+        }
     </style>
 
     <div id="hiddeCSV" hidden></div>
@@ -136,7 +148,7 @@
 
                         <div class="col-md-2">
                             <div class="form-group" style="margin-top:1em;">
-                                <label for="year">Wybierz rok</label>
+                                <label for="year">Rok</label>
                                 <select id="year" class="form-control">
                                     <option value="0">Wszystkie</option>
                                     <option value="2017">2017</option>
@@ -147,7 +159,7 @@
 
                         <div class="col-md-2">
                             <div class="form-group" style="margin-top:1em;">
-                                <label for="weekNumber">Wybierz tydzień</label>
+                                <label for="weekNumber">Tydzień</label>
                                 <select id="weekNumber" class="form-control">
                                     <option value="0">Wszystkie</option>
                                 </select>
@@ -165,7 +177,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="campaignState">Status Kampanii</label>
                                 <select id="campaignState" class="form-control">
@@ -176,7 +188,14 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-3">
+
+                        <div class="col-md-2">
+                            <div class="form-group" style="margin-top:2.6em; width: 100%;">
+                                <button id="limitsButton" class="btn btn-default" style="width:100%;" data-toggle="modal" data-target="#editModal" disabled="true">Edytuj limity</button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
                             <div class="form-group" style="margin-top:2.6em;">
                                 <button class="btn btn-default" id="makeReportClient">Generuj Raport Klienta</button>
                             </div>
@@ -242,6 +261,27 @@
                 </div>
 
             </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="editModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Edytuj</h4>
+                </div>
+                <div class="modal-body edit-modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij okno</button>
+                </div>
+            </div>
+
         </div>
     </div>
 @endsection
@@ -336,6 +376,9 @@
         }
         document.addEventListener('DOMContentLoaded', function (event) {
 
+            let clientRouteIdArr = []; //array of client_route_info ids
+            let arrayOfTableRows = []; //array of modal table rows
+            const editButton = document.querySelector('#limitsButton');
 
             $('#makeReportClient').on('click',function (e) {
                 let selectedClientID = id;
@@ -617,7 +660,7 @@
                     objectArr = [];
                     $('#datatable2 select').change(changeStatus);
 
-                    $/*('.action-buttons-0').click(actionButtonHandler);
+                    /*$('.action-buttons-0').click(actionButtonHandler);
                     $('.action-buttons-1').click(actionButtonHandlerAccepted);
                     $('.action-buttons-2').click(actionButtonHandlerFinished);*/
 
@@ -643,6 +686,17 @@
                             }
                         });
                     });
+
+                    $('#datatable2 tbody tr').on('click', function(e) {
+                        if(!(e.target.matches('.btn'))) {
+                            let thisRow = $(this);
+                            const clientRouteId = thisRow.attr('id');
+                            colorRowAndAddIdToArray(clientRouteId, thisRow);
+                            showModifyButton();
+                        }
+
+                    });
+
                 },
                 "rowCallback": function (row, data, index) {
                     if (sessionStorage.getItem('search')) {
@@ -652,16 +706,15 @@
                         sessionStorage.removeItem('search');
                         table2.ajax.reload();
                     }
-                    /*if (data.status == 0) {
-                        row.style.backgroundColor = "#ffc6c6";
-                    }
-                    else if (data.status == 2) {
-                        row.style.backgroundColor = "#7cf76c";
-                    }
-                    else {
-                        row.style.backgroundColor = "#b3c7f4";
-                    }*/
+
                     $(row).attr('id', "clientRouteInfoId_" + data.client_route_id);
+
+                    clientRouteIdArr.forEach(specificId => { //when someone change table page, we have to reassign classes to rows.
+                        if(specificId == $(row).attr('id')) {
+                            row.classList.add('colorRow');
+                        }
+                    });
+
                     return row;
                 },
                 ajax: {
@@ -782,6 +835,213 @@
                     }
                 ]
             });
+
+            /**
+             * This function append to modal limit input
+             */
+            function appendLimitInput(placeToAppend, limitNumber = 0) {
+                let label = document.createElement('label');
+                label.setAttribute('for', 'changeLimits_' + limitNumber);
+                label.textContent = 'Limit ' + limitNumber;
+                placeToAppend.appendChild(label);
+
+                let limitInput = document.createElement('input');
+                limitInput.id = 'changeLimits_' + limitNumber;
+                limitInput.setAttribute('type', 'number');
+                limitInput.setAttribute('step', '1');
+                limitInput.setAttribute('min', '0');
+                limitInput.classList.add('form-control');
+                placeToAppend.appendChild(limitInput);
+            }
+
+            /**
+             * This function create one row of modal table and place it in rows array.
+             */
+            function createModalTableRow() {
+                clientRouteIdArr.forEach(item => {
+                    let addFlag = true;
+                    let idItem = item;
+                    arrayOfTableRows.forEach(clientId => {
+                        if(item == clientId.id) {
+                            addFlag = false;
+                        }
+                    });
+
+                    if(addFlag == true) {
+                        let givenRow = document.querySelector('#' + idItem);
+                        let givenRowData = givenRow.cells[1].textContent;
+                        let givenRowKampania = givenRow.cells[3].textContent;
+                        let givenRowProjekt = givenRow.cells[2].textContent;
+                        let tr = document.createElement('tr');
+                        let td1 = document.createElement('td');
+                        td1.textContent = givenRowData;
+                        tr.appendChild(td1);
+                        let td2 = document.createElement('td');
+                        td2.textContent = givenRowKampania;
+                        tr.appendChild(td2);
+                        let td3 = document.createElement('td');
+                        td3.textContent = givenRowProjekt;
+                        tr.appendChild(td3);
+
+                        let rowObject = {
+                            id: idItem,
+                            row: tr
+                        };
+
+                        arrayOfTableRows.push(rowObject);
+                    }
+                });
+            }
+
+            /**
+             * This function create on-fly table with basic info about selected rows by user.
+             */
+            function createModalTable(placeToAppend) {
+                createModalTableRow();
+
+                let infoTable = document.createElement('table');
+                infoTable.classList.add('table', 'table-stripped');
+                let theadElement = document.createElement('thead');
+                let tbodyElement = document.createElement('tbody');
+                let tr1 = document.createElement('tr');
+                let th1 = document.createElement('th');
+                let th2 = document.createElement('th');
+                let th3 = document.createElement('th');
+
+                th1.textContent = "Klient";
+                tr1.appendChild(th1);
+
+                th2.textContent = "Trasa";
+                tr1.appendChild(th2);
+
+                th3.textContent = "Data";
+                tr1.appendChild(th3);
+
+                theadElement.appendChild(tr1);
+
+                infoTable.appendChild(theadElement);
+                clientRouteIdArr.forEach(item => {
+                    arrayOfTableRows.forEach(tableRow => {
+                        if(item == tableRow.id){
+                            tbodyElement.appendChild(tableRow.row);
+                        }
+                    })
+
+                });
+
+                infoTable.appendChild(tbodyElement);
+                placeToAppend.appendChild(infoTable);
+            }
+
+            /**
+             * This function fill modal body and attach event listener to submit button.
+             */
+            function addModalBodyContext() {
+                let modalBody = document.querySelector('.edit-modal-body');
+                modalBody.innerHTML = ''; //clear modal body
+
+                createModalTable(modalBody); //table part of modal
+                appendLimitInput(modalBody, 1);
+                appendLimitInput(modalBody, 2);
+                appendLimitInput(modalBody, 3);
+
+                let submitButton = document.createElement('button');
+                submitButton.id = 'submitEdition';
+                submitButton.classList.add('btn', 'btn-success');
+                submitButton.style.marginTop = '1em';
+                submitButton.style.width = "100%";
+                $(submitButton).append($("<span class='glyphicon glyphicon-save'></span>"));
+                $(submitButton).append(" Zapisz");
+
+                modalBody.appendChild(submitButton);
+
+                /*Event Listener Part*/
+                submitButton.addEventListener('click', function() {
+
+                    const limitInput1 = document.querySelector('#changeLimits_1');
+                    const limitInput2 = document.querySelector('#changeLimits_2');
+                    const limitInput3 = document.querySelector('#changeLimits_3');
+
+                    const limitValue1 = limitInput1.value;
+                    const limitValue2 = limitInput2.value;
+                    const limitValue3 = limitInput3.value;
+
+                    const url = `{{route('api.changeLimits')}}`;
+                    const header = new Headers();
+                    header.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                    const data = new FormData();
+                    const JSONClientRouteIdArr = JSON.stringify(clientRouteIdArr);
+                    data.append('ids', JSONClientRouteIdArr);
+                    data.append('limit1', limitValue1);
+                    data.append('limit2', limitValue2);
+                    data.append('limit3', limitValue3);
+
+                    fetch(url, {
+                        method: "POST",
+                        headers: header,
+                        body: data,
+                        credentials: "same-origin"
+                    })
+                        .then(response => response.text())
+                        .then(response => {
+                            console.log(response);
+                            notify("Rekordy zostały zmienione!", "info");
+                            table.ajax.reload();
+                        })
+                        .catch(error => console.error("Błąd :", error))
+
+                    $('#editModal').modal('toggle');
+                });
+            }
+
+            /**
+             * This function append modify button with proper name and remove it if necessary
+             */
+            function showModifyButton() {
+                if (clientRouteIdArr.length >0) {
+                    editButton.disabled = false;
+                    addModalBodyContext();
+                }
+                else {
+                    editButton.disabled = true;
+                }
+            }
+
+
+            /**
+             * This function color selected row and add id value to array.
+             */
+            function colorRowAndAddIdToArray(id, row) {
+                let flag = false;
+                let iterator = 0; //in this variable we will store position of id in array, that has been found.
+                clientRouteIdArr.forEach(stringId => {
+                    if (id === stringId) {
+                        flag = true; //true - this row is already checked
+                    }
+                    if (!flag) {
+                        iterator++;
+                    }
+                });
+
+                if (flag) {
+                    clientRouteIdArr.splice(iterator, 1);
+                    row.removeClass('colorRow');
+
+                    //this part removes object with given id form arrayOfTableRows
+                    iterator = 0;
+                    arrayOfTableRows.forEach(clientId => {
+                        if(id == clientId.id) {
+                            arrayOfTableRows.splice(iterator, 1);
+                        }
+                        iterator++;
+                    });
+
+                }
+                else {
+                    clientRouteIdArr.push(id);
+                    row.addClass('colorRow');
+                }
+            }
 
             function showAllClientsInputHandler(e) {
                 const checkedRow = document.querySelector('.check');

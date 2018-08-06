@@ -1721,7 +1721,6 @@
                         $(firstSelect).on('change', function(e) {
                             secondSelect.setAttribute('data-distance', 'infinity');
                             let voivodeId = e.target.value;
-                            console.log('globalDateIndicator: ', globalDateIndicator);
                             showWithoutDistanceAjax(voivodeId, secondSelect, globalDateIndicator);
                         });
                     }
@@ -2705,7 +2704,10 @@
                                         }
                                     }
                                     else { // there is no next container (related to prev show container)
-                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 100);
+                                        let changeDistanceArr = [100,100];
+                                        limitSelectsWhenBetweenSameDayContainer(nextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+
+                                        // limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 100);
                                     }
                                 }
                                 else { //case when next show is in the same day container
@@ -2733,7 +2735,10 @@
                                         }
                                     }
                                     else { // there is no next container (related to next show container)
-                                        limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
+                                        let changeDistanceArr = [30,30];
+                                        limitSelectsWhenBetweenSameDayContainer(nextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr);
+
+                                        // limitSelectsWhenExtreme(nextShowContainer, prevShowContainerRelatedToNextShowContainer, 30);
                                     }
                                 }
                             }
@@ -2777,7 +2782,9 @@
                                         }
                                     }
                                     else { // there is no previous container (related to prev show container)
-                                        limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
+                                        let changeDistanceArr = [100, 100];
+                                        limitSelectsWhenBetweenSameDayContainer(previousShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
+                                        // limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
                                     }
 
                                 }
@@ -2806,7 +2813,10 @@
                                         }
                                     }
                                     else { // there is no previous container (related to prev show container)
-                                        limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 30);
+                                        let changeDistanceArr = [30, 30];
+                                        limitSelectsWhenBetweenSameDayContainer(previousShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
+
+                                        // limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 30);
                                     }
                                 }
                             }
