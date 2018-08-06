@@ -35,12 +35,12 @@ class Pbx_report_extension extends Model
                     ->where('report_date','>=',$item['dateStop']);
 
                 }
-                $item['success']            = $userInfo->sum('success');
-                $item['avg']                = $item['sec_sum'] != 0 ? round($userInfo->sum('success')/($item['sec_sum']/3600),2) : 0;
+                $item['success']            = $item['success'];
+                $item['avg']                = $item['sec_sum'] != 0 ? round($item['success']/($item['sec_sum']/3600),2) : 0;
                 $item['jankyProc']          = $userInfo->sum('all_checked_talks') != 0 ? round($userInfo->sum('all_bad_talks')/($userInfo->sum('all_checked_talks')) * 100,2) : 0;
                 $item['pause_time']         = Schedule::secondToHour($userInfo->sum('time_pause'));
                 $item['received_calls']     = $userInfo->sum('received_calls');
-                $item['received_callsProc'] = $userInfo->sum('received_calls') != 0 ? round($userInfo->sum('success')/($userInfo->sum('received_calls')) * 100,2) : 0;
+                $item['received_callsProc'] = $userInfo->sum('received_calls') != 0 ? round($item['success']/($userInfo->sum('received_calls')) * 100,2) : 0;
 
             }else{
                 $item['success']            = 0;
