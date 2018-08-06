@@ -339,6 +339,14 @@ class CrmRouteController extends Controller
             $routes->name = $fullName;
             $routes->save();
             $request->session()->flash('adnotation', 'Szablon trasy został dodany pomyślnie!');
+
+            $log = [
+                'T' => 'Dodanie szablonu trasy',
+                'Nazwa trasy' => $fullName,
+                'Id trasy' => $routes->id
+            ];
+
+            new ActivityRecorder($log,228, 1);
         }
         else {
             $request->session()->flash('adnotation', 'Błąd nie udało się dodać szablonu trasy, spróbuj ponownie!');
@@ -406,8 +414,15 @@ class CrmRouteController extends Controller
 
             $routes->name = $fullName;
             $routes->save();
-            $request->session()->flash('adnotation', 'Szablon trasy został dodany pomyślnie!');
+            $request->session()->flash('adnotation', 'Szablon trasy został edytowany pomyślnie!');
 
+            $log = [
+                'T' => 'Edycja szablonu trasy',
+                'Nazwa trasy' => $fullName,
+                'Id trasy' => $routes->id
+            ];
+
+            new ActivityRecorder($log,231, 1);
         }
 
         //changing status to inactive for old records
@@ -678,6 +693,8 @@ class CrmRouteController extends Controller
             $name = substr($name, 0,strlen($name) - 3); // removing last + in name
             $clientRoute->route_name = $name;
             $clientRoute->save();
+
+            new ActivityRecorder(array_merge(['T' => 'Edycja trasy'], $clientRoute->toArray()), 230, 2);
         }
 
         return Redirect::back();
@@ -699,9 +716,12 @@ class CrmRouteController extends Controller
     public function deleteRouteTemplate(Request $request) {
         if($request->has('templateId')) {
             $templateId = $request->templateId;
+            $template = Route::where('id', '=', $templateId);
             RouteInfo::where('routes_id', '=', $templateId)->update(['status' => 0]);
-            Route::where('id', '=', $templateId)->update(['status' => 0]);
+            $template->update(['status' => 0]);
             $info = 'Szablon został usunięty pomyślnie';
+
+            new ActivityRecorder(array_merge(['T' => 'Usunięcie szablonu trasy'], $template->first()->toArray()), 195, 3);
         }
         else {
             $info = 'Szablon nie został usunięty';

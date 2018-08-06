@@ -1402,7 +1402,6 @@
                         validation = validateForm(day);
                     }
 
-                    console.log(validation);
                     if(validation === false) {
                         flag = false;
                     }
@@ -2455,7 +2454,6 @@
                         finalForm.setAttribute('action', "{{URL::to('/assigningRoutesToClients')}}");
                         finalForm.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="alldata" value=' + JSONData + '> <input type="hidden" name="clientInfo" value=' + JSONClientInfo + '>';
                         submitPlace.appendChild(finalForm);
-                        console.log(finalArray);
                         finalForm.submit();
                     }
                     else {
@@ -2529,7 +2527,6 @@
                     const dayContainer = thisSingleShowContainer.closest('.singleDayContainer');
                     const fullDate = dayContainer.querySelector('.day-info').textContent;
                     let correctDate = fullDate.substr(6); //YYYY-MM-DD
-                    console.log('correctDate: ', correctDate);
 
                     let voivodeSelect = thisSingleShowContainer.querySelector('.voivodeSelect');
                     voivodeSelect.innerHTML = ''; //clear select
@@ -2560,6 +2557,7 @@
                         });
 
                         if(existenceArr[0]) {
+                            globalSwalFlag = true;
                             let prevVoivodeSelect = existenceArr[0].querySelector('.voivodeSelect');
                             let prevVoivodeId = getSelectedValue(prevVoivodeSelect);
                             let prevCitySelect = existenceArr[0].querySelector('.citySelect');
@@ -2569,8 +2567,10 @@
                             let defaults = {voivode: prevVoivodeId};
                             allCitiesAndAllVoivodes(existenceArr[0], defaults);
                             setOldValues(prevVoivodeSelect, prevVoivodeId, prevCitySelect, prevCityId);
+                            globalSwalFlag = false;
                         }
                         if(existenceArr[1]) {
+                            globalSwalFlag = true;
                             let nextVoivodeSelect = existenceArr[1].querySelector('.voivodeSelect');
                             let nextVoivodeId = getSelectedValue(nextVoivodeSelect);
                             let nextCitySelect = existenceArr[1].querySelector('.citySelect');
@@ -2580,6 +2580,7 @@
                             let defaults = {voivode: nextVoivodeId};
                             allCitiesAndAllVoivodes(existenceArr[1], defaults);
                             setOldValues(nextVoivodeSelect, nextVoivodeId, nextCitySelect, nextCityId);
+                            globalSwalFlag = false;
                         }
 
                     }

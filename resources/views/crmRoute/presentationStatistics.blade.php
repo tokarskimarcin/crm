@@ -43,8 +43,8 @@
                 </div>
                 <div class="panel-body">
                     <div class="alert alert-info" style="font-size: 1.3em;">
-                        Kolorem <span style="background: #e6eff4;">jasno niebieskim</span> zostały oznaczone wiersze sumujące wartości dla każdego dnia </br>
-                        Kolorem <span style="background: #c67979;">Bordowym</span> zostały oznaczone wiersze sumujące wartości z całego tygodnia dla poszególnego klienta </br>
+                        Kolorem <span style="background: #e6eff4;">jasno niebieskim</span> zostały oznaczone wiersze sumujące wartości dla każdego dnia <br>
+                        Kolorem <span style="background: #c67979;">Bordowym</span> zostały oznaczone wiersze sumujące wartości z całego tygodnia dla poszególnego klienta <br>
                         Kolorem <span style="background: #efef7f;">Zółtym</span> zostały oznaczone komórki, które sumują wartości dla całego tygodnia dla wszystkich klientów.
                     </div>
                     <div class="row">
@@ -87,7 +87,7 @@
                     <div class="row">
                         <div class="col-md-2"></div>
                         <div class="col-md-8">
-                            <input type="submit" class="btn btn-info" style="width:100%; margin:1em; margin-top:0;" value="Generuj"></input>
+                            <input type="submit" class="btn btn-info" style="width:100%; margin:1em; margin-top:0;" value="Generuj">
                         </div>
                         <div class="col-md-2"></div>
                     </div>
@@ -224,6 +224,10 @@
                             <div class="alert alert-info">Brak danych</div>
                         @endif
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
                 {{--</div>--}}
             {{--</div>--}}
         {{--</div>--}}

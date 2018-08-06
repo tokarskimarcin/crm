@@ -31,7 +31,7 @@
         }
 
         @keyframes example {
-            from {backgroud-color: white;}
+            from {background-color: white;}
             to {background-color: #565fff ;}
         }
     </style>
@@ -111,7 +111,7 @@
                             <th>Kampania</th>
                             <th>Podział bazy</th>
                             <th>Sprawdzenie</th>
-                            <th>Zaproszenia </br>Live</th>
+                            <th>Zaproszenia <br>Live</th>
                             <th>Limit</th>
                             <th>Straty</th>
                             <th>Projekt</th>
@@ -128,6 +128,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <!-- Modal -->
@@ -159,7 +160,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
         <script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>
     <script>
-       document.addEventListener('DOMContentLoaded', function(mainEvent) {
+       document.addEventListener('DOMContentLoaded', function() {
            /********** GLOBAL VARIABLES ***********/
            let selectedYears = ["0"]; //this array collect selected by user years
            let selectedWeeks = ["0"]; //this array collect selected by user weeks
@@ -199,7 +200,6 @@
             */
            function colorRowAndAddIdToArray(id, row) {
                let flag = false;
-               let idArr = [];
                let iterator = 0; //in this variable we will store position of id in array, that has been found.
                clientRouteInfoIdArr.forEach(stringId => {
                    if (id === stringId) {
@@ -233,7 +233,7 @@
            /**
             * This function append modify button with proper name and remove it if necessary
             */
-           function showModifyButton(clientRouteInfoId) {
+           function showModifyButton() {
                if (clientRouteInfoIdArr.length >0) {
                    editButton.disabled = false;
                    addModalBodyContext();
@@ -276,7 +276,7 @@
                modalBody.appendChild(submitButton);
 
                /*Event Listener Part*/
-               submitButton.addEventListener('click', function(e) {
+               submitButton.addEventListener('click', function() {
                    const nrPBXInput = document.querySelector('#changeNrPBX');
                    const baseDivisionInput = document.querySelector('#changeBaseDivision');
                    const limitInput = document.querySelector('#changeLimits');
@@ -359,9 +359,9 @@
 
                    if(addFlag == true) {
                        let givenRow = document.querySelector('[data-id="' + idItem + '"]');
-                       givenRowData = givenRow.cells[1].textContent;
-                       givenRowKampania = givenRow.cells[3].textContent;
-                       givenRowProjekt = givenRow.cells[9].textContent;
+                       let givenRowData = givenRow.cells[1].textContent;
+                       let givenRowKampania = givenRow.cells[3].textContent;
+                       let givenRowProjekt = givenRow.cells[9].textContent;
                        let tr = document.createElement('tr');
                        let td1 = document.createElement('td');
                        td1.textContent = givenRowData;
@@ -661,10 +661,12 @@
                        },"name":"hour"
                    },
                    {"data":function (data, type, dataToSet) {
-                       if(data.nrPBX != null)
+                       if(data.nrPBX != null) {
                            return data.cityName +" ("+data.nrPBX+")";
-                       else
+                       }
+                       else {
                            return data.cityName;
+                       }
                        },"name":"cityName"
                    },
                    {"data": function (data, type, dataToSet) {
@@ -729,7 +731,7 @@
                    dataSrc: 'date',
                    startRender: null,
                    endRender: function (rows, group) {
-                       var sumAllSuccess = 0;
+                       let sumAllSuccess = 0;
                        sumAllSuccess =
                            rows
                            .data()
@@ -737,15 +739,15 @@
                            .reduce( function (a, b) {
                                return a + b*1;
                            }, 0);
-                       var sumAllCampaings = rows.data().count();
-                       var sumAllLimit =
+                       let sumAllCampaings = rows.data().count();
+                       let sumAllLimit =
                            rows
                                .data()
                                .pluck('limits')
                                .reduce( function (a, b) {
                                    return a + b*1;
                                }, 0);
-                       var sumAllLose =
+                       let sumAllLose =
                            rows
                                .data()
                                .pluck('loseSuccess')
@@ -809,7 +811,7 @@
            /**
             * This event listener change elements of array selected Years while user selects another year
             */
-           $('#year').on('select2:select', function (e) {
+           $('#year').on('select2:select', function () {
                let yearArr = $('#year').val();
                if(yearArr.length > 0) { //no values, removed by user
                    selectedYears = yearArr;
@@ -823,10 +825,9 @@
            /**
             * This event listener change elements of array selected Years while user unselects some year
             */
-           $('#year').on('select2:unselect', function(e) {
+           $('#year').on('select2:unselect', function() {
                if($('#year').val() != null) {
-                   let yearArr = $('#year').val();
-                   selectedYears = yearArr;
+                   selectedYears = $('#year').val();
                }
                else {
                    selectedYears = ["0"];
@@ -837,7 +838,7 @@
            /**
             * This event listener change elements of array selecteWeeks while user selects another week
             */
-           $('#weeks').on('select2:select', function(e) {
+           $('#weeks').on('select2:select', function() {
                let weeksArr = $('#weeks').val();
                if(weeksArr.length > 0) {
                    selectedWeeks = weeksArr;
@@ -851,10 +852,9 @@
            /**
             * This event listener change elements of array selectedWeeks while user unselects any week.
             */
-           $("#weeks").on('select2:unselect', function(e) {
+           $("#weeks").on('select2:unselect', function() {
                if($('#weeks').val() != null) {
-                   let weeksArr = $('#weeks').val();
-                   selectedWeeks = weeksArr;
+                   selectedWeeks = $('#weeks').val();
                }
                else {
                    selectedWeeks = ['0'];
@@ -865,7 +865,7 @@
            /**
             * This event listener change elements of array selectedDepartments while user selects a department
             */
-           $("#departments").on('select2:select', function(e) {
+           $("#departments").on('select2:select', function() {
                let departments = $('#departments').val();
                if(departments.length > 0) {
                    let helpArray = [];
@@ -885,7 +885,7 @@
            /**
             * This event listener change elements of array selectedDepartments while user unselects a department
             */
-           $("#departments").on('select2:unselect', function(e) {
+           $("#departments").on('select2:unselect', function() {
               if($('#departments').val() != null) {
                   let departments = $('#departments').val();
                   let helpArray = [];
@@ -906,7 +906,7 @@
            /**
             * This event listener change elements of array selectedTypes while user selects any type
             */
-           $('#typ').on('select2:select', function(e) {
+           $('#typ').on('select2:select', function() {
                let types = $('#typ').val();
                if(types.length > 0) {
                    selectedTypes = types;
@@ -920,10 +920,9 @@
            /**
             * This event listener change elements of array selectedTypes while user unselects any type
             */
-           $('#typ').on('select2:unselect', function(e) {
+           $('#typ').on('select2:unselect', function() {
                if($('#typ').val() != null) {
-                   let types = $('#typ').val();
-                   selectedTypes = types;
+                   selectedTypes = $('#typ').val();
                }
                else {
                    selectedTypes = ['0'];
@@ -944,7 +943,7 @@
            /**
             * This function clear all row selections and disable edit button
             */
-           function clearAllSelections(e) {
+           function clearAllSelections() {
                if(arrayOfTableRows.length > 0) {
                    if(document.querySelectorAll('.colorRow')) {
                        const coloredRows = document.querySelectorAll('.colorRow');

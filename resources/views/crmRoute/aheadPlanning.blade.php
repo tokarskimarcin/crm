@@ -80,7 +80,7 @@
                     Planowanie wyprzedzenia
                 </div>
                 <div class="alert alert-info">
-                    Moduł planowanie wyprzedzenia zawiera tabelę pokazującą różnicę pomiędzy ustalonymi <i>limitami</i> a <i>zaproszeniami live</i> z zakładki <strong>informacje o kampaniach</strong> dla poszczególnych oddziałów dla określonych dni.
+                    Moduł planowanie wyprzedzenia zawiera tabelę pokazującą różnicę pomiędzy <i>zaproszeniami live</i> a ustalonymi <i>limitami</i> z zakładki <strong>informacje o kampaniach</strong> dla poszczególnych oddziałów dla określonych dni.
                     Kolumny można sumować w następujący sposób: Po pierwsze należy zaznaczyć pierwszą komórkę z sumy, przytrzymać lewy shift a następnie kliknąć ostatnią komórkę sumy.
                 </div>
                 <div class="panel-body">
@@ -179,7 +179,7 @@
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function (mainEvent) {
+        document.addEventListener('DOMContentLoaded', function () {
 
             (function activateDatepicker() {
                 $('.form_date').datetimepicker({
@@ -198,9 +198,9 @@
             };
             let sumOfSelectedCells = 0;
             const now = new Date();
-            const day = ("0" + now.getDate()).slice(-2);
+            // const day = ("0" + now.getDate()).slice(-2);
             const month = ("0" + (now.getMonth() + 1)).slice(-2);
-            const today = now.getFullYear() + "-" + (month) + "-" + (day);
+            // const today = now.getFullYear() + "-" + (month) + "-" + (day);
             const firstDayOfThisMonth = now.getFullYear() + "-" + (month) + "-01";
             /*******END OF GLOBAL VARIABLES*********/
 
@@ -263,7 +263,7 @@
             /*********************EVENT LISTENERS FUNCTIONS****************************/
 
 
-            $('#date_start, #date_stop').on('change', function (e) {
+            $('#date_start, #date_stop').on('change', function () {
                 table.ajax.reload();
             });
 

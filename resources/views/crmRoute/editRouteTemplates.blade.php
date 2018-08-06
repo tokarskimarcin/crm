@@ -2082,8 +2082,6 @@
                 globalSwalFlag = false;
                 swal.close();
             })();
-
         });
-
     </script>
 @endsection

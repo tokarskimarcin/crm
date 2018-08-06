@@ -81,7 +81,9 @@
         </div>
             @endif
     </div>
-
+    @php
+        $lp = 1;
+    @endphp
     <div class="client-wrapper">
         <div class="client-container">
             @foreach($routeInfo as $campaign)
@@ -90,8 +92,20 @@
                 @endphp
                 <div class="client-container campaign-container">
                         <input type="hidden" value="{{$campaign[0]->id}}" class="campaignDirstClientRouteInfoId">
-                        <h4 class="voivode_info" >Województwo: {{$campaign[0]->voivode_name}}</h4>
-                        <h2 class="city_info" >Miasto: {{$campaign[0]->city_name}}</h2>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h3 class="campaign_lp" >Kampania #{{$lp++}}</h3>
+                        </div>
+                    </div>
+                    <div class="row" style="text-align: center">
+                        <div class="col-md-6">
+                            <h4 class="voivode_info" >Województwo: {{$campaign[0]->voivode_name}}</h4>
+                            <h2 class="city_info" >Miasto: {{$campaign[0]->city_name}}</h2>
+                        </div>
+                        <div class="col-md-6">
+                            <h2 class="date_info" >{{$campaign[0]->date}}</h2>
+                        </div>
+                    </div>
                     <label>Wybierz hotel:</label>
                     <table id="datatable" class="thead-inverse table table-striped row-border datatable hover" data-typ="datatable" cellspacing="0" width="100%">
                         <thead>
@@ -127,8 +141,8 @@
         </div>
 
         <div class="client-container placeToAppendForm">
-            <button class="btn btn-info" style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;" id="redirect">Powrót</button>
-            <button id="submit-button" class="btn btn-success" type="button" style="font-weight:bold;">Zapisz</button>
+            <button class="btn btn-primary" style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;" id="redirect"><span class='glyphicon glyphicon-repeat'></span> Powrót</button>
+            <button id="submit-button" class="btn btn-success" type="button" style="font-weight:bold;"><span class='glyphicon glyphicon-save'></span> Zapisz</button>
         </div>
     </div>
 
