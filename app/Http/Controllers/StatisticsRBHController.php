@@ -37,21 +37,16 @@ class StatisticsRBHController extends Controller
             ->with('Smonth_selected',$sThisMonthToView);
     }
     public function dayReport30RBHPost(Request $request) {
-        dd($request->month_selected);
-        $sThisMonth = date('n',strtotime($request->month_selected));
+        $sThisMonth = date('n',strtotime(date('Y').'-'.$request->month_selected));
         $sThisMonthToView  = $sThisMonth <10 ? '0'.$sThisMonth : $sThisMonth;
-        $sThisYear = date('Y',strtotime($request->reportDate));
-        $sActualMonth = date('Y-m',strtotime($request->reportDate));
+        $sThisYear = date('Y');
+        $sActualMonth = date('Y').'-'.$request->month_selected;
         $iTimeInSHours = 30;
         $iTimeInSeconds = $iTimeInSHours * 60 * 60;
-
         $CusersWorkingLessThan30RBH = Work_Hour::usersWorkingLessThan($iTimeInSHours,$sActualMonth);
         $CallUsersThisMonth = Work_Hour::usersWhoStartedWorkThisMonth($sThisMonth, $sThisYear,$sActualMonth);
-
         $CallUsersThisMonthExtended = Work_Hour::mergeCollection($CallUsersThisMonth,$iTimeInSeconds);
-
         $CallUsersForReport = collect(array_merge($CusersWorkingLessThan30RBH->toArray(), $CallUsersThisMonthExtended->toArray()));
-
         $CallUsersForReport = Pbx_report_extension::getPbxUserStatistics($CallUsersForReport);
         $aCllUsersForReport = $CallUsersForReport->groupBy('dep_id')->sortBy('dep_id');
         $sMonths = Work_Hour::getMonthsNames();

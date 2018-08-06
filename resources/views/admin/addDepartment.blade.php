@@ -67,6 +67,16 @@
             </div>
 
             <div class="form-group">
+                <label for="director">Wybierz kierownika Regionalnego oddziału</label>
+                <select class="form-control" name="regionalManager" id="regionalManager">
+                    <option value="0">Wybierz</option>
+                    @foreach($regionalManagers as $d)
+                        <option value="{{$d->id}}">{{$d->first_name . ' ' . $d->last_name}}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label for="director">Wybierz dyrektora oddziału</label>
                 <select class="form-control" name="director" id="director">
                     <option value="0">Wybierz</option>

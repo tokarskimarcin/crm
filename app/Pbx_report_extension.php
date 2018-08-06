@@ -30,7 +30,10 @@ class Pbx_report_extension extends Model
             $userInfo = $pbx_data->where('user_id',$item['id_user']);
             if(!$userInfo->isEmpty()){
                 if(isset($item['dateStart'])){
-                    $userInfo = $userInfo->whereBetween('report_date', [$item->dateStart, $item->dateStop]);
+                    dd($item['dateStart']);
+                    $userInfo = $userInfo->where('report_date','>=',$item['dateStart'])
+                    ->where('report_date','>=',$item['dateStop']);
+
                 }
                 $item['success']            = $userInfo->sum('success');
                 $item['avg']                = $item['sec_sum'] != 0 ? round($userInfo->sum('success')/($item['sec_sum']/3600),2) : 0;
