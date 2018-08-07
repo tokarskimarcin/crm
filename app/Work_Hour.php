@@ -153,6 +153,7 @@ class Work_Hour extends Model
      */
     public static function mergeCollection($allUsersThisMonth,$iTimeInSeconds) : Collection{
 
+
        return $allUsersThisMonth->map(function($item) use($iTimeInSeconds) {
             if($item->sec_sum > $iTimeInSeconds) { // case when user works over 30 hours
                 //Teraz chce uzyskać daty od kiedy zaczą pracować do kiedy liczyć mu wyniki.
@@ -167,12 +168,12 @@ class Work_Hour extends Model
                         if($key == 0) {
                             $sDateStart = $value->date;
                         }
-
                         $iSecondSum += $value->sec_sum;
                     }
-
                     if($iSecondSum >= $iTimeInSeconds) {
                         $sDateStop = $value->date;
+                        $item->secondStop = $iSecondSum;
+                        break;
                     }
                 }
                 $item->dateStart = $sDateStart;

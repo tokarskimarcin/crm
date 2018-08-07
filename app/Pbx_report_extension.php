@@ -30,19 +30,22 @@ class Pbx_report_extension extends Model
             $userInfo = $pbx_data->where('user_id',$item['id_user']);
             if(!$userInfo->isEmpty()){
                 if(isset($item['dateStart'])){
-
                     $userInfo = $userInfo->where('report_date','>=',$item['dateStart'])
-                    ->where('report_date','>=',$item['dateStop']);
-
+                    ->where('report_date','<=',$item['dateStop']);
+                    $item['avg']  = $item['secondStop'] != 0 ? round($item['success']/($item['secondStop']/3600),2) : 0;
+                }else{
+                    $item['avg']  = $item['sec_sum'] != 0 ? round($item['success']/($item['sec_sum']/3600),2) : 0;
                 }
-                $item['success']            = $item['success'];
-                $item['avg']                = $item['sec_sum'] != 0 ? round($item['success']/($item['sec_sum']/3600),2) : 0;
                 $item['jankyProc']          = $userInfo->sum('all_checked_talks') != 0 ? round($userInfo->sum('all_bad_talks')/($userInfo->sum('all_checked_talks')) * 100,2) : 0;
+                $item['bad_talks']          = $userInfo->sum('all_bad_talks');
+                $item['all_checked_talks']  = $userInfo->sum('all_checked_talks');
+                $item['pause_timeSec']      = $userInfo->sum('time_pause');
                 $item['pause_time']         = Schedule::secondToHour($userInfo->sum('time_pause'));
                 $item['received_calls']     = $userInfo->sum('received_calls');
                 $item['received_callsProc'] = $userInfo->sum('received_calls') != 0 ? round($item['success']/($userInfo->sum('received_calls')) * 100,2) : 0;
-
             }else{
+                $item['bad_talks']          = 0;
+                $item['all_checked_talks']  = 0;
                 $item['success']            = 0;
                 $item['avg']                = 0;
                 $item['jankyProc']          = 0;
