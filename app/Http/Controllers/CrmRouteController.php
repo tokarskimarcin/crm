@@ -1297,9 +1297,6 @@ class CrmRouteController extends Controller
         $typ = $request->typ;
         $typ = $typ == '0' ? '%' : $typ;
 
-        $state = $request->state;
-        $state = $state == '-1' ? '%' : $state;
-
         $client_route_info = DB::table('client_route_info')
             ->select('route_name',
                 'client_route_info.id',
@@ -1308,7 +1305,6 @@ class CrmRouteController extends Controller
                 'client.name as clientName',
                 'city.name as cityName',
                 'date',
-                'client_route.status',
                 'client_route.type',
                 'client_route_id')
             ->join('client_route' ,'client_route.id','=','client_route_id')
@@ -1318,8 +1314,7 @@ class CrmRouteController extends Controller
             ->where('client_route_info.status', '=', 1)
             ->where('date', 'like', $year . '%')
             ->where('weekOfYear', 'like', $selectedWeek)
-            ->where('client_route.type', 'like', $typ)
-            ->where('client_route.status', 'like', $state);
+            ->where('client_route.type', 'like', $typ);
 
         $client_route_info =  $client_route_info->get();
 
@@ -3446,18 +3441,16 @@ class CrmRouteController extends Controller
 
     public function clientReport(Request $request){
             $data['infoClient'] = $this::getDataToCSV($request->clientID,$request->year
-                ,$request->selectedWeek,$request->state);
+                ,$request->selectedWeek);
             $data['distincRouteID'] = $data['infoClient']->groupby('clientRouteID');
             return $data;
     }
 
-    public function getDataToCSV($clientID,$year,$selectedWeek,$state){
+    public function getDataToCSV($clientID,$year,$selectedWeek){
         if($year == 0)
             $year = '%';
         if($selectedWeek == 0)
             $selectedWeek = '%';
-        if($state == -1)
-            $state = '%';
         $data = ClientRouteInfo::
         select(DB::raw('
             client_route_info.client_route_id as clientRouteID,
@@ -3489,7 +3482,6 @@ class CrmRouteController extends Controller
             ->leftjoin('payment_methods','payment_methods.id','hotels.payment_method_id')
             ->leftjoin('city','city.id','hotels.city_id')
             ->where('client_route.client_id','=',$clientID)
-            ->where('client_route.status','like',$state)
             ->where('client_route_info.weekOfYear','like',$selectedWeek)
             ->where('client_route_info.status', '=', 1)
             ->where(DB::raw('YEAR(client_route_info.date)'),'like',$year)

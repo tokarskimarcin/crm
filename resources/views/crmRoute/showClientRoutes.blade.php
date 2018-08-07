@@ -104,6 +104,8 @@
                                     <li class="list-group-item"><strong>Aktywne</strong> oznaczone jako <button class="btn btn-success" style="font-weight:bold;">Aktywna</button> - Trasa jest gotowa do użycia (wszystkie godziny oraz hotele muszą być określone aby mogła być aktywna), pobierane są informacje z PBX odnośnie takich kampanii, wyświetlają się we wszystkich statystykach</li>
                                     <li class="list-group-item"><strong>Zakończone</strong> oznaczone jako <button class="btn btn-info" style="font-weight:bold;">Zakończona</button> - Trasa automatycznie zmienia stan z Aktywnej na Zakończoną, gdy data ostatniego pokazu zostaje osiągnięta</li>
                                 </ul>
+                                Aby trasa była gotowa do przypisywania limitów, należy ustalić hotele i godziny w zakładce Edycja (Hoteli i godzin).
+                                Jeśli wszystko zostanie przypisane poprawnie, trasa zmieni status z "wersja robocza" na "gotowa" w kolumnie "Hotel i godziny".
                             </div>
                         </div>
                     </div>
@@ -171,20 +173,8 @@
                                 <label for="type">Typ</label>
                                 <select id="type" class="form-control">
                                     <option value="0">Wszystkie</option>
-                                    <option value="1">Wysyłka</option>
-                                    <option value="2">Badania</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-md-2">
-                            <div class="form-group" style="margin-top:1em;">
-                                <label for="campaignState">Status Kampanii</label>
-                                <select id="campaignState" class="form-control">
-                                    <option value="-1">Wszystkie</option>
-                                    <option value="0">Niegotowe</option>
-                                    <option value="1">Aktywne</option>
-                                    <option value="2">Zakończone</option>
+                                    <option value="2">Wysyłka</option>
+                                    <option value="1">Badania</option>
                                 </select>
                             </div>
                         </div>
@@ -212,7 +202,6 @@
                                     <th>Data I pokazu</th>
                                     <th>Trasa</th>
                                     <th>Hotel i godziny</th>
-                                    <th>Status trasy</th>
                                     <th>Edycja (Hoteli i godzin)</th>
                                     <th>Edycja (Trasy)</th>
                                     <th>Edycja parametrów (Kampanii)</th>
@@ -385,7 +374,6 @@
                 let year = yearInput.val();
                 let selectedWeek = selectedWeekInput.val();
                 let typ = typInput.val();
-                let state = stateInput.val();
                 if(selectedClientID == '-1')
                     swal('Aby wygenerować raport wybierz jednego klienta');
                 else{
@@ -398,8 +386,7 @@
                         data: {
                             'clientID'      : selectedClientID,
                             'year'          : year,
-                            'selectedWeek'  : selectedWeek,
-                            'state'         : state
+                            'selectedWeek'  : selectedWeek
                         },
                         success: function (response) {
                             var trHTML = '';
@@ -726,7 +713,6 @@
                         d.year = yearInput.val();
                         d.selectedWeek = selectedWeekInput.val();
                         d.typ = typInput.val();
-                        d.state = stateInput.val();
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -752,79 +738,31 @@
                     {
                         "data": function (data, type, dataToSet) {
                             if (data.hotelOrHour) {
-                                return '<span style="color: darkgreen;">Przypisane</span>';
+                                return '<span style="color: darkgreen;">Gotowa</span>';
                             }
                             else {
-                                return '<span style="color: red;">Nieprzypisane</span>';
+                                return '<span style="color: red;">Wersja robocza</span>';
                             }
                         }, "name": "hotelOrHour"
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            disabledOption = '';
-                            if(!data.hotelOrHour){
-                                disabledOption = '';
-                            }
-                            option1 = '<option value="0" '+disabledOption+' >Niegotowa</option>\n';
-                            option2 = '<option value="1" '+disabledOption+'>Aktywna</option>\n';
-                            option3 = '<option value="2" '+disabledOption+'>Zakończona</option>\n';
-                            color='';
                             type = '';
-
-                            if(data.status == 0){
-                                option1 = '<option value="0" selected="selected">Niegotowa</button></option>\n';
-                                color = 'unready';
-
-                            }else if(data.status ==1){
-                                option2 = '<option value="1" selected="selected" '+disabledOption+'>Aktywna</option>\n';
-                                color = 'activated';
-
-                            }else {
-                                option3 = '<option value="2" selected="selected" '+disabledOption+'>Zakończona</option>\n';
-                                color = 'deactivated';
-                                type = '';
-                            }
-                            select  ='<select class="form-control '+ color+'" data-status="'+data.status+'" data-clientRouteId="'+ data.client_route_id+'" '+type+'>' +
-                                option1 +
-                                option2 +
-                                option3 +
-                                '</select>';
-                            return select;
-                            /*if (data.status == 0) {
-                                return '<button data-clientRouteId="' + data.client_route_id + '" class="btn btn-success action-buttons-0" style="width:100%">Aktywuj kampanie</button>';
-                            }
-                            else if (data.status == 2) {
-                                return '<button data-clientRouteId="' + data.client_route_id + '" class="btn btn-primary action-buttons-2" style="width:100%">Trasa niegotowa</button>';
-                            }
-                            else {
-                                return '<button data-clientRouteId="' + data.client_route_id + '" class="btn btn-warning action-buttons-1" style="width:100%">Zakończ kampanie</button>';
-                            }
-*/
-                        }, "name": "status", searchable: false,width:'15%'
-                    },
-                    {
-                        "data": function (data, type, dataToSet) {
-                            type = '';
-                            if(data.status == 2)
-                                type = 'disabled';
                             return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block" data-type="1" '+type+'><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
                         }, "name": "link", width: '10%', searchable: false, orderable: false
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            if(data.status == 2)
-                                type = 'disabled';
                             return '<a href="{{URL::to("/editAssignedRoute")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block" data-type="2" '+type+'><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
                         }, "name": "link", width: '10%', searchable: false, orderable: false
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            if(data.status == 2)
-                                type = 'disabled';
                             return '<button class="btn btn-info btn-block show-modal-with-data" '+type+'><span class="glyphicon glyphicon-edit " data-route_id ="' + data.client_route_id + '" ></span> Edytuj</button>';
                         }, "name": "link", width: '10%', searchable: false, orderable: false
 
-                    },{
+                    },
+                    {
                         "data": function (data, type, dataToSet) {
                             let spanButton = $(document.createElement('span')).addClass('glyphicon glyphicon-search');
                             let button = $(document.createElement('button')).addClass('btn btn-block btn-default').append(spanButton);
@@ -1290,7 +1228,6 @@
                 const yearInput = document.querySelector('#year');
                 const weekNumber = document.querySelector('#weekNumber');
                 const type = document.querySelector('#type');
-                const campaignState = document.querySelector('#campaignState');
                 const showAllClientsCheckbox = document.querySelector('#showAllClients');
                 const showOnlyAssignedCheckbox = document.querySelector('#showOnlyAssigned');
 
@@ -1305,7 +1242,6 @@
                 sessionStorage.setItem('year', yearInput.options[yearInput.selectedIndex].value);
                 sessionStorage.setItem('weekNumber', weekNumber.options[weekNumber.selectedIndex].value);
                 sessionStorage.setItem('type', type.options[type.selectedIndex].value);
-                sessionStorage.setItem('campaignState', campaignState.options[campaignState.selectedIndex].value);
                 sessionStorage.setItem('showAllClients', showAllClientsCheckbox.checked);
                 sessionStorage.setItem('showOnlyAssigned', showOnlyAssignedCheckbox.checked);
             }
@@ -1364,18 +1300,6 @@
                         }
                     }
                     sessionStorage.removeItem('type');
-                }
-
-                const campaignState = document.querySelector('#campaignState');
-                if (sessionStorage.getItem('campaignState')) {
-                    const state = sessionStorage.getItem('campaignState');
-                    somethingChanged = state !== '-1' ? true : somethingChanged;
-                    for (let i = 0; i < campaignState.length; i++) {
-                        if (campaignState[i].value == state) {
-                            campaignState[i].selected = true;
-                        }
-                    }
-                    sessionStorage.removeItem('campaignState');
                 }
 
                 let showAllClientsCheckbox = document.querySelector('#showAllClients');
