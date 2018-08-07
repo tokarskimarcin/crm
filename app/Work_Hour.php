@@ -98,6 +98,7 @@ class Work_Hour extends Model
         Concat(users.first_name," ",users.last_name) as userNameInfo,
         date,
         SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))) as sec_sum,
+        sum(success) as success,
         MONTH(MIN(date)) as minMonth,
         YEAR(MIN(date)) as minYear,
         departments.name as dep_city,
