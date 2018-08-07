@@ -95,7 +95,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="myLabel">Opis:</label>
-                                    <textarea rows="5" style="height: 100%" class="form-control" placeholder="Opis pracownika" id="candidate_desc"></textarea>
+                                    <textarea rows="5" style="height: 100%; resize: vertical; min-height: 5vh; max-height: 30vh" class="form-control" placeholder="Opis pracownika" id="candidate_desc"></textarea>
                                 </div>
                             </div>
                         </div>
