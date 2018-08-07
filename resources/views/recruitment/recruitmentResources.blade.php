@@ -317,7 +317,7 @@ $('#check_result').click((e) => {
                         <td>${value.name}</td>
                         <td>
                             <button class="btn btn-danger" onclick="statusDelete(this)" data-id="${value.id}">
-                                <span></span> Usuń
+                                <span class="glyphicon glyphicon-remove"></span> Usuń
                             </button>
                         </td>
                     </tr>
@@ -338,7 +338,7 @@ $('#check_result').click((e) => {
     });
 });
 
-$('#add_result').click((e) => {
+$('#add_result').click(function(e) {
     var selected_status = $('#selected_status').val();
     var selected_result = $('#selected_result').val();
 
@@ -351,9 +351,8 @@ $('#add_result').click((e) => {
         swal('Wybierz rezultat!');
         return false;
     }
-
-    changeStatus('add', selected_status, selected_result);
-
+    $(e.target).prop('disabled',true);
+    changeStatus('add', selected_status, selected_result, e.target);
 });
 
 function statusDelete(e) {
@@ -369,14 +368,14 @@ function statusDelete(e) {
         cancelButtonColor: '#d33',
         confirmButtonText: 'Tak'
         }).then((result) => {
-        if (result.value) {
-            changeStatus('delete', selected_status, selected_result);
-        }
-    })
+            if (result.value) {
+                changeStatus('delete', selected_status, selected_result,e);
+            }
+    });
 }
 
-function changeStatus(type, selected_status, selected_result) {
-    
+function changeStatus(type, selected_status, selected_result, target = null) {
+    console.log(target);
     $.ajax({
         type: "POST",
         url: '{{ route('api.statusResultChange') }}',
@@ -393,9 +392,13 @@ function changeStatus(type, selected_status, selected_result) {
                 swal('Dodano pomyślnie!');
             } else if (response == 'delete') {
                 swal('Usunięto pomyślnie!');
+            }else if(response == 'already_exists'){
+                swal('Ten rezultat jest już dodany');
             }
+            $(target).prop('disabled',false);
             $('#check_result').click();
         }, error: function(response) {
+            $(target).prop('disabled',false);
             swal('Ups, coś poszło nie tak, skontaktuj się z administratorem!')
         }
     });
