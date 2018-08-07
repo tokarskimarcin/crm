@@ -98,7 +98,7 @@ class Work_Hour extends Model
         Concat(users.first_name," ",users.last_name) as userNameInfo,
         date,
         SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))) as sec_sum,
-        sum(success) as success,
+        
         MONTH(MIN(date)) as minMonth,
         YEAR(MIN(date)) as minYear,
         departments.name as dep_city,
@@ -131,6 +131,7 @@ class Work_Hour extends Model
                 id_user,
                 date,
                 SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))) as sec_sum,
+                success,
                 departments.name as dep_city,
                 department_type.name as dep_type,
                 department_info.id as dep_id
@@ -155,11 +156,12 @@ class Work_Hour extends Model
 
 
        return $allUsersThisMonth->map(function($item) use($iTimeInSeconds) {
-            if($item->sec_sum > $iTimeInSeconds) { // case when user works over 30 hours
+            if($item->sec_sum >= $iTimeInSeconds) { // case when user works over 30 hours
                 //Teraz chce uzyskać daty od kiedy zaczą pracować do kiedy liczyć mu wyniki.
 
                 $allUserRecords = Work_Hour::getWorkHoursRecordsGroupedByDate($item->id_user);
                 $iSecondSum = 0;
+                $only30RBHSuccess = 0;
                 $sDateStart = null;
                 $sDateStop = null;
 
@@ -169,15 +171,18 @@ class Work_Hour extends Model
                             $sDateStart = $value->date;
                         }
                         $iSecondSum += $value->sec_sum;
+                        $only30RBHSuccess += $value->success;
                     }
                     if($iSecondSum >= $iTimeInSeconds) {
                         $sDateStop = $value->date;
                         $item->secondStop = $iSecondSum;
+                        $item->success = $only30RBHSuccess;
                         break;
                     }
                 }
                 $item->dateStart = $sDateStart;
                 $item->dateStop = $sDateStop;
+
             }
             return $item;
         });
