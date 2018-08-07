@@ -35,10 +35,10 @@
                 Źródła pracowników
             </div>
             <div class="panel-body">
-                <div class="table-responsive">
+                <div class="table-responsive">f
                     <table class="table table-striped thead-inverse">
                         <thead>
-                            <th>Źródłó</th>
+                            <th>Źródło</th>
                             <th style="width: 15%">Edytuj</th>
                             <th style="width: 15%">Usuń / Przywróć</th>
                         </thead>
