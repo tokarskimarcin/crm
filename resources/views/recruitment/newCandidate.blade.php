@@ -28,8 +28,8 @@
                             <div class="col-md-12">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="myLabel">Imie:</label>
-                                        <input type="text" class="form-control" placeholder="Imie" id="candidate_name"/>
+                                        <label class="myLabel">Imię:</label>
+                                        <input type="text" class="form-control" placeholder="Imię" id="candidate_name"/>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -117,7 +117,7 @@
                                         <table id="all_user_fired" class="table table-striped thead-inverse">
                                             <thead>
                                             <tr>
-                                                <th>Imie i nazwisko</th>
+                                                <th>Imię i nazwisko</th>
                                                 <th class="category_column">Data rozpoczęcia</th>
                                                 <th class="category_column">Data zakończenia</th>
                                             </tr>

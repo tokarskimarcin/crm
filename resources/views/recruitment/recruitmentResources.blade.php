@@ -38,9 +38,9 @@
                 <div class="table-responsive">
                     <table class="table table-striped thead-inverse">
                         <thead>
-                            <th>Żródłó</th>
+                            <th>Źródłó</th>
                             <th style="width: 15%">Edytuj</th>
-                            <th style="width: 15%">Usuń / Przywróc</th>
+                            <th style="width: 15%">Usuń / Przywróć</th>
                         </thead>
                         <tbody id="sources">
                             
@@ -52,8 +52,8 @@
                     <input type="text" class="form-control" placeholder="Kolejny etap..." id="new_source"/>
                 </div>
                 <div class="form-group">
-                    <button class="btn btn-info" id="add_new_source">
-                        <span class="glyphicon glyphicon-plus"></span> Dodaj żródło
+                    <button class="btn btn-info btn-block" id="add_new_source">
+                        <span class="glyphicon glyphicon-plus"></span> Dodaj źródło
                     </button>
                 </div>
             </div>
@@ -78,7 +78,7 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <button class="btn btn-warning" id="check_result">
+                        <button class="btn btn-warning btn-block" id="check_result">
                             <span class="glyphicon glyphicon-ok"></span> Wybierz status
                         </button>
                     </div>
@@ -91,7 +91,7 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <button class="btn btn-warning" id="add_result">
+                        <button class="btn btn-warning btn-block" id="add_result">
                             <span class="glyphicon glyphicon-ok"></span> Dodaj rezultat
                         </button>
                     </div>

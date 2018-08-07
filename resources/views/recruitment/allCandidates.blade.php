@@ -37,7 +37,7 @@
                        width="100%">
                     <thead>
                     <tr>
-                        <td>Imie i nazwisko</td>
+                        <td>Imię i nazwisko</td>
                         <td>Telefon</td>
                         <td>Data dodania</td>
                         <td>Dodany przez</td>
