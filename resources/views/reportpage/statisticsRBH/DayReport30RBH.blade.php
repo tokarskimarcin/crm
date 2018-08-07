@@ -11,6 +11,15 @@
     </div>
     <div class="row">
         <div class="col-lg-12">
+            <div class="alert alert-info">
+                <strong>Raport Dzienny 30 RBH</strong> pokazuje informacje o konsultantach, którzy przepracowali <u> mniej niż 30 RBH</u>, oraz tych, którzy <u>zaczeli pracę w danym miesiącu</u> i już przekroczyli 30RBH.
+                Osoby, które przekroczyły 30RBH będą widoczne w raporcie  <i>do końca bierzącego miesiąca</i>  a ich wyniki zostały policzone za okres pierwszych 30RBH.
+                Jeśli w kolumnie <i>liczba godzin</i>, znajdują się wartości oddzielone ukośnikiem, oznacza to, że ilość godzin z lewej strony
+                została wykorzystana do wyliczenia statystyk (Około pierwsze 30 godzin pracy konsultanta), a wartość po prawej, oznacza ile do dnia dzisiejszego przepracował RBH.
+                Konsultanci są pogrupowani oddziałami.
+            </div>
+        </div>
+        <div class="col-lg-12">
             <form action="{{URL::to('/pageDayReport30RBH')}}" method="post">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <div class="form-group">
