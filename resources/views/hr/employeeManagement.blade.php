@@ -273,7 +273,6 @@
                     {"data": "private_phone"},
                     {
                         "data": function (data, type, dataToSet) {
-                            console.log(data);
                             if (data.documents == 1)
                                 data.documents = "Posiada";
                             else if (data.documents == 0)

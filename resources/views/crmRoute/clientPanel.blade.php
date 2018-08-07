@@ -494,38 +494,58 @@
                 validation = false;
                 swal("Podaj nazwę klienta (Faktura)")
             }
-            if (clientPaymentPhone.trim().length == 0 || clientNameInvoice == '') {
+            if (clientPaymentPhone.trim().length != 9) {
                 validation = false;
-                swal("Podaj telefon kontaktowy (płatności)")
+                swal("Podaj poprawny telefon kontaktowy (płatności)")
             }
             if (clientPaymentMail.trim().length == 0 || clientNameInvoice == '') {
                 validation = false;
                 swal("Podaj mail kontaktowy (płatności)")
             }
-            if (clientFailuresPhone.trim().length == 0 || clientNameInvoice == '') {
+            if (clientFailuresPhone.trim().length != 9) {
                 validation = false;
-                swal("Podaj telefon kontaktowy (awarie)")
+                swal("Podaj poprawny telefon kontaktowy (awarie)")
             }
             if (clientFailuresMail.trim().length == 0 || clientNameInvoice == '') {
                 validation = false;
                 swal("Podaj mail kontaktowy (awarie)")
             }
-            if (clientSchedulePhone.trim().length == 0 || clientNameInvoice == '') {
+            if (clientSchedulePhone.trim().length != 9) {
                 validation = false;
-                swal("Podaj telefon kontaktowy (grafik)")
+                swal("Podaj poprawny telefon kontaktowy (grafik)")
             }
             if (clientScheduleMail.trim().length == 0 || clientNameInvoice == '') {
                 validation = false;
                 swal("Podaj mail kontaktowy (grafik)")
             }
-            if (clientManagerPhone.trim().length == 0 || clientNameInvoice == '') {
+            if (clientManagerPhone.trim().length != 9) {
                 validation = false;
-                swal("Podaj telefon kontaktowy (Szef)")
+                swal("Podaj poprawny telefon kontaktowy (Szef)")
             }
             if (clientManagersMail.trim().length == 0 || clientNameInvoice == '') {
                 validation = false;
                 swal("Podaj mail kontaktowy (Szef)")
             }
+
+            /* */
+            let emailReg = /\S+@\S+\.\S+/;
+            if (!emailReg.test(clientPaymentMail)) {
+                swal("Niepoprawny mail kontaktowy (płatności)");
+                validation = false;
+            }
+            if (!emailReg.test(clientFailuresMail)) {
+                swal("Niepoprawny mail kontaktowy (awarie)");
+                validation = false;
+            }
+            if (!emailReg.test(clientScheduleMail)) {
+                swal("Niepoprawny mail kontaktowy (grafik)");
+                validation = false;
+            }
+            if (!emailReg.test(clientManagersMail)) {
+                swal("Niepoprawny mail kontaktowy (Szef)");
+                validation = false;
+            }
+
             if (clientMeetingType == 0) {
                 validation = false;
                 swal("Wybierz typ spotkań")
