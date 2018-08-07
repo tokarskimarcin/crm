@@ -39,34 +39,44 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label>Oddział:</label>
-                <select class="form-control" id="selected_dep" name="selected_dep">
-                    <optgroup label="Oddziały">
-                        @foreach($departments as $dep)
-                            <option value="{{$dep->id}}" @if(($wiev_type == 'department') && $dep->id == $dep_id) selected @endif>{{$dep->departments->name . ' ' . $dep->department_type->name}}</option>
-                        @endforeach
-                    </optgroup>
-                    <optgroup label="Dyrektor Regionalny HR">
-                        @foreach($directorsHR as $director)
-                            <option
-                                    @if($wiev_type == 'director' && ('10' . $director->id == $dep_id)) selected @endif
-                            value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
-                        @endforeach
-                    </optgroup>
-                    <optgroup label="Kierownik Regionalny">
-                        @foreach($regionalManagers as $director)
-                            <option
-                                    @if($wiev_type == 'director' && ('10' . $director->id == $dep_id)) selected @endif
-                            value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
-                        @endforeach
-                    </optgroup>
-                    <optgroup label="Dyrektorzy">
-                        @foreach($directors as $director)
-                            <option
-                                    @if($wiev_type == 'director' && ('10' . $director->id == $dep_id)) selected @endif
-                            value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
-                        @endforeach
-                    </optgroup>
-                </select>
+                @if(Auth::user()->user_type_id === 4)
+                        <select class="form-control" id="selected_dep" name="selected_dep" disabled>
+                            @foreach($departments as $dep)
+                                @if($dep_info_id === $dep->id)
+                                    <option value="{{$dep->id}}" @if(($wiev_type == 'department') && $dep->id == $dep_info_id) selected @endif>{{$dep->departments->name . ' ' . $dep->department_type->name}}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    @else
+                        <select class="form-control" id="selected_dep" name="selected_dep">
+                            <optgroup label="Oddziały">
+                                @foreach($departments as $dep)
+                                    <option value="{{$dep->id}}" @if(($wiev_type == 'department') && $dep->id == $dep_info_id) selected @endif>{{$dep->departments->name . ' ' . $dep->department_type->name}}</option>
+                                @endforeach
+                            </optgroup>
+                            <optgroup label="Dyrektor Regionalny HR">
+                                @foreach($directorsHR as $director)
+                                    <option
+                                            @if($wiev_type == 'director' && ('10' . $director->id == $dep_info_id)) selected @endif
+                                    value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
+                                @endforeach
+                            </optgroup>
+                            <optgroup label="Kierownik Regionalny">
+                                @foreach($regionalManagers as $director)
+                                    <option
+                                            @if($wiev_type == 'director' && ('10' . $director->id == $dep_info_id)) selected @endif
+                                    value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
+                                @endforeach
+                            </optgroup>
+                            <optgroup label="Dyrektorzy">
+                                @foreach($directors as $director)
+                                    <option
+                                            @if($wiev_type == 'director' && ('10' . $director->id == $dep_info_id)) selected @endif
+                                    value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
+                                @endforeach
+                            </optgroup>
+                        </select>
+                    @endif
             </div>
         </div>
 
