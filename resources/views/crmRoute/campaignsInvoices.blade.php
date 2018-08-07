@@ -330,7 +330,7 @@
                                 allowEnterKey: false,
                                 onOpen: () => {
                                     swal.showLoading();
-                                    getHotelInfoAjax(hotelId, function (data) {
+                                    getClientInfoAjax(hotelId, function (data) {
                                         let modalContent = $('#' + modalIdString + ' .modal-content');
                                         setModalSize(modalIdString, 3);
                                         clearModalContent(modalContent);
@@ -646,7 +646,18 @@
                         },
                         contentType: false,
                         processData: false,
-                        data: formData
+                        data: formData,
+                        error: function (jqXHR, textStatus, thrownError) {
+                            swal.close();
+                            console.log(jqXHR);
+                            console.log('textStatus: ' + textStatus);
+                            console.log('hrownError: ' + thrownError);
+                            swal({
+                                type: 'error',
+                                title: 'Błąd ' + jqXHR.status,
+                                text: 'Wystąpił błąd: ' + thrownError + ' "' + jqXHR.responseJSON.message + '"',
+                            });
+                        }
                     }).done(function (response) {
                         reloadDataTable(datatable);
                         swal.close();
@@ -665,22 +676,12 @@
                                 type: "danger"
                             });
                         }
-                    }).error(function (jqXHR, textStatus, thrownError) {
-                        swal.close();
-                        console.log(jqXHR);
-                        console.log('textStatus: ' + textStatus);
-                        console.log('hrownError: ' + thrownError);
-                        swal({
-                            type: 'error',
-                            title: 'Błąd ' + jqXHR.status,
-                            text: 'Wystąpił błąd: ' + thrownError + ' "' + jqXHR.responseJSON.message + '"',
-                        });
                     });
                 }
             });
         }
 
-        function getHotelInfoAjax(clientId, callback){
+        function getClientInfoAjax(clientId, callback){
             return $.ajax({
                 type: "POST",
                 url: "{{route('api.getClientInfoAjax')}}",
@@ -689,19 +690,20 @@
                 },
                 data: {
                     clientId: clientId
+                },
+                error: function (jqXHR, textStatus, thrownError) {
+                    swal.close();
+                    console.log(jqXHR);
+                    console.log('textStatus: ' + textStatus);
+                    console.log('hrownError: ' + thrownError);
+                    swal({
+                        type: 'error',
+                        title: 'Błąd ' + jqXHR.status,
+                        text: 'Wystąpił błąd: ' + thrownError + ' "' + jqXHR.responseJSON.message + '"',
+                    });
                 }
             }).done((response)=>{
                 callback(response);
-            }).error(function (jqXHR, textStatus, thrownError) {
-                swal.close();
-                console.log(jqXHR);
-                console.log('textStatus: ' + textStatus);
-                console.log('hrownError: ' + thrownError);
-                swal({
-                    type: 'error',
-                    title: 'Błąd ' + jqXHR.status,
-                    text: 'Wystąpił błąd: ' + thrownError + ' "' + jqXHR.responseJSON.message + '"',
-                });
             });
         }
 
@@ -716,19 +718,20 @@
                     campaignId: campaignId,
                     dateTime: dateTime,
                     penalty : penalty
+                },
+                error: function (jqXHR, textStatus, thrownError) {
+                    swal.close();
+                    console.log(jqXHR);
+                    console.log('textStatus: ' + textStatus);
+                    console.log('hrownError: ' + thrownError);
+                    swal({
+                        type: 'error',
+                        title: 'Błąd ' + jqXHR.status,
+                        text: 'Wystąpił błąd: ' + thrownError + ' "' + jqXHR.responseJSON.message + '"',
+                    });
                 }
             }).done((response)=>{
                 return response;
-            }).error(function (jqXHR, textStatus, thrownError) {
-                swal.close();
-                console.log(jqXHR);
-                console.log('textStatus: ' + textStatus);
-                console.log('hrownError: ' + thrownError);
-                swal({
-                    type: 'error',
-                    title: 'Błąd ' + jqXHR.status,
-                    text: 'Wystąpił błąd: ' + thrownError + ' "' + jqXHR.responseJSON.message + '"',
-                });
             });
         }
 

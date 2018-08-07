@@ -62,7 +62,7 @@
                             <div class="form-group">
                                 <label for="voivode">Województwo</label>
                                 <select name="voivode" id="voivode" class="form-control select2-container" multiple="multiple">
-                                    <option value="0">Wybierz</option>
+                                    {{--<option value="0">Wybierz</option>--}}
                                     @foreach($voivodes as $voivode)
                                         <option value="{{$voivode->id}}">{{$voivode->name}}</option>
                                     @endforeach
@@ -73,7 +73,7 @@
                             <div class="form-group">
                                 <label for="city">Miasto</label>
                                 <select name="city" id="city" class="form-control select2-container" multiple="multiple">
-                                    <option value="0">Wybierz</option>
+                                    {{--<option value="0">Wybierz</option>--}}
                                     @foreach($cities as $city)
                                         <option value="{{$city->id}}">{{$city->name}}</option>
                                     @endforeach
@@ -84,7 +84,7 @@
                             <div class="form-group">
                                 <label for="zipCode">Kod pocztowy</label>
                                 <select name="zipCode" id="zipCode" class="form-control select2-container" multiple="multiple">
-                                    <option value="0">Wybierz</option>
+                                    {{--<option value="0">Wybierz</option>--}}
                                     @foreach($zipCode as $item)
                                         <option>{{$item->zip_code}}</option>
                                     @endforeach
@@ -427,6 +427,202 @@
             paymentMethodInput.selectpicker('refresh');
             clientsExceptionsInput.selectpicker('refresh');
         }
+        //Walidacja Zapisu
+        function saveNewHotel() {
+            let DEFFERED = $.Deferred();
+
+            var name = $("#name").val();
+            //var price = $('#price').val();
+            var street = $('#street').val();
+            var voivode = $('#voivodeAdd').val();
+            var city = $('#cityAdd').val();
+            var comment = $('#comment').val();
+            var validate = true;
+            let parking = $('#parking').val();
+            let paymentMethodId = $('#paymentMethod').val();
+            let dailyBid = $('#dailyBid').val();
+            let hourBid = $('#hourBid').val();
+            let hotelId = $('#hotelId').val();
+            let bidType = $('#bidType').val();
+            let zipCode ='';
+            $('.zipCode').each(function( key, item ) {
+                zipCode += item.value;
+            });
+
+            if(bidType == 0){
+                swal('Wybierz typ stawki')
+                validate = false;
+            }else{
+                if(bidType == 2 && (dailyBid == 0 || dailyBid.trim().length == 0 || dailyBid == '')){
+                    swal('Wybierz stawkę dzienną');
+                    validate = false;
+                }else if (bidType == 1 && (hourBid == 0 || hourBid.trim().length == 0 || hourBid == '')){
+                    swal('Wybierz stawkę godzinową');
+                    validate = false;
+                }
+            }
+            if (zipCode.trim().length < 5) {
+                validate = false;
+                swal("Podaj kod pocztowy");
+            }
+            if(parking == -1){
+                swal('Wybierz pole z parkingiem');
+                validate = false;
+            }
+            if(paymentMethodId == 0){
+                swal('Wybierz formę płatności');
+                validate = false;
+            }
+            if (name.trim().length == 0) {
+                swal('Wprowadź nazwę hotelu!');
+                validate = false;
+            }
+            if (street.trim().length == 0) {
+                swal('Wprowadź ulicę!');
+                validate = false;
+            }
+            if (voivode == 0) {
+                swal('Wybierz województwo!');
+                validate = false;
+            }
+            if (city == 0 || city=='') {
+                swal('Wybierz miasto!');
+                validate = false;
+            }
+            $('.hotelPhoneNumber').each(function(key, item){
+                if(item.value === ''){
+                    swal("Wpisz numery telefonów do wszystkich pól");
+                    validate = false;
+                    return false;
+                }else if(isNaN(item.value)){
+                    swal("Podane numery muszą być w formacie liczbowym");
+                    validate = false;
+                    return false;
+                }else if(String(item.value).length !== 9){
+                    swal("Numery muszą składać się z 9 cyfr");
+                    validate = false;
+                    return false;
+                }
+            });
+            $('input[name="hotelPhoneNumber"]').each(function(key, item){
+                if(item.checked == true){
+                    return false;
+                }
+                if(key == $('input[name="hotelPhoneNumber"]').length-1) {
+                    swal("Zaznacz sugerowany numer telefonu");
+                    validate = false;
+                }
+            });
+
+            $('.hotelEmail').each(function(key, item){
+                if(item.value === ''){
+                    swal("Wpisz maile do wszystkich pól");
+                    validate = false;
+                    return false;
+                }else{
+                    var re = /\S+@\S+\.\S+/;
+                    if(! re.test(item.value)){
+                        swal("Podane maile muszą być w odpowiednim formacie");
+                        validate = false;
+                        return false;
+                    }
+                }
+            });
+
+            $('input[name="hotelEmail"]').each(function(key, item){
+                if(item.checked == true){
+                    return false;
+                }
+                if(key == $('input[name="hotelEmail"]').length-1) {
+                    swal("Zaznacz sugerowany email");
+                    validate = false;
+                }
+            });
+
+            if(validate) {
+                saveHotelFlag = true;
+                $('#saveHotel').prop('disabled', true);
+                let phones = [];
+                let emails = [];
+                $('.mailsContainer .contact .input-group').each(function(key, item){
+                    let radio = $(item).find('input[name="hotelEmail"]');
+                    let email = $(item).find('.hotelEmail');
+                    emails.push({id:email.data('id'), new: email.data('new'), value: email.val(), suggested: radio.prop('checked')});
+                });
+                $('.phonesContainer .contact .input-group').each(function(key, item){
+                    let radio = $(item).find('input[name="hotelPhoneNumber"]');
+                    let phone = $(item).find('.hotelPhoneNumber');
+                    phones.push({id:phone.data('id'), new: phone.data('new'), value: phone.val(), suggested: radio.prop('checked')});
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{route('api.saveNewHotel')}}",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        'voivode':      voivode,
+                        'name':         name,
+                        //'price': price,
+                        'street':       street,
+                        'city':         city,
+                        'zipCode':      zipCode,
+                        'hotelId':      hotelId,
+                        'comment' :     comment,
+                        'hotelStatus' : hotelStatus,
+                        'dailyBid':     dailyBid,
+                        'hourBid' :     hourBid,
+                        'paymentMethodId': paymentMethodId,
+                        'parking' :     parking,
+                        bidType: bidType,
+                        phones : phones,
+                        emails : emails,
+                        clientsExceptions : $('#clientsExceptions').val()
+                    },
+                    error: function (jqXHR, textStatus, thrownError) {
+                        console.log(jqXHR);
+                        console.log('textStatus: ' + textStatus);
+                        console.log('hrownError: ' + thrownError);
+                        swal({
+                            type: 'error',
+                            title: 'Błąd ' + jqXHR.status,
+                            text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
+                        });
+                        $('#saveHotel').prop('disabled', false);
+                        DEFFERED.reject();
+                        return DEFFERED.promise();
+                    }
+                }).done(function (response) {
+                    $('#HotelModal').modal('hide');
+                    if (addNewHotelFlag) {
+                        $.notify({
+                            icon: 'glyphicon glyphicon-ok',
+                            message: 'Dodano nowy hotel <strong>' + name + '</strong>'
+                        }, {
+                            type: "success"
+                        });
+                        addNewHotelFlag = false;
+                    }
+                    if (editHotelFlag) {
+                        $.notify({
+                            icon: 'glyphicon glyphicon-ok',
+                            message: 'Edytowano hotel <strong>' + name + '</strong>'
+                        }, {
+                            type: "success"
+                        });
+                        editHotelFlag = false;
+                    }
+                    $('#saveHotel').prop('disabled', false);
+                    DEFFERED.resolve();
+                    return DEFFERED.promise();
+                });
+            }else{
+                DEFFERED.reject();
+            }
+            return DEFFERED.promise();
+        }
+
 
         document.addEventListener('DOMContentLoaded', function(event) {
             $('#NewHotelModal').on('click',function () {
@@ -747,7 +943,6 @@
 
             $('#invoiceTemplate').change(function(e){
                 let allowedExtensions = <?php echo $validHotelInvoiceTemplatesExtensions; ?>;
-                console.log(allowedExtensions);
                 if(allowedExtensions.indexOf(getFileExtension($(e.target).prop('files')[0].name)) === -1){
                     $(e.target).val('');
                     swal({
@@ -758,9 +953,10 @@
                 }
             });
 
+
             $('#newHotelForm').submit(function (e) {
                 e.preventDefault();
-                saveNewHotel().then(function(){
+                saveNewHotel().done(function(){
                     //let orderFileInput = $('#order');
                     let invoiceTemplateFileInput = $('#invoiceTemplate');
                     /*if(orderFileInput.prop("files").length !== 0){
@@ -824,7 +1020,6 @@
                             },
                             data: {'hotel_id': hotel_id}
                         }).done(function (response){
-                            console.log(response);
                             swal.close();
                         }).error(function (jqXHR, textStatus, thrownError) {
                             swal.close();
@@ -993,193 +1188,6 @@
             return fname.slice((fname.lastIndexOf(".") - 1 >>> 0) + 2);
         }
 
-        //Walidacja Zapisu
-        function saveNewHotel() {
-            var name = $("#name").val();
-            //var price = $('#price').val();
-            var street = $('#street').val();
-            var voivode = $('#voivodeAdd').val();
-            var city = $('#cityAdd').val();
-            var comment = $('#comment').val();
-            var validate = true;
-            let parking = $('#parking').val();
-            let paymentMethodId = $('#paymentMethod').val();
-            let dailyBid = $('#dailyBid').val();
-            let hourBid = $('#hourBid').val();
-            let hotelId = $('#hotelId').val();
-            let bidType = $('#bidType').val();
-            let zipCode ='';
-            $('.zipCode').each(function( key, item ) {
-                zipCode += item.value;
-            });
-
-            if(bidType == 0){
-                swal('Wybierz typ stawki')
-                validate = false;
-            }else{
-                if(bidType == 2 && (dailyBid == 0 || dailyBid.trim().length == 0 || dailyBid == '')){
-                    swal('Wybierz stawkę dzienną');
-                    validate = false;
-                }else if (bidType == 1 && (hourBid == 0 || hourBid.trim().length == 0 || hourBid == '')){
-                    swal('Wybierz stawkę godzinową');
-                    validate = false;
-                }
-            }
-            if (zipCode.trim().length < 5) {
-                validate = false;
-                swal("Podaj kod pocztowy");
-            }
-            if(parking == -1){
-                swal('Wybierz pole z parkingiem');
-                validate = false;
-            }
-            if(paymentMethodId == 0){
-                swal('Wybierz formę płatności');
-                validate = false;
-            }
-            if (name.trim().length == 0) {
-                swal('Wprowadź nazwę hotelu!');
-                validate = false;
-            }
-            if (street.trim().length == 0) {
-                swal('Wprowadź ulicę!');
-                validate = false;
-            }
-            if (voivode == 0) {
-                swal('Wybierz województwo!');
-                validate = false;
-            }
-            if (city == 0 || city=='') {
-                swal('Wybierz miasto!');
-                validate = false;
-            }
-            $('.hotelPhoneNumber').each(function(key, item){
-                if(item.value === ''){
-                    swal("Wpisz numery telefonów do wszystkich pól");
-                    validate = false;
-                    return false;
-                }else if(isNaN(item.value)){
-                    swal("Podane numery muszą być w formacie liczbowym");
-                    validate = false;
-                    return false;
-                }else if(String(item.value).length !== 9){
-                    swal("Numery muszą składać się z 9 cyfr");
-                    validate = false;
-                    return false;
-                }
-            });
-            $('input[name="hotelPhoneNumber"]').each(function(key, item){
-                if(item.checked == true){
-                    return false;
-                }
-                if(key == $('input[name="hotelPhoneNumber"]').size()-1) {
-                    swal("Zaznacz sugerowany numer telefonu");
-                    validate = false;
-                }
-            });
-
-            $('.hotelEmail').each(function(key, item){
-                if(item.value === ''){
-                    swal("Wpisz maile do wszystkich pól");
-                    validate = false;
-                    return false;
-                }else{
-                    var re = /\S+@\S+\.\S+/;
-                    if(! re.test(item.value)){
-                        swal("Podane maile muszą być w odpowiednim formacie");
-                        validate = false;
-                        return false;
-                    }
-                }
-            });
-
-            $('input[name="hotelEmail"]').each(function(key, item){
-                if(item.checked == true){
-                    return false;
-                }
-                if(key == $('input[name="hotelEmail"]').size()-1) {
-                    swal("Zaznacz sugerowany email");
-                    validate = false;
-                }
-            });
-
-            if(validate) {
-                saveHotelFlag = true;
-                $('#saveHotel').prop('disabled', true);
-                let phones = [];
-                let emails = [];
-                $('.mailsContainer .contact .input-group').each(function(key, item){
-                    let radio = $(item).find('input[name="hotelEmail"]');
-                    let email = $(item).find('.hotelEmail');
-                    emails.push({id:email.data('id'), new: email.data('new'), value: email.val(), suggested: radio.prop('checked')});
-                });
-                $('.phonesContainer .contact .input-group').each(function(key, item){
-                    let radio = $(item).find('input[name="hotelPhoneNumber"]');
-                    let phone = $(item).find('.hotelPhoneNumber');
-                    phones.push({id:phone.data('id'), new: phone.data('new'), value: phone.val(), suggested: radio.prop('checked')});
-                });
-
-                return $.ajax({
-                    type: "POST",
-                    url: "{{route('api.saveNewHotel')}}",
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    data: {
-                        'voivode':      voivode,
-                        'name':         name,
-                        //'price': price,
-                        'street':       street,
-                        'city':         city,
-                        'zipCode':      zipCode,
-                        'hotelId':      hotelId,
-                        'comment' :     comment,
-                        'hotelStatus' : hotelStatus,
-                        'dailyBid':     dailyBid,
-                        'hourBid' :     hourBid,
-                        'paymentMethodId': paymentMethodId,
-                        'parking' :     parking,
-                        bidType: bidType,
-                        phones : phones,
-                        emails : emails,
-                        clientsExceptions : $('#clientsExceptions').val()
-                    },
-                    error: function (jqXHR, textStatus, thrownError) {
-                        console.log(jqXHR);
-                        console.log('textStatus: ' + textStatus);
-                        console.log('hrownError: ' + thrownError);
-                        swal({
-                            type: 'error',
-                            title: 'Błąd ' + jqXHR.status,
-                            text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
-                        });
-                        $('#saveHotel').prop('disabled', false);
-                    }
-                }).done(function (response) {
-                    $('#HotelModal').modal('hide');
-                    if (addNewHotelFlag) {
-                        $.notify({
-                            icon: 'glyphicon glyphicon-ok',
-                            message: 'Dodano nowy hotel <strong>' + name + '</strong>'
-                        }, {
-                            type: "success"
-                        });
-                        addNewHotelFlag = false;
-                    }
-                    if (editHotelFlag) {
-                        $.notify({
-                            icon: 'glyphicon glyphicon-ok',
-                            message: 'Edytowano hotel <strong>' + name + '</strong>'
-                        }, {
-                            type: "success"
-                        });
-                        editHotelFlag = false;
-                    }
-                    $('#saveHotel').prop('disabled', false);
-                });
-            }
-        }
-
         /**
          * Method creates container with radio box, input and removal button
          *
@@ -1204,7 +1212,7 @@
             let newContactColumn = $(document.createElement('div')).addClass('col-md-10').append(inputGroup);
 
             let newContainer = $(document.createElement('div')).addClass('row contact').css('margin-top','1em').append(newContactColumn);
-            if(inputs.size() === 0)
+            if(inputs.length === 0)
                 radioInput.prop('checked', true);
             else if(!preview){
                 let span = $(document.createElement('span')).addClass('glyphicon glyphicon-minus');
@@ -1237,9 +1245,9 @@
                 }
 
             }else{
-                radioInput.data('id', 'new_'+(inputs.size()+1));
+                radioInput.data('id', 'new_'+(inputs.length+1));
                 radioInput.attr('data-new', true);
-                newContactInput.data('id', 'new_'+(inputs.size()+1));
+                newContactInput.data('id', 'new_'+(inputs.length+1));
                 newContactInput.attr('data-new', true);
             }
 
