@@ -105,18 +105,19 @@
                     }else if(response === 'fail'){
                         location.reload();
                     }
+                },
+                error: function (jqXHR, textStatus, thrownError) {
+                    swal.close();
+                    console.log(jqXHR);
+                    console.log('textStatus: ' + textStatus);
+                    console.log('hrownError: ' + thrownError);
+                    swal({
+                        type: 'error',
+                        title: 'Błąd ' + jqXHR.status,
+                        text: 'Wystąpił błąd: ' + thrownError + ' "' + jqXHR.responseJSON.message + '"',
+                    });
                 }
-            }).error(function (jqXHR, textStatus, thrownError) {
-                swal.close();
-                console.log(jqXHR);
-                console.log('textStatus: ' + textStatus);
-                console.log('hrownError: ' + thrownError);
-                swal({
-                    type: 'error',
-                    title: 'Błąd ' + jqXHR.status,
-                    text: 'Wystąpił błąd: ' + thrownError + ' "' + jqXHR.responseJSON.message + '"',
-                });
-            });
+            })
         });
     $("#start_stop").on('click', '#stop',function () {
 
@@ -154,17 +155,18 @@
                   }else if(response === 'fail'){
                       location.reload();
                   }
+              },
+              error: function (jqXHR, textStatus, thrownError) {
+                  swal.close();
+                  console.log(jqXHR);
+                  console.log('textStatus: ' + textStatus);
+                  console.log('hrownError: ' + thrownError);
+                  swal({
+                      type: 'error',
+                      title: 'Błąd ' + jqXHR.status,
+                      text: 'Wystąpił błąd: ' + thrownError + ' "' + jqXHR.responseJSON.message + '"',
+                  });
               }
-          }).error(function (jqXHR, textStatus, thrownError) {
-              swal.close();
-              console.log(jqXHR);
-              console.log('textStatus: ' + textStatus);
-              console.log('hrownError: ' + thrownError);
-              swal({
-                  type: 'error',
-                  title: 'Błąd ' + jqXHR.status,
-                  text: 'Wystąpił błąd: ' + thrownError + ' "' + jqXHR.responseJSON.message + '"',
-              });
           });
         }
       })

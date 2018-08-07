@@ -396,7 +396,6 @@
                 },
                 success: function (response) {
                     if (response == 1){
-                        console.log('zapisany');
                         window.location = '{{URL::to('/show_tests')}}';
                     }
                     $("#save_button").remove('disabled', true);

@@ -375,7 +375,6 @@
                          var choisen_tr = $('#'+question_text_array[i].id).find('.button_question_choice');
                          $(choisen_tr).trigger('click');
                          i--;
-                         console.log(question_text_array);
                      }
                  }
                  if(count_random_question != 'Wybierz')
@@ -518,7 +517,6 @@
                 },
                 success: function (response) {
                     if (response == 1){
-                        console.log('zapisany');
                         window.location = '{{URL::to('/show_tests')}}';
                     }
                     if (response == 0){
@@ -585,7 +583,6 @@
              question_time = time_question_from_database;
          }
         // gdy wiersz nie jest zaznaczony: Działaj
-        console.log(question_text);
          if(tr_class_name == 'no_checked' )
          {
              // dodaj wiersz do datatable -> tabela pod modalem

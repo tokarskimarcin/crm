@@ -146,8 +146,9 @@ document.addEventListener('DOMContentLoaded', function() {
            swal(
                'Dodano!',
                'Grupa została dodana',
-               'Sukces'
-           )}
+               'success'
+           )
+           }
        });
    }
 
@@ -170,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
            swal(
                'Usunięto!',
                'Grupa została usunięta',
-               'Sukces'
+               'success'
            )}
         });
    }

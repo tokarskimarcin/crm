@@ -49,14 +49,6 @@
                 <input type="text" class="form-control" name="new_ip" id="new_ip" placeholder="127.0.0.1"/>
             </div>
             <div class="form-group">
-                <label for="new_ip">Status</label>
-                <select class="form-control" name="ip_status" id="ip_status">
-                    <option>Wybierz</option>
-                    <option value="0">Nie</option>
-                    <option value="1">Tak</option>
-                </select>
-            </div>
-            <div class="form-group">
                 <input type="submit" class="btn btn-default btn-lg" value="Dodaj IP" id="ip_submit"/>
             </div>
         </form>
@@ -70,15 +62,9 @@
 
 $('#ip_submit').on('click', () => {
     var new_ip = $('#new_ip').val();
-    var ip_status = $('#ip_status').val();
 
     if (new_ip == '') {
         swal('Podaj adres IP!')
-        return false;
-    }
-
-    if (ip_status == 'Wybierz') {
-        swal('Wybierz status!')
         return false;
     }
 

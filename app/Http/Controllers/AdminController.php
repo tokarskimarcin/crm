@@ -447,8 +447,8 @@ class AdminController extends Controller
 
     public function removeGroup(Request $request) {
         $data = [];
-        $data['ID grupy'] = removeLinkGroup;
         $groupID = $request->removeLinkGroup;
+        $data['ID grupy'] = $groupID;
         $groupToDelete = LinkGroups::where('id', '=', $groupID)->first();
         $groupToDelete->delete();
         new ActivityRecorder($data, 72, 3);
@@ -457,23 +457,22 @@ class AdminController extends Controller
 
     public function firewallGet() {
         $firewall = Firewall::all();
-
         return view('admin.firewall')
             ->with('firewall', $firewall);
     }
 
     public function firewallPost(Request $request) {
         $data = [];
-        $firewall = new Firewall();
 
-        if ($request->ip_status != 1 && $request->ip_status != 2) {
-            return view('errors.404');
+        $firewallSotry =  Firewall::where('ip_address',$request->new_ip)->first();
+        if(empty($firewallSotry)){
+            $firewall = new Firewall();
+        }else{
+            $firewall = $firewallSotry;
         }
-
         $data['IP'] = $request->new_ip;
-        $data['Status'] = $request->ip_status;
         $firewall->ip_address = $request->new_ip;
-        $firewall->whitelisted = $request->ip_status;
+        $firewall->whitelisted = 1;
         $firewall->save();
 
         new ActivityRecorder($data, 88,1);
