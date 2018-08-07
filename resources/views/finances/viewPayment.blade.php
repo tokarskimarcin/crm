@@ -427,7 +427,7 @@
                         $('row c[r^="I"]', sheet).each( function () {
                                 if($('is t', this).text() != 'Kara(Janki)')
                                 {
-                                    $text = $('is t', this).context.textContent;
+                                    $text = $('is t', this).textContent;
                                     var penatly_bonus = $text;
                                     if(parseInt(penatly_bonus) < 0)
                                     {
@@ -439,7 +439,7 @@
                         $('row c[r^="K"]', sheet).each( function () {
                             if($('is t', this).text() != 'Premia - Kara')
                             {
-                                $text = $('is t', this).context.textContent;
+                                $text = $('is t', this).textContent;
                                 var penatly_bonus = $text;
                                 if(penatly_bonus < 0)
                                 {
@@ -450,11 +450,11 @@
                         $('row c[r^="O"]', sheet).each( function (key,value) {
                             if($('is t', this).text() != 'Całość na konto')
                             {
-                                $text = $('is t', this).context.textContent;
+                                $text = $('is t', this)[0].textContent;
 
                                 if($text == 'Tak')
                                 {
-                                    let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                    let row_number = $('is t', this)[0].closest('c').attributes[1].nodeValue;
                                     row_number = row_number.substring(1);
                                     $('row:nth-child('+row_number+') c', sheet).attr( 's', '45' );
                                 }
@@ -490,7 +490,7 @@
                         $('row c[r^="I"]', sheet).each( function () {
                             if($('is t', this).text() != 'Kara(Janki)')
                             {
-                                $text = $('is t', this).context.textContent;
+                                $text = $('is t', this).textContent;
                                 var penatly_bonus = $text;
                                 if(penatly_bonus < 0)
                                 {
@@ -502,9 +502,9 @@
                         $('row c[r^="K"]', sheet).each( function () {
                             if($('is t', this).text() != 'Premia - Kara')
                             {
-                                $text = $('is t', this).context.textContent;
+                                $text = $('is t', this).textContent;
                                 var penatly_bonus = $text;
-                                if(penatly_bonus[0] < 0)
+                                if(penatly_bonus < 0)
                                 {
                                     $(this).attr( 's', '35' );
                                 }
@@ -513,11 +513,11 @@
                         $('row c[r^="O"]', sheet).each( function (key,value) {
                             if($('is t', this).text() != 'Całość na konto')
                             {
-                                $text = $('is t', this).context.textContent;
+                                $text = $('is t', this)[0].textContent;
 
                                 if($text == 'Tak')
                                 {
-                                    let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                    let row_number = $('is t', this)[0].closest('c').attributes[1].nodeValue;
                                     row_number = row_number.substring(1);
                                     $('row:nth-child('+row_number+') c', sheet).attr( 's', '45' );
                                 }
@@ -552,7 +552,7 @@
                         $('row c[r^="I"]', sheet).each( function () {
                             if($('is t', this).text() != 'Kara(Janki)')
                             {
-                                $text = $('is t', this).context.textContent;
+                                $text = $('is t', this).textContent;
                                 var penatly_bonus = $text;
                                 if(penatly_bonus < 0)
                                 {
@@ -564,7 +564,7 @@
                         $('row c[r^="K"]', sheet).each( function () {
                             if($('is t', this).text() != 'Premia - Kara')
                             {
-                                $text = $('is t', this).context.textContent;
+                                $text = $('is t', this).textContent;
                                 var penatly_bonus = $text;
                                 if(penatly_bonus < 0)
                                 {
@@ -575,11 +575,11 @@
                         $('row c[r^="O"]', sheet).each( function (key,value) {
                             if($('is t', this).text() != 'Całość na konto')
                             {
-                                $text = $('is t', this).context.textContent;
+                                $text = $('is t', this)[0].textContent;
 
                                 if($text == 'Tak')
                                 {
-                                    let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                    let row_number = $('is t', this)[0].closest('c').attributes[1].nodeValue;
                                     row_number = row_number.substring(1);
                                     $('row:nth-child('+row_number+') c', sheet).attr( 's', '45' );
                                 }
