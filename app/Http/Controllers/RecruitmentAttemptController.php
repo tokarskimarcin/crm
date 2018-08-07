@@ -402,17 +402,26 @@ class RecruitmentAttemptController extends Controller
     public function statusResultChange(Request $request) {
         if ($request->ajax()) {
             if ($request->type == 'add') {
-                DB::table('attempt_result_attempt_status')
-                    ->insert([
+                $attemptResultAttemptStatusIdsArray = DB::table('attempt_result_attempt_status')
+                    ->where('attempt_status_id','=',$request->selected_status)
+                    ->get()
+                    ->pluck('attempt_result_id')->toArray();
+
+                if(!in_array($request->selected_result,$attemptResultAttemptStatusIdsArray)){
+                    DB::table('attempt_result_attempt_status')
+                        ->insert([
+                            'attempt_status_id' => $request->selected_status,
+                            'attempt_result_id' => $request->selected_result
+                        ]);
+                    $LogData = array_merge(["T" => " Dodanie rezultatu epatu"], [
                         'attempt_status_id' => $request->selected_status,
                         'attempt_result_id' => $request->selected_result
                     ]);
-                $LogData = array_merge(["T" => " Dodanie rezultatu epatu"], [
-                    'attempt_status_id' => $request->selected_status,
-                    'attempt_result_id' => $request->selected_result
-                ]);
-                new ActivityRecorder($LogData, 120, 1);
-                return $request->type;
+                    new ActivityRecorder($LogData, 120, 1);
+                    return $request->type;
+                }else{
+                    return 'already_exists';
+                }
             } elseif ($request->type == 'delete') {
                 DB::table('attempt_result_attempt_status')
                     ->where('attempt_status_id', '=', $request->selected_status)

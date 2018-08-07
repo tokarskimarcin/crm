@@ -139,7 +139,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <button class="btn btn-info" style="width: 100%; margin-top: 33px" id="filter_interviews">
-                                <span class="glyphicon glyphicon-ok"></span> Filtruj wyniki
+                                <span class="glyphicon glyphicon-filter"></span> Filtruj wyniki
                             </button>
                         </div>
                     </div>
@@ -198,7 +198,7 @@
                                     <td>{{$item->comment}}</td>
                                     <td>
                                         <button class="btn btn-info info_interview" data-id="{{$item->id}}" data-toggle="modal" data-target="#myModal">
-                                            <span class="glyphicon glyphicon-envelope"></span> Szczegóły
+                                            <span class="glyphicon glyphicon-search"></span> Szczegóły
                                         </button>
                                     </td>
                                 </tr>
@@ -437,7 +437,7 @@ table = $('#candidates').DataTable({
         {"data": "created_at"},
         {"data": "attempt_name"},
         {"data": function (data, type, dataToSet) {
-            return "<a href='{{ URL::to('/candidateProfile') }}/" + data.id +"' class='btn btn-info'><span class='glyphicon glyphicon-pencil'></span> Szczegóły</a>";
+            return "<a href='{{ URL::to('/candidateProfile') }}/" + data.id +"' class='btn btn-info'><span class='glyphicon glyphicon-search'></span> Szczegóły</a>";
         },"orderable": false, "searchable": false},
     ]
 });
