@@ -55,7 +55,7 @@
                                        cellspacing="0" width="100%">
                                     <thead>
                                     <tr>
-                                        <th>Wojweództwo</th>
+                                        <th>Wojwództwo</th>
                                         <th>Miasto</th>
                                         <th>Kod Pocztowy</th>
                                         <th>Szerokość Geo.</th>
@@ -85,6 +85,17 @@
                     <h4 class="modal-title" id="modal_title">Dodawanie Miasta<span id="modalCity"></span></h4>
                 </div>
                 <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="alert alert-info">
+                                Jeśli miasto ma nie mieć karencji, należy wpisać <strong>-1</strong>
+                                <br>
+                                Jeśli miasto ma mieć nielimitowaną liczbę pokazów w miesiącu, należy wpisać <strong>-1</strong>.
+                                <br>
+                                Szerokość i długość geograficzną należy wpisać w formacie <code>xx.xxxxxx</code> (sześć miejsc po kropce).
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="col-md-3">
@@ -146,18 +157,18 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label class="myLabel">Szerokość geograficzna:</label>
                                     <input class="form-control" id="latitude" name="latitude"
-                                           placeholder="Szerokość geograficzna" type="number">
+                                           placeholder="np: 51.819495" type="number">
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label class="myLabel">Długość geograficzna:</label>
                                     <input class="form-control" id="longitude" name="longitude"
-                                           placeholder="Długość geograficzna" type="number">
+                                           placeholder="np: 19.303840" type="number">
                                 </div>
                             </div>
                             {{--<div class="col-md-3">--}}
@@ -167,7 +178,20 @@
                                            {{--type="number" min="0" step="1" disabled>--}}
                                 {{--</div>--}}
                             {{--</div>--}}
-                            <div class="col-md-3" style="visibility: hidden; display:inline;">
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label class="myLabel">Max pokazów w miesiącu</label>
+                                    <input class="form-control" type="number" id="max_shows" name="max_shows" min="-1" step="1">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label class="myLabel">Mediana</label>
+                                    <input class="form-control" type="number" id="median" name="median" min="0" step="0.1">
+                                </div>
+                            </div>
+
+                            <div class="col-md-3" style="visibility: hidden; display:inline; position:absolute;">
                                 <div class="form-group">
                                     <label class="myLabel">Status</label>
                                     <input class="form-control" id="status" name="status" placeholder="Status"
@@ -222,6 +246,8 @@
         function clearModal() {
             $('#voiovedshipID').val("1");
             $('#cityName').val("");
+            $('#max_shows').val("");
+            $('#median').val("");
 
             $('.zipCode').val("");
             /*
@@ -243,6 +269,8 @@
             let eventCount = $('#eventCount').val();
             let gracePeriod = $('#gracePeriod').val();
 
+            let median = $("#median").val();
+            let maxShows = $('#max_shows').val();
             let status = $('#status').val();
             let zipCode ='';
             $('.zipCode').each(function( key, item ) {
@@ -259,6 +287,16 @@
                 validation = false;
                 swal("Podaj kod pocztowy")
             }
+
+            if(median == '' || median == null) {
+                $('#median').val('0');
+            }
+
+            if(maxShows.trim().length == 0) {
+                validation = false;
+                swal('Podaj maksymalną liczbę pokazów')
+            }
+
             if (latitude.trim().length == 0) {
                 validation = false;
                 swal("Podaj szerokość geograficzną")
@@ -296,7 +334,8 @@
                         'longitude': longitude,
                         'zipCode': zipCode,
                         'cityID': $('#cityID').val(),
-                        // 'weekGrace': weekGrace,
+                        'maxShows': maxShows,
+                        'median': median,
                         'status': status
                     },
                     success: function (response) {
@@ -564,6 +603,8 @@
                                 $('#cityName').val(response.name);
                                 $('#eventCount').val(response.max_hour);
                                 $('#gracePeriod').val(response.grace_period);
+                                $('#max_shows').val(response.max_month_show);
+                                $('#median').val(response.median);
                                 // $('#weekGrace').val(response.grace_week);
                                 // if(response.grace_period == '-1') {
                                 //     $('#weekGrace').prop('disabled', false);

@@ -2290,6 +2290,8 @@ class CrmRouteController extends Controller
             $newCity->latitude = $request->latitude;
             $newCity->longitude = $request->longitude;
             $newCity->zip_code = $request->zipCode;
+            $newCity->max_month_show = $request->maxShows;
+            $newCity->median = $request->median;
 
             if(is_null($request->status)) {
                 $newCity->status = 0;
