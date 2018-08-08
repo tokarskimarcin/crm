@@ -299,12 +299,12 @@
                         $('row c[r^="E"]', sheet).each( function (key,value) {
                             if($('is t', this).text() != 'Całość na konto')
                             {
-                                var text = $('is t', this).context.textContent;
+                                var text = $('is t', this)[0].textContent;
                                     for(var l=0;l<departments.length;l++)
                                     {
                                         if(departments[l].dep_name+" "+departments[l].dep_type == text)
                                         {
-                                            let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                            let row_number = $('is t', this)[0].closest('c').attributes[1].nodeValue;
                                             row_number = row_number.substring(1);
                                             $('row:nth-child('+row_number+') c', sheet).attr('s', (cellXfscount + departments[l].id) + '');
                                         }
@@ -373,12 +373,12 @@
                         $('row c[r^="E"]', sheet).each( function (key,value) {
                             if($('is t', this).text() != 'Całość na konto')
                             {
-                                var text = $('is t', this).context.textContent;
+                                var text = $('is t', this)[0].textContent;
                                 for(var l=0;l<departments.length;l++)
                                 {
                                     if(departments[l].dep_name+" "+departments[l].dep_type == text)
                                     {
-                                        let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                        let row_number = $('is t', this)[0].closest('c').attributes[1].nodeValue;
                                         row_number = row_number.substring(1);
                                         $('row:nth-child('+row_number+') c', sheet).attr('s', (cellXfscount + departments[l].id) + '');
                                     }
@@ -447,12 +447,12 @@
                     $('row c[r^="E"]', sheet).each( function (key,value) {
                         if($('is t', this).text() != 'Całość na konto')
                         {
-                            var text = $('is t', this).context.textContent;
+                            var text = $('is t', this)[0].textContent;
                             for(var l=0;l<departments.length;l++)
                             {
                                 if(departments[l].dep_name+" "+departments[l].dep_type == text)
                                 {
-                                    let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                    let row_number = $('is t', this)[0].closest('c').attributes[1].nodeValue;
                                     row_number = row_number.substring(1);
                                     $('row:nth-child('+row_number+') c', sheet).attr('s', (cellXfscount + departments[l].id) + '');
                                 }
@@ -520,12 +520,12 @@
                     $('row c[r^="E"]', sheet).each( function (key,value) {
                         if($('is t', this).text() != 'Całość na konto')
                         {
-                            var text = $('is t', this).context.textContent;
+                            var text = $('is t', this)[0].textContent;
                             for(var l=0;l<departments.length;l++)
                             {
                                 if(departments[l].dep_name+" "+departments[l].dep_type == text)
                                 {
-                                    let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                    let row_number = $('is t', this)[0].closest('c').attributes[1].nodeValue;
                                     row_number = row_number.substring(1);
                                     $('row:nth-child('+row_number+') c', sheet).attr('s', (cellXfscount + departments[l].id) + '');
                                 }

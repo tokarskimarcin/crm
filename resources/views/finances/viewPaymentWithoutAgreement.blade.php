@@ -386,11 +386,11 @@
                         $('row c[r^="K"]', sheet).each( function (key,value) {
                             if($('is t', this).text() != 'Całość na konto')
                             {
-                                $text = $('is t', this).context.textContent;
+                                $text = $('is t', this)[0].textContent;
 
                                 if($text == 'Tak')
                                 {
-                                    let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                    let row_number = $('is t', this)[0].closest('c').attributes[1].nodeValue;
                                     row_number = row_number.substring(1);
                                     $('row:nth-child('+row_number+') c', sheet).attr( 's', '45' );
                                 }
@@ -449,11 +449,11 @@
                         $('row c[r^="K"]', sheet).each( function (key,value) {
                             if($('is t', this).text() != 'Całość na konto')
                             {
-                                $text = $('is t', this).context.textContent;
+                                $text = $('is t', this)[0].textContent;
 
                                 if($text == 'Tak')
                                 {
-                                    let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                    let row_number = $('is t', this)[0].closest('c').attributes[1].nodeValue;
                                     row_number = row_number.substring(1);
                                     $('row:nth-child('+row_number+') c', sheet).attr( 's', '45' );
                                 }
@@ -511,11 +511,11 @@
                         $('row c[r^="K"]', sheet).each( function (key,value) {
                             if($('is t', this).text() != 'Całość na konto')
                             {
-                                $text = $('is t', this).context.textContent;
+                                $text = $('is t', this)[0].textContent;
 
                                 if($text == 'Tak')
                                 {
-                                    let row_number = $('is t', this).context.attributes[1].nodeValue;
+                                    let row_number = $('is t', this)[0].closest('c').attributes[1].nodeValue;
                                     row_number = row_number.substring(1);
                                     $('row:nth-child('+row_number+') c', sheet).attr( 's', '45' );
                                 }
