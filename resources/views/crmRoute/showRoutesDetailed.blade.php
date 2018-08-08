@@ -826,7 +826,7 @@
             * This event listener change elements of array selected Years while user unselects some year
             */
            $('#year').on('select2:unselect', function() {
-               if($('#year').val() != null) {
+               if($('#year').val().length != 0) {
                    selectedYears = $('#year').val();
                }
                else {
@@ -840,6 +840,7 @@
             */
            $('#weeks').on('select2:select', function() {
                let weeksArr = $('#weeks').val();
+               console.log('weeksArr', weeksArr);
                if(weeksArr.length > 0) {
                    selectedWeeks = weeksArr;
                }
@@ -853,7 +854,7 @@
             * This event listener change elements of array selectedWeeks while user unselects any week.
             */
            $("#weeks").on('select2:unselect', function() {
-               if($('#weeks').val() != null) {
+               if($('#weeks').val().length != 0) {
                    selectedWeeks = $('#weeks').val();
                }
                else {
@@ -886,7 +887,7 @@
             * This event listener change elements of array selectedDepartments while user unselects a department
             */
            $("#departments").on('select2:unselect', function() {
-              if($('#departments').val() != null) {
+              if($('#departments').val().length != 0) {
                   let departments = $('#departments').val();
                   let helpArray = [];
                   departments.forEach(item => {
@@ -921,7 +922,7 @@
             * This event listener change elements of array selectedTypes while user unselects any type
             */
            $('#typ').on('select2:unselect', function() {
-               if($('#typ').val() != null) {
+               if($('#typ').val().length != 0) {
                    selectedTypes = $('#typ').val();
                }
                else {
