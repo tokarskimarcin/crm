@@ -3623,6 +3623,8 @@ class CrmRouteController extends Controller
         $limit2 = $request->limit2;
         $limit3 = $request->limit3;
 
+        $singleLimit = $request->singleLimit;
+
         $ids = json_decode($request->ids);
         $onlyIds = []; // here we have only client_route id's [120, 130, 132]
         foreach($ids as $id) {
@@ -3630,27 +3632,105 @@ class CrmRouteController extends Controller
             array_push($onlyIds, $tempArr[1]);
         }
 
-        $campaignRecords = ClientRouteCampaigns::ActiveCampaigns($onlyIds)->get();
+        //required clientRouteCampaigns records
+        $campaignRecords = ClientRouteCampaigns::select('client_route_campaigns.hour_count', 'client_route_info.date', 'client_route_campaigns.id', 'client_route_info.client_route_id', 'client_route_info.id as client_route_info_id')
+            ->ActiveCampaigns($onlyIds)
+            ->get();
 
-        foreach($campaignRecords as $campaignRecord) { //mamy pierwszy rekord client_route_info.
-            $idArr = [];
-            $basicId = $campaignRecord->client_route_info_id;
+        //create new collection and setting properites by client_route_id
+        $ClientRouteCampaignsGroupedByClientRoutes = collect();
+        foreach($onlyIds as $ids) {
+            $ClientRouteCampaignsGroupedByClientRoutes[$ids] = null;
+        }
 
-            $numberOfHours = $campaignRecord->hour_count;
-            if($numberOfHours == 1) {
-                ClientRouteInfo::where('id', '=', $basicId)->update(['limits' => $limit1]);
+        foreach($ClientRouteCampaignsGroupedByClientRoutes as $key => $value) { //we create collection with clientRoute keys and inside clientRouteInfo records
+            $arrayOfInfo = [];
+            $givenClientRouteCampaigns = $campaignRecords->where('client_route_id', '=', $key); // campaigns only from one route
+
+            foreach($givenClientRouteCampaigns as $oneCampaign) { //working on single campaign
+                $basicId = $oneCampaign->client_route_info_id; //clientRouteInfo id of first campaign show
+                $numberOfHours = $oneCampaign->hour_count; // number of hours in campaign
+
+                //this procedure assign property "onlyOne" which indices whether campaign is single show
+                for($hourCount = 0; $hourCount < $numberOfHours; $hourCount++) {
+                    $rec = ClientRouteInfo::where('id', '=', $basicId + $hourCount)->first();
+                    if($numberOfHours == 1) {
+                        $rec->onlyOne = 1;
+                    }
+                    else {
+                        $rec->onlyOne = 0;
+                    }
+                    array_push($arrayOfInfo, $rec);
+                }
             }
-            if($numberOfHours == 2) {
-                ClientRouteInfo::where('id', '=', $basicId)->update(['limits' => $limit1]);
-                ClientRouteInfo::where('id', '=', $basicId + 1)->update(['limits' => $limit2]);
-            }
-            if($numberOfHours == 3) {
-                ClientRouteInfo::where('id', '=', $basicId)->update(['limits' => $limit1]);
-                ClientRouteInfo::where('id', '=', $basicId + 1)->update(['limits' => $limit2]);
-                ClientRouteInfo::where('id', '=', $basicId + 2)->update(['limits' => $limit3]);
+            $ClientRouteCampaignsGroupedByClientRoutes[$key] = collect($arrayOfInfo);
+        }
+
+        foreach($ClientRouteCampaignsGroupedByClientRoutes as $key => $value) { //we create collection with clientRoute keys and inside clientRouteInfo records
+            $recGroupedByDate = $ClientRouteCampaignsGroupedByClientRoutes[$key]->groupBy('date'); //we are grouping records by date
+
+            //this procedure checks whether in single day campaign is only 2 hour
+            foreach($recGroupedByDate as $singleDateGroup) {
+                $onlyTwoHourCampaign = null;
+                $i = 0;
+                if($singleDateGroup->count() == 2) {
+                    $onlyTwoHourCampaign = true;
+                    foreach($singleDateGroup as $singleDateItem) { //order items in date.
+                        if($singleDateItem->onlyOne == 1) {
+                            $onlyTwoHourCampaign = false;
+                        }
+                    }
+
+                }
+
+                //if inside single day there is only single 2 hour campaign we assign every clientRouteInfo record property onlyTwoHour = 1; Also we numerate hours inside day container
+                foreach($singleDateGroup as $singleDateItem) { //order items in date.
+                    if($onlyTwoHourCampaign == true) {
+                        $singleDateItem->onlyTwoHour = 1;
+                    }
+                    else {
+                        $singleDateItem->onlyTwoHour = 0;
+                    }
+                    $singleDateItem->nr = $i;
+                    $i++;
+                }
+
+                $recGroupedByShowOrder = $singleDateGroup->groupBy('show_order');
+
+                foreach($recGroupedByShowOrder as $orderedShow) {
+
+                    //here we assign limits according to different scenario
+                    foreach($orderedShow as $singleItem) {
+
+                        for($show_order = 0; $show_order < 3; $show_order++) {
+                            if($singleItem->show_order == $show_order && $singleItem->nr == 0) {
+                                ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit1]);
+                            }
+                            else if($singleItem->show_order == $show_order && $singleItem->nr == 1) {
+                                ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit2]);
+                            }
+                            else if($singleItem->show_order == $show_order && $singleItem->nr == 2) {
+                                ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit3]);
+                            }
+                        }
+
+                        //case if there is single hour campaign
+                        if($singleItem->onlyOne == 1) {
+                            ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $singleLimit]);
+                        }
+
+                        //case if inside one day there is only 2 hour campaign
+                        if($singleItem->onlyTwoHour == 1 && $singleItem->nr == 0) {
+                            ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit2]);
+                        }
+                        else if($singleItem->onlyTwoHour == 1 && $singleItem->nr == 1) {
+                            ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit3]);
+                        }
+                    }
+                }
             }
         }
-        return $campaignRecords;
+        return '1';
     }
 
 }
