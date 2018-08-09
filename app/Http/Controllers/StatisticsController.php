@@ -1583,8 +1583,9 @@ class StatisticsController extends Controller
             if(!$dateHireCandidateDepartment->isEmpty()){
                 $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
             }
+            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
             return $item;
-        });
+        })->sortByDesc('procScore');
         return view('reportpage.recruitmentReport.DayReportRecruitmentTrainingGroupFirstAndHire')
             ->with([
                 'data' => $date,
@@ -1606,8 +1607,9 @@ class StatisticsController extends Controller
             if(!$dateHireCandidateDepartment->isEmpty()){
                 $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
             }
+            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
             return $item;
-        });
+        })->sortByDesc('procScore');
         return view('reportpage.recruitmentReport.DayReportRecruitmentTrainingGroupFirstAndHire')
             ->with([
                 'data' => $date,
@@ -1628,8 +1630,9 @@ class StatisticsController extends Controller
             if(!$dateHireCandidateDepartment->isEmpty()){
                 $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
             }
+            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
             return $item;
-        });
+        })->sortByDesc('procScore');
         $data = [
             'data' => $date,
             'start_date' => $date_start
@@ -1653,8 +1656,9 @@ class StatisticsController extends Controller
             if(!$dateHireCandidateDepartment->isEmpty()){
                 $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
             }
+            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
             return $item;
-        });
+        })->sortByDesc('procScore');
         return view('reportpage.recruitmentReport.WeekReportRecruitmentTrainingGroupFirstAndHire')
             ->with([
                 'data' => $date,
@@ -1677,8 +1681,9 @@ class StatisticsController extends Controller
             if(!$dateHireCandidateDepartment->isEmpty()){
                 $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
             }
+            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
             return $item;
-        });
+        })->sortByDesc('procScore');
         return view('reportpage.recruitmentReport.WeekReportRecruitmentTrainingGroupFirstAndHire')
             ->with([
                 'data' => $date,
@@ -1701,8 +1706,9 @@ class StatisticsController extends Controller
             if(!$dateHireCandidateDepartment->isEmpty()){
                 $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
             }
+            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
             return $item;
-        });
+        })->sortByDesc('procScore');
         $data = [
             'data' => $date,
             'start_date' => $date_start,
@@ -1731,8 +1737,10 @@ class StatisticsController extends Controller
             if(!$dateHireCandidateDepartment->isEmpty()){
                 $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
             }
+            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
+
             return $item;
-        });
+        })->sortByDesc('procScore');
         return view('reportpage.recruitmentReport.MonthReportRecruitmentTrainingGroupFirstAndHire')
             ->with([
                 'data' => $date,
@@ -1782,8 +1790,10 @@ class StatisticsController extends Controller
             if(!$dateHireCandidateDepartment->isEmpty()){
                 $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
             }
+            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
+
             return $item;
-        });
+        })->sortByDesc('procScore');
         $data = [
             'data' => $date,
             'start_date' => $date_start,
