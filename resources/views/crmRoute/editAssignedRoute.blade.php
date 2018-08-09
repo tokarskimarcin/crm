@@ -2532,6 +2532,7 @@
                                         'Trasa została zdezaktywowana',
                                         'success'
                                     )
+                                    window.location.href = '{{URL::to('/showClientRoutes')}}';
                                 })
                         }
                     })
