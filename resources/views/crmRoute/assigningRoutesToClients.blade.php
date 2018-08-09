@@ -519,6 +519,7 @@
                                                 let dayContainer = null;
                                                 for (let i = 0, respLength = response.length; i < respLength; i++) {
                                                     if (i === 0) { //first iteration
+
                                                         console.log('warunek na raz');
                                                         dayBox = new DayBox();
                                                         dayBox.createDOMDayBox();
