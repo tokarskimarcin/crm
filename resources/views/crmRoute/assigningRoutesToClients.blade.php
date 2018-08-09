@@ -710,8 +710,6 @@
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
                                 success: function (response2) {
-                                    console.log(response);
-                                    console.log(response2);
                                     secondResponse = response2;
                                     voivodeSelect.innerHTML = '';
                                     citySelect.innerHTML = '';
@@ -745,7 +743,6 @@
                                         setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
                                     }
 
-                                    console.log('nextCityDistance', nextCityDistance);
                                     citySelect.setAttribute('data-distance', nextCityDistance);
                                     $(voivodeSelect).on('change', function() {
                                         citySelect.innerHTML = ''; //cleaning previous insertions
@@ -805,8 +802,6 @@
                                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                         },
                                         success: function (response2) {
-                                            console.log(response);
-                                            console.log(response2);
                                             secondResponse = response2;
                                             voivodeSelect.innerHTML = '';
                                             citySelect.innerHTML = '';
@@ -840,7 +835,6 @@
                                                 setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
                                             }
 
-                                            console.log('nextCityDistance', nextCityDistance);
 
                                             citySelect.setAttribute('data-distance', nextCityDistance);
                                             $(voivodeSelect).on('change', function() {
@@ -897,7 +891,6 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function (response) {
-                            console.log(response);
                             let allVoivodes = response['voievodeInfo'];
                             console.assert(Array.isArray(allVoivodes), "allVoivodes in showInExtreme method is not array!");
                             let allCitiesGroupedByVoivodes = response['cityInfo'];
@@ -959,7 +952,6 @@
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
                                 success: function (response) {
-                                    console.log(response);
                                     let allVoivodes = response['voievodeInfo'];
                                     console.assert(Array.isArray(allVoivodes), "allVoivodes in showInExtreme method is not array!");
                                     let allCitiesGroupedByVoivodes = response['cityInfo'];
@@ -1029,8 +1021,6 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function(response) {
-                            console.log('to');
-                            console.log(response);
                             console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
                             let placeToAppend = citySelect;
                             placeToAppend.innerHTML = '';
@@ -1089,8 +1079,6 @@
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
                                 success: function(response) {
-                                    console.log('to');
-                                    console.log(response);
                                     console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
                                     let placeToAppend = citySelect;
                                     placeToAppend.innerHTML = '';
@@ -1759,13 +1747,6 @@
                         const nextCitySelect = nextBox.querySelector('.citySelect');
                         const nextCityDistance = nextCitySelect.dataset.distance;
                         const nextCityId = getSelectedValue(nextCitySelect);
-
-                        console.log('previousCitySelect', previousCitySelect);
-                        console.log('previousCityDistance', previousCityDistance);
-                        console.log('previousCityId', previousCityId);
-                        console.log('nextCitySelect', nextCitySelect);
-                        console.log('nextCityDistance', nextCityDistance);
-                        console.log('nextCityId', nextCityId);
 
                         showInTheMiddleAjax(previousCityDistance,previousCityId,nextCityDistance,nextCityId,secondSelect,firstSelect,previousCitySelect);
                     }
@@ -2820,7 +2801,6 @@
                                         }
                                     }
                                     else { // there is no previous container (related to prev show container)
-                                        console.log('tutej');
                                         let changeDistanceArr = [100, 100];
                                         limitSelectsWhenBetweenSameDayContainer(previousShowContainer, thisSingleShowContainer, previousShowContainer, changeDistanceArr);
                                         // limitSelectsWhenExtreme(previousShowContainer, nextShowContainerRelatedToPreviousShowContainer, 100);
