@@ -542,6 +542,10 @@
                 }));
             });
 
+            $('#simulation').change(function () {
+               selectedRowDays = [];
+               colorSelectedRowDays();
+            });
 
             $('.simulationSection').hide();
             $('#resultsSimulationButton').click(function () {
