@@ -2734,21 +2734,56 @@ class CrmRouteController extends Controller
         $departmentsInvitationsAveragesInfo = collect();
         foreach ($departmentInfo as $item) {
             $actualDate = $startDate;
-            $sum = 0;
-            $divider = 0;
+            $weekSum = 0;
+            $weekDivider = 0;
+
+            $saturdaySum = 0;
+            $saturdayDivider = 0;
+
+            $sundaySum = 0;
+            $sundayDivider = 0;
             while ($actualDate < $stopDate) {
                 $routeInfo = $routeInfoOverall->where('department_info_id' ,'=', $item->id)
                     ->where('date', '=', $actualDate)
                     ->first();
-                $sum += $routeInfo['sumOfActualSuccess'];
+                if($routeInfo['sumOfActualSuccess'] != 0){
+                    if(date('N',strtotime($actualDate)) <6){
+                        $weekSum += $routeInfo['sumOfActualSuccess'];
+                        $weekDivider++;
+                    } else if (date('N', strtotime($actualDate)) == 6) {
+                        $saturdaySum += $routeInfo['sumOfActualSuccess'];
+                        $saturdayDivider++;
+                    } else if (date('N', strtotime($actualDate)) == 7) {
+                        $sundaySum += $routeInfo['sumOfActualSuccess'];
+                        $sundayDivider++;
+                    }
+                }
+
                 $actualDate = date('Y-m-d', strtotime($actualDate. ' + 1 days'));
-                $divider++;
             }
+
+            $departmentAverages = collect();
             $average = 0;
-            if($divider != 0){
-                $average = $sum / $divider;
+            if($weekDivider != 0){
+                $average = $weekSum / $weekDivider;
             }
-            $departmentsInvitationsAveragesInfo->offsetSet($item->name2, floor($average));
+            $departmentAverages->offsetSet('week',floor($average));
+
+            if($saturdayDivider != 0){
+                $average = $saturdaySum / $saturdayDivider;
+            }else{
+                $average = $average*95/100;
+            }
+            $departmentAverages->offsetSet('saturday',floor($average));
+
+            if($sundayDivider != 0){
+                $average = $sundaySum / $sundayDivider;
+            }else{
+                $average = $average*80/100;
+            }
+            $departmentAverages->offsetSet('sunday',floor($average));
+
+            $departmentsInvitationsAveragesInfo->offsetSet($item->name2, $departmentAverages);
         }
 
         return $departmentsInvitationsAveragesInfo;
