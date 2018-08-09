@@ -1687,6 +1687,7 @@ class CrmRouteController extends Controller
                     ->where('client_route_info.status', '=', 1)
                     ->whereBetween('client_route_info.date', [$firstDayOfThisMonth, $lastDayOfThisMonth])
                     ->get();
+
                 $numberOfRecords = $allRecordsFromClientRouteInfo->count();
                 if($numberOfRecords > $item->max_month_show) {
                     $item->max_month_exceeded = 1;
