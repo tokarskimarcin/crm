@@ -249,6 +249,7 @@
                                     style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;"
                                     id="save"><span class='glyphicon glyphicon-save'></span> Zapisz
                             </button>
+                            <button class="btn btn-danger" id="remove-route" style="margin-bottom:1em;font-size:1.1em;font-weight:bold;">Usuń trasę</button>
                         </div>
                     </div>
                 </div>
@@ -2503,6 +2504,37 @@
                             $('#showRecords').modal('show');
                         })
 
+                }
+                else if(e.target.matches('#remove-route')) {
+                    swal({
+                        title: 'Jesteś pewien?',
+                        text: "Brak możliwości cofnięcia zmian!",
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Tak, usuń!'
+                    }).then((result) => {
+                        if (result.value) {
+
+                            const ourHeaders = new Headers();
+                            ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+
+                            fetch('{{URL::current()}}', {
+                                method: 'delete',
+                                headers: ourHeaders,
+                                credentials: "same-origin"
+                            })
+                                .then(resp => resp.text())
+                                .then(resp => {
+                                    swal(
+                                        'Usunięto!',
+                                        'Trasa została zdezaktywowana',
+                                        'success'
+                                    )
+                                })
+                        }
+                    })
                 }
             }
 
