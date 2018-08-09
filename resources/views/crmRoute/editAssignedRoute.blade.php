@@ -1023,7 +1023,12 @@
                                 let responseOption = document.createElement('option');
                                 responseOption.value = response[i].id;
                                 responseOption.textContent = response[i].name;
-                                if(response[i].block == 1) {
+
+                                if(response[i].max_month_exceeded == 1) {
+                                    responseOption.setAttribute('data-max_hours', `0`);
+                                    responseOption.textContent = response[i].name + '[miesięczny limit przekroczony]';
+                                }
+                                else if(response[i].block == 1) {
                                     if(response[i].exceeded == 0) {
                                         responseOption.textContent = response[i].name + " [dostępne jeszcze " + response[i].used_hours + " godzin]";
                                         responseOption.setAttribute('data-max_hours', `${response[i].used_hours}`); //needed for auto setting hours
@@ -1033,7 +1038,7 @@
                                         responseOption.setAttribute('data-max_hours', '0'); //needed for auto setting hours
                                     }
                                 }
-                                else {
+                                else if(response[i].block == 0) {
                                     responseOption.textContent = response[i].name;
                                     if (response[i].max_hour >= 0) {
                                         responseOption.setAttribute('data-max_hours', `${response[i].max_hour}`); //needed for auto setting hours
@@ -1076,7 +1081,12 @@
                                         let responseOption = document.createElement('option');
                                         responseOption.value = response[i].id;
                                         responseOption.textContent = response[i].name;
-                                        if(response[i].block == 1) {
+
+                                        if(response[i].max_month_exceeded == 1) {
+                                            responseOption.setAttribute('data-max_hours', `0`);
+                                            responseOption.textContent = response[i].name + '[miesięczny limit przekroczony]';
+                                        }
+                                        else if(response[i].block == 1) {
                                             if(response[i].exceeded == 0) {
                                                 responseOption.textContent = response[i].name + " [dostępne jeszcze " + response[i].used_hours + " godzin]";
                                                 responseOption.setAttribute('data-max_hours', `${response[i].used_hours}`); //needed for auto setting hours
@@ -1086,7 +1096,7 @@
                                                 responseOption.setAttribute('data-max_hours', '0'); //needed for auto setting hours
                                             }
                                         }
-                                        else {
+                                        else if(response[i].block == 0) {
                                             responseOption.textContent = response[i].name;
                                             if (response[i].max_hour >= 0) {
                                                 responseOption.setAttribute('data-max_hours', `${response[i].max_hour}`); //needed for auto setting hours
@@ -1258,7 +1268,11 @@
                 cityOpt.value = data.city_id;
                 cityOpt.textContent = data.city_name;
 
-                if(data.block == 1) {
+                if(data.max_month_exceeded == 1) {
+                    cityOpt.setAttribute('data-max_hours', `0`);
+                    cityOpt.textContent = data.city_name + '[miesięczny limit przekroczony]';
+                }
+                else if(data.block == 1) {
                     if(data.exceeded == 0) {
                         cityOpt.setAttribute('data-max_hours', `${data.used_hours}`);
                         cityOpt.textContent = data.city_name + ' [dostępne jeszcze ' + data.used_hours + ' godzin]';
@@ -1268,7 +1282,7 @@
                         cityOpt.textContent = data.city_name + '(KARENCJA do ' + data.available_date + ') [przekroczono o ' + data.used_hours + ' godzin]';
                     }
                 }
-                else {
+                else if(data.block == 0) {
                     if(data.max_hour >= 0) {
                         cityOpt.setAttribute('data-max_hours', `${data.max_hour}`);
                     }
