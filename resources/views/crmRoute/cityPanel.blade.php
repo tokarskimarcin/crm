@@ -184,6 +184,7 @@
                                     <input class="form-control" type="number" id="max_shows" name="max_shows" min="-1" step="1" value="28" placeholder="Jeśli brak danych wybrac duża liczbę">
                                 </div>
                             </div>
+
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label class="myLabel">Mediana</label>
