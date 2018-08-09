@@ -2533,6 +2533,7 @@
                                         'success'
                                     )
                                     window.location.href = '{{URL::to('/showClientRoutes')}}';
+
                                 })
                         }
                     })
