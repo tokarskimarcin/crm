@@ -788,7 +788,7 @@ class CrmRouteController extends Controller
             $cities = Cities::all();
             $city = Cities::where('id', '=', $cityId)->first();
             //part responsible for grace period
-            $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
+            $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period', 'city.max_month_show as max_month_show')
                 ->join('city','city.id','client_route_info.city_id')
                 ->where('client_route_info.status', '=', 1)
                 ->orderBy('city.name')
@@ -808,12 +808,12 @@ class CrmRouteController extends Controller
 
     public function findCityByDistanceWithDistanceLimit($city, $currentDate,$clientRoutesInfoWithUsedCities,$cities, $limit){
         if($limit == 'infinity'){
-            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour'))
+            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour', 'city.max_month_show as max_month_show'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
                 ->orderBy('city.name')
                 ->get();
         }else {
-            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
+            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour, city.max_month_show as max_month_show,
             ( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
              * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
               * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
@@ -849,7 +849,23 @@ class CrmRouteController extends Controller
                     array_push($checkedCities, $cityInfoObject);
                 }
             }
-            $voievodeshipRound->map(function($item) use($checkedCities){
+            $voievodeshipRound->map(function($item) use($checkedCities, $currentDate){
+
+                $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
+                $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
+                $allRecordsFromClientRouteInfo = ClientRouteInfo::where('city_id', '=', $item->city_id)
+                    ->where('client_route_info.status', '=', 1)
+                    ->whereBetween('client_route_info.date', [$firstDayOfThisMonth, $lastDayOfThisMonth])
+                    ->get();
+
+                $numberOfRecords = $allRecordsFromClientRouteInfo->count();
+                if($numberOfRecords > $item->max_month_show) {
+                    $item->max_month_exceeded = 1;
+                }
+                else {
+                    $item->max_month_exceeded = 0;
+                }
+
                 $hourNumber = 0; //This variable counts how many times city was used in grace period
                 foreach($checkedCities as $cityRecords) {
                     if ($cityRecords->city_id == $item->city_id) {
@@ -1625,7 +1641,7 @@ class CrmRouteController extends Controller
 //                ->toArray();
 
             //Rekordy clientRoutesInfo w których były użyte miasta
-            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
+            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period', 'city.max_month_show as max_month_show')
                 ->join('city','city.id','client_route_info.city_id')
                 ->where('client_route_info.status', '=', 1)
                 ->orderBy('city.name')
@@ -1660,7 +1676,26 @@ class CrmRouteController extends Controller
                 }
 
             }
-            $all_cities->map(function($item) use($checkedCities){
+//            dd($all_cities->pluck('max_month_show'));
+            $all_cities->map(function($item) use($checkedCities, $currentDate){
+
+                $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
+
+                $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
+
+                $allRecordsFromClientRouteInfo = ClientRouteInfo::where('city_id', '=', $item->id)
+                    ->where('client_route_info.status', '=', 1)
+                    ->whereBetween('client_route_info.date', [$firstDayOfThisMonth, $lastDayOfThisMonth])
+                    ->get();
+
+                $numberOfRecords = $allRecordsFromClientRouteInfo->count();
+                if($numberOfRecords > $item->max_month_show) {
+                    $item->max_month_exceeded = 1;
+                }
+                else {
+                    $item->max_month_exceeded = 0;
+                }
+
                 $hourNumber = 0; //This variable counts how many times city was used in grace period
                 foreach($checkedCities as $cityRecords) {
                     if ($cityRecords->city_id == $item->id) {
@@ -1671,6 +1706,7 @@ class CrmRouteController extends Controller
                 $blockFlag = false;
                 foreach($checkedCities as $blockedCity) {
                     if($blockedCity->city_id == $item->id) {
+
                         $blockFlag = true;
                         $item->block = 1;
                         $item->available_date = $blockedCity->available_date;
@@ -1785,7 +1821,7 @@ class CrmRouteController extends Controller
             ['status', '=', 1]
         ])->get();
         $cities = Cities::all();
-        $clientRouteInfo = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
+        $clientRouteInfo = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period', 'city.max_month_show as max_month_show')
             ->join('city','city.id','client_route_info.city_id')
             ->where('client_route_info.status', '=', 1)
             ->get();
@@ -2013,11 +2049,11 @@ class CrmRouteController extends Controller
     public function findCityByDistance($city, $currentDate,$clientRoutesInfoWithUsedCities,$cities, $removeLimit = false){
         $distance = 100;
         if($removeLimit){
-            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour'))
+            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour', 'city.max_month_show as max_month_show'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
                 ->get();
         }else {
-            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
+            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour, city.max_month_show as max_month_show,
             ( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
              * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
               * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
@@ -2052,7 +2088,22 @@ class CrmRouteController extends Controller
                         array_push($checkedCities, $cityInfoObject);
                 }
             }
-            $voievodeshipRound->map(function($item) use($checkedCities){
+            $voievodeshipRound->map(function($item) use($checkedCities, $currentDate){
+                $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
+                $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
+                $allRecordsFromClientRouteInfo = ClientRouteInfo::where('city_id', '=', $item->city_id)
+                    ->where('client_route_info.status', '=', 1)
+                    ->whereBetween('client_route_info.date', [$firstDayOfThisMonth, $lastDayOfThisMonth])
+                    ->get();
+
+                $numberOfRecords = $allRecordsFromClientRouteInfo->count();
+                if($numberOfRecords > $item->max_month_show) {
+                    $item->max_month_exceeded = 1;
+                }
+                else {
+                    $item->max_month_exceeded = 0;
+                }
+
                 $hourNumber = 0; //This variable counts how many times city was used in grace period
                 foreach($checkedCities as $cityRecords) {
                     if ($cityRecords->city_id == $item->city_id) {
@@ -2109,7 +2160,7 @@ class CrmRouteController extends Controller
             $cities = Cities::all();
             $city = Cities::where('id', '=', $cityId)->first();
             //part responsible for grace period
-            $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
+            $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period', 'city.max_month_show as max_month_show')
                 ->join('city','city.id','client_route_info.city_id')
                 ->where('client_route_info.status', '=', 1)
                 ->get();
