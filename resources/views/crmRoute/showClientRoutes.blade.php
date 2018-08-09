@@ -902,6 +902,7 @@
 
             function appendHeading(placeToAppend, text) {
                 let heading = document.createElement('div');
+                heading.classList.add('heading');
                 heading.style.fontSize = '1.4em';
                 heading.textContent = text;
                 let line = document.createElement('hr');
@@ -926,6 +927,12 @@
                     modalSaveButton.parentNode.removeChild(modalSaveButton);
                 }
 
+                if(modalBody.querySelector('.heading')) {
+                    let heading = modalBody.querySelector('.heading');
+                    heading.parentNode.removeChild(heading);
+                }
+
+
                 modalBody1.innerHTML = ''; //clear modal body1
                 modalBody2.innerHTML = ''; //clear modal body2
 
@@ -933,6 +940,7 @@
                 appendHeading(modalBody2, 'Limit dla kampanii 1 pokazowej');
 
                 createModalTable(modalBody); //table part of modal
+                appendHeading(modalBody, 'Przypisywanie limitów działa poprawnie dla tras, które mają max 3 dni oraz max 3 godziny pokazów w poszczególnym dniu');
                 appendLimitInput(modalBody1, 1);
                 appendLimitInput(modalBody1, 2);
                 appendLimitInput(modalBody1, 3);
