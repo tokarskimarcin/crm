@@ -2670,7 +2670,7 @@ class CrmRouteController extends Controller
         $startDate  = $request->startDate;
         $stopDate   = $request->stopDate;
         $actualDate = $startDate;
-        $allInfoCollect = collect();
+        $aheadPlanningData = collect();
 
         $routeInfoOverall = ClientRouteInfo::select(DB::raw('
             date,
@@ -2681,6 +2681,8 @@ class CrmRouteController extends Controller
             ->where('client_route_info.status', '=', 1)
             ->groupBy('date', 'department_info_id')
             ->get();
+
+        //dd();
 
         while($actualDate <= $stopDate){
             $dayCollect = collect();
@@ -2713,13 +2715,44 @@ class CrmRouteController extends Controller
                 $allSet = "Tak";
             $dayCollect->offsetSet('allSet',$allSet);
             $dayCollect->offsetSet('totalScore',$totalScore);
-            $allInfoCollect->push($dayCollect);
+            $aheadPlanningData->push($dayCollect);
             $actualDate = date('Y-m-d', strtotime($actualDate. ' + 1 days'));
         }
-
+        $departmentsInvitationsAverages = $request->departmentsInvitationsAverages;
+        if($departmentsInvitationsAverages == null){
+            $stopDate = date('Y-m-d');
+            $startDate = date('Y-m-d', strtotime($stopDate. ' - 14 days'));
+            $departmentsInvitationsAverages = $this->getDepartmentsInvitationsAverages($startDate,$stopDate,$routeInfoOverall,$departmentInfo);
+        }
+        $allInfoCollect = collect();
+        $allInfoCollect->offsetSet('aheadPlanningData', $aheadPlanningData);
+        $allInfoCollect->offsetSet('departmentsInvitationsAveragesData',$departmentsInvitationsAverages);
         return $allInfoCollect;
     }
 
+    public function getDepartmentsInvitationsAverages($startDate, $stopDate, $routeInfoOverall, $departmentInfo){
+        $departmentsInvitationsAveragesInfo = collect();
+        foreach ($departmentInfo as $item) {
+            $actualDate = $startDate;
+            $sum = 0;
+            $divider = 0;
+            while ($actualDate < $stopDate) {
+                $routeInfo = $routeInfoOverall->where('department_info_id' ,'=', $item->id)
+                    ->where('date', '=', $actualDate)
+                    ->first();
+                $sum += $routeInfo['sumOfActualSuccess'];
+                $actualDate = date('Y-m-d', strtotime($actualDate. ' + 1 days'));
+                $divider++;
+            }
+            $average = 0;
+            if($divider != 0){
+                $average = $sum / $divider;
+            }
+            $departmentsInvitationsAveragesInfo->offsetSet($item->name2, floor($average));
+        }
+
+        return $departmentsInvitationsAveragesInfo;
+    }
     public function getNameOfWeek($date){
         $arrayOfWeekName = [
             '1' => 'Poniedziałek',

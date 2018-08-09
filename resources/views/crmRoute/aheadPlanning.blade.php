@@ -61,20 +61,17 @@
         .alert-info {
             font-size: 1.2em;
         }
+        .thisDay{
+            background: #fffc8b !important;
+        }
+
     </style>
 
     {{--Header page --}}
-    <div class="row">
-        <div class="col-md-12">
             <div class="page-header">
                 <div class="alert gray-nav ">Planowanie Wyprzedzenia</div>
             </div>
-        </div>
-    </div>
 
-
-    <div class="row">
-        <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     Planowanie wyprzedzenia
@@ -167,8 +164,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
 @endsection
 
@@ -199,9 +194,14 @@
             let sumOfSelectedCells = 0;
             const now = new Date();
             // const day = ("0" + now.getDate()).slice(-2);
-            const month = ("0" + (now.getMonth() + 1)).slice(-2);
+            const dd = ("0"+now.getDate()).slice(-2);
+            const mm = ("0" + (now.getMonth() + 1)).slice(-2);
+            const yyyy = now.getFullYear();
             // const today = now.getFullYear() + "-" + (month) + "-" + (day);
-            const firstDayOfThisMonth = now.getFullYear() + "-" + (month) + "-01";
+            const firstDayOfThisMonth = yyyy + "-" + (mm) + "-01";
+
+
+            let today = yyyy+'-'+mm+'-'+dd;
             /*******END OF GLOBAL VARIABLES*********/
 
             $('#date_start').val(firstDayOfThisMonth);
@@ -210,8 +210,13 @@
             let aheadPlanningData = {
                 limitSimulation: null,
                 newClientSimulation: null,
+                data: {
+                    aheadPlaning: null,
+                    departmentsInvitationsAverages: null
+                },
                 getData: function (startDate, stopDate) {
                     let deffered = $.Deferred();
+                    let obj = this;
                     $.ajax({
                         url: "{{ route('api.getaHeadPlanningInfo') }}",
                         type: 'POST',
@@ -219,13 +224,16 @@
                         data: {
                             startDate: startDate,
                             stopDate: stopDate,
-                            limitSimulation: this.limitSimulation,
-                            newClientSimulation: this.newClientSimulation
+                            limitSimulation: obj.limitSimulation,
+                            newClientSimulation: obj.newClientSimulation,
+                            departmentsInvitationsAverages: obj.data.departmentsInvitationsAverages
                         },
                         success: function (response) {
-                            deffered.resolve(response);
+                            obj.data.aheadPlaning = response.aheadPlanningData;
+                            obj.data.departmentsInvitationsAverages = response.departmentsInvitationsAveragesData;
+                            deffered.resolve(obj.data.aheadPlaning);
                         },
-                        function (jqXHR, textStatus, thrownError) {
+                        error: function (jqXHR, textStatus, thrownError) {
                             console.log(jqXHR);
                             console.log('textStatus: ' + textStatus);
                             console.log('hrownError: ' + thrownError);
@@ -234,7 +242,6 @@
                                 title: 'Błąd ' + jqXHR.status,
                                 text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
                             });
-                            $('#saveHotel').prop('disabled', false);
                             deffered.reject();
                         }
                     });
@@ -242,8 +249,10 @@
                 }
             };
 
+            $('#datatable_processing').show();
             aheadPlanningData.getData($('#date_start').val(),$("#date_stop").val()).done(function (response) {
                 aheadPlaningTable.setTableData(response);
+                $('#datatable_processing').hide();
             });
 
             let aheadPlaningTable = {
@@ -253,12 +262,21 @@
                     scrollX: true,
                     scrollCollapse: true,
                     paging: false,
+                    processing: true,
                     fixedColumns: {
                         leftColumns: 3
                     },
                     "language": {
                         "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
-                    }, fnDrawCallback: function () {
+                    },
+                    fnRowCallback:  function( nRow, aData, iDisplayIndex, iDisplayIndexFull ){
+                        if(aData.day === today){
+                            for( i = 0 ; i< 3; i++){
+                                $($(nRow).children()[i]).addClass('thisDay');
+                            }
+                        }
+                    },
+                    fnDrawCallback: function () {
                         elementsToSum.firstElement.tdId = null;
                         elementsToSum.firstElement.trId = null;
                         elementsToSum.lastElement.tdId = null;
@@ -305,7 +323,14 @@
 
 
             $('#date_start, #date_stop').on('change', function () {
-                table.ajax.reload();
+                $('#datatable_processing').show();
+                aheadPlaningTable.dataTable.clear();
+                aheadPlaningTable.dataTable.draw();
+                aheadPlanningData.getData($('#date_start').val(),$("#date_stop").val()).done(function (response) {
+                    aheadPlaningTable.setTableData(response);
+                    $('#datatable_processing').hide();
+                });
+                //table.ajax.reload();
             });
 
             /**
@@ -412,6 +437,7 @@
                 //rightTopCell = $($(trElements.get(firstElementTrId + 1)).children().get(lastElementTdId));
 
             }
+
         });
     </script>
 @endsection
