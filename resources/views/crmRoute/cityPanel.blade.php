@@ -178,10 +178,10 @@
                                            {{--type="number" min="0" step="1" disabled>--}}
                                 {{--</div>--}}
                             {{--</div>--}}
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label class="myLabel">Max pokazów w miesiącu</label>
-                                    <input class="form-control" type="number" id="max_shows" name="max_shows" min="-1" step="1">
+                                    <input class="form-control" type="number" id="max_shows" name="max_shows" min="-1" step="1" value="28" placeholder="Jeśli brak danych wybrac duża liczbę">
                                 </div>
                             </div>
                             <div class="col-md-2">
