@@ -2504,7 +2504,9 @@ class CrmRouteController extends Controller
         client_route_info.limits as limits,
         client_route_info.actual_success as actual_success,
         YEAR(client_route_info.date) as year,       
-        (client_route_info.actual_success - client_route_info.limits) as loseSuccess,       
+        ( case when client_route_info.actual_success is null then 0 - client_route_info.limits
+         else
+          client_route_info.actual_success - client_route_info.limits end) as loseSuccess,       
         client.name as clientName,
         departments.name as departmentName,
         department_type.name as departmentName2,
@@ -2537,7 +2539,6 @@ class CrmRouteController extends Controller
         if($typ[0] != '0') {
             $campaignsInfo = $campaignsInfo->whereIn('client_route.type', $typ);
         }
-
         return datatables($campaignsInfo->get())->make(true);
     }
 
