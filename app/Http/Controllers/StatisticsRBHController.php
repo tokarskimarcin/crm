@@ -98,7 +98,7 @@ class StatisticsRBHController extends Controller
             'sDayToHeader' => date('Y-m-d'), 'Smonth_selected' => $sThisMonthToView,
         ];
 
-        $preperMail = new VeronaMail('statisticsRBHMail.dayReport30RBH.blade',$data,$title);
+        $preperMail = new VeronaMail('statisticsRBHMail.dayReport30RBH',$data,$title);
         if($preperMail->sendMail()){
             return 'Mail wysłano';
         }else{
