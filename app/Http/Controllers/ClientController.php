@@ -197,7 +197,7 @@ class ClientController extends Controller
      */
     public function editMeeting(Request $request){
         if($request->ajax()){
-            $meeting = ClientGiftType::find($request->id);
+            $meeting = ClientMeetingType::find($request->id);
             $meeting->name = $request->name;
             $meeting->save();
             new ActivityRecorder(array_merge(['T'=>'Edycja typu pokazu'], $meeting->toArray()),208,2);
