@@ -197,6 +197,7 @@ class ClientController extends Controller
      */
     public function editMeeting(Request $request){
         if($request->ajax()){
+
             $meeting = ClientMeetingType::find($request->id);
             $meeting->name = $request->name;
             $meeting->save();
