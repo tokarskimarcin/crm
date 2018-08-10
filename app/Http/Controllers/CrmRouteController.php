@@ -2682,8 +2682,6 @@ class CrmRouteController extends Controller
             ->groupBy('date', 'department_info_id')
             ->get();
 
-        //dd();
-
         while($actualDate <= $stopDate){
             $dayCollect = collect();
             $dayCollect->offsetSet('numberOfWeek',date('W',strtotime($actualDate)));
@@ -2691,6 +2689,13 @@ class CrmRouteController extends Controller
             $dayCollect->offsetSet('day',$actualDate);
             $totalScore = 0;
             $allSet = true;
+
+
+            $unallocatedLimits = $routeInfoOverall
+                ->where('department_info_id','=',null)
+                ->where('date', '=', $actualDate)
+                ->first()['sumOfLimits'];
+
             foreach ($departmentInfo as $item){
                 $routeInfo = $routeInfoOverall
                     ->where('department_info_id' ,'=', $item->id)
@@ -2699,7 +2704,8 @@ class CrmRouteController extends Controller
 
                 $dayLimit = $routeInfo['sumOfLimits'];
                 $daySuccess = $routeInfo['sumOfActualSuccess'];
-                $wynik = $daySuccess - $dayLimit;
+
+                $wynik = (is_null($daySuccess) ? 0 : $daySuccess) - (is_null($dayLimit) ? 0 : $dayLimit) - (is_null($unallocatedLimits) ? 0 : $unallocatedLimits);
                 $dayCollect->offsetSet($item->name2, $wynik);
 
                 $totalScore += $wynik;
@@ -2718,6 +2724,7 @@ class CrmRouteController extends Controller
             $aheadPlanningData->push($dayCollect);
             $actualDate = date('Y-m-d', strtotime($actualDate. ' + 1 days'));
         }
+
         $departmentsInvitationsAverages = $request->departmentsInvitationsAverages;
         if($departmentsInvitationsAverages == null){
             $stopDate = date('Y-m-d');
@@ -2785,10 +2792,10 @@ class CrmRouteController extends Controller
 
             $departmentsInvitationsAveragesInfo->offsetSet($item->name2, $departmentAverages);
         }
-
         return $departmentsInvitationsAveragesInfo;
     }
-    public function getNameOfWeek($date){
+
+    private function getNameOfWeek($date){
         $arrayOfWeekName = [
             '1' => 'Poniedziałek',
             '2' => 'Wtorek',
@@ -2798,7 +2805,6 @@ class CrmRouteController extends Controller
             '6' => 'Sobota',
             '7' => 'Niedziela'];
         return $arrayOfWeekName[date('N',strtotime($date))+0];
-
     }
 
     /**
