@@ -786,9 +786,9 @@ class CrmRouteController extends Controller
             $limit = $request->limit;
 
             $cities = Cities::all();
-            $city = Cities::where('id', '=', $cityId)->first();
+            $city = $cities->where('id', '=', $cityId)->first();
             //part responsible for grace period
-            $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period', 'city.max_month_show as max_month_show')
+            $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date as date','client_route_info.city_id','city.grace_period', 'city.max_month_show as max_month_show')
                 ->join('city','city.id','client_route_info.city_id')
                 ->where('client_route_info.status', '=', 1)
                 ->orderBy('city.name')
@@ -849,14 +849,14 @@ class CrmRouteController extends Controller
                     array_push($checkedCities, $cityInfoObject);
                 }
             }
-            $voievodeshipRound->map(function($item) use($checkedCities, $currentDate){
+            $voievodeshipRound->map(function($item) use($checkedCities, $currentDate, $clientRoutesInfoWithUsedCities){
 
                 $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
                 $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
-                $allRecordsFromClientRouteInfo = ClientRouteInfo::where('city_id', '=', $item->city_id)
-                    ->where('client_route_info.status', '=', 1)
-                    ->whereBetween('client_route_info.date', [$firstDayOfThisMonth, $lastDayOfThisMonth])
-                    ->get();
+                $allRecordsFromClientRouteInfo = $clientRoutesInfoWithUsedCities
+                    ->where('city_id', '=', $item->city_id)
+                    ->where('date', '>=', $firstDayOfThisMonth)
+                    ->where('date', '<=', $lastDayOfThisMonth);
 
                 $numberOfRecords = $allRecordsFromClientRouteInfo->count();
                 if($numberOfRecords > $item->max_month_show) {
@@ -1705,16 +1705,15 @@ class CrmRouteController extends Controller
 
             }
 //            dd($all_cities->pluck('max_month_show'));
-            $all_cities->map(function($item) use($checkedCities, $currentDate){
+            $all_cities->map(function($item) use($checkedCities, $currentDate, $clientRoutesInfoWithUsedCities){
 
                 $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
-
                 $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
 
-                $allRecordsFromClientRouteInfo = ClientRouteInfo::where('city_id', '=', $item->id)
-                    ->where('client_route_info.status', '=', 1)
-                    ->whereBetween('client_route_info.date', [$firstDayOfThisMonth, $lastDayOfThisMonth])
-                    ->get();
+                $allRecordsFromClientRouteInfo = $clientRoutesInfoWithUsedCities
+                    ->where('city_id', '=', $item->id)
+                    ->where('date', '>=', $firstDayOfThisMonth)
+                    ->where('date', '<=', $lastDayOfThisMonth);
 
                 $numberOfRecords = $allRecordsFromClientRouteInfo->count();
                 if($numberOfRecords > $item->max_month_show) {
@@ -2116,13 +2115,12 @@ class CrmRouteController extends Controller
                         array_push($checkedCities, $cityInfoObject);
                 }
             }
-            $voievodeshipRound->map(function($item) use($checkedCities, $currentDate){
+            $voievodeshipRound->map(function($item) use($checkedCities, $currentDate, $clientRoutesInfoWithUsedCities){
                 $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
                 $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
-                $allRecordsFromClientRouteInfo = ClientRouteInfo::where('city_id', '=', $item->city_id)
-                    ->where('client_route_info.status', '=', 1)
-                    ->whereBetween('client_route_info.date', [$firstDayOfThisMonth, $lastDayOfThisMonth])
-                    ->get();
+                $allRecordsFromClientRouteInfo = $clientRoutesInfoWithUsedCities->where('city_id', '=', $item->city_id)
+                    ->where('date', '>=', $firstDayOfThisMonth)
+                    ->where('date', '<=', $lastDayOfThisMonth);
 
                 $numberOfRecords = $allRecordsFromClientRouteInfo->count();
                 if($numberOfRecords > $item->max_month_show) {
