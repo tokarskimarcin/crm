@@ -5,25 +5,18 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="page-header">
-                <div class="alert gray-nav">Miesięczny Raport Szkoleń</div>
+                <div class="alert gray-nav">Raport Dzienny Szkoleń / Zatrudnionych kandydatów</div>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-lg-12">
-            <form action="{{URL::to('/pageMonthReportTrainingGroup')}}" method="post">
+            <form action="{{URL::to('/pageDayReportRecruitmentTrainingGroupFirstAndHire')}}" method="post">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <div class="form-group">
-                    <label for="date" class="myLabel">Data początkowa:</label>
+                    <label class="myLabel">Data:</label>
                     <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:50%;">
-                        <input class="form-control" name="date_start" id="date" type="text" value="{{isset($date_start) ? $date_start :date("Y-m-d")}}">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="date_stop" class="myLabel">Data końcowa:</label>
-                    <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:50%;">
-                        <input class="form-control" name="date_stop" id="date_stop" type="text" value="{{isset($date_stop) ? $date_stop :date("Y-m-d")}}">
+                        <input class="form-control" name="date" id="date" type="text" value="{{isset($start_date) ? $start_date :date("Y-m-d")}}">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                     </div>
                 </div>
@@ -38,7 +31,7 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <div class="panel-body">
-                                        @include('mail.recruitmentMail.monthReportRecruitmentTrainingGroup')
+                                        @include('mail.recruitmentMail.dayReportRecruitmentTrainingGroupFirstAndHire')
                                     </div>
                                 </div>
                             </div>
