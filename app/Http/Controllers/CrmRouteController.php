@@ -3804,6 +3804,8 @@ class CrmRouteController extends Controller
             ->ActiveCampaigns($onlyIds)
             ->get();
 
+        $allClientRouteInfoRecords = ClientRouteInfo::all();
+
         //create new collection and setting properites by client_route_id
         $ClientRouteCampaignsGroupedByClientRoutes = collect();
         foreach($onlyIds as $ids) {
@@ -3819,16 +3821,21 @@ class CrmRouteController extends Controller
                 $numberOfHours = $oneCampaign->hour_count; // number of hours in campaign
 
                 //this procedure assign property "onlyOne" which indices whether campaign is single show
-                for($hourCount = 0; $hourCount < $numberOfHours; $hourCount++) {
-                    $rec = ClientRouteInfo::where('id', '=', $basicId + $hourCount)->first();
-                    if($numberOfHours == 1) {
-                        $rec->onlyOne = 1;
+                    $infoRecord = ClientRouteInfo::where('id', '=', $basicId)->first();
+                    $showOrder = $infoRecord->show_order;
+                    $clientRouteId = $infoRecord->client_route_id;
+                    $date = $infoRecord->date;
+
+                    $allRecordsForUpdate = ClientRouteInfo::where('client_route_id', '=', $clientRouteId)->where('date', '=', $date)->where('show_order', '=', $showOrder)->get();
+                    foreach($allRecordsForUpdate as $recToUpd) {
+                        if($numberOfHours == 1) {
+                            $recToUpd->onlyOne = 1;
+                        }
+                        else {
+                            $recToUpd->onlyOne = 0;
+                        }
+                        array_push($arrayOfInfo, $recToUpd);
                     }
-                    else {
-                        $rec->onlyOne = 0;
-                    }
-                    array_push($arrayOfInfo, $rec);
-                }
             }
             $ClientRouteCampaignsGroupedByClientRoutes[$key] = collect($arrayOfInfo);
         }
@@ -3863,8 +3870,8 @@ class CrmRouteController extends Controller
                 }
 
                 $recGroupedByShowOrder = $singleDateGroup->groupBy('show_order');
-
                 foreach($recGroupedByShowOrder as $orderedShow) {
+
 
                     //here we assign limits according to different scenario
                     foreach($orderedShow as $singleItem) {
