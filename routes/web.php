@@ -332,7 +332,7 @@ Route::get('/monthReportTelemarketing', 'StatisticsController@MailmonthReportTel
 Route::get('/dayReportTelemarketing', 'StatisticsController@MailDayReportTelemarketing'); // tutaj dodac
 
 Route::get('/weekReportPlanningRBH', 'StatisticsRBHController@WeekReportPlanningRBHMail');
-Route::get('/dayReport30RBH', 'StatisticsRBHController@WeekReportPlanningRBHMail');
+Route::get('/dayReport30RBH', 'StatisticsRBHController@DayReport30RBHMail');
 
 Route::get('/invoices', 'CrmRouteController@invoicesMail');
 //Gniezno
