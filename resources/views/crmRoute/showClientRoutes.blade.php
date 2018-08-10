@@ -186,6 +186,11 @@
                         </div>
 
                         <div class="col-md-2">
+                            <button class="btn btn-basic" id="clearButton" style="width:100%; margin-top:2.6em;">
+                                <span class='glyphicon glyphicon-unchecked'></span>Czyść zaznaczone</button>
+                        </div>
+
+                        <div class="col-md-2">
                             <div class="form-group" style="margin-top:2.6em;">
                                 <button class="btn btn-default" id="makeReportClient">Generuj Raport Klienta</button>
                             </div>
@@ -289,6 +294,9 @@
 @section('script')
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
+
+        let idOfRow = null;
+
         $('#menu-toggle').change(()=>{
             table2.columns.adjust().draw();
         });
@@ -326,7 +334,7 @@
                     break;
                 }
                 let limit = allRow[i].querySelector('.optionLimit').querySelector('.form-control').value;
-                if (limit == '') {
+                if (limit == '' || limit == 0 || limit == null) {
                     validation = false;
                     swal('Brak Limitów');
                     break;
@@ -342,6 +350,14 @@
             }
             //Save campain option
             if (validation) {
+                //this part changes color of button
+                let thisRow = document.querySelector(`#${idOfRow}`);
+                let limitEditButton = thisRow.querySelector('.show-modal-with-data');
+                if(!(limitEditButton.matches('.btn-info'))) {
+                    limitEditButton.classList.remove('btn-warning');
+                    limitEditButton.classList.add('btn-info');
+                }
+
                 $.ajax({
                     type: "POST",
                     url: '{{ route('api.saveCampaignOption') }}',
@@ -379,6 +395,8 @@
             let clientRouteIdArr = []; //array of client_route_info ids
             let arrayOfTableRows = []; //array of modal table rows
             const editButton = document.querySelector('#limitsButton');
+            const clearButton = document.querySelector('#clearButton');
+
 
             $('#makeReportClient').on('click',function (e) {
                 let selectedClientID = id;
@@ -769,7 +787,13 @@
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            return '<button class="btn btn-info btn-block show-modal-with-data" '+type+'><span class="glyphicon glyphicon-edit " data-route_id ="' + data.client_route_id + '" ></span> Edytuj</button>';
+                            if(data.hasAllLimits == 1) {
+                                return '<button class="btn btn-info btn-block show-modal-with-data" '+type+'><span class="glyphicon glyphicon-edit " data-route_id ="' + data.client_route_id + '" ></span> Edytuj</button>';
+                            }
+                            else {
+                                return '<button class="btn btn-warning btn-block show-modal-with-data" '+type+'><span class="glyphicon glyphicon-edit " data-route_id ="' + data.client_route_id + '" ></span> Edytuj</button>';
+                            }
+
                         }, "name": "link", width: '10%', searchable: false, orderable: false
 
                     },
@@ -796,6 +820,7 @@
 
                 let limitInput = document.createElement('input');
                 limitInput.id = 'changeLimits_' + limitNumber;
+                limitInput.classList.add('limitInp');
                 limitInput.setAttribute('type', 'number');
                 limitInput.setAttribute('step', '1');
                 limitInput.setAttribute('min', '0');
@@ -817,6 +842,7 @@
                 limitInput.setAttribute('type', 'number');
                 limitInput.setAttribute('step', '1');
                 limitInput.setAttribute('min', '0');
+                limitInput.classList.add('limitInp');
                 limitInput.classList.add('form-control');
                 placeToAppend.appendChild(limitInput);
             }
@@ -906,6 +932,7 @@
                 heading.style.fontSize = '1.4em';
                 heading.textContent = text;
                 let line = document.createElement('hr');
+                line.classList.add('horizontal-line');
                 placeToAppend.insertAdjacentElement('afterbegin', line);
                 placeToAppend.insertAdjacentElement('afterbegin', heading);
             }
@@ -932,6 +959,10 @@
                     heading.parentNode.removeChild(heading);
                 }
 
+                if(modalBody.querySelector('.horizontal-line')) {
+                    let hr = modalBody.querySelector('.horizontal-line');
+                    hr.parentNode.removeChild(hr);
+                }
 
                 modalBody1.innerHTML = ''; //clear modal body1
                 modalBody2.innerHTML = ''; //clear modal body2
@@ -960,6 +991,15 @@
                 /*Event Listener Part*/
                 submitButton.addEventListener('click', function() {
 
+                    //validation
+                    const allLimits = document.querySelectorAll('.limitInp');
+                    let allGood = true;
+                    allLimits.forEach(limit => {
+                       if(limit.value == 0 || limit.value == '' || limit.value == null) {
+                           allGood = false;
+                       }
+                    });
+
                     const limitInput1 = document.querySelector('#changeLimits_1');
                     const limitInput2 = document.querySelector('#changeLimits_2');
                     const limitInput3 = document.querySelector('#changeLimits_3');
@@ -970,32 +1010,51 @@
                     const limitValue3 = limitInput3.value;
                     const singleLimitvalue = singleLimitInput.value;
 
-                    const url = `{{route('api.changeLimits')}}`;
-                    const header = new Headers();
-                    header.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
-                    const data = new FormData();
-                    const JSONClientRouteIdArr = JSON.stringify(clientRouteIdArr);
-                    data.append('ids', JSONClientRouteIdArr);
-                    data.append('limit1', limitValue1);
-                    data.append('limit2', limitValue2);
-                    data.append('limit3', limitValue3);
-                    data.append('singleLimit', singleLimitvalue);
+                    if(allGood) {
 
-                    fetch(url, {
-                        method: "POST",
-                        headers: header,
-                        body: data,
-                        credentials: "same-origin"
-                    })
-                        .then(response => response.text())
-                        .then(response => {
-                            console.log(response);
-                            notify("Rekordy zostały zmienione!", "info");
-                            table.ajax.reload();
+                        //this part changes color of button
+                        clientRouteIdArr.forEach(id => {
+                           if(document.querySelector(`#${id}`)) {
+                               let givenRow = document.querySelector(`#${id}`);
+                               let limitEditButton = givenRow.querySelector('.show-modal-with-data');
+                               if(!(limitEditButton.matches('.btn-info'))) {
+                                   limitEditButton.classList.remove('btn-warning');
+                                   limitEditButton.classList.add('btn-info');
+                               }
+                           }
+                        });
+
+                        const url = `{{route('api.changeLimits')}}`;
+                        const header = new Headers();
+                        header.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                        const data = new FormData();
+                        const JSONClientRouteIdArr = JSON.stringify(clientRouteIdArr);
+                        data.append('ids', JSONClientRouteIdArr);
+                        data.append('limit1', limitValue1);
+                        data.append('limit2', limitValue2);
+                        data.append('limit3', limitValue3);
+                        data.append('singleLimit', singleLimitvalue);
+
+                        fetch(url, {
+                            method: "POST",
+                            headers: header,
+                            body: data,
+                            credentials: "same-origin"
                         })
-                        .catch(error => console.error("Błąd :", error))
+                            .then(response => response.text())
+                            .then(response => {
+                                notify("Rekordy zostały zmienione!", "info");
+                                table.ajax.reload();
+                            })
+                            .catch(error => console.error("Błąd :", error))
 
-                    $('#editModal').modal('toggle');
+                        $('#editModal').modal('toggle');
+                    }
+                    else {
+                        swal('Wypełnij wszystkie pola');
+                    }
+
+
                 });
             }
 
@@ -1415,7 +1474,37 @@
                 table2.ajax.reload();
             });
 
+
+            /**
+             * This function clear all row selections and disable edit button
+             */
+            function clearAllSelections() {
+                if(arrayOfTableRows.length > 0) {
+                    if(document.querySelectorAll('.colorRow')) {
+                        const coloredRows = document.querySelectorAll('.colorRow');
+                        coloredRows.forEach(colorRow => {
+                            colorRow.classList.remove('colorRow');
+                        });
+                        notify("<strong>Wszystkie zaznaczenia zostały usuniete</strong>", 'success', 4000);
+                    }
+                }
+                arrayOfTableRows = [];
+                clientRouteIdArr = [];
+                let limitsButton = document.querySelector('#limitsButton');
+                limitsButton.disabled = true;
+            }
+
+            function globalClickHandler(e) {
+                if(e.target.matches('.show-modal-with-data')) {
+                    let thisButton = e.target;
+                    let thisRow = thisButton.closest('tr');
+                    idOfRow = thisRow.id;
+                }
+            }
+
             window.addEventListener('pagehide', setItemsToSeessionStorage);
+            clearButton.addEventListener('click', clearAllSelections);
+            document.addEventListener('click', globalClickHandler)
 
         });
     </script>
