@@ -213,7 +213,7 @@ class VeronaMail
             });
             return true;
         }catch (\Exception $eExept){
-            return false;
+            throw $eExept;
         }
     }
 }
