@@ -855,7 +855,6 @@ class CrmRouteController extends Controller
                 $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
                 $allRecordsFromClientRouteInfo = $clientRoutesInfoWithUsedCities
                     ->where('city_id', '=', $item->city_id)
-                    ->where('client_route_info.status', '=', 1)
                     ->where('date', '>=', $firstDayOfThisMonth)
                     ->where('date', '<=', $lastDayOfThisMonth);
 
@@ -1697,11 +1696,10 @@ class CrmRouteController extends Controller
             $all_cities->map(function($item) use($checkedCities, $currentDate, $clientRoutesInfoWithUsedCities){
 
                 $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
-
                 $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
 
-                $allRecordsFromClientRouteInfo = $clientRoutesInfoWithUsedCities->where('city_id', '=', $item->id)
-                    ->where('client_route_info.status', '=', 1)
+                $allRecordsFromClientRouteInfo = $clientRoutesInfoWithUsedCities
+                    ->where('city_id', '=', $item->id)
                     ->where('date', '>=', $firstDayOfThisMonth)
                     ->where('date', '<=', $lastDayOfThisMonth);
 
@@ -2109,7 +2107,6 @@ class CrmRouteController extends Controller
                 $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
                 $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
                 $allRecordsFromClientRouteInfo = $clientRoutesInfoWithUsedCities->where('city_id', '=', $item->city_id)
-                    ->where('client_route_info.status', '=', 1)
                     ->where('date', '>=', $firstDayOfThisMonth)
                     ->where('date', '<=', $lastDayOfThisMonth);
 
