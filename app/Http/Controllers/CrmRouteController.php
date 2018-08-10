@@ -1326,7 +1326,8 @@ class CrmRouteController extends Controller
                 'city.name as cityName',
                 'date',
                 'client_route.type',
-                'client_route_id')
+                'client_route_id',
+                'limits')
             ->join('client_route' ,'client_route.id','=','client_route_id')
             ->join('client' ,'client.id','=','client_route.client_id')
             ->join('city' ,'city.id','=', 'city_id')
@@ -1344,6 +1345,16 @@ class CrmRouteController extends Controller
         $fullArray = [];
         foreach($client_route_ids as $client_route_id){
 
+            //this part check whether all limits are assigned
+            $infoRecords = $client_route_info->where('client_route_id', '=', $client_route_id);
+            $limitFlag = true;
+            foreach($infoRecords as $oneRecord) {
+                if($oneRecord->limits == null || $oneRecord->limits == 0) {
+                    $limitFlag = false;
+                    break;
+                }
+            }
+
             $client_routes = $this->getClientRouteGroupedByDateSortedByHour($client_route_id, $client_route_info);
 
             //$route_name = $this->createRouteName($client_routes);
@@ -1354,6 +1365,7 @@ class CrmRouteController extends Controller
             }
 
             $client_routes[0]->hotelOrHour = $hourOrHotelAssigned;
+            $client_routes[0]->hasAllLimits = $limitFlag ? 1 : 0;
             //$client_routes[0]->route_name = $route_name;
             array_push($fullArray, $client_routes[0]);
         }
@@ -1378,7 +1390,7 @@ class CrmRouteController extends Controller
     private function getClientRouteGroupedByDateSortedByHour($client_route_id, $client_route_info = null){
         $grouped_by_day_client_routes= [];
         if($client_route_info === null){
-            $client_route_info = ClientRouteInfo::select( 'client_route_info.id as id', 'city.name as cityName','client_route_info.hour as hour' , 'client_route_info.date as date')
+            $client_route_info = ClientRouteInfo::select( 'client_route_info.id as id', 'city.name as cityName','client_route_info.hour as hour' , 'client_route_info.date as date', 'client_route_info.limits as limits')
                 ->join('city', 'city.id', '=', 'client_route_info.city_id')
                 ->where('client_route_id', '=', $client_route_id)
                 ->where('client_route_info.status', '=', 1)
