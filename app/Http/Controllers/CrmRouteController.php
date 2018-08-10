@@ -951,7 +951,8 @@ class CrmRouteController extends Controller
                     'hotel_id',
                     'hour',
                     'city.name as city_name',
-                    'voivodeship.name as voivode_name'
+                    'voivodeship.name as voivode_name',
+                    'hotel_price'
                 )
                 ->where('cr.status', '=', 1)
                 ->where('cr.id', '=', $id)
@@ -965,7 +966,8 @@ class CrmRouteController extends Controller
                     'routeName' => $clientRouteInfo[0]->route_name,
                     'week' => $clientRouteInfo[0]->week,
                     'date' => $clientRouteInfo[0]->date,
-                    'userReservation' => $clientRouteInfo[0]->user_reservation
+                    'userReservation' => $clientRouteInfo[0]->user_reservation,
+                    'hotel_price' => $clientRouteInfo[0]->hotel_price
                 ];
                 for ($i = 0; $i < $clientRouteInfo->count(); $i++) {
                     $campaign = [];
@@ -1012,7 +1014,8 @@ class CrmRouteController extends Controller
                 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id',
                 'client_route_info.hour as hour',
                 'client_route.client_id as client_id',
-                'client_route_info.weekOfYear as weekOfYear')
+                'client_route_info.weekOfYear as weekOfYear',
+                'client_route_info.hotel_price')
                 ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
                 ->join('city', 'city.id', '=', 'client_route_info.city_id')
                 ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
@@ -1115,7 +1118,7 @@ class CrmRouteController extends Controller
     /**
      * This method saves changes about specific route
      */
-    public function updateClientRouteInfoHotelsAndHours(Request $request){
+    public function updateClientRouteInfoHotelsAndHours(Request $request) {
         $all_data = json_decode($request->JSONData); //we obtain 3 dimensional array
         //dd($all_data);
         $clientRouteInfoIds = 'clientRouteInfoIds: ';
@@ -1127,7 +1130,8 @@ class CrmRouteController extends Controller
                     ])->update([
                         'hotel_id' => $clientRouteInfo->hotelId,
                         'hour' => $clientRouteInfo->time == "" ? null : $clientRouteInfo->time,
-                        'user_reservation' => $campaign->userReservation
+                        'user_reservation' => $campaign->userReservation,
+                        'hotel_price' => $campaign->hotelPrice
                     ]);
                     $clientRouteInfoIds .= $clientRouteInfo->clientRouteInfoId . ', ';
                 }catch(\Exception $e){
