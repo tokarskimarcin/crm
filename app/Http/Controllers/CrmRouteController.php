@@ -3375,6 +3375,7 @@ class CrmRouteController extends Controller
         if($request->showWithoutHotelInput == 'true')
             $clientRouteInfo = $clientRouteInfo->where('hotels.name',null);
         return datatables($clientRouteInfo->get()->sortby('id')->sortby('hour')->sortby('weekOfYear'))->make(true);
+
     }
 
     /**
