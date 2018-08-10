@@ -966,8 +966,8 @@ class CrmRouteController extends Controller
                     'routeName' => $clientRouteInfo[0]->route_name,
                     'week' => $clientRouteInfo[0]->week,
                     'date' => $clientRouteInfo[0]->date,
-                    'userReservation' => $clientRouteInfo[0]->user_reservation,
-                    'hotel_price' => $clientRouteInfo[0]->hotel_price
+                    'user_reservation' => $clientRouteInfo[0]->user_reservation == 'Brak' ? '' : $clientRouteInfo[0]->user_reservation,
+                    'hotel_price' => $clientRouteInfo[0]->hotel_price == 0 ? null : $clientRouteInfo[0]->hotel_price,
                 ];
                 for ($i = 0; $i < $clientRouteInfo->count(); $i++) {
                     $campaign = [];
@@ -1123,16 +1123,28 @@ class CrmRouteController extends Controller
         //dd($all_data);
         $clientRouteInfoIds = 'clientRouteInfoIds: ';
         foreach($all_data as $campaign) {
+            $lp = 1;
             foreach ($campaign->timeHotelArr as $clientRouteInfo){
                 try{
-                    ClientRouteInfo::where([
-                        ['id', '=', $clientRouteInfo->clientRouteInfoId]
-                    ])->update([
-                        'hotel_id' => $clientRouteInfo->hotelId,
-                        'hour' => $clientRouteInfo->time == "" ? null : $clientRouteInfo->time,
-                        'user_reservation' => $campaign->userReservation,
-                        'hotel_price' => $campaign->hotelPrice
-                    ]);
+                    if($lp == 1){
+                        ClientRouteInfo::where([
+                            ['id', '=', $clientRouteInfo->clientRouteInfoId]
+                        ])->update([
+                            'hotel_id' => $clientRouteInfo->hotelId,
+                            'hour' => $clientRouteInfo->time == "" ? null : $clientRouteInfo->time,
+                            'user_reservation' => $campaign->userReservation == 'Brak' ? '' : $campaign->userReservation,
+                            'hotel_price' => $campaign->hotelPrice == 0 ? null : $campaign->hotelPrice
+                        ]);
+                        $lp++;
+                    }
+                    else{
+                        ClientRouteInfo::where([
+                            ['id', '=', $clientRouteInfo->clientRouteInfoId]
+                        ])->update([
+                            'hotel_id' => $clientRouteInfo->hotelId,
+                            'hour' => $clientRouteInfo->time == "" ? null : $clientRouteInfo->time
+                        ]);
+                    }
                     $clientRouteInfoIds .= $clientRouteInfo->clientRouteInfoId . ', ';
                 }catch(\Exception $e){
                     return $e;
@@ -3340,6 +3352,8 @@ class CrmRouteController extends Controller
 
     public function datatableClientRouteInfoAjax(Request $request){
         $clientRouteInfo = ClientRouteInfo::select(
+            'client_route_info.id',
+            'client_route_info.hour',
             'client.name as clientName',
             'weekOfYear',
             'client_route_info.date',
@@ -3360,7 +3374,7 @@ class CrmRouteController extends Controller
         }
         if($request->showWithoutHotelInput == 'true')
             $clientRouteInfo = $clientRouteInfo->where('hotels.name',null);
-        return datatables($clientRouteInfo->get())->make(true);
+        return datatables($clientRouteInfo->get()->sortby('id')->sortby('hour')->sortby('weekOfYear'))->make(true);
     }
 
     /**

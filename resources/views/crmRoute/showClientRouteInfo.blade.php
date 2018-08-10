@@ -128,13 +128,13 @@
                 url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
             },
             columns:[
-                {data: 'clientName'},
-                {data: 'weekOfYear'},
-                {data: 'date'},
-                {data: 'cityName'},
-                {data: 'hotelName'},
-                {data: 'userReservation'},
-                {data: 'hotelPrice'}
+                {data: 'clientName','orderable':false},
+                {data: 'weekOfYear','orderable':false},
+                {data: 'date','orderable':false},
+                {data: 'cityName','orderable':false},
+                {data: 'hotelName','orderable':false},
+                {data: 'userReservation','orderable':false},
+                {data: 'hotelPrice','orderable':false}
             ]
         });
 
