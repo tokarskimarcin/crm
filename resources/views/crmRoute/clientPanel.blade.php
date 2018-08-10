@@ -768,7 +768,7 @@
                             let cel = row.find("td:first");
                             let celVal = cel.text();
                             $(this).toggleClass('btn-info btn-success');
-                            cel.html("<input type='text' class='form-control'  value=" + celVal + " />");
+                            cel.html(`<input type='text' class='form-control'  value="${celVal}">`);
                             $(this).html("<span class='glyphicon glyphicon-save'></span> <span>Zapisz</span>");
                             $(this).data('type', 2);
                         } else if (actualAction == 2) {
@@ -893,7 +893,7 @@
                             let row = $(this).closest('tr');
                             let cel = row.find("td:first");
                             let celVal = cel.text();
-                            cel.html("<input type='text' class='form-control'  value=" + celVal + " />");
+                            cel.html(`<input type='text' class='form-control'  value="${celVal}">`);
                             $(this).html("<span class='glyphicon glyphicon-save'></span> <span>Zapisz</span>");
                             $(this).data('type', 2);
                         } else if (actualAction == 2) {
@@ -901,10 +901,11 @@
                             let cel = row.find("td:first");
                             let celInput = cel.find("input");
                             let celVal = celInput.val();
+                            console.log(celVal);
                             let validate = true;
                             if (celVal.trim().length == 0 || celVal == '') {
                                 validate = false;
-                                swal("Podaj nazwę typu poazau")
+                                swal("Podaj nazwę typu pokazu")
                             }
                             if (validate) {
                                 element.attr("disabled", true);
