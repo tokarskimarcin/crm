@@ -168,6 +168,7 @@
            let clientRouteInfoIdArr = []; //array of client_route_info ids
            let selectedTypes = ['0']; //array of selected by user types
            let arrayOfTableRows = []; //array of modal table rows
+           let datatableHeight = '75vh'; //this variable defines height of table
            const clearButton = document.querySelector('#clearButton');
            const editButton = document.querySelector('#editOneRecord');
            /*******END OF GLOBAL VARIABLES*********/
@@ -597,12 +598,10 @@
            /**********************************************************/
 
            table = $('#datatable').DataTable({
-
-               "autoWidth": false,
-               "processing": true,
-               "serverSide": true,
-               "fixedHeader": true,
-               "scrollX": "100%",
+               autoWidth: true,
+               processing: true,
+               serverSide: true,
+               scrollY: datatableHeight,
                "drawCallback": function( settings ) {
 
                },
