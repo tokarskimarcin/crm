@@ -305,7 +305,7 @@ class FinancesController extends Controller
 
         // użytkownicy pracujący
         $users =  User::where('department_info_id', Auth::user()->department_info_id)
-            ->whereIn('user_type_id', [1, 2])
+            ->whereIn('user_type_id', [1, 2, 9])
             ->where('status_work', '=', 1)
             ->orderBy('last_name')
             ->get();
@@ -313,14 +313,14 @@ class FinancesController extends Controller
         $current_month = date("Y-m");
         // zwolnieni miesiąc temu
         $users_fired_last_month =  User::where('department_info_id', Auth::user()->department_info_id)
-            ->whereIn('user_type_id', [1, 2])
+            ->whereIn('user_type_id', [1, 2, 9])
             ->where('status_work', '=', 0)
             ->where('end_work', 'like', $last_month.'%')
             ->orderBy('last_name')
             ->get();
         // zwolnieni w tym miesiącu
         $users_fired_current_month =  User::where('department_info_id', Auth::user()->department_info_id)
-            ->whereIn('user_type_id', [1, 2])
+            ->whereIn('user_type_id', [1, 2, 9])
             ->where('status_work', '=', 0)
             ->where('end_work', 'like', $current_month.'%')
             ->orderBy('last_name')
@@ -335,7 +335,7 @@ class FinancesController extends Controller
     {
         // użytkownicy pracujący
         $users =  User::where('department_info_id', Auth::user()->department_info_id)
-            ->whereIn('user_type_id', [1, 2])
+            ->whereIn('user_type_id', [1, 2, 9])
             ->where('status_work', '=', 1)
             ->orderBy('last_name')
             ->get();
@@ -344,14 +344,14 @@ class FinancesController extends Controller
         $current_month = date("Y-m");
         // zwolnieni miesiąc temu
         $users_fired_last_month =  User::where('department_info_id', Auth::user()->department_info_id)
-            ->whereIn('user_type_id', [1, 2])
+            ->whereIn('user_type_id', [1, 2, 9])
             ->where('status_work', '=', 0)
             ->where('end_work', 'like', $last_month.'%')
             ->orderBy('last_name')
             ->get();
         // zwolnieni w tym miesiącu
         $users_fired_current_month =  User::where('department_info_id', Auth::user()->department_info_id)
-            ->whereIn('user_type_id', [1, 2])
+            ->whereIn('user_type_id', [1, 2, 9])
             ->where('status_work', '=', 0)
             ->where('end_work', 'like', $current_month.'%')
             ->orderBy('last_name')
@@ -375,7 +375,7 @@ class FinancesController extends Controller
                '))->where('users.department_info_id',Auth::user()->department_info_id)
                 ->whereBetween('event_date', [$date_start, $date_stop])
                 ->whereIn('type', [1,2])
-                ->where('users.user_type_id',1)
+                ->whereIn('users.user_type_id',[1,2,9])
                 ->where('penalty_bonus.status',1);
         if($request->showuser != -1)
         {
