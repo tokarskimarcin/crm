@@ -3639,13 +3639,9 @@ class CrmRouteController extends Controller
             hotels.zip_code,
             payment_methods.name as paymentMethod,
             0 as hotelContact,
-            0 as toPay,
+            null as toPay,
             hotels.bidType,
-            case 
-                when bidType = 1 then hotels.hour_bid 
-                when bidType = 2 then hotels.daily_bid
-                else 0
-            end as bid,
+            client_route_info.hotel_price as bid,
             client.name as clientName,
             client_gift_type.name as clientGiftName,
             client_meeting_type.name clientMeetingName,
@@ -3682,17 +3678,7 @@ class CrmRouteController extends Controller
             if($item->hotelID != null){
                 if(!in_array([$item->clientRouteID => $item->hotelID],$routeAllreadySetBil)){
                     array_push($routeAllreadySetBil,[$item->clientRouteID => $item->hotelID]);
-                    if($item->bidType == 2){
                         $item->toPay = $item->bid;
-                    }else  if($item->bidType == 1){
-                        $eventCount = $data->where('clientRouteID','=',$item->clientRouteID)
-                            ->where('hotelID','=',$item->hotelID)
-                            ->count();
-                        $item->toPay = $eventCount*$item->bid;
-                    }else{
-                        $item->paymentMethod = 'Brak danych';
-                        $item->toPay = 'Brak danych';
-                    }
                 }else{
                     $item->paymentMethod = '';
                     $item->toPay = '';
