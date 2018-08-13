@@ -3371,7 +3371,9 @@ class CrmRouteController extends Controller
             ->orderby('weekOfYear','ASC')
             ->orderby('city.name','ASC')
             ->orderby('date','ASC')
+            ->orderby('clientName','ASC')
             ->orderby('hour','ASC');
+
         if($request->clients[0] != 0) {
             $clientRouteInfo = $clientRouteInfo->whereIn('client.id', $request->clients);
         }
