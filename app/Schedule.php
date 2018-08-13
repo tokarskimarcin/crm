@@ -62,6 +62,29 @@ class Schedule extends Model
         return $CusersScheduleInfo;
     }
 
+
+
+
+    public static function changeSecondsToHourArray(&$object){
+        foreach ($object as &$item)
+        {
+            $item = self::secondToHour($item);
+        }
+        return $object;
+    }
+    public static function prepereObjectSumColumn(){
+        $data = new \stdClass();
+        $data->sumSecMonday     = 0;
+        $data->sumSecTuesday    = 0;
+        $data->sumSecWednesday  = 0;
+        $data->sumSecThursday   = 0;
+        $data->sumSecFriday     = 0;
+        $data->sumSecSaturday   = 0;
+        $data->sumSecSunday     = 0;
+        $data->sumSecAll       = 0;
+        return $data;
+    }
+
     /**
      * Convert second to Hour
      * @param $Ssecond
@@ -80,18 +103,26 @@ class Schedule extends Model
      * @param $CsheduleInfo
      * @return Collection
      */
-    public static function groupUsersRBHbyDepartments($CsheduleInfo) : Collection{
-        $CsheduleInfo = $CsheduleInfo->groupBy('department_info_id')->map(function ($row){
+    public static function groupUsersRBHbyDepartments($CsheduleInfo,&$objectOfSumColumns) : Collection{
+        $CsheduleInfo = $CsheduleInfo->groupBy('department_info_id')->map(function ($row) use ($objectOfSumColumns) {
             $CfirstCollect = $row->first();
-            $CfirstCollect->sec_sum         = self::secondToHour(
-                $row->sum('sec_monday') +
+            $sumAllRecordInRow = $row->sum('sec_monday') +
                 $row->sum('sec_tuesday')         +
                 $row->sum('sec_wednesday')       +
                 $row->sum('sec_thursday')        +
                 $row->sum('sec_friday')          +
                 $row->sum('sec_saturday')        +
-                $row->sum('sec_sunday')
-            );
+                $row->sum('sec_sunday');
+            $CfirstCollect->sec_sum         = self::secondToHour($sumAllRecordInRow);
+            $objectOfSumColumns->sumSecMonday        += $row->sum('sec_monday');
+            $objectOfSumColumns->sumSecTuesday       += $row->sum('sec_tuesday');
+            $objectOfSumColumns->sumSecWednesday     += $row->sum('sec_wednesday');
+            $objectOfSumColumns->sumSecThursday      += $row->sum('sec_thursday') ;
+            $objectOfSumColumns->sumSecFriday        += $row->sum('sec_friday');
+            $objectOfSumColumns->sumSecSaturday      += $row->sum('sec_saturday') ;
+            $objectOfSumColumns->sumSecSunday        += $row->sum('sec_sunday');
+            $objectOfSumColumns->sumSecAll           += $sumAllRecordInRow;
+
             //21600 + 16200 + 21600/
             $CfirstCollect->sec_monday      =   self::secondToHour( $row->sum('sec_monday'));
             $CfirstCollect->sec_tuesday     =   self::secondToHour( $row->sum('sec_tuesday'));
@@ -137,6 +168,16 @@ class Schedule extends Model
         $CnewItemToCollect->offsetSet('sec_friday',0);
         $CnewItemToCollect->offsetSet('sec_saturday',0);
         $CnewItemToCollect->offsetSet('sec_sunday',0);
+
+        $CnewItemToCollect->offsetSet('sumSecMonday',0);
+        $CnewItemToCollect->offsetSet('sumSecTuesday',0);
+        $CnewItemToCollect->offsetSet('sumSecWednesday',0);
+        $CnewItemToCollect->offsetSet('sumSecThursday',0);
+        $CnewItemToCollect->offsetSet('sumSecFriday',0);
+        $CnewItemToCollect->offsetSet('sumSecSaturday',0);
+        $CnewItemToCollect->offsetSet('sumSecSunday',0);
+        $CnewItemToCollect->offsetSet('sumSecAll',0);
+
         $CnewItemToCollect->offsetSet('sec_sum',0);
         $CnewItemToCollect->offsetSet('departmentConcatName',$Cdepartment->departments->name.' '.$Cdepartment->department_type->name);
         $Ccollect->push($CnewItemToCollect);
