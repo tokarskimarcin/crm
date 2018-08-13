@@ -140,6 +140,9 @@
             ],
             scrollY: datatableHeight,
             data: ajaxResponde(),
+            columnDefs: [
+                { orderable: false, targets: '_all' }
+            ],
             {{--ajax: {--}}
                 {{--url: "{{route('api.datatableClientRouteInfoAjax')}}",--}}
                 {{--type: 'POST',--}}
