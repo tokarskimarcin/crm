@@ -7,6 +7,7 @@
 @extends('layouts.main')
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <link href="{{ asset('/css//buttons.dataTables.min.css')}}" rel="stylesheet">
     <style>
         #fullscreen {
             margin-top: 1.75em;
@@ -84,6 +85,9 @@
 @section('script')
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script src="{{ asset('/js/dataTables.buttons.min.js')}}"></script>
+    <script src="{{ asset('/js/jszip.min.js')}}"></script>
+    <script src="{{ asset('/js/buttons.html5.min.js')}}"></script>
 
     <script>
         let datatableHeight = '45vh'; //this variable defines height of table
@@ -108,22 +112,45 @@
 
         })();
 
-        let table = $('#datatable').DataTable({
-            autoWidth: true,
-            processing: true,
-            serverSide: true,
-            scrollY: datatableHeight,
-            ajax: {
+        function ajaxResponde() {
+            var tmp = null;
+            $.ajax({
                 url: "{{route('api.datatableClientRouteInfoAjax')}}",
                 type: 'POST',
-                data: function (d) {
-                    d.dateStop = $('#date_stop').val();
-                    d.dateStart = $('#date_start').val();
-                    d.clients = $('#clients').val();
-                    d.showWithoutHotelInput = showWithoutHotelInput.prop('checked');
+                'async': false,
+                data: {
+                    'dateStop': $('#date_stop').val(),
+                    'dateStart': $('#date_start').val(),
+                    'clients': $('#clients').val(),
+                    'showWithoutHotelInput': showWithoutHotelInput.prop('checked')
                 },
-                headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
-            },
+                headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                success: function (response) {
+                    console.log(response);
+                    tmp =  response;
+                }
+            });
+            return tmp;
+        };
+        let table = $('#datatable').DataTable({
+            autoWidth: true,
+            dom: 'Bfrtip',
+            buttons: [
+                'excel'
+            ],
+            scrollY: datatableHeight,
+            data: ajaxResponde(),
+            {{--ajax: {--}}
+                {{--url: "{{route('api.datatableClientRouteInfoAjax')}}",--}}
+                {{--type: 'POST',--}}
+                {{--data: function (d) {--}}
+                    {{--d.dateStop = $('#date_stop').val();--}}
+                    {{--d.dateStart = $('#date_start').val();--}}
+                    {{--d.clients = $('#clients').val();--}}
+                    {{--d.showWithoutHotelInput = showWithoutHotelInput.prop('checked');--}}
+                {{--},--}}
+                {{--headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}--}}
+            {{--},--}}
             language: {
                 url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
             },
@@ -142,13 +169,17 @@
             table.columns.adjust().draw();
         });
         showWithoutHotelInput.change(function(e){
-            table.ajax.reload();
+            table.clear().draw();
+            table.rows.add(ajaxResponde());
+            table.columns.adjust().draw();
         });
         /**
          * This event listener reloads table after changing start or stop date
          */
         $('#date_start, #date_stop, #clients').on('change', function(e) {
-            table.ajax.reload();
+            table.clear().draw();
+            table.rows.add(ajaxResponde());
+            table.columns.adjust().draw();
         });
 
         /**
