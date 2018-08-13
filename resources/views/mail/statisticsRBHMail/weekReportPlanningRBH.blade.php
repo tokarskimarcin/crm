@@ -47,5 +47,14 @@
         </tr>
     @endforeach
     <tr>
-    <tbody>
+        <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px" colspan="2">Suma</td>
+        <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$columnSum->sumSecMonday}}</td>
+        <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$columnSum->sumSecTuesday}}</td>
+        <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$columnSum->sumSecWednesday}}</td>
+        <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$columnSum->sumSecThursday}}</td>
+        <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$columnSum->sumSecFriday}}</td>
+        <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$columnSum->sumSecSaturday}}</td>
+        <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$columnSum->sumSecSunday}}</td>
+        <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$columnSum->sumSecAll}}</td>
+    </tbody>
 </table>
