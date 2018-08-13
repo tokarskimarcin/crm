@@ -744,15 +744,15 @@
                                     }
 
                                     citySelect.setAttribute('data-distance', nextCityDistance);
-                                    $(voivodeSelect).on('change', function() {
+                                    $(voivodeSelect).on('change', function(e) {
                                         citySelect.innerHTML = ''; //cleaning previous insertions
+                                        let voivodeId = e.target.value;
                                         appendBasicOption(citySelect);
-
                                         voivodeSet.forEach(voivode => {
                                             citySet.forEach(voivodeCity => {
                                                 console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
                                                 voivodeCity.forEach(city => {
-                                                    if(city.id === voivode.id) {
+                                                    if(city.id === voivode.id && voivodeId == voivode.id ) {
                                                         appendCityOptions(citySelect, city);
                                                     }
                                                 });
@@ -836,15 +836,15 @@
                                             }
 
                                             citySelect.setAttribute('data-distance', nextCityDistance);
-                                            $(voivodeSelect).on('change', function() {
+                                            $(voivodeSelect).on('change', function(e) {
                                                 citySelect.innerHTML = ''; //cleaning previous insertions
                                                 appendBasicOption(citySelect);
-
+                                                let voivodeId = e.target.value;
                                                 voivodeSet.forEach(voivode => {
                                                     citySet.forEach(voivodeCity => {
                                                         console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
                                                         voivodeCity.forEach(city => {
-                                                            if(city.id === voivode.id) {
+                                                            if(city.id === voivode.id && voivodeId == voivode.id) {
                                                                 appendCityOptions(citySelect, city);
                                                             }
                                                         });
