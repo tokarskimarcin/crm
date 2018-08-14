@@ -390,7 +390,13 @@
                                 $($(nRow).children()[i]).addClass('thisDay');
                             }
                         }
-                        if(moment.duration(moment(new Date(aData.day)).diff(moment(new Date(today)))).asDays() <= warningResult.lowAheadDay){
+
+                        let simulatedActualDay = today;
+                        if(selectedRowDays.hasOwnProperty(0)){
+                            simulatedActualDay = moment(new Date(
+                                $('#date_start').val())).add(selectedRowDays[0],'d').format('YYYY-MM-DD');
+                        }
+                        if(moment.duration(moment(new Date(aData.day)).diff(moment(new Date(simulatedActualDay)))).asDays() <= warningResult.lowAheadDay){
                             for(let i = 3 ; i< $(nRow).children().length - 1; i++){
                                 if(parseInt($($(nRow).children()[i]).text()) < 0){
                                     $($(nRow).children()[i]).addClass('warningResult');
@@ -398,7 +404,7 @@
                             }
                         }
 
-                        if(moment.duration(moment(new Date(aData.day)).diff(moment(new Date(today)))).asDays() >= warningResult.highAheadDay){
+                        if(moment.duration(moment(new Date(aData.day)).diff(moment(new Date(simulatedActualDay)))).asDays() >= warningResult.highAheadDay){
                             for(let i = 3 ; i< $(nRow).children().length - 1; i++){
                                 if(parseInt($($(nRow).children()[i]).text()) === 0){
                                     $($(nRow).children()[i]).addClass('warningResult');
@@ -628,11 +634,12 @@
             }
 
             //  simulations template
-            function Simulation( name, availableSelectedDays, sectionsToShow, simulateCallback, validateCallback) {
+            function Simulation( name, availableSelectedDays, sectionsToShow, isChangingAheadPlanningData, simulateCallback, validateCallback) {
                 return {
                     name: name,
                     availableSelectedDays: availableSelectedDays,
                     sectionsToShow: sectionsToShow,
+                    isChangingAheadPlanningData: isChangingAheadPlanningData,
                     simulate: function () {
                         simulateCallback(this);
                     },
@@ -649,6 +656,7 @@
                 'Przewidywanie wyprzedzenia na wybrany dzień',
                 1, // available days to select
                 ['factorsSection'], //sections to show
+                true, // flag that identify is ahead planning data after simulation are changed
                 /* ---------------- simulation function ----------------------- */
                 function (thisObj){
                     let selectedDay = getSelectedDay(selectedRowDays[0]);
@@ -764,6 +772,7 @@
                 'Wyliczenie średniej zaproszeń dla oddziałów do dnia',
                 2, // available days to select
                 [], //sections to show
+                false, // flag that identify is ahead planning data after simulation are changed
                 /* ---------------- simulation function ----------------------- */
                 function (thisObj) {
                 },
@@ -807,18 +816,17 @@
                 selectedRowDays = [];
                 colorSelectedRowDays();
 
+                if($('#removeSimulationButton').is(':visible'))
+                    $('#removeSimulationButton').click();
                 // sections assigned to simulations are hidden or shown depending on selected simulation
                 let simulationIndex = $(e.target).val();
                 $.each(simulations,function (index, item) {
-                    if(index == simulationIndex){
-                        $.each(item.sectionsToShow,function (index, sectionToShow) {
-                            $('.'+sectionToShow).show();
-                        });
-                    }else{
                         $.each(item.sectionsToShow,function (index, sectionToShow) {
                             $('.'+sectionToShow).hide();
                         });
-                    }
+                });
+                $.each(simulations[simulationIndex].sectionsToShow,function (index, sectionToShow) {
+                    $('.'+sectionToShow).show();
                 });
             });
 
@@ -832,6 +840,15 @@
                 let workFreeDayCheckboxes = $('#workFreeDaysModal').find(':checkbox');
                 $.each(workFreeDayCheckboxes, function (index, checkbox) {
                     workFreeDaysForDepartments[$(checkbox).data('date')][$(checkbox).data('name')] = checkbox.checked;
+                });
+                $.notify({
+                    message: 'Dni wolne zapisane'
+                }, {
+                    type: 'success',
+                    placement: {
+                        from: "bottom",
+                        align: "right"
+                    }
                 })
             });
 
@@ -841,7 +858,9 @@
                     if(simulations[simulationIndex].validate()){
                         let height = $(window).scrollTop();
                         simulations[simulationIndex].simulate();
-                        $('#removeSimulationButton').show();
+                        if(simulations[simulationIndex].isChangingAheadPlanningData){
+                            $('#removeSimulationButton').show();
+                        }
                         $(window).scrollTop(height);
                     }
                 }else{
@@ -851,8 +870,8 @@
 
             $('#removeSimulationButton').click(function (e) {
                 let height = $(window).scrollTop();
-                aheadPlaningTable.setTableData(aheadPlanningData.data.aheadPlaning);
                 selectedRowDays = [];
+                aheadPlaningTable.setTableData(aheadPlanningData.data.aheadPlaning);
                 $(e.target).hide();
                 $(window).scrollTop(height);
             });
@@ -875,7 +894,7 @@
                 let tHeadTr = $(document.createElement('tr'));
                 tHeadTr.append($(document.createElement('th')).text('Data'));
                 $.each(departmentInfo,function (index, department) {
-                    tHeadTr.append($(document.createElement('th')).text(department.name2).css({'width':'5%'}));
+                    tHeadTr.append($(document.createElement('th')).text(department.name2));
                 });
                 let tHead = $(document.createElement('thead')).append(tHeadTr);
 
