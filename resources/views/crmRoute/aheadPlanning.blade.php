@@ -48,16 +48,6 @@
             margin: 1em;
         }
 
-        .colorCell {
-            background-color: #bcb7ff !important;
-        }
-
-        .selectedCell {
-            border-color: blue !important;
-            border-style: dashed !important;
-            border-width: 1px !important;
-        }
-
         .selectedRowDay{
             background: #bcb7ff !important;
         }
@@ -73,6 +63,16 @@
 
         .warningResult{
             background: #ff7878 !important;
+        }
+
+        .colorCell {
+            background-color: #bcb7ff !important;
+        }
+
+        .selectedCell {
+            border-color: blue !important;
+            border-style: dashed !important;
+            border-width: 1px !important;
         }
 
         .glyphicon-info-sign:hover{
@@ -700,9 +700,6 @@
                             }
                         });
 
-                        ///////////////////////////////////////////////////////////////
-                        prepareTestingData();/// do usuniecia
-                        ///////////////////////////////////////////////////////////////
 
                         //counting simulated result for every department
                         $.each(departmentInfo,function (index, department) {
