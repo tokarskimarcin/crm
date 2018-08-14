@@ -75,6 +75,9 @@
             background: #ff7878 !important;
         }
 
+        .glyphicon-info-sign:hover{
+            color: #5bc0de;
+        }
     </style>
 
     {{--Header page --}}
@@ -132,14 +135,16 @@
                                 </div>
                                 <div class="row factorsSection" style="margin-top:1em; display:none">
                                     <div class="col-md-6">
-                                        <label>Mnożnik sobót</label>
+                                        <label>Mnożnik sobót <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right"
+                                                                   title="W przypadku, gdy średnie wyniki sobót wynoszą 0 to, te wyniki wyliczane są ze średnich dziennych pomnożonych o określony MNOŻNIK SOBÓT"></span></label>
                                         <div class="input-group">
                                             <input id="saturdayFactor" class="form-control" type="text" value="95" style="text-align: right;">
                                             <span class="input-group-addon" id="basic-addon1">%</span>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label>Mnożnik niedziel</label>
+                                        <label>Mnożnik niedziel <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right"
+                                                                      title="W przypadku, gdy średnie wyniki niedziel wynoszą 0 to, te wyniki wyliczane są ze średnich sobót pomnożonych o określony MNOŻNIK NIEDZIEL"></span></label>
                                         <div class="input-group">
                                             <input id="sundayFactor" class="form-control" type="text" value="80" style="text-align: right;">
                                             <span class="input-group-addon" id="basic-addon1">%</span>
@@ -285,7 +290,7 @@
 
             function fillWorkFreeDaysForDepartments() {
                 let iterator = 1;
-                while(moment(new Date(today)).add(iterator,'d') <= moment(new Date(stopDate))){
+                while(moment(new Date(today)).add(iterator,'d') <= moment(new Date($('#date_stop').val()))){
                     let day = moment(new Date(today)).add(iterator,'d').format('YYYY-MM-DD');
                     if(!workFreeDaysForDepartments.hasOwnProperty(day)){
                         workFreeDaysForDepartments[day] = {};
