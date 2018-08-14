@@ -758,7 +758,6 @@ class CrmRouteController extends Controller
 
             $city = Cities::where('id', '=', $cityId)->first();
             $voievodeshipRound = $this::findCityByDistanceWithoutGracePeriod($city, $limit);
-
             $voievodeshipRound = $voievodeshipRound->groupBy('id');
             $voievodeshipDistinc = array();
             foreach ($voievodeshipRound as $item){
@@ -814,9 +813,19 @@ class CrmRouteController extends Controller
                 ->get();
         }else {
             $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour, city.max_month_show as max_month_show,
-            ( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
-             * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
-              * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
+           CASE
+              WHEN          
+                   (( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
+                        * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
+                        * sin( radians( `latitude` ) ) ) ) * 1.60)           
+           IS NULL
+               THEN 0
+           ELSE         
+                   (( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
+                        * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
+                        * sin( radians( `latitude` ) ) ) ) * 1.60)
+           END AS distance'
+            ))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
                 ->having('distance', '<=', $limit)
                 ->orderBy('city.name')
@@ -915,9 +924,19 @@ class CrmRouteController extends Controller
                 ->get();
         }else {
             $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour,
-        ( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
-         * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
-          * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
+          CASE
+           WHEN          
+           (( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
+                * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
+                * sin( radians( `latitude` ) ) ) ) * 1.60)           
+           IS NULL
+                then 0
+           ELSE         
+           (( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
+                * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
+                * sin( radians( `latitude` ) ) ) ) * 1.60)
+           END          
+           AS distance'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
                 ->having('distance', '<=', $limit)
                 ->orderBy('city.name')
@@ -2081,9 +2100,19 @@ class CrmRouteController extends Controller
                 ->get();
         }else {
             $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour, city.max_month_show as max_month_show,
-            ( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
-             * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
-              * sin( radians( `latitude` ) ) ) ) * 1.60 AS distance'))
+           CASE
+              WHEN          
+                   (( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
+                        * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
+                        * sin( radians( `latitude` ) ) ) ) * 1.60)           
+           IS NULL
+               THEN 0
+           ELSE         
+                   (( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
+                        * cos( radians( `longitude` ) - radians(' . $city->longitude . ') ) + sin ( radians(' . $city->latitude . ') )
+                        * sin( radians( `latitude` ) ) ) ) * 1.60)
+           END AS distance'
+            ))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
                 ->having('distance', '<=', $distance)
                 ->get();
