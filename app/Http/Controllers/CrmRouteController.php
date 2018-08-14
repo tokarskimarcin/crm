@@ -2809,10 +2809,10 @@ class CrmRouteController extends Controller
         }
 
         $departmentsInvitationsAverages = $request->departmentsInvitationsAverages;
-        if($departmentsInvitationsAverages == null){
+        if($departmentsInvitationsAverages == null or $request->factors['isChanged'] === 'true'){
             $stopDate = date('Y-m-d');
             $startDate = date('Y-m-d', strtotime($stopDate. ' - 14 days'));
-            $departmentsInvitationsAverages = $this->getDepartmentsInvitationsAverages($startDate,$stopDate,$routeInfoOverall,$departmentInfo);
+            $departmentsInvitationsAverages = $this->getDepartmentsInvitationsAverages($startDate,$stopDate,$request->factors, $routeInfoOverall,$departmentInfo);
         }
         $allInfoCollect = collect();
         $allInfoCollect->offsetSet('aheadPlanningData', $aheadPlanningData);
@@ -2820,7 +2820,7 @@ class CrmRouteController extends Controller
         return $allInfoCollect;
     }
 
-    public function getDepartmentsInvitationsAverages($startDate, $stopDate, $routeInfoOverall, $departmentInfo){
+    private function getDepartmentsInvitationsAverages($startDate, $stopDate, $factors, $routeInfoOverall, $departmentInfo){
         $departmentsInvitationsAveragesInfo = collect();
         foreach ($departmentInfo as $item) {
             $actualDate = $startDate;
@@ -2857,19 +2857,19 @@ class CrmRouteController extends Controller
             if($weekDivider != 0){
                 $average = $weekSum / $weekDivider;
             }
-            $departmentAverages->offsetSet('week',floor($average));
+            $departmentAverages->offsetSet('workingDays',floor($average));
 
             if($saturdayDivider != 0){
                 $average = $saturdaySum / $saturdayDivider;
             }else{
-                $average = $average*95/100;
+                $average = $average*$factors['saturday']/100;
             }
             $departmentAverages->offsetSet('saturday',floor($average));
 
             if($sundayDivider != 0){
                 $average = $sundaySum / $sundayDivider;
             }else{
-                $average = $average*80/100;
+                $average = $average*$factors['sunday']/100;
             }
             $departmentAverages->offsetSet('sunday',floor($average));
 
@@ -2880,13 +2880,13 @@ class CrmRouteController extends Controller
 
     private function getNameOfWeek($date){
         $arrayOfWeekName = [
-            '1' => 'Poniedziałek',
-            '2' => 'Wtorek',
-            '3' => 'Środa',
-            '4' => 'Czwartek',
-            '5' => 'Piątek',
-            '6' => 'Sobota',
-            '7' => 'Niedziela'];
+            '1' => 'Pn',
+            '2' => 'Wt',
+            '3' => 'Śr',
+            '4' => 'Czw',
+            '5' => 'Pt',
+            '6' => 'Sb',
+            '7' => 'Nd'];
         return $arrayOfWeekName[date('N',strtotime($date))+0];
     }
 
