@@ -237,6 +237,23 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
+    <div class="modal fade" id="simulationAverages" tabindex="-1" role="dialog" >
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Wyliczone średnie zaproszeń na dzień dla poszczególnego oddziału</h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 @endsection
 
 @section('script')
@@ -295,7 +312,12 @@
                     if(!workFreeDaysForDepartments.hasOwnProperty(day)){
                         workFreeDaysForDepartments[day] = {};
                         $.each(departmentInfo,function (index, department) {
-                            workFreeDaysForDepartments[day][department.name2] = false;
+                            if(moment(new Date(day)).format('E') == 7 ){
+                                workFreeDaysForDepartments[day][department.name2] = true;
+
+                            }else{
+                                workFreeDaysForDepartments[day][department.name2] = false;
+                            }
                         })
                     }
                     iterator++;
@@ -685,7 +707,7 @@
                             };
 
                             // counting working days, saturdays and sundays for every department
-                            for(let i = 0; i < daysBetweenSelectedAndActualDay; i++){
+                            for(let i = 0; i < daysBetweenSelectedAndActualDay - 1; i++){
                                 let dayOfWeek = moment(new Date(today)).add(i+1,'d').format('E');
                                 let departmentFreeDay = workFreeDaysForDepartments[moment(new Date(today)).add(i+1,'d').format('YYYY-MM-DD')][department.name2];
                                 if(!departmentFreeDay){
@@ -700,6 +722,7 @@
                             }
                         });
 
+                        //prepareTestingData();
 
                         //counting simulated result for every department
                         $.each(departmentInfo,function (index, department) {
@@ -746,7 +769,6 @@
 
                     function prepareTestingData() {
                         $.each(departmentInfo, function (index, department) {
-
                             let departmenAverages = aheadPlanningData.data.departmentsInvitationsAverages[department.name2];
                             departmenAverages.workingDays = Math.floor(Math.random()*400)+1200;
                             departmenAverages.saturday = departmenAverages.workingDays*95/100;
@@ -768,10 +790,74 @@
             simulations.push(Simulation(
                 'Wyliczenie średniej zaproszeń dla oddziałów do dnia',
                 2, // available days to select
-                [], //sections to show
+                ['factorsSection'], //sections to show
                 false, // flag that identify is ahead planning data after simulation are changed
                 /* ---------------- simulation function ----------------------- */
                 function (thisObj) {
+                    let selectedNewActualDay= getSelectedDay(selectedRowDays[0] < selectedRowDays[1] ? selectedRowDays[0] : selectedRowDays[1]);
+                    let selectedDayWithCompletedResult = getSelectedDay(selectedRowDays[0] > selectedRowDays[1] ? selectedRowDays[0] : selectedRowDays[1]);
+                    let daysBetweenSelectedAndActualDay = Math.abs(moment.duration(moment(new Date(selectedNewActualDay)).diff(moment(new Date(today)))).asDays());
+
+                    prepareSimulationData();
+                    simulation();
+                    $('#simulationAverages .modal-body').text('');
+                    $('#simulationAverages .modal-body').append(createSimulationAveragesTable());
+                    $('#simulationAverages').modal('show');
+
+                    function prepareSimulationData() {
+                        $.each(departmentInfo,function (index, department) {
+                            aheadPlanningData.data.departmentsInvitationsAverages[department.name2].simulated = {
+                                workingDays: 0,
+                                saturday: 0
+                            };
+                            department.multiplier = {
+                                workingDays: 0,
+                                saturdays: 0,
+                                sundays: 0
+                            };
+
+                            // counting working days, saturdays and sundays for every department
+                            for(let i = 0; i < daysBetweenSelectedAndActualDay; i++){
+                                let dayOfWeek = moment(new Date(today)).add(i+1,'d').format('E');
+                                let departmentFreeDay = workFreeDaysForDepartments[moment(new Date(today)).add(i+1,'d').format('YYYY-MM-DD')][department.name2];
+                                if(!departmentFreeDay){
+                                    if(dayOfWeek < 6){
+                                        department.multiplier.workingDays += 1;
+                                    }else if(dayOfWeek == 6){
+                                        department.multiplier.saturdays += 1;
+                                    }else{
+                                        department.multiplier.sundays += 1;
+                                    }
+                                }
+                            }
+                        });
+
+                    }
+                    function simulation() {
+                        let simulationData = aheadPlanningData.data.getCopyAheadPlaning();
+                        $.each(simulationData, function (index, dayInfo) {
+                            if (moment(new Date(dayInfo.day)) > moment(new Date(today)) && moment(new Date(dayInfo.day)) <= moment(new Date(selectedDayWithCompletedResult))) {
+                                $.each(departmentInfo, function (item, department) {
+                                    aheadPlanningData.data.departmentsInvitationsAverages[department.name2].simulated.workingDays += dayInfo[department.name2];
+                                });
+                            }
+                        });
+
+                        $.each(departmentInfo, function (item, department) {
+                            let sumOfDays = department.multiplier.workingDays + department.multiplier.saturdays;
+                            if(sumOfDays > 0){
+                                let sumOfDepartmentLimits = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].simulated.workingDays;
+                                let averagePerDay = Math.abs(Math.round(sumOfDepartmentLimits / sumOfDays));
+                                if(department.multiplier.saturdays>0){
+                                    aheadPlanningData.data.departmentsInvitationsAverages[department.name2].simulated.saturday = Math.round(averagePerDay*parseInt($('#saturdayFactor').val())/100);
+                                }else{
+                                    aheadPlanningData.data.departmentsInvitationsAverages[department.name2].simulated.saturday = 0;
+                                }
+                                aheadPlanningData.data.departmentsInvitationsAverages[department.name2].simulated.workingDays =
+                                    averagePerDay + Math.round(((averagePerDay*(100-parseInt($('#saturdayFactor').val()))/100)*department.multiplier.saturdays)/department.multiplier.workingDays);
+                            }
+                        });
+                    }
                 },
                 /* ---------------- validation function ----------------------- */
                 function (thisObj) {
@@ -922,6 +1008,36 @@
                 let uncheckButtonColumn = $(document.createElement('div')).addClass('col-md-4').append(uncheckButton);
                 let buttonsRow = $(document.createElement('div')).addClass('row').css({'padding-bottom':'1em','border-bottom-width':'1px','border-bottom-color':'#c1c1c1','border-bottom-style': 'solid'}).append(uncheckButtonColumn);
                 let tableColumn = $(document.createElement('div')).addClass('col-md-12').append(workFreeDaysTable).css({'height':'75vh','overflow':'scroll'});
+                let tableRow = $(document.createElement('div')).addClass('row').append(tableColumn);
+                return  $(document.createElement('div')).append(buttonsRow).append(tableRow);
+            }
+
+            function createSimulationAveragesTable() {
+                let tHeadTr = $(document.createElement('tr'));
+                tHeadTr.append($(document.createElement('th')).text('Oddział'));
+                tHeadTr.append($(document.createElement('th')).text('Pn-Pt'));
+                tHeadTr.append($(document.createElement('th')).text('Sobota'));
+                let tHead = $(document.createElement('thead')).append(tHeadTr);
+
+                let tBody = $(document.createElement('tbody'));
+                $.each(aheadPlanningData.data.departmentsInvitationsAverages,function (department, departmentsInvitationsAverage) {
+                    let tr = $(document.createElement('tr'));
+                    tr.append($(document.createElement('td')).append(department));
+                    tr.append($(document.createElement('td')).append(departmentsInvitationsAverage.simulated.workingDays));
+                    tr.append($(document.createElement('td')).append(departmentsInvitationsAverage.simulated.saturday));
+                    tBody.append(tr);
+                });
+
+                let simulationAveragesTable = $(document.createElement('table')).addClass('table table-striped').css('width','100%').prop('id','workFreeDaysTable');
+                simulationAveragesTable.append(tHead).append(tBody);
+                let firstSelectedDay = getSelectedDay(selectedRowDays[0] < selectedRowDays[1] ? selectedRowDays[0] : selectedRowDays[1]);
+                let secondSelectedDay = getSelectedDay(selectedRowDays[0] > selectedRowDays[1] ? selectedRowDays[0] : selectedRowDays[1]);
+                let firstSelectedDayLi =  $(document.createElement('li')).addClass('list-group-item').text(firstSelectedDay+' - ostatni dzień dzwonienia');
+                let secondSelectedDayLi =  $(document.createElement('li')).addClass('list-group-item').text(secondSelectedDay+' - dzień wyrobienia limitów');
+                let infoUl = $(document.createElement('ul')).addClass('list-group').append(firstSelectedDayLi).append(secondSelectedDayLi);
+                let infoColumn = $(document.createElement('div')).addClass('col-md-12').append(infoUl);
+                let buttonsRow = $(document.createElement('div')).addClass('row').css({'border-bottom-width':'1px','border-bottom-color':'#c1c1c1','border-bottom-style': 'solid'}).append(infoColumn);
+                let tableColumn = $(document.createElement('div')).addClass('col-md-12').append(simulationAveragesTable);//.css({'height':'75vh','overflow':'scroll'});
                 let tableRow = $(document.createElement('div')).addClass('row').append(tableColumn);
                 return  $(document.createElement('div')).append(buttonsRow).append(tableRow);
             }
