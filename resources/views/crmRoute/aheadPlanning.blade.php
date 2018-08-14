@@ -71,6 +71,10 @@
             left: 0px;
         }
 
+        .warningResult{
+            background: #ff7878 !important;
+        }
+
     </style>
 
     {{--Header page --}}
@@ -266,6 +270,10 @@
 
             let workFreeDaysForDepartments = {};
 
+            const warningResult = {
+                lowAheadDay: 2,
+                highAheadDay: 15
+            };
             const firstDayOfThisMonth = moment().format('YYYY-MM')+'-01';
             const today = moment().format('YYYY-MM-DD');
             const startDate = moment().add(-1,'w').format('YYYY-MM-DD');
@@ -373,8 +381,23 @@
                     },
                     fnRowCallback:  function( nRow, aData, iDisplayIndex, iDisplayIndexFull ){
                         if(aData.day === today){
-                            for( i = 0 ; i< 3; i++){
+                            for(let i = 0 ; i< 3; i++){
                                 $($(nRow).children()[i]).addClass('thisDay');
+                            }
+                        }
+                        if(moment.duration(moment(new Date(aData.day)).diff(moment(new Date(today)))).asDays() <= warningResult.lowAheadDay){
+                            for(let i = 3 ; i< $(nRow).children().length - 1; i++){
+                                if(parseInt($($(nRow).children()[i]).text()) < 0){
+                                    $($(nRow).children()[i]).addClass('warningResult');
+                                }
+                            }
+                        }
+
+                        if(moment.duration(moment(new Date(aData.day)).diff(moment(new Date(today)))).asDays() >= warningResult.highAheadDay){
+                            for(let i = 3 ; i< $(nRow).children().length - 1; i++){
+                                if(parseInt($($(nRow).children()[i]).text()) === 0){
+                                    $($(nRow).children()[i]).addClass('warningResult');
+                                }
                             }
                         }
                     },
@@ -732,7 +755,7 @@
                     }
                 }
             ));
-            (Simulation(
+            simulations.push(Simulation(
                 'Wyliczenie średniej zaproszeń dla oddziałów do dnia',
                 2, // available days to select
                 [], //sections to show
