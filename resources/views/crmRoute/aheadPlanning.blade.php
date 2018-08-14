@@ -48,16 +48,6 @@
             margin: 1em;
         }
 
-        .colorCell {
-            background-color: #bcb7ff !important;
-        }
-
-        .selectedCell {
-            border-color: blue !important;
-            border-style: dashed !important;
-            border-width: 1px !important;
-        }
-
         .selectedRowDay{
             background: #bcb7ff !important;
         }
@@ -71,6 +61,23 @@
             left: 0px;
         }
 
+        .warningResult{
+            background: #ff7878 !important;
+        }
+
+        .colorCell {
+            background-color: #bcb7ff !important;
+        }
+
+        .selectedCell {
+            border-color: blue !important;
+            border-style: dashed !important;
+            border-width: 1px !important;
+        }
+
+        .glyphicon-info-sign:hover{
+            color: #5bc0de;
+        }
     </style>
 
     {{--Header page --}}
@@ -128,14 +135,16 @@
                                 </div>
                                 <div class="row factorsSection" style="margin-top:1em; display:none">
                                     <div class="col-md-6">
-                                        <label>Mnożnik sobót</label>
+                                        <label>Mnożnik sobót <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right"
+                                                                   title="W przypadku, gdy średnie wyniki sobót wynoszą 0 to, te wyniki wyliczane są ze średnich dziennych pomnożonych o określony MNOŻNIK SOBÓT"></span></label>
                                         <div class="input-group">
                                             <input id="saturdayFactor" class="form-control" type="text" value="95" style="text-align: right;">
                                             <span class="input-group-addon" id="basic-addon1">%</span>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label>Mnożnik niedziel</label>
+                                        <label>Mnożnik niedziel <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right"
+                                                                      title="W przypadku, gdy średnie wyniki niedziel wynoszą 0 to, te wyniki wyliczane są ze średnich sobót pomnożonych o określony MNOŻNIK NIEDZIEL"></span></label>
                                         <div class="input-group">
                                             <input id="sundayFactor" class="form-control" type="text" value="80" style="text-align: right;">
                                             <span class="input-group-addon" id="basic-addon1">%</span>
@@ -266,6 +275,10 @@
 
             let workFreeDaysForDepartments = {};
 
+            const warningResult = {
+                lowAheadDay: 2,
+                highAheadDay: 15
+            };
             const firstDayOfThisMonth = moment().format('YYYY-MM')+'-01';
             const today = moment().format('YYYY-MM-DD');
             const startDate = moment().add(-1,'w').format('YYYY-MM-DD');
@@ -277,7 +290,7 @@
 
             function fillWorkFreeDaysForDepartments() {
                 let iterator = 1;
-                while(moment(new Date(today)).add(iterator,'d') <= moment(new Date(stopDate))){
+                while(moment(new Date(today)).add(iterator,'d') <= moment(new Date($('#date_stop').val()))){
                     let day = moment(new Date(today)).add(iterator,'d').format('YYYY-MM-DD');
                     if(!workFreeDaysForDepartments.hasOwnProperty(day)){
                         workFreeDaysForDepartments[day] = {};
@@ -373,8 +386,29 @@
                     },
                     fnRowCallback:  function( nRow, aData, iDisplayIndex, iDisplayIndexFull ){
                         if(aData.day === today){
-                            for( i = 0 ; i< 3; i++){
+                            for(let i = 0 ; i< 3; i++){
                                 $($(nRow).children()[i]).addClass('thisDay');
+                            }
+                        }
+
+                        let simulatedActualDay = today;
+                        if(selectedRowDays.hasOwnProperty(0)){
+                            simulatedActualDay = moment(new Date(
+                                $('#date_start').val())).add(selectedRowDays[0],'d').format('YYYY-MM-DD');
+                        }
+                        if(moment.duration(moment(new Date(aData.day)).diff(moment(new Date(simulatedActualDay)))).asDays() <= warningResult.lowAheadDay){
+                            for(let i = 3 ; i< $(nRow).children().length - 1; i++){
+                                if(parseInt($($(nRow).children()[i]).text()) < 0){
+                                    $($(nRow).children()[i]).addClass('warningResult');
+                                }
+                            }
+                        }
+
+                        if(moment.duration(moment(new Date(aData.day)).diff(moment(new Date(simulatedActualDay)))).asDays() >= warningResult.highAheadDay){
+                            for(let i = 3 ; i< $(nRow).children().length - 1; i++){
+                                if(parseInt($($(nRow).children()[i]).text()) === 0){
+                                    $($(nRow).children()[i]).addClass('warningResult');
+                                }
                             }
                         }
                     },
@@ -600,11 +634,12 @@
             }
 
             //  simulations template
-            function Simulation( name, availableSelectedDays, sectionsToShow, simulateCallback, validateCallback) {
+            function Simulation( name, availableSelectedDays, sectionsToShow, isChangingAheadPlanningData, simulateCallback, validateCallback) {
                 return {
                     name: name,
                     availableSelectedDays: availableSelectedDays,
                     sectionsToShow: sectionsToShow,
+                    isChangingAheadPlanningData: isChangingAheadPlanningData,
                     simulate: function () {
                         simulateCallback(this);
                     },
@@ -621,6 +656,7 @@
                 'Przewidywanie wyprzedzenia na wybrany dzień',
                 1, // available days to select
                 ['factorsSection'], //sections to show
+                true, // flag that identify is ahead planning data after simulation are changed
                 /* ---------------- simulation function ----------------------- */
                 function (thisObj){
                     let selectedDay = getSelectedDay(selectedRowDays[0]);
@@ -664,9 +700,6 @@
                             }
                         });
 
-                        ///////////////////////////////////////////////////////////////
-                        prepareTestingData();/// do usuniecia
-                        ///////////////////////////////////////////////////////////////
 
                         //counting simulated result for every department
                         $.each(departmentInfo,function (index, department) {
@@ -732,10 +765,11 @@
                     }
                 }
             ));
-            (Simulation(
+            simulations.push(Simulation(
                 'Wyliczenie średniej zaproszeń dla oddziałów do dnia',
                 2, // available days to select
                 [], //sections to show
+                false, // flag that identify is ahead planning data after simulation are changed
                 /* ---------------- simulation function ----------------------- */
                 function (thisObj) {
                 },
@@ -779,18 +813,17 @@
                 selectedRowDays = [];
                 colorSelectedRowDays();
 
+                if($('#removeSimulationButton').is(':visible'))
+                    $('#removeSimulationButton').click();
                 // sections assigned to simulations are hidden or shown depending on selected simulation
                 let simulationIndex = $(e.target).val();
                 $.each(simulations,function (index, item) {
-                    if(index == simulationIndex){
-                        $.each(item.sectionsToShow,function (index, sectionToShow) {
-                            $('.'+sectionToShow).show();
-                        });
-                    }else{
                         $.each(item.sectionsToShow,function (index, sectionToShow) {
                             $('.'+sectionToShow).hide();
                         });
-                    }
+                });
+                $.each(simulations[simulationIndex].sectionsToShow,function (index, sectionToShow) {
+                    $('.'+sectionToShow).show();
                 });
             });
 
@@ -804,6 +837,15 @@
                 let workFreeDayCheckboxes = $('#workFreeDaysModal').find(':checkbox');
                 $.each(workFreeDayCheckboxes, function (index, checkbox) {
                     workFreeDaysForDepartments[$(checkbox).data('date')][$(checkbox).data('name')] = checkbox.checked;
+                });
+                $.notify({
+                    message: 'Dni wolne zapisane'
+                }, {
+                    type: 'success',
+                    placement: {
+                        from: "bottom",
+                        align: "right"
+                    }
                 })
             });
 
@@ -813,7 +855,9 @@
                     if(simulations[simulationIndex].validate()){
                         let height = $(window).scrollTop();
                         simulations[simulationIndex].simulate();
-                        $('#removeSimulationButton').show();
+                        if(simulations[simulationIndex].isChangingAheadPlanningData){
+                            $('#removeSimulationButton').show();
+                        }
                         $(window).scrollTop(height);
                     }
                 }else{
@@ -823,8 +867,8 @@
 
             $('#removeSimulationButton').click(function (e) {
                 let height = $(window).scrollTop();
-                aheadPlaningTable.setTableData(aheadPlanningData.data.aheadPlaning);
                 selectedRowDays = [];
+                aheadPlaningTable.setTableData(aheadPlanningData.data.aheadPlaning);
                 $(e.target).hide();
                 $(window).scrollTop(height);
             });
@@ -847,7 +891,7 @@
                 let tHeadTr = $(document.createElement('tr'));
                 tHeadTr.append($(document.createElement('th')).text('Data'));
                 $.each(departmentInfo,function (index, department) {
-                    tHeadTr.append($(document.createElement('th')).text(department.name2).css({'width':'5%'}));
+                    tHeadTr.append($(document.createElement('th')).text(department.name2));
                 });
                 let tHead = $(document.createElement('thead')).append(tHeadTr);
 
