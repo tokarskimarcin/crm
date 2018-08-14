@@ -27,19 +27,19 @@
 {{-- Here go includes from folder js_includes --}}
 
     {{-- Include JS for moving notifications div--}}
-    @include('partials.js_includes._janky_notifications')
+    {{--@include('partials.js_includes._janky_notifications')--}}
 
     {{-- Include JS for multiple table sliders --}}
     @include('partials.js_includes._sliders')
 
     {{-- Include JS for sound notifications--}}
-    @include('partials.js_includes._sound_notifications')
+    {{--@include('partials.js_includes._sound_notifications')--}}
 
     {{-- Include small janky table for DKJ--}}
-    @include('partials.js_includes._janky_table_small')
+    {{--@include('partials.js_includes._janky_table_small')--}}
 
     {{-- Include big janky table for DKJ--}}
-    @include('partials.js_includes._janky_table_big')
+    {{--@include('partials.js_includes._janky_table_big')--}}
 
     {{-- Include JS for change department--}}
     @include('partials.js_includes._change_department')
