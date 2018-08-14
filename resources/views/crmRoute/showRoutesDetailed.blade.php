@@ -753,6 +753,7 @@
                                .reduce( function (a, b) {
                                    return a + b*1;
                                }, 0);
+                       if(sumAllLose > 0 ) sumAllLose = 0;
 
                        return $('<tr/>')
                            .append('<td colspan="2">Podsumowanie Dnia: ' + group + '</td>')
