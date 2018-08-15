@@ -858,16 +858,26 @@ class CrmRouteController extends Controller
                     array_push($checkedCities, $cityInfoObject);
                 }
             }
+
+            $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
+            $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
+            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select(DB::raw('city_id,count(city_id) as cityCount'))
+                ->join('city','city.id','client_route_info.city_id')
+                ->where('client_route_info.status', '=', 1)
+                ->where('date', '>=', $firstDayOfThisMonth)
+                ->where('date', '<=', $lastDayOfThisMonth)
+                ->groupby('city.id')
+                ->get();
+
             $voievodeshipRound->map(function($item) use($checkedCities, $currentDate, $clientRoutesInfoWithUsedCities){
-
-                $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
-                $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
                 $allRecordsFromClientRouteInfo = $clientRoutesInfoWithUsedCities
-                    ->where('city_id', '=', $item->city_id)
-                    ->where('date', '>=', $firstDayOfThisMonth)
-                    ->where('date', '<=', $lastDayOfThisMonth);
+                    ->where('city_id', '=', $item->city_id);
 
-                $numberOfRecords = $allRecordsFromClientRouteInfo->count();
+                if($allRecordsFromClientRouteInfo->isEmpty()){
+                    $numberOfRecords = 0;
+                }else{
+                    $numberOfRecords = $allRecordsFromClientRouteInfo->first()->cityCount;
+                }
                 if($numberOfRecords > $item->max_month_show) {
                     $item->max_month_exceeded = 1;
                 }
@@ -1704,6 +1714,7 @@ class CrmRouteController extends Controller
                 ->orderBy('city.name')
                 ->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
+
             foreach($clientRoutesInfoWithUsedCities as $item) {
                 //wartość karencji dla danego miasta
                 $properDate = date_create($currentDate);
@@ -1733,18 +1744,27 @@ class CrmRouteController extends Controller
                 }
 
             }
-//            dd($all_cities->pluck('max_month_show'));
+
+
+            $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
+            $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
+            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select(DB::raw('city_id,count(city_id) as cityCount'))
+                ->join('city','city.id','client_route_info.city_id')
+                ->where('client_route_info.status', '=', 1)
+                ->where('date', '>=', $firstDayOfThisMonth)
+                ->where('date', '<=', $lastDayOfThisMonth)
+                ->groupby('city.id')
+                ->get();
             $all_cities->map(function($item) use($checkedCities, $currentDate, $clientRoutesInfoWithUsedCities){
 
-                $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
-                $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
-
                 $allRecordsFromClientRouteInfo = $clientRoutesInfoWithUsedCities
-                    ->where('city_id', '=', $item->id)
-                    ->where('date', '>=', $firstDayOfThisMonth)
-                    ->where('date', '<=', $lastDayOfThisMonth);
+                    ->where('city_id', '=', $item->id);
 
-                $numberOfRecords = $allRecordsFromClientRouteInfo->count();
+                if($allRecordsFromClientRouteInfo->isEmpty()){
+                    $numberOfRecords = 0;
+                }else{
+                    $numberOfRecords = $allRecordsFromClientRouteInfo->first()->cityCount;
+                }
                 if($numberOfRecords > $item->max_month_show) {
                     $item->max_month_exceeded = 1;
                 }
@@ -1795,6 +1815,8 @@ class CrmRouteController extends Controller
             $all_cities = Cities::where('voivodeship_id', '=', $voivodeId)->orderBy('name')->get();
         }
 //        $all_cities = Cities::where('voivodeship_id', '=', $voivodeId)->get();
+
+
         return $all_cities;
     }
 
@@ -1814,21 +1836,21 @@ class CrmRouteController extends Controller
             $properDate = date_create($date);
 
             //lista miast we wszystkich trasach.
-            $citiesAvailable = DB::table('routes_info')->select(DB::raw('
-            city_id as cityId
-            '))
-                ->pluck('cityId')
-                ->toArray();
-
+//            $citiesAvailable = DB::table('routes_info')->select(DB::raw('
+//            city_id as cityId
+//            '))
+//                ->groupBy('cityId')
+//                ->pluck('cityId')
+//                ->toArray();
             //Rekordy clientRoutesInfo w których były użyte miasta
-            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date')
-                ->whereIn('city_id', $citiesAvailable)
+            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select('city_id', 'date','city.grace_period')
+                ->join('city','city.id','city_id')
                 ->where('client_route_info.status', '=', 1)
                 ->get();
             $checkedCities = array(); //In this array we indices cities that should not be in route
             foreach($clientRoutesInfoWithUsedCities as $item) {
                 //wartość karencji dla danego miasta
-                $gracePeriod = Cities::find($item->city_id)->grace_period;
+                $gracePeriod = $item->grace_period;
                 $goodDate = date_create($item->date);
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
@@ -1846,7 +1868,6 @@ class CrmRouteController extends Controller
                 }
 
             }
-
             $rout = RouteInfo::select('routes_id')->whereIn('city_id', $checkedCities)->where('status', '=', 1)->groupBy('routes_id')->pluck('routes_id')->toArray();
             $routesFiltered = Route::select('id', 'name')->whereNotIn('id', $rout)->where('status', '=', 1)->get();
             $routes = Route::where('status', '=', 1)->get();
