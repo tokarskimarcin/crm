@@ -804,15 +804,34 @@ class CrmRouteController extends Controller
             return $responseArray;
         }
     }
-
     public function findCityByDistanceWithDistanceLimit($city, $currentDate,$clientRoutesInfoWithUsedCities,$cities, $limit){
+
+        $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
+        $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
+
         if($limit == 'infinity'){
-            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour', 'city.max_month_show as max_month_show'))
-                ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
-                ->orderBy('city.name')
+            $voievodeshipRound = DB::table('city as cityAlias')->select(DB::raw('
+            voivodeship.id as id,
+            voivodeship.name,
+            cityAlias.name as city_name,
+            cityAlias.id as city_id,
+            cityAlias.max_hour as max_hour,
+            cityAlias.max_month_show as max_month_show,
+                (SELECT count(*) from client_route_info e where e.city_id = cityAlias.`id` and e.date >= "'.$firstDayOfThisMonth.'"
+                and e.date <= "'.$lastDayOfThisMonth.'"  and e.status = 1) as numberOfRecords'))
+                ->join('voivodeship', 'voivodeship.id', 'cityAlias.voivodeship_id')
+                ->orderBy('cityAlias.name')
                 ->get();
         }else {
-            $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour, city.max_month_show as max_month_show,
+            $voievodeshipRound = DB::table('city as cityAlias')->select(DB::raw('
+            voivodeship.id as id,
+            voivodeship.name,
+            cityAlias.name as city_name,
+            cityAlias.id as city_id, 
+            cityAlias.max_hour as max_hour,
+            cityAlias.max_month_show as max_month_show,
+            (SELECT count(*) from client_route_info e where e.city_id = cityAlias.`id` and e.date >= "'.$firstDayOfThisMonth.'"
+            and e.date <= "'.$lastDayOfThisMonth.'" and e.status = 1) as numberOfRecords,
            CASE
               WHEN          
                    (( 3959 * acos ( cos ( radians(' . $city->latitude . ') ) * cos( radians( `latitude` ) )
@@ -826,9 +845,9 @@ class CrmRouteController extends Controller
                         * sin( radians( `latitude` ) ) ) ) * 1.60)
            END AS distance'
             ))
-                ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
+                ->join('voivodeship', 'voivodeship.id', 'cityAlias.voivodeship_id')
                 ->having('distance', '<=', $limit)
-                ->orderBy('city.name')
+                ->orderBy('cityAlias.name')
                 ->get();
         }
         //part responsible for grace period
@@ -858,27 +877,29 @@ class CrmRouteController extends Controller
                     array_push($checkedCities, $cityInfoObject);
                 }
             }
+//
+//            $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
+//            $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
+//            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select(DB::raw('city_id,count(city_id) as cityCount'))
+//                ->join('city','city.id','client_route_info.city_id')
+//                ->where('client_route_info.status', '=', 1)
+//                ->where('date', '>=', $firstDayOfThisMonth)
+//                ->where('date', '<=', $lastDayOfThisMonth)
+//                ->groupby('city.id')
+//                ->get();
 
-            $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
-            $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
-            $clientRoutesInfoWithUsedCities = ClientRouteInfo::select(DB::raw('city_id,count(city_id) as cityCount'))
-                ->join('city','city.id','client_route_info.city_id')
-                ->where('client_route_info.status', '=', 1)
-                ->where('date', '>=', $firstDayOfThisMonth)
-                ->where('date', '<=', $lastDayOfThisMonth)
-                ->groupby('city.id')
-                ->get();
-
-            $voievodeshipRound->map(function($item) use($checkedCities, $currentDate, $clientRoutesInfoWithUsedCities){
-                $allRecordsFromClientRouteInfo = $clientRoutesInfoWithUsedCities
-                    ->where('city_id', '=', $item->city_id);
-
-                if($allRecordsFromClientRouteInfo->isEmpty()){
-                    $numberOfRecords = 0;
-                }else{
-                    $numberOfRecords = $allRecordsFromClientRouteInfo->first()->cityCount;
-                }
-                if($numberOfRecords > $item->max_month_show) {
+            $voievodeshipRound->map(function($item) use($checkedCities, $currentDate){
+//                $allRecordsFromClientRouteInfo = $clientRoutesInfoWithUsedCities
+//                    ->where('city_id', '=', $item->city_id);
+//
+//                if($allRecordsFromClientRouteInfo->isEmpty()){
+//                    $numberOfRecords = 0;
+//                }else{
+//                    dd($allRecordsFromClientRouteInfo);
+//                    dd($item);
+//                    $numberOfRecords = $allRecordsFromClientRouteInfo->first()->cityCount;
+//                }
+                if($item->numberOfRecords > $item->max_month_show) {
                     $item->max_month_exceeded = 1;
                 }
                 else {
@@ -925,6 +946,7 @@ class CrmRouteController extends Controller
 
         return $voievodeshipRound;
     }
+
 
     public function findCityByDistanceWithoutGracePeriod($city, $limit){
         if($limit == 'infinity'){
