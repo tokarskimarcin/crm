@@ -1375,13 +1375,13 @@ class CrmRouteController extends Controller
 
         $client_route_info =  $client_route_info->get();
 
-        $client_route_ids = $client_route_info->pluck('client_route_id')->unique();
+        $client_route_ids = $client_route_info->groupBy('client_route_id');
 
         $fullArray = [];
         foreach($client_route_ids as $client_route_id){
 
             //this part check whether all limits are assigned
-            $infoRecords = $client_route_info->where('client_route_id', '=', $client_route_id);
+            $infoRecords = $client_route_id;
             $limitFlag = true;
             foreach($infoRecords as $oneRecord) {
                 if($oneRecord->limits == null || $oneRecord->limits == 0) {
@@ -1390,25 +1390,35 @@ class CrmRouteController extends Controller
                 }
             }
 
-            $client_routes = $this->getClientRouteGroupedByDateSortedByHour($client_route_id, $client_route_info);
+            $client_routes = $client_route_id->sort(function($a, $b) {
+                if($a->date === $b->date) {
+                    if($a->id === $b->id) {
+                        return 0;
+                    }
+                    return $a->id < $b->id ? -1 : 1;
+                }
+                return $a->date < $b->date ? -1 : 1;
+            });
+            //$client_routes = $this->getClientRouteGroupedByDateSortedByHour($client_route_id->first()->client_route_id, $client_route_info);
 
             //$route_name = $this->createRouteName($client_routes);
-            $hourOrHotelAssigned = $client_routes[0]->hour == null || $client_routes[0]->hotel_id == null ? false : true;
+            $hourOrHotelAssigned = $client_routes->first()->hour == null || $client_routes->first()->hotel_id == null ? false : true;
             for($i = 1; $i < count($client_routes);$i++){
                 if($hourOrHotelAssigned && ($client_routes[$i]->hotel_id == null || $client_routes[$i]->hour == null) )
                     $hourOrHotelAssigned = false;
             }
-
-            $client_routes[0]->hotelOrHour = $hourOrHotelAssigned;
-            $client_routes[0]->hasAllLimits = $limitFlag ? 1 : 0;
+            //dd($client_routes->first());
+            $client_routes->first()->hotelOrHour = $hourOrHotelAssigned;
+            $client_routes->first()->hasAllLimits = $limitFlag ? 1 : 0;
             //$client_routes[0]->route_name = $route_name;
-            array_push($fullArray, $client_routes[0]);
+            array_push($fullArray, $client_routes->first());
         }
         $full_clients_routes = collect($fullArray);
 
         if($showOnlyAssigned == 'true'){
             $full_clients_routes = $full_clients_routes->where('hotelOrHour','=', false);
         }
+
 
         return datatables($full_clients_routes)->make(true);
     }
