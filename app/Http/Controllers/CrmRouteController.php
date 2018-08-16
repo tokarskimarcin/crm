@@ -3920,7 +3920,7 @@ class CrmRouteController extends Controller
         }
 
         foreach($ClientRouteCampaignsGroupedByClientRoutes as $key => $value) { //we create collection with clientRoute keys and inside clientRouteInfo records
-            $recGroupedByDate = $ClientRouteCampaignsGroupedByClientRoutes[$key]->groupBy('date'); //we are grouping records by date
+            $recGroupedByDate = $ClientRouteCampaignsGroupedByClientRoutes[$key]->sortBy('hour')->groupBy('date'); //we are grouping records by date
 
             //this procedure checks whether in single day campaign is only 2 hour
             foreach($recGroupedByDate as $singleDateGroup) {
@@ -3937,6 +3937,7 @@ class CrmRouteController extends Controller
                 }
 
                 //if inside single day there is only single 2 hour campaign we assign every clientRouteInfo record property onlyTwoHour = 1; Also we numerate hours inside day container
+
                 foreach($singleDateGroup as $singleDateItem) { //order items in date.
                     if($onlyTwoHourCampaign == true) {
                         $singleDateItem->onlyTwoHour = 1;

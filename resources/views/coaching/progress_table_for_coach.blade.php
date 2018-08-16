@@ -24,7 +24,7 @@
                         daty rozpoczęcia coachingu.</p>
                     <p><strong>Cel</strong> - Wymagany wynik na coachingu.</p>
                     <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po
-                        <strong>18 RBH konsultanta</strong>,
+                        <strong><span id="hoursAfterWhichItBecomesUnsettledSpan"></span> RBH konsultanta</strong>,
                         licząc od daty rozpoczęcia coachingu.</p>
                     <p>Gdy pracownik przepracuje więcej niż <strong>26 RBH</strong> podświetli się na czerwono w tabeli
                         "Nierozliczone"</p>
@@ -403,6 +403,8 @@
             <script>
 
                 var user_department_type = "{{$coachingManagerList['user_department_type']}}";
+                let hoursAfterWhichItBecomesUnsettled = 14;
+                $('#hoursAfterWhichItBecomesUnsettledSpan').text(hoursAfterWhichItBecomesUnsettled);
                 /**
                  * Zapisywanie nowego coaching'u
                  * @param e
@@ -641,7 +643,7 @@
                             'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                         },
                         "rowCallback": function (row, data, index) {
-                            if (parseInt(data.actual_rbh) >= parseInt(18)) {
+                            if (parseInt(data.actual_rbh) >= parseInt(hoursAfterWhichItBecomesUnsettled)) {
                                 $(row).hide();
                             }
                             $(row).attr('id', data.id);
@@ -858,7 +860,7 @@
                             },
                             'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                         }, "rowCallback": function (row, data, index) {
-                            if (parseInt(data.actual_rbh) < parseInt(18)) {
+                            if (parseInt(data.actual_rbh) < parseInt(hoursAfterWhichItBecomesUnsettled)) {
                                 $(row).hide();
                             }
                             if (parseInt(data.actual_rbh) > 26) {

@@ -248,10 +248,12 @@
                         <div id="insertModalHere">
 
                         </div>
-                        <div class="col-md-12">
-                            <button type="button" class="btn btn-success" style="width: 100%" id="saveCampaingOption"
-                                    onclick="saveOptions(this)">Zapisz
-                            </button>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-success" style="width: 100%" id="saveCampaingOption"
+                                        onclick="saveOptions(this)"><span class="glyphicon glyphicon-save"></span> Zapisz
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -514,7 +516,7 @@
                 let routeContainer = document.createElement('div');
                 routeContainer.className = 'campain-container';
                 var content = '';
-                for (var i = 0; i < response.length; i++) {
+                for (var i = response.length -1; i >= 0; i--) {
                     content += '<div class="row">\n' +
                         '                            <div class="col-lg-12">\n' +
                         '                                <div class="panel panel-default">\n' +
@@ -1053,7 +1055,7 @@
                                 notify("Rekordy zostały zmienione!", "info");
                                 table.ajax.reload();
                             })
-                            .catch(error => console.error("Błąd :", error))
+                            .catch(error => console.error("Błąd :", error));
 
                         $('#editModal').modal('toggle');
                     }
