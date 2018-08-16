@@ -23,9 +23,28 @@
           <div class="panel-heading">{{$notification->title}}</div>
           <div class="panel-body">
             <p>
-              <b>Problem zgłoszony przez:</b>
-              {{$notification->user->first_name . ' ' . $notification->user->last_name}}
-              <br />
+                <div class="row">
+                  <div class="col-md-4">
+                      <b>Problem zgłoszony przez:</b>
+                      {{$notification->user->first_name . ' ' . $notification->user->last_name}}
+                  </div>
+                  <div class="col-md-4">
+                      <b>Nr telefonu służbowy:</b>
+                      @if($notification->user->phone == 0 or $notification->user->phone == null)
+                          Brak
+                      @else
+                          {{$notification->user->phone }}
+                      @endif
+                  </div>
+                  <div class="col-md-4">
+                      <b>Nr telefonu prywatny:</b>
+                      @if($notification->user->private_phone == 0 or $notification->user->private_phone == null)
+                          Brak
+                      @else
+                          {{$notification->user->private_phone }}
+                      @endif
+                  </div>
+              </div>
               <hr>
             </p>
             <p>

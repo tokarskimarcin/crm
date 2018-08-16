@@ -98,12 +98,12 @@
                             <div class="alert alert-info">
                                 Moduł plik klientów pozwala na podgląd tras oraz zarządzanie nimi. Tabelę z
                                 trasami można filtrować dostępnymi polami jak również filtrować za pomocą dowolnych fraz
-                                wpisanych w polu "Szukaj". Trasy dzielą się na: </br>
+                                wpisanych w polu "Szukaj". {{--Trasy dzielą się na: </br>
                                 <ul class="list-group">
                                     <li class="list-group-item"><strong>Niegotowe</strong> oznaczone jako <button class="btn btn-danger" style="font-weight:bold;"s>Niegotowa</button> - Trasa nie jest widocza w "Informacje o kampaniach" oraz nie jest wliczana w "Planowanie wyprzedzenia" </li>
                                     <li class="list-group-item"><strong>Aktywne</strong> oznaczone jako <button class="btn btn-success" style="font-weight:bold;">Aktywna</button> - Trasa jest gotowa do użycia (wszystkie godziny oraz hotele muszą być określone aby mogła być aktywna), pobierane są informacje z PBX odnośnie takich kampanii, wyświetlają się we wszystkich statystykach</li>
                                     <li class="list-group-item"><strong>Zakończone</strong> oznaczone jako <button class="btn btn-info" style="font-weight:bold;">Zakończona</button> - Trasa automatycznie zmienia stan z Aktywnej na Zakończoną, gdy data ostatniego pokazu zostaje osiągnięta</li>
-                                </ul>
+                                </ul>--}}
                                 Aby trasa była gotowa do przypisywania limitów, należy ustalić hotele i godziny w zakładce Edycja (Hoteli i godzin).
                                 Jeśli wszystko zostanie przypisane poprawnie, trasa zmieni status z "wersja robocza" na "gotowa" w kolumnie "Hotel i godziny".
                             </div>
@@ -178,12 +178,11 @@
                                 </select>
                             </div>
                         </div>
-
-
-
-                        <div class="col-md-2">
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-3">
                             <div class="form-group" style="margin-top:2.6em;">
-                                <button class="btn btn-default" id="makeReportClient">Generuj Raport Klienta</button>
+                                <button class="btn btn-info form-control" id="makeReportClient"><span class="glyphicon glyphicon-file"></span> Generuj Raport Klienta</button>
                             </div>
                         </div>
                     </div>
@@ -201,7 +200,7 @@
 
                         <div class="col-md-3">
                             <button class="btn btn-basic" id="clearButton" style="width:100%;">
-                                <span class='glyphicon glyphicon-unchecked'></span>Czyść zaznaczone</button>
+                                <span class='glyphicon glyphicon-unchecked'></span> Czyść zaznaczone</button>
                         </div>
                     </div>
 
