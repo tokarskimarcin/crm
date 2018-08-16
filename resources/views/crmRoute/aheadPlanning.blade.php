@@ -1149,6 +1149,7 @@
                     value: index,
                     text: item.name
                 }));
+                $('#simulation').selectpicker('refresh');
             });
 
             // hide simulation section
