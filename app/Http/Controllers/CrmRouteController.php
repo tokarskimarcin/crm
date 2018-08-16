@@ -2814,10 +2814,13 @@ class CrmRouteController extends Controller
         ->where('id_dep_type','=',2)
         ->get();
 
+        $allClients = Clients::where('status','1')->get();
+
         return view('crmRoute.aheadPlanning')
             ->with('lastWeek', $numberOfLastYearsWeek)
             ->with('currentWeek', $weeksString)
             ->with('currentYear', $year)
+            ->with('allClients', json_decode($allClients))
             ->with('departmentInfo', $departmentInfo);
     }
 
@@ -2887,27 +2890,27 @@ class CrmRouteController extends Controller
                             foreach ($incollectItem->groupBy('city_id') as $cityGroup) {
                                 $cityGroup = $cityGroup->sortBy('hour');
                                 if ($cityGroup->count() == 3) {
-                                    $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][0] : $cityGroup[0]->limits;
-                                    $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[1]->limits;
-                                    $cityGroup[2]->limits != null ? $objItem['arrayOfLimit'][2] : $cityGroup[2]->limits;
+                                    $cityGroup[0]->limits = $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][0] : $cityGroup[0]->limits;
+                                    $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[1]->limits;
+                                    $cityGroup[2]->limits = $cityGroup[2]->limits != null ? $objItem['arrayOfLimit'][2] : $cityGroup[2]->limits;
                                 } else if ($cityGroup->count() == 2) {
                                     // 1 + 2 od drugiego
                                     if ($cityGroup->first()->show_order == 1) {
-                                        $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[0]->limits;
-                                        $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][2] : $cityGroup[1]->limits;
+                                        $cityGroup[0]->limits =  $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[0]->limits;
+                                        $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][2] : $cityGroup[1]->limits;
                                     } else {// 2 + 1 od pierwszego
-                                        $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][0] : $cityGroup[0]->limits;
-                                        $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[1]->limits;
+                                        $cityGroup[0]->limits = $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][0] : $cityGroup[0]->limits;
+                                        $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[1]->limits;
                                     }
                                 } else {
-                                    $cityGroup[0]->limits != null ? $objItem['limitForOneHour'] : $cityGroup[0]->limits;
+                                    $cityGroup[0]->limits = $cityGroup[0]->limits != null ? $objItem['limitForOneHour'] : $cityGroup[0]->limits;
                                 }
                             }
                         }
                     }
                 }
                 foreach ($item as $toSave) {
-                    $emptyCollect->push($toSave->only('date', 'department_info_id', 'limits', 'actual_success'));
+                    $emptyCollect->push($toSave->only('date', 'department_info_id', 'limits', 'actual_success','client_id'));
                 }
                 return $item;
             });
@@ -2915,22 +2918,25 @@ class CrmRouteController extends Controller
             foreach ($departmentInfo as $item) {
                 $tosumObj = $emptyCollect->where('department_info_id', $item->id)->groupBy('date');
                 foreach ($tosumObj as $toSumItem) {
-                    $tempClass = new \stdClass();
-                    $tempClass->date = $toSumItem->first()['date'];
-                    $tempClass->department_info_id = $item->id;
-                    $tempClass->sumOfLimits = $toSumItem->sum('limits');
-                    $tempClass->sumOfActualSuccess = $toSumItem->sum('actual_success');
+                    $tempClass = [];
+                    $tempClass['date'] = $toSumItem->first()['date'];
+                    $tempClass['client_id'] = $toSumItem->first()['client_id'];
+                    $tempClass['department_info_id'] = null;
+                    $tempClass['sumOfLimits'] = $toSumItem->sum('limits');
+                    $tempClass['sumOfActualSuccess'] = $toSumItem->sum('actual_success');
                     $finallCollect->push($tempClass);
                 }
             }
             //add null
             $tosumObj = $emptyCollect->where('department_info_id', null)->groupBy('date');
             foreach ($tosumObj as $toSumItem) {
-                $tempClass = new \stdClass();
-                $tempClass->date = $toSumItem->first()['date'];
-                $tempClass->department_info_id = null;
-                $tempClass->sumOfLimits = $toSumItem->sum('limits');
-                $tempClass->sumOfActualSuccess = $toSumItem->sum('actual_success');
+
+                $tempClass = [];
+                $tempClass['date'] = $toSumItem->first()['date'];
+                $tempClass['department_info_id'] = null;
+                $tempClass['sumOfLimits'] = $toSumItem->sum('limits');
+                $tempClass['sumOfActualSuccess'] = $toSumItem->sum('actual_success');
+
                 $finallCollect->push($tempClass);
             }
             $routeInfoOverall = $finallCollect;
@@ -2949,14 +2955,12 @@ class CrmRouteController extends Controller
                 ->where('department_info_id','=',null)
                 ->where('date', '=', $actualDate)
                 ->first()['sumOfLimits'];
-            dd($routeInfoOverall);
 
             foreach ($departmentInfo as $item){
                 $routeInfo = $routeInfoOverall
                     ->where('department_info_id' ,'=', $item->id)
                     ->where('date', '=', $actualDate)
                     ->first();
-                dd($routeInfoOverall);
                 $dayLimit = $routeInfo['sumOfLimits'];
                 $daySuccess = $routeInfo['sumOfActualSuccess'];
 
