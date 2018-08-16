@@ -2873,7 +2873,7 @@ class CrmRouteController extends Controller
                 $wynik = (is_null($daySuccess) ? 0 : $daySuccess) - (is_null($dayLimit) ? 0 : $dayLimit) - (is_null($unallocatedLimits) ? 0 : $unallocatedLimits);
                 $dayCollect->offsetSet($item->name2, $wynik);
 
-                $totalScore += $wynik;
+                $totalScore += $wynik > 0 ? 0 : $wynik;
             }
             $isSet = ClientRouteInfo::where('date','=',$actualDate)
                 ->where('department_info_id','=',null)

@@ -249,7 +249,7 @@
                                     style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;"
                                     id="save"><span class='glyphicon glyphicon-save'></span> Zapisz
                             </button>
-                            <button class="btn btn-danger" id="remove-route" style="margin-bottom:1em;font-size:1.1em;font-weight:bold;">Usuń trasę</button>
+                            <button class="btn btn-danger" id="remove-route" style="margin-bottom:1em;font-size:1.1em;font-weight:bold;"><span class='glyphicon glyphicon-minus'></span> Usuń trasę</button>
                         </div>
                     </div>
                 </div>
@@ -493,6 +493,7 @@
                             swal({
                                 title: 'Ładowawnie...',
                                 text: 'To może chwilę zająć',
+                                showConfirmButton: false,
                                 allowOutsideClick: false,
                                 allowEscapeKey: false,
                                 allowEnterKey: false,
@@ -769,6 +770,7 @@
                     swal({
                         title: 'Ładowawnie...',
                         text: 'To może chwilę zająć',
+                        showConfirmButton: false,
                         allowOutsideClick: false,
                         allowEscapeKey: false,
                         allowEnterKey: false,
@@ -931,6 +933,7 @@
                     swal({
                         title: 'Ładowawnie...',
                         text: 'To może chwilę zająć',
+                        showConfirmButton: false,
                         allowOutsideClick: false,
                         allowEscapeKey: false,
                         allowEnterKey: false,
@@ -1056,6 +1059,7 @@
                     swal({
                         title: 'Ładowawnie...',
                         text: 'To może chwilę zająć',
+                        showConfirmButton: false,
                         allowOutsideClick: false,
                         allowEscapeKey: false,
                         allowEnterKey: false,
@@ -1804,12 +1808,16 @@
                         let buttonCol = document.createElement('div');
                         buttonCol.classList.add('col-md-12');
 
+                        let addNewShowSpan = document.createElement('span');
+                        $(addNewShowSpan).addClass('glyphicon glyphicon-collapse-down');
+
                         let addNewShowButton = document.createElement('button');
                         addNewShowButton.classList.add('btn');
                         addNewShowButton.classList.add('btn-info');
                         addNewShowButton.classList.add('addNewShowButton');
                         addNewShowButton.style.width = "100%";
-                        addNewShowButton.textContent = 'Dodaj nowy pokaz';
+                        addNewShowButton.appendChild(addNewShowSpan);
+                        $(addNewShowButton).append(' Dodaj nowy pokaz');
 
                         buttonCol.appendChild(addNewShowButton);
                         buttonRow.appendChild(buttonCol);
@@ -1874,12 +1882,16 @@
                         let nextDayCol = document.createElement('div');
                         nextDayCol.classList.add('col-md-12');
 
+                        let nextDaySpan =  document.createElement('span');
+                        $(nextDaySpan).addClass('glyphicon glyphicon-plus');
+
                         let nextDayButton = document.createElement('button');
                         nextDayButton.id = 'addNewDay';
                         nextDayButton.classList.add('btn');
-                        nextDayButton.classList.add('btn-success');
+                        nextDayButton.classList.add('btn-default');
                         nextDayButton.style.width = '100%';
-                        nextDayButton.textContent = 'Dodaj nowy dzień';
+                        nextDayButton.appendChild(nextDaySpan);
+                        $(nextDayButton).append(' Dodaj nowy dzień');
 
                         nextDayCol.appendChild(nextDayButton);
                         nextDayRow.appendChild(nextDayCol);
@@ -2884,6 +2896,7 @@
                 swal({
                     title: 'Ładowawnie...',
                     text: 'To może chwilę zająć',
+                    showConfirmButton: false,
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                     allowEnterKey: false,
