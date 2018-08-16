@@ -161,6 +161,12 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-default simulationClientLimit"  style="width: 100%" data-toggle="modal" data-target="#modalSimulationClient" >Symulacja Klienta(Edycja Limitów)</button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-default simulationNewClient"  style="width: 100%" data-toggle="modal"  data-target="#modalSimulationClient" >Symulacja Klienta(Nowy Klient)</button>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4">
@@ -254,6 +260,34 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
+
+    <div id="modalSimulationClient" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg" style="width: 90%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" id="modal_title">Sekcja symulatcji<span id="modal_category"></span></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Symalacja limitów klienta
+                        </div>
+                        <div class="panel-body">
+                            <div id="placeToAppendClientLimit"></div>
+                            <div class="col-md-12">
+                                <button class="btn btn-info separate renderSimulation" style="width: 100%">
+                                    <span class="glyphicon glyphicon-cloud"></span> <span>Pokaż symulację</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @section('script')
@@ -265,6 +299,243 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+
+
+
+            function getColMDConteiner() {
+                let divChoiceClientLimit = document.createElement('div');
+                divChoiceClientLimit.classList.add('col-md-4');
+                return divChoiceClientLimit;
+            }
+            function getInputGroup() {
+                let divChoiceClientLimitInputGroup = document.createElement('div');
+                divChoiceClientLimitInputGroup.classList.add('input-group');
+                return divChoiceClientLimitInputGroup;
+            }
+            function getSpan(spanText) {
+                let divChoiceClientLimitSpan = document.createElement('span');
+                divChoiceClientLimitSpan.classList.add('input-group-addon');
+                divChoiceClientLimitSpan.textContent = spanText;
+                return divChoiceClientLimitSpan;
+            }
+            function getSelectWithPicker() {
+                let divChoiceClientLimitSelect = document.createElement('select');
+                divChoiceClientLimitSelect.classList.add('form-control');
+                divChoiceClientLimitSelect.classList.add('selectedClientToChangeLimit');
+                divChoiceClientLimitSelect.classList.add('selectpicker');
+                divChoiceClientLimitSelect.setAttribute('data-live-search','true');
+                divChoiceClientLimitSelect.setAttribute('data-width','100%');
+                divChoiceClientLimitSelect.setAttribute('multiple','multiple');
+                return divChoiceClientLimitSelect;
+            }
+            function getSelectOption(optionText) {
+                let divChoiceClientLimitSelectOption = document.createElement('option');
+                divChoiceClientLimitSelectOption.text = optionText;
+                return divChoiceClientLimitSelectOption;
+            }
+            function getDateDiv() {
+                let divDate = document.createElement('div');
+                divDate.classList.add('input-group');
+                divDate.classList.add('date');
+                divDate.classList.add('form_date');
+                divDate.classList.add('col-md-5');
+                divDate.setAttribute('data-date-format',"yyyy-mm-dd");
+                divDate.setAttribute('data-link-field',"datak");
+                divDate.setAttribute('style','width:100%');
+                return divDate;
+            }
+            function getInputDate(className,dateValue) {
+                let inputDate = document.createElement('input');
+                inputDate.classList.add('form-control');
+                inputDate.classList.add(className);
+                inputDate.setAttribute('name',className);
+                inputDate.setAttribute('type','text');
+                inputDate.value = dateValue;
+                return inputDate;
+            }
+            function getGlyphiconDate() {
+                let dateSpan = document.createElement('span');
+                dateSpan.classList.add('glyphicon');
+                dateSpan.classList.add('glyphicon-th');
+                let outSideSpan = getSpan('');
+                outSideSpan.appendChild(dateSpan);
+                return outSideSpan;
+            }
+            function getGlyphicon(type) {
+                let glyphicon = document.createElement('span');
+                glyphicon.classList.add('glyphicon', 'glyphicon-'+type);
+                return glyphicon
+            }
+            function TemplateDOMOfClientSimulationEditLimits(placeToAppend) {
+                let mainDiv = document.createElement('div');
+                mainDiv.classList.add('col-md-12');
+                mainDiv.classList.add('changeClientLimitContener');
+
+                let divChangeClientLimit = document.createElement('div');
+                divChangeClientLimit.classList.add('changeClientLimit');
+
+                //Create colMD Conteiner
+                let divChoiceClientLimit = getColMDConteiner();
+                //Create InputGroupDiv
+                let divInputGroup = getInputGroup();
+                divChoiceClientLimit.appendChild(divInputGroup);
+                //Create Span
+                let divSpan = getSpan('Wybierz klienta');
+                //Append Span to container
+                divInputGroup.appendChild(divSpan);
+
+                //Create Select
+                let divChoiceClientLimitSelect = getSelectWithPicker();
+                divChoiceClientLimitSelect.title = "wybierz klientów...";
+
+                // Select Option
+                let divChoiceClientLimitSelectOption = getSelectOption(1);
+                divChoiceClientLimitSelect.add(divChoiceClientLimitSelectOption);
+                let divChoiceClientLimitSelectOption2 = getSelectOption(2);
+
+                //Append Select Option
+                divChoiceClientLimitSelect.add(divChoiceClientLimitSelectOption2);
+                divChoiceClientLimitSelect.add(divChoiceClientLimitSelectOption);
+                //Append Select to Input Group
+                divInputGroup.appendChild(divChoiceClientLimitSelect);
+
+                // END FIRST COL
+
+                // Start Second COL
+                let divDateStartClientLimit = getColMDConteiner();
+                //Create InputGroupDiv
+                divInputGroup = getInputGroup();
+                divDateStartClientLimit.appendChild(divInputGroup);
+                //Create Span
+                divSpan  = getSpan('Data od');
+                //Append Span to container
+                divInputGroup.appendChild(divSpan);
+                //Create Date Div
+                let divDate = getDateDiv();
+                //Create Input Datepicker
+                let inputDate = getInputDate('dateStartLimit',"{{date("Y-m-d")}}");
+                divDate.appendChild(inputDate);
+                //Append GlyphiconDate()
+                let outSideSpan = getGlyphiconDate();
+                divDate.appendChild(outSideSpan);
+                divInputGroup.appendChild(divDate);
+
+                let divDateStopClientLimit = getColMDConteiner();
+                //Create InputGroupDiv
+                divInputGroup = getInputGroup();
+                divDateStopClientLimit.appendChild(divInputGroup);
+                //Create Span
+                divSpan  = getSpan('Data do');
+                //Append Span to container
+                divInputGroup.appendChild(divSpan);
+                //Create Date Div
+                divDate = getDateDiv();
+                //Create Input Datepicker
+                inputDate = getInputDate('dateStopLimit',"{{date("Y-m-d")}}");
+                divDate.appendChild(inputDate);
+                //Append GlyphiconDate()
+                outSideSpan = getGlyphiconDate();
+                divDate.appendChild(outSideSpan);
+                divInputGroup.appendChild(divDate);
+
+
+                let divLimitPanel = document.createElement('div');
+                divLimitPanel.classList.add('limitSection');
+
+                let divLimitForAllEvent = document.createElement('div');
+                divLimitForAllEvent.classList.add('col-md-4');
+                let divLimitForAllEventLabel = document.createElement('label');
+                divLimitForAllEventLabel.textContent = "Limit dla pokazów pełnych (3)";
+                divLimitForAllEvent.appendChild(divLimitForAllEventLabel);
+                for(var i =0;i<3;i++){
+                    let limitInput = document.createElement('div');
+                    limitInput.classList.add('input-group','limitInput');
+                    let span = getSpan('Limit #'+(i+1));
+                    let inputLimit = getInputDate('AllFirstLimit','');
+                    limitInput.appendChild(span);
+                    limitInput.appendChild(inputLimit);
+                    divLimitForAllEvent.appendChild(limitInput);
+                }
+                divLimitPanel.appendChild(divLimitForAllEvent);
+
+                let divLimitForOneEvent = document.createElement('div');
+                divLimitForOneEvent.classList.add('col-md-4');
+                let divLimitForOneEventLabel = document.createElement('label');
+                divLimitForOneEventLabel.textContent = "Limit dla pokazów godzinowych";
+                divLimitForOneEvent.appendChild(divLimitForOneEventLabel);
+
+                let limitInput = document.createElement('div');
+                limitInput.classList.add('input-group','limitInput');
+                let span = getSpan('Limit #1');
+                let inputLimit = getInputDate('OnlyFirstLimit','');
+                limitInput.appendChild(span);
+                limitInput.appendChild(inputLimit);
+                divLimitForOneEvent.appendChild(limitInput);
+                divLimitPanel.appendChild(divLimitForOneEvent);
+
+                let divLimitConteinerButton = document.createElement('div');
+                divLimitConteinerButton.classList.add('col-md-12');
+
+                let divAddLimitButton = document.createElement('button');
+                divAddLimitButton.classList.add('btn','btn-default','separate','AddNewSimulation');
+                divAddLimitButton.addEventListener('click',function (e) {
+                    TemplateDOMOfClientSimulationEditLimits('placeToAppendClientLimit');
+                });
+                let glyphicon = getGlyphicon('plus');
+                divAddLimitButton.appendChild(glyphicon);
+                divSpan = getSpan('Dodaj Kolejną symulacje');
+                divSpan.classList.remove('input-group-addon');
+                divAddLimitButton.appendChild(divSpan);
+                divLimitConteinerButton.appendChild(divAddLimitButton);
+
+
+                let divRemoveLimitButton = document.createElement('button');
+                divRemoveLimitButton.classList.add('btn','btn-danger','separate','RemoveSimulation');
+                divRemoveLimitButton.addEventListener('click',function (e) {
+                    if(document.getElementsByClassName('changeClientLimitContener').length != 1)
+                        e.target.closest('.changeClientLimitContener').remove();
+                    else{
+                        swal('Nie ma co usunąć')
+                    }
+                });
+                glyphicon = getGlyphicon('minus');
+                divRemoveLimitButton.appendChild(glyphicon);
+                divSpan = getSpan('Usuń Symulację');
+                divSpan.classList.remove('input-group-addon');
+                divRemoveLimitButton.appendChild(divSpan);
+                divLimitConteinerButton.appendChild(divRemoveLimitButton);
+
+                divLimitPanel.appendChild(divLimitConteinerButton);
+
+                divChangeClientLimit.appendChild(divChoiceClientLimit);
+                divChangeClientLimit.appendChild(divDateStartClientLimit);
+                divChangeClientLimit.appendChild(divDateStopClientLimit);
+                divChangeClientLimit.appendChild(divLimitPanel);
+                mainDiv.appendChild(divChangeClientLimit);
+                document.getElementById(placeToAppend).appendChild(mainDiv);
+                reloadDatePicker();
+                reloadSelectPicker();
+            }
+
+            TemplateDOMOfClientSimulationEditLimits('placeToAppendClientLimit');
+
+
+            function reloadDatePicker() {
+                $('.form_date').datetimepicker({
+                    language: 'pl',
+                    autoclose: 1,
+                    minView: 2,
+                    pickTime: false,
+                });
+            }
+            function reloadSelectPicker() {
+                $('.selectpicker').selectpicker({
+                    selectAllText: 'Zaznacz wszystkie',
+                    deselectAllText: 'Odznacz wszystkie'
+                });
+            }
+
+
 
             (function activateDatepicker() {
                 $('.form_date').datetimepicker({
