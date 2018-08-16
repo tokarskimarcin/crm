@@ -341,11 +341,9 @@
 
             let mainContainer = document.querySelector('.routes-wrapper'); //zaznaczamy główny container
             let route_id = 0;
-            let client_id = 0;
+            let clientId = 0;
 
 //*********************START CLIENT SECTON***************************
-
-            let finalClientId = null; //This variable is needed for form submit
 
             function writeCheckedClientInfo() {
                 let tr_line = document.getElementsByClassName('check')[0];
@@ -403,8 +401,7 @@
                         if ($(this).hasClass('check')) {
                             $(this).removeClass('check');
                             $(this).find('.client_check').prop('checked', false);
-                            client_id = 0;
-                            finalClientId = 0;
+                            clientId = null;
                             clearCheckedClientInfo();
                         }
                         else {
@@ -415,8 +412,7 @@
                                 });
                                 $(this).addClass('check');
                                 $(this).find('.client_check').prop('checked', true);
-                                client_id = $(this).attr('id');
-                                finalClientId = $(this).attr('id');
+                                clientId = $(this).attr('id');
                                 writeCheckedClientInfo();
                             }
 
@@ -494,6 +490,7 @@
                                 swal({
                                     title: 'Ładowawnie...',
                                     text: 'To może chwilę zająć',
+                                    showConfirmButton: false,
                                     allowOutsideClick: false,
                                     allowEscapeKey: false,
                                     allowEnterKey: false,
@@ -772,6 +769,7 @@
                     swal({
                         title: 'Ładowawnie...',
                         text: 'To może chwilę zająć',
+                        showConfirmButton: false,
                         allowOutsideClick: false,
                         allowEscapeKey: false,
                         allowEnterKey: false,
@@ -937,6 +935,7 @@
                     swal({
                         title: 'Ładowawnie...',
                         text: 'To może chwilę zająć',
+                        showConfirmButton: false,
                         allowOutsideClick: false,
                         allowEscapeKey: false,
                         allowEnterKey: false,
@@ -1065,6 +1064,7 @@
                     swal({
                         title: 'Ładowawnie...',
                         text: 'To może chwilę zająć',
+                        showConfirmButton: false,
                         allowOutsideClick: false,
                         allowEscapeKey: false,
                         allowEnterKey: false,
@@ -1809,12 +1809,16 @@
                         let buttonCol = document.createElement('div');
                         buttonCol.classList.add('col-md-12');
 
+                        let addNewShowSpan = document.createElement('span');
+                        $(addNewShowSpan).addClass('glyphicon glyphicon-collapse-down');
+
                         let addNewShowButton = document.createElement('button');
                         addNewShowButton.classList.add('btn');
                         addNewShowButton.classList.add('btn-info');
                         addNewShowButton.classList.add('addNewShowButton');
                         addNewShowButton.style.width = "100%";
-                        addNewShowButton.textContent = 'Dodaj nowy pokaz';
+                        addNewShowButton.appendChild(addNewShowSpan);
+                        $(addNewShowButton).append(' Dodaj nowy pokaz');
 
                         buttonCol.appendChild(addNewShowButton);
                         buttonRow.appendChild(buttonCol);
@@ -1879,12 +1883,16 @@
                         let nextDayCol = document.createElement('div');
                         nextDayCol.classList.add('col-md-12');
 
+                        let nextDaySpan =  document.createElement('span');
+                        $(nextDaySpan).addClass('glyphicon glyphicon-plus');
+
                         let nextDayButton = document.createElement('button');
                         nextDayButton.id = 'addNewDay';
                         nextDayButton.classList.add('btn');
-                        nextDayButton.classList.add('btn-success');
+                        nextDayButton.classList.add('btn-default');
                         nextDayButton.style.width = '100%';
-                        nextDayButton.textContent = 'Dodaj nowy dzień';
+                        nextDayButton.appendChild(nextDaySpan);
+                        $(nextDayButton).append(' Dodaj nowy dzień');
 
                         nextDayCol.appendChild(nextDayButton);
                         nextDayRow.appendChild(nextDayCol);
@@ -2422,21 +2430,22 @@
                         const clientTypeValue = $('#client_choice_type option:selected').val();
                         const clientTable = document.querySelector('#table_client');
                         let selectedCheckbox;
-                        if(clientTable.querySelector('input[type="checkbox"]:checked')) {
-                            selectedCheckbox = clientTable.querySelector('input[type="checkbox"]:checked');
-                        }
-                        else {
+                        if(clientId == 0 || clientId == null) {
                             notify('Wybierz klienta!');
                             return false;
                         }
-                        const selectedTr = selectedCheckbox.closest('tr');
-                        let clientId = selectedTr.id;
-                        clientId = clientId.substr(9);
+                        let selectedClientId = clientId;
+                        selectedClientId = selectedClientId.substr(9);
 
                         const clientInfo = {
-                            clientId: clientId,
+                            clientId: selectedClientId,
                             clientType: clientTypeValue
                         };
+                        if(allSingleDayContainers.length == 0){
+
+                            notify('Stwórz trasę!');
+                            return false;
+                        }
 
                         for(let i = 0; i < allSingleDayContainers.length; i++) {
                             let singleShowContainersInsideGivenDay = allSingleDayContainers[i].querySelectorAll('.singleShowContainer');

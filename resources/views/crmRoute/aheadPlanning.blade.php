@@ -975,7 +975,7 @@
                 /* ---------------- simulation function ----------------------- */
                 function (thisObj){
                     let selectedDay = getSelectedDay(selectedRowDays[0]);
-                    let daysBetweenSelectedAndActualDay = Math.abs(moment.duration(moment(new Date(selectedDay)).diff(moment(new Date(today)))).asDays());
+                    let daysBetweenSelectedAndActualDay = Math.abs(Math.round(moment.duration(moment(new Date(selectedDay)).diff(moment(new Date(today)))).asDays()));
                     let workingHoursLeft = Math.abs(Math.round(moment.duration((moment().diff(moment().hour(16).minute(0)))).asHours()));
                     let simulatedData = null;
 
@@ -1034,6 +1034,7 @@
                                 thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sunday*thisDayMultiplier;
                             }
                             department.simulatedResult += Math.round(thisDaySimulatedResult);
+                            department.simulatedResult = Math.round(department.simulatedResult);
                         });
                     }
 
@@ -1170,6 +1171,7 @@
                     value: index,
                     text: item.name
                 }));
+                $('#simulation').selectpicker('refresh');
             });
 
             // hide simulation section
