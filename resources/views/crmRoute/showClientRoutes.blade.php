@@ -112,7 +112,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <button id="addNewClientRoute" class="btn btn-info"
-                                    style="margin-bottom: 1em; font-weight: bold;">Przejdź do przypisywania tras klientom
+                                    style="margin-bottom: 1em; font-weight: bold;"><span class="glyphicon glyphicon-th-list"></span> Przejdź do przypisywania tras klientom
                             </button>
                         </div>
                     </div>
@@ -194,7 +194,8 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-group" style="width: 100%;">
-                                <button id="limitsButton" class="btn btn-default" style="width:100%;" data-toggle="modal" data-target="#editModal" disabled="true">Edytuj limity</button>
+                                <button id="limitsButton" class="btn btn-default" style="width:100%;" data-toggle="modal" data-target="#editModal" disabled="true">
+                                    <span class="glyphicon glyphicon-edit"></span> Edytuj limity</button>
                             </div>
                         </div>
 
