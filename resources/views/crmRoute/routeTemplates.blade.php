@@ -77,10 +77,10 @@
                     <div class="summaryButtonContainer">
                         <div class="row">
                             <div class="col-md-12">
-                                <button id="addNewDay" class="btn btn-default" style="width: 100%; margin-bottom: 1em;">Dodaj nowy dzień</button>
+                                <button id="addNewDay" class="btn btn-default" style="width: 100%; margin-bottom: 1em;"><span class="glyphicon glyphicon-plus"></span> Dodaj nowy dzień</button>
                             </div>
                             <div class="col-md-12">
-                                <button id="save" class="btn btn-success" style="width: 100%;">Zapisz</button>
+                                <button id="save" class="btn btn-success" style="width: 100%;"><span class="glyphicon glyphicon-save"></span> Zapisz</button>
                             </div>
                         </div>
 
@@ -120,19 +120,19 @@
                 firstForm.createDOMBox();
                 let firstFormDOM = firstForm.getForm();
 
-                firstDayContainer.appendChild(firstFormDOM);
+                firstDayContainer.appendChild(firstFormDOM);F
             })();
 
             /**
              * This method is used in shows appended between another ones
              */
             function showInTheMiddleAjax(previousCityDistance, previousCityId, nextCityDistance, nextCityId, citySelect, voivodeSelect, oldValuesArray = null) {
-                console.assert(citySelect.matches('.citySelect'), 'citySelect in showInTheMiddleAjax method is not city select');
-                console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInTheMiddleAjax method is not voivode select');
-                console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInTheMiddleAjax is not number!');
-                console.assert((!isNaN(parseInt(previousCityId))) && (previousCityId != 0), 'previousCityId in showInTheMiddleAjax is not number!');
-                console.assert((!isNaN(parseInt(previousCityDistance))) || (previousCityDistance == 'infinity'), 'previousCityId in showInTheMiddleAjax is not correct value!');
-                console.assert((!isNaN(parseInt(nextCityDistance))) || (nextCityDistance == 'infinity'), 'nextCityDistance in showInTheMiddleAjax is not correct value!');
+                //console.assert(citySelect.matches('.citySelect'), 'citySelect in showInTheMiddleAjax method is not city select');
+                //console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInTheMiddleAjax method is not voivode select');
+                //console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInTheMiddleAjax is not number!');
+                //console.assert((!isNaN(parseInt(previousCityId))) && (previousCityId != 0), 'previousCityId in showInTheMiddleAjax is not number!');
+                //console.assert((!isNaN(parseInt(previousCityDistance))) || (previousCityDistance == 'infinity'), 'previousCityId in showInTheMiddleAjax is not correct value!');
+                //console.assert((!isNaN(parseInt(nextCityDistance))) || (nextCityDistance == 'infinity'), 'nextCityDistance in showInTheMiddleAjax is not correct value!');
                 let firstResponse = null;
                 let secondResponse = null;
                 let intersectionArray = null;
@@ -140,6 +140,7 @@
                 swal({
                     title: 'Ładowawnie...',
                     text: 'To może chwilę zająć',
+                    showConfirmButton: false,
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                     allowEnterKey: false,
@@ -158,7 +159,7 @@
                             },
                             success: function (response) {
                                 firstResponse = response;
-                                console.assert(typeof(firstResponse) === "object", "firstResponse in showInTheMiddleAjax is not object!");
+                                //console.assert(typeof(firstResponse) === "object", "firstResponse in showInTheMiddleAjax is not object!");
                                 $.ajax({
                                     type: "POST",
                                     async: false,
@@ -174,7 +175,7 @@
                                         secondResponse = response2;
                                         voivodeSelect.innerHTML = '';
                                         citySelect.innerHTML = '';
-                                        console.assert(typeof(secondResponse) === "object", "secondResponse in showInTheMiddleAjax is not object!");
+                                        //console.assert(typeof(secondResponse) === "object", "secondResponse in showInTheMiddleAjax is not object!");
                                         intersectionArray = getIntersection(firstResponse, secondResponse);
 
                                         let voivodeSet = intersectionArray[0];
@@ -186,12 +187,12 @@
                                         });
 
                                         if(oldValuesArray) { //this is optional
-                                            console.assert(Array.isArray(oldValuesArray), "oldVoivodeArr in showInExtreme method is not array!");
+                                            //console.assert(Array.isArray(oldValuesArray), "oldVoivodeArr in showInExtreme method is not array!");
                                             appendBasicOption(citySelect);
                                             voivodeSet.forEach(voivode => {
                                                 if(voivode.id == oldValuesArray[1]) {
                                                     citySet.forEach(voivodeCity => {
-                                                        console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
+                                                        //console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
                                                         voivodeCity.forEach(city => {
                                                             if(city.id === voivode.id) {
                                                                 appendCityOptions(citySelect, city);
@@ -211,7 +212,7 @@
 
                                             voivodeSet.forEach(voivode => {
                                                 citySet.forEach(voivodeCity => {
-                                                    console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
+                                                    //console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
                                                     voivodeCity.forEach(city => {
                                                         if(city.id === voivode.id) {
                                                             appendCityOptions(citySelect, city);
@@ -236,14 +237,15 @@
              * This method is used in shows appended as first or last ones
              */
             function showInExtreme(limit, nextCityId, citySelect, voivodeSelect, oldVoivodeArr = null) {
-                console.assert(citySelect.matches('.citySelect'), 'citySelect in showInExtreme method is not city select');
-                console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInExtreme method is not voivode select');
-                console.assert(!isNaN(parseInt(limit)), 'limit in showInExtreme is not number!');
-                console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInExtreme is not number!');
+                //console.assert(citySelect.matches('.citySelect'), 'citySelect in showInExtreme method is not city select');
+                //console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInExtreme method is not voivode select');
+                //console.assert(!isNaN(parseInt(limit)), 'limit in showInExtreme is not number!');
+                //console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInExtreme is not number!');
 
                 swal({
                     title: 'Ładowawnie...',
                     text: 'To może chwilę zająć',
+                    showConfirmButton: false,
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                     allowEnterKey: false,
@@ -262,16 +264,16 @@
                             },
                             success: function (response) {
                                 let allVoivodes = response['voievodeInfo'];
-                                console.assert(Array.isArray(allVoivodes), "allVoivodes in showInExtreme method is not array!");
+                                //console.assert(Array.isArray(allVoivodes), "allVoivodes in showInExtreme method is not array!");
                                 let allCitiesGroupedByVoivodes = response['cityInfo'];
-                                console.assert(typeof(allCitiesGroupedByVoivodes) === "object", "allCitiesGroupedByVoivodes in showInExtreme method is not object!");
+                                //console.assert(typeof(allCitiesGroupedByVoivodes) === "object", "allCitiesGroupedByVoivodes in showInExtreme method is not object!");
                                 allVoivodes.forEach(voivode => {
                                     appendVoivodeOptions(voivodeSelect, voivode)
                                 });
                                 citySelect.setAttribute('data-distance', limit); //applaying old value
                                 if(oldVoivodeArr) { //this is optional
                                     appendBasicOption(citySelect);
-                                    console.assert(Array.isArray(oldVoivodeArr), "oldVoivodeArr in showInExtreme method is not array!");
+                                    //console.assert(Array.isArray(oldVoivodeArr), "oldVoivodeArr in showInExtreme method is not array!");
                                     for(let Id in allCitiesGroupedByVoivodes) {
                                         if(oldVoivodeArr[1] == Id) {
                                             allCitiesGroupedByVoivodes[Id].forEach(city => {
@@ -290,7 +292,7 @@
                                     let voivodeId = e.target.value;
                                     for(let Id in allCitiesGroupedByVoivodes) {
                                         if(voivodeId == Id) {
-                                            console.assert(Array.isArray(allCitiesGroupedByVoivodes[Id]), "allCitiesGroupedByVoivodes in showInExtreme method is not array!");
+                                            //console.assert(Array.isArray(allCitiesGroupedByVoivodes[Id]), "allCitiesGroupedByVoivodes in showInExtreme method is not array!");
                                             allCitiesGroupedByVoivodes[Id].forEach(city => {
                                                 appendCityOptions(citySelect, city);
                                             });
@@ -309,12 +311,13 @@
              * This method is used in shows without distance limit
              */
             function showWithoutDistanceAjax(voivodeId, citySelect) {
-                console.assert(!isNaN(parseInt(voivodeId)) && voivodeId != 0, 'voivodeId in showWithoutDistanceAjax is not number!');
-                console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
+                //console.assert(!isNaN(parseInt(voivodeId)) && voivodeId != 0, 'voivodeId in showWithoutDistanceAjax is not number!');
+                //console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
 
                 swal({
                     title: 'Ładowawnie...',
                     text: 'To może chwilę zająć',
+                    showConfirmButton: false,
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                     allowEnterKey: false,
@@ -331,7 +334,7 @@
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
                             success: function(response) {
-                                console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
+                                //console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
                                 let placeToAppend = citySelect;
                                 placeToAppend.innerHTML = '';
                                 appendBasicOption(placeToAppend);
@@ -350,9 +353,9 @@
             }
 
             function limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr = null) {
-                console.assert(grandNextShowContainer.matches('.singleShowContainer'), 'grandNextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
-                console.assert(thisSingleShowContainer.matches('.singleShowContainer'), 'thisSingleShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
-                console.assert(nextShowContainer.matches('.singleShowContainer'), 'nextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                //console.assert(grandNextShowContainer.matches('.singleShowContainer'), 'grandNextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                //console.assert(thisSingleShowContainer.matches('.singleShowContainer'), 'thisSingleShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                //console.assert(nextShowContainer.matches('.singleShowContainer'), 'nextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
                 const grandNextShowContainerCitySelect = grandNextShowContainer.querySelector('.citySelect');
                 const grandNextShowContainerCityDistance = grandNextShowContainerCitySelect.dataset.distance;
                 let grandNextShowContainerCityId = getSelectedValue(grandNextShowContainerCitySelect);
@@ -383,8 +386,8 @@
                 // nextShowContainerVoivodeSelect = nextShowContainer.querySelector('.voivodeSelect');
                 nextShowContainerVoivodeSelect.innerHTML = '';
                 nextShowContainerCitySelect.innerHTML = '';
-                console.log(grandNextShowContainerCitySelect);
-                console.log(thisSingleShowContainerCitySelect);
+                //console.log(grandNextShowContainerCitySelect);
+                //console.log(thisSingleShowContainerCitySelect);
 
                 if(changeDistanceArr) {
                     let helpArr = [];
@@ -400,7 +403,7 @@
                     else {
                         helpArr.push(thisSingleShowContainerCitySelectCityDistance);
                     }
-                    console.log(helpArr);
+                    //console.log(helpArr);
                     showInTheMiddleAjax(helpArr[0],grandNextShowContainerCityId,helpArr[1],thisSingleShowContainerCityId,nextShowContainerCitySelect,nextShowContainerVoivodeSelect, oldValuesArray);
                 }
                 else {
@@ -436,7 +439,7 @@
                 prevShowContainerVoivodeSelect.innerHTML = '';
                 appendBasicOption(prevShowContainerVoivodeSelect);
                 prevShowContainerCitySelect.innerHTML = '';
-                console.log('limit: ', limit);
+                //console.log('limit: ', limit);
 
                 showInExtreme(limit, nextShowContainerRelatedToPreviousShowContainerCityId, prevShowContainerCitySelect, prevShowContainerVoivodeSelect, oldValuesArray);
             }
@@ -469,7 +472,7 @@
              * This method appends basic option to voivode select
              */
             function appendBasicOption(element) {
-                console.assert(element.tagName === "SELECT", 'Element in appendBasicOption is not select element');
+                //console.assert(element.tagName === "SELECT", 'Element in appendBasicOption is not select element');
                 let basicVoivodeOption = document.createElement('option');
                 basicVoivodeOption.value = '0';
                 basicVoivodeOption.textContent = 'Wybierz';
@@ -490,7 +493,7 @@
              * This method appends options with voivode data
              */
             function appendVoivodeOptions(element, data) {
-                console.assert(element.matches('.voivodeSelect'), 'Element in appendVoivodeOptions method is not voivode select');
+                //console.assert(element.matches('.voivodeSelect'), 'Element in appendVoivodeOptions method is not voivode select');
                 let voivodeOption = document.createElement('option');
                 voivodeOption.value = data.id;
                 voivodeOption.textContent = data.name;
@@ -501,7 +504,7 @@
              * This method appends options with city data
              */
             function appendCityOptions(element,data) {
-                console.assert(element.matches('.citySelect'), 'Element in appendCityOptions method is not city select');
+                //console.assert(element.matches('.citySelect'), 'Element in appendCityOptions method is not city select');
                 let cityOpt = document.createElement('option');
                 cityOpt.value = data.city_id;
                 cityOpt.textContent = data.city_name;
@@ -518,10 +521,10 @@
                 const secondVoivodeInfo = secondResponse['voievodeInfo'];
                 const firstCityInfo = firstResponse['cityInfo'];
                 const secondCityInfo = secondResponse['cityInfo'];
-                console.assert(Array.isArray(firstVoivodeInfo), "firstVoivodeInfo in getIntersection method is not array!");
-                console.assert(Array.isArray(secondVoivodeInfo), "secondVoivodeInfo in getIntersection method is not array!");
-                console.assert(typeof(firstCityInfo) === "object", "firstCityInfo in getIntersection method is not object!");
-                console.assert(typeof(secondCityInfo) === "object", "secondCityInfo in getIntersection method is not object!");
+                //console.assert(Array.isArray(firstVoivodeInfo), "firstVoivodeInfo in getIntersection method is not array!");
+                //console.assert(Array.isArray(secondVoivodeInfo), "secondVoivodeInfo in getIntersection method is not array!");
+                //console.assert(typeof(firstCityInfo) === "object", "firstCityInfo in getIntersection method is not object!");
+                //console.assert(typeof(secondCityInfo) === "object", "secondCityInfo in getIntersection method is not object!");
 
                 //linear looking for same voivodes
                 firstVoivodeInfo.forEach(voivode => {
@@ -554,7 +557,7 @@
                 intersectionArray.push(intersectionVoivodes);
                 intersectionArray.push(intersectionCities);
 
-                console.assert(intersectionArray.length === 2, 'Problem with intersectionArray in getIntersection method');
+                //console.assert(intersectionArray.length === 2, 'Problem with intersectionArray in getIntersection method');
                 return intersectionArray;
             }
 
@@ -590,7 +593,7 @@
              * @returns {Array} [undefined/true/false, undefined/true/false] - (undefined - no container given in arrayOfContainers, false - not checked, true - checked)
              */
             function checkboxFilter(arrayOfContainers) {
-                console.assert(Array.isArray(arrayOfContainers), "arrayOfContainers in checkboxFilter method is not array!");
+                //console.assert(Array.isArray(arrayOfContainers), "arrayOfContainers in checkboxFilter method is not array!");
                 let prevCont = arrayOfContainers[0];
                 let nextCont = arrayOfContainers[1];
                 let isCheckedPrev = undefined;
@@ -614,7 +617,7 @@
              * This method validate all single day forms
              */
             function validateAllForms(element) {
-                // console.assert(element.matches('.singleShowContainer'), 'element in validateAllForms is not single show container');
+                // //console.assert(element.matches('.singleShowContainer'), 'element in validateAllForms is not single show container');
                 let flag = true;
                 element.forEach(day => {
                     let validation = validateForm(day);
@@ -630,7 +633,7 @@
              * This method returns selected by user from list item's value or null.
              */
             function getSelectedValue(element) {
-                console.assert(element.tagName === 'SELECT', 'Argument of getSelectedValue is not select element');
+                //console.assert(element.tagName === 'SELECT', 'Argument of getSelectedValue is not select element');
                 if(element.options[element.selectedIndex]) {
                     return element.options[element.selectedIndex].value;
                 }
@@ -647,10 +650,10 @@
              * @param cityId
              */
             function setOldValues(voivodeSelect, voivodeId, citySelect, cityId) {
-                console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in setOldValues method is not voivode select');
-                console.assert((!isNaN(parseInt(voivodeId))) && (voivodeId != 0), 'voivodeId in setOldValues is not number!');
-                console.assert(citySelect.matches('.citySelect'), 'citySelect in setOldValues method is not city select');
-                console.assert((!isNaN(parseInt(cityId))) && (cityId != 0), 'cityId in setOldValues is not number!');
+                //console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in setOldValues method is not voivode select');
+                //console.assert((!isNaN(parseInt(voivodeId))) && (voivodeId != 0), 'voivodeId in setOldValues is not number!');
+                //console.assert(citySelect.matches('.citySelect'), 'citySelect in setOldValues method is not city select');
+                //console.assert((!isNaN(parseInt(cityId))) && (cityId != 0), 'cityId in setOldValues is not number!');
                 let voivodeFlag = true;
                 let cityFlag = true;
                 for(let i = 0; i < voivodeSelect.length; i++) {
@@ -667,11 +670,11 @@
                 }
                 if(voivodeFlag) {
                     $(voivodeSelect).val('0');
-                    // console.log('zmienilo na wartosc domyslna voivode');
+                    // //console.log('zmienilo na wartosc domyslna voivode');
                 }
                 if(cityFlag) {
                     $(citySelect).val('0');
-                    // console.log('zmienilo na wartosc domyslna city');
+                    // //console.log('zmienilo na wartosc domyslna city');
                 }
             }
 
@@ -697,7 +700,7 @@
              * This method validate form false - bad, true - good
              */
             function validateForm(element) {
-                console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
+                //console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
                 let citySelect = element.querySelector('.citySelect');
                 let cityValue = getSelectedValue(citySelect);
                 return !(cityValue == 0);
@@ -739,7 +742,7 @@
 
                     /*REMOVE BUTTON PART*/
                     if(this.addRemoveShowButtonFlag) { //adding remove button.
-                        console.assert(this.addRemoveShowButtonFlag === true, 'addRemoveShowButtonFlag error');
+                        //console.assert(this.addRemoveShowButtonFlag === true, 'addRemoveShowButtonFlag error');
                         let removeButtonContainer = document.createElement('div');
                         removeButtonContainer.classList.add('remove-button-container');
                         let removeButton = document.createElement('span');
@@ -769,7 +772,7 @@
 
                     /* CHECKBOX PART */
                     if(this.addCheckboxFlag) { //adding checkbox
-                        console.assert(this.addCheckboxFlag === true, 'addCheckboxFlag error');
+                        //console.assert(this.addCheckboxFlag === true, 'addCheckboxFlag error');
                         let afterHeaderRow = document.createElement('div');
                         afterHeaderRow.classList.add('row');
 
@@ -869,19 +872,23 @@
 
                     /* ADD NEW SHOW BUTTON */
                         if(this.addNewShowButtonFlag) {
-                            console.assert(this.addNewShowButtonFlag === true, 'addNewShowButtonFlag error');
+                            //console.assert(this.addNewShowButtonFlag === true, 'addNewShowButtonFlag error');
                             let buttonRow = document.createElement('div');
                             buttonRow.classList.add('row');
 
                             let buttonCol = document.createElement('div');
                             buttonCol.classList.add('col-md-12');
 
+                            let addNewShowSpan = document.createElement('span');
+                            $(addNewShowSpan).addClass('glyphicon glyphicon-collapse-down');
+
                             let addNewShowButton = document.createElement('button');
                             addNewShowButton.classList.add('btn');
                             addNewShowButton.classList.add('btn-info');
                             addNewShowButton.classList.add('addNewShowButton');
                             addNewShowButton.style.width = "100%";
-                            addNewShowButton.textContent = 'Dodaj nowy pokaz';
+                            addNewShowButton.appendChild(addNewShowSpan);
+                            $(addNewShowButton).append(' Dodaj nowy pokaz');
 
                             buttonCol.appendChild(addNewShowButton);
                             buttonRow.appendChild(buttonCol);
@@ -1045,18 +1052,18 @@
                                     if(grandPrevDayFlag) { //grandprev is in grand previous day
                                         if(nextShowContainer) { //next container exist
                                             if(nextShowFlag) { //next container is in another day
-                                                console.log('prev exist & prev day, grandprev exist & grandprev is in grandprevday, nextshowcontaierExist & in another day');
+                                                //console.log('prev exist & prev day, grandprev exist & grandprev is in grandprevday, nextshowcontaierExist & in another day');
                                                 let changeDistanceArr = [100, 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
                                             }
                                             else { //next container is in the same day
-                                                console.log('prev exist & prev day, grandprev exist & grandprev is in grandprevday, nextshowcontaierExist & in same day');
+                                                //console.log('prev exist & prev day, grandprev exist & grandprev is in grandprevday, nextshowcontaierExist & in same day');
                                                 let changeDistanceArr = [100, 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
                                             }
                                         }
                                         else { //next container doesn't exist
-                                            console.log('prev exist & prev day, grandprev exist & grandprev is in grandprevday, nextshowcontaier doesnt exist');
+                                            //console.log('prev exist & prev day, grandprev exist & grandprev is in grandprevday, nextshowcontaier doesnt exist');
                                             limitSelectsWhenExtreme(prevShowContainer, grandPrevCont, 100);
                                         }
 
@@ -1064,19 +1071,19 @@
                                     else { //grandprev is in previous day(same as previousShowContainer)
                                         if(nextShowContainer) { //next container exist
                                             if(nextShowFlag) { //next container is in another day
-                                                console.log('prev exist & prev day, grandprev exist & grandprev is same day as prev, nextshowcontaier Exist & in another day');
+                                                //console.log('prev exist & prev day, grandprev exist & grandprev is same day as prev, nextshowcontaier Exist & in another day');
                                                 let changeDistanceArr = ['undefined', 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
 
                                             }
                                             else { //next container is in the same day
-                                                console.log('prev exist & prev day, grandprev exist & grandprev is same day as prev, nextshowcontaier Exist & in same day');
+                                                //console.log('prev exist & prev day, grandprev exist & grandprev is same day as prev, nextshowcontaier Exist & in same day');
                                                 let changeDistanceArr = ['undefined', 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
                                             }
                                         }
                                         else { //next container doesn't exist
-                                            console.log('prev exist & prev day, grandprev exist & grandprev is same day as prev, nextshowcontaier doesnt Exist');
+                                            //console.log('prev exist & prev day, grandprev exist & grandprev is same day as prev, nextshowcontaier doesnt Exist');
                                             limitSelectsWhenExtreme(prevShowContainer, grandPrevCont, 30);
                                         }
                                     }
@@ -1084,16 +1091,16 @@
                                 else { //grandprev doesn't exist
                                     if(nextShowContainer) { //next container exist
                                         if(nextShowFlag) { //next container is in another day
-                                            console.log('prev exist & prev day, grandprev doesnt exist, nextshowcontaier Exist & in another day');
+                                            //console.log('prev exist & prev day, grandprev doesnt exist, nextshowcontaier Exist & in another day');
                                             //nic nie robie, ponieważ akcja ma miejsce w tym przypadku w przypadku dla nastepnego.
                                         }
                                         else { //next container is in the same day
-                                            console.log('prev exist & prev day, grandprev doesnt exist, nextshowcontaier Exist & in same day');
+                                            //console.log('prev exist & prev day, grandprev doesnt exist, nextshowcontaier Exist & in same day');
                                             //nic nie robie, ponieważ akcja ma miejsce w tym przypadku w przypadku dla nastepnego.
                                         }
                                     }
                                     else { //next container doesn't exist
-                                        console.log('prev exist & prev day, grandprev doesnt exist, nextshowcontaier doesnt Exist');
+                                        //console.log('prev exist & prev day, grandprev doesnt exist, nextshowcontaier doesnt Exist');
                                         allCitiesAndAllVoivodes(prevShowContainer);
                                     }
                                 }
@@ -1103,36 +1110,36 @@
                                     if(grandPrevDayFlag) { //grandprev is in grand previous day
                                         if(nextShowContainer) { //next container exist
                                             if(nextShowFlag) { //next container is in another day
-                                                console.log('prev exist & same day, grandprev exist & grandprev is in grandprevday, nextshowcontaier exist & in another day');
+                                                //console.log('prev exist & same day, grandprev exist & grandprev is in grandprevday, nextshowcontaier exist & in another day');
                                                 let changeDistanceArr = [100, 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
                                             }
                                             else { //next container is in the same day
-                                                console.log('prev exist & same day, grandprev exist & grandprev is in grandprevday, nextshowcontaier exist & in same day');
+                                                //console.log('prev exist & same day, grandprev exist & grandprev is in grandprevday, nextshowcontaier exist & in same day');
                                                 let changeDistanceArr = [100, 'undefined'];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
                                             }
                                         }
                                         else { //next container doesn't exist
-                                            console.log('prev exist & same day, grandprev exist & grandprev is in grandprevday, nextshowcontaier doesnt exist');
+                                            //console.log('prev exist & same day, grandprev exist & grandprev is in grandprevday, nextshowcontaier doesnt exist');
                                             limitSelectsWhenExtreme(prevShowContainer, grandPrevCont, 100);
                                         }
                                     }
                                     else { //grandprev is in previous day(same as previousShowContainer)(all containers are in same day container case)
                                         if(nextShowContainer) { //next container exist
                                             if(nextShowFlag) { //next container is in another day
-                                                console.log('prev exist & same day, grandprev exist & grandprev is prev day, nextshowcontaier Exist & in another day');
+                                                //console.log('prev exist & same day, grandprev exist & grandprev is prev day, nextshowcontaier Exist & in another day');
                                                 let changeDistanceArr = ['undefined', 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
                                             }
                                             else { //next container is in the same day
-                                                console.log('prev exist & same day, grandprev exist & grandprev is prev day, nextshowcontaier Exist & in same day');
+                                                //console.log('prev exist & same day, grandprev exist & grandprev is prev day, nextshowcontaier Exist & in same day');
                                                 let changeDistanceArr = ['undefined', 'undefined'];
                                                 limitSelectsWhenBetweenSameDayContainer(grandPrevCont, nextShowContainer, prevShowContainer, changeDistanceArr);
                                             }
                                         }
                                         else { //next container doesn't exist
-                                            console.log('prev exist & same day, grandprev exist & grandprev is prev day, nextshowcontaier doesnt exist');
+                                            //console.log('prev exist & same day, grandprev exist & grandprev is prev day, nextshowcontaier doesnt exist');
                                             limitSelectsWhenExtreme(prevShowContainer, grandPrevCont, 30);
                                         }
                                     }
@@ -1140,16 +1147,16 @@
                                 else { //grandprev container doesn't exist
                                     if(nextShowContainer) { //next container exist
                                         if(nextShowFlag) { //next container is in another day
-                                            console.log('grandprev doesnt exist, next exist and another day');
+                                            //console.log('grandprev doesnt exist, next exist and another day');
                                             ////nic nie robie, ponieważ akcja ma miejsce w tym przypadku w przypadku dla nastepnego.
                                         }
                                         else { //next container is in the same day
-                                            console.log('grandprev doesnt exist, next exist and same day');
+                                            //console.log('grandprev doesnt exist, next exist and same day');
                                             //nic nie robie, ponieważ akcja ma miejsce w tym przypadku w przypadku dla nastepnego.
                                         }
                                     }
                                     else { //next container doesn't exist
-                                        console.log('grandprev doesnt exist, next doesnt exist');
+                                        //console.log('grandprev doesnt exist, next doesnt exist');
                                         let prevShowVoivodeSelect = prevShowContainer.querySelector('.voivodeSelect');
                                         let prevVoivode = getSelectedValue(prevShowVoivodeSelect);
                                         let prevShowCitySelect = prevShowContainer.querySelector('.citySelect');
@@ -1196,18 +1203,18 @@
                                     if(grandNextDayFlag) { //grandprev is in grand previous day
                                         if(prevShowContainer) { //next container exist
                                             if(prevShowFlag) { //next container is in another day
-                                                console.log('next exist & next day, grandnext exist & grandnext is in grandnextday, prevshowcontaierExist & in another day');
+                                                //console.log('next exist & next day, grandnext exist & grandnext is in grandnextday, prevshowcontaierExist & in another day');
                                                 let changeDistanceArr = [100, 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
                                             }
                                             else { //prev container is in the same day
-                                                console.log('next exist & next day, grandnext exist & grandnext in grandnextday, prevshowcontaierExist & in same day');
+                                                //console.log('next exist & next day, grandnext exist & grandnext in grandnextday, prevshowcontaierExist & in same day');
                                                 let changeDistanceArr = [100, 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
                                             }
                                         }
                                         else { //prev container doesn't exist
-                                            console.log('next exist & next day, grandnext exist & grandnext is in grandnextday, prevshowcontaier doesnt exist');
+                                            //console.log('next exist & next day, grandnext exist & grandnext is in grandnextday, prevshowcontaier doesnt exist');
                                             limitSelectsWhenExtreme(nextShowContainer, grandNextCont, 100);
                                         }
 
@@ -1215,19 +1222,19 @@
                                     else { //grandnext is in next day(same as nextShowContainer)
                                         if(prevShowContainer) { //prev container exist
                                             if(prevShowFlag) { //prev container is in another day
-                                                console.log('next exist & next day, grandnext exist & grandnext is same day as next, prevshowcontaier Exist & in another day');
+                                                //console.log('next exist & next day, grandnext exist & grandnext is same day as next, prevshowcontaier Exist & in another day');
                                                 let changeDistanceArr = ['undefined', 100]; //[dalszy, blizszy]
                                                 limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
 
                                             }
                                             else { //prev container is in the same day
-                                                console.log('next exist & next day, grandnext exist & grandnext is same day as next, prevshowcontaier Exist & in same day');
+                                                //console.log('next exist & next day, grandnext exist & grandnext is same day as next, prevshowcontaier Exist & in same day');
                                                 let changeDistanceArr = ['undefined', 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
                                             }
                                         }
                                         else { //prev container doesn't exist
-                                            console.log('next exist & next day, grandnext exist & grandnext is same day as prev, prevshowcontaier doesnt Exist');
+                                            //console.log('next exist & next day, grandnext exist & grandnext is same day as prev, prevshowcontaier doesnt Exist');
                                             limitSelectsWhenExtreme(nextShowContainer, grandNextCont, 30);
                                         }
                                     }
@@ -1235,16 +1242,16 @@
                                 else { //grandNext doesn't exist
                                     if(prevShowContainer) { //prev container exist
                                         if(prevShowFlag) { //prev container is in another day
-                                            console.log('next exist & next day, grandnext doesnt exist, prevshowcontaier Exist & in another day');
+                                            //console.log('next exist & next day, grandnext doesnt exist, prevshowcontaier Exist & in another day');
                                             limitSelectsWhenExtreme(nextShowContainer, prevShowContainer, 100);
                                         }
                                         else { //prev container is in the same day
-                                            console.log('next exist & next day, grandnext doesnt exist, prevshowcontaier Exist & in same day');
+                                            //console.log('next exist & next day, grandnext doesnt exist, prevshowcontaier Exist & in same day');
                                             limitSelectsWhenExtreme(nextShowContainer, prevShowContainer, 100);
                                         }
                                     }
                                     else { //prev container doesn't exist
-                                        console.log('next exist & next day, grandnext doesnt exist, prevshowcontaier doesnt Exist');
+                                        //console.log('next exist & next day, grandnext doesnt exist, prevshowcontaier doesnt Exist');
                                         allCitiesAndAllVoivodes(nextShowContainer);
                                     }
                                 }
@@ -1254,36 +1261,36 @@
                                     if(grandNextDayFlag) { //grandnext is in grand next day
                                         if(prevShowContainer) { //prev container exist
                                             if(prevShowFlag) { //prev container is in another day
-                                                console.log('next exist & same day, grandnext exist & grandnext is in grandnextday, prevshowcontaier exist & in another day');
+                                                //console.log('next exist & same day, grandnext exist & grandnext is in grandnextday, prevshowcontaier exist & in another day');
                                                 let changeDistanceArr = [100, 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
                                             }
                                             else { //prev container is in the same day
-                                                console.log('next exist & same day, grandnext exist & grandnext is in grandnextday, prevshowcontaier exist & in same day');
+                                                //console.log('next exist & same day, grandnext exist & grandnext is in grandnextday, prevshowcontaier exist & in same day');
                                                 let changeDistanceArr = [100, 'undefined'];
                                                 limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
                                             }
                                         }
                                         else { //prev container doesn't exist
-                                            console.log('next exist & same day, grandnext exist & grandnext is in grandnextday, prevshowcontaier doesnt exist');
+                                            //console.log('next exist & same day, grandnext exist & grandnext is in grandnextday, prevshowcontaier doesnt exist');
                                             limitSelectsWhenExtreme(nextShowContainer, grandNextCont, 100);
                                         }
                                     }
                                     else { //grandnext is in next day(same as nextShowContainer)(all containers are in same day container case)
                                         if(prevShowContainer) { //prev container exist
                                             if(prevShowFlag) { //prev container is in another day
-                                                console.log('next exist & same day, grandnext exist & grandnext is same day, prevshowcontaier Exist & in another day');
+                                                //console.log('next exist & same day, grandnext exist & grandnext is same day, prevshowcontaier Exist & in another day');
                                                 let changeDistanceArr = ['undefined', 100];
                                                 limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
                                             }
                                             else { //prev container is in the same day
-                                                console.log('next exist & same day, grandnext exist & grandnext is next day, prevshowcontaier Exist & in same day');
+                                                //console.log('next exist & same day, grandnext exist & grandnext is next day, prevshowcontaier Exist & in same day');
                                                 let changeDistanceArr = ['undefined', 'undefined'];
                                                 limitSelectsWhenBetweenSameDayContainer(grandNextCont, prevShowContainer, nextShowContainer, changeDistanceArr);
                                             }
                                         }
                                         else { //prev container doesn't exist
-                                            console.log('next exist & same day, grandnext exist & grandnext is same day, prevshowcontaier doesnt exist');
+                                            //console.log('next exist & same day, grandnext exist & grandnext is same day, prevshowcontaier doesnt exist');
                                             limitSelectsWhenExtreme(nextShowContainer, grandNextCont, 30);
                                         }
                                     }
@@ -1291,11 +1298,11 @@
                                 else { //grandnext container doesn't exist
                                     if(prevShowContainer) { //prev container exist
                                         if(prevShowFlag) { //prev container is in another day
-                                            console.log('grandnext doesnt exist, next in same day, prev exist and another day');
+                                            //console.log('grandnext doesnt exist, next in same day, prev exist and another day');
                                             limitSelectsWhenExtreme(nextShowContainer, prevShowContainer, 100);
                                         }
                                         else { //next container is in the same day
-                                            console.log('grandnext doesnt exist, prev exist and same day');
+                                            //console.log('grandnext doesnt exist, prev exist and same day');
                                             limitSelectsWhenExtreme(nextShowContainer, prevShowContainer, 30);
                                         }
                                     }
@@ -1314,7 +1321,7 @@
                     }
 
                     const allRemoveButtons = dayContainer.getElementsByClassName('remove-button');
-                    console.assert(allRemoveButtons, "Brak przycisków usuń");
+                    //console.assert(allRemoveButtons, "Brak przycisków usuń");
                     if(allRemoveButtons.length > 1) { //delete only show box
                         showContainer.parentNode.removeChild(showContainer);
                     }
