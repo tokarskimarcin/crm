@@ -2821,6 +2821,17 @@ class CrmRouteController extends Controller
             ->with('departmentInfo', $departmentInfo);
     }
 
+    public function generateLimitSimulation(Request $request){
+        $objectToSimulate = $request->objectToSimulate;
+        $startDate  = $request->startDate;
+        $stopDate   = $request->stopDate;
+
+        foreach ($objectToSimulate as $item){
+
+        }
+        return $startDate;
+    }
+
     public function getaHeadPlanningInfo(Request $request){
         $departmentInfo = DB::table('department_info')->select(DB::raw('
         department_info.id as id, 
@@ -2832,20 +2843,98 @@ class CrmRouteController extends Controller
             ->where('id_dep_type','=',2)
             ->get();
 
-        $startDate  = $request->startDate;
-        $stopDate   = $request->stopDate;
-        $actualDate = $startDate;
-        $aheadPlanningData = collect();
-
-        $routeInfoOverall = ClientRouteInfo::select(DB::raw('
+        $startDate          = $request->startDate;
+        $stopDate           = $request->stopDate;
+        $simulateObject     = $request->objectClientLimitToSimulate;
+        $actualDate         = $startDate;
+        $aheadPlanningData  = collect();
+        $routeInfoOverall   = ClientRouteInfo::select(DB::raw('
             date,
-            department_info_id,
+            department_info_id,            
             SUM(limits) as sumOfLimits,
             SUM(actual_success) as sumOfActualSuccess
         '))
             ->where('client_route_info.status', '=', 1)
             ->groupBy('date', 'department_info_id')
             ->get();
+        //simulate client limit
+        if($simulateObject != null) {
+            $routeInfoOverall = ClientRouteInfo::select(DB::raw('
+            client_route_info.id,
+            client_route_info.city_id,
+            client_route_info.client_route_id,
+            client_route_info.date,
+            client_route_info.hour,
+            client_route_info.department_info_id,            
+            client_route_info.limits,
+            client_route.client_id,
+            client_route_info.actual_success,
+            client_route_info.show_order
+        '))
+                ->join('client_route', 'client_route.id', 'client_route_info.client_route_id')
+                ->where('client_route_info.status', '=', 1)
+                ->get();
+            $routeInfoOverall = $routeInfoOverall->groupBy('client_route_id');
+            $emptyCollect = collect();
+            $routeInfoOverall->map(function ($item) use ($simulateObject, &$emptyCollect) {
+                foreach ($simulateObject as $objItem) {
+                    $inCollect = $item->whereIn('client_id', $objItem['arrayOfClinet'])
+                        ->where('date', '>=', $objItem['dateStart'])
+                        ->where('date', '<=', $objItem['dateStop']);
+                    if (!$inCollect->isEmpty()) {
+                        $inCollect = $inCollect->groupBy('date');
+                        foreach ($inCollect as $incollectItem) {
+                            foreach ($incollectItem->groupBy('city_id') as $cityGroup) {
+                                $cityGroup = $cityGroup->sortBy('hour');
+                                if ($cityGroup->count() == 3) {
+                                    $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][0] : $cityGroup[0]->limits;
+                                    $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[1]->limits;
+                                    $cityGroup[2]->limits != null ? $objItem['arrayOfLimit'][2] : $cityGroup[2]->limits;
+                                } else if ($cityGroup->count() == 2) {
+                                    // 1 + 2 od drugiego
+                                    if ($cityGroup->first()->show_order == 1) {
+                                        $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[0]->limits;
+                                        $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][2] : $cityGroup[1]->limits;
+                                    } else {// 2 + 1 od pierwszego
+                                        $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][0] : $cityGroup[0]->limits;
+                                        $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[1]->limits;
+                                    }
+                                } else {
+                                    $cityGroup[0]->limits != null ? $objItem['limitForOneHour'] : $cityGroup[0]->limits;
+                                }
+                            }
+                        }
+                    }
+                }
+                foreach ($item as $toSave) {
+                    $emptyCollect->push($toSave->only('date', 'department_info_id', 'limits', 'actual_success'));
+                }
+                return $item;
+            });
+            $finallCollect = collect();
+            foreach ($departmentInfo as $item) {
+                $tosumObj = $emptyCollect->where('department_info_id', $item->id)->groupBy('date');
+                foreach ($tosumObj as $toSumItem) {
+                    $tempClass = new \stdClass();
+                    $tempClass->date = $toSumItem->first()['date'];
+                    $tempClass->department_info_id = $item->id;
+                    $tempClass->sumOfLimits = $toSumItem->sum('limits');
+                    $tempClass->sumOfActualSuccess = $toSumItem->sum('actual_success');
+                    $finallCollect->push($tempClass);
+                }
+            }
+            //add null
+            $tosumObj = $emptyCollect->where('department_info_id', null)->groupBy('date');
+            foreach ($tosumObj as $toSumItem) {
+                $tempClass = new \stdClass();
+                $tempClass->date = $toSumItem->first()['date'];
+                $tempClass->department_info_id = null;
+                $tempClass->sumOfLimits = $toSumItem->sum('limits');
+                $tempClass->sumOfActualSuccess = $toSumItem->sum('actual_success');
+                $finallCollect->push($tempClass);
+            }
+            $routeInfoOverall = $finallCollect;
+        }
 
         while($actualDate <= $stopDate){
             $dayCollect = collect();
@@ -2860,13 +2949,14 @@ class CrmRouteController extends Controller
                 ->where('department_info_id','=',null)
                 ->where('date', '=', $actualDate)
                 ->first()['sumOfLimits'];
+            dd($routeInfoOverall);
 
             foreach ($departmentInfo as $item){
                 $routeInfo = $routeInfoOverall
                     ->where('department_info_id' ,'=', $item->id)
                     ->where('date', '=', $actualDate)
                     ->first();
-
+                dd($routeInfoOverall);
                 $dayLimit = $routeInfo['sumOfLimits'];
                 $daySuccess = $routeInfo['sumOfActualSuccess'];
 
@@ -3990,5 +4080,8 @@ class CrmRouteController extends Controller
     public function deleteGivenRouteAjax($id, Request $request) {
         return ClientRoute::where('id', '=', $id)->update(['status' => 0]);
     }
+
+
+
 
 }

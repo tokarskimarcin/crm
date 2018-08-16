@@ -298,6 +298,7 @@ Route::post('/saveCampaignOption', 'CrmRouteController@saveCampaignOption')->nam
 Route::post('/presentationStatisticsAjax', 'CrmRouteController@presentationStatisticsAjax')->name('getPresentationWeeks');
 Route::post('/getClientRouteInfoRecord', 'CrmRouteController@getClientRouteInfoRecord')->name('api.getClientRouteInfoRecord');
 Route::post('/datatableClientRouteInfoAjax', 'CrmRouteController@datatableClientRouteInfoAjax')->name('api.datatableClientRouteInfoAjax');
+Route::post('/generateLimitSimulation', 'CrmRouteController@generateLimitSimulation')->name('api.generateLimitSimulation');
 /* END CRM-ROUTES AJAX */
 
 /* HR-ROUTES AJAX */
