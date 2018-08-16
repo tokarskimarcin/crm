@@ -320,11 +320,13 @@
             let currentDate = today;
 
             let route_id = 0;
-            let client_id = 0;
 
 //*********************START CLIENT SECTON***************************
-
-            let finalClientId = null; //This variable is needed for form submit
+            let clientId = 0;
+            @if(isset($client_route))
+            let clientRouteInfo = @json($client_route);
+            clientId = 'clientId_'+clientRouteInfo.clientId;
+            @endif
 
             function writeCheckedClientInfo() {
                 let tr_line = document.getElementsByClassName('check')[0];
@@ -355,18 +357,14 @@
              * This function set client value and its type, using data from database about given client route
              */
             function setClientAndItsType() {
-                @if(isset($client_route))
-                const clientInfo = @json($client_route);
-                @endif
                 const clientTable = document.querySelector('#table_client');
                 const allTr = clientTable.querySelectorAll('tr');
-                const clientId = 'clientId_' + clientInfo.clientId;
                 allTr.forEach(tableRow => {
                     if(tableRow.id == clientId) {
                         $(tableRow).trigger('click');
                     }
                 });
-                $('#client_choice_type').val(clientInfo.clientType);
+                $('#client_choice_type').val(clientRouteInfo.clientType);
             }
 
 
@@ -400,8 +398,7 @@
                         if ($(this).hasClass('check')) {
                             $(this).removeClass('check');
                             $(this).find('.client_check').prop('checked', false);
-                            client_id = 0;
-                            finalClientId = 0;
+                            clientId = null;
                             clearCheckedClientInfo();
                         }
                         else {
@@ -412,8 +409,7 @@
                                 });
                                 $(this).addClass('check');
                                 $(this).find('.client_check').prop('checked', true);
-                                client_id = $(this).attr('id');
-                                finalClientId = $(this).attr('id');
+                                clientId = $(this).attr('id');
                                 writeCheckedClientInfo();
                             }
 
@@ -2422,22 +2418,23 @@
                         const clientTypeValue = $('#client_choice_type option:selected').val();
                         const clientTable = document.querySelector('#table_client');
                         let selectedCheckbox;
-                        if(clientTable.querySelector('input[type="checkbox"]:checked')) {
-                            selectedCheckbox = clientTable.querySelector('input[type="checkbox"]:checked');
-                        }
-                        else {
+                        if(clientId == null || clientId == 0) {
                             notify('Wybierz klienta!');
                             return false;
                         }
-                        const selectedTr = selectedCheckbox.closest('tr');
-                        let clientId = selectedTr.id;
-                        clientId = clientId.substr(9);
+                        let selectedClientId = clientId;
+                        selectedClientId = selectedClientId.substr(9);
 
                         const clientInfo = {
-                            clientId: clientId,
+                            clientId: selectedClientId,
                             clientType: clientTypeValue
                         };
 
+                        if(allSingleDayContainers.length == 0){
+
+                            notify('Stwórz trasę!');
+                            return false;
+                        }
                         for(let i = 0; i < allSingleDayContainers.length; i++) {
                             let singleShowContainersInsideGivenDay = allSingleDayContainers[i].querySelectorAll('.singleShowContainer');
                             let fullDate = allSingleDayContainers[i].querySelector('.day-info').textContent;
@@ -2463,7 +2460,7 @@
                                     voivode: voivodeId,
                                     city: cityId,
                                     checkbox: checkboxVal
-                                }
+                                };
                                 finalArray.push(info);
                             });
                         }
