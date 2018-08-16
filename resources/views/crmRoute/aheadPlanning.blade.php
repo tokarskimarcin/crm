@@ -78,6 +78,15 @@
         .glyphicon-info-sign:hover{
             color: #5bc0de;
         }
+
+        .myHR{
+            border-bottom: 3px;
+            background: black;
+            margin: 1%;
+        }
+        .separate{
+            margin: 1%;
+        }
     </style>
 
     {{--Header page --}}
@@ -190,36 +199,6 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {{--@foreach($departmentInfo as $item)--}}
-                        {{--<tr>--}}
-                        {{--<td>1</td>--}}
-                        {{--<td>2</td>--}}
-                        {{--<td>3</td>--}}
-                        {{--@foreach($departmentInfo as $item)--}}
-                        {{--<td>1123123123123123</td>--}}
-                        {{--@endforeach--}}
-                        {{--<td>5</td>--}}
-                        {{--<td>6</td>--}}
-                        {{--@foreach($departmentInfo as $item)--}}
-                        {{--<td>1123123123123123</td>--}}
-                        {{--@endforeach--}}
-                        {{--</tr>--}}
-                        {{--@endforeach--}}
-                        {{--@foreach($departmentInfo as $item)--}}
-                        {{--<tr>--}}
-                        {{--<td>1</td>--}}
-                        {{--<td>2</td>--}}
-                        {{--<td>3</td>--}}
-                        {{--@foreach($departmentInfo as $item)--}}
-                        {{--<td>1123123123123123</td>--}}
-                        {{--@endforeach--}}
-                        {{--<td>5</td>--}}
-                        {{--<td>6</td>--}}
-                        {{--@foreach($departmentInfo as $item)--}}
-                        {{--<td>1123123123123123</td>--}}
-                        {{--@endforeach--}}
-                        {{--</tr>--}}
-                        {{--@endforeach--}}
                         </tbody>
                     </table>
                     <div class="row">
@@ -301,7 +280,6 @@
         document.addEventListener('DOMContentLoaded', function () {
 
 
-
             function getColMDConteiner() {
                 let divChoiceClientLimit = document.createElement('div');
                 divChoiceClientLimit.classList.add('col-md-4');
@@ -328,9 +306,10 @@
                 divChoiceClientLimitSelect.setAttribute('multiple','multiple');
                 return divChoiceClientLimitSelect;
             }
-            function getSelectOption(optionText) {
+            function getSelectOption(optionText,id) {
                 let divChoiceClientLimitSelectOption = document.createElement('option');
                 divChoiceClientLimitSelectOption.text = optionText;
+                divChoiceClientLimitSelectOption.value = id;
                 return divChoiceClientLimitSelectOption;
             }
             function getDateDiv() {
@@ -386,16 +365,17 @@
 
                 //Create Select
                 let divChoiceClientLimitSelect = getSelectWithPicker();
-                divChoiceClientLimitSelect.title = "wybierz klientów...";
+                divChoiceClientLimitSelect.title = "Wybierz klientów...";
 
                 // Select Option
-                let divChoiceClientLimitSelectOption = getSelectOption(1);
-                divChoiceClientLimitSelect.add(divChoiceClientLimitSelectOption);
-                let divChoiceClientLimitSelectOption2 = getSelectOption(2);
+                let clients =  {!! json_encode($allClients) !!};
+                clients.forEach(function (value,key) {
+                    let divChoiceClientLimitSelectOption = getSelectOption(value.name,value.id);
+                    //Append Select Option
+                    divChoiceClientLimitSelect.add(divChoiceClientLimitSelectOption);
+                });
 
-                //Append Select Option
-                divChoiceClientLimitSelect.add(divChoiceClientLimitSelectOption2);
-                divChoiceClientLimitSelect.add(divChoiceClientLimitSelectOption);
+
                 //Append Select to Input Group
                 divInputGroup.appendChild(divChoiceClientLimitSelect);
 
@@ -451,7 +431,7 @@
                     let limitInput = document.createElement('div');
                     limitInput.classList.add('input-group','limitInput');
                     let span = getSpan('Limit #'+(i+1));
-                    let inputLimit = getInputDate('AllFirstLimit','');
+                    let inputLimit = getInputDate('AllLimit'+(i+1),'');
                     limitInput.appendChild(span);
                     limitInput.appendChild(inputLimit);
                     divLimitForAllEvent.appendChild(limitInput);
@@ -519,7 +499,18 @@
 
             TemplateDOMOfClientSimulationEditLimits('placeToAppendClientLimit');
 
+            class SimulationChangeLimitForClient{
+                constructor(arrayOfClinet, dateStart,dateStop,arrayOfLimit,limitForOneHour){
+                    this.arrayOfClinet      = arrayOfClinet;
+                    this.dateStart          = dateStart;
+                    this.dateStop           = dateStop;
+                    this.arrayOfLimit       = arrayOfLimit;
+                    this.limitForOneHour    = limitForOneHour;
+                }
+            };
 
+
+            var simulationArray = [];
             function reloadDatePicker() {
                 $('.form_date').datetimepicker({
                     language: 'pl',
@@ -571,10 +562,40 @@
             const today = moment().format('YYYY-MM-DD');
             const startDate = moment().add(-1,'w').format('YYYY-MM-DD');
             const stopDate = moment().add(3,'w').format('YYYY-MM-DD');
+
+
             /*******END OF GLOBAL VARIABLES*********/
 
             $('#date_start').val(startDate);
             $('#date_stop').val(stopDate);
+
+
+            $('.renderSimulation').on('click',function (e) {
+                simulationArray = [];
+                allContentToSave = $('.changeClientLimitContener');
+                allContentToSave.each(function (key,value) {
+                    let jObject                 = $(value);
+                    let arrayOfClinet        = jObject.find('select').val();
+                    let dateStartSimulation     = jObject.find('.dateStartLimit').val();
+                    let dateStopSimulation      = jObject.find('.dateStopLimit').val();
+                    let arrayOfLimit = [];
+                    arrayOfLimit.push(jObject.find('.AllLimit1').val());
+                    arrayOfLimit.push(jObject.find('.AllLimit2').val());
+                    arrayOfLimit.push(jObject.find('.AllLimit3').val());
+                    let onlyFirstLimit          = jObject.find('.OnlyFirstLimit').val();
+                    simulationArray.push(new SimulationChangeLimitForClient(arrayOfClinet,dateStartSimulation,dateStopSimulation,arrayOfLimit,onlyFirstLimit));
+                    //Reload Datatable
+                    $('#datatable_processing').show();
+                    aheadPlaningTable.dataTable.clear();
+                    aheadPlaningTable.dataTable.draw();
+                    aheadPlanningData.getData($('#date_start').val(),$("#date_stop").val()).done(function (response) {
+                        aheadPlaningTable.setTableData(response);
+                        $('#datatable_processing').hide();
+                    });
+                    $('#modalSimulationClient').modal('hide');
+                });
+            });
+
 
             function fillWorkFreeDaysForDepartments() {
                 let iterator = 1;
@@ -627,6 +648,7 @@
                             limitSimulation: obj.limitSimulation,
                             newClientSimulation: obj.newClientSimulation,
                             departmentsInvitationsAverages: obj.data.departmentsInvitationsAverages,
+                            objectClientLimitToSimulate : simulationArray,
                             factors: {
                                 isChanged: factorsChanged,
                                 saturday: $('#saturdayFactor').val(),
