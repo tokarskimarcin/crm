@@ -98,14 +98,38 @@
                             <div class="alert alert-info">
                                 Moduł plik klientów pozwala na podgląd tras oraz zarządzanie nimi. Tabelę z
                                 trasami można filtrować dostępnymi polami jak również filtrować za pomocą dowolnych fraz
-                                wpisanych w polu "Szukaj". Trasy dzielą się na: </br>
+                                wpisanych w polu "Szukaj". {{--Trasy dzielą się na: </br>
                                 <ul class="list-group">
                                     <li class="list-group-item"><strong>Niegotowe</strong> oznaczone jako <button class="btn btn-danger" style="font-weight:bold;"s>Niegotowa</button> - Trasa nie jest widocza w "Informacje o kampaniach" oraz nie jest wliczana w "Planowanie wyprzedzenia" </li>
                                     <li class="list-group-item"><strong>Aktywne</strong> oznaczone jako <button class="btn btn-success" style="font-weight:bold;">Aktywna</button> - Trasa jest gotowa do użycia (wszystkie godziny oraz hotele muszą być określone aby mogła być aktywna), pobierane są informacje z PBX odnośnie takich kampanii, wyświetlają się we wszystkich statystykach</li>
                                     <li class="list-group-item"><strong>Zakończone</strong> oznaczone jako <button class="btn btn-info" style="font-weight:bold;">Zakończona</button> - Trasa automatycznie zmienia stan z Aktywnej na Zakończoną, gdy data ostatniego pokazu zostaje osiągnięta</li>
-                                </ul>
+                                </ul>--}}
+                                Trasy mające przyciski edycji o różnych kolorach dzielą się na: </br>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <strong>Edycja (Hoteli i godzin):</strong>
+                                        <ul class="list-group">
+                                            <li class="list-group-item"><button class="btn btn-danger" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edycja</button>
+                                                - trasa niegotowa (nieprzypisane hotele i godziny)</li>
+                                            <li class="list-group-item"><button class="btn btn-info" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edycja</button>
+                                                - trasa gotowa (przypisane hotele i godziny)</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <strong>Edycja parametrów (Kampanii):</strong>
+                                        <ul class="list-group">
+                                            <li class="list-group-item"><button class="btn btn-danger" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edycja</button>
+                                                - trasy z nie przypisanymi oddziałami i nie ustawionymi limitami</li>
+                                            <li class="list-group-item"><button class="btn btn-warning" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edycja</button>
+                                                - trasy z nie przypisanymi oddziałami albo nie ustawionymi limitami</li>
+                                            <li class="list-group-item"><button class="btn btn-info" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edycja</button>
+                                                - trasy z przypisanymi oddziałami i ustawionymi limitami</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
                                 Aby trasa była gotowa do przypisywania limitów, należy ustalić hotele i godziny w zakładce Edycja (Hoteli i godzin).
-                                Jeśli wszystko zostanie przypisane poprawnie, trasa zmieni status z "wersja robocza" na "gotowa" w kolumnie "Hotel i godziny".
+                                Jeśli wszystko zostanie przypisane poprawnie, trasa zmieni status z "wersja robocza" na "gotowa".
                             </div>
                         </div>
                     </div>
@@ -178,30 +202,38 @@
                                 </select>
                             </div>
                         </div>
-
-
-
                         <div class="col-md-2">
+                            <div class="form-group" style="margin-top:1em;">
+                                <label for="parameters">Parametry</label>
+                                <select id="parameters" class="form-control">
+                                    <option value="0">Wszystkie</option>
+                                    <option value="1">Bez limitów</option>
+                                    <option value="2">Bez oddziałów</option>
+                                    <option value="3">Przydzielone oddziały i ustawione limity</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
                             <div class="form-group" style="margin-top:2.6em;">
-                                <button class="btn btn-default" id="makeReportClient">Generuj Raport Klienta</button>
+                                <button class="btn btn-info form-control" id="makeReportClient"><span class="glyphicon glyphicon-file"></span> Generuj Raport Klienta</button>
                             </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
 
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="form-group" style="width: 100%;">
                                 <button id="limitsButton" class="btn btn-default" style="width:100%;" data-toggle="modal" data-target="#editModal" disabled="true">
                                     <span class="glyphicon glyphicon-edit"></span> Edytuj limity</button>
                             </div>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <button class="btn btn-basic" id="clearButton" style="width:100%;">
-                                <span class='glyphicon glyphicon-unchecked'></span>Czyść zaznaczone</button>
+                                <span class='glyphicon glyphicon-unchecked'></span> Czyść zaznaczone</button>
                         </div>
                     </div>
 
@@ -214,7 +246,7 @@
                                     <th>Klient</th>
                                     <th>Data I pokazu</th>
                                     <th>Trasa</th>
-                                    <th>Hotel i godziny</th>
+                                    {{--<th>Hotel i godziny</th>--}}
                                     <th>Edycja (Hoteli i godzin)</th>
                                     <th>Edycja (Trasy)</th>
                                     <th>Edycja parametrów (Kampanii)</th>
@@ -484,6 +516,7 @@
             let yearInput = $('#year');
             let typInput = $('#type');
             let stateInput = $('#campaignState');
+            let parametersInput = $('#parameters');
 
             //This part is responsible for listing every week number into select
             const lastWeekOfYear ={{$lastWeek}};
@@ -752,6 +785,7 @@
                         d.year = yearInput.val();
                         d.selectedWeek = selectedWeekInput.val();
                         d.typ = typInput.val();
+                        d.parameters = parametersInput.val();
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -774,7 +808,7 @@
                             return finalName;
                         }, "name": "route_name"
                     },
-                    {
+                   /* {
                         "data": function (data, type, dataToSet) {
                             if (data.hotelOrHour) {
                                 return '<span style="color: darkgreen;">Gotowa</span>';
@@ -783,11 +817,16 @@
                                 return '<span style="color: red;">Wersja robocza</span>';
                             }
                         }, "name": "hotelOrHour"
-                    },
+                    },*/
                     {
                         "data": function (data, type, dataToSet) {
                             type = '';
-                            return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block" data-type="1" '+type+'><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
+
+                            if (data.hotelOrHour) {
+                                return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '"><button class="btn btn-info btn-block" data-type="1" ' + type + '><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
+                            } else{
+                                return '<a href="{{URL::to("/specificRoute")}}/' + data.client_route_id + '"><button class="btn btn-danger btn-block" data-type="1" ' + type + '><span class="glyphicon glyphicon-edit"></span> Edytuj</button></a>';
+                            }
                         }, "name": "link", width: '10%', searchable: false, orderable: false
                     },
                     {
@@ -797,11 +836,14 @@
                     },
                     {
                         "data": function (data, type, dataToSet) {
-                            if(data.hasAllLimits == 1) {
+                            if(data.hasAllLimits == 1 && data.hasAllDepartments == 1) {
                                 return '<button class="btn btn-info btn-block show-modal-with-data" '+type+'><span class="glyphicon glyphicon-edit " data-route_id ="' + data.client_route_id + '" ></span> Edytuj</button>';
+                            }else
+                            if(myXOR(data.hasAllLimits == 1 , data.hasAllDepartments == 1)) {
+                                return '<button class="btn btn-warning btn-block show-modal-with-data" '+type+'><span class="glyphicon glyphicon-edit " data-route_id ="' + data.client_route_id + '" ></span> Edytuj</button>';
                             }
                             else {
-                                return '<button class="btn btn-warning btn-block show-modal-with-data" '+type+'><span class="glyphicon glyphicon-edit " data-route_id ="' + data.client_route_id + '" ></span> Edytuj</button>';
+                                return '<button class="btn btn-danger btn-block show-modal-with-data" '+type+'><span class="glyphicon glyphicon-edit " data-route_id ="' + data.client_route_id + '" ></span> Edytuj</button>';
                             }
 
                         }, "name": "link", width: '10%', searchable: false, orderable: false
@@ -819,6 +861,9 @@
                 ]
             });
 
+            function myXOR(a,b) {
+                return ( a || b ) && !( a && b );
+            }
             /**
              * This function append to modal limit input
              */
@@ -1478,6 +1523,9 @@
 
             yearInput.change(yearHandler);
             typInput.change(() => {
+                table2.ajax.reload();
+            });
+            parametersInput.change(() => {
                 table2.ajax.reload();
             });
             stateInput.change(() => {
