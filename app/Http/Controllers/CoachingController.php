@@ -432,6 +432,7 @@ class CoachingController extends Controller
             if (is_numeric($request->type) && $request->type != 0) {
                 $coaching_consultant_inprogres = $coaching_consultant_inprogres->where('coaching_type', '=', $request->type);
             }
+            //dd($coaching_consultant_inprogres);
             return $coaching_consultant_inprogres;
         } else if ($request->coaching_level == 2) {
             //informacje o coachingu dla kierownika
@@ -1007,7 +1008,7 @@ class CoachingController extends Controller
      */
     public function getCoachConsultant($coach_id)
     {
-        if ($coach_id[0] == 1364)
+        if ($coach_id[0] == 1364 or $coach_id[0] == 6964)
             $coach_id[0] = 4153;
         $all_users = DB::table('work_hours')
             ->select(
@@ -1032,7 +1033,7 @@ class CoachingController extends Controller
             $date_start = '';
             $date_stop = '';
             $i = 0;
-            while ($rbh < 64800 && is_object($item->first())) { // po przepracowaniu coanjmniej 18 rbh
+            while ($rbh < 18*60*60 && is_object($item->first())) { // po przepracowaniu coanjmniej 18 rbh
                 $work_hours = $item->first();
                 if ($i == 0) {
                     $date_stop = $work_hours->date;
