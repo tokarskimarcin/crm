@@ -1391,6 +1391,7 @@ class CrmRouteController extends Controller
                 'hotel_id',
                 'client.name as clientName',
                 'city.name as cityName',
+                'department_info_id',
                 'date',
                 'client_route.type',
                 'client_route_id',
@@ -1415,10 +1416,13 @@ class CrmRouteController extends Controller
             //this part check whether all limits are assigned
             $infoRecords = $client_route_id;
             $limitFlag = true;
+            $departmentsFlag = true;
             foreach($infoRecords as $oneRecord) {
                 if($oneRecord->limits == null || $oneRecord->limits == 0) {
                     $limitFlag = false;
-                    break;
+                }
+                if($oneRecord->department_info_id == null || $oneRecord->department_info_id == 0) {
+                    $departmentsFlag = false;
                 }
             }
 
@@ -1442,11 +1446,18 @@ class CrmRouteController extends Controller
             //dd($client_routes->first());
             $client_routes->first()->hotelOrHour = $hourOrHotelAssigned;
             $client_routes->first()->hasAllLimits = $limitFlag ? 1 : 0;
+            $client_routes->first()->hasAllDepartments = $departmentsFlag ? 1 : 0;
             //$client_routes[0]->route_name = $route_name;
             array_push($fullArray, $client_routes->first());
         }
         $full_clients_routes = collect($fullArray);
 
+        switch ($request->parameters){
+            case 0: break; // all
+            case 1: $full_clients_routes = $full_clients_routes->where('hasAllLimits','=',0); break; //without all limits
+            case 2: $full_clients_routes = $full_clients_routes->where('hasAllDepartments','=',0); break; //without all departments
+            case 3: $full_clients_routes = $full_clients_routes->where('hasAllLimits','=',1)->where('hasAllDepartments','=',1); break;//without all departments
+        }
         if($showOnlyAssigned == 'true'){
             $full_clients_routes = $full_clients_routes->where('hotelOrHour','=', false);
         }
