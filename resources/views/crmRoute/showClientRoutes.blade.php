@@ -339,9 +339,6 @@
 
         let idOfRow = null;
 
-        $('#menu-toggle').change(()=>{
-            table2.columns.adjust().draw();
-        });
         var toDay = '{{date('Y-m-d')}}';
         var tableToExcel = (function() {
             var uri = 'data:application/vnd.ms-excel;base64,'
@@ -709,7 +706,7 @@
             });
 
 
-            table2 = $('#datatable2').DataTable({
+            let table2 = $('#datatable2').DataTable({
                 autoWidth: true,
                 processing: true,
                 serverSide: true,
@@ -1099,7 +1096,7 @@
                             .then(response => response.text())
                             .then(response => {
                                 notify("Rekordy zostały zmienione!", "info");
-                                table.ajax.reload();
+                                table2.ajax.reload();
                             })
                             .catch(error => console.error("Błąd :", error));
 
@@ -1562,7 +1559,9 @@
 
             window.addEventListener('pagehide', setItemsToSeessionStorage);
             clearButton.addEventListener('click', clearAllSelections);
-            document.addEventListener('click', globalClickHandler)
+            document.addEventListener('click', globalClickHandler);
+
+            resizeDatatablesOnMenuToggle([table2]);
 
         });
     </script>

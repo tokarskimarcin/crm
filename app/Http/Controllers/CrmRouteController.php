@@ -2892,6 +2892,9 @@ class CrmRouteController extends Controller
             $emptyCollect = collect();
             $routeInfoOverall->map(function ($item) use ($simulateObject, &$emptyCollect) {
                 foreach ($simulateObject as $objItem) {
+                    //Save simulation status
+                    $saveStatus = false;
+                    $saveStatus = $objItem['saveStatus'] == 'false' ? false : true;
                     $inCollect = $item->whereIn('client_id', $objItem['arrayOfClinet'])
                         ->where('date', '>=', $objItem['dateStart'])
                         ->where('date', '<=', $objItem['dateStop']);
@@ -2901,20 +2904,54 @@ class CrmRouteController extends Controller
                             foreach ($incollectItem->groupBy('city_id') as $cityGroup) {
                                 $cityGroup = $cityGroup->sortBy('hour');
                                 if ($cityGroup->count() == 3) {
-                                    $cityGroup[0]->limits = $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][0] : $cityGroup[0]->limits;
-                                    $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[1]->limits;
-                                    $cityGroup[2]->limits = $cityGroup[2]->limits != null ? $objItem['arrayOfLimit'][2] : $cityGroup[2]->limits;
+                                    if($objItem['arrayOfLimit'][0] != null ){
+                                        $cityGroup[0]->limits = $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][0] : $cityGroup[0]->limits;
+                                        if($saveStatus)
+                                            $cityGroup[0]->save();
+                                    }
+                                    if($objItem['arrayOfLimit'][1] != null ){
+                                        $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[1]->limits;
+                                        if($saveStatus)
+                                            $cityGroup[1]->save();
+                                    }
+                                    if($objItem['arrayOfLimit'][2] != null ){
+                                        $cityGroup[2]->limits = $cityGroup[2]->limits != null ? $objItem['arrayOfLimit'][2] : $cityGroup[2]->limits;
+                                        if($saveStatus)
+                                            $cityGroup[2]->save();
+                                    }
                                 } else if ($cityGroup->count() == 2) {
                                     // 1 + 2 od drugiego
                                     if ($cityGroup->first()->show_order == 1) {
-                                        $cityGroup[0]->limits =  $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[0]->limits;
-                                        $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][2] : $cityGroup[1]->limits;
+                                        if($objItem['arrayOfLimit'][1] != null ){
+                                            $cityGroup[0]->limits =  $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[0]->limits;
+                                            if($saveStatus)
+                                                $cityGroup[0]->save();
+                                        }
+                                        if($objItem['arrayOfLimit'][2] != null ){
+                                            $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][2] : $cityGroup[1]->limits;
+                                            if($saveStatus)
+                                                $cityGroup[1]->save();
+                                        }
+
                                     } else {// 2 + 1 od pierwszego
-                                        $cityGroup[0]->limits = $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][0] : $cityGroup[0]->limits;
-                                        $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[1]->limits;
+                                        if($objItem['arrayOfLimit'][0] != null ){
+                                            $cityGroup[0]->limits = $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][0] : $cityGroup[0]->limits;
+                                            if($saveStatus)
+                                                $cityGroup[0]->save();
+                                        }
+                                        if($objItem['arrayOfLimit'][1] != null ){
+                                            $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[1]->limits;
+                                            if($saveStatus)
+                                                $cityGroup[1]->save();
+                                        }
+
                                     }
                                 } else {
-                                    $cityGroup[0]->limits = $cityGroup[0]->limits != null ? $objItem['limitForOneHour'] : $cityGroup[0]->limits;
+                                    if($objItem['limitForOneHour'] != null ){
+                                        $cityGroup[0]->limits = $cityGroup[0]->limits != null ? $objItem['limitForOneHour'] : $cityGroup[0]->limits;
+                                        if($saveStatus)
+                                            $cityGroup[0]->save();
+                                    }
                                 }
                             }
                         }
@@ -2932,7 +2969,7 @@ class CrmRouteController extends Controller
                     $tempClass = [];
                     $tempClass['date'] = $toSumItem->first()['date'];
                     $tempClass['client_id'] = $toSumItem->first()['client_id'];
-                    $tempClass['department_info_id'] = null;
+                    $tempClass['department_info_id'] = $item->id;
                     $tempClass['sumOfLimits'] = $toSumItem->sum('limits');
                     $tempClass['sumOfActualSuccess'] = $toSumItem->sum('actual_success');
                     $finallCollect->push($tempClass);
@@ -3989,7 +4026,7 @@ class CrmRouteController extends Controller
             ->ActiveCampaigns($onlyIds)
             ->get();
 
-        $allClientRouteInfoRecords = ClientRouteInfo::all();
+        //$allClientRouteInfoRecords = ClientRouteInfo::all();
 
         //create new collection and setting properites by client_route_id
         $ClientRouteCampaignsGroupedByClientRoutes = collect();
@@ -4011,7 +4048,7 @@ class CrmRouteController extends Controller
                     $clientRouteId = $infoRecord->client_route_id;
                     $date = $infoRecord->date;
 
-                    $allRecordsForUpdate = ClientRouteInfo::where('client_route_id', '=', $clientRouteId)->where('date', '=', $date)->where('show_order', '=', $showOrder)->get();
+                    $allRecordsForUpdate = ClientRouteInfo::where('client_route_id', '=', $clientRouteId)->where('date', '=', $date)->where('show_order', '=', $showOrder)->where('status','=','1')->get();
                     foreach($allRecordsForUpdate as $recToUpd) {
                         if($numberOfHours == 1) {
                             $recToUpd->onlyOne = 1;
@@ -4062,6 +4099,7 @@ class CrmRouteController extends Controller
                     //here we assign limits according to different scenario
                     foreach($orderedShow as $singleItem) {
 
+                        //dd($singleItem);
                         for($show_order = 0; $show_order < 3; $show_order++) {
                             if($singleItem->show_order == $show_order && $singleItem->nr == 0) {
                                 ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit1]);
@@ -4086,6 +4124,7 @@ class CrmRouteController extends Controller
                         else if($singleItem->onlyTwoHour == 1 && $singleItem->nr == 1) {
                             ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit3]);
                         }
+                        //dd(ClientRouteInfo::where('id', '=', $singleItem->id)->get());
                     }
                 }
             }
