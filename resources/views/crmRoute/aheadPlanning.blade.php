@@ -92,9 +92,12 @@
     </style>
 
     {{--Header page --}}
+
+
             <div class="page-header">
                 <div class="alert gray-nav ">Planowanie Wyprzedzenia</div>
             </div>
+
 
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -106,6 +109,11 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
+
+                        <div id="test">
+
+                        </div>
+
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label for="date" class="myLabel">Data początkowa:</label>
@@ -176,7 +184,7 @@
                             <button class="btn btn-default simulationClientLimit"  style="width: 100%" data-toggle="modal" data-target="#modalSimulationClient" >Symulacja Klienta(Edycja Limitów)</button>
                         </div>
                         <div class="col-md-4">
-                            <button class="btn btn-default simulationNewClient"  style="width: 100%" data-toggle="modal"  data-target="#modalSimulationClient" >Symulacja Klienta(Nowy Klient)</button>
+                            <button class="btn btn-default simulationNewClient"  style="width: 100%" data-toggle="modal"  data-target="#modalSimulationNewClient" >Symulacja Klienta(Nowy Klient)</button>
                         </div>
                         <div class="col-md-4">
                         </div>
@@ -277,6 +285,34 @@
         </div>
     </div>
 
+
+    <div id="modalSimulationNewClient" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg" style="width: 90%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" id="modal_title">Sekcja symulatcji Nowego Klienta<span></span></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Symalacja nowego klienta
+                        </div>
+                        <div class="panel-body">
+                            <div id="placeToAppendNewClient"></div>
+                            <div class="col-md-12">
+                                <button class="btn btn-info separateBTN renderSimulationNewClient" style="width: 100%">
+                                    <span class="glyphicon glyphicon-cloud"></span> <span>Pokaż symulację</span>
+                                </button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @section('script')
@@ -312,9 +348,17 @@
                 }
             };
 
+            class SimulationNewClientClient{
+                constructor(dayCountEventArray, arrayOfNumberWeekNewClient,arrayOfLimit){
+                    this.dayCountEventArray                     = dayCountEventArray;
+                    this.arrayOfNumberWeekNewClient             = arrayOfNumberWeekNewClient;
+                    this.arrayOfLimit                           = arrayOfLimit;
+                }
+            };
 
-            var simulationArray = [];
 
+            var simulationEditLimitArray = [];
+            var simulationNewClientArray = [];
             let departmentInfo = <?php echo json_encode($departmentInfo->toArray()) ?>;
 
             let elementsToSum = {
@@ -385,7 +429,6 @@
                     deselectAllText: 'Odznacz wszystkie'
                 });
             }
-
             function getColMDConteiner() {
                 let divChoiceClientLimit = document.createElement('div');
                 divChoiceClientLimit.classList.add('col-md-4');
@@ -452,6 +495,112 @@
                 glyphicon.classList.add('glyphicon', 'glyphicon-'+type);
                 return glyphicon
             }
+            var polishDayArray = ["Poniedziałek","Wtorek","Środa","Czwartek","Piątek","Sobota","Niedziela","Suma"];
+            function TemplateDOMOfNewClientSimulation(placeToAppend) {
+                let mainDiv = document.createElement('div');
+                mainDiv.classList.add('col-md-12');
+                mainDiv.classList.add('newClientSimulation');
+                let dayEventCount= document.createElement('div');
+                dayEventCount.classList.add('dayEventCount');
+
+                let tableDayEventCount = document.createElement('table');
+                tableDayEventCount.classList.add('tableDayEventCount');
+                tableDayEventCount.classList.add('table');
+
+                let tableThead = document.createElement('thead');
+                let tableTheadTr = document.createElement('tr');
+                polishDayArray.forEach(function (value) {
+                    let tableTheadTh = document.createElement('th');
+                        tableTheadTh.textContent = value;
+                    tableTheadTr.appendChild(tableTheadTh);
+                });
+                tableThead.appendChild(tableTheadTr);
+                tableDayEventCount.appendChild(tableThead);
+
+                let tableTbody = document.createElement('tbody');
+                let tableTbodyTr = document.createElement('tr');
+                polishDayArray.forEach(function (value,index) {
+                    let tableTbodyTd = document.createElement('td');
+                    let tableTbodyTdInput = document.createElement('input');
+                    tableTbodyTdInput.classList.add('form-control');
+                    if(polishDayArray.length-1 == index){
+                        tableTbodyTdInput.classList.add('dayEventCountSum');
+                        tableTbodyTdInput.setAttribute("disabled","true");
+                    }else{
+                        tableTbodyTdInput.classList.add('dayEventCountNumber'+(index+1));
+                    }
+                    tableTbodyTd.appendChild(tableTbodyTdInput);
+                    tableTbodyTr.appendChild(tableTbodyTd);
+                });
+                tableTbody.appendChild(tableTbodyTr);
+                tableDayEventCount.appendChild(tableTbody);
+                dayEventCount.appendChild(tableDayEventCount);
+
+                let limitSectionNewClient = document.createElement('div');
+                limitSectionNewClient.classList.add('limitSectionNewClient');
+
+                let divlimitNewClientInput = document.createElement('div');
+                divlimitNewClientInput.classList.add('col-md-6');
+                let divlimitNewClientInputLabel = document.createElement('label');
+                divlimitNewClientInputLabel.textContent = "Limitu dla pokazów";
+                divlimitNewClientInput.appendChild(divlimitNewClientInputLabel);
+
+                for( let i =0;i<3;i++){
+                    let limitInput = document.createElement('div');
+                    limitInput.classList.add('input-group','limitNewClientInput');
+                    let span = getSpan('Limit #'+(i+1));
+                    let inputLimit = getInputDate('NewClientLimit'+(i+1),'');
+                    limitInput.appendChild(span);
+                    limitInput.appendChild(inputLimit);
+                    divlimitNewClientInput.appendChild(limitInput);
+                }
+                limitSectionNewClient.appendChild(divlimitNewClientInput);
+
+
+
+
+
+
+                let divLimitConteinerButton = document.createElement('div');
+                divLimitConteinerButton.classList.add('col-md-12');
+
+                let divAddLimitButton = document.createElement('button');
+                divAddLimitButton.classList.add('btn','btn-default','separate','AddNewClientSimulationBTN');
+                divAddLimitButton.addEventListener('click',function (e) {
+                    TemplateDOMOfNewClientSimulation(placeToAppend);
+                });
+                let glyphicon = getGlyphicon('plus');
+                divAddLimitButton.appendChild(glyphicon);
+                divSpan = getSpan('Dodaj Symulację Kolejnego Klienta');
+                divSpan.classList.remove('input-group-addon');
+                divAddLimitButton.appendChild(divSpan);
+                divLimitConteinerButton.appendChild(divAddLimitButton);
+
+
+                let divRemoveLimitButton = document.createElement('button');
+                divRemoveLimitButton.classList.add('btn','btn-danger','separate','RemoveSimulationNewClientBTN');
+                divRemoveLimitButton.addEventListener('click',function (e) {
+                    if(document.getElementsByClassName('newClientSimulation').length != 1)
+                        e.target.closest('.newClientSimulation').remove();
+                    else{
+                        swal('Nie ma co usunąć')
+                    }
+                });
+                glyphicon = getGlyphicon('minus');
+                divRemoveLimitButton.appendChild(glyphicon);
+                divSpan = getSpan('Usuń Symulację');
+                divSpan.classList.remove('input-group-addon');
+                divRemoveLimitButton.appendChild(divSpan);
+                divLimitConteinerButton.appendChild(divRemoveLimitButton);
+
+                limitSectionNewClient.appendChild(divLimitConteinerButton);
+
+
+                mainDiv.appendChild(dayEventCount);
+                mainDiv.appendChild(limitSectionNewClient);
+                document.getElementById(placeToAppend).appendChild(mainDiv);
+            }
+            TemplateDOMOfNewClientSimulation('placeToAppendNewClient');
             function TemplateDOMOfClientSimulationEditLimits(placeToAppend) {
                 let mainDiv = document.createElement('div');
                 mainDiv.classList.add('col-md-12');
@@ -615,7 +764,7 @@
                 $('#modalSimulationClient').modal('hide');
             }
             $('.renderSimulation, .saveSimulation').on('click',function (e) {
-                simulationArray     = [];
+                simulationEditLimitArray     = [];
                 let valide          = true;
                 let btnType         = $(this).attr("class").split(" ")[3];
                 allContentToSave    = $('.changeClientLimitContener');
@@ -635,7 +784,7 @@
                     arrayOfLimit.push(jObject.find('.AllLimit2').val());
                     arrayOfLimit.push(jObject.find('.AllLimit3').val());
                     let onlyFirstLimit          = jObject.find('.OnlyFirstLimit').val();
-                    simulationArray.push(new SimulationChangeLimitForClient(arrayOfClinet,dateStartSimulation,dateStopSimulation,arrayOfLimit,onlyFirstLimit,saveStatus));
+                    simulationEditLimitArray.push(new SimulationChangeLimitForClient(arrayOfClinet,dateStartSimulation,dateStopSimulation,arrayOfLimit,onlyFirstLimit,saveStatus));
                     if(arrayOfClinet.length == 0){
                         valide = false;
                         swal("Wybierz klienta do zmiany limitów")
@@ -684,7 +833,7 @@
                     confirmButtonText: 'Tak, resetuj!'
                 }).then((result) => {
                     if (result.value) {
-                        simulationArray = [];
+                        simulationEditLimitArray = [];
                         document.getElementById('placeToAppendClientLimit').innerHTML = "";
                         TemplateDOMOfClientSimulationEditLimits('placeToAppendClientLimit');
                         reloadDataTable();
@@ -729,7 +878,7 @@
                             limitSimulation: obj.limitSimulation,
                             newClientSimulation: obj.newClientSimulation,
                             departmentsInvitationsAverages: obj.data.departmentsInvitationsAverages,
-                            objectClientLimitToSimulate : simulationArray,
+                            objectClientLimitToSimulate : simulationEditLimitArray,
                             factors: {
                                 isChanged: factorsChanged,
                                 saturday: $('#saturdayFactor').val(),
