@@ -1259,7 +1259,11 @@
                     let tr = $(document.createElement('tr'));
                     if(moment(new Date(date))>moment(new Date(today))){
                         tr.append($(document.createElement('td')).css('cursor','pointer').append(date).click(function (e) {
-                            $(e.target).parent().find(':checkbox').prop('checked',true)
+                            if($(e.target).parent().children().length - 1 === $(e.target).parent().children().has(':checked').length){
+                                $(e.target).parent().find(':checkbox').prop('checked',false);
+                            }else{
+                                $(e.target).parent().find(':checkbox').prop('checked',true);
+                            }
                         }));
                         $.each(departmentInfo,function (index, department) {
                             tr.append($(document.createElement('td')).css({'text-align':'center'})
