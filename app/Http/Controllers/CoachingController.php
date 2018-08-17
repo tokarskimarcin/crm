@@ -8,6 +8,7 @@ use App\CoachDirectorHistory;
 use App\Coaching;
 use App\CoachingDirector;
 use App\Department_info;
+use App\Department_types;
 use App\User;
 use Exception;
 use function foo\func;
@@ -174,8 +175,11 @@ class CoachingController extends Controller
             'collect_report' => $coachingConsultantList,
             'user_department_type' => $loggedUser
         ];
+        $departmentInfo = Department_info::where('id','=',Auth::user()->department_info_id)->first();
+
         return view('coaching.progress_table_for_coach')
-            ->with('coachingManagerList', $data);
+            ->with('coachingManagerList', $data)
+            ->with('userDepartmentInfo',$departmentInfo);
     }
 
     /**

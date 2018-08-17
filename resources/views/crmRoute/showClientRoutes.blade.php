@@ -233,7 +233,7 @@
                         </div>
 
                         <div class="col-md-4">
-                            <button class="btn btn-basic" id="clearButton" style="width:100%;">
+                            <button class="btn btn-default" id="clearButton" style="width:100%;">
                                 <span class='glyphicon glyphicon-unchecked'></span> Czyść zaznaczone</button>
                         </div>
                     </div>

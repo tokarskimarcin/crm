@@ -60,7 +60,7 @@
                                         <th>Kod Pocztowy</th>
                                         <th>Szerokość Geo.</th>
                                         <th>Długość Geo.</th>
-                                        <th>Ilość Pokazów</th>
+                                        <th>Liczba Pokazów</th>
                                         <th>Karencja</th>
                                         <th>Edycja</th>
                                     </tr>
@@ -115,9 +115,9 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label class="myLabel">Ilość pokazów:</label>
+                                    <label class="myLabel">Liczba pokazów:</label>
                                     <input class="form-control" id="eventCount" name="eventCount"
-                                           placeholder="Ilość pokazów" type="number" min="0">
+                                           placeholder="Liczba pokazów" type="number" min="0">
                                 </div>
                             </div>
                             <div class="col-md-3">

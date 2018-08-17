@@ -17,7 +17,7 @@
                     <p><strong>Aktualny Wynik</strong> - aktualny wynik danego typu coachingu(przyrostowy), liczony od daty rozpoczęcia coachingu.</p>
                     <p><strong>Aktualna RBH</strong> - ilość aktualnych zaakceptowanych godzin (przyrostowa), liczone od daty rozpoczęcia coachingu.</p>
                     <p><strong>Cel</strong> -  Wymagany wynik na coachingu.</p>
-                    <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po <strong>18 RBH konsultanta</strong>,
+                    <p>Coaching zmieni status z <strong>"W toku"</strong> na <strong>"Nierozliczone"</strong> po <strong><span id="hoursAfterWhichItBecomesUnsettledSpan"></span> RBH konsultanta</strong>,
                         licząc od daty rozpoczęcia coachingu.</p>
                     <p>Gdy pracownik przepracuje więcej niż <strong>26 RBH</strong> podświetli się na czerwono w tabeli "Nierozliczone"</p>
                 </h4>
@@ -236,11 +236,28 @@
 
         $(document).ready(function(){
 
+
+            let hoursAfterWhichItBecomesUnsettled = 18;
+            changeHoursAfterWhichItBecomseUnsettledDependsOnSelectedDep();
+
+
             function isNumeric(n) {
                 return !isNaN(parseFloat(n)) && isFinite(n);
             }
-
+            function changeHoursAfterWhichItBecomseUnsettledDependsOnSelectedDep(){
+                @foreach($departments as $dep)
+                if($('#selected_dep').val() == {{$dep->id}}){
+                    if({{$dep->id_dep_type}} == 1){
+                        hoursAfterWhichItBecomesUnsettled = 14;
+                    }else{
+                        hoursAfterWhichItBecomesUnsettled = 18;
+                    }
+                }
+                @endforeach
+                $('#hoursAfterWhichItBecomesUnsettledSpan').text(hoursAfterWhichItBecomesUnsettled);
+            }
             $('#selected_dep').on('change',function () {
+                changeHoursAfterWhichItBecomseUnsettledDependsOnSelectedDep();
                 $.ajax({
                     type: "POST",
                     url: '{{ route('api.getcoach_list') }}',
@@ -286,7 +303,7 @@
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-                    if (parseInt(data.actual_rbh) >= parseInt(18)) {
+                    if (parseInt(data.actual_rbh) >= parseInt(hoursAfterWhichItBecomesUnsettled)) {
                         $(row).hide();
                     }
                     $(row).attr('id', data.id);
@@ -453,7 +470,7 @@
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
-                    if (parseInt(data.actual_rbh) < parseInt(18)) {
+                    if (parseInt(data.actual_rbh) < parseInt(hoursAfterWhichItBecomesUnsettled)) {
                         $(row).hide();
                     }
                     if(parseInt(data.actual_rbh) > 26){
