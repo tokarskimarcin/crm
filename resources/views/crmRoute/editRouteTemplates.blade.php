@@ -103,6 +103,8 @@
                 let panelBody = document.querySelector('.panel-body');
                 let submitPlace = document.querySelector('.panel-heading');
                 let globalSwalFlag = false;
+            let newShowDeferred = new $.Deferred();
+            let removeShowDeferred = new $.Deferred();
             //END GLOBAL VARIABLES
 
             /**
@@ -122,6 +124,12 @@
                 let firstFormDOM = firstForm.getForm();
 
                 firstDayContainer.appendChild(firstFormDOM);
+                newShowDeferred.promise().then(function (resolve){
+                    $(firstFormDOM).slideDown('slow',function () {
+                        firstDayContainer.scrollIntoView({behavior: "smooth"});
+                    });
+                }, function (reject) {
+                });
             })();
 
             /**
@@ -139,7 +147,32 @@
                 let intersectionArray = null;
 
                 if(globalSwalFlag) {
-                    $.ajax({
+                    getVoivodeshipRoundWithoutGracePeriodAjax().done((response) => {
+                        newShowDeferred.resolve();
+                        removeShowDeferred.resolve();
+                    });
+                }
+                else {
+                    swal({
+                        title: 'Ładowawnie...',
+                        text: 'To może chwilę zająć',
+                        showConfirmButton: false,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        allowEnterKey: false,
+                        onOpen: () => {
+                            swal.showLoading();
+                            getVoivodeshipRoundWithoutGracePeriodAjax().done((response) => {
+                                swal.close();
+                                newShowDeferred.resolve();
+                                removeShowDeferred.resolve();
+                            });
+                        }
+                    });
+
+                }
+                function getVoivodeshipRoundWithoutGracePeriodAjax() {
+                    return $.ajax({
                         type: "POST",
                         async: false,
                         url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
@@ -220,103 +253,6 @@
                         }
                     });
                 }
-                else {
-                    swal({
-                        title: 'Ładowawnie...',
-                        text: 'To może chwilę zająć',
-                        showConfirmButton: false,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        onOpen: () => {
-                            swal.showLoading();
-                            $.ajax({
-                                type: "POST",
-                                async: false,
-                                url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
-                                data: {
-                                    'limit': previousCityDistance,
-                                    "cityId": previousCityId
-                                },
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                                success: function (response) {
-                                    firstResponse = response;
-                                    //console.assert(typeof(firstResponse) === "object", "firstResponse in showInTheMiddleAjax is not object!");
-                                    $.ajax({
-                                        type: "POST",
-                                        async: false,
-                                        url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
-                                        data: {
-                                            'limit': nextCityDistance,
-                                            "cityId": nextCityId
-                                        },
-                                        headers: {
-                                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                        },
-                                        success: function (response2) {
-                                            secondResponse = response2;
-                                            voivodeSelect.innerHTML = '';
-                                            citySelect.innerHTML = '';
-                                            //console.assert(typeof(secondResponse) === "object", "secondResponse in showInTheMiddleAjax is not object!");
-                                            intersectionArray = getIntersection(firstResponse, secondResponse);
-
-                                            let voivodeSet = intersectionArray[0];
-                                            let citySet = intersectionArray[1];
-                                            appendBasicOption(voivodeSelect);
-
-                                            voivodeSet.forEach(voivode => {
-                                                appendVoivodeOptions(voivodeSelect, voivode);
-                                            });
-
-                                            if(oldValuesArray) { //this is optional
-                                                //console.assert(Array.isArray(oldValuesArray), "oldVoivodeArr in showInExtreme method is not array!");
-                                                appendBasicOption(citySelect);
-                                                voivodeSet.forEach(voivode => {
-                                                    if(voivode.id == oldValuesArray[1]) {
-                                                        citySet.forEach(voivodeCity => {
-                                                            //console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
-                                                            voivodeCity.forEach(city => {
-                                                                if(city.id === voivode.id) {
-                                                                    appendCityOptions(citySelect, city);
-                                                                }
-                                                            });
-                                                        });
-                                                    }
-
-                                                });
-                                                setOldValues(oldValuesArray[0], oldValuesArray[1], oldValuesArray[2], oldValuesArray[3]);
-                                            }
-
-                                            citySelect.setAttribute('data-distance', nextCityDistance);
-                                            $(voivodeSelect).on('change', function() {
-                                                citySelect.innerHTML = ''; //cleaning previous insertions
-                                                appendBasicOption(citySelect);
-
-                                                voivodeSet.forEach(voivode => {
-                                                    citySet.forEach(voivodeCity => {
-                                                        //console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
-                                                        voivodeCity.forEach(city => {
-                                                            if(city.id === voivode.id) {
-                                                                appendCityOptions(citySelect, city);
-                                                            }
-                                                        });
-                                                    });
-                                                });
-                                            });
-                                        }
-                                    });
-
-                                }
-                            }).done((response) => {
-                                swal.close();
-                            });
-                        }
-                    });
-
-                }
-
 
             }
 
@@ -330,7 +266,33 @@
                 //console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInExtreme is not number!');
 
                 if(globalSwalFlag) {
-                    $.ajax({
+                    getVoivodeshipRoundWithoutGracePeriodAjax().done((response) => {
+                        newShowDeferred.resolve();
+                        removeShowDeferred.resolve();
+                    });
+                }
+                else {
+                    swal({
+                        title: 'Ładowawnie...',
+                        text: 'To może chwilę zająć',
+                        showConfirmButton: false,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        allowEnterKey: false,
+                        onOpen: () => {
+                            swal.showLoading();
+                            getVoivodeshipRoundWithoutGracePeriodAjax().done((response) => {
+                                swal.close();
+                                newShowDeferred.resolve();
+                                removeShowDeferred.resolve();
+                            });
+                        }
+                    });
+
+                }
+
+                function getVoivodeshipRoundWithoutGracePeriodAjax() {
+                    return $.ajax({
                         type: "POST",
                         async: false,
                         url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
@@ -381,73 +343,6 @@
                         }
                     });
                 }
-                else {
-                    swal({
-                        title: 'Ładowawnie...',
-                        text: 'To może chwilę zająć',
-                        showConfirmButton: false,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        onOpen: () => {
-                            swal.showLoading();
-                            $.ajax({
-                                type: "POST",
-                                async: false,
-                                url: '{{ route('api.getVoivodeshipRoundWithoutGracePeriod') }}',
-                                data: {
-                                    'limit': limit,
-                                    "cityId": nextCityId
-                                },
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                                success: function (response) {
-                                    let allVoivodes = response['voievodeInfo'];
-                                    //console.assert(Array.isArray(allVoivodes), "allVoivodes in showInExtreme method is not array!");
-                                    let allCitiesGroupedByVoivodes = response['cityInfo'];
-                                    //console.assert(typeof(allCitiesGroupedByVoivodes) === "object", "allCitiesGroupedByVoivodes in showInExtreme method is not object!");
-                                    allVoivodes.forEach(voivode => {
-                                        appendVoivodeOptions(voivodeSelect, voivode)
-                                    });
-                                    citySelect.setAttribute('data-distance', limit); //applaying old value
-                                    if(oldVoivodeArr) { //this is optional
-                                        appendBasicOption(citySelect);
-                                        //console.assert(Array.isArray(oldVoivodeArr), "oldVoivodeArr in showInExtreme method is not array!");
-                                        for(let Id in allCitiesGroupedByVoivodes) {
-                                            if(oldVoivodeArr[1] == Id) {
-                                                allCitiesGroupedByVoivodes[Id].forEach(city => {
-                                                    appendCityOptions(citySelect, city);
-                                                });
-                                            }
-                                        }
-                                        setOldValues(oldVoivodeArr[0], oldVoivodeArr[1], oldVoivodeArr[2], oldVoivodeArr[3]);
-                                    }
-
-                                    //After selecting voivode, this event listener appends cities from given range into city select
-                                    $(voivodeSelect).on('change', function(e) {
-                                        citySelect.innerHTML = ''; //cleaning previous insertions
-                                        appendBasicOption(citySelect);
-
-                                        let voivodeId = e.target.value;
-                                        for(let Id in allCitiesGroupedByVoivodes) {
-                                            if(voivodeId == Id) {
-                                                //console.assert(Array.isArray(allCitiesGroupedByVoivodes[Id]), "allCitiesGroupedByVoivodes in showInExtreme method is not array!");
-                                                allCitiesGroupedByVoivodes[Id].forEach(city => {
-                                                    appendCityOptions(citySelect, city);
-                                                });
-                                            }
-                                        }
-                                    });
-                                }
-                            }).done((response) => {
-                                swal.close();
-                            });
-                        }
-                    });
-
-                }
-
 
             }
 
@@ -459,7 +354,30 @@
                 //console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
 
                 if(globalSwalFlag) {
-                    $.ajax({
+                    allCitiesInGivenVoivodeAjaxAjax().done((response) => {
+                        newShowDeferred.resolve();
+                    });
+                }
+                else {
+                    swal({
+                        title: 'Ładowawnie...',
+                        text: 'To może chwilę zająć',
+                        showConfirmButton: false,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        allowEnterKey: false,
+                        onOpen: () => {
+                            swal.showLoading();
+                            allCitiesInGivenVoivodeAjaxAjax().done((response) => {
+                                swal.close();
+                                newShowDeferred.resolve();
+                            });
+                        }
+                    });
+
+                }
+                function allCitiesInGivenVoivodeAjaxAjax() {
+                    return $.ajax({
                         type: "POST",
                         async: false,
                         url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
@@ -483,47 +401,6 @@
                         }
                     });
                 }
-                else {
-                    swal({
-                        title: 'Ładowawnie...',
-                        text: 'To może chwilę zająć',
-                        showConfirmButton: false,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        onOpen: () => {
-                            swal.showLoading();
-                            $.ajax({
-                                type: "POST",
-                                async: false,
-                                url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
-                                data: {
-                                    "id": voivodeId
-                                },
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                                success: function(response) {
-                                    //console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
-                                    let placeToAppend = citySelect;
-                                    placeToAppend.innerHTML = '';
-                                    appendBasicOption(placeToAppend);
-                                    for(let i = 0; i < response.length; i++) {
-                                        let responseOption = document.createElement('option');
-                                        responseOption.value = response[i].id;
-                                        responseOption.textContent = response[i].name;
-                                        placeToAppend.appendChild(responseOption);
-                                    }
-                                }
-                            }).done((response) => {
-                                swal.close();
-                            });
-                        }
-                    });
-
-                }
-
-
             }
 
             function limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr = null) {
@@ -913,6 +790,7 @@
                 this.createDOMBox = function(distance = Infinity, selectedCity = null, intersetion = false, previousBox = null, nextBox = null) { //Creation of DOM form
                     let formBox = document.createElement('div'); //creation of main form container
                     formBox.classList.add('singleShowContainer');
+                    $(formBox).prop('hidden',true);
 
                     /*REMOVE BUTTON PART*/
                     if(this.addRemoveShowButtonFlag) { //adding remove button.
@@ -1010,6 +888,7 @@
                             firstSelect.appendChild(singleVoivode);
                         @endforeach()
 
+                        newShowDeferred.resolve();
                         $(firstSelect).on('change', function(e) {
                             secondSelect.setAttribute('data-distance', 'infinity');
                             let voivodeId = e.target.value;
@@ -1145,14 +1024,24 @@
                         if(isChecked) { //when clicked singleDayContainer has checkbox checked
                             newForm.createDOMBox();
                             let newFormDomElement = newForm.getForm();
-                            thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
+                            thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                            newShowDeferred.promise().then(function (resolve){
+                                $(newFormDomElement).slideDown('slow',function () {
+                                    thisShowContainer.scrollIntoView({behavior: "smooth"});});
+                            }, function (reject) {
+                            });
                         }
                         else {
                             //we are checking whether cliecked singleDayContainer is last one, or between others.
                             if(lastOneFlag === true) {
                                 newForm.createDOMBox(30, selectedCityId);
                                 let newFormDomElement = newForm.getForm();
-                                thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
+                                thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                                newShowDeferred.promise().then(function (resolve){
+                                    $(newFormDomElement).slideDown('slow',function () {
+                                        thisShowContainer.scrollIntoView({behavior: "smooth"});});
+                                }, function (reject) {
+                                });
                             }
                             else { //container is not last one
                                 const apreviousCitySelect = thisShowContainer.querySelector('.citySelect');
@@ -1162,7 +1051,12 @@
                                     apreviousCitySelect.dataset.distance = 30;
                                     newForm.createDOMBox(30, selectedCityId, true, thisShowContainer, nextShowContainer);
                                     let newFormDomElement = newForm.getForm();
-                                    thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
+                                    thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                                    newShowDeferred.promise().then(function (resolve){
+                                        $(newFormDomElement).slideDown('slow',function () {
+                                            thisShowContainer.scrollIntoView({behavior: "smooth"});});
+                                    }, function (reject) {
+                                    });
                                 }
                                 else {
                                     notify('Wybierz miasta w pokazach powyżej i poniżej');
@@ -1495,22 +1389,28 @@
                         }
                     }
 
-                    const allRemoveButtons = dayContainer.getElementsByClassName('remove-button');
-                    //console.assert(allRemoveButtons, "Brak przycisków usuń");
-                    if(allRemoveButtons.length > 1) { //delete only show box
-                        showContainer.parentNode.removeChild(showContainer);
-                    }
-                    else if(allRemoveButtons.length === 1) { //delete day box
-                        const allDayContainers = document.getElementsByClassName('singleDayContainer');
-                        if(allDayContainers.length > 1) {
-                            dayContainer.parentNode.removeChild(dayContainer);
-                            adjustDayNumbers();
+                    removeShowDeferred.promise().then(function () {
+                        const allRemoveButtons = dayContainer.getElementsByClassName('remove-button');
+                        //console.assert(allRemoveButtons, "Brak przycisków usuń");
+                        if(allRemoveButtons.length > 1) { //delete only show box
+                            $(showContainer).slideUp('slow',function () {
+                                showContainer.parentNode.removeChild(showContainer);
+                            });
                         }
-                        else {
-                            notify('Nie można usunąć pierwszego dnia!');
-                        }
+                        else if(allRemoveButtons.length === 1) { //delete day box
+                            const allDayContainers = document.getElementsByClassName('singleDayContainer');
+                            if(allDayContainers.length > 1) {
+                                $(showContainer).slideUp('slow',function () {
+                                    dayContainer.parentNode.removeChild(dayContainer);
+                                    adjustDayNumbers();
+                                });
+                            }
+                            else {
+                                notify('Nie można usunąć pierwszego dnia!');
+                            }
 
-                    }
+                        }
+                    });
                 }
                 else if(e.target.matches('#addNewDay')) { // user clicks on 'add new day' button
                     let firstDay = new DayBox();
@@ -1543,7 +1443,14 @@
 
                         }
                         let firstFormDOM = firstForm.getForm();
-                        firstDayContainer.appendChild(firstFormDOM).scrollIntoView({behavior: "smooth"});
+                        firstDayContainer.appendChild(firstFormDOM);
+
+                        newShowDeferred.promise().then(function (resolve){
+                            $(firstFormDOM).slideDown('slow',function () {
+                                firstDayContainer.scrollIntoView({behavior: "smooth"});
+                            });
+                        }, function (reject) {
+                        });
                     }
                     else {
                         notify('Uzupełnij miasto');
@@ -2012,7 +1919,14 @@
 
                                 showWithoutDistanceAjax(voivodeId, citySelect);
 
-                                dayContainer.appendChild(firstFormDOM).scrollIntoView({behavior: "smooth"});
+                                dayContainer.appendChild(firstFormDOM);
+
+                                newShowDeferred.promise().then(function (resolve){
+                                    $(firstFormDOM).slideDown('slow',function () {
+                                        dayContainer.scrollIntoView({behavior: "smooth"});
+                                    });
+                                }, function (reject) {
+                                });
 
                                 if(response[i].checkbox == 1) { //case when checkbox need to be checked
                                     let checkboxElement = firstFormDOM.querySelector('.distance-checkbox');
