@@ -339,9 +339,6 @@
 
         let idOfRow = null;
 
-        $('#menu-toggle').change(()=>{
-            table2.columns.adjust().draw();
-        });
         var toDay = '{{date('Y-m-d')}}';
         var tableToExcel = (function() {
             var uri = 'data:application/vnd.ms-excel;base64,'
@@ -1562,7 +1559,9 @@
 
             window.addEventListener('pagehide', setItemsToSeessionStorage);
             clearButton.addEventListener('click', clearAllSelections);
-            document.addEventListener('click', globalClickHandler)
+            document.addEventListener('click', globalClickHandler);
+
+            resizeDatatablesOnMenuToggle([table2]);
 
         });
     </script>
