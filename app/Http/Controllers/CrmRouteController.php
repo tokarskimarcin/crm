@@ -3895,7 +3895,7 @@ class CrmRouteController extends Controller
             ->ActiveCampaigns($onlyIds)
             ->get();
 
-        $allClientRouteInfoRecords = ClientRouteInfo::all();
+        //$allClientRouteInfoRecords = ClientRouteInfo::all();
 
         //create new collection and setting properites by client_route_id
         $ClientRouteCampaignsGroupedByClientRoutes = collect();
@@ -3917,7 +3917,7 @@ class CrmRouteController extends Controller
                     $clientRouteId = $infoRecord->client_route_id;
                     $date = $infoRecord->date;
 
-                    $allRecordsForUpdate = ClientRouteInfo::where('client_route_id', '=', $clientRouteId)->where('date', '=', $date)->where('show_order', '=', $showOrder)->get();
+                    $allRecordsForUpdate = ClientRouteInfo::where('client_route_id', '=', $clientRouteId)->where('date', '=', $date)->where('show_order', '=', $showOrder)->where('status','=','1')->get();
                     foreach($allRecordsForUpdate as $recToUpd) {
                         if($numberOfHours == 1) {
                             $recToUpd->onlyOne = 1;
@@ -3968,6 +3968,7 @@ class CrmRouteController extends Controller
                     //here we assign limits according to different scenario
                     foreach($orderedShow as $singleItem) {
 
+                        //dd($singleItem);
                         for($show_order = 0; $show_order < 3; $show_order++) {
                             if($singleItem->show_order == $show_order && $singleItem->nr == 0) {
                                 ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit1]);
@@ -3992,6 +3993,7 @@ class CrmRouteController extends Controller
                         else if($singleItem->onlyTwoHour == 1 && $singleItem->nr == 1) {
                             ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit3]);
                         }
+                        //dd(ClientRouteInfo::where('id', '=', $singleItem->id)->get());
                     }
                 }
             }
