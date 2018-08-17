@@ -131,13 +131,12 @@
                 }
             });
             return tmp;
-        };
+        }
+
         let table = $('#datatable').DataTable({
             autoWidth: true,
-            dom: 'Bfrtip',
-            buttons: [
-                'excel'
-            ],
+            dom: 'lBfrtip',
+            buttons: ['excel'],
             scrollY: datatableHeight,
             data: ajaxResponde(),
             order: [],

@@ -96,7 +96,7 @@
                             <span class='glyphicon glyphicon-edit'></span> Edytuj rekordy</button>
                     </div>
                     <div class="col-md-4">
-                        <button class="btn btn-basic" id="clearButton" style="width:100%;">
+                        <button class="btn btn-default" id="clearButton" style="width:100%;">
                             <span class='glyphicon glyphicon-unchecked'></span> Wyczyść zaznaczenia</button>
                     </div>
 
@@ -435,10 +435,17 @@
 
                let liveInput = document.createElement('input');
                liveInput.id = 'liveInvitation';
-               liveInput.setAttribute('type', 'number');
-               liveInput.setAttribute('step', '1');
-               liveInput.setAttribute('min', '0');
+               liveInput.setAttribute('type', 'text');
+               //liveInput.setAttribute('step', '1');
+               //liveInput.setAttribute('min', '0');
                liveInput.classList.add('form-control');
+               $(liveInput).on('input',function (e) {
+                   if(!$.isNumeric($(e.target).val())){
+                       $(e.target).val('');
+                   }else if($(e.target).val()<0){
+                       $(e.target).val(0);
+                   }
+               });
                placeToAppend.appendChild(liveInput);
            }
 
@@ -482,10 +489,17 @@
 
                let NrPBXInput = document.createElement('input');
                NrPBXInput.id = 'changeNrPBX';
-               NrPBXInput.setAttribute('type', 'number');
-               NrPBXInput.setAttribute('step', '1');
-               NrPBXInput.setAttribute('min', '0');
+               NrPBXInput.setAttribute('type', 'text');
+               //NrPBXInput.setAttribute('step', '1');
+               //NrPBXInput.setAttribute('min', '0');
                NrPBXInput.classList.add('form-control');
+               $(NrPBXInput).on('input',function (e) {
+                   if(!$.isNumeric($(e.target).val())){
+                       $(e.target).val('');
+                   }else if($(e.target).val()<0){
+                       $(e.target).val(0);
+                   }
+               });
                placeToAppend.appendChild(NrPBXInput);
            }
            /**
@@ -514,10 +528,17 @@
 
                let limitInput = document.createElement('input');
                limitInput.id = 'changeLimits';
-               limitInput.setAttribute('type', 'number');
-               limitInput.setAttribute('step', '1');
-               limitInput.setAttribute('min', '0');
+               limitInput.setAttribute('type', 'text');
+               //limitInput.setAttribute('step', '1');
+               //limitInput.setAttribute('min', '0');
                limitInput.classList.add('form-control');
+               $(limitInput).on('input',function (e) {
+                   if(!$.isNumeric($(e.target).val())){
+                       $(e.target).val('');
+                   }else if($(e.target).val()<0){
+                       $(e.target).val(0);
+                   }
+               });
                placeToAppend.appendChild(limitInput);
            }
 

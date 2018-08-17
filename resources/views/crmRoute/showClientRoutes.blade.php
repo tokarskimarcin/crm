@@ -52,6 +52,7 @@
             from {background-color: white;}
             to {background-color: #565fff ;}
         }
+
     </style>
 
     <div id="hiddeCSV" hidden></div>
@@ -232,7 +233,7 @@
                         </div>
 
                         <div class="col-md-4">
-                            <button class="btn btn-basic" id="clearButton" style="width:100%;">
+                            <button class="btn btn-default" id="clearButton" style="width:100%;">
                                 <span class='glyphicon glyphicon-unchecked'></span> Czyść zaznaczone</button>
                         </div>
                     </div>
@@ -339,9 +340,6 @@
 
         let idOfRow = null;
 
-        $('#menu-toggle').change(()=>{
-            table2.columns.adjust().draw();
-        });
         var toDay = '{{date('Y-m-d')}}';
         var tableToExcel = (function() {
             var uri = 'data:application/vnd.ms-excel;base64,'
@@ -876,10 +874,17 @@
                 let limitInput = document.createElement('input');
                 limitInput.id = 'changeLimits_' + limitNumber;
                 limitInput.classList.add('limitInp');
-                limitInput.setAttribute('type', 'number');
-                limitInput.setAttribute('step', '1');
-                limitInput.setAttribute('min', '0');
+                limitInput.setAttribute('type', 'text');
+                //limitInput.setAttribute('step', '1');
+                //limitInput.setAttribute('min', '0');
                 limitInput.classList.add('form-control');
+                $(limitInput).on('input',function (e) {
+                   if(!$.isNumeric($(e.target).val())){
+                       $(e.target).val('');
+                   }else if($(e.target).val()<0){
+                       $(e.target).val(0);
+                   }
+                });
                 placeToAppend.appendChild(limitInput);
             }
 
@@ -894,11 +899,18 @@
 
                 let limitInput = document.createElement('input');
                 limitInput.id = 'singleLimit_' + limitNumber;
-                limitInput.setAttribute('type', 'number');
-                limitInput.setAttribute('step', '1');
-                limitInput.setAttribute('min', '0');
+                limitInput.setAttribute('type', 'text');
+                //limitInput.setAttribute('step', '1');
+                //limitInput.setAttribute('min', '0');
                 limitInput.classList.add('limitInp');
                 limitInput.classList.add('form-control');
+                $(limitInput).on('input',function (e) {
+                    if(!$.isNumeric($(e.target).val())){
+                        $(e.target).val('');
+                    }else if($(e.target).val()<0){
+                        $(e.target).val(0);
+                    }
+                });
                 placeToAppend.appendChild(limitInput);
             }
 
@@ -1562,7 +1574,9 @@
 
             window.addEventListener('pagehide', setItemsToSeessionStorage);
             clearButton.addEventListener('click', clearAllSelections);
-            document.addEventListener('click', globalClickHandler)
+            document.addEventListener('click', globalClickHandler);
+
+            resizeDatatablesOnMenuToggle([table2]);
 
         });
     </script>
