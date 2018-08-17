@@ -16,7 +16,6 @@
 @section('content')
 
     <style>
-
         .dataTable td{
             -moz-user-select: none; /* Firefox */
             -ms-user-select: none; /* Internet Explorer */
@@ -86,6 +85,9 @@
         }
         .separate{
             margin: 1%;
+        }
+        .separateBTN{
+            margin-top: 1%;
         }
     </style>
 
@@ -256,8 +258,11 @@
                         <div class="panel-body">
                             <div id="placeToAppendClientLimit"></div>
                             <div class="col-md-12">
-                                <button class="btn btn-info separate renderSimulation" style="width: 100%">
+                                <button class="btn btn-info separateBTN renderSimulation" style="width: 100%">
                                     <span class="glyphicon glyphicon-cloud"></span> <span>Pokaż symulację</span>
+                                </button>
+                                <button class="btn btn-success separateBTN saveSimulation" style="width: 100%">
+                                    <span class="glyphicon glyphicon-save"></span> <span>Zapisz symulację</span>
                                 </button>
                             </div>
                         </div>
@@ -272,6 +277,7 @@
 @section('script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script src="{{ asset('/js/fixedColumns.dataTables.min.js')}}"></script>
+    <script src="{{ asset('/js/polishSelectPicker.js')}}"></script>
     <script src="{{ asset('/js/dataTables.fixedHeader.min.js')}}"></script>
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script src="{{ asset('/js/moment.js')}}"></script>
@@ -279,6 +285,101 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
+            (function activateDatepicker() {
+                $('.form_date').datetimepicker({
+                    language: 'pl',
+                    autoclose: 1,
+                    minView: 2,
+                    pickTime: false,
+                });
+            })();
+
+            /********** GLOBAL VARIABLES ***********/
+
+            class SimulationChangeLimitForClient{
+                constructor(arrayOfClinet, dateStart,dateStop,arrayOfLimit,limitForOneHour,saveStatus){
+                    this.arrayOfClinet      = arrayOfClinet;
+                    this.dateStart          = dateStart;
+                    this.dateStop           = dateStop;
+                    this.arrayOfLimit       = arrayOfLimit;
+                    this.limitForOneHour    = limitForOneHour;
+                    this.saveStatus         = saveStatus;
+                }
+            };
+
+
+            var simulationArray = [];
+
+            let departmentInfo = <?php echo json_encode($departmentInfo->toArray()) ?>;
+
+            let elementsToSum = {
+                firstElement: {trId: null, tdId: null},
+                lastElement: {trId: null, tdId: null}
+            };
+
+            let sumOfSelectedCells = 0;
+
+            let factorsChanged = false;
+            let selectedRowDays = [];
+
+            let workFreeDaysForDepartments = {};
+
+            const warningResult = {
+                lowAheadDay: 2,
+                highAheadDay: 15
+            };
+            const firstDayOfThisMonth = moment().format('YYYY-MM')+'-01';
+            const today = moment().format('YYYY-MM-DD');
+            const startDate = moment().add(-1,'w').format('YYYY-MM-DD');
+            const stopDate = moment().add(3,'w').format('YYYY-MM-DD');
+
+
+            /*******END OF GLOBAL VARIABLES*********/
+
+            $('#date_start').val(startDate);
+            $('#date_stop').val(stopDate);
+
+            $('.AllLimit1, .OnlyFirstLimit').on("input propertychange", function (e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+
+
+            function fillWorkFreeDaysForDepartments() {
+                let iterator = 1;
+                while(moment(new Date(today)).add(iterator,'d') <= moment(new Date($('#date_stop').val()))){
+                    let day = moment(new Date(today)).add(iterator,'d').format('YYYY-MM-DD');
+                    if(!workFreeDaysForDepartments.hasOwnProperty(day)){
+                        workFreeDaysForDepartments[day] = {};
+                        $.each(departmentInfo,function (index, department) {
+                            if(moment(new Date(day)).format('E') == 7 ){
+                                workFreeDaysForDepartments[day][department.name2] = true;
+
+                            }else{
+                                workFreeDaysForDepartments[day][department.name2] = false;
+                            }
+                        })
+                    }
+                    iterator++;
+                }
+            }
+
+
+            /********************Change Limit Simulation*************************/
+            function reloadDatePicker() {
+                $('.form_date').datetimepicker({
+                    language: 'pl',
+                    autoclose: 1,
+                    minView: 2,
+                    pickTime: false,
+                });
+            }
+            function reloadSelectPicker() {
+                $('.selectpicker').selectpicker({
+                    selectAllText: 'Zaznacz wszystkie',
+                    deselectAllText: 'Odznacz wszystkie'
+                });
+            }
 
             function getColMDConteiner() {
                 let divChoiceClientLimit = document.createElement('div');
@@ -302,6 +403,7 @@
                 divChoiceClientLimitSelect.classList.add('selectedClientToChangeLimit');
                 divChoiceClientLimitSelect.classList.add('selectpicker');
                 divChoiceClientLimitSelect.setAttribute('data-live-search','true');
+                divChoiceClientLimitSelect.setAttribute('data-selected-text-format','count');
                 divChoiceClientLimitSelect.setAttribute('data-width','100%');
                 divChoiceClientLimitSelect.setAttribute('multiple','multiple');
                 return divChoiceClientLimitSelect;
@@ -427,7 +529,7 @@
                 let divLimitForAllEventLabel = document.createElement('label');
                 divLimitForAllEventLabel.textContent = "Limit dla pokazów pełnych (3)";
                 divLimitForAllEvent.appendChild(divLimitForAllEventLabel);
-                for(var i =0;i<3;i++){
+                for( let i =0;i<3;i++){
                     let limitInput = document.createElement('div');
                     limitInput.classList.add('input-group','limitInput');
                     let span = getSpan('Limit #'+(i+1));
@@ -496,125 +598,77 @@
                 reloadDatePicker();
                 reloadSelectPicker();
             }
-
-            TemplateDOMOfClientSimulationEditLimits('placeToAppendClientLimit');
-
-            class SimulationChangeLimitForClient{
-                constructor(arrayOfClinet, dateStart,dateStop,arrayOfLimit,limitForOneHour){
-                    this.arrayOfClinet      = arrayOfClinet;
-                    this.dateStart          = dateStart;
-                    this.dateStop           = dateStop;
-                    this.arrayOfLimit       = arrayOfLimit;
-                    this.limitForOneHour    = limitForOneHour;
-                }
-            };
-
-
-            var simulationArray = [];
-            function reloadDatePicker() {
-                $('.form_date').datetimepicker({
-                    language: 'pl',
-                    autoclose: 1,
-                    minView: 2,
-                    pickTime: false,
+            function reloadDataTable(){
+                //Reload Datatable
+                $('#datatable_processing').show();
+                aheadPlaningTable.dataTable.clear();
+                aheadPlaningTable.dataTable.draw();
+                aheadPlanningData.getData($('#date_start').val(),$("#date_stop").val()).done(function (response) {
+                    aheadPlaningTable.setTableData(response);
+                    $('#datatable_processing').hide();
                 });
+                $('#modalSimulationClient').modal('hide');
             }
-            function reloadSelectPicker() {
-                $('.selectpicker').selectpicker({
-                    selectAllText: 'Zaznacz wszystkie',
-                    deselectAllText: 'Odznacz wszystkie'
-                });
-            }
-
-
-
-            (function activateDatepicker() {
-                $('.form_date').datetimepicker({
-                    language: 'pl',
-                    autoclose: 1,
-                    minView: 2,
-                    pickTime: false,
-                });
-            })();
-
-
-            /********** GLOBAL VARIABLES ***********/
-
-            let departmentInfo = <?php echo json_encode($departmentInfo->toArray()) ?>;
-
-            let elementsToSum = {
-                firstElement: {trId: null, tdId: null},
-                lastElement: {trId: null, tdId: null}
-            };
-
-            let sumOfSelectedCells = 0;
-
-            let factorsChanged = false;
-            let selectedRowDays = [];
-
-            let workFreeDaysForDepartments = {};
-
-            const warningResult = {
-                lowAheadDay: 2,
-                highAheadDay: 15
-            };
-            const firstDayOfThisMonth = moment().format('YYYY-MM')+'-01';
-            const today = moment().format('YYYY-MM-DD');
-            const startDate = moment().add(-1,'w').format('YYYY-MM-DD');
-            const stopDate = moment().add(3,'w').format('YYYY-MM-DD');
-
-
-            /*******END OF GLOBAL VARIABLES*********/
-
-            $('#date_start').val(startDate);
-            $('#date_stop').val(stopDate);
-
-
-            $('.renderSimulation').on('click',function (e) {
-                simulationArray = [];
-                allContentToSave = $('.changeClientLimitContener');
+            $('.renderSimulation, .saveSimulation').on('click',function (e) {
+                simulationArray     = [];
+                let valide          = true;
+                let btnType         = $(this).attr("class").split(" ")[3];
+                allContentToSave    = $('.changeClientLimitContener');
                 allContentToSave.each(function (key,value) {
                     let jObject                 = $(value);
-                    let arrayOfClinet        = jObject.find('select').val();
+                    let arrayOfClinet           = jObject.find('select').val();
                     let dateStartSimulation     = jObject.find('.dateStartLimit').val();
                     let dateStopSimulation      = jObject.find('.dateStopLimit').val();
-                    let arrayOfLimit = [];
+                    let arrayOfLimit            = [];
+                    let saveStatus              = false;
+                    if(btnType == 'renderSimulation'){
+                        saveStatus              = false;
+                    }else if(btnType == 'saveSimulation'){
+                        saveStatus              = true;
+                    }
                     arrayOfLimit.push(jObject.find('.AllLimit1').val());
                     arrayOfLimit.push(jObject.find('.AllLimit2').val());
                     arrayOfLimit.push(jObject.find('.AllLimit3').val());
                     let onlyFirstLimit          = jObject.find('.OnlyFirstLimit').val();
-                    simulationArray.push(new SimulationChangeLimitForClient(arrayOfClinet,dateStartSimulation,dateStopSimulation,arrayOfLimit,onlyFirstLimit));
-                    //Reload Datatable
-                    $('#datatable_processing').show();
-                    aheadPlaningTable.dataTable.clear();
-                    aheadPlaningTable.dataTable.draw();
-                    aheadPlanningData.getData($('#date_start').val(),$("#date_stop").val()).done(function (response) {
-                        aheadPlaningTable.setTableData(response);
-                        $('#datatable_processing').hide();
-                    });
-                    $('#modalSimulationClient').modal('hide');
+                    simulationArray.push(new SimulationChangeLimitForClient(arrayOfClinet,dateStartSimulation,dateStopSimulation,arrayOfLimit,onlyFirstLimit,saveStatus));
+                    if(arrayOfClinet.length == 0){
+                        valide = false;
+                        swal("Wybierz klienta do zmiany limitów")
+                        return false;
+                    }
+                    if(dateStartSimulation > dateStopSimulation){
+                        valide = false;
+                        swal("Data rozpoczęcia symulacji nie może być większa, niż data zakończenia symulacji")
+                        return false;
+                    }
                 });
-            });
-
-
-            function fillWorkFreeDaysForDepartments() {
-                let iterator = 1;
-                while(moment(new Date(today)).add(iterator,'d') <= moment(new Date($('#date_stop').val()))){
-                    let day = moment(new Date(today)).add(iterator,'d').format('YYYY-MM-DD');
-                    if(!workFreeDaysForDepartments.hasOwnProperty(day)){
-                        workFreeDaysForDepartments[day] = {};
-                        $.each(departmentInfo,function (index, department) {
-                            if(moment(new Date(day)).format('E') == 7 ){
-                                workFreeDaysForDepartments[day][department.name2] = true;
-
-                            }else{
-                                workFreeDaysForDepartments[day][department.name2] = false;
+                if(valide){
+                    if(btnType == 'saveSimulation'){
+                        swal({
+                            title: 'Jesteś Pewny ?',
+                            text: "Potwierdzenie spowoduje zapisanie zmian",
+                            type: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Tak, zapisz!'
+                        }).then((result) => {
+                            if (result.value) {
+                                reloadDataTable();
+                                swal(
+                                    'Zapisano!',
+                                    'Limity zostały zmienione.',
+                                    'success'
+                                )
                             }
                         })
+                    }else{
+                        reloadDataTable();
                     }
-                    iterator++;
+
                 }
-            }
+            });
+            TemplateDOMOfClientSimulationEditLimits('placeToAppendClientLimit');
 
             /*********************DataTable FUNCTUONS****************************/
             let aheadPlanningData = {
