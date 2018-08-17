@@ -52,6 +52,7 @@
             from {background-color: white;}
             to {background-color: #565fff ;}
         }
+
     </style>
 
     <div id="hiddeCSV" hidden></div>
@@ -873,10 +874,17 @@
                 let limitInput = document.createElement('input');
                 limitInput.id = 'changeLimits_' + limitNumber;
                 limitInput.classList.add('limitInp');
-                limitInput.setAttribute('type', 'number');
-                limitInput.setAttribute('step', '1');
-                limitInput.setAttribute('min', '0');
+                limitInput.setAttribute('type', 'text');
+                //limitInput.setAttribute('step', '1');
+                //limitInput.setAttribute('min', '0');
                 limitInput.classList.add('form-control');
+                $(limitInput).on('input',function (e) {
+                   if(!$.isNumeric($(e.target).val())){
+                       $(e.target).val('');
+                   }else if($(e.target).val()<0){
+                       $(e.target).val(0);
+                   }
+                });
                 placeToAppend.appendChild(limitInput);
             }
 
@@ -891,11 +899,18 @@
 
                 let limitInput = document.createElement('input');
                 limitInput.id = 'singleLimit_' + limitNumber;
-                limitInput.setAttribute('type', 'number');
-                limitInput.setAttribute('step', '1');
-                limitInput.setAttribute('min', '0');
+                limitInput.setAttribute('type', 'text');
+                //limitInput.setAttribute('step', '1');
+                //limitInput.setAttribute('min', '0');
                 limitInput.classList.add('limitInp');
                 limitInput.classList.add('form-control');
+                $(limitInput).on('input',function (e) {
+                    if(!$.isNumeric($(e.target).val())){
+                        $(e.target).val('');
+                    }else if($(e.target).val()<0){
+                        $(e.target).val(0);
+                    }
+                });
                 placeToAppend.appendChild(limitInput);
             }
 
