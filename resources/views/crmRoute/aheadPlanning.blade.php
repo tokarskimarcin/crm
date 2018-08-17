@@ -178,6 +178,11 @@
                         <div class="col-md-4">
                             <button class="btn btn-default simulationNewClient"  style="width: 100%" data-toggle="modal"  data-target="#modalSimulationClient" >Symulacja Klienta(Nowy Klient)</button>
                         </div>
+                        <div class="col-md-4">
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-danger resetSimulationClientLimit"  style="width: 100%" data-toggle="modal" >Resetuj Symulacje</button>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4">
@@ -668,8 +673,30 @@
 
                 }
             });
+            $('.resetSimulationClientLimit').on('click',function (e) {
+                swal({
+                    title: 'Jesteś Pewny ?',
+                    text: "Potwierdzenie spowoduje resetowanie symulacji",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Tak, resetuj!'
+                }).then((result) => {
+                    if (result.value) {
+                        simulationArray = [];
+                        document.getElementById('placeToAppendClientLimit').innerHTML = "";
+                        TemplateDOMOfClientSimulationEditLimits('placeToAppendClientLimit');
+                        reloadDataTable();
+                        swal(
+                            'Wykonano!',
+                            'Limity zostały zresetowane.',
+                            'success'
+                        )
+                    }
+                });
+            });
             TemplateDOMOfClientSimulationEditLimits('placeToAppendClientLimit');
-
             /*********************DataTable FUNCTUONS****************************/
             let aheadPlanningData = {
                 limitSimulation: null,
