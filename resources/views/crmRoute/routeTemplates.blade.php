@@ -102,6 +102,9 @@
             //GLOBAL VARIABLES
                 let panelBody = document.querySelector('.panel-body');
                 let submitPlace = document.querySelector('.summaryButtonContainer');
+
+            let newShowDeferred = new $.Deferred();
+            let removeShowDeferred = new $.Deferred();
             //END GLOBAL VARIABLES
 
             /**
@@ -120,7 +123,14 @@
                 firstForm.createDOMBox();
                 let firstFormDOM = firstForm.getForm();
 
-                firstDayContainer.appendChild(firstFormDOM);F
+                firstDayContainer.appendChild(firstFormDOM);
+
+                newShowDeferred.promise().then(function (resolve){
+                    $(firstFormDOM).slideDown('slow',function () {
+                        firstDayContainer.scrollIntoView({behavior: "smooth"});
+                    });
+                }, function (reject) {
+                });
             })();
 
             /**
@@ -227,6 +237,8 @@
                             }
                         }).done((response) => {
                             swal.close();
+                            newShowDeferred.resolve();
+                            removeShowDeferred.resolve();
                         });
                     }
                 });
@@ -302,6 +314,8 @@
                             }
                         }).done((response) => {
                             swal.close();
+                            newShowDeferred.resolve();
+                            removeShowDeferred.resolve();
                         });
                     }
                 });
@@ -347,6 +361,7 @@
                             }
                         }).done((response) => {
                             swal.close();
+                            newShowDeferred.resolve();
                         });
                     }
                 });
@@ -739,6 +754,7 @@
                 this.createDOMBox = function(distance = Infinity, selectedCity = null, intersetion = false, previousBox = null, nextBox = null) { //Creation of DOM form
                     let formBox = document.createElement('div'); //creation of main form container
                     formBox.classList.add('singleShowContainer');
+                    $(formBox).prop('hidden',true);
 
                     /*REMOVE BUTTON PART*/
                     if(this.addRemoveShowButtonFlag) { //adding remove button.
@@ -834,8 +850,8 @@
                             singleVoivode.value = {{$voivode->id}};
                             singleVoivode.textContent = '{{$voivode->name}}';
                             firstSelect.appendChild(singleVoivode);
-                        @endforeach()
-
+                        @endforeach
+                        newShowDeferred.resolve();
                         $(firstSelect).on('change', function(e) {
                             secondSelect.setAttribute('data-distance', 'infinity');
                             let voivodeId = e.target.value;
@@ -971,14 +987,24 @@
                         if(isChecked) { //when clicked singleDayContainer has checkbox checked
                             newForm.createDOMBox();
                             let newFormDomElement = newForm.getForm();
-                            thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
+                            thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                            newShowDeferred.promise().then(function (resolve){
+                                $(newFormDomElement).slideDown('slow',function () {
+                                    thisShowContainer.scrollIntoView({behavior: "smooth"});});
+                            }, function (reject) {
+                            });
                         }
                         else {
                             //we are checking whether cliecked singleDayContainer is last one, or between others.
                             if(lastOneFlag === true) {
                                 newForm.createDOMBox(30, selectedCityId);
                                 let newFormDomElement = newForm.getForm();
-                                thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
+                                thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                                newShowDeferred.promise().then(function (resolve){
+                                    $(newFormDomElement).slideDown('slow',function () {
+                                        thisShowContainer.scrollIntoView({behavior: "smooth"});});
+                                }, function (reject) {
+                                });
                             }
                             else { //container is not last one
                                 const apreviousCitySelect = thisShowContainer.querySelector('.citySelect');
@@ -988,7 +1014,12 @@
                                     apreviousCitySelect.dataset.distance = 30;
                                     newForm.createDOMBox(30, selectedCityId, true, thisShowContainer, nextShowContainer);
                                     let newFormDomElement = newForm.getForm();
-                                    thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
+                                    thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                                    newShowDeferred.promise().then(function (resolve){
+                                        $(newFormDomElement).slideDown('slow',function () {
+                                            thisShowContainer.scrollIntoView({behavior: "smooth"});});
+                                    }, function (reject) {
+                                    });
                                 }
                                 else {
                                     notify('Wybierz miasta w pokazach powyżej i poniżej');
@@ -1320,22 +1351,28 @@
                         }
                     }
 
-                    const allRemoveButtons = dayContainer.getElementsByClassName('remove-button');
-                    //console.assert(allRemoveButtons, "Brak przycisków usuń");
-                    if(allRemoveButtons.length > 1) { //delete only show box
-                        showContainer.parentNode.removeChild(showContainer);
-                    }
-                    else if(allRemoveButtons.length === 1) { //delete day box
-                        const allDayContainers = document.getElementsByClassName('singleDayContainer');
-                        if(allDayContainers.length > 1) {
-                            dayContainer.parentNode.removeChild(dayContainer);
-                            adjustDayNumbers();
+                    removeShowDeferred.promise().then(function () {
+                        const allRemoveButtons = dayContainer.getElementsByClassName('remove-button');
+                        //console.assert(allRemoveButtons, "Brak przycisków usuń");
+                        if(allRemoveButtons.length > 1) { //delete only show box
+                            $(showContainer).slideUp('slow',function () {
+                                showContainer.parentNode.removeChild(showContainer);
+                            });
                         }
-                        else {
-                            notify('Nie można usunąć pierwszego dnia!');
-                        }
+                        else if(allRemoveButtons.length === 1) { //delete day box
+                            const allDayContainers = document.getElementsByClassName('singleDayContainer');
+                            if(allDayContainers.length > 1) {
+                                $(showContainer).slideUp('slow',function () {
+                                    dayContainer.parentNode.removeChild(dayContainer);
+                                    adjustDayNumbers();
+                                });
+                            }
+                            else {
+                                notify('Nie można usunąć pierwszego dnia!');
+                            }
 
-                    }
+                        }
+                    });
                 }
                 else if(e.target.matches('#addNewDay')) { // user clicks on 'add new day' button
                     let firstDay = new DayBox();
@@ -1368,7 +1405,14 @@
 
                         }
                         let firstFormDOM = firstForm.getForm();
-                        firstDayContainer.appendChild(firstFormDOM).scrollIntoView({behavior: "smooth"});
+                        firstDayContainer.appendChild(firstFormDOM);
+
+                        newShowDeferred.promise().then(function (resolve){
+                            $(firstFormDOM).slideDown('slow',function () {
+                                firstDayContainer.scrollIntoView({behavior: "smooth"});
+                            });
+                        }, function (reject) {
+                        });
                     }
                     else {
                         notify('Uzupełnij miasto');
