@@ -1560,7 +1560,7 @@
                             voivodeSelect.appendChild(singleVoivode);
                             @endforeach()
                             citySelect.setAttribute('data-distance', 'infinity');
-                            voivodeSelect.addEventListener('change', e => {
+                            $(voivodeSelect).on('change', e => {
                                 let voivodeId = e.target.value;
                                 showWithoutDistanceAjax(voivodeId, citySelect);
                             });
@@ -1614,7 +1614,7 @@
                                 voivodeSelect.appendChild(singleVoivode); //password_date
                                 @endforeach()
 
-                                voivodeSelect.addEventListener('change', e => {
+                                $(voivodeSelect).on('change', e => {
                                     citySelect.setAttribute('data-distance', 'infinity');
                                     let voivodeId = e.target.value;
                                     showWithoutDistanceAjax(voivodeId, citySelect);
