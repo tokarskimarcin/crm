@@ -284,10 +284,14 @@ class CrmRouteController extends Controller
 //            ->with('routeInfo', $routeInfo);
 //    }
 
+    /**
+     * @return view route Templates
+     */
     public function addNewRouteTemplateGet() {
         $voivodes = Voivodes::all();
 
-        return view('crmRoute.routeTemplates')->with('voivodes', $voivodes);
+        return view('crmRoute.routeTemplates')
+            ->with('voivodes', $voivodes);
     }
 
     /**
@@ -368,6 +372,11 @@ class CrmRouteController extends Controller
             ->with('routeTemplate', $route);
     }
 
+    /**
+     * @param $id
+     * @param Request $request
+     * This method saves route template edited version
+     */
     public function editRouteTemplatesPost($id, Request $request) {
         if($request->has('alldata')) {
             $allData = json_decode($request->alldata);
@@ -3532,7 +3541,6 @@ class CrmRouteController extends Controller
             }
         }
 
-//        dd($weeks);
         $lastNumberOfWeek = $actualWeek;
         $dateNextMonth = date('Y-m-d', strtotime($date . ' + 1 days'));
         $daysInNextMonth = date('t', strtotime($dateNextMonth));
