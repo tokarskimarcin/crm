@@ -3118,6 +3118,18 @@ class CrmRouteController extends Controller
         return $arrayOfWeekName[date('N',strtotime($date))+0];
     }
 
+    private function getNameOfWeek2($date){
+        $arrayOfWeekName = [
+            '1' => 'Poniedziałek',
+            '2' => 'Wtorek',
+            '3' => 'Środa',
+            '4' => 'Czwartek',
+            '5' => 'Piątek',
+            '6' => 'Sobota',
+            '7' => 'Niedziela'];
+        return $arrayOfWeekName[date('N',strtotime($date))+0];
+    }
+
     /**
      * This method returns view presentationStatistics with a data necessary for table
      */
@@ -3488,20 +3500,28 @@ class CrmRouteController extends Controller
             '7' => 'Niedziela'];
 
         $days_in_month = date('t', strtotime($year . '-' . $month));
-
-//        $lastMonthLastWeekNumber =
+//
+//        $givenMonth = date('Y-m-d', strtotime($year.'-'.$month.'-01'));
+//        $prevMonth = mktime(0,0,0,$givenMonth)
+//        $lastDayOfPrevMonth = date_add($lastMonth, '-1 day');
+//        dd($lastDayOfPrevMonth);
         $numberOfWeekPreviusMonth = $this::getWeekNumber(date('Y-m-d', strtotime($year.'-'.$month.'-01'. ' - 1 days')));
 
-//        dd($numberOfWeekPreviusMonth);
+//        dd(date('Y-m-d', strtotime($year.'-'.$month.'-01'. ' - 1 days')));
+
         $weeks = [];
         for ($i = 1; $i <= $days_in_month; $i++) {
             $loop_day = ($i < 10) ? '0' . $i : $i ;
             $date = $year.'-'.$month.'-'.$loop_day;
             $actualWeek = $this::getWeekNumber($date);
-//            dd($actualWeek);
+//            if($i == $days_in_month - 1) {
+////                            dd($numberOfWeekPreviusMonth);
+//                dd($this::getNameOfWeek2($date));
+//            }
+
             if($actualWeek != $numberOfWeekPreviusMonth){
                 foreach($arrayOfWeekName as $key => $value) {
-                    if($value == $this::getNameOfWeek($date)) {
+                    if($value == $this::getNameOfWeek2($date)) {
                         $weeksObj = new \stdClass();
                         $weeksObj->date = $date;
                         $weeksObj->weekNumber = date('W', strtotime($date));
@@ -3521,6 +3541,8 @@ class CrmRouteController extends Controller
                 }
             }
         }
+
+//        dd($weeks);
         $lastNumberOfWeek = $actualWeek;
         $dateNextMonth = date('Y-m-d', strtotime($date . ' + 1 days'));
         $daysInNextMonth = date('t', strtotime($dateNextMonth));
