@@ -1600,7 +1600,7 @@
                         }
                     }
                     else {
-                        e.target.checked = isChecked ? e.target.checked = false : e.target.checked = true;
+                        e.target.checked = isChecked ? false : true;
 
                         swal('Wybierz miasta i województwa w listach poniżej i powyżej');
                     }

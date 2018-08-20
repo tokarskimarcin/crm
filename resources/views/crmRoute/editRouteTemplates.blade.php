@@ -1647,7 +1647,7 @@
                         }
                     }
                     else {
-                        e.target.checked = isChecked ? e.target.checked = false : e.target.checked = true;
+                        e.target.checked = isChecked ? false : true;
 
                         swal('Wybierz maista w listach poniżej i powyżej');
                     }
