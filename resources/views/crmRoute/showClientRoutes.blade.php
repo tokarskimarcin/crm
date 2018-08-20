@@ -110,20 +110,20 @@
                                     <div class="col-md-5">
                                         <strong>Edycja (Hoteli i godzin):</strong>
                                         <ul class="list-group">
-                                            <li class="list-group-item"><button class="btn btn-danger" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edycja</button>
+                                            <li class="list-group-item"><button class="btn btn-danger" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edytuj</button>
                                                 - trasa niegotowa (nieprzypisane hotele i godziny)</li>
-                                            <li class="list-group-item"><button class="btn btn-info" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edycja</button>
+                                            <li class="list-group-item"><button class="btn btn-info" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edytuj</button>
                                                 - trasa gotowa (przypisane hotele i godziny)</li>
                                         </ul>
                                     </div>
                                     <div class="col-md-7">
                                         <strong>Edycja parametrów (Kampanii):</strong>
                                         <ul class="list-group">
-                                            <li class="list-group-item"><button class="btn btn-danger" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edycja</button>
+                                            <li class="list-group-item"><button class="btn btn-danger" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edytuj</button>
                                                 - trasy z nie przypisanymi oddziałami i nie ustawionymi limitami</li>
-                                            <li class="list-group-item"><button class="btn btn-warning" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edycja</button>
+                                            <li class="list-group-item"><button class="btn btn-warning" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edytuj</button>
                                                 - trasy z nie przypisanymi oddziałami albo nie ustawionymi limitami</li>
-                                            <li class="list-group-item"><button class="btn btn-info" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edycja</button>
+                                            <li class="list-group-item"><button class="btn btn-info" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edytuj</button>
                                                 - trasy z przypisanymi oddziałami i ustawionymi limitami</li>
                                         </ul>
                                     </div>
@@ -463,7 +463,7 @@
                             $.each(response['distincRouteID'],function (key,value) {
                                 var clienObject = {key : key, color: random_rgba(),clientName: value[0].clientName};
                                 clientColorObj.push(clienObject);
-                            })
+                            });
 
                             $.each(response['infoClient'],function (key,value) {
                                 var color = random_rgba();
@@ -1061,11 +1061,11 @@
                     //validation
                     const allLimits = document.querySelectorAll('.limitInp');
                     let allGood = true;
-                    allLimits.forEach(limit => {
+                    /*allLimits.forEach(limit => {
                        if(limit.value == 0 || limit.value == '' || limit.value == null) {
                            allGood = false;
                        }
-                    });
+                    });*/
 
                     const limitInput1 = document.querySelector('#changeLimits_1');
                     const limitInput2 = document.querySelector('#changeLimits_2');
@@ -1078,9 +1078,8 @@
                     const singleLimitvalue = singleLimitInput.value;
 
                     if(allGood) {
-
                         //this part changes color of button
-                        clientRouteIdArr.forEach(id => {
+                        /*clientRouteIdArr.forEach(id => {
                            if(document.querySelector(`#${id}`)) {
                                let givenRow = document.querySelector(`#${id}`);
                                let limitEditButton = givenRow.querySelector('.show-modal-with-data');
@@ -1089,7 +1088,7 @@
                                    limitEditButton.classList.add('btn-info');
                                }
                            }
-                        });
+                        });*/
 
                         const url = `{{route('api.changeLimits')}}`;
                         const header = new Headers();
