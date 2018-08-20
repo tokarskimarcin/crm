@@ -438,6 +438,7 @@
                liveInput.setAttribute('type', 'text');
                //liveInput.setAttribute('step', '1');
                //liveInput.setAttribute('min', '0');
+               liveInput.setAttribute('placeholder', 'Aktualna liczba wydzwonionych zaproszeń np: 20');
                liveInput.classList.add('form-control');
                $(liveInput).on('input',function (e) {
                    if(!$.isNumeric($(e.target).val())){
@@ -492,6 +493,7 @@
                NrPBXInput.setAttribute('type', 'text');
                //NrPBXInput.setAttribute('step', '1');
                //NrPBXInput.setAttribute('min', '0');
+               NrPBXInput.setAttribute('placeholder', 'Numer kampanii z PBX');
                NrPBXInput.classList.add('form-control');
                $(NrPBXInput).on('input',function (e) {
                    if(!$.isNumeric($(e.target).val())){
@@ -529,6 +531,7 @@
                let limitInput = document.createElement('input');
                limitInput.id = 'changeLimits';
                limitInput.setAttribute('type', 'text');
+               limitInput.setAttribute('placeholder', 'Limit dla danej godziny z kampanii');
                //limitInput.setAttribute('step', '1');
                //limitInput.setAttribute('min', '0');
                limitInput.classList.add('form-control');
@@ -554,6 +557,7 @@
                let commentInput = document.createElement('input');
                commentInput.id = 'changeComments';
                commentInput.setAttribute('type', 'text');
+               commentInput.setAttribute('placeholder', 'Tutaj można umieścić krótki komentarz');
                commentInput.classList.add('form-control');
                placeToAppend.appendChild(commentInput);
            }
@@ -690,14 +694,16 @@
                        },"name":"cityName"
                    },
                    {"data": function (data, type, dataToSet) {
-                           if(data.baseDivision != null)
+                           if(data.baseDivision != null) {
+                               return '<textarea class="form-control baseDivision" cols="10" readonly>'+data.baseDivision+'</textarea>';
+                           }
+                           else {
+                               return "";
+                           }
                                /*return data.baseDivision;
                            else
                                return "";*/
-                            return '<textarea class="form-control baseDivision" cols="10" readonly>'+data.baseDivision+'</textarea>';
-                           else
-                               return "";
-                   }
+                   },"name":"baseDivision"
                    },
                    {"data":function (data, type, dataToSet) {
                        let verificationInfo;
@@ -720,7 +726,12 @@
                        },"name":"limits"
                    },
                    {"data":function (data, type, dataToSet) {
+                       if(data.loseSuccess <= 0) {
                            return data.loseSuccess;
+                       }
+                       else {
+                           return 0;
+                       }
                        },"name":"loseSuccess"
                    },
                    {"data":function (data, type, dataToSet) {
