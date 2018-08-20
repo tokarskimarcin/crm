@@ -136,12 +136,12 @@
              * This method is used in shows appended between another ones
              */
             function showInTheMiddleAjax(previousCityDistance, previousCityId, nextCityDistance, nextCityId, citySelect, voivodeSelect, oldValuesArray = null) {
-                //console.assert(citySelect.matches('.citySelect'), 'citySelect in showInTheMiddleAjax method is not city select');
-                //console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInTheMiddleAjax method is not voivode select');
-                //console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInTheMiddleAjax is not number!');
-                //console.assert((!isNaN(parseInt(previousCityId))) && (previousCityId != 0), 'previousCityId in showInTheMiddleAjax is not number!');
-                //console.assert((!isNaN(parseInt(previousCityDistance))) || (previousCityDistance == 'infinity'), 'previousCityId in showInTheMiddleAjax is not correct value!');
-                //console.assert((!isNaN(parseInt(nextCityDistance))) || (nextCityDistance == 'infinity'), 'nextCityDistance in showInTheMiddleAjax is not correct value!');
+                console.assert(citySelect.matches('.citySelect'), 'citySelect in showInTheMiddleAjax method is not city select');
+                console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInTheMiddleAjax method is not voivode select');
+                console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInTheMiddleAjax is not number!');
+                console.assert((!isNaN(parseInt(previousCityId))) && (previousCityId != 0), 'previousCityId in showInTheMiddleAjax is not number!');
+                console.assert((!isNaN(parseInt(previousCityDistance))) || (previousCityDistance == 'infinity'), 'previousCityId in showInTheMiddleAjax is not correct value!');
+                console.assert((!isNaN(parseInt(nextCityDistance))) || (nextCityDistance == 'infinity'), 'nextCityDistance in showInTheMiddleAjax is not correct value!');
                 let firstResponse = null;
                 let secondResponse = null;
                 let intersectionArray = null;
@@ -185,7 +185,7 @@
                         },
                         success: function (response) {
                             firstResponse = response;
-                            //console.assert(typeof(firstResponse) === "object", "firstResponse in showInTheMiddleAjax is not object!");
+                            console.assert(typeof(firstResponse) === "object", "firstResponse in showInTheMiddleAjax is not object!");
                             $.ajax({
                                 type: "POST",
                                 async: false,
@@ -201,7 +201,7 @@
                                     secondResponse = response2;
                                     voivodeSelect.innerHTML = '';
                                     citySelect.innerHTML = '';
-                                    //console.assert(typeof(secondResponse) === "object", "secondResponse in showInTheMiddleAjax is not object!");
+                                    console.assert(typeof(secondResponse) === "object", "secondResponse in showInTheMiddleAjax is not object!");
                                     intersectionArray = getIntersection(firstResponse, secondResponse);
 
                                     let voivodeSet = intersectionArray[0];
@@ -213,12 +213,12 @@
                                     });
 
                                     if(oldValuesArray) { //this is optional
-                                        //console.assert(Array.isArray(oldValuesArray), "oldVoivodeArr in showInExtreme method is not array!");
+                                        console.assert(Array.isArray(oldValuesArray), "oldVoivodeArr in showInExtreme method is not array!");
                                         appendBasicOption(citySelect);
                                         voivodeSet.forEach(voivode => {
                                             if(voivode.id == oldValuesArray[1]) {
                                                 citySet.forEach(voivodeCity => {
-                                                    //console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
+                                                    console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
                                                     voivodeCity.forEach(city => {
                                                         if(city.id === voivode.id) {
                                                             appendCityOptions(citySelect, city);
@@ -238,7 +238,7 @@
 
                                         voivodeSet.forEach(voivode => {
                                             citySet.forEach(voivodeCity => {
-                                                //console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
+                                                console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
                                                 voivodeCity.forEach(city => {
                                                     if(city.id === voivode.id) {
                                                         appendCityOptions(citySelect, city);
@@ -260,10 +260,10 @@
              * This method is used in shows appended as first or last ones
              */
             function showInExtreme(limit, nextCityId, citySelect, voivodeSelect, oldVoivodeArr = null) {
-                //console.assert(citySelect.matches('.citySelect'), 'citySelect in showInExtreme method is not city select');
-                //console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInExtreme method is not voivode select');
-                //console.assert(!isNaN(parseInt(limit)), 'limit in showInExtreme is not number!');
-                //console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInExtreme is not number!');
+                console.assert(citySelect.matches('.citySelect'), 'citySelect in showInExtreme method is not city select');
+                console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInExtreme method is not voivode select');
+                console.assert(!isNaN(parseInt(limit)), 'limit in showInExtreme is not number!');
+                console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInExtreme is not number!');
 
                 if(globalSwalFlag) {
                     getVoivodeshipRoundWithoutGracePeriodAjax().done((response) => {
@@ -305,16 +305,16 @@
                         },
                         success: function (response) {
                             let allVoivodes = response['voievodeInfo'];
-                            //console.assert(Array.isArray(allVoivodes), "allVoivodes in showInExtreme method is not array!");
+                            console.assert(Array.isArray(allVoivodes), "allVoivodes in showInExtreme method is not array!");
                             let allCitiesGroupedByVoivodes = response['cityInfo'];
-                            //console.assert(typeof(allCitiesGroupedByVoivodes) === "object", "allCitiesGroupedByVoivodes in showInExtreme method is not object!");
+                            console.assert(typeof(allCitiesGroupedByVoivodes) === "object", "allCitiesGroupedByVoivodes in showInExtreme method is not object!");
                             allVoivodes.forEach(voivode => {
                                 appendVoivodeOptions(voivodeSelect, voivode)
                             });
                             citySelect.setAttribute('data-distance', limit); //applaying old value
                             if(oldVoivodeArr) { //this is optional
                                 appendBasicOption(citySelect);
-                                //console.assert(Array.isArray(oldVoivodeArr), "oldVoivodeArr in showInExtreme method is not array!");
+                                console.assert(Array.isArray(oldVoivodeArr), "oldVoivodeArr in showInExtreme method is not array!");
                                 for(let Id in allCitiesGroupedByVoivodes) {
                                     if(oldVoivodeArr[1] == Id) {
                                         allCitiesGroupedByVoivodes[Id].forEach(city => {
@@ -333,7 +333,7 @@
                                 let voivodeId = e.target.value;
                                 for(let Id in allCitiesGroupedByVoivodes) {
                                     if(voivodeId == Id) {
-                                        //console.assert(Array.isArray(allCitiesGroupedByVoivodes[Id]), "allCitiesGroupedByVoivodes in showInExtreme method is not array!");
+                                        console.assert(Array.isArray(allCitiesGroupedByVoivodes[Id]), "allCitiesGroupedByVoivodes in showInExtreme method is not array!");
                                         allCitiesGroupedByVoivodes[Id].forEach(city => {
                                             appendCityOptions(citySelect, city);
                                         });
@@ -350,8 +350,8 @@
              * This method is used in shows without distance limit
              */
             function showWithoutDistanceAjax(voivodeId, citySelect) {
-                //console.assert(!isNaN(parseInt(voivodeId)) && voivodeId != 0, 'voivodeId in showWithoutDistanceAjax is not number!');
-                //console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
+                console.assert(!isNaN(parseInt(voivodeId)) && voivodeId != 0, 'voivodeId in showWithoutDistanceAjax is not number!');
+                console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
 
                 if(globalSwalFlag) {
                     allCitiesInGivenVoivodeAjaxAjax().done((response) => {
@@ -388,7 +388,7 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function(response) {
-                            //console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
+                            console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
                             let placeToAppend = citySelect;
                             placeToAppend.innerHTML = '';
                             appendBasicOption(placeToAppend);
@@ -404,9 +404,9 @@
             }
 
             function limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr = null) {
-                //console.assert(grandNextShowContainer.matches('.singleShowContainer'), 'grandNextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
-                //console.assert(thisSingleShowContainer.matches('.singleShowContainer'), 'thisSingleShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
-                //console.assert(nextShowContainer.matches('.singleShowContainer'), 'nextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                console.assert(grandNextShowContainer.matches('.singleShowContainer'), 'grandNextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                console.assert(thisSingleShowContainer.matches('.singleShowContainer'), 'thisSingleShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                console.assert(nextShowContainer.matches('.singleShowContainer'), 'nextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
                 const grandNextShowContainerCitySelect = grandNextShowContainer.querySelector('.citySelect');
                 const grandNextShowContainerCityDistance = grandNextShowContainerCitySelect.dataset.distance;
                 let grandNextShowContainerCityId = getSelectedValue(grandNextShowContainerCitySelect);
@@ -523,7 +523,7 @@
              * This method appends basic option to voivode select
              */
             function appendBasicOption(element) {
-                //console.assert(element.tagName === "SELECT", 'Element in appendBasicOption is not select element');
+                console.assert(element.tagName === "SELECT", 'Element in appendBasicOption is not select element');
                 let basicVoivodeOption = document.createElement('option');
                 basicVoivodeOption.value = '0';
                 basicVoivodeOption.textContent = 'Wybierz';
@@ -544,7 +544,7 @@
              * This method appends options with voivode data
              */
             function appendVoivodeOptions(element, data) {
-                //console.assert(element.matches('.voivodeSelect'), 'Element in appendVoivodeOptions method is not voivode select');
+                console.assert(element.matches('.voivodeSelect'), 'Element in appendVoivodeOptions method is not voivode select');
                 let voivodeOption = document.createElement('option');
                 voivodeOption.value = data.id;
                 voivodeOption.textContent = data.name;
@@ -555,7 +555,7 @@
              * This method appends options with city data
              */
             function appendCityOptions(element,data) {
-                //console.assert(element.matches('.citySelect'), 'Element in appendCityOptions method is not city select');
+                console.assert(element.matches('.citySelect'), 'Element in appendCityOptions method is not city select');
                 let cityOpt = document.createElement('option');
                 cityOpt.value = data.city_id;
                 cityOpt.textContent = data.city_name;
@@ -572,10 +572,10 @@
                 const secondVoivodeInfo = secondResponse['voievodeInfo'];
                 const firstCityInfo = firstResponse['cityInfo'];
                 const secondCityInfo = secondResponse['cityInfo'];
-                //console.assert(Array.isArray(firstVoivodeInfo), "firstVoivodeInfo in getIntersection method is not array!");
-                //console.assert(Array.isArray(secondVoivodeInfo), "secondVoivodeInfo in getIntersection method is not array!");
-                //console.assert(typeof(firstCityInfo) === "object", "firstCityInfo in getIntersection method is not object!");
-                //console.assert(typeof(secondCityInfo) === "object", "secondCityInfo in getIntersection method is not object!");
+                console.assert(Array.isArray(firstVoivodeInfo), "firstVoivodeInfo in getIntersection method is not array!");
+                console.assert(Array.isArray(secondVoivodeInfo), "secondVoivodeInfo in getIntersection method is not array!");
+                console.assert(typeof(firstCityInfo) === "object", "firstCityInfo in getIntersection method is not object!");
+                console.assert(typeof(secondCityInfo) === "object", "secondCityInfo in getIntersection method is not object!");
 
                 //linear looking for same voivodes
                 firstVoivodeInfo.forEach(voivode => {
@@ -608,7 +608,7 @@
                 intersectionArray.push(intersectionVoivodes);
                 intersectionArray.push(intersectionCities);
 
-                //console.assert(intersectionArray.length === 2, 'Problem with intersectionArray in getIntersection method');
+                console.assert(intersectionArray.length === 2, 'Problem with intersectionArray in getIntersection method');
                 return intersectionArray;
             }
 
@@ -644,7 +644,7 @@
              * @returns {Array} [undefined/true/false, undefined/true/false] - (undefined - no container given in arrayOfContainers, false - not checked, true - checked)
              */
             function checkboxFilter(arrayOfContainers) {
-                //console.assert(Array.isArray(arrayOfContainers), "arrayOfContainers in checkboxFilter method is not array!");
+                console.assert(Array.isArray(arrayOfContainers), "arrayOfContainers in checkboxFilter method is not array!");
                 let prevCont = arrayOfContainers[0];
                 let nextCont = arrayOfContainers[1];
                 let isCheckedPrev = undefined;
@@ -668,7 +668,7 @@
              * This method validate all single day forms
              */
             function validateAllForms(element) {
-                // //console.assert(element.matches('.singleShowContainer'), 'element in validateAllForms is not single show container');
+                console.assert(element.matches('.singleShowContainer'), 'element in validateAllForms is not single show container');
                 let flag = true;
                 element.forEach(day => {
                     let validation = validateForm(day);
@@ -684,7 +684,7 @@
              * This method returns selected by user from list item's value or null.
              */
             function getSelectedValue(element) {
-                //console.assert(element.tagName === 'SELECT', 'Argument of getSelectedValue is not select element');
+                console.assert(element.tagName === 'SELECT', 'Argument of getSelectedValue is not select element');
                 if(element.options[element.selectedIndex]) {
                     return element.options[element.selectedIndex].value;
                 }
@@ -701,10 +701,10 @@
              * @param cityId
              */
             function setOldValues(voivodeSelect, voivodeId, citySelect, cityId) {
-                //console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in setOldValues method is not voivode select');
-                //console.assert((!isNaN(parseInt(voivodeId))) && (voivodeId != 0), 'voivodeId in setOldValues is not number!');
-                //console.assert(citySelect.matches('.citySelect'), 'citySelect in setOldValues method is not city select');
-                //console.assert((!isNaN(parseInt(cityId))) && (cityId != 0), 'cityId in setOldValues is not number!');
+                console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in setOldValues method is not voivode select');
+                console.assert((!isNaN(parseInt(voivodeId))) && (voivodeId != 0), 'voivodeId in setOldValues is not number!');
+                console.assert(citySelect.matches('.citySelect'), 'citySelect in setOldValues method is not city select');
+                console.assert((!isNaN(parseInt(cityId))) && (cityId != 0), 'cityId in setOldValues is not number!');
                 let voivodeFlag = true;
                 let cityFlag = true;
                 for(let i = 0; i < voivodeSelect.length; i++) {
@@ -751,7 +751,7 @@
              * This method validate form false - bad, true - good
              */
             function validateForm(element) {
-                //console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
+                console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
                 let citySelect = element.querySelector('.citySelect');
                 let cityValue = getSelectedValue(citySelect);
                 return !(cityValue == 0);
@@ -794,7 +794,7 @@
 
                     /*REMOVE BUTTON PART*/
                     if(this.addRemoveShowButtonFlag) { //adding remove button.
-                        //console.assert(this.addRemoveShowButtonFlag === true, 'addRemoveShowButtonFlag error');
+                        console.assert(this.addRemoveShowButtonFlag === true, 'addRemoveShowButtonFlag error');
                         let removeButtonContainer = document.createElement('div');
                         removeButtonContainer.classList.add('remove-button-container');
                         let removeButton = document.createElement('span');
@@ -824,7 +824,7 @@
 
                     /* CHECKBOX PART */
                     if(this.addCheckboxFlag) { //adding checkbox
-                        //console.assert(this.addCheckboxFlag === true, 'addCheckboxFlag error');
+                        console.assert(this.addCheckboxFlag === true, 'addCheckboxFlag error');
                         let afterHeaderRow = document.createElement('div');
                         afterHeaderRow.classList.add('row');
 
@@ -925,7 +925,7 @@
 
                     /* ADD NEW SHOW BUTTON */https://laravel.com/docs/5.5/collections#method-sortby
                         if(this.addNewShowButtonFlag) {
-                            //console.assert(this.addNewShowButtonFlag === true, 'addNewShowButtonFlag error');
+                            console.assert(this.addNewShowButtonFlag === true, 'addNewShowButtonFlag error');
                             let buttonRow = document.createElement('div');
                             buttonRow.classList.add('row');
 
@@ -1391,7 +1391,7 @@
 
                     removeShowDeferred.promise().then(function () {
                         const allRemoveButtons = dayContainer.getElementsByClassName('remove-button');
-                        //console.assert(allRemoveButtons, "Brak przycisków usuń");
+                        console.assert(allRemoveButtons, "Brak przycisków usuń");
                         if(allRemoveButtons.length > 1) { //delete only show box
                             $(showContainer).slideUp('slow',function () {
                                 showContainer.parentNode.removeChild(showContainer);
@@ -1557,8 +1557,10 @@
                             prevVoivodeSelect.innerHTML = '';
                             prevCitySelect.innerHTML = '';
                             let defaults = {voivode: prevVoivodeId};
+                            globalSwalFlag = true;
                             allCitiesAndAllVoivodes(existenceArr[0], defaults);
                             setOldValues(prevVoivodeSelect, prevVoivodeId, prevCitySelect, prevCityId);
+                            globalSwalFlag = false;
                         }
                         if(existenceArr[1]) {
                             let nextVoivodeSelect = existenceArr[1].querySelector('.voivodeSelect');
@@ -1568,8 +1570,10 @@
                             nextVoivodeSelect.innerHTML = '';
                             nextCitySelect.innerHTML = '';
                             let defaults = {voivode: nextVoivodeId};
+                            globalSwalFlag = true;
                             allCitiesAndAllVoivodes(existenceArr[1], defaults);
                             setOldValues(nextVoivodeSelect, nextVoivodeId, nextCitySelect, nextCityId);
+                            globalSwalFlag = false;
                         }
 
                     }
