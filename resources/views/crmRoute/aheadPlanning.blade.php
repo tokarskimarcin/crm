@@ -92,9 +92,12 @@
     </style>
 
     {{--Header page --}}
+
+
             <div class="page-header">
                 <div class="alert gray-nav ">Planowanie Wyprzedzenia</div>
             </div>
+
 
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -106,6 +109,11 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
+
+                        <div id="test">
+
+                        </div>
+
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label for="date" class="myLabel">Data początkowa:</label>
@@ -176,7 +184,7 @@
                             <button class="btn btn-default simulationClientLimit"  style="width: 100%" data-toggle="modal" data-target="#modalSimulationClient" >Symulacja Klienta(Edycja Limitów)</button>
                         </div>
                         <div class="col-md-4">
-                            <button class="btn btn-default simulationNewClient"  style="width: 100%" data-toggle="modal"  data-target="#modalSimulationClient" >Symulacja Klienta(Nowy Klient)</button>
+                            <button class="btn btn-default simulationNewClient"  style="width: 100%" data-toggle="modal"  data-target="#modalSimulationNewClient" >Symulacja Klienta(Nowy Klient)</button>
                         </div>
                         <div class="col-md-4">
                         </div>
@@ -277,6 +285,34 @@
         </div>
     </div>
 
+
+    <div id="modalSimulationNewClient" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg" style="width: 90%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" id="modal_title">Sekcja symulatcji Nowego Klienta<span></span></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Symalacja nowego klienta
+                        </div>
+                        <div class="panel-body">
+                            <div id="placeToAppendNewClient"></div>
+                            <div class="col-md-12">
+                                <button class="btn btn-info separateBTN renderSimulationNewClient" style="width: 100%">
+                                    <span class="glyphicon glyphicon-cloud"></span> <span>Pokaż symulację</span>
+                                </button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @section('script')
@@ -312,9 +348,18 @@
                 }
             };
 
+            class SimulationNewClientClient{
+                constructor(dayCountEventArray, arrayOfNumberWeekNewClient,arrayOfLimit,year){
+                    this.dayCountEventArray                     = dayCountEventArray;
+                    this.arrayOfNumberWeekNewClient             = arrayOfNumberWeekNewClient;
+                    this.arrayOfLimit                           = arrayOfLimit;
+                    this.year                                   = year;
+                }
+            };
 
-            var simulationArray = [];
 
+            var simulationEditLimitArray = [];
+            var simulationNewClientArray = [];
             let departmentInfo = <?php echo json_encode($departmentInfo->toArray()) ?>;
 
             let elementsToSum = {
@@ -343,12 +388,6 @@
 
             $('#date_start').val(startDate);
             $('#date_stop').val(stopDate);
-
-            $('.AllLimit1, .OnlyFirstLimit').on("input propertychange", function (e) {
-                this.value = this.value.replace(/[^0-9]/g, '');
-            });
-
-
 
             function fillWorkFreeDaysForDepartments() {
                 let iterator = 1;
@@ -385,7 +424,6 @@
                     deselectAllText: 'Odznacz wszystkie'
                 });
             }
-
             function getColMDConteiner() {
                 let divChoiceClientLimit = document.createElement('div');
                 divChoiceClientLimit.classList.add('col-md-4');
@@ -402,15 +440,19 @@
                 divChoiceClientLimitSpan.textContent = spanText;
                 return divChoiceClientLimitSpan;
             }
-            function getSelectWithPicker() {
+            function getSelectWithPicker(multiSelect = true,className = true) {
                 let divChoiceClientLimitSelect = document.createElement('select');
                 divChoiceClientLimitSelect.classList.add('form-control');
-                divChoiceClientLimitSelect.classList.add('selectedClientToChangeLimit');
                 divChoiceClientLimitSelect.classList.add('selectpicker');
                 divChoiceClientLimitSelect.setAttribute('data-live-search','true');
                 divChoiceClientLimitSelect.setAttribute('data-selected-text-format','count');
                 divChoiceClientLimitSelect.setAttribute('data-width','100%');
-                divChoiceClientLimitSelect.setAttribute('multiple','multiple');
+                if(className){
+                    divChoiceClientLimitSelect.classList.add('selectedClientToChangeLimit');
+                }
+                if(multiSelect){
+                    divChoiceClientLimitSelect.setAttribute('multiple','multiple');
+                }
                 return divChoiceClientLimitSelect;
             }
             function getSelectOption(optionText,id) {
@@ -452,6 +494,157 @@
                 glyphicon.classList.add('glyphicon', 'glyphicon-'+type);
                 return glyphicon
             }
+            var polishDayArray = ["Poniedziałek","Wtorek","Środa","Czwartek","Piątek","Sobota","Niedziela","Suma"];
+            function TemplateDOMOfNewClientSimulation(placeToAppend) {
+                let mainDiv = document.createElement('div');
+                mainDiv.classList.add('col-md-12');
+                mainDiv.classList.add('newClientSimulation');
+                let dayEventCount= document.createElement('div');
+                dayEventCount.classList.add('dayEventCount');
+
+                let tableDayEventCount = document.createElement('table');
+                tableDayEventCount.classList.add('tableDayEventCount');
+                tableDayEventCount.classList.add('table');
+
+                let tableThead = document.createElement('thead');
+                let tableTheadTr = document.createElement('tr');
+                polishDayArray.forEach(function (value) {
+                    let tableTheadTh = document.createElement('th');
+                        tableTheadTh.textContent = value;
+                    tableTheadTr.appendChild(tableTheadTh);
+                });
+                tableThead.appendChild(tableTheadTr);
+                tableDayEventCount.appendChild(tableThead);
+
+                let tableTbody = document.createElement('tbody');
+                let tableTbodyTr = document.createElement('tr');
+                polishDayArray.forEach(function (value,index) {
+                    let tableTbodyTd = document.createElement('td');
+                    let tableTbodyTdInput = document.createElement('input');
+                    tableTbodyTdInput.classList.add('form-control');
+                    if(polishDayArray.length-1 == index){
+                        tableTbodyTdInput.classList.add('dayEventCountSum');
+                        tableTbodyTdInput.setAttribute("disabled","true");
+                    }else{
+                        tableTbodyTdInput.classList.add('dayEventCountNumber'+(index+1));
+                        tableTbodyTdInput.classList.add('dayEventCountNumber');
+                    }
+                    tableTbodyTd.appendChild(tableTbodyTdInput);
+                    tableTbodyTr.appendChild(tableTbodyTd);
+                });
+                tableTbody.appendChild(tableTbodyTr);
+                tableDayEventCount.appendChild(tableTbody);
+                dayEventCount.appendChild(tableDayEventCount);
+
+                let limitSectionNewClient = document.createElement('div');
+                limitSectionNewClient.classList.add('limitSectionNewClient');
+
+                let divlimitNewClientInput = document.createElement('div');
+                divlimitNewClientInput.classList.add('col-md-6');
+                let divlimitNewClientInputLabel = document.createElement('label');
+                divlimitNewClientInputLabel.textContent = "Limitu dla pokazów";
+                divlimitNewClientInput.appendChild(divlimitNewClientInputLabel);
+
+                for( let i =0;i<3;i++){
+                    let limitInput = document.createElement('div');
+                    limitInput.classList.add('input-group','limitNewClientInput');
+                    let span = getSpan('Limit #'+(i+1));
+                    let inputLimit = getInputDate('NewClientLimit'+(i+1),'');
+                    inputLimit.classList.add('NewClientLimit');
+                    limitInput.appendChild(span);
+                    limitInput.appendChild(inputLimit);
+                    divlimitNewClientInput.appendChild(limitInput);
+                }
+                limitSectionNewClient.appendChild(divlimitNewClientInput);
+
+                let divWeekNumber = document.createElement('div');
+                divWeekNumber.classList.add('col-md-6');
+
+
+                let divLimitWeekLabel = document.createElement('label');
+                divLimitWeekLabel.textContent = "Przedział czasowy nowego klienta";
+                divWeekNumber.appendChild(divLimitWeekLabel);
+
+                let yearInput = document.createElement('div');
+                yearInput.classList.add('input-group','yearNewClientInput');
+                let span = getSpan('Rok');
+                let selectYear = getSelectWithPicker(false,false);
+                selectYear.classList.add('NewClientYear');
+                for(let i = -1; i <= 1; i++){
+                    let divChoiceClientYearOption = getSelectOption(new Date().getFullYear()+i,new Date().getFullYear()+i);
+                    if(new Date().getFullYear() == new Date().getFullYear()+i)
+                        divChoiceClientYearOption.setAttribute('selected','selected');
+                    selectYear.add(divChoiceClientYearOption);
+                }
+                yearInput.appendChild(span);
+                yearInput.appendChild(selectYear);
+                divWeekNumber.appendChild(yearInput);
+
+                //Create colMD Conteiner
+                let divChoiceWeekNewClient = getColMDConteiner();
+                //Create InputGroupDiv
+                let divInputGroup = getInputGroup();
+                divChoiceWeekNewClient.appendChild(divInputGroup);
+                //Create Span
+                let divSpan = getSpan('Wybierz tydzień');
+                //Append Span to container
+                divInputGroup.appendChild(divSpan);
+                //Create Select
+                let divChoiceClientWeekSelect = getSelectWithPicker(true,false);
+                divChoiceClientWeekSelect.classList.add('NewClientWeek');
+                divChoiceClientWeekSelect.title = "Wybierz tydzień...";
+                // Select Optio
+                for(let i = 1; i < 53 ;i++) {
+                    let divChoiceClientWeekOption = getSelectOption(i,i);
+                    //Append Select Option
+                    divChoiceClientWeekSelect.add(divChoiceClientWeekOption);
+                }
+                //Append Select to Input Group
+                divInputGroup.appendChild(divChoiceClientWeekSelect);
+                divWeekNumber.appendChild(divInputGroup);
+
+                limitSectionNewClient.appendChild(divWeekNumber);
+
+
+                let divLimitConteinerButton = document.createElement('div');
+                divLimitConteinerButton.classList.add('col-md-12');
+
+                let divAddLimitButton = document.createElement('button');
+                divAddLimitButton.classList.add('btn','btn-default','separate','AddNewClientSimulationBTN');
+                divAddLimitButton.addEventListener('click',function (e) {
+                    TemplateDOMOfNewClientSimulation(placeToAppend);
+                });
+                let glyphicon = getGlyphicon('plus');
+                divAddLimitButton.appendChild(glyphicon);
+                divSpan = getSpan('Dodaj Symulację Kolejnego Klienta');
+                divSpan.classList.remove('input-group-addon');
+                divAddLimitButton.appendChild(divSpan);
+                divLimitConteinerButton.appendChild(divAddLimitButton);
+
+
+                let divRemoveLimitButton = document.createElement('button');
+                divRemoveLimitButton.classList.add('btn','btn-danger','separate','RemoveSimulationNewClientBTN');
+                divRemoveLimitButton.addEventListener('click',function (e) {
+                    if(document.getElementsByClassName('newClientSimulation').length != 1)
+                        e.target.closest('.newClientSimulation').remove();
+                    else{
+                        swal('Nie ma co usunąć')
+                    }
+                });
+                glyphicon = getGlyphicon('minus');
+                divRemoveLimitButton.appendChild(glyphicon);
+                divSpan = getSpan('Usuń Symulację');
+                divSpan.classList.remove('input-group-addon');
+                divRemoveLimitButton.appendChild(divSpan);
+                divLimitConteinerButton.appendChild(divRemoveLimitButton);
+                limitSectionNewClient.appendChild(divLimitConteinerButton);
+                mainDiv.appendChild(dayEventCount);
+                mainDiv.appendChild(limitSectionNewClient);
+                document.getElementById(placeToAppend).appendChild(mainDiv);
+                reloadDatePicker();
+                reloadSelectPicker();
+            }
+            TemplateDOMOfNewClientSimulation('placeToAppendNewClient');
             function TemplateDOMOfClientSimulationEditLimits(placeToAppend) {
                 let mainDiv = document.createElement('div');
                 mainDiv.classList.add('col-md-12');
@@ -539,6 +732,7 @@
                     limitInput.classList.add('input-group','limitInput');
                     let span = getSpan('Limit #'+(i+1));
                     let inputLimit = getInputDate('AllLimit'+(i+1),'');
+                    inputLimit.classList.add('AllLimit');
                     limitInput.appendChild(span);
                     limitInput.appendChild(inputLimit);
                     divLimitForAllEvent.appendChild(limitInput);
@@ -603,7 +797,7 @@
                 reloadDatePicker();
                 reloadSelectPicker();
             }
-            function reloadDataTable(){
+            function reloadDataTable(modalToHide){
                 //Reload Datatable
                 $('#datatable_processing').show();
                 aheadPlaningTable.dataTable.clear();
@@ -612,10 +806,10 @@
                     aheadPlaningTable.setTableData(response);
                     $('#datatable_processing').hide();
                 });
-                $('#modalSimulationClient').modal('hide');
+                $(modalToHide).modal('hide');
             }
             $('.renderSimulation, .saveSimulation').on('click',function (e) {
-                simulationArray     = [];
+                simulationEditLimitArray     = [];
                 let valide          = true;
                 let btnType         = $(this).attr("class").split(" ")[3];
                 allContentToSave    = $('.changeClientLimitContener');
@@ -635,7 +829,7 @@
                     arrayOfLimit.push(jObject.find('.AllLimit2').val());
                     arrayOfLimit.push(jObject.find('.AllLimit3').val());
                     let onlyFirstLimit          = jObject.find('.OnlyFirstLimit').val();
-                    simulationArray.push(new SimulationChangeLimitForClient(arrayOfClinet,dateStartSimulation,dateStopSimulation,arrayOfLimit,onlyFirstLimit,saveStatus));
+                    simulationEditLimitArray.push(new SimulationChangeLimitForClient(arrayOfClinet,dateStartSimulation,dateStopSimulation,arrayOfLimit,onlyFirstLimit,saveStatus));
                     if(arrayOfClinet.length == 0){
                         valide = false;
                         swal("Wybierz klienta do zmiany limitów")
@@ -668,9 +862,44 @@
                             }
                         })
                     }else{
-                        reloadDataTable();
+                        reloadDataTable('#modalSimulationClient');
                     }
 
+                }
+            });
+            $('.renderSimulationNewClient').on('click',function (e) {
+                simulationNewClientArray = [];
+                let valide          = true;
+                allContentToSave    = $('.newClientSimulation');
+                allContentToSave.each(function (key,value) {
+                    let jObject                     = $(value);
+                    let dayCountEventArray          = [];
+                    let arrayOfNumberWeekNewClient  = jObject.find('.NewClientWeek select').val();
+                    let arrayOfLimit                = [];
+                    let year                        = jObject.find('.NewClientYear select').val();
+                    for(let i = 1; i <= 3; i++){
+                        if(jObject.find('.NewClientLimit'+i).val() != ""){
+                            arrayOfLimit.push(jObject.find('.NewClientLimit'+i).val());
+                        }
+                    }
+                    for(let i = 1; i <= 7; i++)
+                        dayCountEventArray.push(jObject.find('.dayEventCountNumber'+i).val());
+                    if(arrayOfLimit.length < 3){
+                        valide = false;
+                        swal("Aby dodać nowego klienta musisz ustalić wszystkie limity")
+                        return false;
+                    }
+                    if(arrayOfNumberWeekNewClient.length == 0){
+                        valide = false;
+                        swal("Wybierz tydzień dla klienta")
+                        return false;
+                    }
+                    if(valide){
+                        simulationNewClientArray.push(new SimulationNewClientClient(dayCountEventArray,arrayOfNumberWeekNewClient,arrayOfLimit,year));
+                    }
+                });
+                if(valide){
+                    reloadDataTable('#modalSimulationNewClient');
                 }
             });
             $('.resetSimulationClientLimit').on('click',function (e) {
@@ -684,10 +913,13 @@
                     confirmButtonText: 'Tak, resetuj!'
                 }).then((result) => {
                     if (result.value) {
-                        simulationArray = [];
+                        simulationEditLimitArray = [];
+                        simulationNewClientArray = [];
                         document.getElementById('placeToAppendClientLimit').innerHTML = "";
+                        document.getElementById('placeToAppendNewClient').innerHTML = "";
                         TemplateDOMOfClientSimulationEditLimits('placeToAppendClientLimit');
-                        reloadDataTable();
+                        TemplateDOMOfNewClientSimulation('placeToAppendNewClient');
+                        reloadDataTable('#modalSimulationClient');
                         swal(
                             'Wykonano!',
                             'Limity zostały zresetowane.',
@@ -696,6 +928,11 @@
                     }
                 });
             });
+            //Pass only number
+            $('.AllLimit1, .OnlyFirstLimit, .dayEventCountNumber, .NewClientLimit').on("input propertychange", function (e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
             TemplateDOMOfClientSimulationEditLimits('placeToAppendClientLimit');
             /*********************DataTable FUNCTUONS****************************/
             let aheadPlanningData = {
@@ -729,7 +966,8 @@
                             limitSimulation: obj.limitSimulation,
                             newClientSimulation: obj.newClientSimulation,
                             departmentsInvitationsAverages: obj.data.departmentsInvitationsAverages,
-                            objectClientLimitToSimulate : simulationArray,
+                            objectClientLimitToSimulate : simulationEditLimitArray,
+                            objectNewClientToSimulate :simulationNewClientArray,
                             factors: {
                                 isChanged: factorsChanged,
                                 saturday: $('#saturdayFactor').val(),
