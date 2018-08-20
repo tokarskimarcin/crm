@@ -9,8 +9,8 @@
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.datatables.net/rowgroup/1.0.3/css/rowGroup.dataTables.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="{{asset('/css/fixedHeader.dataTables.min.css')}}">
-
+    {{--<link rel="stylesheet" href="{{asset('/css/fixedHeader.dataTables.min.css')}}">
+--}}
 @endsection
 @section('content')
 
@@ -158,7 +158,7 @@
         <script src="https://cdn.datatables.net/rowgroup/1.0.3/js/dataTables.rowGroup.min.js"></script>
         <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
-        <script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>
+        {{--<script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>--}}
     <script>
        document.addEventListener('DOMContentLoaded', function() {
            /********** GLOBAL VARIABLES ***********/
@@ -622,7 +622,7 @@
            /****************END OF MODAL FUNCTIONS********************/
            /**********************************************************/
 
-           table = $('#datatable').DataTable({
+           let table = $('#datatable').DataTable({
                autoWidth: true,
                processing: true,
                serverSide: true,
@@ -634,12 +634,39 @@
                    if(data.comment+'' != 'null' && data.comment !== ''){
                        $(row).css('background-color', '#fffc8b');
                    }
-                    row.setAttribute('data-id', data.id);
-                    clientRouteInfoIdArr.forEach(specificId => { //when someone change table page, we have to reassign classes to rows.
-                        if(specificId == data.id) {
-                            row.classList.add('colorRow');
-                        }
-                    });
+                   row.setAttribute('data-id', data.id);
+                   clientRouteInfoIdArr.forEach(specificId => { //when someone change table page, we have to reassign classes to rows.
+                       if (specificId == data.id) {
+                           row.classList.add('colorRow');
+                       }
+                   });
+                   $(row).find('.commentInput').val(data.comment);
+                   $(row).find('.comment button').click(function (e) {
+                       let campaignId = $(e.target).attr('id');
+                       swal({
+                           title: 'Czy na pewno?',
+                           text: 'Czy chcesz usunąc uwagę?',
+                           type:'warning',
+                           showCancelButton: true
+                       }).then((result) => {
+                           if(result.value){
+                               $.ajax({
+                                   type: 'POST',
+                                   url: '{{route('api.removeCampaignComment')}}',
+                                   headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                                   data: {
+                                       campaignId: campaignId
+                                   },
+                                   success: function (response) {
+                                       console.log(response);
+                                       if(response == 'success')
+                                           table.ajax.reload();
+                                   }
+                               });
+                           }
+                       });
+
+                   });
                },
                "fnDrawCallback": function(settings) {
                    $('#datatable tbody tr').on('click', function(e) {
@@ -751,7 +778,25 @@
                        },"name":"departmentName", "searchable": "false"
                    },
                    {"data":function (data, type, dataToSet) {
-                           return data.comment;
+                            if(data.comment == '' || data.comment == null){
+                                return '';
+                            }else{
+                                let commentInput = $(document.createElement('input')).attr('type','text').addClass('commentInput form-control')
+                                    .prop('readonly',true)
+                                    .css('width','10em');
+
+                                let removeCommentButtonSpan =  $(document.createElement('span')).addClass('glyphicon glyphicon-remove');//.css({'position':'absolute'});
+                                let removeCommentButton =  $(document.createElement('button')).attr('id',data.id).addClass('btn btn-default').append(removeCommentButtonSpan);
+
+                                let inputGroupSpan =  $(document.createElement('span')).addClass('input-group-btn').append(removeCommentButton);
+
+                                let inputGroup = $(document.createElement('div')).addClass('input-group').append(commentInput).append(inputGroupSpan);
+                                let commentDivRow = $(document.createElement('div')).addClass('row').addClass('comment');
+                                let commentColumn = $(document.createElement('div')).addClass('col-md-12');
+                                commentColumn.append(inputGroup);
+                                commentDivRow.append(commentColumn);
+                                return commentDivRow.prop('outerHTML');
+                            }
                        },"name":"comment"
                    },
                    {"data":"nrPBX", "visible":false}

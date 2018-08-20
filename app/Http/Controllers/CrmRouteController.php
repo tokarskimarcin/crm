@@ -2664,6 +2664,11 @@ class CrmRouteController extends Controller
         return datatables($campaignsInfo->get())->make(true);
     }
 
+    public function removeCampaignCommentAjax(Request $request){
+        ClientRouteInfo::where('id','=',$request->campaignId)->update(['comment' => null]);
+        return 'success';
+    }
+
     /**
      * @param ids - array, limit - number, comment - text, verification - (0,1), invitation - number, department - number
      * @return adnotation for user
