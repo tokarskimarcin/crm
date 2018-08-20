@@ -1337,7 +1337,7 @@
              * if withHours - true, check whether hour input has != 0 value.
              */
             function validateForm(element, withHours = null) {
-                console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
+                // console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
                 let flag = true;
                 let citySelect = element.querySelector('.citySelect');
                 let cityValue = getSelectedValue(citySelect);
