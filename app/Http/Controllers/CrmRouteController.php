@@ -284,10 +284,14 @@ class CrmRouteController extends Controller
 //            ->with('routeInfo', $routeInfo);
 //    }
 
+    /**
+     * @return view route Templates
+     */
     public function addNewRouteTemplateGet() {
         $voivodes = Voivodes::all();
 
-        return view('crmRoute.routeTemplates')->with('voivodes', $voivodes);
+        return view('crmRoute.routeTemplates')
+            ->with('voivodes', $voivodes);
     }
 
     /**
@@ -368,6 +372,11 @@ class CrmRouteController extends Controller
             ->with('routeTemplate', $route);
     }
 
+    /**
+     * @param $id
+     * @param Request $request
+     * This method saves route template edited version
+     */
     public function editRouteTemplatesPost($id, Request $request) {
         if($request->has('alldata')) {
             $allData = json_decode($request->alldata);
@@ -2624,8 +2633,11 @@ class CrmRouteController extends Controller
         client_route_info.actual_success as actual_success,
         YEAR(client_route_info.date) as year,       
         ( case when client_route_info.actual_success is null then 0 - client_route_info.limits
-         else
-          client_route_info.actual_success - client_route_info.limits end) as loseSuccess,       
+         when 
+          client_route_info.actual_success - client_route_info.limits > 0 then 0
+           else
+           client_route_info.actual_success - client_route_info.limits
+           end) as loseSuccess,       
         client.name as clientName,
         departments.name as departmentName,
         department_type.name as departmentName2,
@@ -2659,6 +2671,11 @@ class CrmRouteController extends Controller
             $campaignsInfo = $campaignsInfo->whereIn('client_route.type', $typ);
         }
         return datatables($campaignsInfo->get())->make(true);
+    }
+
+    public function removeCampaignCommentAjax(Request $request){
+        ClientRouteInfo::where('id','=',$request->campaignId)->update(['comment' => null]);
+        return 'success';
     }
 
     /**
@@ -3188,6 +3205,18 @@ class CrmRouteController extends Controller
         return $arrayOfWeekName[date('N',strtotime($date))+0];
     }
 
+    private function getNameOfWeek2($date){
+        $arrayOfWeekName = [
+            '1' => 'Poniedziałek',
+            '2' => 'Wtorek',
+            '3' => 'Środa',
+            '4' => 'Czwartek',
+            '5' => 'Piątek',
+            '6' => 'Sobota',
+            '7' => 'Niedziela'];
+        return $arrayOfWeekName[date('N',strtotime($date))+0];
+    }
+
     /**
      * This method returns view presentationStatistics with a data necessary for table
      */
@@ -3210,6 +3239,8 @@ class CrmRouteController extends Controller
         $week = $date->format("W");
         //Pobranie równych czterech tygodni
         $split_month = $this->monthPerWeekDivision(date('m'),date('Y'));
+
+//        dd($split_month);
         $allInfo = Clients::select(DB::raw(
                 'client.id,
                 client.name,
@@ -3556,15 +3587,18 @@ class CrmRouteController extends Controller
             '7' => 'Niedziela'];
 
         $days_in_month = date('t', strtotime($year . '-' . $month));
+
         $numberOfWeekPreviusMonth = $this::getWeekNumber(date('Y-m-d', strtotime($year.'-'.$month.'-01'. ' - 1 days')));
+
         $weeks = [];
         for ($i = 1; $i <= $days_in_month; $i++) {
             $loop_day = ($i < 10) ? '0' . $i : $i ;
             $date = $year.'-'.$month.'-'.$loop_day;
             $actualWeek = $this::getWeekNumber($date);
+
             if($actualWeek != $numberOfWeekPreviusMonth){
                 foreach($arrayOfWeekName as $key => $value) {
-                    if($value == $this::getNameOfWeek($date)) {
+                    if($value == $this::getNameOfWeek2($date)) {
                         $weeksObj = new \stdClass();
                         $weeksObj->date = $date;
                         $weeksObj->weekNumber = date('W', strtotime($date));
@@ -3573,7 +3607,7 @@ class CrmRouteController extends Controller
                         array_push($weeks,$weeksObj);
 
                         // czy niedziela
-                        if($weeksObj->name == $arrayOfWeekName[7]) {
+                        if($weeksObj->name == 'Nd') {
                             $sumObj = new \stdClass();
                             $sumObj->date = 'Suma';
                             $sumObj->weekNumber = date('W', strtotime($date));
@@ -3584,6 +3618,7 @@ class CrmRouteController extends Controller
                 }
             }
         }
+
         $lastNumberOfWeek = $actualWeek;
         $dateNextMonth = date('Y-m-d', strtotime($date . ' + 1 days'));
         $daysInNextMonth = date('t', strtotime($dateNextMonth));

@@ -259,8 +259,24 @@
                 });
 
             });
+            let hoursAfterWhichItBecomesUnsettled = 18;
+            changeHoursAfterWhichItBecomseUnsettledDependsOnSelectedDep();
 
+            function changeHoursAfterWhichItBecomseUnsettledDependsOnSelectedDep(){
+                @foreach($departments as $dep)
+                if($('#selected_dep').val() == {{$dep->id}}){
+                    if({{$dep->id_dep_type}} == 1){
+                        hoursAfterWhichItBecomesUnsettled = 14;
+                    }else{
+                        hoursAfterWhichItBecomesUnsettled = 18;
+                    }
+                }
+                @endforeach
+                //$('#hoursAfterWhichItBecomesUnsettledSpan').text(hoursAfterWhichItBecomesUnsettled);
+            }
             $('#selected_dep').on('change',function () {
+
+                changeHoursAfterWhichItBecomseUnsettledDependsOnSelectedDep();
                 $.ajax({
                     type: "POST",
                     url: '{{ route('api.getcoach_list') }}',
@@ -307,7 +323,7 @@
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
                     if($('#coaching_level').val() == 1) {
-                        if (parseInt(data.actual_rbh) >= parseInt(18)) {
+                        if (parseInt(data.actual_rbh) >= parseInt(hoursAfterWhichItBecomesUnsettled)) {
                             $(row).hide();
                         }
                     }else{
@@ -431,7 +447,7 @@
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },"rowCallback": function( row, data, index ) {
                     if($('#coaching_level').val() == 1) {
-                        if (parseInt(data.actual_rbh) < parseInt(18)) {
+                        if (parseInt(data.actual_rbh) < parseInt(hoursAfterWhichItBecomesUnsettled)) {
                             $(row).hide();
                         }
                         if(parseInt(data.actual_rbh) > 26){
