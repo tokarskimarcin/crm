@@ -2624,8 +2624,11 @@ class CrmRouteController extends Controller
         client_route_info.actual_success as actual_success,
         YEAR(client_route_info.date) as year,       
         ( case when client_route_info.actual_success is null then 0 - client_route_info.limits
-         else
-          client_route_info.actual_success - client_route_info.limits end) as loseSuccess,       
+         when 
+          client_route_info.actual_success - client_route_info.limits > 0 then 0
+           else
+           client_route_info.actual_success - client_route_info.limits
+           end) as loseSuccess,       
         client.name as clientName,
         departments.name as departmentName,
         department_type.name as departmentName2,
@@ -3137,6 +3140,8 @@ class CrmRouteController extends Controller
         $week = $date->format("W");
         //Pobranie równych czterech tygodni
         $split_month = $this->monthPerWeekDivision(date('m'),date('Y'));
+
+//        dd($split_month);
         $allInfo = Clients::select(DB::raw(
                 'client.id,
                 client.name,
@@ -3483,12 +3488,17 @@ class CrmRouteController extends Controller
             '7' => 'Niedziela'];
 
         $days_in_month = date('t', strtotime($year . '-' . $month));
+
+//        $lastMonthLastWeekNumber =
         $numberOfWeekPreviusMonth = $this::getWeekNumber(date('Y-m-d', strtotime($year.'-'.$month.'-01'. ' - 1 days')));
+
+//        dd($numberOfWeekPreviusMonth);
         $weeks = [];
         for ($i = 1; $i <= $days_in_month; $i++) {
             $loop_day = ($i < 10) ? '0' . $i : $i ;
             $date = $year.'-'.$month.'-'.$loop_day;
             $actualWeek = $this::getWeekNumber($date);
+//            dd($actualWeek);
             if($actualWeek != $numberOfWeekPreviusMonth){
                 foreach($arrayOfWeekName as $key => $value) {
                     if($value == $this::getNameOfWeek($date)) {

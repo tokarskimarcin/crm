@@ -1423,6 +1423,7 @@
                 const type = document.querySelector('#type');
                 const showAllClientsCheckbox = document.querySelector('#showAllClients');
                 const showOnlyAssignedCheckbox = document.querySelector('#showOnlyAssigned');
+                const parameterSelect = document.querySelector('#parameters');
 
                 if (document.querySelector('.check')) {
                     let idOfClient = document.querySelector('.check').id;
@@ -1437,6 +1438,7 @@
                 sessionStorage.setItem('type', type.options[type.selectedIndex].value);
                 sessionStorage.setItem('showAllClients', showAllClientsCheckbox.checked);
                 sessionStorage.setItem('showOnlyAssigned', showOnlyAssignedCheckbox.checked);
+                sessionStorage.setItem('parameters', parameterSelect.options[parameterSelect.selectedIndex].value);
             }
 
             /**
@@ -1477,7 +1479,7 @@
                     for (let i = 0; i < weekNumber.length; i++) {
                         if (weekNumber[i].value == week) {
                             weekNumber[i].selected = true;
-                            selectedWeek = weekNumber[i].value;
+                            // selectedWeek = weekNumber[i].value;
                         }
                     }
                     sessionStorage.removeItem('weekNumber');
@@ -1518,6 +1520,18 @@
                         showOnlyAssignedInput.prop('checked', true);
                     }
                     sessionStorage.removeItem('showOnlyAssigned');
+                }
+
+                let parameterSelect = document.querySelector('#parameters');
+                if(sessionStorage.getItem('parameters')) {
+                    const parameter = sessionStorage.getItem('parameters');
+                    somethingChanged = parameter !== '0' ? true : somethingChanged;
+                    for (let i = 0, max = parameterSelect.length; i < max; i++) {
+                        if (parameterSelect[i].value == parameter) {
+                            parameterSelect[i].selected = true;
+                        }
+                    }
+                    sessionStorage.removeItem('parameters');
                 }
 
                 if(somethingChanged) {
