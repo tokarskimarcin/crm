@@ -1602,7 +1602,7 @@
                     else {
                         e.target.checked = isChecked ? e.target.checked = false : e.target.checked = true;
 
-                        swal('Wybierz maista w listach poniżej i powyżej');
+                        swal('Wybierz miasta i województwa w listach poniżej i powyżej');
                     }
 
 

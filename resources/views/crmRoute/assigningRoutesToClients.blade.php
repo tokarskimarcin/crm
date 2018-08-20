@@ -2430,6 +2430,7 @@
              */
             function globalChangeHandler(e) {
                 if(e.target.matches('.distance-checkbox')) {
+                    let allIsGood = true;
                     let isChecked = e.target.checked;
                     let previousSingleShowContainer = null;
                     let nextSingleShowContainer = null;
@@ -2439,117 +2440,144 @@
                     const fullDate = dayContainer.querySelector('.day-info').textContent;
                     let correctDate = fullDate.substr(6); //YYYY-MM-DD
 
-                    let voivodeSelect = thisSingleShowContainer.querySelector('.voivodeSelect');
-                    voivodeSelect.innerHTML = ''; //clear select
-                    let citySelect = thisSingleShowContainer.querySelector('.citySelect');
-                    citySelect.innerHTML = ''; //clear select
-
-                    $(voivodeSelect).off();
-
-                    voivodeSelect = thisSingleShowContainer.querySelector('.voivodeSelect');
-
-                    appendBasicOption(citySelect);
-                    appendBasicOption(voivodeSelect);
-
-                    if(isChecked) { // activate no distance limit option
-                        let existenceArr = checkingExistenceOfPrevAndNextContainers(thisSingleShowContainer, 'singleShowContainer');
-
-                        citySelect.setAttribute('data-previousdistance', citySelect.dataset.distance);
-                                @foreach($voivodes as $voivode)
-                        var singleVoivode = document.createElement('option');
-                        singleVoivode.value = {{$voivode->id}};
-                        singleVoivode.textContent = '{{$voivode->name}}';
-                        voivodeSelect.appendChild(singleVoivode);
-                        @endforeach()
-                        citySelect.setAttribute('data-distance', 'infinity');
-                        $(voivodeSelect).on('change', function(e) {
-                            let voivodeId = e.target.value;
-                            showWithoutDistanceAjax(voivodeId, citySelect, correctDate);
-                        });
-
-                        if(existenceArr[0]) {
-                            globalSwalFlag = true;
-                            let prevVoivodeSelect = existenceArr[0].querySelector('.voivodeSelect');
-                            let prevVoivodeId = getSelectedValue(prevVoivodeSelect);
-                            let prevCitySelect = existenceArr[0].querySelector('.citySelect');
-                            let prevCityId = getSelectedValue(prevCitySelect);
-                            prevVoivodeSelect.innerHTML = '';
-                            prevCitySelect.innerHTML = '';
-                            let defaults = {voivode: prevVoivodeId};
-                            allCitiesAndAllVoivodes(existenceArr[0], defaults);
-                            setOldValues(prevVoivodeSelect, prevVoivodeId, prevCitySelect, prevCityId);
-                            globalSwalFlag = false;
+                    let existenceArr = checkingExistenceOfPrevAndNextContainers(thisSingleShowContainer, 'singleShowContainer');
+                    if(existenceArr[0]) {
+                        let prevVoivodeSelect = existenceArr[0].querySelector('.voivodeSelect');
+                        let prevVoivodeId = getSelectedValue(prevVoivodeSelect);
+                        let prevCitySelect = existenceArr[0].querySelector('.citySelect');
+                        let prevCityId = getSelectedValue(prevCitySelect);
+                        if(prevCityId == 0 || prevVoivodeId == 0) {
+                            allIsGood = false;
                         }
-                        if(existenceArr[1]) {
-                            globalSwalFlag = true;
-                            let nextVoivodeSelect = existenceArr[1].querySelector('.voivodeSelect');
-                            let nextVoivodeId = getSelectedValue(nextVoivodeSelect);
-                            let nextCitySelect = existenceArr[1].querySelector('.citySelect');
-                            let nextCityId = getSelectedValue(nextCitySelect);
-                            nextVoivodeSelect.innerHTML = '';
-                            nextCitySelect.innerHTML = '';
-                            let defaults = {voivode: nextVoivodeId};
-                            allCitiesAndAllVoivodes(existenceArr[1], defaults);
-                            setOldValues(nextVoivodeSelect, nextVoivodeId, nextCitySelect, nextCityId);
-                            globalSwalFlag = false;
-                        }
-
                     }
-                    else { //deactivate no distance limit option
-                        const allSingleShowContainers = document.getElementsByClassName('singleShowContainer');
-                        for(let i = 0; i < allSingleShowContainers.length; i++) {
-                            if(thisSingleShowContainer == allSingleShowContainers[i]) {
-                                if(allSingleShowContainers[i-1]) {
-                                    previousSingleShowContainer = allSingleShowContainers[i-1];
-                                }
-                                if(allSingleShowContainers[i+1]) {
-                                    nextSingleShowContainer = allSingleShowContainers[i+1];
-                                }
-                            }
+                    if(existenceArr[1]) {
+                        let nextVoivodeSelect = existenceArr[1].querySelector('.voivodeSelect');
+                        let nextVoivodeId = getSelectedValue(nextVoivodeSelect);
+                        let nextCitySelect = existenceArr[1].querySelector('.citySelect');
+                        let nextCityId = getSelectedValue(nextCitySelect);
+                        if(nextCityId == 0 || nextVoivodeId == 0) {
+                            allIsGood = false;
                         }
+                    }
 
-                        if(previousSingleShowContainer === null && nextSingleShowContainer === null) { //there is only one show
+                    if(allIsGood) {
+                        let voivodeSelect = thisSingleShowContainer.querySelector('.voivodeSelect');
+                        voivodeSelect.innerHTML = ''; //clear select
+                        let citySelect = thisSingleShowContainer.querySelector('.citySelect');
+                        citySelect.innerHTML = ''; //clear select
+
+                        $(voivodeSelect).off();
+
+                        voivodeSelect = thisSingleShowContainer.querySelector('.voivodeSelect');
+
+                        appendBasicOption(citySelect);
+                        appendBasicOption(voivodeSelect);
+
+                        if(isChecked) { // activate no distance limit option
+
+                            citySelect.setAttribute('data-previousdistance', citySelect.dataset.distance);
                                     @foreach($voivodes as $voivode)
                             var singleVoivode = document.createElement('option');
                             singleVoivode.value = {{$voivode->id}};
                             singleVoivode.textContent = '{{$voivode->name}}';
-                            voivodeSelect.appendChild(singleVoivode); //password_date
+                            voivodeSelect.appendChild(singleVoivode);
                             @endforeach()
-
+                            citySelect.setAttribute('data-distance', 'infinity');
                             $(voivodeSelect).on('change', function(e) {
-                                citySelect.setAttribute('data-distance', 'infinity');
                                 let voivodeId = e.target.value;
                                 showWithoutDistanceAjax(voivodeId, citySelect, correctDate);
                             });
-                        }
-                        else if(previousSingleShowContainer !== null && nextSingleShowContainer === null) { //case when show is last one dziala
-                            const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
-                            const previousCityId = getSelectedValue(previousCitySelect);
-                            const previousShowDayContainer = previousCitySelect.closest('.singleDayContainer');
-                            const date = previousShowDayContainer.querySelector('.day-info').textContent;
-                            // console.log('date ', date);
-                            showInExtreme(citySelect.dataset.previousdistance, previousCityId, date, citySelect, voivodeSelect);
-                        }
-                        else if(previousSingleShowContainer === null && nextSingleShowContainer !== null) { //case when show is first one
-                            const nextCitySelect = nextSingleShowContainer.querySelector('.citySelect');
-                            const nextCityId = getSelectedValue(nextCitySelect);
-                            const nextShowDayContainer = nextCitySelect.closest('.singleDayContainer');
-                            const date = nextShowDayContainer.querySelector('.day-info').textContent;
-                            showInExtreme(30, nextCityId, date, citySelect, voivodeSelect);
-                        }
-                        else if(previousSingleShowContainer !== null && nextSingleShowContainer !== null) { //case when show is in the middle
-                            const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
-                            const previousCityDistance = previousCitySelect.dataset.distance;
-                            const previousCityId = getSelectedValue(previousCitySelect);
 
-                            const nextCitySelect = nextSingleShowContainer.querySelector('.citySelect');
-                            const nextCityDistance = nextCitySelect.dataset.distance;
-                            const nextCityId = getSelectedValue(nextCitySelect);
+                            if(existenceArr[0]) {
+                                globalSwalFlag = true;
+                                let prevVoivodeSelect = existenceArr[0].querySelector('.voivodeSelect');
+                                let prevVoivodeId = getSelectedValue(prevVoivodeSelect);
+                                let prevCitySelect = existenceArr[0].querySelector('.citySelect');
+                                let prevCityId = getSelectedValue(prevCitySelect);
+                                prevVoivodeSelect.innerHTML = '';
+                                prevCitySelect.innerHTML = '';
+                                let defaults = {voivode: prevVoivodeId};
+                                allCitiesAndAllVoivodes(existenceArr[0], defaults);
+                                setOldValues(prevVoivodeSelect, prevVoivodeId, prevCitySelect, prevCityId);
+                                globalSwalFlag = false;
+                            }
+                            if(existenceArr[1]) {
+                                globalSwalFlag = true;
+                                let nextVoivodeSelect = existenceArr[1].querySelector('.voivodeSelect');
+                                let nextVoivodeId = getSelectedValue(nextVoivodeSelect);
+                                let nextCitySelect = existenceArr[1].querySelector('.citySelect');
+                                let nextCityId = getSelectedValue(nextCitySelect);
+                                nextVoivodeSelect.innerHTML = '';
+                                nextCitySelect.innerHTML = '';
+                                let defaults = {voivode: nextVoivodeId};
+                                allCitiesAndAllVoivodes(existenceArr[1], defaults);
+                                setOldValues(nextVoivodeSelect, nextVoivodeId, nextCitySelect, nextCityId);
+                                globalSwalFlag = false;
+                            }
 
-                            showInTheMiddleAjax(previousCityDistance, previousCityId, nextCityDistance, nextCityId, citySelect, voivodeSelect, thisSingleShowContainer);
                         }
+                        else { //deactivate no distance limit option
+                            const allSingleShowContainers = document.getElementsByClassName('singleShowContainer');
+                            for(let i = 0; i < allSingleShowContainers.length; i++) {
+                                if(thisSingleShowContainer == allSingleShowContainers[i]) {
+                                    if(allSingleShowContainers[i-1]) {
+                                        previousSingleShowContainer = allSingleShowContainers[i-1];
+                                    }
+                                    if(allSingleShowContainers[i+1]) {
+                                        nextSingleShowContainer = allSingleShowContainers[i+1];
+                                    }
+                                }
+                            }
 
+                            if(previousSingleShowContainer === null && nextSingleShowContainer === null) { //there is only one show
+                                        @foreach($voivodes as $voivode)
+                                var singleVoivode = document.createElement('option');
+                                singleVoivode.value = {{$voivode->id}};
+                                singleVoivode.textContent = '{{$voivode->name}}';
+                                voivodeSelect.appendChild(singleVoivode); //password_date
+                                @endforeach()
+
+                                $(voivodeSelect).on('change', function(e) {
+                                    citySelect.setAttribute('data-distance', 'infinity');
+                                    let voivodeId = e.target.value;
+                                    showWithoutDistanceAjax(voivodeId, citySelect, correctDate);
+                                });
+                            }
+                            else if(previousSingleShowContainer !== null && nextSingleShowContainer === null) { //case when show is last one dziala
+                                const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
+                                const previousCityId = getSelectedValue(previousCitySelect);
+                                const previousShowDayContainer = previousCitySelect.closest('.singleDayContainer');
+                                const date = previousShowDayContainer.querySelector('.day-info').textContent;
+                                // console.log('date ', date);
+                                showInExtreme(citySelect.dataset.previousdistance, previousCityId, date, citySelect, voivodeSelect);
+                            }
+                            else if(previousSingleShowContainer === null && nextSingleShowContainer !== null) { //case when show is first one
+                                const nextCitySelect = nextSingleShowContainer.querySelector('.citySelect');
+                                const nextCityId = getSelectedValue(nextCitySelect);
+                                const nextShowDayContainer = nextCitySelect.closest('.singleDayContainer');
+                                const date = nextShowDayContainer.querySelector('.day-info').textContent;
+                                showInExtreme(30, nextCityId, date, citySelect, voivodeSelect);
+                            }
+                            else if(previousSingleShowContainer !== null && nextSingleShowContainer !== null) { //case when show is in the middle
+                                const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
+                                const previousCityDistance = previousCitySelect.dataset.distance;
+                                const previousCityId = getSelectedValue(previousCitySelect);
+
+                                const nextCitySelect = nextSingleShowContainer.querySelector('.citySelect');
+                                const nextCityDistance = nextCitySelect.dataset.distance;
+                                const nextCityId = getSelectedValue(nextCitySelect);
+
+                                showInTheMiddleAjax(previousCityDistance, previousCityId, nextCityDistance, nextCityId, citySelect, voivodeSelect, thisSingleShowContainer);
+                            }
+
+                        }
                     }
+                    else {
+                        e.target.checked = isChecked ? e.target.checked = false : e.target.checked = true;
+
+                        swal('Wybierz miasta i województwa w listach poniżej i powyżej');
+                    }
+
                 }
                 else if(e.target.matches('.citySelect')) { // user changes city
                     const thisSingleShowContainer = e.target.closest('.singleShowContainer');
