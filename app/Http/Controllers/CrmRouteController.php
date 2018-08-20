@@ -3500,24 +3500,14 @@ class CrmRouteController extends Controller
             '7' => 'Niedziela'];
 
         $days_in_month = date('t', strtotime($year . '-' . $month));
-//
-//        $givenMonth = date('Y-m-d', strtotime($year.'-'.$month.'-01'));
-//        $prevMonth = mktime(0,0,0,$givenMonth)
-//        $lastDayOfPrevMonth = date_add($lastMonth, '-1 day');
-//        dd($lastDayOfPrevMonth);
-        $numberOfWeekPreviusMonth = $this::getWeekNumber(date('Y-m-d', strtotime($year.'-'.$month.'-01'. ' - 1 days')));
 
-//        dd(date('Y-m-d', strtotime($year.'-'.$month.'-01'. ' - 1 days')));
+        $numberOfWeekPreviusMonth = $this::getWeekNumber(date('Y-m-d', strtotime($year.'-'.$month.'-01'. ' - 1 days')));
 
         $weeks = [];
         for ($i = 1; $i <= $days_in_month; $i++) {
             $loop_day = ($i < 10) ? '0' . $i : $i ;
             $date = $year.'-'.$month.'-'.$loop_day;
             $actualWeek = $this::getWeekNumber($date);
-//            if($i == $days_in_month - 1) {
-////                            dd($numberOfWeekPreviusMonth);
-//                dd($this::getNameOfWeek2($date));
-//            }
 
             if($actualWeek != $numberOfWeekPreviusMonth){
                 foreach($arrayOfWeekName as $key => $value) {
@@ -3530,7 +3520,7 @@ class CrmRouteController extends Controller
                         array_push($weeks,$weeksObj);
 
                         // czy niedziela
-                        if($weeksObj->name == $arrayOfWeekName[7]) {
+                        if($weeksObj->name == 'Nd') {
                             $sumObj = new \stdClass();
                             $sumObj->date = 'Suma';
                             $sumObj->weekNumber = date('W', strtotime($date));
