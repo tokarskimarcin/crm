@@ -630,7 +630,7 @@
              * This method validate all single day forms
              */
             function validateAllForms(element) {
-                console.assert(element.matches('.singleShowContainer'), 'element in validateAllForms is not single show container');
+                // console.assert(element.matches('.singleShowContainer'), 'element in validateAllForms is not single show container');
                 let flag = true;
                 element.forEach(day => {
                     let validation = validateForm(day);
@@ -713,7 +713,7 @@
              * This method validate form false - bad, true - good
              */
             function validateForm(element) {
-                console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
+                // console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
                 let citySelect = element.querySelector('.citySelect');
                 let cityValue = getSelectedValue(citySelect);
                 return !(cityValue == 0);

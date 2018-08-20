@@ -358,7 +358,6 @@
                     opt.textContent = j;
                     if(j == currentYear) {
                         opt.setAttribute('selected', 'selected');
-                        selectedYear = [j];
                     }
                     yearSelect.appendChild(opt);
                 }
@@ -369,7 +368,6 @@
                     opt.textContent = monthNames[i - 1];
                     if(i == currentMonth) {
                         opt.setAttribute('selected', 'selected');
-                        selectedMonth = [i];
                     }
                     monthSelect.appendChild(opt);
                 }
@@ -380,8 +378,6 @@
                     opt.textContent = k;
                     weekSelect.appendChild(opt);
                 }
-
-
             })();
 
             /**

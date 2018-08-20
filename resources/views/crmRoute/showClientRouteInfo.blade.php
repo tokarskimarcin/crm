@@ -31,8 +31,8 @@
             <div class="row">
                 <div class="col-md-12">
                         <div class="form-group">
+                            <input type="checkbox" style="display:inline-block; margin-right: 0.5em; margin-left: 0.5em;" id="showWithoutHotel">
                             <label for="showWithoutHotel">Pokazy bez hoteli</label>
-                            <input type="checkbox" style="display:inline-block" id="showWithoutHotel">
                         </div>
                 </div>
                 <div class="col-md-3">
