@@ -138,16 +138,19 @@ class StatisticsRBHController extends Controller
         $SactualWeekNumber = $request->date;
         $week_start = new DateTime();
         $week_start->setISODate($SactualYear,$SactualWeekNumber);
+        $objectOfSumColumns = Schedule::prepereObjectSumColumn();
         $CsheduleInfo = Schedule::getUsersRBHSchedule($SactualWeekNumber,$SactualYear);
-        $CsheduleInfo = Schedule::groupUsersRBHbyDepartments($CsheduleInfo);
+        $CsheduleInfo = Schedule::groupUsersRBHbyDepartments($CsheduleInfo,$objectOfSumColumns);
         $CsheduleInfo = Schedule::addMissingDepartmentToCollect($CsheduleInfo)->sortBy('department_info_id');
+        $objectOfSumColumns = Schedule::changeSecondsToHourArray($objectOfSumColumns);
         $SfirstDate   =  $week_start->modify('monday this week')->format('Y-m-d');
         $SlastDate    = $week_start->modify('sunday this week')->format('Y-m-d');
         return View('reportpage.statisticsRBH.WeekReportPlanningRBH')
             ->with('CsheduleInfo',$CsheduleInfo)
             ->with('SfirstDate',$SfirstDate)
             ->with('SlastDate',$SlastDate)
-            ->with('SactualWeekNumber',$SactualWeekNumber);
+            ->with('SactualWeekNumber',$SactualWeekNumber)
+            ->with('columnSum',$objectOfSumColumns);;
     }
 
     /**
