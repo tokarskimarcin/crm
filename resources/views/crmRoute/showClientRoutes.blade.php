@@ -110,20 +110,20 @@
                                     <div class="col-md-5">
                                         <strong>Edycja (Hoteli i godzin):</strong>
                                         <ul class="list-group">
-                                            <li class="list-group-item"><button class="btn btn-danger" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edycja</button>
+                                            <li class="list-group-item"><button class="btn btn-danger" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edytuj</button>
                                                 - trasa niegotowa (nieprzypisane hotele i godziny)</li>
-                                            <li class="list-group-item"><button class="btn btn-info" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edycja</button>
+                                            <li class="list-group-item"><button class="btn btn-info" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edytuj</button>
                                                 - trasa gotowa (przypisane hotele i godziny)</li>
                                         </ul>
                                     </div>
                                     <div class="col-md-7">
                                         <strong>Edycja parametrów (Kampanii):</strong>
                                         <ul class="list-group">
-                                            <li class="list-group-item"><button class="btn btn-danger" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edycja</button>
+                                            <li class="list-group-item"><button class="btn btn-danger" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edytuj</button>
                                                 - trasy z nie przypisanymi oddziałami i nie ustawionymi limitami</li>
-                                            <li class="list-group-item"><button class="btn btn-warning" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edycja</button>
+                                            <li class="list-group-item"><button class="btn btn-warning" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edytuj</button>
                                                 - trasy z nie przypisanymi oddziałami albo nie ustawionymi limitami</li>
-                                            <li class="list-group-item"><button class="btn btn-info" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edycja</button>
+                                            <li class="list-group-item"><button class="btn btn-info" style="font-weight:bold;"><span class="glyphicon glyphicon-edit"></span> Edytuj</button>
                                                 - trasy z przypisanymi oddziałami i ustawionymi limitami</li>
                                         </ul>
                                     </div>
@@ -463,7 +463,7 @@
                             $.each(response['distincRouteID'],function (key,value) {
                                 var clienObject = {key : key, color: random_rgba(),clientName: value[0].clientName};
                                 clientColorObj.push(clienObject);
-                            })
+                            });
 
                             $.each(response['infoClient'],function (key,value) {
                                 var color = random_rgba();
@@ -1061,11 +1061,11 @@
                     //validation
                     const allLimits = document.querySelectorAll('.limitInp');
                     let allGood = true;
-                    allLimits.forEach(limit => {
+                    /*allLimits.forEach(limit => {
                        if(limit.value == 0 || limit.value == '' || limit.value == null) {
                            allGood = false;
                        }
-                    });
+                    });*/
 
                     const limitInput1 = document.querySelector('#changeLimits_1');
                     const limitInput2 = document.querySelector('#changeLimits_2');
@@ -1078,9 +1078,8 @@
                     const singleLimitvalue = singleLimitInput.value;
 
                     if(allGood) {
-
                         //this part changes color of button
-                        clientRouteIdArr.forEach(id => {
+                        /*clientRouteIdArr.forEach(id => {
                            if(document.querySelector(`#${id}`)) {
                                let givenRow = document.querySelector(`#${id}`);
                                let limitEditButton = givenRow.querySelector('.show-modal-with-data');
@@ -1089,7 +1088,7 @@
                                    limitEditButton.classList.add('btn-info');
                                }
                            }
-                        });
+                        });*/
 
                         const url = `{{route('api.changeLimits')}}`;
                         const header = new Headers();
@@ -1423,6 +1422,7 @@
                 const type = document.querySelector('#type');
                 const showAllClientsCheckbox = document.querySelector('#showAllClients');
                 const showOnlyAssignedCheckbox = document.querySelector('#showOnlyAssigned');
+                const parameterSelect = document.querySelector('#parameters');
 
                 if (document.querySelector('.check')) {
                     let idOfClient = document.querySelector('.check').id;
@@ -1437,6 +1437,7 @@
                 sessionStorage.setItem('type', type.options[type.selectedIndex].value);
                 sessionStorage.setItem('showAllClients', showAllClientsCheckbox.checked);
                 sessionStorage.setItem('showOnlyAssigned', showOnlyAssignedCheckbox.checked);
+                sessionStorage.setItem('parameters', parameterSelect.options[parameterSelect.selectedIndex].value);
             }
 
             /**
@@ -1477,7 +1478,7 @@
                     for (let i = 0; i < weekNumber.length; i++) {
                         if (weekNumber[i].value == week) {
                             weekNumber[i].selected = true;
-                            selectedWeek = weekNumber[i].value;
+                            // selectedWeek = weekNumber[i].value;
                         }
                     }
                     sessionStorage.removeItem('weekNumber');
@@ -1518,6 +1519,18 @@
                         showOnlyAssignedInput.prop('checked', true);
                     }
                     sessionStorage.removeItem('showOnlyAssigned');
+                }
+
+                let parameterSelect = document.querySelector('#parameters');
+                if(sessionStorage.getItem('parameters')) {
+                    const parameter = sessionStorage.getItem('parameters');
+                    somethingChanged = parameter !== '0' ? true : somethingChanged;
+                    for (let i = 0, max = parameterSelect.length; i < max; i++) {
+                        if (parameterSelect[i].value == parameter) {
+                            parameterSelect[i].selected = true;
+                        }
+                    }
+                    sessionStorage.removeItem('parameters');
                 }
 
                 if(somethingChanged) {

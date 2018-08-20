@@ -102,6 +102,9 @@
             //GLOBAL VARIABLES
                 let panelBody = document.querySelector('.panel-body');
                 let submitPlace = document.querySelector('.summaryButtonContainer');
+
+            let newShowDeferred = new $.Deferred();
+            let removeShowDeferred = new $.Deferred();
             //END GLOBAL VARIABLES
 
             /**
@@ -120,19 +123,26 @@
                 firstForm.createDOMBox();
                 let firstFormDOM = firstForm.getForm();
 
-                firstDayContainer.appendChild(firstFormDOM);F
+                firstDayContainer.appendChild(firstFormDOM);
+
+                newShowDeferred.promise().then(function (resolve){
+                    $(firstFormDOM).slideDown('slow',function () {
+                        firstDayContainer.scrollIntoView({behavior: "smooth"});
+                    });
+                }, function (reject) {
+                });
             })();
 
             /**
              * This method is used in shows appended between another ones
              */
             function showInTheMiddleAjax(previousCityDistance, previousCityId, nextCityDistance, nextCityId, citySelect, voivodeSelect, oldValuesArray = null) {
-                //console.assert(citySelect.matches('.citySelect'), 'citySelect in showInTheMiddleAjax method is not city select');
-                //console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInTheMiddleAjax method is not voivode select');
-                //console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInTheMiddleAjax is not number!');
-                //console.assert((!isNaN(parseInt(previousCityId))) && (previousCityId != 0), 'previousCityId in showInTheMiddleAjax is not number!');
-                //console.assert((!isNaN(parseInt(previousCityDistance))) || (previousCityDistance == 'infinity'), 'previousCityId in showInTheMiddleAjax is not correct value!');
-                //console.assert((!isNaN(parseInt(nextCityDistance))) || (nextCityDistance == 'infinity'), 'nextCityDistance in showInTheMiddleAjax is not correct value!');
+                console.assert(citySelect.matches('.citySelect'), 'citySelect in showInTheMiddleAjax method is not city select');
+                console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInTheMiddleAjax method is not voivode select');
+                console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInTheMiddleAjax is not number!');
+                console.assert((!isNaN(parseInt(previousCityId))) && (previousCityId != 0), 'previousCityId in showInTheMiddleAjax is not number!');
+                console.assert((!isNaN(parseInt(previousCityDistance))) || (previousCityDistance == 'infinity'), 'previousCityId in showInTheMiddleAjax is not correct value!');
+                console.assert((!isNaN(parseInt(nextCityDistance))) || (nextCityDistance == 'infinity'), 'nextCityDistance in showInTheMiddleAjax is not correct value!');
                 let firstResponse = null;
                 let secondResponse = null;
                 let intersectionArray = null;
@@ -159,7 +169,7 @@
                             },
                             success: function (response) {
                                 firstResponse = response;
-                                //console.assert(typeof(firstResponse) === "object", "firstResponse in showInTheMiddleAjax is not object!");
+                                console.assert(typeof(firstResponse) === "object", "firstResponse in showInTheMiddleAjax is not object!");
                                 $.ajax({
                                     type: "POST",
                                     async: false,
@@ -175,7 +185,7 @@
                                         secondResponse = response2;
                                         voivodeSelect.innerHTML = '';
                                         citySelect.innerHTML = '';
-                                        //console.assert(typeof(secondResponse) === "object", "secondResponse in showInTheMiddleAjax is not object!");
+                                        console.assert(typeof(secondResponse) === "object", "secondResponse in showInTheMiddleAjax is not object!");
                                         intersectionArray = getIntersection(firstResponse, secondResponse);
 
                                         let voivodeSet = intersectionArray[0];
@@ -187,12 +197,12 @@
                                         });
 
                                         if(oldValuesArray) { //this is optional
-                                            //console.assert(Array.isArray(oldValuesArray), "oldVoivodeArr in showInExtreme method is not array!");
+                                            console.assert(Array.isArray(oldValuesArray), "oldVoivodeArr in showInExtreme method is not array!");
                                             appendBasicOption(citySelect);
                                             voivodeSet.forEach(voivode => {
                                                 if(voivode.id == oldValuesArray[1]) {
                                                     citySet.forEach(voivodeCity => {
-                                                        //console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
+                                                        console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
                                                         voivodeCity.forEach(city => {
                                                             if(city.id === voivode.id) {
                                                                 appendCityOptions(citySelect, city);
@@ -212,7 +222,7 @@
 
                                             voivodeSet.forEach(voivode => {
                                                 citySet.forEach(voivodeCity => {
-                                                    //console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
+                                                    console.assert(Array.isArray(voivodeCity), "voivodeCity in showInTheMiddleAjax method is not array!");
                                                     voivodeCity.forEach(city => {
                                                         if(city.id === voivode.id) {
                                                             appendCityOptions(citySelect, city);
@@ -227,6 +237,8 @@
                             }
                         }).done((response) => {
                             swal.close();
+                            newShowDeferred.resolve();
+                            removeShowDeferred.resolve();
                         });
                     }
                 });
@@ -237,10 +249,10 @@
              * This method is used in shows appended as first or last ones
              */
             function showInExtreme(limit, nextCityId, citySelect, voivodeSelect, oldVoivodeArr = null) {
-                //console.assert(citySelect.matches('.citySelect'), 'citySelect in showInExtreme method is not city select');
-                //console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInExtreme method is not voivode select');
-                //console.assert(!isNaN(parseInt(limit)), 'limit in showInExtreme is not number!');
-                //console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInExtreme is not number!');
+                console.assert(citySelect.matches('.citySelect'), 'citySelect in showInExtreme method is not city select');
+                console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in showInExtreme method is not voivode select');
+                console.assert(!isNaN(parseInt(limit)), 'limit in showInExtreme is not number!');
+                console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInExtreme is not number!');
 
                 swal({
                     title: 'Ładowawnie...',
@@ -264,16 +276,16 @@
                             },
                             success: function (response) {
                                 let allVoivodes = response['voievodeInfo'];
-                                //console.assert(Array.isArray(allVoivodes), "allVoivodes in showInExtreme method is not array!");
+                                console.assert(Array.isArray(allVoivodes), "allVoivodes in showInExtreme method is not array!");
                                 let allCitiesGroupedByVoivodes = response['cityInfo'];
-                                //console.assert(typeof(allCitiesGroupedByVoivodes) === "object", "allCitiesGroupedByVoivodes in showInExtreme method is not object!");
+                                console.assert(typeof(allCitiesGroupedByVoivodes) === "object", "allCitiesGroupedByVoivodes in showInExtreme method is not object!");
                                 allVoivodes.forEach(voivode => {
                                     appendVoivodeOptions(voivodeSelect, voivode)
                                 });
                                 citySelect.setAttribute('data-distance', limit); //applaying old value
                                 if(oldVoivodeArr) { //this is optional
                                     appendBasicOption(citySelect);
-                                    //console.assert(Array.isArray(oldVoivodeArr), "oldVoivodeArr in showInExtreme method is not array!");
+                                    console.assert(Array.isArray(oldVoivodeArr), "oldVoivodeArr in showInExtreme method is not array!");
                                     for(let Id in allCitiesGroupedByVoivodes) {
                                         if(oldVoivodeArr[1] == Id) {
                                             allCitiesGroupedByVoivodes[Id].forEach(city => {
@@ -292,7 +304,7 @@
                                     let voivodeId = e.target.value;
                                     for(let Id in allCitiesGroupedByVoivodes) {
                                         if(voivodeId == Id) {
-                                            //console.assert(Array.isArray(allCitiesGroupedByVoivodes[Id]), "allCitiesGroupedByVoivodes in showInExtreme method is not array!");
+                                            console.assert(Array.isArray(allCitiesGroupedByVoivodes[Id]), "allCitiesGroupedByVoivodes in showInExtreme method is not array!");
                                             allCitiesGroupedByVoivodes[Id].forEach(city => {
                                                 appendCityOptions(citySelect, city);
                                             });
@@ -302,6 +314,8 @@
                             }
                         }).done((response) => {
                             swal.close();
+                            newShowDeferred.resolve();
+                            removeShowDeferred.resolve();
                         });
                     }
                 });
@@ -311,51 +325,50 @@
              * This method is used in shows without distance limit
              */
             function showWithoutDistanceAjax(voivodeId, citySelect) {
-                //console.assert(!isNaN(parseInt(voivodeId)) && voivodeId != 0, 'voivodeId in showWithoutDistanceAjax is not number!');
-                //console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
+                console.assert(!isNaN(parseInt(voivodeId)) && voivodeId != 0, 'voivodeId in showWithoutDistanceAjax is not number!');
+                console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
 
-                swal({
-                    title: 'Ładowawnie...',
-                    text: 'To może chwilę zająć',
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    allowEnterKey: false,
-                    onOpen: () => {
-                        swal.showLoading();
-                        $.ajax({
-                            type: "POST",
-                            async: false,
-                            url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
-                            data: {
-                                "id": voivodeId
-                            },
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function(response) {
-                                //console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
-                                let placeToAppend = citySelect;
-                                placeToAppend.innerHTML = '';
-                                appendBasicOption(placeToAppend);
-                                for(let i = 0; i < response.length; i++) {
-                                    let responseOption = document.createElement('option');
-                                    responseOption.value = response[i].id;
-                                    responseOption.textContent = response[i].name;
-                                    placeToAppend.appendChild(responseOption);
-                                }
-                            }
-                        }).done((response) => {
-                            swal.close();
-                        });
+                // swal({
+                //     title: 'Ładowawnie...',
+                //     text: 'To może chwilę zająć',
+                //     showConfirmButton: false,
+                //     allowOutsideClick: false,
+                //     allowEscapeKey: false,
+                //     allowEnterKey: false,
+                //     onOpen: () => {
+                //         swal.showLoading();
+                //     }
+                // });
+
+                $.ajax({
+                    type: "POST",
+                    async: false,
+                    url: '{{ route('api.allCitiesInGivenVoivodeAjax') }}',
+                    data: {
+                        "id": voivodeId
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        console.assert(Array.isArray(response), "response from ajax in showWithoutDistanceAjax method is not array!");
+                        let placeToAppend = citySelect;
+                        placeToAppend.innerHTML = '';
+                        appendBasicOption(placeToAppend);
+                        for(let i = 0; i < response.length; i++) {
+                            let responseOption = document.createElement('option');
+                            responseOption.value = response[i].id;
+                            responseOption.textContent = response[i].name;
+                            placeToAppend.appendChild(responseOption);
+                        }
                     }
                 });
             }
 
             function limitSelectsWhenBetweenSameDayContainer(grandNextShowContainer, thisSingleShowContainer, nextShowContainer, changeDistanceArr = null) {
-                //console.assert(grandNextShowContainer.matches('.singleShowContainer'), 'grandNextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
-                //console.assert(thisSingleShowContainer.matches('.singleShowContainer'), 'thisSingleShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
-                //console.assert(nextShowContainer.matches('.singleShowContainer'), 'nextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                console.assert(grandNextShowContainer.matches('.singleShowContainer'), 'grandNextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                console.assert(thisSingleShowContainer.matches('.singleShowContainer'), 'thisSingleShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
+                console.assert(nextShowContainer.matches('.singleShowContainer'), 'nextShowContainer in limitSelectsWhenBetweenSameDayContainer is not single day container');
                 const grandNextShowContainerCitySelect = grandNextShowContainer.querySelector('.citySelect');
                 const grandNextShowContainerCityDistance = grandNextShowContainerCitySelect.dataset.distance;
                 let grandNextShowContainerCityId = getSelectedValue(grandNextShowContainerCitySelect);
@@ -472,7 +485,7 @@
              * This method appends basic option to voivode select
              */
             function appendBasicOption(element) {
-                //console.assert(element.tagName === "SELECT", 'Element in appendBasicOption is not select element');
+                console.assert(element.tagName === "SELECT", 'Element in appendBasicOption is not select element');
                 let basicVoivodeOption = document.createElement('option');
                 basicVoivodeOption.value = '0';
                 basicVoivodeOption.textContent = 'Wybierz';
@@ -493,7 +506,7 @@
              * This method appends options with voivode data
              */
             function appendVoivodeOptions(element, data) {
-                //console.assert(element.matches('.voivodeSelect'), 'Element in appendVoivodeOptions method is not voivode select');
+                console.assert(element.matches('.voivodeSelect'), 'Element in appendVoivodeOptions method is not voivode select');
                 let voivodeOption = document.createElement('option');
                 voivodeOption.value = data.id;
                 voivodeOption.textContent = data.name;
@@ -504,7 +517,7 @@
              * This method appends options with city data
              */
             function appendCityOptions(element,data) {
-                //console.assert(element.matches('.citySelect'), 'Element in appendCityOptions method is not city select');
+                console.assert(element.matches('.citySelect'), 'Element in appendCityOptions method is not city select');
                 let cityOpt = document.createElement('option');
                 cityOpt.value = data.city_id;
                 cityOpt.textContent = data.city_name;
@@ -521,10 +534,10 @@
                 const secondVoivodeInfo = secondResponse['voievodeInfo'];
                 const firstCityInfo = firstResponse['cityInfo'];
                 const secondCityInfo = secondResponse['cityInfo'];
-                //console.assert(Array.isArray(firstVoivodeInfo), "firstVoivodeInfo in getIntersection method is not array!");
-                //console.assert(Array.isArray(secondVoivodeInfo), "secondVoivodeInfo in getIntersection method is not array!");
-                //console.assert(typeof(firstCityInfo) === "object", "firstCityInfo in getIntersection method is not object!");
-                //console.assert(typeof(secondCityInfo) === "object", "secondCityInfo in getIntersection method is not object!");
+                console.assert(Array.isArray(firstVoivodeInfo), "firstVoivodeInfo in getIntersection method is not array!");
+                console.assert(Array.isArray(secondVoivodeInfo), "secondVoivodeInfo in getIntersection method is not array!");
+                console.assert(typeof(firstCityInfo) === "object", "firstCityInfo in getIntersection method is not object!");
+                console.assert(typeof(secondCityInfo) === "object", "secondCityInfo in getIntersection method is not object!");
 
                 //linear looking for same voivodes
                 firstVoivodeInfo.forEach(voivode => {
@@ -557,7 +570,7 @@
                 intersectionArray.push(intersectionVoivodes);
                 intersectionArray.push(intersectionCities);
 
-                //console.assert(intersectionArray.length === 2, 'Problem with intersectionArray in getIntersection method');
+                console.assert(intersectionArray.length === 2, 'Problem with intersectionArray in getIntersection method');
                 return intersectionArray;
             }
 
@@ -593,7 +606,7 @@
              * @returns {Array} [undefined/true/false, undefined/true/false] - (undefined - no container given in arrayOfContainers, false - not checked, true - checked)
              */
             function checkboxFilter(arrayOfContainers) {
-                //console.assert(Array.isArray(arrayOfContainers), "arrayOfContainers in checkboxFilter method is not array!");
+                console.assert(Array.isArray(arrayOfContainers), "arrayOfContainers in checkboxFilter method is not array!");
                 let prevCont = arrayOfContainers[0];
                 let nextCont = arrayOfContainers[1];
                 let isCheckedPrev = undefined;
@@ -617,7 +630,7 @@
              * This method validate all single day forms
              */
             function validateAllForms(element) {
-                // //console.assert(element.matches('.singleShowContainer'), 'element in validateAllForms is not single show container');
+                console.assert(element.matches('.singleShowContainer'), 'element in validateAllForms is not single show container');
                 let flag = true;
                 element.forEach(day => {
                     let validation = validateForm(day);
@@ -633,7 +646,7 @@
              * This method returns selected by user from list item's value or null.
              */
             function getSelectedValue(element) {
-                //console.assert(element.tagName === 'SELECT', 'Argument of getSelectedValue is not select element');
+                console.assert(element.tagName === 'SELECT', 'Argument of getSelectedValue is not select element');
                 if(element.options[element.selectedIndex]) {
                     return element.options[element.selectedIndex].value;
                 }
@@ -650,10 +663,10 @@
              * @param cityId
              */
             function setOldValues(voivodeSelect, voivodeId, citySelect, cityId) {
-                //console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in setOldValues method is not voivode select');
-                //console.assert((!isNaN(parseInt(voivodeId))) && (voivodeId != 0), 'voivodeId in setOldValues is not number!');
-                //console.assert(citySelect.matches('.citySelect'), 'citySelect in setOldValues method is not city select');
-                //console.assert((!isNaN(parseInt(cityId))) && (cityId != 0), 'cityId in setOldValues is not number!');
+                console.assert(voivodeSelect.matches('.voivodeSelect'), 'voivodeSelect in setOldValues method is not voivode select');
+                console.assert((!isNaN(parseInt(voivodeId))) && (voivodeId != 0), 'voivodeId in setOldValues is not number!');
+                console.assert(citySelect.matches('.citySelect'), 'citySelect in setOldValues method is not city select');
+                console.assert((!isNaN(parseInt(cityId))) && (cityId != 0), 'cityId in setOldValues is not number!');
                 let voivodeFlag = true;
                 let cityFlag = true;
                 for(let i = 0; i < voivodeSelect.length; i++) {
@@ -670,11 +683,11 @@
                 }
                 if(voivodeFlag) {
                     $(voivodeSelect).val('0');
-                    // //console.log('zmienilo na wartosc domyslna voivode');
+                    // console.log('zmienilo na wartosc domyslna voivode');
                 }
                 if(cityFlag) {
                     $(citySelect).val('0');
-                    // //console.log('zmienilo na wartosc domyslna city');
+                    // console.log('zmienilo na wartosc domyslna city');
                 }
             }
 
@@ -700,7 +713,7 @@
              * This method validate form false - bad, true - good
              */
             function validateForm(element) {
-                //console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
+                console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
                 let citySelect = element.querySelector('.citySelect');
                 let cityValue = getSelectedValue(citySelect);
                 return !(cityValue == 0);
@@ -739,10 +752,11 @@
                 this.createDOMBox = function(distance = Infinity, selectedCity = null, intersetion = false, previousBox = null, nextBox = null) { //Creation of DOM form
                     let formBox = document.createElement('div'); //creation of main form container
                     formBox.classList.add('singleShowContainer');
+                    $(formBox).prop('hidden',true);
 
                     /*REMOVE BUTTON PART*/
                     if(this.addRemoveShowButtonFlag) { //adding remove button.
-                        //console.assert(this.addRemoveShowButtonFlag === true, 'addRemoveShowButtonFlag error');
+                        console.assert(this.addRemoveShowButtonFlag === true, 'addRemoveShowButtonFlag error');
                         let removeButtonContainer = document.createElement('div');
                         removeButtonContainer.classList.add('remove-button-container');
                         let removeButton = document.createElement('span');
@@ -772,7 +786,7 @@
 
                     /* CHECKBOX PART */
                     if(this.addCheckboxFlag) { //adding checkbox
-                        //console.assert(this.addCheckboxFlag === true, 'addCheckboxFlag error');
+                        console.assert(this.addCheckboxFlag === true, 'addCheckboxFlag error');
                         let afterHeaderRow = document.createElement('div');
                         afterHeaderRow.classList.add('row');
 
@@ -834,8 +848,8 @@
                             singleVoivode.value = {{$voivode->id}};
                             singleVoivode.textContent = '{{$voivode->name}}';
                             firstSelect.appendChild(singleVoivode);
-                        @endforeach()
-
+                        @endforeach
+                        newShowDeferred.resolve();
                         $(firstSelect).on('change', function(e) {
                             secondSelect.setAttribute('data-distance', 'infinity');
                             let voivodeId = e.target.value;
@@ -872,7 +886,7 @@
 
                     /* ADD NEW SHOW BUTTON */
                         if(this.addNewShowButtonFlag) {
-                            //console.assert(this.addNewShowButtonFlag === true, 'addNewShowButtonFlag error');
+                            console.assert(this.addNewShowButtonFlag === true, 'addNewShowButtonFlag error');
                             let buttonRow = document.createElement('div');
                             buttonRow.classList.add('row');
 
@@ -971,14 +985,24 @@
                         if(isChecked) { //when clicked singleDayContainer has checkbox checked
                             newForm.createDOMBox();
                             let newFormDomElement = newForm.getForm();
-                            thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
+                            thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                            newShowDeferred.promise().then(function (resolve){
+                                $(newFormDomElement).slideDown('slow',function () {
+                                    thisShowContainer.scrollIntoView({behavior: "smooth"});});
+                            }, function (reject) {
+                            });
                         }
                         else {
                             //we are checking whether cliecked singleDayContainer is last one, or between others.
                             if(lastOneFlag === true) {
                                 newForm.createDOMBox(30, selectedCityId);
                                 let newFormDomElement = newForm.getForm();
-                                thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
+                                thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                                newShowDeferred.promise().then(function (resolve){
+                                    $(newFormDomElement).slideDown('slow',function () {
+                                        thisShowContainer.scrollIntoView({behavior: "smooth"});});
+                                }, function (reject) {
+                                });
                             }
                             else { //container is not last one
                                 const apreviousCitySelect = thisShowContainer.querySelector('.citySelect');
@@ -988,7 +1012,12 @@
                                     apreviousCitySelect.dataset.distance = 30;
                                     newForm.createDOMBox(30, selectedCityId, true, thisShowContainer, nextShowContainer);
                                     let newFormDomElement = newForm.getForm();
-                                    thisShowContainer.insertAdjacentElement('afterend',newFormDomElement).scrollIntoView({behavior: "smooth"});
+                                    thisShowContainer.insertAdjacentElement('afterend',newFormDomElement);
+                                    newShowDeferred.promise().then(function (resolve){
+                                        $(newFormDomElement).slideDown('slow',function () {
+                                            thisShowContainer.scrollIntoView({behavior: "smooth"});});
+                                    }, function (reject) {
+                                    });
                                 }
                                 else {
                                     notify('Wybierz miasta w pokazach powyżej i poniżej');
@@ -1320,22 +1349,28 @@
                         }
                     }
 
-                    const allRemoveButtons = dayContainer.getElementsByClassName('remove-button');
-                    //console.assert(allRemoveButtons, "Brak przycisków usuń");
-                    if(allRemoveButtons.length > 1) { //delete only show box
-                        showContainer.parentNode.removeChild(showContainer);
-                    }
-                    else if(allRemoveButtons.length === 1) { //delete day box
-                        const allDayContainers = document.getElementsByClassName('singleDayContainer');
-                        if(allDayContainers.length > 1) {
-                            dayContainer.parentNode.removeChild(dayContainer);
-                            adjustDayNumbers();
+                    removeShowDeferred.promise().then(function () {
+                        const allRemoveButtons = dayContainer.getElementsByClassName('remove-button');
+                        console.assert(allRemoveButtons, "Brak przycisków usuń");
+                        if(allRemoveButtons.length > 1) { //delete only show box
+                            $(showContainer).slideUp('slow',function () {
+                                showContainer.parentNode.removeChild(showContainer);
+                            });
                         }
-                        else {
-                            notify('Nie można usunąć pierwszego dnia!');
-                        }
+                        else if(allRemoveButtons.length === 1) { //delete day box
+                            const allDayContainers = document.getElementsByClassName('singleDayContainer');
+                            if(allDayContainers.length > 1) {
+                                $(showContainer).slideUp('slow',function () {
+                                    dayContainer.parentNode.removeChild(dayContainer);
+                                    adjustDayNumbers();
+                                });
+                            }
+                            else {
+                                notify('Nie można usunąć pierwszego dnia!');
+                            }
 
-                    }
+                        }
+                    });
                 }
                 else if(e.target.matches('#addNewDay')) { // user clicks on 'add new day' button
                     let firstDay = new DayBox();
@@ -1368,7 +1403,14 @@
 
                         }
                         let firstFormDOM = firstForm.getForm();
-                        firstDayContainer.appendChild(firstFormDOM).scrollIntoView({behavior: "smooth"});
+                        firstDayContainer.appendChild(firstFormDOM);
+
+                        newShowDeferred.promise().then(function (resolve){
+                            $(firstFormDOM).slideDown('slow',function () {
+                                firstDayContainer.scrollIntoView({behavior: "smooth"});
+                            });
+                        }, function (reject) {
+                        });
                     }
                     else {
                         notify('Uzupełnij miasto');
@@ -1426,119 +1468,144 @@
                  */
             function globalChangeHandler(e) {
                 if(e.target.matches('.distance-checkbox')) {
+                    let allIsGood = true;
                     let isChecked = e.target.checked;
                     let previousSingleShowContainer = null;
                     let nextSingleShowContainer = null;
                     const thisSingleShowContainer = e.target.closest('.singleShowContainer');
 
-                    let voivodeSelect = thisSingleShowContainer.querySelector('.voivodeSelect');
-                    voivodeSelect.innerHTML = ''; //clear select
-                    let citySelect = thisSingleShowContainer.querySelector('.citySelect');
-                    citySelect.innerHTML = ''; //clear select
+                    let existenceArr = checkingExistenceOfPrevAndNextContainers(thisSingleShowContainer, 'singleShowContainer');
+                    if(existenceArr[0]) {
+                        let prevVoivodeSelect = existenceArr[0].querySelector('.voivodeSelect');
+                        let prevVoivodeId = getSelectedValue(prevVoivodeSelect);
+                        let prevCitySelect = existenceArr[0].querySelector('.citySelect');
+                        let prevCityId = getSelectedValue(prevCitySelect);
+                        if(prevCityId == 0 || prevVoivodeId == 0) {
+                            allIsGood = false;
+                        }
+                    }
+                    if(existenceArr[1]) {
+                        let nextVoivodeSelect = existenceArr[1].querySelector('.voivodeSelect');
+                        let nextVoivodeId = getSelectedValue(nextVoivodeSelect);
+                        let nextCitySelect = existenceArr[1].querySelector('.citySelect');
+                        let nextCityId = getSelectedValue(nextCitySelect);
+                        if(nextCityId == 0 || nextVoivodeId == 0) {
+                            allIsGood = false;
+                        }
+                    }
+                    if(allIsGood) {
+                        let voivodeSelect = thisSingleShowContainer.querySelector('.voivodeSelect');
+                        voivodeSelect.innerHTML = ''; //clear select
+                        let citySelect = thisSingleShowContainer.querySelector('.citySelect');
+                        citySelect.innerHTML = ''; //clear select
 
-                    // //this part remove all event listeners from this node
-                    // var old_element = voivodeSelect;
-                    // var new_element = old_element.cloneNode(true);
-                    // old_element.parentNode.replaceChild(new_element, old_element);
-                    // //end remove all event listeners
-                    $(voivodeSelect).off();
+                        $(voivodeSelect).off();
 
-                    voivodeSelect = thisSingleShowContainer.querySelector('.voivodeSelect');
+                        voivodeSelect = thisSingleShowContainer.querySelector('.voivodeSelect');
 
-                    appendBasicOption(citySelect);
-                    appendBasicOption(voivodeSelect);
+                        appendBasicOption(citySelect);
+                        appendBasicOption(voivodeSelect);
 
-                    if(isChecked) { // activate no distance limit option
-                        let existenceArr = checkingExistenceOfPrevAndNextContainers(thisSingleShowContainer, 'singleShowContainer');
+                        if(isChecked) { // activate no distance limit option
 
-                        citySelect.setAttribute('data-previousdistance', citySelect.dataset.distance);
-                        @foreach($voivodes as $voivode)
+                            citySelect.setAttribute('data-previousdistance', citySelect.dataset.distance);
+                                    @foreach($voivodes as $voivode)
                             var singleVoivode = document.createElement('option');
                             singleVoivode.value = {{$voivode->id}};
                             singleVoivode.textContent = '{{$voivode->name}}';
                             voivodeSelect.appendChild(singleVoivode);
-                        @endforeach()
+                            @endforeach()
                             citySelect.setAttribute('data-distance', 'infinity');
-                            voivodeSelect.addEventListener('change', e => {
+                            $(voivodeSelect).on('change', e => {
                                 let voivodeId = e.target.value;
                                 showWithoutDistanceAjax(voivodeId, citySelect);
                             });
 
-                        if(existenceArr[0]) {
-                            let prevVoivodeSelect = existenceArr[0].querySelector('.voivodeSelect');
-                            let prevVoivodeId = getSelectedValue(prevVoivodeSelect);
-                            let prevCitySelect = existenceArr[0].querySelector('.citySelect');
-                            let prevCityId = getSelectedValue(prevCitySelect);
-                            prevVoivodeSelect.innerHTML = '';
-                            prevCitySelect.innerHTML = '';
-                            let defaults = {voivode: prevVoivodeId};
-                            allCitiesAndAllVoivodes(existenceArr[0], defaults);
-                            setOldValues(prevVoivodeSelect, prevVoivodeId, prevCitySelect, prevCityId);
-                        }
-                        if(existenceArr[1]) {
-                            let nextVoivodeSelect = existenceArr[1].querySelector('.voivodeSelect');
-                            let nextVoivodeId = getSelectedValue(nextVoivodeSelect);
-                            let nextCitySelect = existenceArr[1].querySelector('.citySelect');
-                            let nextCityId = getSelectedValue(nextCitySelect);
-                            nextVoivodeSelect.innerHTML = '';
-                            nextCitySelect.innerHTML = '';
-                            let defaults = {voivode: nextVoivodeId};
-                            allCitiesAndAllVoivodes(existenceArr[1], defaults);
-                            setOldValues(nextVoivodeSelect, nextVoivodeId, nextCitySelect, nextCityId);
-                        }
+                            if(existenceArr[0]) {
+                                let prevVoivodeSelect = existenceArr[0].querySelector('.voivodeSelect');
+                                let prevVoivodeId = getSelectedValue(prevVoivodeSelect);
+                                let prevCitySelect = existenceArr[0].querySelector('.citySelect');
+                                let prevCityId = getSelectedValue(prevCitySelect);
+                                prevVoivodeSelect.innerHTML = '';
+                                prevCitySelect.innerHTML = '';
+                                let defaults = {voivode: prevVoivodeId};
+                                allCitiesAndAllVoivodes(existenceArr[0], defaults);
+                                setOldValues(prevVoivodeSelect, prevVoivodeId, prevCitySelect, prevCityId);
+                            }
+                            if(existenceArr[1]) {
+                                let nextVoivodeSelect = existenceArr[1].querySelector('.voivodeSelect');
+                                let nextVoivodeId = getSelectedValue(nextVoivodeSelect);
+                                let nextCitySelect = existenceArr[1].querySelector('.citySelect');
+                                let nextCityId = getSelectedValue(nextCitySelect);
+                                nextVoivodeSelect.innerHTML = '';
+                                nextCitySelect.innerHTML = '';
+                                let defaults = {voivode: nextVoivodeId};
+                                allCitiesAndAllVoivodes(existenceArr[1], defaults);
+                                setOldValues(nextVoivodeSelect, nextVoivodeId, nextCitySelect, nextCityId);
+                            }
 
-                    }
-                    else { //deactivate no distance limit option
-                        const allSingleShowContainers = document.getElementsByClassName('singleShowContainer');
-                        for(let i = 0; i < allSingleShowContainers.length; i++) {
-                            if(thisSingleShowContainer == allSingleShowContainers[i]) {
-                                if(allSingleShowContainers[i-1]) {
-                                    previousSingleShowContainer = allSingleShowContainers[i-1];
-                                }
-                                if(allSingleShowContainers[i+1]) {
-                                    nextSingleShowContainer = allSingleShowContainers[i+1];
+                        }
+                        else { //deactivate no distance limit option
+                            const allSingleShowContainers = document.getElementsByClassName('singleShowContainer');
+                            for(let i = 0; i < allSingleShowContainers.length; i++) {
+                                if(thisSingleShowContainer == allSingleShowContainers[i]) {
+                                    if(allSingleShowContainers[i-1]) {
+                                        previousSingleShowContainer = allSingleShowContainers[i-1];
+                                    }
+                                    if(allSingleShowContainers[i+1]) {
+                                        nextSingleShowContainer = allSingleShowContainers[i+1];
+                                    }
                                 }
                             }
+
+                            if(previousSingleShowContainer === null && nextSingleShowContainer === null) { //there is only one show
+                                        @foreach($voivodes as $voivode)
+                                var singleVoivode = document.createElement('option');
+                                singleVoivode.value = {{$voivode->id}};
+                                singleVoivode.textContent = '{{$voivode->name}}';
+                                voivodeSelect.appendChild(singleVoivode); //password_date
+                                @endforeach()
+
+                                $(voivodeSelect).on('change', e => {
+                                    citySelect.setAttribute('data-distance', 'infinity');
+                                    let voivodeId = e.target.value;
+                                    showWithoutDistanceAjax(voivodeId, citySelect);
+                                });
+                            }
+                            else if(previousSingleShowContainer !== null && nextSingleShowContainer === null) { //case when show is last one dziala
+                                const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
+                                const previousCityId = getSelectedValue(previousCitySelect);
+                                showInExtreme(citySelect.dataset.previousdistance, previousCityId, citySelect, voivodeSelect);
+
+                            }
+                            else if(previousSingleShowContainer === null && nextSingleShowContainer !== null) { //case when show is first one
+                                const nextCitySelect = nextSingleShowContainer.querySelector('.citySelect');
+                                const nextCityId = getSelectedValue(nextCitySelect);
+                                showInExtreme(30, nextCityId, citySelect, voivodeSelect);
+
+                            }
+                            else if(previousSingleShowContainer !== null && nextSingleShowContainer !== null) { //case when show is in the middle
+                                const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
+                                const previousCityDistance = previousCitySelect.dataset.distance;
+                                const previousCityId = getSelectedValue(previousCitySelect);
+
+                                const nextCitySelect = nextSingleShowContainer.querySelector('.citySelect');
+                                const nextCityDistance = nextCitySelect.dataset.distance;
+                                const nextCityId = getSelectedValue(nextCitySelect);
+
+                                showInTheMiddleAjax(previousCityDistance, previousCityId, nextCityDistance, nextCityId, citySelect, voivodeSelect);
+
+                            }
+
                         }
-
-                        if(previousSingleShowContainer === null && nextSingleShowContainer === null) { //there is only one show
-                            @foreach($voivodes as $voivode)
-                            var singleVoivode = document.createElement('option');
-                            singleVoivode.value = {{$voivode->id}};
-                            singleVoivode.textContent = '{{$voivode->name}}';
-                            voivodeSelect.appendChild(singleVoivode); //password_date
-                            @endforeach()
-
-                            voivodeSelect.addEventListener('change', e => {
-                                citySelect.setAttribute('data-distance', 'infinity');
-                                let voivodeId = e.target.value;
-                                showWithoutDistanceAjax(voivodeId, citySelect);
-                            });
-                        }
-                        else if(previousSingleShowContainer !== null && nextSingleShowContainer === null) { //case when show is last one dziala
-                            const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
-                            const previousCityId = getSelectedValue(previousCitySelect);
-                            showInExtreme(citySelect.dataset.previousdistance, previousCityId, citySelect, voivodeSelect);
-                        }
-                        else if(previousSingleShowContainer === null && nextSingleShowContainer !== null) { //case when show is first one
-                            const nextCitySelect = nextSingleShowContainer.querySelector('.citySelect');
-                            const nextCityId = getSelectedValue(nextCitySelect);
-
-                            showInExtreme(30, nextCityId, citySelect, voivodeSelect);
-                        }
-                        else if(previousSingleShowContainer !== null && nextSingleShowContainer !== null) { //case when show is in the middle
-                            const previousCitySelect = previousSingleShowContainer.querySelector('.citySelect');
-                            const previousCityDistance = previousCitySelect.dataset.distance;
-                            const previousCityId = getSelectedValue(previousCitySelect);
-
-                            const nextCitySelect = nextSingleShowContainer.querySelector('.citySelect');
-                            const nextCityDistance = nextCitySelect.dataset.distance;
-                            const nextCityId = getSelectedValue(nextCitySelect);
-
-                            showInTheMiddleAjax(previousCityDistance, previousCityId, nextCityDistance, nextCityId, citySelect, voivodeSelect);
-                        }
-
                     }
+                    else {
+                        e.target.checked = isChecked ? false : true;
+
+                        swal('Wybierz miasta i województwa w listach poniżej i powyżej');
+                    }
+
+
                 }
                 else if(e.target.matches('.citySelect')) { // user changes city
                     const thisSingleShowContainer = e.target.closest('.singleShowContainer');
