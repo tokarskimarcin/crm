@@ -180,6 +180,7 @@
                                 </div>
                             </div>
                         </div>
+                        @if(Auth::user()->user_type_id != 8)
                         <div class="col-md-4">
                             <button class="btn btn-default simulationClientLimit"  style="width: 100%" data-toggle="modal" data-target="#modalSimulationClient" >Symulacja Klienta(Edycja Limitów)</button>
                         </div>
@@ -197,6 +198,7 @@
                             <button id="removeSimulationButton" class="btn btn-block btn-danger" style="display: none;"><span class="glyphicon glyphicon-remove"></span> Usuń symulację wyników</button>
                         </div>
                     </div>
+                    @endif
                     <table id="datatable" class="table table-striped row-border" style="width:100%;">
                         <thead>
                         <tr>

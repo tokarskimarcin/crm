@@ -2978,7 +2978,7 @@ class CrmRouteController extends Controller
             $tempClass['department_info_id'] = null;
             $tempClass['sumOfLimits'] = $toSumItem->sum('limits');
             $tempClass['sumOfActualSuccess'] = $toSumItem->sum('actual_success');
-
+            $tempClass['addAfter'] = 0;
             $finallCollect->push($tempClass);
         }
         $routeInfoOverall = $finallCollect;
@@ -3019,7 +3019,8 @@ class CrmRouteController extends Controller
             date,
             department_info_id,            
             SUM(limits) as sumOfLimits,
-            SUM(actual_success) as sumOfActualSuccess
+            SUM(actual_success) as sumOfActualSuccess,
+            0 as addAfter
         '))
             ->where('client_route_info.status', '=', 1)
             ->groupBy('date', 'department_info_id')
@@ -3066,17 +3067,22 @@ class CrmRouteController extends Controller
                     }
                     $arrayResult['sumOfLimits'] = $limit;
                     $arrayResult['sumOfActualSuccess'] = 0;
+                    $arrayResult['addAfter'] = 1;
+
 
                     $merge = $routeInfoOverall->where('date',$itemDate)
                                     ->where('department_info_id',null);
                     if(!$merge->isEmpty()){
                             try {
-                                $routeInfoOverall->where('date',$itemDate)
-                                    ->where('department_info_id',null)->first()->sumOfLimits  += round($arrayResult['sumOfLimits']/count($departmentInfo),2);
-
+                                $obj = $routeInfoOverall->where('date',$itemDate)
+                                    ->where('department_info_id',null)->first();
+                                $obj->sumOfLimits  += round($arrayResult['sumOfLimits']/count($departmentInfo),2);
+                                $obj->addAfter = 1;
                             }catch (\Exception $e){
-                               $routeInfoOverall->where('date',$itemDate)
-                                    ->where('department_info_id',null)->first()['sumOfLimits'] += round($arrayResult['sumOfLimits']/count($departmentInfo),2);
+                                $obj = $routeInfoOverall->where('date',$itemDate)
+                                    ->where('department_info_id',null)->first();
+                                $obj['sumOfLimits'] += round($arrayResult['sumOfLimits']/count($departmentInfo),2);
+                                $obj['addAfter'] = 1;
                         }
                     }else{
                         $arrayResult['sumOfLimits'] = round($arrayResult['sumOfLimits']/$departmentInfo->count(),2) ;
@@ -3095,10 +3101,13 @@ class CrmRouteController extends Controller
             $allSet = true;
 
 
-            $unallocatedLimits = $routeInfoOverall
+            $allScore = $routeInfoOverall
                 ->where('department_info_id','=',null)
                 ->where('date', '=', $actualDate)
-                ->first()['sumOfLimits'];
+               ;
+            $unallocatedLimits = $allScore->where('addAfter',0) ->first()['sumOfLimits'];
+            $unallocatedLimitsAfter = $allScore->where('addAfter',1) ->first()['sumOfLimits'];
+
             foreach ($departmentInfo as $item){
                 $routeInfo = $routeInfoOverall
                     ->where('department_info_id' ,'=', $item->id)
@@ -3109,6 +3118,9 @@ class CrmRouteController extends Controller
 
                 $wynik = (is_null($daySuccess) ? 0 : $daySuccess) - (is_null($dayLimit) ? 0 : $dayLimit) - (is_null($unallocatedLimits) ? 0 : $unallocatedLimits);
                 $wynik = $wynik > 0 ? 0 : $wynik;
+               // if($actualDate == '2018-08-20')
+                   // dd($allScore);
+                $wynik -= is_null($unallocatedLimitsAfter) ? 0 : $unallocatedLimitsAfter ;
                 $dayCollect->offsetSet($item->name2, $wynik);
 
                 $totalScore += $wynik;
