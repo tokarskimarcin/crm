@@ -3034,7 +3034,6 @@ class CrmRouteController extends Controller
         //simulate new Client
         if($simulateNewClientObject != null)
         {
-            //dd($simulateNewClientObject);
             foreach ($simulateNewClientObject as $item){
                 $dayArray = $this::getDateofWeekFromArray($item['arrayOfNumberWeekNewClient'],$item['year']);
                 foreach ($dayArray as $itemDate){
