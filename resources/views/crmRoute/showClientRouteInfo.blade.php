@@ -126,7 +126,7 @@
                 },
                 headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
                 success: function (response) {
-                    console.log(response);
+                    // console.log(response);
                     tmp =  response;
                 }
             });
