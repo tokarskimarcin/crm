@@ -855,7 +855,7 @@
                             confirmButtonText: 'Tak, zapisz!'
                         }).then((result) => {
                             if (result.value) {
-                                reloadDataTable();
+                                reloadDataTable('#modalSimulationClient');
                                 swal(
                                     'Zapisano!',
                                     'Limity zostały zmienione.',
