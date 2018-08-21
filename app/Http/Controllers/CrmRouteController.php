@@ -793,15 +793,14 @@ class CrmRouteController extends Controller
 
             $limit = $request->limit;
 
-            $cities = Cities::all();
-            $city = $cities->where('id', '=', $cityId)->first();
+            $city = Cities::where('id', '=', $cityId)->first();
             //part responsible for grace period
             $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date as date','client_route_info.city_id','city.grace_period', 'city.max_month_show as max_month_show')
                 ->join('city','city.id','client_route_info.city_id')
                 ->where('client_route_info.status', '=', 1)
                 ->orderBy('city.name')
                 ->get();
-            $voievodeshipRound = $this::findCityByDistanceWithDistanceLimit($city, $currentDate, $clientRouteInfoAll, $cities, $limit);
+            $voievodeshipRound = $this::findCityByDistanceWithDistanceLimit($city, $currentDate, $clientRouteInfoAll, $limit);
 
             $voievodeshipRound = $voievodeshipRound->groupBy('id');
             $voievodeshipDistinc = array();
@@ -813,7 +812,7 @@ class CrmRouteController extends Controller
             return $responseArray;
         }
     }
-    public function findCityByDistanceWithDistanceLimit($city, $currentDate,$clientRoutesInfoWithUsedCities,$cities, $limit){
+    public function findCityByDistanceWithDistanceLimit($city, $currentDate,$clientRoutesInfoWithUsedCities, $limit){
 
         $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
         $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
@@ -1376,8 +1375,8 @@ class CrmRouteController extends Controller
      * This method return data about all client routes to datatable in showClientRoutes
      */
     public function showClientRoutesInfoAjax(Request $request) {
-        $clientId = $request->id;
-        $clientId = $clientId == '-1' ? '%' : $clientId;
+        $selectedClientIds = $request->selectedClientIds;
+        //$selectedClientIds = $selectedClientIds == null ? '%' : $selectedClientIds;
 
         $showOnlyAssigned = $request->showOnlyAssigned;
         if($request->year > 0) {
@@ -1409,11 +1408,15 @@ class CrmRouteController extends Controller
             ->join('client' ,'client.id','=','client_route.client_id')
             ->join('city' ,'city.id','=', 'city_id')
             ->where('client_route.status', '=', 1)
-            ->where('client_route.client_id','like',$clientId)
+            //->whereIn('client_route.client_id', $selectedClientIds)
             ->where('client_route_info.status', '=', 1)
             ->where('date', 'like', $year . '%')
             ->where('weekOfYear', 'like', $selectedWeek)
             ->where('client_route.type', 'like', $typ);
+
+        if($selectedClientIds !== null){
+            $client_route_info->whereIn('client_route.client_id', $selectedClientIds);
+        }
 
         $client_route_info =  $client_route_info->get();
 
@@ -3068,11 +3071,13 @@ class CrmRouteController extends Controller
                                     ->where('department_info_id',null);
                     if(!$merge->isEmpty()){
                             try {
+
                                 $routeInfoOverall->where('date',$itemDate)
-                                    ->where('department_info_id',null)->first()->sumOfLimits  += $arrayResult['sumOfLimits'];
+                                    ->where('department_info_id',null)->first()->sumOfLimits  += round($arrayResult['sumOfLimits']/count($departmentInfo),2);
+
                             }catch (\Exception $e){
                                $routeInfoOverall->where('date',$itemDate)
-                                    ->where('department_info_id',null)->first()['sumOfLimits'] += $arrayResult['sumOfLimits'];
+                                    ->where('department_info_id',null)->first()['sumOfLimits'] += round($arrayResult['sumOfLimits']/count($departmentInfo),2);
                         }
                     }else{
                         $routeInfoOverall->push(collect($arrayResult));
@@ -3118,7 +3123,7 @@ class CrmRouteController extends Controller
             else
                 $allSet = "Tak";
             $dayCollect->offsetSet('allSet',$allSet);
-            $dayCollect->offsetSet('totalScore',$totalScore);
+            $dayCollect->offsetSet('totalScore',intval($totalScore));
             $aheadPlanningData->push($dayCollect);
             $actualDate = date('Y-m-d', strtotime($actualDate. ' + 1 days'));
         }
@@ -3950,13 +3955,13 @@ class CrmRouteController extends Controller
     }
 
     public function clientReport(Request $request){
-            $data['infoClient'] = $this::getDataToCSV($request->clientID,$request->year
+            $data['infoClient'] = $this::getDataToCSV($request->selectedClientIds,$request->year
                 ,$request->selectedWeek);
             $data['distincRouteID'] = $data['infoClient']->groupby('clientRouteID');
             return $data;
     }
 
-    public function getDataToCSV($clientID,$year,$selectedWeek){
+    public function getDataToCSV($selectedClientIds,$year,$selectedWeek){
         if($year == 0)
             $year = '%';
         if($selectedWeek == 0)
@@ -3988,7 +3993,7 @@ class CrmRouteController extends Controller
             ->leftjoin('payment_methods','payment_methods.id','hotels.payment_method_id')
             ->leftjoin('city','city.id','hotels.city_id')
             ->where('client_route.status', '=', 1)
-            ->where('client_route.client_id','=',$clientID)
+            ->whereIn('client_route.client_id',$selectedClientIds)
             ->where('client_route_info.weekOfYear','like',$selectedWeek)
             ->where('client_route_info.status', '=', 1)
             ->where(DB::raw('YEAR(client_route_info.date)'),'like',$year)
@@ -4021,6 +4026,7 @@ class CrmRouteController extends Controller
         });
         return $data;
     }
+
     public function hotelConfirmationGet(){
         $allClients = ClientRouteCampaigns::select(DB::raw('distinct(client.id),client.name'))
             ->join('client_route_info','client_route_info.id','client_route_campaigns.client_route_info_id')

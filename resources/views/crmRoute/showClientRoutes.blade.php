@@ -340,6 +340,7 @@
 
         let idOfRow = null;
 
+        let selectedClientIds = []; //after user click on 1st table row, it assing clientRouteId to this variable
         var toDay = '{{date('Y-m-d')}}';
         var tableToExcel = (function() {
             var uri = 'data:application/vnd.ms-excel;base64,'
@@ -439,13 +440,13 @@
 
 
             $('#makeReportClient').on('click',function (e) {
-                let selectedClientID = id;
                 let year = yearInput.val();
                 let selectedWeek = selectedWeekInput.val();
                 let typ = typInput.val();
-                if(selectedClientID == '-1')
-                    swal('Aby wygenerować raport wybierz jednego klienta');
+                if( selectedClientIds.length !== 1)
+                    swal('Aby wygenerować raport wybierz tylko jednego klienta');
                 else{
+                    console.log('raport');
                     $.ajax({
                         type: 'POST',
                         headers: {
@@ -453,9 +454,9 @@
                         },
                         url: '{{ route('api.clientReport') }}',
                         data: {
-                            'clientID'      : selectedClientID,
-                            'year'          : year,
-                            'selectedWeek'  : selectedWeek
+                            'selectedClientIds' :  selectedClientIds ,
+                            'year'              : year,
+                            'selectedWeek'      : selectedWeek
                         },
                         success: function (response) {
                             var trHTML = '';
@@ -535,7 +536,6 @@
             const showOnlyAssignedInput = $('#showOnlyAssigned');
             const showAllClientsInput = $('#showAllClients');
             let selectedWeekInput = $('#weekNumber');
-            let id = -1; //after user click on 1st table row, it assing clientRouteId to this variable
             let rowIterator = null;
             // let colorIterator = 0;
             // let showAllClients = null; //this variable indices whether checkbox "Pokaż wszystkich klientó" is checked
@@ -645,7 +645,7 @@
                 "drawCallback": function (settings) {
                 },
                 "rowCallback": function (row, data, index) {
-                    $(row).attr('id', "client_" + data.id);
+                    $(row).attr('id', "client_" + data.id).addClass('client');
                     return row;
                 }, "fnDrawCallback": function (settings) {
                     $('#datatable tbody tr').click(function () {
@@ -653,20 +653,23 @@
                             showAllClientsInput.prop('checked', false)
                         }
                         test = $(this).closest('table');
-                        if ($(this).hasClass('check')) {
+                        let thisClientId  = $(this).attr('id');
+                        thisClientId =  thisClientId.substr(thisClientId.lastIndexOf('_')+1);
+                        if ($.inArray(thisClientId,selectedClientIds) !== -1) {
                             $(this).removeClass('check');
-                            showAllClientsInput.prop('checked', true);
-                            id = -1;
+                            selectedClientIds.splice(selectedClientIds.indexOf(thisClientId),1);
+                            if(selectedClientIds.length === 0){
+                                showAllClientsInput.prop('checked', true);
+                            }
                         }
                         else {
-                            test.find('tr.check').removeClass('check');
-                            $.each(test.find('.checkbox_info'), function (item, val) {
-                                $(val).prop('checked', false);
-                            });
-                            $(this).addClass('check');
-                            id = $(this).attr('id');
-                            indexOfUnderscore = id.lastIndexOf('_');
-                            id = id.substr(indexOfUnderscore + 1);
+                            selectedClientIds.push(thisClientId);
+                            if(selectedClientIds.length === $(this).closest('table').find('tr.client').length){
+                                showAllClientsInput.prop('checked', true);
+                                showAllClientsInput.change();
+                            }else{
+                                $(this).addClass('check');
+                            }
                         }
                         rowIterator = null;
                         // colorIterator = 0;
@@ -675,18 +678,10 @@
 
                         table2.ajax.reload();
                     });
-                    if (sessionStorage.getItem('idOfClient')) {
-                        let idOfClient = sessionStorage.getItem('idOfClient');
-                        const allClientsInTable = document.querySelectorAll('#datatable tr');
-                        allClientsInTable.forEach(client => {
-                            if (client.id == idOfClient) {
-                                client.classList.add('check');
-                                const clientIdNotTrimmed = client.id;
-                                indexOfUnderscore = clientIdNotTrimmed.lastIndexOf('_');
-                                id = clientIdNotTrimmed.substr(indexOfUnderscore + 1);
-                                sessionStorage.removeItem('idOfClient');
-                            }
-                        });
+                    if (sessionStorage.getItem('idsOfSelectedClients')) {
+                        selectedClientIds = sessionStorage.getItem('idsOfSelectedClients').split(",");
+                        colorSelectedClients(selectedClientIds);
+                        sessionStorage.removeItem('idsOfSelectedClients');
                         table2.ajax.reload();
                     }
                 }, "ajax": {
@@ -778,7 +773,7 @@
                     'url': "{{route('api.getClientRouteInfo')}}",
                     'type': 'POST',
                     'data': function (d) {
-                        d.id = id;
+                        d.selectedClientIds =  selectedClientIds ;
                         d.showOnlyAssigned = showOnlyAssignedInput.prop('checked');
                         d.year = yearInput.val();
                         d.selectedWeek = selectedWeekInput.val();
@@ -1174,12 +1169,8 @@
             }
 
             function showAllClientsInputHandler(e) {
-                const checkedRow = document.querySelector('.check');
-                // console.assert(checkedRow, "Brak podswietlonego wiersza");
-                if (checkedRow) { //remove row higlight and reset id variable
-                    checkedRow.classList.remove('check');
-                    id = -1;
-                }
+                $('#datatable tr').removeClass('check');
+                selectedClientIds  = [];
                 table2.ajax.reload();
             }
 
@@ -1424,9 +1415,10 @@
                 const showOnlyAssignedCheckbox = document.querySelector('#showOnlyAssigned');
                 const parameterSelect = document.querySelector('#parameters');
 
-                if (document.querySelector('.check')) {
-                    let idOfClient = document.querySelector('.check').id;
-                    sessionStorage.setItem('idOfClient', idOfClient);
+                if (selectedClientIds.length > 0) {
+                    //let idsOfSelectedClients = document.querySelector('.check').id;
+                    console.log(selectedClientIds);
+                    sessionStorage.setItem('idsOfSelectedClients', selectedClientIds.toString());
                 }
 
                 const searchBox = document.querySelector('input[type="search"][aria-controls="datatable2"');
@@ -1557,6 +1549,16 @@
                 table2.ajax.reload();
             });
 
+            function colorSelectedClients(selectedClients) {
+                const allClientsInTable = document.querySelectorAll('#datatable tr');
+                allClientsInTable.forEach(client => {
+                    let clientIdNotTrimmed = client.id;
+                    let clientId  = clientIdNotTrimmed.substr(clientIdNotTrimmed.lastIndexOf('_')+1);
+                    if ($.inArray(clientId, selectedClients) !== -1) {
+                        client.classList.add('check');
+                    }
+                });
+            }
 
             /**
              * This function clear all row selections and disable edit button
