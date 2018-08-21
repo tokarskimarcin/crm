@@ -512,15 +512,6 @@
                             let placeToAppend = document.querySelector('.route-here');
                             placeToAppend.innerHTML = '';
 
-                            swal({
-                                title: 'Ładowawnie...',
-                                text: 'To może chwilę zająć',
-                                showConfirmButton: false,
-                                allowOutsideClick: false,
-                                allowEscapeKey: false,
-                                allowEnterKey: false,
-                                onOpen: () => {
-                                    swal.showLoading();
                                     // Pobranie informacji o zaznaczonej trasie
                                     $.ajax({
                                         type: "POST",
@@ -534,6 +525,13 @@
                                         },
                                         success: function (response) {
                                             globalSwalFlag = true;
+                                            $('#progressModal').modal();
+                                            let progressBar = document.querySelector('.progress-bar');
+                                            progressBar.style.width = '1%';
+                                            progressBar.textContent = '1%';
+
+                                            let percentStep = Math.round(100 / response.length);
+                                            let percentSum = 0;
                                             let placeToAppend = document.querySelector('.route-here');
                                             placeToAppend.innerHTML = '';
                                             let dayFlag = null; //indices day change
@@ -664,16 +662,15 @@
                                                     dayFlag = response[i].day;
                                                 }
 
-
+                                                percentSum += percentStep;
+                                                progressBar.style.width = `${percentSum}%`;
+                                                progressBar.textContent = `${percentSum}%`;
                                             }
+                                            $('#progressModal').modal('hide');
                                             globalSwalFlag = false;
                                         }
 
-                                    }).done((response) => {
-                                        swal.close();
                                     });
-                                }
-                            });
 
                                 }
                             });
@@ -2823,7 +2820,6 @@
                 table.ajax.reload();
             });
 
-
             /**
              * This method launch as DOM loads
              */
@@ -2831,6 +2827,8 @@
                 globalSwalFlag = true;
                         $('#progressModal').modal();
                         let progressBar = document.querySelector('.progress-bar');
+                        progressBar.style.width = '1%';
+                        progressBar.textContent = '1%';
 
                         //route generation part
                         const response = @json($clientRouteInfo);

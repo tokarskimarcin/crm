@@ -277,6 +277,30 @@
 
         </div>
     </div>
+
+    <!-- Modal -->
+    <div id="progressModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Trwa ładowanie trasy</h4>
+                </div>
+                <div class="modal2-body">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped active progress-bar-success" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width:1">
+                            1%
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+
+        </div>
+    </div>
 @endsection
 
 @section('script')
@@ -489,15 +513,6 @@
                             let placeToAppend = document.querySelector('.route-here');
                             placeToAppend.innerHTML = '';
 
-                                swal({
-                                    title: 'Ładowawnie...',
-                                    text: 'To może chwilę zająć',
-                                    showConfirmButton: false,
-                                    allowOutsideClick: false,
-                                    allowEscapeKey: false,
-                                    allowEnterKey: false,
-                                    onOpen: () => {
-                                        swal.showLoading();
                                         // Pobranie informacji o zaznaczonej trasie
                                         $.ajax({
                                             type: "POST",
@@ -510,6 +525,13 @@
                                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                             },
                                             success: function (response) {
+                                                $('#progressModal').modal();
+                                                let progressBar = document.querySelector('.progress-bar');
+                                                progressBar.style.width = '1%';
+                                                progressBar.textContent = '1%';
+                                                let percentStep = Math.round(100 / response.length);
+                                                let percentSum = 0;
+
                                                 globalSwalFlag = true;
                                                 let placeToAppend = document.querySelector('.route-here');
                                                 placeToAppend.innerHTML = '';
@@ -643,16 +665,16 @@
                                                         dayFlag = response[i].day;
                                                     }
 
-
+                                                    percentSum += percentStep;
+                                                    progressBar.style.width = `${percentSum}%`;
+                                                    progressBar.textContent = `${percentSum}%`;
                                                 }
+                                                $('#progressModal').modal('hide');
                                                 notify('Szablon trasy został w pełni załadowany!');
                                                 globalSwalFlag = false;
                                             }
-                                        }).done((response) => {
-                                            swal.close();
-                                        });
-                                    }
-                                });
+                                        })
+
                                 }
                             });
 
