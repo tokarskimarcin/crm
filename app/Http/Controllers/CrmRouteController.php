@@ -2923,7 +2923,14 @@ class CrmRouteController extends Controller
             client_route_info.department_info_id,            
             client_route_info.limits,
             client_route.client_id,
-            client_route_info.actual_success,
+            (case 
+                when                
+                    client_route_info.actual_success -  client_route_info.limits >= 0
+                    then
+                        client_route_info.limits
+                    else
+                        client_route_info.actual_success              
+            END) as actual_success,
             client_route_info.show_order
         '))
             ->join('client_route', 'client_route.id', 'client_route_info.client_route_id')
@@ -3013,8 +3020,8 @@ class CrmRouteController extends Controller
                 $tempClass['client_id'] = $toSumItem->first()['client_id'];
                 $tempClass['department_info_id'] = $item->id;
                 $tempClass['sumOfLimits'] = $toSumItem->sum('limits');
-                $tempClass['sumOfActualSuccess'] = $toSumItem->sum('actual_success') - $toSumItem->sum('limits') >0 ? $toSumItem->sum('limits')
-                :$toSumItem->sum('actual_success');
+                $tempClass['sumOfActualSuccess'] = $toSumItem->sum('actual_success');
+                $tempClass['addAfter'] = 0;
                 $finallCollect->push($tempClass);
             }
         }
