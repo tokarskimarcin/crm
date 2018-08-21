@@ -278,6 +278,30 @@
 
         </div>
     </div>
+
+    <!-- Modal -->
+    <div id="progressModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Trwa ładowanie trasy</h4>
+                </div>
+                <div class="modal2-body">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped active progress-bar-success" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width:1">
+                            1%
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+
+        </div>
+    </div>
 @endsection
 
 @section('script')
@@ -488,15 +512,6 @@
                             let placeToAppend = document.querySelector('.route-here');
                             placeToAppend.innerHTML = '';
 
-                            swal({
-                                title: 'Ładowawnie...',
-                                text: 'To może chwilę zająć',
-                                showConfirmButton: false,
-                                allowOutsideClick: false,
-                                allowEscapeKey: false,
-                                allowEnterKey: false,
-                                onOpen: () => {
-                                    swal.showLoading();
                                     // Pobranie informacji o zaznaczonej trasie
                                     $.ajax({
                                         type: "POST",
@@ -510,6 +525,13 @@
                                         },
                                         success: function (response) {
                                             globalSwalFlag = true;
+                                            $('#progressModal').modal();
+                                            let progressBar = document.querySelector('.progress-bar');
+                                            progressBar.style.width = '1%';
+                                            progressBar.textContent = '1%';
+
+                                            let percentStep = Math.round(100 / response.length);
+                                            let percentSum = 0;
                                             let placeToAppend = document.querySelector('.route-here');
                                             placeToAppend.innerHTML = '';
                                             let dayFlag = null; //indices day change
@@ -640,16 +662,15 @@
                                                     dayFlag = response[i].day;
                                                 }
 
-
+                                                percentSum += percentStep;
+                                                progressBar.style.width = `${percentSum}%`;
+                                                progressBar.textContent = `${percentSum}%`;
                                             }
+                                            $('#progressModal').modal('hide');
                                             globalSwalFlag = false;
                                         }
 
-                                    }).done((response) => {
-                                        swal.close();
                                     });
-                                }
-                            });
 
                                 }
                             });
@@ -1337,7 +1358,7 @@
              * if withHours - true, check whether hour input has != 0 value.
              */
             function validateForm(element, withHours = null) {
-                console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
+                // console.assert(element.matches('.singleShowContainer'), 'element in validateForm is not singleShowContainer');
                 let flag = true;
                 let citySelect = element.querySelector('.citySelect');
                 let cityValue = getSelectedValue(citySelect);
@@ -2799,22 +2820,20 @@
                 table.ajax.reload();
             });
 
-
             /**
              * This method launch as DOM loads
              */
             (function init() {
                 globalSwalFlag = true;
-                swal({
-                    title: 'Ładowawnie...',
-                    text: 'To może chwilę zająć',
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    allowEnterKey: false,
-                    onOpen: function() {
+                        $('#progressModal').modal();
+                        let progressBar = document.querySelector('.progress-bar');
+                        progressBar.style.width = '1%';
+                        progressBar.textContent = '1%';
+
                         //route generation part
                         const response = @json($clientRouteInfo);
+                        let percentStep = Math.round(100 / response.length);
+                        let percentSum = 0;
                         let placeToAppend = document.querySelector('.route-here');
                         placeToAppend.innerHTML = '';
                         let dateFlag = null; //indices day change
@@ -2955,12 +2974,14 @@
                                 hourInput.value = showHours;
                                 dateFlag = response[i].date;
                             }
+                            percentSum += percentStep;
+                            progressBar.style.width = `${percentSum}%`;
+                            progressBar.textContent = `${percentSum}%`;
                         }
+                        $('#progressModal').modal('hide');
                         notify('Trasa została w pełni załadowana!');
                         globalSwalFlag = false;
-                        swal.close();
-                    }
-                });
+
             })();
 
         });
