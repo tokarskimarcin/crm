@@ -3063,14 +3063,13 @@ class CrmRouteController extends Controller
                         };
                         $limit = $eventLimit;
                     }
-                    $arrayResult['sumOfLimits'] = $limit;
+                    $arrayResult['sumOfLimits'] = round($limit/$departmentInfo->count(),2) ;
                     $arrayResult['sumOfActualSuccess'] = 0;
 
                     $merge = $routeInfoOverall->where('date',$itemDate)
                                     ->where('department_info_id',null);
                     if(!$merge->isEmpty()){
                             try {
-                                dd($departmentInfo->count());
                                 $routeInfoOverall->where('date',$itemDate)
                                     ->where('department_info_id',null)->first()->sumOfLimits  += round($arrayResult['sumOfLimits']/$departmentInfo->count(),2);
 
