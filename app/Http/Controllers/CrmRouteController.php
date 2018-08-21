@@ -705,9 +705,10 @@ class CrmRouteController extends Controller
             $clientRoute->save();
 
             new ActivityRecorder(array_merge(['T' => 'Edycja trasy'], $clientRoute->toArray()), 230, 2);
+            $request->session()->flash('adnotation', 'Trasa została edytowana!');
         }
 
-        return Redirect::back();
+        return Redirect::to('/showClientRoutes');
     }
 
     public function getRouteTemplate(Request $request) {
