@@ -2855,15 +2855,62 @@ class CrmRouteController extends Controller
             ->with('departmentInfo', $departmentInfo);
     }
 
-    public function generateLimitSimulation(Request $request){
-        $objectToSimulate = $request->objectToSimulate;
-        $startDate  = $request->startDate;
-        $stopDate   = $request->stopDate;
+    public function generateLimitNewClientSimulation($simulateNewClientObject,&$routeInfoOverall,$departmentInfo){
+        foreach ($simulateNewClientObject as $item){
+            $dayArray = $this::getDateofWeekFromArray($item['arrayOfNumberWeekNewClient'],$item['year']);
+            foreach ($dayArray as $itemDate){
+                $arrayResult['date'] = $itemDate;
+                $dow = date("N",strtotime($itemDate));
+                $arrayResult['department_info_id'] = null;
+                $limit = 0;
+                if($item['dayCountEventArray'][($dow-1)] != null ){
+                    $eventCount = $item['dayCountEventArray'][($dow-1)];
+                    $eventLimit = 0;
+                    while($eventCount > 0){
+                        $diff = intval($eventCount/3);
+                        $diffMultiple = $diff * 3;
+                        $eventLimit += ($diff * ($item['arrayOfLimit'][0] +
+                                $item['arrayOfLimit'][1] +
+                                $item['arrayOfLimit'][2]));
+                        $eventCount -= $diffMultiple;
+                        $diff = intval($eventCount/2);
+                        $diffMultiple =  $diff * 2;
+                        $eventLimit += ($diff * ($item['arrayOfLimit'][1] +
+                                $item['arrayOfLimit'][2]));
+                        $eventCount -= $diffMultiple;
 
-        foreach ($objectToSimulate as $item){
+                        $diff = intval($eventCount/1);
+                        $diffMultiple = $diff * 1;
+                        $eventLimit += ($diff * ($item['arrayOfLimit'][0]));
+                        $eventCount -= $diffMultiple;
+                    };
+                    $limit = $eventLimit;
+                }
+                $arrayResult['sumOfLimits'] = $limit;
+                $arrayResult['sumOfActualSuccess'] = 0;
+                $arrayResult['addAfter'] = 1;
 
+
+                $merge = $routeInfoOverall->where('date',$itemDate)
+                    ->where('department_info_id',null);
+                if(!$merge->isEmpty()){
+                    try {
+                        $obj = $routeInfoOverall->where('date',$itemDate)
+                            ->where('department_info_id',null)->first();
+                        $obj->sumOfLimits  += round($arrayResult['sumOfLimits']/count($departmentInfo),2);
+                        $obj->addAfter = 1;
+                    }catch (\Exception $e){
+                        $obj = $routeInfoOverall->where('date',$itemDate)
+                            ->where('department_info_id',null)->first();
+                        $obj['sumOfLimits'] += round($arrayResult['sumOfLimits']/count($departmentInfo),2);
+                        $obj['addAfter'] = 1;
+                    }
+                }else{
+                    $arrayResult['sumOfLimits'] = round($arrayResult['sumOfLimits']/$departmentInfo->count(),2) ;
+                    $routeInfoOverall->push(collect($arrayResult));
+                }
+            }
         }
-        return $startDate;
     }
 
     public function simulateNewLimit($simulateObject,$departmentInfo){
@@ -2880,6 +2927,7 @@ class CrmRouteController extends Controller
             client_route_info.show_order
         '))
             ->join('client_route', 'client_route.id', 'client_route_info.client_route_id')
+            ->where('client_route.status', '=', 1)
             ->where('client_route_info.status', '=', 1)
             ->get();
         $routeInfoOverall = $routeInfoOverall->groupBy('client_route_id');
@@ -2965,7 +3013,8 @@ class CrmRouteController extends Controller
                 $tempClass['client_id'] = $toSumItem->first()['client_id'];
                 $tempClass['department_info_id'] = $item->id;
                 $tempClass['sumOfLimits'] = $toSumItem->sum('limits');
-                $tempClass['sumOfActualSuccess'] = $toSumItem->sum('actual_success');
+                $tempClass['sumOfActualSuccess'] = $toSumItem->sum('actual_success') - $toSumItem->sum('limits') >0 ? $toSumItem->sum('limits')
+                :$toSumItem->sum('actual_success');
                 $finallCollect->push($tempClass);
             }
         }
@@ -3019,9 +3068,20 @@ class CrmRouteController extends Controller
             date,
             department_info_id,            
             SUM(limits) as sumOfLimits,
-            SUM(actual_success) as sumOfActualSuccess,
+            SUM(
+            case 
+                when
+                     actual_success - limits > 0 
+                     then
+                        limits
+                     else
+                       actual_success
+            END
+            ) as sumOfActualSuccess,
             0 as addAfter
         '))
+            ->join('client_route','client_route.id','client_route_info.client_route_id')
+            ->where('client_route.status', '=', 1)
             ->where('client_route_info.status', '=', 1)
             ->groupBy('date', 'department_info_id')
             ->get();
@@ -3034,61 +3094,7 @@ class CrmRouteController extends Controller
         //simulate new Client
         if($simulateNewClientObject != null)
         {
-            foreach ($simulateNewClientObject as $item){
-                $dayArray = $this::getDateofWeekFromArray($item['arrayOfNumberWeekNewClient'],$item['year']);
-                foreach ($dayArray as $itemDate){
-                    $arrayResult['date'] = $itemDate;
-                    $dow = date("N",strtotime($itemDate));
-                    $arrayResult['department_info_id'] = null;
-                    $limit = 0;
-                    if($item['dayCountEventArray'][($dow-1)] != null ){
-                        $eventCount = $item['dayCountEventArray'][($dow-1)];
-                        $eventLimit = 0;
-                        while($eventCount > 0){
-                            $diff = intval($eventCount/3);
-                            $diffMultiple = $diff * 3;
-                            $eventLimit += ($diff * ($item['arrayOfLimit'][0] +
-                                    $item['arrayOfLimit'][1] +
-                                    $item['arrayOfLimit'][2]));
-                            $eventCount -= $diffMultiple;
-                            $diff = intval($eventCount/2);
-                            $diffMultiple =  $diff * 2;
-                            $eventLimit += ($diff * ($item['arrayOfLimit'][1] +
-                                    $item['arrayOfLimit'][2]));
-                            $eventCount -= $diffMultiple;
-
-                            $diff = intval($eventCount/1);
-                            $diffMultiple = $diff * 1;
-                            $eventLimit += ($diff * ($item['arrayOfLimit'][0]));
-                            $eventCount -= $diffMultiple;
-                        };
-                        $limit = $eventLimit;
-                    }
-                    $arrayResult['sumOfLimits'] = $limit;
-                    $arrayResult['sumOfActualSuccess'] = 0;
-                    $arrayResult['addAfter'] = 1;
-
-
-                    $merge = $routeInfoOverall->where('date',$itemDate)
-                                    ->where('department_info_id',null);
-                    if(!$merge->isEmpty()){
-                            try {
-                                $obj = $routeInfoOverall->where('date',$itemDate)
-                                    ->where('department_info_id',null)->first();
-                                $obj->sumOfLimits  += round($arrayResult['sumOfLimits']/count($departmentInfo),2);
-                                $obj->addAfter = 1;
-                            }catch (\Exception $e){
-                                $obj = $routeInfoOverall->where('date',$itemDate)
-                                    ->where('department_info_id',null)->first();
-                                $obj['sumOfLimits'] += round($arrayResult['sumOfLimits']/count($departmentInfo),2);
-                                $obj['addAfter'] = 1;
-                        }
-                    }else{
-                        $arrayResult['sumOfLimits'] = round($arrayResult['sumOfLimits']/$departmentInfo->count(),2) ;
-                        $routeInfoOverall->push(collect($arrayResult));
-                    }
-                }
-            }
+            $this::generateLimitNewClientSimulation($simulateNewClientObject,$routeInfoOverall,$departmentInfo);
         }
 
         while($actualDate <= $stopDate){
@@ -3117,8 +3123,6 @@ class CrmRouteController extends Controller
 
                 $wynik = (is_null($daySuccess) ? 0 : $daySuccess) - (is_null($dayLimit) ? 0 : $dayLimit) - (is_null($unallocatedLimits) ? 0 : $unallocatedLimits);
                 $wynik = $wynik > 0 ? 0 : $wynik;
-               // if($actualDate == '2018-08-20')
-                   // dd($allScore);
                 $wynik -= is_null($unallocatedLimitsAfter) ? 0 : $unallocatedLimitsAfter ;
                 $dayCollect->offsetSet($item->name2, $wynik);
 
