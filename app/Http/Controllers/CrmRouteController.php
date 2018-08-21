@@ -2970,30 +2970,31 @@ class CrmRouteController extends Controller
                                 }
                             } else if ($cityGroup->count() == 2) {
                                 // 1 + 2 od drugiego
-//                                if ($cityGroup->first()->show_order == 1) {
-//                                    if($objItem['arrayOfLimit'][1] != null ){
-//                                        $cityGroup[0]->limits =  $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[0]->limits;
-//                                        if($saveStatus)
-//                                            $cityGroup[0]->save();
-//                                    }
-//                                    if($objItem['arrayOfLimit'][2] != null ){
-//                                        $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][2] : $cityGroup[1]->limits;
-//                                        if($saveStatus)
-//                                            $cityGroup[1]->save();
-//                                    }
-//
-//                                } else {// 2 + 1 od pierwszego
-                                    if($objItem['arrayOfLimit'][0] != null ){
-                                        $cityGroup[0]->limits = $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][0] : $cityGroup[0]->limits;
+                                //if ($cityGroup->first()->show_order == 1) {
+                                    if($objItem['arrayOfLimit'][1] != null ){
+                                        $cityGroup[0]->limits =  $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[0]->limits;
                                         if($saveStatus)
                                             $cityGroup[0]->save();
                                     }
-                                    if($objItem['arrayOfLimit'][1] != null ){
-                                        $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[1]->limits;
+                                    if($objItem['arrayOfLimit'][2] != null ){
+                                        $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][2] : $cityGroup[1]->limits;
                                         if($saveStatus)
                                             $cityGroup[1]->save();
                                     }
+
                                 //}
+//                                else {// 2 + 1 od pierwszego
+//                                    if($objItem['arrayOfLimit'][0] != null ){
+//                                        $cityGroup[0]->limits = $cityGroup[0]->limits != null ? $objItem['arrayOfLimit'][0] : $cityGroup[0]->limits;
+//                                        if($saveStatus)
+//                                            $cityGroup[0]->save();
+//                                    }
+//                                    if($objItem['arrayOfLimit'][1] != null ){
+//                                        $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[1]->limits;
+//                                        if($saveStatus)
+//                                            $cityGroup[1]->save();
+//                                    }
+//                                }
                             } else {
                                 if($objItem['limitForOneHour'] != null ){
                                     $cityGroup[0]->limits = $cityGroup[0]->limits != null ? $objItem['limitForOneHour'] : $cityGroup[0]->limits;
