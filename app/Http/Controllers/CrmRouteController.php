@@ -3070,7 +3070,7 @@ class CrmRouteController extends Controller
                                     ->where('department_info_id',null);
                     if(!$merge->isEmpty()){
                             try {
-
+                                dd($departmentInfo->count());
                                 $routeInfoOverall->where('date',$itemDate)
                                     ->where('department_info_id',null)->first()->sumOfLimits  += round($arrayResult['sumOfLimits']/$departmentInfo->count(),2);
 
