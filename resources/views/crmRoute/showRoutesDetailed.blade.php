@@ -184,7 +184,7 @@
            /**
             * This function shows notification.
             */
-           function notify(htmltext$string, type$string = info, delay$miliseconds$number = 5000) {
+           function notify(htmltext$string, type$string = 'info', delay$miliseconds$number = 5000) {
                $.notify({
                    // options
                    message: htmltext$string
