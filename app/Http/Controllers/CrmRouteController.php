@@ -2880,6 +2880,7 @@ class CrmRouteController extends Controller
             client_route_info.show_order
         '))
             ->join('client_route', 'client_route.id', 'client_route_info.client_route_id')
+            ->where('client_route.status', '=', 1)
             ->where('client_route_info.status', '=', 1)
             ->get();
         $routeInfoOverall = $routeInfoOverall->groupBy('client_route_id');
@@ -3022,6 +3023,8 @@ class CrmRouteController extends Controller
             SUM(actual_success) as sumOfActualSuccess,
             0 as addAfter
         '))
+            ->join('client_route','client_route.id','client_route_info.client_route_id')
+            ->where('client_route.status', '=', 1)
             ->where('client_route_info.status', '=', 1)
             ->groupBy('date', 'department_info_id')
             ->get();
