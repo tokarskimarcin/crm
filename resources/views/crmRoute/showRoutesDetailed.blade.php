@@ -27,7 +27,7 @@
         }
 
         .page-info {
-            font-size: 1.5em;
+            font-size: 1.3em;
         }
 
         @keyframes example {
@@ -53,7 +53,10 @@
             </div>
             <div class="panel-body">
                 <div class="alert alert-info page-info">
-                    Moduł <span style="font-weight: bold;">Szczegółowe informacje o kampaniach</span> wyświetla informacje o poszczególnych pokazo-godzinach, które mogą być zbiorczo edytowane. Tabela z rekordami może być filtrowana dostępnymi polami wielokrotnego wyboru. W tabeli znajdują się jedynie rekordy <span style="text-decoration: underline;">aktywnych</span> oraz <span style="text-decoration: underline;">zakończonych</span>  kampanii. Aby edytować rekordy, należy je zaznaczyć i nacisnąć przycisk <span style="font-weight: bold;">Edytuj rekord(y)</span>.
+                    Moduł <span style="font-weight: bold;">Szczegółowe informacje o kampaniach</span> wyświetla informacje o poszczególnych pokazo-godzinach,
+                    które mogą być zbiorczo edytowane. Tabela z rekordami może być filtrowana dostępnymi polami wielokrotnego wyboru.
+                    Aby edytować rekordy, należy je zaznaczyć i nacisnąć przycisk <span style="font-weight: bold;">Edytuj rekord(y)</span>.
+                    Jeśli liczba <i>zaproszeń live</i> przekracza zakładane <i>limity</i>, w kolumnie <i>straty</i> wyswietli się 0.
                 </div>
                 <div class="row">
                     <div class="col-md-2">
@@ -181,7 +184,7 @@
            /**
             * This function shows notification.
             */
-           function notify(htmltext$string, type$string = info, delay$miliseconds$number = 5000) {
+           function notify(htmltext$string, type$string = 'info', delay$miliseconds$number = 5000) {
                $.notify({
                    // options
                    message: htmltext$string
