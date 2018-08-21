@@ -2854,15 +2854,15 @@ class CrmRouteController extends Controller
                                     ->where('department_info_id',null);
                     if(!$merge->isEmpty()){
                             try {
-
                                 $routeInfoOverall->where('date',$itemDate)
-                                    ->where('department_info_id',null)->first()->sumOfLimits  += round($arrayResult['sumOfLimits']/count($departmentInfo),2);
+                                    ->where('department_info_id',null)->first()->sumOfLimits  += round($arrayResult['sumOfLimits']/$departmentInfo->count(),2);
 
                             }catch (\Exception $e){
                                $routeInfoOverall->where('date',$itemDate)
-                                    ->where('department_info_id',null)->first()['sumOfLimits'] += round($arrayResult['sumOfLimits']/count($departmentInfo),2);
+                                    ->where('department_info_id',null)->first()['sumOfLimits'] += round($arrayResult['sumOfLimits']/$departmentInfo->count(),2);
                         }
                     }else{
+                        $arrayResult['sumOfLimits'] = round($arrayResult['sumOfLimits']/$departmentInfo->count(),2) ;
                         $routeInfoOverall->push(collect($arrayResult));
                     }
                 }

@@ -2462,6 +2462,7 @@
                                     )
                                     window.location.href = '{{URL::to('/showClientRoutes')}}';
                                 })
+                                .catch(err => notify(err))
                         }
                     })
                 }
