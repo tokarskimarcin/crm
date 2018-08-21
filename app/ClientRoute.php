@@ -14,4 +14,12 @@ class ClientRoute extends Model
     public function scopeOnlyActiveClientRoutes($query) {
         $query->where('client_route.status', '=', 1);
     }
+
+    /**
+     * @param $id - client route id
+     * This method delete client route by changing it's status to 0
+     */
+    public static function safeDelete($id) {
+        ClientRoute::find($id)->update(['status' => 0]);
+    }
 }
