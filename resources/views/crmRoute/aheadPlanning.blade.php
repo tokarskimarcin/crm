@@ -145,7 +145,7 @@
                     <div class="row ">
                         <div class="col-md-4">
                             <button class="btn btn-block btn-default" id="resultsSimulationButton">Symulacje wyników <span class="glyphicon glyphicon-chevron-down"></span></button>
-                            <div class="simulationSection well well-sm">
+                            <div class="simulationSection well well-sm" style="display:none">
                                 <div class="row">
                                     <div class="col-md-12 ">
                                         <select id="simulation" class="selectpicker form-control show-tick" title="Wybierz symulację wyników">
@@ -346,7 +346,7 @@
                     this.limitForOneHour    = limitForOneHour;
                     this.saveStatus         = saveStatus;
                 }
-            };
+            }
 
             class SimulationNewClientClient{
                 constructor(dayCountEventArray, arrayOfNumberWeekNewClient,arrayOfLimit,year){
@@ -355,7 +355,7 @@
                     this.arrayOfLimit                           = arrayOfLimit;
                     this.year                                   = year;
                 }
-            };
+            }
 
 
             var simulationEditLimitArray = [];
@@ -891,7 +891,7 @@
                     }
                     if(arrayOfNumberWeekNewClient.length == 0){
                         valide = false;
-                        swal("Wybierz tydzień dla klienta")
+                        swal("Wybierz tydzień dla klienta");
                         return false;
                     }
                     if(valide){
@@ -954,7 +954,7 @@
                     }
                 },
                 getData: function (startDate, stopDate) {
-                    let deffered = $.Deferred();
+                    let deferred = $.Deferred();
                     let obj = this;
                     $.ajax({
                         url: "{{ route('api.getaHeadPlanningInfo') }}",
@@ -977,7 +977,7 @@
                         success: function (response) {
                             obj.data.aheadPlaning = response.aheadPlanningData;
                             obj.data.departmentsInvitationsAverages = response.departmentsInvitationsAveragesData;
-                            deffered.resolve(obj.data.aheadPlaning);
+                            deferred.resolve(obj.data.aheadPlaning);
                             fillWorkFreeDaysForDepartments();
                         },
                         error: function (jqXHR, textStatus, thrownError) {
@@ -989,12 +989,12 @@
                                 title: 'Błąd ' + jqXHR.status,
                                 text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
                             });
-                            deffered.reject();
+                            deferred.reject();
                         }
                     });
                     selectedRowDays = [];
                     $('#removeSimulationButton').hide();
-                    return deffered.promise();
+                    return deferred.promise();
                 }
             };
 
@@ -1109,13 +1109,90 @@
              */
             $('#datatable').click((e) => {
                 addOrRemoveClickedElement(e);
+            });
 
-                /*if (elementsToSum.firstElement.tdId !== null
-                    && (elementsToSum.firstElement.trId !== elementsToSum.lastElement.trId
-                        || elementsToSum.firstElement.tdId !== elementsToSum.lastElement.tdId)) {
-                    $('#sumButton').removeAttr('disabled');
-                } else if (!$('#sumButton').prop('disabled'))
-                    $('#sumButton').prop('disabled', true);*/
+            // resultsSimulationButton toggle simulation section
+            $('#resultsSimulationButton').click(function () {
+                $('.simulationSection').slideToggle('slow', function () {
+
+                    if($('.simulationSection').is(':hidden')){
+                        $('#resultsSimulationButton span').removeClass().addClass('glyphicon glyphicon-chevron-down');
+                    }else{
+                        $('#resultsSimulationButton span').removeClass().addClass('glyphicon glyphicon-chevron-up');
+                    }
+                });
+            });
+
+            $('#simulation').change(function (e){
+                //clear selected days
+                selectedRowDays = [];
+                colorSelectedRowDays();
+
+                if($('#removeSimulationButton').is(':visible'))
+                    $('#removeSimulationButton').click();
+                // sections assigned to simulations are hidden or shown depending on selected simulation
+                let simulationIndex = $(e.target).val();
+                $.each(simulations,function (index, item) {
+                    $.each(item.sectionsToShow,function (index, sectionToShow) {
+                        $('.'+sectionToShow).hide();
+                    });
+                });
+                $.each(simulations[simulationIndex].sectionsToShow,function (index, sectionToShow) {
+                    $('.'+sectionToShow).show();
+                });
+            });
+
+            $('#workFreeDaysButton').click(function () {
+                let modalBody = $('#workFreeDaysModal .modal-body');
+                modalBody.text('');
+                let workFreeDaysTable = createWorkFreeDaysTable();
+                modalBody.append(workFreeDaysTable);
+            });
+            $('#saveWorkFreeDays').click(function (e) {
+                let workFreeDayCheckboxes = $('#workFreeDaysModal').find(':checkbox');
+                $.each(workFreeDayCheckboxes, function (index, checkbox) {
+                    workFreeDaysForDepartments[$(checkbox).data('date')][$(checkbox).data('name')] = checkbox.checked;
+                });
+                $.notify({
+                    message: 'Dni wolne zapisane'
+                }, {
+                    type: 'success',
+                    placement: {
+                        from: "bottom",
+                        align: "right"
+                    }
+                })
+            });
+
+            $('#simulationButton').click(function () {
+                let simulationIndex = $('#simulation').val();
+                if(simulations[simulationIndex]){
+                    if(simulations[simulationIndex].validate()){
+                        let height = $(window).scrollTop();
+                        simulations[simulationIndex].simulate();
+                        if(simulations[simulationIndex].isChangingAheadPlanningData){
+                            $('#removeSimulationButton').show();
+                        }
+                        $(window).scrollTop(height);
+                    }
+                }else{
+                    swal('Wybierz symulację');
+                }
+            });
+
+            $('#removeSimulationButton').click(function (e) {
+                let height = $(window).scrollTop();
+                selectedRowDays = [];
+                aheadPlaningTable.setTableData(aheadPlanningData.data.aheadPlaning);
+                $(e.target).hide();
+                $(window).scrollTop(height);
+            });
+
+            $('#saturdayFactor').change(function (e) {
+                factorsChangeHandler(e,95);
+            });
+            $('#sundayFactor').change(function (e) {
+                factorsChangeHandler(e,80);
             });
 
             /*********************END EVENT LISTENERS FUNCTIONS****************************/
@@ -1134,7 +1211,6 @@
                     selectedRowDays = [];
                     if (e.shiftKey) {
                         if (elementsToSum.firstElement.tdId !== null) {
-                            elementsToSum.lastElement.tdId = elementsToSum.lastElement.tdId; //clickedElementTdIndex;
                             elementsToSum.lastElement.trId = clickedElementTrIndex;
                             colorCellsRectangle(elementsToSum);
                             $.notify({
@@ -1491,93 +1567,6 @@
                     text: item.name
                 }));
                 $('#simulation').selectpicker('refresh');
-            });
-
-            // hide simulation section
-            $('.simulationSection').hide();
-
-            // resultsSimulationButton toggle simulation section
-            $('#resultsSimulationButton').click(function () {
-               $('.simulationSection').slideToggle('slow', function () {
-
-                   if($('.simulationSection').is(':hidden')){
-                       $('#resultsSimulationButton span').removeClass().addClass('glyphicon glyphicon-chevron-down');
-                   }else{
-                       $('#resultsSimulationButton span').removeClass().addClass('glyphicon glyphicon-chevron-up');
-                   }
-               });
-            });
-
-            $('#simulation').change(function (e){
-                //clear selected days
-                selectedRowDays = [];
-                colorSelectedRowDays();
-
-                if($('#removeSimulationButton').is(':visible'))
-                    $('#removeSimulationButton').click();
-                // sections assigned to simulations are hidden or shown depending on selected simulation
-                let simulationIndex = $(e.target).val();
-                $.each(simulations,function (index, item) {
-                        $.each(item.sectionsToShow,function (index, sectionToShow) {
-                            $('.'+sectionToShow).hide();
-                        });
-                });
-                $.each(simulations[simulationIndex].sectionsToShow,function (index, sectionToShow) {
-                    $('.'+sectionToShow).show();
-                });
-            });
-
-            $('#workFreeDaysButton').click(function () {
-                let modalBody = $('#workFreeDaysModal .modal-body');
-                modalBody.text('');
-                let workFreeDaysTable = createWorkFreeDaysTable();
-                modalBody.append(workFreeDaysTable);
-            });
-            $('#saveWorkFreeDays').click(function (e) {
-                let workFreeDayCheckboxes = $('#workFreeDaysModal').find(':checkbox');
-                $.each(workFreeDayCheckboxes, function (index, checkbox) {
-                    workFreeDaysForDepartments[$(checkbox).data('date')][$(checkbox).data('name')] = checkbox.checked;
-                });
-                $.notify({
-                    message: 'Dni wolne zapisane'
-                }, {
-                    type: 'success',
-                    placement: {
-                        from: "bottom",
-                        align: "right"
-                    }
-                })
-            });
-
-            $('#simulationButton').click(function () {
-                let simulationIndex = $('#simulation').val();
-                if(simulations[simulationIndex]){
-                    if(simulations[simulationIndex].validate()){
-                        let height = $(window).scrollTop();
-                        simulations[simulationIndex].simulate();
-                        if(simulations[simulationIndex].isChangingAheadPlanningData){
-                            $('#removeSimulationButton').show();
-                        }
-                        $(window).scrollTop(height);
-                    }
-                }else{
-                    swal('Wybierz symulację');
-                }
-            });
-
-            $('#removeSimulationButton').click(function (e) {
-                let height = $(window).scrollTop();
-                selectedRowDays = [];
-                aheadPlaningTable.setTableData(aheadPlanningData.data.aheadPlaning);
-                $(e.target).hide();
-                $(window).scrollTop(height);
-            });
-
-            $('#saturdayFactor').change(function (e) {
-                factorsChangeHandler(e,95);
-            });
-            $('#sundayFactor').change(function (e) {
-                factorsChangeHandler(e,80);
             });
 
             function factorsChangeHandler(e, value){
