@@ -793,15 +793,14 @@ class CrmRouteController extends Controller
 
             $limit = $request->limit;
 
-            $cities = Cities::all();
-            $city = $cities->where('id', '=', $cityId)->first();
+            $city = Cities::where('id', '=', $cityId)->first();
             //part responsible for grace period
             $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date as date','client_route_info.city_id','city.grace_period', 'city.max_month_show as max_month_show')
                 ->join('city','city.id','client_route_info.city_id')
                 ->where('client_route_info.status', '=', 1)
                 ->orderBy('city.name')
                 ->get();
-            $voievodeshipRound = $this::findCityByDistanceWithDistanceLimit($city, $currentDate, $clientRouteInfoAll, $cities, $limit);
+            $voievodeshipRound = $this::findCityByDistanceWithDistanceLimit($city, $currentDate, $clientRouteInfoAll, $limit);
 
             $voievodeshipRound = $voievodeshipRound->groupBy('id');
             $voievodeshipDistinc = array();
@@ -813,7 +812,7 @@ class CrmRouteController extends Controller
             return $responseArray;
         }
     }
-    public function findCityByDistanceWithDistanceLimit($city, $currentDate,$clientRoutesInfoWithUsedCities,$cities, $limit){
+    public function findCityByDistanceWithDistanceLimit($city, $currentDate,$clientRoutesInfoWithUsedCities, $limit){
 
         $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
         $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
@@ -3072,11 +3071,13 @@ class CrmRouteController extends Controller
                                     ->where('department_info_id',null);
                     if(!$merge->isEmpty()){
                             try {
+
                                 $routeInfoOverall->where('date',$itemDate)
-                                    ->where('department_info_id',null)->first()->sumOfLimits  += $arrayResult['sumOfLimits'];
+                                    ->where('department_info_id',null)->first()->sumOfLimits  += round($arrayResult['sumOfLimits']/count($departmentInfo),2);
+
                             }catch (\Exception $e){
                                $routeInfoOverall->where('date',$itemDate)
-                                    ->where('department_info_id',null)->first()['sumOfLimits'] += $arrayResult['sumOfLimits'];
+                                    ->where('department_info_id',null)->first()['sumOfLimits'] += round($arrayResult['sumOfLimits']/count($departmentInfo),2);
                         }
                     }else{
                         $routeInfoOverall->push(collect($arrayResult));
@@ -3122,7 +3123,7 @@ class CrmRouteController extends Controller
             else
                 $allSet = "Tak";
             $dayCollect->offsetSet('allSet',$allSet);
-            $dayCollect->offsetSet('totalScore',$totalScore);
+            $dayCollect->offsetSet('totalScore',intval($totalScore));
             $aheadPlanningData->push($dayCollect);
             $actualDate = date('Y-m-d', strtotime($actualDate. ' + 1 days'));
         }
