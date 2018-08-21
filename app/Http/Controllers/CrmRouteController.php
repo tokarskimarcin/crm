@@ -41,249 +41,6 @@ class CrmRouteController extends Controller
     private $validHotelInvoiceTemplatesExtensions = ['pdf'];
     private $validCampaignInvoiceExtensions = ['pdf'];
 
-//prawdopodobnie nieużywane metody
-//    public function index()
-//    {
-//        $departments = Department_info::all();
-//        $today = date('Y-m-d');
-//        $today .= '';
-//        $voivodes = Voivodes::all();
-//        $year = date('Y',strtotime("this year"));
-//        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
-//        return view('crmRoute.index')
-//            ->with('departments', $departments)
-//            ->with('voivodes', $voivodes)
-//            ->with('lastWeek', $numberOfLastYearsWeek)
-//            ->with('today', $today);
-//    }
-
-//    /**
-//     * This method saves new routes connected with client
-//     */
-//    public function indexPost(Request $request) {
-//        //Get values from form elements
-//        $voivode = $request->voivode;
-//        $city = $request->city;
-//        $hour = $request->hour;
-//        $date = $request->date;
-//        $clientType = $request->clientType; // 1 - badania, 2 - wysyłka
-//        $clientIdNotTrimmed = $request->clientId;
-//
-//        //explode values into arrays
-//        $voivodeArr = explode(',', $voivode);
-//        $cityArr = explode(',', $city);
-//        $hourArr = explode(',',$hour);
-//        $clientId = explode('_',$clientIdNotTrimmed)[1];
-//        $dateArr = explode(',',$date);
-//
-//        $loggedUser = Auth::user();
-//
-//        //New insertion into ClientRoute table
-//        $clientRoute = new ClientRoute();
-//        $clientRoute->client_id = $clientId;
-//        $clientRoute->user_id = $loggedUser->id;
-//        $clientRoute->status = 0;
-//        $clientRoute->type = $clientType; // 1 - badania, 2 - wysyłka
-//        $clientRoute->save();
-//
-//        //New insertions into ClientRouteInfo table
-//        for($i = 0; $i < count($voivodeArr); $i++) {
-//            for($j = 1; $j <= $hourArr[$i] ; $j++) { // for example if user type 2 hours, method will insert 2 insertions with given row.
-//                $clientRouteInfo = new ClientRouteInfo();
-//                $clientRouteInfo->client_route_id = $clientRoute->id;
-//                $clientRouteInfo->city_id = $cityArr[$i];
-//                $clientRouteInfo->voivode_id = $voivodeArr[$i];
-//                $clientRouteInfo->date = $dateArr[$i];
-//                $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
-//                $day = substr($dateArr[$i],8,2);
-//
-//                $month = substr($dateArr[$i],5,2);
-//
-//                $year = substr($dateArr[$i], 0,4);
-//
-//                $date = mktime(0, 0, 0, $month, $day, $year);
-//                $weekOfYear = date('W',$date);
-//                $clientRouteInfo->weekOfYear = $weekOfYear;
-//                $clientRouteInfo->save();
-//            }
-//        }
-//
-//        new ActivityRecorder(array_merge(['T'=>'Dodanie trasy dla klienta'],$clientRoute->toArray()),209,1);
-//        $request->session()->flash('adnotation', 'Trasa została pomyślnie przypisana dla klienta');
-//
-//        return Redirect::back();
-//
-//    }
-
-//    /**
-//     * This method saves new routes connected with client
-//     */
-//    public function indexEditPost(Request $request) {
-////        dd($request);
-//        //Get values from form elements
-//        $voivode = $request->voivode;
-//        $city = $request->city;
-//        $hour = $request->hour;
-//        $date = $request->date;
-//        $type = $request->type;
-//        $clientIdNotTrimmed = $request->clientId;
-//
-//        //explode values into arrays
-//        $voivodeArr = explode(',', $voivode);
-//        $cityArr = explode(',', $city);
-//        $hourArr = explode(',',$hour);
-//        $clientId = explode('_',$clientIdNotTrimmed)[1];
-//        $dateArr = explode(',',$date);
-//
-//        $loggedUser = Auth::user();
-//
-////        dd($hourArr);
-//        //New insertion into ClientRoute table
-//        $clientRoute = ClientRoute::find($request->route_id);
-//        $clientRoute->client_id = $clientId;
-//        $clientRoute->user_id = $loggedUser->id;
-//        $clientRoute->status = 0;
-//        $clientRoute->type = $type;
-//        $clientRoute->save();
-//
-//        ClientRouteInfo::where('client_route_id','=',$request->route_id)->delete();
-//        //New insertions into ClientRouteInfo table
-//        for($i = 0; $i < count($voivodeArr); $i++) {
-//            for($j = 1; $j <= $hourArr[$i] ; $j++) { // for example if user type 2 hours, method will insert 2 insertions with given row.
-//                $clientRouteInfo = new ClientRouteInfo();
-//                $clientRouteInfo->client_route_id = $clientRoute->id;
-//                $clientRouteInfo->city_id = $cityArr[$i];
-//                $clientRouteInfo->voivode_id = $voivodeArr[$i];
-//                $clientRouteInfo->date = $dateArr[$i];
-//                $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
-//                $day = substr($dateArr[$i],8,2);
-//
-//                $month = substr($dateArr[$i],5,2);
-//
-//                $year = substr($dateArr[$i], 0,4);
-//
-//                $date = mktime(0, 0, 0, $month, $day, $year);
-//                $weekOfYear = date('W',$date);
-//                $clientRouteInfo->weekOfYear = $weekOfYear;
-//                $clientRouteInfo->save();
-//            }
-//        }
-//        $request->session()->flash('adnotation', 'Trasa została pomyślnie przypisana dla klienta');
-//
-//        new ActivityRecorder(array_merge(['T'=>'Dodanie trasy dla klienta'],$clientRoute->toArray()),212,1);
-//
-//        return Redirect::back();
-//
-//    }
-
-//    /**
-//     * This method shows specific route
-//     */
-//    public function specificRouteEditGet($id) {
-//        $clients = Clients::all();
-//        $cities = Cities::all();
-//        $voivodes = Voivodes::all();
-//        $departments = Department_info::all(); //niezbędne
-//
-//        $clientRouteInfo = ClientRouteInfo::select('client_route_info.id', 'voivodeship.name as voivode', 'client_route_info.voivode_id as voivode_id','city.name as city','city.name as cityName', 'client_route_info.city_id as city_id','client_route_info.hotel_price as hotel_price', 'client_route.client_id as client_id', 'client_route_info.client_route_id as client_route_id', 'client_route_info.date as date', 'client_route_info.hotel_id as hotel_id', 'client_route_info.hour as hour', 'client_route.type as type')
-//            ->join('city', 'city.id', '=', 'client_route_info.city_id')
-//            ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
-//            ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
-//            ->where('client_route_id', '=', $id)
-//            ->where('client_route_info.status', '=', 1)
-//            ->get();
-//
-//        $clientRoute = $this->getClientRouteGroupedByDateSortedByHour($id, $clientRouteInfo);
-//        $routeInfo = new \stdClass;
-//        $routeInfo->routeName = $this->createRouteName($clientRoute);
-//        $routeInfo->firstDate = $clientRoute[0]->date;
-//        $routeInfo->week =  $clientRoute[0]->weekOfYear;
-//
-//        $clientRouteInfoExtended = array();
-//        $insideArr = array();
-//        $cityId = null;
-//        $flag = 0; //indices whether $insideArr push into $clientRouteInfoExtended 1 - push, 0 - don't push
-//        $iterator = 0; //It count loops of foreach
-//        $iteratorFinish = count($clientRouteInfo); // indices when condition inside foreach should push array into $clientRouteInfoExtended array.
-//        $clientName = null;
-//        $clientType = null;
-//
-//        foreach($clientRouteInfo as $info) {
-//            if($iterator == 0) {
-//                $clientType = $info->type;
-//            }
-//
-//            if($cityId == null) {
-//                $flag = 0;
-//                $cityId = $info->city_id;
-//            }
-//            else if($info->city_id == $cityId) {
-//                $flag = 0;
-//                $cityId = $info->city_id;
-//            }
-//            else {
-//                array_push($clientRouteInfoExtended, $insideArr);
-//                $insideArr = [];
-//                $flag = 1;
-//                $cityId = $info->city_id;
-//            }
-//
-//            $clientRId = $info->client_id;
-//
-//            $stdClass = new \stdClass();
-//
-//            foreach($clients as $client) {
-//                if($info->client_id == $client->id) {
-//                    $stdClass->clientName = $client->name;
-//                }
-//            }
-//
-//            $stdClass->client_route_id = $info->client_route_id;
-//            $stdClass->city_id = $info->city_id;
-//            $stdClass->voivode_id = $info->voivode_id;
-//            $stdClass->date = $info->date;
-//            $stdClass->hotel_id = $info->hotel_id;
-//            $stdClass->hour = $info->hour;
-//
-//            array_push($insideArr, $stdClass);
-//            if($flag == 1) {
-//                $flag = 0;
-//            }
-//            if($iterator == ($iteratorFinish - 1)) {
-//                array_push($clientRouteInfoExtended, $insideArr);
-//            }
-//            $iterator++;
-//        }
-//
-//        $clientRouteInfo = collect($clientRouteInfoExtended);
-//
-//        $today = date('Y-m-d');
-//        $today .= '';
-//        $year = date('Y',strtotime("this year"));
-//        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
-//
-//        $clientRouteInfo = $clientRouteInfo->sortByDesc('date');
-//        $clientRouteInfoAll = ClientRouteInfo::select('client_route_info.date','client_route_info.city_id','city.grace_period')
-//            ->join('city','city.id','client_route_info.city_id')
-//            ->where('client_route_info.status', '=', 1)
-//            ->get();
-//        $clientRouteInfo->map(function($item) use($cities,$clientRouteInfoAll) {
-//            $cityObject = $cities->where('id','=',$item[0]->city_id)->first();
-//            $item[0]->cities = $this::findCityByDistance($cityObject, $item[0]->date,$clientRouteInfoAll,$cities);
-//            return $item;
-//        });
-//        return view('crmRoute.editSpecificRoute')
-//            ->with('departments', $departments)
-//            ->with('voivodes', $voivodes)
-//            ->with('lastWeek', $numberOfLastYearsWeek)
-//            ->with('today', $today)
-//            ->with('clientRouteInfo',$clientRouteInfo)
-//            ->with('clientRId', $clientRId)
-//            ->with('routeId',$id)
-//            ->with('clientType', $clientType)
-//            ->with('routeInfo', $routeInfo);
-//    }
-
     /**
      * @return view route Templates
      */
@@ -813,6 +570,7 @@ class CrmRouteController extends Controller
             return $responseArray;
         }
     }
+
     public function findCityByDistanceWithDistanceLimit($city, $currentDate,$clientRoutesInfoWithUsedCities, $limit){
 
         $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
@@ -955,7 +713,6 @@ class CrmRouteController extends Controller
 
         return $voievodeshipRound;
     }
-
 
     public function findCityByDistanceWithoutGracePeriod($city, $limit){
         if($limit == 'infinity'){
@@ -1216,48 +973,6 @@ class CrmRouteController extends Controller
     }
 
     /**
-     * This method saves changes about specific route
-     */
-   /* public function specificRoutePost(Request $request) {
-        $all_data = json_decode($request->JSONData); //we obtain 2 dimensional array
-        $clientRouteInfoIds = 'clientRouteInfoIds: ';
-        foreach($all_data as $city) {
-            $clientRouteInfo = ClientRouteInfo::where([
-                ['city_id', '=', $city->cityId],
-                ['voivode_id', '=', $city->voivodeId],
-                ['client_route_id', '=', $city->clientRouteId]
-            ])
-                ->get();
-            $numberOfRecords = count($clientRouteInfo);
-            $iterator = 0;
-            foreach($clientRouteInfo as $item) {
-                if($city->timeHotelArr[$iterator]->time == '') {
-                    $item->hour = null;
-                }
-                else {
-                    $item->hour = $city->timeHotelArr[$iterator]->time;
-                }
-                if($city->priceHotelArr[$iterator]->price == '') {
-                    $item->hotel_price = null;
-                }
-                else {
-                    $item->hotel_price = $city->priceHotelArr[$iterator]->price;
-                }
-
-                $item->hotel_id = $city->timeHotelArr[$iterator]->hotelId;
-                $item->department_info_id = null; //At this point nobody choose it's value, can't be 0 because
-                $item->user_reservation = $city->user_reservation;
-                $item->save();
-                $iterator++;
-                $clientRouteInfoIds .= $item->id . ', ';
-            }
-        }
-        new ActivityRecorder(['T'=>'Edycja hoteli i godzin trasy','clientRouteInfoIds:' => $clientRouteInfoIds], 211,2);
-
-        return $all_data;
-    }*/
-
-    /**
      * Return ready route with info
      * @param Request $request
      */
@@ -1287,7 +1002,6 @@ class CrmRouteController extends Controller
         }else
             return 500;
     }
-
 
     /**
      * @param Request $request
@@ -1488,6 +1202,7 @@ class CrmRouteController extends Controller
         });
 
     }
+
     private function getClientRouteGroupedByDateSortedByHour($client_route_id, $client_route_info = null){
         $grouped_by_day_client_routes= [];
         if($client_route_info === null){
@@ -1592,65 +1307,6 @@ class CrmRouteController extends Controller
 
         return $success;
     }
-
-    //Prawdopodobnie nieużywane metody
-//    /**
-//     * @return $this method returns view addNewRoute with data about all voivodes
-//     */
-//    public function addNewRouteGet() {
-//        $voivodes = Voivodes::all();
-//
-//        return view('crmRoute.addNewRoute')->with('voivodes', $voivodes);
-//    }
-
-//    /**
-//     * This method saves new route to database
-//     */
-//    public function addNewRoutePost(Request $request) {
-//        $voivode = $request->voivode;
-//        $city = $request->city;
-//
-//        $voivodeIdArr = explode(',', $voivode);
-//        $cityIdArr = explode(',', $city);
-//
-//        $cityNamesArr = array();
-//
-//        foreach($cityIdArr as $city) {
-//            $givenCity = Cities::where('id', '=', $city)->first();
-//            $name = $givenCity->name;
-//            array_push($cityNamesArr,$name);
-//        }
-//
-//        $nameOfRoute = '';
-//        foreach($cityNamesArr as $name) {
-//            $nameOfRoute .= $name . ' | ';
-//        }
-//        $nameOfRoute = trim($nameOfRoute, ' | ');
-//
-//        $newRoute = new Route();
-//        $newRoute->status = 1; // 1 - aktywne dane, 0 - usunięte dane
-//        $newRoute->name = $nameOfRoute;
-//        $newRoute->save();
-//        foreach($voivodeIdArr as $voivodekey => $voivode) {
-//            foreach($cityIdArr as $citykey => $city) {
-//                if($voivodekey == $citykey) {
-//                    $newRouteInfo = new RouteInfo();
-//                    $newRouteInfo->routes_id = $newRoute->id;
-//                    $newRouteInfo->voivodeship_id = $voivode;
-//                    $newRouteInfo->city_id = $city;
-//                    $newRouteInfo->status = 1; // 1 - aktywne dane, 0 - usunięte dane
-//                    $newRouteInfo->save();
-//                }
-//            }
-//
-//        }
-//        new ActivityRecorder(array_merge(['T' => 'Dodanie nowego szablonu trasy'], $newRoute->toArray()),193,1);
-//
-//        $request->session()->flash('adnotation', 'Trasa została dodana pomyślnie!');
-//
-//        return Redirect::to('/showRoutes');
-//
-//    }
 
     /**
      * This method saves changes related to given route.
@@ -1866,6 +1522,130 @@ class CrmRouteController extends Controller
         return $all_cities;
     }
 
+    /*
+ * This method changes limits for given set of clientRoute ids
+ */
+    public function changeLimitsAjax(Request $request) {
+        $limit1 = $request->limit1;
+        $limit2 = $request->limit2;
+        $limit3 = $request->limit3;
+
+        $singleLimit = $request->singleLimit;
+
+        $ids = json_decode($request->ids);
+        $onlyIds = []; // here we have only client_route id's [120, 130, 132]
+        foreach($ids as $id) {
+            $tempArr = explode('_', $id);
+            array_push($onlyIds, $tempArr[1]);
+        }
+
+        //required clientRouteCampaigns records
+        $campaignRecords = ClientRouteCampaigns::select('client_route_campaigns.hour_count', 'client_route_info.date', 'client_route_campaigns.id', 'client_route_info.client_route_id', 'client_route_info.id as client_route_info_id')
+            ->ActiveCampaigns($onlyIds)
+            ->get();
+
+        //create new collection and setting properites by client_route_id
+        $ClientRouteCampaignsGroupedByClientRoutes = collect();
+        foreach($onlyIds as $ids) {
+            $ClientRouteCampaignsGroupedByClientRoutes[$ids] = null;
+        }
+
+        foreach($ClientRouteCampaignsGroupedByClientRoutes as $key => $value) { //we create collection with clientRoute keys and inside clientRouteInfo records
+            $arrayOfInfo = [];
+            $givenClientRouteCampaigns = $campaignRecords->where('client_route_id', '=', $key); // campaigns only from one route
+
+            foreach($givenClientRouteCampaigns as $oneCampaign) { //working on single campaign
+                $basicId = $oneCampaign->client_route_info_id; //clientRouteInfo id of first campaign show
+                $numberOfHours = $oneCampaign->hour_count; // number of hours in campaign
+
+                //this procedure assign property "onlyOne" which indices whether campaign is single show
+                $infoRecord = ClientRouteInfo::where('id', '=', $basicId)->first();
+                $showOrder = $infoRecord->show_order;
+                $clientRouteId = $infoRecord->client_route_id;
+                $date = $infoRecord->date;
+
+                $allRecordsForUpdate = ClientRouteInfo::where('client_route_id', '=', $clientRouteId)->where('date', '=', $date)->where('show_order', '=', $showOrder)->where('status','=','1')->get();
+                foreach($allRecordsForUpdate as $recToUpd) {
+                    if($numberOfHours == 1) {
+                        $recToUpd->onlyOne = 1;
+                    }
+                    else {
+                        $recToUpd->onlyOne = 0;
+                    }
+                    array_push($arrayOfInfo, $recToUpd);
+                }
+            }
+            $ClientRouteCampaignsGroupedByClientRoutes[$key] = collect($arrayOfInfo);
+        }
+
+        foreach($ClientRouteCampaignsGroupedByClientRoutes as $key => $value) { //we create collection with clientRoute keys and inside clientRouteInfo records
+            $recGroupedByDate = $ClientRouteCampaignsGroupedByClientRoutes[$key]->sortBy('hour')->groupBy('date'); //we are grouping records by date
+
+            //this procedure checks whether in single day campaign is only 2 hour
+            foreach($recGroupedByDate as $singleDateGroup) {
+                $onlyTwoHourCampaign = null;
+                $i = 0;
+                if($singleDateGroup->count() == 2) {
+                    $onlyTwoHourCampaign = true;
+                    foreach($singleDateGroup as $singleDateItem) { //order items in date.
+                        if($singleDateItem->onlyOne == 1) {
+                            $onlyTwoHourCampaign = false;
+                        }
+                    }
+
+                }
+
+                //if inside single day there is only single 2 hour campaign we assign every clientRouteInfo record property onlyTwoHour = 1; Also we numerate hours inside day container
+
+                foreach($singleDateGroup as $singleDateItem) { //order items in date.
+                    if($onlyTwoHourCampaign == true) {
+                        $singleDateItem->onlyTwoHour = 1;
+                    }
+                    else {
+                        $singleDateItem->onlyTwoHour = 0;
+                    }
+                    $singleDateItem->nr = $i;
+                    $i++;
+                }
+
+                $recGroupedByShowOrder = $singleDateGroup->groupBy('show_order');
+                foreach($recGroupedByShowOrder as $orderedShow) {
+
+
+                    //here we assign limits according to different scenario
+                    foreach($orderedShow as $singleItem) {
+
+                        for($show_order = 0; $show_order < 3; $show_order++) {
+                            if($singleItem->show_order == $show_order && $singleItem->nr == 0) {
+                                ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit1]);
+                            }
+                            else if($singleItem->show_order == $show_order && $singleItem->nr == 1) {
+                                ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit2]);
+                            }
+                            else if($singleItem->show_order == $show_order && $singleItem->nr == 2) {
+                                ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit3]);
+                            }
+                        }
+
+                        //case if there is single hour campaign
+                        if($singleItem->onlyOne == 1) {
+                            ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $singleLimit]);
+                        }
+
+                        //case if inside one day there is only 2 hour campaign
+                        if($singleItem->onlyTwoHour == 1 && $singleItem->nr == 0) {
+                            ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit2]);
+                        }
+                        else if($singleItem->onlyTwoHour == 1 && $singleItem->nr == 1) {
+                            ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit3]);
+                        }
+                    }
+                }
+            }
+        }
+        return '1';
+    }
+
     /**
      * @return Return view "show routes"
      */
@@ -1962,6 +1742,11 @@ class CrmRouteController extends Controller
             ->with('voivodes', $voivodes)
             ->with('editFlag', $editFlag)
             ->with('route', $route);
+    }
+
+    //This method changes clientRoute status to 0 (inactive);
+    public function deleteGivenRouteAjax($id) {
+        return ClientRoute::safeDelete($id);
     }
 
     /**
@@ -2309,7 +2094,6 @@ class CrmRouteController extends Controller
         }
     }
 
-
     /**
      * Save new/edit hotel
      * @param Request $request
@@ -2545,6 +2329,7 @@ class CrmRouteController extends Controller
             $newCity->save();
         }
     }
+
     /**
      * find city by id
      */
@@ -2554,6 +2339,7 @@ class CrmRouteController extends Controller
             return $city;
         }
     }
+
     /**
      * find Hotel by id
      */
@@ -2570,7 +2356,6 @@ class CrmRouteController extends Controller
             return ['hotel'=>$hotel,'contacts'=>$contacts, 'clientsExceptions'=>$clientsExceptions->pluck('client_id')->toArray()];
         }
     }
-
 
     /**
      * This method returns view showRoutesDetailed
@@ -2612,13 +2397,11 @@ class CrmRouteController extends Controller
         return datatables($detailedInfo)->make(true);
     }
 
-
     /**
      * CampaignsInfo
      * @params: weeks - array, years - array, departments - array, typ - array
      * This method returns to server data for datatable about all records from ClientRouteInfo table.
      */
-
     public function campaignsInfo(Request $request){
         $years = $request->years;
         $weeks = $request->weeks;
@@ -3676,6 +3459,7 @@ class CrmRouteController extends Controller
         ];
         return $months;
     }
+
     public function getPresentationInfo(){
         $client = Clients::select('name','type')->get();
         return datatables($client)->make(true);
@@ -3782,6 +3566,7 @@ class CrmRouteController extends Controller
     public function invoicesMail(){
         return view('mail.invoices');
     }
+
     public function sendMailWithInvoice(Request $request){
         if($request->ajax()){
             $campaignID =  $request->actualCampaignID;
@@ -3813,6 +3598,7 @@ class CrmRouteController extends Controller
         }
         return 500;
     }
+
     public function sendMail($mail_type,$data,$accepted_users,$mail_title,$storageURL){
         /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
         Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title,$storageURL)
@@ -3830,6 +3616,7 @@ class CrmRouteController extends Controller
 
         });
     }
+
     public function downloadCampaignInvoicePDF($id){
         $clientRouteCampaign = ClientRouteCampaigns::find($id);
         $url = $clientRouteCampaign->invoice_path;
@@ -4118,137 +3905,5 @@ class CrmRouteController extends Controller
             return 'Brak Danych';
         }
     }
-
-    /*
-     * This method changes limits for given set of clientRoute ids
-     */
-    public function changeLimitsAjax(Request $request) {
-        $limit1 = $request->limit1;
-        $limit2 = $request->limit2;
-        $limit3 = $request->limit3;
-
-        $singleLimit = $request->singleLimit;
-
-        $ids = json_decode($request->ids);
-        $onlyIds = []; // here we have only client_route id's [120, 130, 132]
-        foreach($ids as $id) {
-            $tempArr = explode('_', $id);
-            array_push($onlyIds, $tempArr[1]);
-        }
-
-        //required clientRouteCampaigns records
-        $campaignRecords = ClientRouteCampaigns::select('client_route_campaigns.hour_count', 'client_route_info.date', 'client_route_campaigns.id', 'client_route_info.client_route_id', 'client_route_info.id as client_route_info_id')
-            ->ActiveCampaigns($onlyIds)
-            ->get();
-
-        //create new collection and setting properites by client_route_id
-        $ClientRouteCampaignsGroupedByClientRoutes = collect();
-        foreach($onlyIds as $ids) {
-            $ClientRouteCampaignsGroupedByClientRoutes[$ids] = null;
-        }
-
-        foreach($ClientRouteCampaignsGroupedByClientRoutes as $key => $value) { //we create collection with clientRoute keys and inside clientRouteInfo records
-            $arrayOfInfo = [];
-            $givenClientRouteCampaigns = $campaignRecords->where('client_route_id', '=', $key); // campaigns only from one route
-
-            foreach($givenClientRouteCampaigns as $oneCampaign) { //working on single campaign
-                $basicId = $oneCampaign->client_route_info_id; //clientRouteInfo id of first campaign show
-                $numberOfHours = $oneCampaign->hour_count; // number of hours in campaign
-
-                //this procedure assign property "onlyOne" which indices whether campaign is single show
-                    $infoRecord = ClientRouteInfo::where('id', '=', $basicId)->first();
-                    $showOrder = $infoRecord->show_order;
-                    $clientRouteId = $infoRecord->client_route_id;
-                    $date = $infoRecord->date;
-
-                    $allRecordsForUpdate = ClientRouteInfo::where('client_route_id', '=', $clientRouteId)->where('date', '=', $date)->where('show_order', '=', $showOrder)->where('status','=','1')->get();
-                    foreach($allRecordsForUpdate as $recToUpd) {
-                        if($numberOfHours == 1) {
-                            $recToUpd->onlyOne = 1;
-                        }
-                        else {
-                            $recToUpd->onlyOne = 0;
-                        }
-                        array_push($arrayOfInfo, $recToUpd);
-                    }
-            }
-            $ClientRouteCampaignsGroupedByClientRoutes[$key] = collect($arrayOfInfo);
-        }
-
-        foreach($ClientRouteCampaignsGroupedByClientRoutes as $key => $value) { //we create collection with clientRoute keys and inside clientRouteInfo records
-            $recGroupedByDate = $ClientRouteCampaignsGroupedByClientRoutes[$key]->sortBy('hour')->groupBy('date'); //we are grouping records by date
-
-            //this procedure checks whether in single day campaign is only 2 hour
-            foreach($recGroupedByDate as $singleDateGroup) {
-                $onlyTwoHourCampaign = null;
-                $i = 0;
-                if($singleDateGroup->count() == 2) {
-                    $onlyTwoHourCampaign = true;
-                    foreach($singleDateGroup as $singleDateItem) { //order items in date.
-                        if($singleDateItem->onlyOne == 1) {
-                            $onlyTwoHourCampaign = false;
-                        }
-                    }
-
-                }
-
-                //if inside single day there is only single 2 hour campaign we assign every clientRouteInfo record property onlyTwoHour = 1; Also we numerate hours inside day container
-
-                foreach($singleDateGroup as $singleDateItem) { //order items in date.
-                    if($onlyTwoHourCampaign == true) {
-                        $singleDateItem->onlyTwoHour = 1;
-                    }
-                    else {
-                        $singleDateItem->onlyTwoHour = 0;
-                    }
-                    $singleDateItem->nr = $i;
-                    $i++;
-                }
-
-                $recGroupedByShowOrder = $singleDateGroup->groupBy('show_order');
-                foreach($recGroupedByShowOrder as $orderedShow) {
-
-
-                    //here we assign limits according to different scenario
-                    foreach($orderedShow as $singleItem) {
-
-                        for($show_order = 0; $show_order < 3; $show_order++) {
-                            if($singleItem->show_order == $show_order && $singleItem->nr == 0) {
-                                ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit1]);
-                            }
-                            else if($singleItem->show_order == $show_order && $singleItem->nr == 1) {
-                                ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit2]);
-                            }
-                            else if($singleItem->show_order == $show_order && $singleItem->nr == 2) {
-                                ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit3]);
-                            }
-                        }
-
-                        //case if there is single hour campaign
-                        if($singleItem->onlyOne == 1) {
-                            ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $singleLimit]);
-                        }
-
-                        //case if inside one day there is only 2 hour campaign
-                        if($singleItem->onlyTwoHour == 1 && $singleItem->nr == 0) {
-                            ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit2]);
-                        }
-                        else if($singleItem->onlyTwoHour == 1 && $singleItem->nr == 1) {
-                            ClientRouteInfo::where('id', '=', $singleItem->id)->update(['limits' => $limit3]);
-                        }
-                    }
-                }
-            }
-        }
-        return '1';
-    }
-
-    //This method changes clientRoute status to 0 (inactive);
-    public function deleteGivenRouteAjax($id, Request $request) {
-        return ClientRoute::safeDelete($id);
-    }
-
-
-
 
 }
