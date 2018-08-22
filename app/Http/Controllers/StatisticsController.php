@@ -47,6 +47,8 @@ class StatisticsController extends Controller
         ];
         return $data;
     }
+
+
 // Mail do raportu godzinnego telemarketing
     public function MailhourReportTelemarketing() {
         $data = $this::hourReportTelemarketing();
@@ -133,7 +135,8 @@ class StatisticsController extends Controller
         $reports_with_dkj = $reports->map(function($item) use ($pbx_dkj_data,$work_hours) {
             $info_with_janky = $pbx_dkj_data->where('id', '=', $item->id)->first();
             $item->janki = $info_with_janky != null ? $info_with_janky->janky_proc : 0;
-            $info_with_work_hours= $work_hours->where('id', '=', $item->id)->first();
+            $info_with_work_hours = $work_hours->where('id', '=', $item->id)->first();
+
             $item->avg_average = $info_with_work_hours->realRBH != 0 ? round($item->sum_success/$info_with_work_hours->realRBH,2) : 0;
             return $item;
         });
@@ -166,7 +169,7 @@ class StatisticsController extends Controller
         $date_start = date("Y-m-d",strtotime('-7 Days'));
         $date_stop = date("Y-m-d",strtotime('-1 Day'));
         $data = $this::weekReportTelemarketing($date_start, $date_stop);
-//
+
         return view('reportpage.WeekReportTelemarketing')
             ->with([
                 'work_hours' => $data['work_hours'],
@@ -180,7 +183,7 @@ class StatisticsController extends Controller
         $date_start = $request->date_start;
         $date_stop = $request->date_stop;
         $data = $this::weekReportTelemarketing($date_start, $date_stop);
-//
+
         return view('reportpage.WeekReportTelemarketing')
             ->with([
                 'work_hours' => $data['work_hours'],
@@ -3165,6 +3168,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ->groupBy('report_date')
             ->where('department_info_id', '=', $dep_id)
             ->get();
+
+//        dd($reportIds);
 
         /**
          * Pobranie danych do raportu
