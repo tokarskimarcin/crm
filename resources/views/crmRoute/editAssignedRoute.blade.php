@@ -511,7 +511,6 @@
                             route_id = $(this).attr('id'); // przypisuje route_id gdy zaznaczamy checkboxa
                             let placeToAppend = document.querySelector('.route-here');
                             placeToAppend.innerHTML = '';
-
                                     // Pobranie informacji o zaznaczonej trasie
                                     $.ajax({
                                         type: "POST",
@@ -2463,6 +2462,7 @@
                                     )
                                     window.location.href = '{{URL::to('/showClientRoutes')}}';
                                 })
+                                .catch(err => notify(err))
                         }
                     })
                 }

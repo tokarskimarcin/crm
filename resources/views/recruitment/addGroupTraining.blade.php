@@ -951,10 +951,10 @@
 
                 if(actual_stage == 1)
                 {
-                    $('#modal_title').text('Nowe Szkolenie (Etap 1)');
+                    $('#modal_title').text('Nowe Szkolenie (Etap 1) - Kandydaci są dostępni z plus/minus 7 dni');
                     $('#save_button').text('Dodaj szkolenie');
                 }else{
-                    $('#modal_title').text('Nowe Szkolenie (Etap 2)');
+                    $('#modal_title').text('Nowe Szkolenie (Etap 2) - Kandydaci są dostępni z plus/minus 7 dni');
                     $('#save_button').text('Dodaj szkolenie');
                 }
 
