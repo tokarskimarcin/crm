@@ -54,7 +54,7 @@ Route::POST('/datatableDkjShowEmployee', 'DkjController@datatableDkjShowEmployee
 
 Route::POST('/datatableCadreHR', 'UsersController@datatableCadreHR')->name('api.datatableCadreHR');
 Route::POST('/datatableMyNotifications', 'NotificationController@datatableMyNotifications')->name('api.datatableMyNotifications');
-
+Route::POST('/datatableMyHandledNotifications', 'NotificationController@datatableMyHandledNotifications')->name('api.datatableMyHandledNotifications');
 /* Equipment start */
 Route::POST('/datatableShowLaptop', 'EquipmentsController@datatableShowLaptop')->name('api.datatableShowLaptop');
 Route::POST('/datatableShowTablet', 'EquipmentsController@datatableShowTablet')->name('api.datatableShowTablet');
