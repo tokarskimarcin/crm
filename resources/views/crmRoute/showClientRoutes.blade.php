@@ -438,6 +438,14 @@
             const editButton = document.querySelector('#limitsButton');
             const clearButton = document.querySelector('#clearButton');
 
+            (function init() {
+                @if(Session::has('adnotation'))
+                    notify(`{{Session::get('adnotation') }}`, 'success');
+                @php
+                    Session::forget('adnotation');
+                @endphp
+                @endif
+            })();
 
             $('#makeReportClient').on('click',function (e) {
                 let year = yearInput.val();
@@ -497,7 +505,7 @@
             /**
              * This function shows notification.
              */
-            function notify(htmltext$string, type$string = info, delay$miliseconds$number = 5000) {
+            function notify(htmltext$string, type$string = 'info', delay$miliseconds$number = 5000) {
                 $.notify({
                     // options
                     message: htmltext$string
