@@ -21,5 +21,6 @@ class ClientRoute extends Model
      */
     public static function safeDelete($id) {
         ClientRoute::find($id)->update(['status' => 0]);
+        ClientRouteInfo::where('client_route_id', '=', $id)->where('status', '=', 1)->update(['status' => 0]);
     }
 }
