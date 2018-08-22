@@ -260,6 +260,8 @@ Route::post('/allCitiesInGivenVoivodeAjax', 'CrmRouteController@allCitiesInGiven
 Route::post('/deleteRouteTemplate', 'CrmRouteController@deleteRouteTemplate')->name('api.deleteRouteTemplate');
 Route::post('/removeCampaignComment','CrmRouteController@removeCampaignCommentAjax')->name('api.removeCampaignComment');
 Route::delete('editAssignedRoute/{id}', 'CrmRouteController@deleteGivenRouteAjax')->name('api.deleteGivenRouteAjax');
+Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clientReport');
+Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.changeLimits');
 
 Route::post('/getConfirmHotelInfo','CrmRouteController@getConfirmHotelInfo')->name('api.getConfirmHotelInfo');
 Route::post('/changeConfirmStatus','CrmRouteController@changeConfirmStatus')->name('api.changeConfirmStatus');
@@ -970,6 +972,10 @@ Route::get('/pbxDetailedReport', 'PBXDataAPI@pbx_detailed_campaign_report');
 
 //Dane z Aktuanlnego stanu kampanii
 Route::get('/pbx_crm_info', 'PBXDataAPI@pbx_crm_info');
+
+Route::get('/ReportCoaching', 'StatisticsController@MailpageReportCoaching');
+Route::get('/MailToDirectors', 'StatisticsController@MailToEveryDirector');
+
 /**END OUT OF FIREWALL**/
 
 
@@ -981,8 +987,7 @@ Route::get('/pbx_crm_info', 'PBXDataAPI@pbx_crm_info');
 //Route::post('/pageReportCoachingWeekSummary', 'StatisticsController@pageReportCoachingSummaryPost');//do usunięcia, stary
 //Route::get('/ReportCoachingSummary', 'StatisticsController@MailReportCoachingSummary'); //do usunięcia, stary
 
-Route::get('/ReportCoaching', 'StatisticsController@MailpageReportCoaching');
-Route::get('/MailToDirectors', 'StatisticsController@MailToEveryDirector');
+
 //END COACHINGS
 
 //pobieranie danych po oddziałach godzinny
@@ -1001,6 +1006,3 @@ Route::get('/autoConsultantsLoginsCheckingGet', 'StatisticsController@autoConsul
 Route::get('/autoConsultantsLoginsBlockedGet', 'StatisticsController@autoConsultantsLoginsBlockedGet');
 Route::get('/checkPenatly', 'AutoScriptController@checkPenatly');
 
-Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clientReport');
-
-Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.changeLimits');
