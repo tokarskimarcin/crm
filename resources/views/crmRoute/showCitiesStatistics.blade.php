@@ -68,7 +68,7 @@
                             </div>
 
                             <div class="col-md-4">
-                                <div class="form-group"style="margin-left: 1em;">
+                                <div class="form-group" style="margin-left: 1em;">
                                     <label for="date_stop" class="myLabel">Data końcowa:</label>
                                     <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
                                         <input class="form-control" name="date_stop" id="date_stop" type="text" value="{{date("Y-m-d")}}">
@@ -127,18 +127,29 @@
 @section('script')
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function(mainEvent) {
+        document.addEventListener('DOMContentLoaded', function() {
+
             /********** GLOBAL VARIABLES ***********/
-            const modalCloseButton = document.querySelector('#modal-close-button');
-            const now = new Date();
-            const day = ("0" + now.getDate()).slice(-2);
-            const month = ("0" + (now.getMonth() + 1)).slice(-2);
-            const today = now.getFullYear() + "-" + (month) + "-" + (day);
-            const firstDayOfThisMonth = now.getFullYear() + "-" + (month) + "-01";
-            const dateStart = $("#date_start");
-            const dateStop = $('#date_stop');
-            // toDate.val(today);
+            let APP = {
+                dates: {
+                    now: new Date()
+                },
+                DOMElements: {
+                    dateStart: $("#date_start"),
+                    dateStop: $('#date_stop'),
+                    modalCloseButton: document.querySelector('#modal-close-button')
+                }
+            };
             /*******END OF GLOBAL VARIABLES*********/
+
+            /**
+             * This function at beggining set date input value to first day of current month
+             */
+            (function init() {
+                let month = ("0" + (APP.dates.now.getMonth() + 1)).slice(-2);
+                let firstDayOfThisMonth = APP.dates.now.getFullYear() + "-" + (month) + "-01";
+                $(APP.DOMElements.dateStart).val(firstDayOfThisMonth);
+            })();
 
             $('.form_date').datetimepicker({
                 language:  'pl',
@@ -147,15 +158,10 @@
                 pickTime: false,
             });
 
-            dateStart.val(firstDayOfThisMonth);
-
-            table = $('#datatable').DataTable({
+            let table = $('#datatable').DataTable({
                 "autoWidth": true,
                 "processing": true,
                 "serverSide": true,
-                "drawCallback": function( settings ) {
-
-                },
                 "ajax": {
                     'url': "{{ route('api.showCitiesStatisticsAjax') }}",
                     'type': 'POST',
@@ -168,21 +174,20 @@
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },"columns":[
-                    {"data":function (data, type, dataToSet) {
+                    {"data":function (data) {
                             return data.voivodeName;
                         },"name":"voivodeName","orderable": true
                     },
-                    {"data":function (data, type, dataToSet) {
+                    {"data":function (data) {
                             return data.cityName;
                         },"name":"cityName","orderable": true
                     },
-                    {"data":function (data, type, dataToSet) {
+                    {"data":function (data) {
                             return data.ilosc;
                         },"name":"ilosc","orderable": true
                     },
-                    {"data":function (data, type, dataToSet) {
+                    {"data":function (data) {
                        return '<button class="btn btn-default btn-block" data-toggle="modal" data-target="#showRecords" data-type="searchIcon" data-cityId="' + data.cityId + '"><span class="glyphicon glyphicon-search" data-cityId="' + data.cityId + '" data-type="searchIcon" style="font-size: 2em;"></span></button>';
-                            // return '<a data-toggle="modal"  class="modal_trigger2" href="#showRecords"> <span class="glyphicon glyphicon-search" data-cityId="' + data.cityId + '" data-type="searchIcon"></span></a>';
                         },"name":"ilosc","orderable": false, searchable: false, width: '10%'
                     }
                 ]
@@ -191,7 +196,7 @@
             /**
              * This event listener reloads table after changing start or stop date
              */
-            $('#date_start, #date_stop').on('change', function(e) {
+            $('#date_start, #date_stop').on('change', () => {
                table.ajax.reload();
             });
 
@@ -212,14 +217,14 @@
              * @param data - mostly clientRouteInfo records
              */
             function createModalTable(placeToAppend, data) {
+                console.assert(Array.isArray(data), 'data parameter in createModalTable function ins not Array!');
                 const infoTable = document.createElement('table');
                 infoTable.classList.add('table', 'table-striped');
 
-                const theadElement = document.createElement('thead');
-                const tbodyElement = document.createElement('tbody');
-                const tr1Element = document.createElement('tr');
-                const th1Element = document.createElement('th');
-                const th2Element = document.createElement('th');
+                with (document) {
+                   [theadElement, tbodyElement, tr1Element, th1Element, th2Element] =
+                       [createElement('thead'), createElement('tbody'), createElement('tr'), createElement('th'), createElement('th')];
+                }
 
                 th1Element.textContent = 'Miasto';
                 tr1Element.appendChild(th1Element);
@@ -230,10 +235,11 @@
                 theadElement.appendChild(tr1Element);
                 infoTable.appendChild(theadElement);
 
-                for (let i = 0; i < data.length; i++) {
-                    const trElement = document.createElement('tr');
-                    const td1Element = document.createElement('td');
-                    const td2Element = document.createElement('td');
+                for (let i = 0, max = data.length; i < max; i++) {
+                    with(document) {
+                        [trElement, td1Element, td2Element] = [createElement('tr'), createElement('td'), createElement('td')];
+                    }
+
                     td1Element.textContent = data[i].cityName;
                     td2Element.textContent = data[i].date;
                     trElement.appendChild(td1Element);
@@ -255,8 +261,8 @@
 
                 const data = new FormData();
                 data.append('cityId', cityId);
-                data.append('dateStart', dateStart.val());
-                data.append('dateStop', dateStop.val());
+                data.append('dateStart', APP.DOMElements.dateStart.val());
+                data.append('dateStop', APP.DOMElements.dateStop.val());
 
                 fetch(url, {
                     method: 'post',
@@ -269,13 +275,14 @@
                         modalBody.innerHTML = '';
                         return createModalTable(modalBody, resp);
                     })
-                    .then(resp => {
+                    .then(() => {
                         const modalBody = document.querySelector('.modal2-body');
                         const info = document.createElement('div');
                         info.classList.add('alert', 'alert-info', 'loadedMessage');
                         info.textContent = "Załadowano dane";
                         modalBody.appendChild(info);
                     })
+                    .catch(err => console.log('Błąd: ', err))
             }
 
             /**
@@ -290,7 +297,7 @@
             }
 
             document.addEventListener('click', clickHandler);
-            modalCloseButton.addEventListener('click', closeButtonHandler);
+            APP.DOMElements.modalCloseButton.addEventListener('click', closeButtonHandler);
         });
     </script>
 @endsection
