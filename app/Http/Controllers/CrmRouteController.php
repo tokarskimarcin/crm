@@ -2454,6 +2454,11 @@ class CrmRouteController extends Controller
             $campaignsInfo = $campaignsInfo->whereIn('client_route_info.department_info_id', $departments);
         }
 
+        if(in_array('-1',$departments)){
+            $campaignsInfo->orWhere(function ($query){
+               $query->whereNull('client_route_info.department_info_id');
+            });
+        }
         if($typ[0] != '0') {
             $campaignsInfo = $campaignsInfo->whereIn('client_route.type', $typ);
         }

@@ -1226,9 +1226,7 @@ class StatisticsController extends Controller
     public function weekReportChecked() {
         $date_start = date("Y-m-d",strtotime('-7 Days'));
         $date_stop = date("Y-m-d",strtotime('-1 Day'));
-        $hour_start = '00:00:00';
-        $hour_stop = '24:00:00';
-        $data = $this->reportCheckedData($date_start, $date_stop, $hour_start, $hour_stop);
+        $data = $this->reportCheckedData($date_start, $date_stop, '00:00:00', '24:00:00');
         $data = [
             'day_start' => $date_start,
             'day_stop' => $date_stop,
@@ -1243,9 +1241,7 @@ class StatisticsController extends Controller
     public function pageWeekReportChecked() {
         $date_start = date("Y-m-d",strtotime('-7 Days'));
         $date_stop = date("Y-m-d",strtotime('-1 Day'));
-        $hour_start = '00:00:00';
-        $hour_stop = '24:00:00';
-        $data = $this->reportCheckedData($date_start, $date_stop, $hour_start, $hour_stop);
+        $data = $this->reportCheckedData($date_start, $date_stop, '00:00:00', '24:00:00');
         return view('reportpage.WeekReportChecked')
             ->with([
                 'day_start' => $date_start,
@@ -1258,9 +1254,7 @@ class StatisticsController extends Controller
     public function pageWeekReportCheckedPost(Request $request) {
         $date_start = $request->date_start;
         $date_stop = $request->date_stop;
-        $hour_start = '00:00:00';
-        $hour_stop = '24:00:00';
-        $data = $this->reportCheckedData($date_start, $date_stop, $hour_start, $hour_stop);
+        $data = $this->reportCheckedData($date_start, $date_stop, '00:00:00', '24:00:00');
         return view('reportpage.WeekReportChecked')
             ->with([
                 'day_start' => $date_start,
