@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Repository\TestingUser\EloquentMyTest;
+use App\Repository\TestingUser\MyTestRepository;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 class AppServiceProvider extends ServiceProvider
@@ -24,6 +26,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(MyTestRepository::class, EloquentMyTest::class);
     }
 }
