@@ -193,16 +193,8 @@ class StatisticsController extends Controller
             ]);
     }
     //dane do raportu dziennego telemarketing
-    private function dayReportTelemarketing($type)
+    private function dayReportTelemarketing($date)
     {
-        if ($type == 'today') {
-            $date = date('Y-m-d');
-        } else if ($type == 'yesterday') {
-            $date = date("Y-m-d", strtotime('-1 Day'));
-        }
-        else {
-            $date = $type;
-        }
         $reports = DB::table('hour_report')
             ->select(DB::raw(
                 'SUM(call_time) as sum_call_time,
@@ -278,14 +270,16 @@ class StatisticsController extends Controller
     }
 //Mail do raportu dziennego Telemarketing
     public function MailDayReportTelemarketing() {
-        $data = $this::dayReportTelemarketing('yesterday');
+        $yesterday = date("Y-m-d", strtotime('-1 Day'));
+        $data = $this::dayReportTelemarketing($yesterday);
 
         $title = 'Raport dzienny telemarketing '.date("d.m.Y", strtotime('-1 Day'));
         $this->sendMailByVerona('dayReportTelemarketing', $data, $title,null,[2]);
     }
     // Wyswietlenie raportu dziennego na stronie 'telemarketing'
     public function pageDayReportTelemarketing() {
-        $data = $this::dayReportTelemarketing('today');
+        $today = date("Y-m-d");
+        $data = $this::dayReportTelemarketing($today);
 
         return view('reportpage.dayReportTelemarketing')
             ->with('date', $data['date'])
@@ -1092,10 +1086,9 @@ class StatisticsController extends Controller
     private function hourReportCheckedData() {
         $date = date('Y-m-d');
         $hour = date('H') . ':00:00';
-        $hour_stop = '23:00:00';
-        $hour_start = '07:00:00';
 
-        $reports = $this->getHourReportData('hourReport', $date, $hour);
+        //$reports = $this->getHourReportData('hourReport', $date, $hour);
+        $reports = $this->getReportCheckedPbxDkjTeamData( $date, $date, $hour, $hour);
         $today = date('Y-m-d');
 
         $hour_stop = $today . ' ' . '23:00:00';
@@ -1151,44 +1144,10 @@ class StatisticsController extends Controller
           ->with('reports', $data['reports']);
     }
 
-    //dane do raportu dziennego odsłuchancyh rozmow
-    private function dayReportCheckedData($type) {
-        if ($type == 'today') {
-            $today = date('Y-m-d');
-            $data_help = date('Y-m-d');
-        } else if ($type == 'yesterday') {
-            $today = date("Y-m-d",strtotime('-1 Day'));
-            $data_help = $today;
-        }
-        else {
-            $today = $type;
-        }
-
-        $hour_reports = $this->getHourReportData('dayReport', $today);
-
-        $dkj = DB::table('dkj')
-            ->select(DB::raw('
-                users.department_info_id,
-                users.dating_type,
-                count(*) as dkj_sum
-            '))
-            ->join('users', 'users.id', '=', 'dkj.id_user')
-            ->where('add_date', 'like', $today . '%')
-            ->groupBy('users.department_info_id')
-            ->groupBy('users.dating_type')
-            ->get();
-
-        $data = [
-            'today' => $today,
-            'hour_reports' => $hour_reports,
-            'dkj' => $dkj
-        ];
-        return $data;
-    }
-
     //wysyłanie emaili (raport dzienny odłsuchanych rozmów)
     public function dayReportChecked() {
-      $data = $this->dayReportCheckedData('yesterday');
+        $yesterday = date("Y-m-d",strtotime('-1 Day'));
+      $data = $this->reportCheckedData($yesterday,$yesterday, '00:00:00','24:00:00');
 
       $title = 'Raport dzienny odsłuchanych rozmów '.date("d.m.Y",strtotime('-1 Day'));
       $this->sendMailByVerona('dayReportChecked', $data, $title);
@@ -1196,51 +1155,52 @@ class StatisticsController extends Controller
 
     //wyświetlanie raportu odsłuchanych rozmów (raport dzienny)
     public function pageDayReportChecked() {
-        $data = $this->dayReportCheckedData('today');
+        $today = date("Y-m-d");
+        $data = $this->reportCheckedData($today, $today, '00:00:00','24:00:00');
 
         return view('reportpage.DayReportChecked')
             ->with('hour_reports', $data['hour_reports'])
             ->with('dkj', $data['dkj'])
-            ->with('today', $data['today']);
+            ->with('date_start', $data['date_start']);
     }
 
     public function pageDayReportCheckedPost(Request $request) {
         $date = $request->date;
-        $data = $this->dayReportCheckedData($date);
+        $data = $this->reportCheckedData($date, $date, '00:00:00','24:00:00');
 
         return view('reportpage.DayReportChecked')
             ->with('hour_reports', $data['hour_reports'])
             ->with('dkj', $data['dkj'])
-            ->with('today', $data['today']);
+            ->with('date_start', $data['date_start']);
     }
 
     //przygotowanie danych dla raportu tygodniowego odsłuchane rozmowy
-    private function weekReportCheckedData($date_start, $date_stop) {
-//          $hour_reports = DB::table('hour_report')
-//              ->select(DB::raw('
-//                department_info_id,
-//                sum(success) as success,
-//                departments.name as dep_name,
-//                department_type.name as dep_name_type
-//              '))
-//              ->join('department_info', 'department_info.id', '=', 'hour_report.department_info_id')
-//              ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-//              ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-//              ->whereIn('hour_report.id', function($query) use($date_start, $date_stop){
-//                  $query->select(DB::raw('
-//                    MAX(hour_report.id)
-//                  '))
-//                  ->from('hour_report')
-//                  ->whereBetween('hour_report.report_date', [$date_start, $date_stop])
-//                  ->groupBy('hour_report.department_info_id')
-//                  ->groupBy('hour_report.report_date');
-//              })
-//              //->where('department_info.id_dep_type', '=', 2)
-//              ->groupBy('hour_report.department_info_id')
-//              ->get();
+    private function reportCheckedData($date_start, $date_stop, $hour_start, $hour_stop) {
+        $reports = $this->getReportCheckedPbxDkjTeamData($date_start, $date_stop, $hour_start, $hour_stop);
+        $dkj = DB::table('dkj')
+            ->select(DB::raw('
+                  users.department_info_id,
+                  count(*) as dkj_sum,
+                  users.dating_type
+            '))
+            ->join('users', 'users.id', '=', 'dkj.id_user')
+            ->whereBetween('add_date', [$date_start, $date_stop])
+            ->groupBy('users.department_info_id')
+            ->groupBy('users.dating_type')
+            ->get();
 
-          $reports = DB::table('pbx_dkj_team')
-              ->select(DB::raw('
+        $data = [
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'hour_reports' => $reports,
+            'dkj' => $dkj
+        ];
+        return $data;
+    }
+
+    private function getReportCheckedPbxDkjTeamData($date_start, $date_stop, $hour_start, $hour_stop){
+        return $reports = DB::table('pbx_dkj_team')
+            ->select(DB::raw('
               department_info_id,
               SUM(success) as success,
               departments.name as dep_name,
@@ -1248,59 +1208,33 @@ class StatisticsController extends Controller
               SUM(count_all_check) as all_checked,
               SUM(count_good_check) as all_good
               '))
-              ->join('department_info', 'department_info.id', 'pbx_dkj_team.department_info_id')
-              ->join('departments', 'departments.id', '=', 'department_info.id_dep')
-              ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-                ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop){
-                    $query->select(DB::raw('
+            ->join('department_info', 'department_info.id', 'pbx_dkj_team.department_info_id')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
+            ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop, $hour_start, $hour_stop){
+                $query->select(DB::raw('
                             MAX(pbx_dkj_team.id)
                           '))
-                        ->from('pbx_dkj_team')
-                        ->whereBetween('pbx_dkj_team.report_date', [$date_start, $date_stop])
-                        ->groupBy('pbx_dkj_team.department_info_id')
-                        ->groupBy('pbx_dkj_team.report_date');
-                })
-                    //->where('department_info.id_dep_type', '=', 2)
+                    ->from('pbx_dkj_team')
+                    ->whereBetween('pbx_dkj_team.report_date', [$date_start, $date_stop])
+                    ->whereBetween('pbx_dkj_team.hour', [$hour_start, $hour_stop])
                     ->groupBy('pbx_dkj_team.department_info_id')
-                    ->get();
-
-          $day_start = date("Y-m-d",strtotime('-7 Days'));
-          $day_stop = date("Y-m-d",strtotime('-1 Day'));
-
-          $date_start .= ' 00:00:00';
-          $date_stop .= ' 23:00:00';
-
-          $dkj = DB::table('dkj')
-              ->select(DB::raw('
-                  users.department_info_id,
-                  count(*) as dkj_sum,
-                  users.dating_type
-              '))
-              ->join('users', 'users.id', '=', 'dkj.id_user')
-              ->whereBetween('add_date', [$date_start, $date_stop])
-              ->groupBy('users.department_info_id')
-              ->groupBy('users.dating_type')
-              ->get();
-
-          $data = [
-              'day_start' => $day_start,
-              'day_stop' => $day_stop,
-              'hour_reports' => $reports,
-              'dkj' => $dkj
-          ];
-          return $data;
+                    ->groupBy('pbx_dkj_team.report_date');
+            })
+            //->where('department_info.id_dep_type', '=', 2)
+            ->groupBy('pbx_dkj_team.department_info_id')
+            ->get();
     }
-
     //Wysyłanie maila raport tygodniowy odsłuchane rozmowy
     public function weekReportChecked() {
         $date_start = date("Y-m-d",strtotime('-7 Days'));
         $date_stop = date("Y-m-d",strtotime('-1 Day'));
-        $all_data = $this->weekReportCheckedData($date_start, $date_stop);
+        $data = $this->reportCheckedData($date_start, $date_stop, '00:00:00', '24:00:00');
         $data = [
             'day_start' => $date_start,
             'day_stop' => $date_stop,
-            'dkj' => $all_data['dkj'],
-            'hour_reports' => $all_data['hour_reports']
+            'dkj' => $data['dkj'],
+            'hour_reports' => $data['hour_reports']
         ];
         $title = 'Raport tygodniowy odsłuchanych rozmów '.$date_start.' - '.$date_stop;
         $this->sendMailByVerona('weekReportChecked', $data, $title);
@@ -1310,7 +1244,7 @@ class StatisticsController extends Controller
     public function pageWeekReportChecked() {
         $date_start = date("Y-m-d",strtotime('-7 Days'));
         $date_stop = date("Y-m-d",strtotime('-1 Day'));
-        $data = $this->weekReportCheckedData($date_start, $date_stop);
+        $data = $this->reportCheckedData($date_start, $date_stop, '00:00:00', '24:00:00');
         return view('reportpage.WeekReportChecked')
             ->with([
                 'day_start' => $date_start,
@@ -1323,7 +1257,7 @@ class StatisticsController extends Controller
     public function pageWeekReportCheckedPost(Request $request) {
         $date_start = $request->date_start;
         $date_stop = $request->date_stop;
-        $data = $this->weekReportCheckedData($date_start, $date_stop);
+        $data = $this->reportCheckedData($date_start, $date_stop, '00:00:00', '24:00:00');
         return view('reportpage.WeekReportChecked')
             ->with([
                 'day_start' => $date_start,

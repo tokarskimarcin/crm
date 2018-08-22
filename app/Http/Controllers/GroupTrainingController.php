@@ -252,14 +252,14 @@ class GroupTrainingController extends Controller
     {
         if($request->ajax())
         {
-            //Przygotowanie daty -3 dni + 3 dni do szkolenia(Zakres)
+            //Przygotowanie daty -7 dni + 7 dni do szkolenia(Zakres)
             $training_date_start = new DateTime($request->date_training);
             $training_date_stop = new DateTime($request->date_training);
 
-            $training_date_start->modify('-3 day');
+            $training_date_start->modify('-7 day');
             $training_date_start = $training_date_start->format('Y-m-d');
 
-            $training_date_stop->modify('+3 day');
+            $training_date_stop->modify('+7 day');
             $training_date_stop = $training_date_stop->format('Y-m-d');
 
             if($request->training_stage == 1)

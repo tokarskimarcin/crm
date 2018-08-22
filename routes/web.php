@@ -1006,3 +1006,8 @@ Route::get('/autoConsultantsLoginsCheckingGet', 'StatisticsController@autoConsul
 Route::get('/autoConsultantsLoginsBlockedGet', 'StatisticsController@autoConsultantsLoginsBlockedGet');
 Route::get('/checkPenatly', 'AutoScriptController@checkPenatly');
 
+
+Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.changeLimits');
+
+
+Route::get('/getAllTask', 'MyUserTestController@getAllTask');

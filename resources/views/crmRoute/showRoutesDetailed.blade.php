@@ -77,6 +77,7 @@
                         <div class="form-group">
                             <label for="departments">Oddział</label>
                             <select id="departments" multiple="multiple" style="width: 100%;">
+                                    <option value="dep_-1">Nieprzydzielone</option>
                                 @foreach($departmentInfo as $item)
                                     <option value="dep_{{$item->id}}">{{$item->name2}} {{$item->name}}</option>
                                 @endforeach
