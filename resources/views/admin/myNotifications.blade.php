@@ -14,17 +14,17 @@
         {{$message_ok}}
     </div>
 @endif
-
+<div class="well">Moje wysłane zgłoszenia</div>
     <div class="table-responsive">
         <table id="datatable" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%">
             <thead>
                 <tr>
-                    <th style="width: 20%">Data:</th>
-                    <th style="width: 40%">Tytuł:</th>
-                    <th style="width: 20%">Stan realizacji</th>
-                    <th style="width: 10%">Szczegóły</th>
-                    <th style="width: 5%">Oceń</th>
-                    <th style="width: 10%">Akcja</th>
+                    <th style="width: 20%;">Data:</th>
+                    <th style="width: 40%;">Tytuł:</th>
+                    <th style="width: 20%;">Stan realizacji</th>
+                    <th style="width: 10%;">Szczegóły</th>
+                    <th style="width: 5%;">Oceń</th>
+                    <th style="width: 10%;">Akcja</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,6 +32,26 @@
             </tbody>
         </table>
     </div>
+<hr>
+<div class="well">Moje przyjęte zgłoszenia</div>
+
+    @if($notifications > 0)
+        <div class="table-responsive">
+            <table id="datatable2" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%">
+                <thead>
+                <tr>
+                    <th style="width: 20%;">Data:</th>
+                    <th style="width: 40%;">Tytuł:</th>
+                    <th style="width: 20%;">Stan realizacji</th>
+                    <th style="width: 10%;">Szczegóły</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    @endif
 
 @endsection
 @section('script')
@@ -128,9 +148,11 @@ table = $('#datatable').DataTable({
                                         'error'
                                     )
                                 }else{
+                                    swal(
                                         'Problem skontaktuj się z admininstratorem.',
                                         'Problem skontaktuj się z admininstratorem.',
                                         'error'
+                                    )
                                 }
                             }
                         });
@@ -138,6 +160,39 @@ table = $('#datatable').DataTable({
                 });
             });
         },
+});
+
+
+
+let table2 = $('#datatable2').DataTable({
+    "autoWidth": false,
+    "processing": true,
+    "serverSide": true,
+    "ajax": {
+        'url': "{{ route('api.datatableMyHandledNotifications') }}",
+        'type': 'POST',
+        'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+    },
+    "language": {
+        "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+    },"columns":[
+        {"data": "created_at"},
+        {"data": "title"},
+        {"data": function (data, type, dataToSet) {
+                var status = data.status;
+                if (status == 1) {
+                    return 'Zgłoszono';
+                } else if (status == 2) {
+                    return 'Przyjęto do realizacji';
+                } else if (status == 3) {
+                    return 'Zakończono';
+                }
+            }
+        },
+        {"data": function (data, type, dataToSet) {
+                return '<a class="btn btn-default" href="view_notification/'+data.id+'" >Szczegóły</a>';
+            },"orderable": false, "searchable": false },
+    ]
 });
 
 </script>
