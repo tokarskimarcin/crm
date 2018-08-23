@@ -3045,6 +3045,7 @@ class CrmRouteController extends Controller
             $departmentAverages->offsetSet('$weekScoresArr', $weekScoresArr);
             //**********
 
+
             $saturdayVariance = 0;
             $saturdayAvg = 0;
             $saturdayStdDev = 0;
