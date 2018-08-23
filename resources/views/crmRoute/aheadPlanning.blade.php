@@ -340,13 +340,14 @@
             /********** GLOBAL VARIABLES ***********/
 
             class SimulationChangeLimitForClient{
-                constructor(arrayOfClinet, dateStart,dateStop,arrayOfLimit,limitForOneHour,saveStatus){
-                    this.arrayOfClinet      = arrayOfClinet;
-                    this.dateStart          = dateStart;
-                    this.dateStop           = dateStop;
-                    this.arrayOfLimit       = arrayOfLimit;
-                    this.limitForOneHour    = limitForOneHour;
-                    this.saveStatus         = saveStatus;
+                constructor(arrayOfClinet, dateStart,dateStop,arrayOfLimit,limitForOneHour,saveStatus,arrayOfIncreaseLimit){
+                    this.arrayOfClinet          = arrayOfClinet;
+                    this.dateStart              = dateStart;
+                    this.dateStop               = dateStop;
+                    this.arrayOfLimit           = arrayOfLimit;
+                    this.limitForOneHour        = limitForOneHour;
+                    this.saveStatus             = saveStatus;
+                    this.arrayOfIncreaseLimit   = arrayOfIncreaseLimit;
                 }
             }
 
@@ -373,7 +374,39 @@
 
             let factorsChanged = false;
             let selectedRowDays = [];
+            //Pass only number
+            $onyNumber = (function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+            $disablePartOfContent = (function() {
+                let selectObject = $(this);
+                selectObject.find('.AllLimitIncrease').attr('disabled','true');
+                let divContent      = selectObject.parent().parent().parent().parent();
+                let inputIncrease   = divContent.find('.limitInputIncrease input');
+                let limitInput      = divContent.find('.limitInput input');
+                let disabled        = false;
+                if(selectObject.val().length <= 1){
+                    disabled        = true;
+                }
+                inputIncrease.each(function (item,value) {
+                    // if(disabled){
+                    //     $(value).prop('disabled',true);
+                    //     $(value).val('');
+                    // }
+                    //
+                    // else
+                        $(value).prop('disabled',false);
+                });
+                limitInput.each(function (item,value) {
+                    //if(disabled)
+                        $(value).prop('disabled',false);
+                    // else{
+                    //     $(value).prop('disabled',true);
+                    //     $(value).val('');
+                    // }
 
+                });
+            });
             let workFreeDaysForDepartments = {};
 
             const warningResult = {
@@ -446,7 +479,6 @@
                 let divChoiceClientLimitSelect = document.createElement('select');
                 divChoiceClientLimitSelect.classList.add('form-control');
                 divChoiceClientLimitSelect.classList.add('selectpicker');
-                divChoiceClientLimitSelect.setAttribute('data-live-search','true');
                 divChoiceClientLimitSelect.setAttribute('data-selected-text-format','count');
                 divChoiceClientLimitSelect.setAttribute('data-width','100%');
                 if(className){
@@ -454,6 +486,8 @@
                 }
                 if(multiSelect){
                     divChoiceClientLimitSelect.setAttribute('multiple','multiple');
+                    divChoiceClientLimitSelect.setAttribute('data-actions-box','true');
+                    divChoiceClientLimitSelect.onchange = $disablePartOfContent;
                 }
                 return divChoiceClientLimitSelect;
             }
@@ -474,13 +508,18 @@
                 divDate.setAttribute('style','width:100%');
                 return divDate;
             }
-            function getInputDate(className,dateValue) {
+            function getInputDate(className,dateValue,type = 'text') {
                 let inputDate = document.createElement('input');
                 inputDate.classList.add('form-control');
                 inputDate.classList.add(className);
                 inputDate.setAttribute('name',className);
-                inputDate.setAttribute('type','text');
-                inputDate.value = dateValue;
+                inputDate.setAttribute('type',type);
+                if(dateValue != "{{date("Y-m-d")}}" && type == 'text'){
+                    inputDate.onkeypress = $onyNumber;
+                    inputDate.onfocusout = $onyNumber;
+                    inputDate.onkeyup = $onyNumber;
+                }
+                    inputDate.value = dateValue;
                 return inputDate;
             }
             function getGlyphiconDate() {
@@ -496,7 +535,7 @@
                 glyphicon.classList.add('glyphicon', 'glyphicon-'+type);
                 return glyphicon
             }
-            var polishDayArray = ["Poniedziałek","Wtorek","Środa","Czwartek","Piątek","Sobota","Niedziela","Suma"];
+            let  polishDayArray = ["Poniedziałek","Wtorek","Środa","Czwartek","Piątek","Sobota","Niedziela","Suma"];
             function TemplateDOMOfNewClientSimulation(placeToAppend) {
                 let mainDiv = document.createElement('div');
                 mainDiv.classList.add('col-md-12');
@@ -756,6 +795,27 @@
                 divLimitForOneEvent.appendChild(limitInput);
                 divLimitPanel.appendChild(divLimitForOneEvent);
 
+
+
+                let divLimitForAllEventIncrease = document.createElement('div');
+                divLimitForAllEventIncrease.classList.add('col-md-4');
+                let divLimitForAllEventLabelIncrease = document.createElement('label');
+                divLimitForAllEventLabelIncrease.textContent = "Zwiększanie/Zmniejszanie limitów o wartość";
+                divLimitForAllEventIncrease.appendChild(divLimitForAllEventLabelIncrease);
+                for( let i =0;i<3;i++){
+                    let limitInput = document.createElement('div');
+                    limitInput.classList.add('input-group','limitInputIncrease');
+                    let span = getSpan('Limit #'+(i+1));
+                    let inputLimit = getInputDate('AllLimitIncrease'+(i+1),'','number');
+                   // inputLimit.setAttribute('disabled',true);
+                    inputLimit.classList.add('AllLimitIncrease');
+                    limitInput.appendChild(span);
+                    limitInput.appendChild(inputLimit);
+                    divLimitForAllEventIncrease.appendChild(limitInput);
+                }
+                divLimitPanel.appendChild(divLimitForAllEventIncrease);
+
+
                 let divLimitConteinerButton = document.createElement('div');
                 divLimitConteinerButton.classList.add('col-md-12');
 
@@ -810,6 +870,7 @@
                 });
                 $(modalToHide).modal('hide');
             }
+
             $('.renderSimulation, .saveSimulation').on('click',function (e) {
                 simulationEditLimitArray     = [];
                 let valide          = true;
@@ -821,6 +882,7 @@
                     let dateStartSimulation     = jObject.find('.dateStartLimit').val();
                     let dateStopSimulation      = jObject.find('.dateStopLimit').val();
                     let arrayOfLimit            = [];
+                    let arrayOfIncreaseLimit    = [];
                     let saveStatus              = false;
                     if(btnType == 'renderSimulation'){
                         saveStatus              = false;
@@ -830,8 +892,11 @@
                     arrayOfLimit.push(jObject.find('.AllLimit1').val());
                     arrayOfLimit.push(jObject.find('.AllLimit2').val());
                     arrayOfLimit.push(jObject.find('.AllLimit3').val());
+                    arrayOfIncreaseLimit.push(jObject.find('.AllLimitIncrease1').val());
+                    arrayOfIncreaseLimit.push(jObject.find('.AllLimitIncrease2').val());
+                    arrayOfIncreaseLimit.push(jObject.find('.AllLimitIncrease3').val());
                     let onlyFirstLimit          = jObject.find('.OnlyFirstLimit').val();
-                    simulationEditLimitArray.push(new SimulationChangeLimitForClient(arrayOfClinet,dateStartSimulation,dateStopSimulation,arrayOfLimit,onlyFirstLimit,saveStatus));
+                    simulationEditLimitArray.push(new SimulationChangeLimitForClient(arrayOfClinet,dateStartSimulation,dateStopSimulation,arrayOfLimit,onlyFirstLimit,saveStatus,arrayOfIncreaseLimit));
                     if(arrayOfClinet.length == 0){
                         valide = false;
                         swal("Wybierz klienta do zmiany limitów")
@@ -929,10 +994,6 @@
                         )
                     }
                 });
-            });
-            //Pass only number
-            $('.AllLimit1, .OnlyFirstLimit, .dayEventCountNumber, .NewClientLimit').on("input propertychange", function (e) {
-                this.value = this.value.replace(/[^0-9]/g, '');
             });
 
             TemplateDOMOfClientSimulationEditLimits('placeToAppendClientLimit');
