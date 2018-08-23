@@ -977,6 +977,7 @@
                             }
                         },
                         success: function (response) {
+                            console.log(response);
                             obj.data.aheadPlaning = response.aheadPlanningData;
                             obj.data.departmentsInvitationsAverages = response.departmentsInvitationsAveragesData;
                             deferred.resolve(obj.data.aheadPlaning);
