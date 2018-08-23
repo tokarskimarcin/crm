@@ -2760,13 +2760,31 @@ class CrmRouteController extends Controller
                                     if($saveStatus)
                                         $cityGroup[0]->save();
                                 }
+                                if($objItem['arrayOfIncreaseLimit'][0] != null ){
+                                    $cityGroup[0]->limits = $cityGroup[0]->limits != null ? $cityGroup[0]->limits  + $objItem['arrayOfIncreaseLimit'][0] :
+                                        $cityGroup[0]->limits;
+                                    if($saveStatus)
+                                        $cityGroup[0]->save();
+                                }
                                 if($objItem['arrayOfLimit'][1] != null ){
                                     $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][1] : $cityGroup[1]->limits;
                                     if($saveStatus)
                                         $cityGroup[1]->save();
                                 }
+                                if($objItem['arrayOfIncreaseLimit'][1] != null ){
+                                    $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $cityGroup[1]->limits + $objItem['arrayOfIncreaseLimit'][1] :
+                                        $cityGroup[1]->limits;
+                                    if($saveStatus)
+                                        $cityGroup[1]->save();
+                                }
                                 if($objItem['arrayOfLimit'][2] != null ){
                                     $cityGroup[2]->limits = $cityGroup[2]->limits != null ? $objItem['arrayOfLimit'][2] : $cityGroup[2]->limits;
+                                    if($saveStatus)
+                                        $cityGroup[2]->save();
+                                }
+                                if($objItem['arrayOfIncreaseLimit'][2] != null ){
+                                    $cityGroup[2]->limits = $cityGroup[2]->limits != null ? $cityGroup[2]->limits + $objItem['arrayOfIncreaseLimit'][2] :
+                                        $cityGroup[2]->limits;
                                     if($saveStatus)
                                         $cityGroup[2]->save();
                                 }
@@ -2778,8 +2796,19 @@ class CrmRouteController extends Controller
                                         if($saveStatus)
                                             $cityGroup[0]->save();
                                     }
+                                    if($objItem['arrayOfIncreaseLimit'][1] != null ){
+                                        $cityGroup[0]->limits =  $cityGroup[0]->limits != null ? $cityGroup[0]->limits + $objItem['arrayOfIncreaseLimit'][1] : $cityGroup[0]->limits;
+                                        if($saveStatus)
+                                            $cityGroup[0]->save();
+                                    }
                                     if($objItem['arrayOfLimit'][2] != null ){
                                         $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $objItem['arrayOfLimit'][2] : $cityGroup[1]->limits;
+                                        if($saveStatus)
+                                            $cityGroup[1]->save();
+                                    }
+                                    if($objItem['arrayOfIncreaseLimit'][2] != null ){
+                                        $cityGroup[1]->limits = $cityGroup[1]->limits != null ? $cityGroup[1]->limits + $objItem['arrayOfIncreaseLimit'][2]  :
+                                            $cityGroup[1]->limits;
                                         if($saveStatus)
                                             $cityGroup[1]->save();
                                     }
@@ -2800,6 +2829,12 @@ class CrmRouteController extends Controller
                             } else {
                                 if($objItem['limitForOneHour'] != null ){
                                     $cityGroup[0]->limits = $cityGroup[0]->limits != null ? $objItem['limitForOneHour'] : $cityGroup[0]->limits;
+                                    if($saveStatus)
+                                        $cityGroup[0]->save();
+                                }
+                                if($objItem['arrayOfIncreaseLimit'][0] != null ){
+                                    $cityGroup[0]->limits = $cityGroup[0]->limits != null ? $cityGroup[0]->limits + $objItem['arrayOfIncreaseLimit'][0] :
+                                        $cityGroup[0]->limits;
                                     if($saveStatus)
                                         $cityGroup[0]->save();
                                 }
