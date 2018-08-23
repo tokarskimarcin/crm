@@ -2942,7 +2942,7 @@ class CrmRouteController extends Controller
         $departmentsInvitationsAverages = $request->departmentsInvitationsAverages;
         if($departmentsInvitationsAverages == null or $request->factors['isChanged'] === 'true'){
             $stopDate = date('Y-m-d');
-            $startDate = date('Y-m-d', strtotime($stopDate. ' - 14 days'));
+            $startDate = date('Y-m-d', strtotime($stopDate. ' - 100 days'));
             $departmentsInvitationsAverages = $this->getDepartmentsInvitationsAverages($startDate,$stopDate,$request->factors, $routeInfoOverall,$departmentInfo);
         }
         $allInfoCollect = collect();
@@ -2956,12 +2956,15 @@ class CrmRouteController extends Controller
         foreach ($departmentInfo as $item) {
             $actualDate = $startDate;
             $weekSum = 0;
+            $weekScoresArr = [];
             $weekDivider = 0;
 
             $saturdaySum = 0;
+            $saturdayScoresArr = [];
             $saturdayDivider = 0;
 
             $sundaySum = 0;
+            $sundayScoresArr = [];
             $sundayDivider = 0;
             while ($actualDate < $stopDate) {
                 $routeInfo = $routeInfoOverall->where('department_info_id' ,'=', $item->id)
@@ -2970,12 +2973,15 @@ class CrmRouteController extends Controller
                 if($routeInfo['sumOfActualSuccess'] != 0){
                     if(date('N',strtotime($actualDate)) <6){
                         $weekSum += $routeInfo['sumOfActualSuccess'];
+                        array_push($weekScoresArr, $routeInfo['sumOfActualSuccess']);
                         $weekDivider++;
                     } else if (date('N', strtotime($actualDate)) == 6) {
                         $saturdaySum += $routeInfo['sumOfActualSuccess'];
+                        array_push($saturdayScoresArr, $routeInfo['sumOfActualSuccess']);
                         $saturdayDivider++;
                     } else if (date('N', strtotime($actualDate)) == 7) {
                         $sundaySum += $routeInfo['sumOfActualSuccess'];
+                        array_push($sundayScoresArr, $routeInfo['sumOfActualSuccess']);
                         $sundayDivider++;
                     }
                 }
@@ -2985,28 +2991,236 @@ class CrmRouteController extends Controller
 
             $departmentAverages = collect();
             $average = 0;
+            $weekVariance = 0;
             if($weekDivider != 0){
                 $average = $weekSum / $weekDivider;
+
+                $sumOfSquaresOfDifferences = 0; // numerator of variance
+                foreach($weekScoresArr as $score) { //this part counts stdDev numerator(licznik)
+                    $sumOfSquaresOfDifferences += pow(($score - $average),2);
+                }
+
+                if($weekDivider >= 2) {
+                    $weekVariance = $sumOfSquaresOfDifferences / ($weekDivider - 1);
+                }
+                else {
+                    $weekVariance = $sumOfSquaresOfDifferences / ($weekDivider);
+                }
+
             }
+//            dd($this->getCzynnikC4($weekDivider));
+            $stdDev = ($weekDivider >= 2 && $weekDivider <= 75) ? sqrt($weekVariance) / $this->getCzynnikC4($weekDivider) : sqrt($weekVariance);  //week standard deviation
+
+            $percentOfAvgWeek = (100 * $stdDev / $average) / 100; // procent średniej jakim jest odchylenie standardowe
+
             $departmentAverages->offsetSet('workingDays',floor($average));
+            $departmentAverages->offsetSet('$stdDev',floor($stdDev));
+
+            if($percentOfAvgWeek < 0.5) {
+                $departmentAverages->offsetSet('workingDaysMin', floor($average - ($stdDev)));
+                $departmentAverages->offsetSet('workingDaysMax', floor($average + ($stdDev)));
+            }
+            else if($percentOfAvgWeek >= 0.5) {
+                $departmentAverages->offsetSet('workingDaysMin', floor($average - (0.8 * $stdDev)));
+                $departmentAverages->offsetSet('workingDaysMax', floor($average + (0.8 * $stdDev)));
+            }
+
+            $departmentAverages->offsetSet('$weekScoresArr', $weekScoresArr);
+
+            $saturdayVariance = 0;
+            $saturdayAvg = 0;
+            $saturdayStdDev = 0;
 
             if($saturdayDivider != 0){
-                $average = $saturdaySum / $saturdayDivider;
+                $saturdayAvg = $saturdaySum / $saturdayDivider;
+
+                $sumOfSquaresOfDifferences = 0; // numerator of variance
+                foreach($saturdayScoresArr as $score) { //this part counts stdDev numerator(licznik)
+                    $sumOfSquaresOfDifferences += pow(($score - $saturdayAvg),2);
+                }
+
+                if($saturdayDivider >= 2) {
+                    $saturdayVariance = $sumOfSquaresOfDifferences / ($saturdayDivider - 1);
+                }
+                else {
+                    $saturdayVariance = $sumOfSquaresOfDifferences / ($saturdayDivider);
+                }
+
+                $saturdayStdDev = ($saturdayVariance >= 2 && $saturdayVariance <= 75) ? sqrt($saturdayVariance) / $this->getCzynnikC4($saturdayDivider) : sqrt($saturdayVariance);  //saturday standard deviation
             }else{
-                $average = $average*$factors['saturday']/100;
+                $saturdayAvg = $average*$factors['saturday']/100;
+
+                $sumOfSquaresOfDifferences = 0; // numerator of variance
+
+                //Estimation of variance with use of saturday factor to each data item.
+                foreach($weekScoresArr as $score) { //this part counts stdDev numerator(licznik)
+                    $sumOfSquaresOfDifferences += pow((($score * ($factors['saturday'] / 100)) - $saturdayAvg),2);
+                }
+
+                if($weekDivider >= 2) {
+                    $saturdayVariance = $sumOfSquaresOfDifferences / ($weekDivider - 1);
+                }
+                else {
+                    $saturdayVariance = $sumOfSquaresOfDifferences / ($weekDivider);
+                }
+
+                $saturdayStdDev = ($weekDivider >= 2 && $weekDivider <= 75) ? sqrt($saturdayVariance) / $this->getCzynnikC4($weekDivider) : sqrt($saturdayVariance);  //saturday standard deviation
             }
-            $departmentAverages->offsetSet('saturday',floor($average));
+
+            $departmentAverages->offsetSet('saturday',floor($saturdayAvg));
+
+            $percentOfAvgSaturday = (100 * $saturdayStdDev / $saturdayAvg) / 100; // procent średniej jakim jest odchylenie standardowe
+
+            if($percentOfAvgSaturday < 0.5) {
+                $departmentAverages->offsetSet('saturdayMin', floor($saturdayAvg - ($saturdayStdDev)));
+                $departmentAverages->offsetSet('saturdayMax', floor($saturdayAvg + ($saturdayStdDev)));
+            }
+            else if($percentOfAvgSaturday >= 0.5) {
+                $departmentAverages->offsetSet('saturdayMin', floor($saturdayAvg - (0.8 * $saturdayStdDev)));
+                $departmentAverages->offsetSet('saturdayMax', floor($saturdayAvg + (0.8 * $saturdayStdDev)));
+            }
+            $departmentAverages->offsetSet('$saturdayScoresArr', $saturdayScoresArr);
+
+            $sundayVariance = 0;
+            $sundayAvg = 0;
+            $sundayStdDev = 0;
 
             if($sundayDivider != 0){
-                $average = $sundaySum / $sundayDivider;
+                $sundayAvg = $sundaySum / $sundayDivider;
+
+                $sumOfSquaresOfDifferences = 0; // numerator of variance
+                foreach($sundayScoresArr as $score) { //this part counts stdDev numerator(licznik)
+                    $sumOfSquaresOfDifferences += pow(($score - $sundayAvg),2);
+                }
+
+                if($sundayDivider >= 2) {
+                    $sundayVariance = $sumOfSquaresOfDifferences / ($sundayDivider - 1);
+                }
+                else {
+                    $sundayVariance = $sumOfSquaresOfDifferences / ($sundayDivider);
+                }
+
+                $sundayStdDev = ($sundayVariance >= 2 && $sundayVariance <= 75) ? sqrt($sundayVariance) / $this->getCzynnikC4($sundayDivider) : sqrt($sundayVariance);  //saturday standard deviation
             }else{
-                $average = $average*$factors['sunday']/100;
+                $sundayAvg = $average*$factors['sunday']/100;
+
+                $sumOfSquaresOfDifferences = 0; // numerator of variance
+
+                //Estimation of variance with use of sunday factor to each data item.
+                foreach($weekScoresArr as $score) { //this part counts stdDev numerator(licznik)
+                    $sumOfSquaresOfDifferences += pow((($score * ($factors['sunday'] / 100)) - $sundayAvg), 2);
+                }
+
+                if($weekDivider >= 2) {
+                    $sundayVariance = $sumOfSquaresOfDifferences / ($weekDivider - 1);
+                }
+                else {
+                    $sundayVariance = $sumOfSquaresOfDifferences / ($weekDivider);
+                }
+
+                $sundayStdDev = ($weekDivider >= 2 && $weekDivider <= 75) ? sqrt($sundayVariance) / $this->getCzynnikC4($weekDivider) : sqrt($sundayVariance);  //saturday standard deviation
             }
-            $departmentAverages->offsetSet('sunday',floor($average));
+
+            $departmentAverages->offsetSet('sunday',floor($sundayAvg));
+
+            $percentOfAvgSunday = (100 * $sundayStdDev / $sundayAvg) / 100; // procent średniej jakim jest odchylenie standardowe
+
+            if($percentOfAvgSunday < 0.5) {
+                $departmentAverages->offsetSet('sundayMin', floor($sundayAvg - ($sundayStdDev)));
+                $departmentAverages->offsetSet('sundayMax', floor($sundayAvg + ($sundayStdDev)));
+            }
+            else if($percentOfAvgSunday >= 0.5) {
+                $departmentAverages->offsetSet('sundayMin', floor($sundayAvg - (0.8 * $sundayStdDev)));
+                $departmentAverages->offsetSet('sundayMax', floor($sundayAvg + (0.8 * $sundayStdDev)));
+            }
+            $departmentAverages->offsetSet('$sundayScoresArr', $sundayScoresArr);
 
             $departmentsInvitationsAveragesInfo->offsetSet($item->name2, $departmentAverages);
         }
         return $departmentsInvitationsAveragesInfo;
+    }
+
+    private function getCzynnikC4($number) {
+        // https://pl.wikisource.org/wiki/Czynnik_c4
+        $arr = [
+            '1' => 0.76000,
+           '2'  =>	0.79788,
+           '3'  =>	0.88623,
+           '4'  =>	0.92132,
+           '5'  =>	0.93999,
+           '6'  =>	0.95153,
+           '7'  =>	0.95937,
+           '8'  =>	0.96503,
+           '9'  =>	0.96931,
+           '10'  =>	0.97266,
+           '11'  =>	0.97535,
+           '12'  =>	0.97756,
+           '13'  =>	0.97941,
+           '14'  =>	0.98097,
+           '15'  =>	0.98232,
+           '16'  =>	0.98348,
+           '17'  =>	0.98451,
+           '18'  =>	0.98541,
+           '19'  =>	0.98621,
+           '20'  =>	0.98693,
+           '21'  =>	0.98758,
+           '22'  =>	0.98817,
+           '23'  => 0.9887,
+            '24'  =>	0.98919,
+           '25'  =>	0.98964,
+           '26'  =>	0.99005,
+           '27'  =>	0.99043,
+           '28'  =>	0.99079,
+           '29'  =>	0.99111,
+           '30'  =>	0.99142,
+           '31'  => 0.9917,
+            '32'  =>	0.99197,
+           '33'  =>	0.99222,
+           '34'  =>	0.99245,
+           '35'  =>	0.99268,
+           '36'  =>	0.99288,
+           '37'  =>	0.99308,
+           '38'  =>	0.99327,
+           '39'  =>	0.99344,
+           '40'  =>	0.99361,
+           '41'  =>	0.99377,
+           '42'  =>	0.99392,
+           '43'  =>	0.99407,
+           '44'  => 0.9942,
+            '45'  =>	0.99433,
+           '46' =>	0.99446,
+           '47' =>	0.99458,
+           '48' => 0.9947,
+            '49' =>	0.99481,
+           '50' =>	0.99491,
+           '51' =>	0.99501,
+           '52' =>	0.99511,
+           '53' => 0.9952,
+            '54' =>	0.99529,
+           '55' =>	0.99538,
+           '56' =>	0.99547,
+           '57' =>	0.99555,
+           '58' =>	0.99562,
+           '59' => 0.9957,
+            '60' =>	0.99577,
+           '61' =>	0.99584,
+           '62' =>	0.99591,
+           '63' =>	0.99598,
+           '64' =>	0.99604,
+           '65' => 0.9961,
+            '66' =>	0.99616,
+           '67' =>	0.99622,
+           '68' =>	0.99628,
+           '69' =>	0.99633,
+           '70' =>	0.99638,
+           '71' =>	0.99644,
+           '72' =>	0.99649,
+           '73' =>	0.99653,
+           '74' =>	0.99658,
+           '75' =>	0.99663
+        ];
+
+        return $arr[$number];
     }
 
     private function getNameOfWeek($date){

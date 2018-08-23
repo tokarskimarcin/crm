@@ -48,7 +48,6 @@ class StatisticsController extends Controller
         return $data;
     }
 
-
 // Mail do raportu godzinnego telemarketing
     public function MailhourReportTelemarketing() {
         $data = $this::hourReportTelemarketing();
