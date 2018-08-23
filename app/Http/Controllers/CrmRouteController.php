@@ -2451,14 +2451,17 @@ class CrmRouteController extends Controller
         }
 
         if($departments[0] != '0') {
-            $campaignsInfo = $campaignsInfo->whereIn('client_route_info.department_info_id', $departments);
-        }
-
-        if(in_array('-1',$departments)){
-            $campaignsInfo->orWhere(function ($query){
-               $query->whereNull('client_route_info.department_info_id');
+            $campaignsInfo->where(function ($query) use ($departments){
+                $query->whereIn('client_route_info.department_info_id', $departments);
+                if(in_array('-1',$departments)){
+                    $query->orWhere(function ($query){
+                        $query->whereNull('client_route_info.department_info_id');
+                    });
+                }
             });
         }
+
+
         if($typ[0] != '0') {
             $campaignsInfo = $campaignsInfo->whereIn('client_route.type', $typ);
         }

@@ -195,8 +195,8 @@ class NotificationController extends Controller
         }
     }
     public function myNotifications() {
-
-        return view('admin.myNotifications');
+        $notifications = Notifications::where('displayed_by', '=', Auth::user()->id)->count();
+        return view('admin.myNotifications')->with('notifications', $notifications);
     }
 
     public function judgeNotificationGet($id){
@@ -291,6 +291,21 @@ class NotificationController extends Controller
             ->leftJoin('users', 'users.id', '=', 'notifications.displayed_by')
             ->where('status','!=',0)
             ->where('user_id', '=', Auth::user()->id)
+            ->get();
+
+        return datatables($data)->make(true);
+    }
+
+    public function datatableMyHandledNotifications(Request $request) {
+        $data = DB::table('notifications')
+            ->select(DB::raw('
+                notifications.*,
+                users.first_name as first_name,
+                users.last_name as last_name
+            '))
+            ->leftJoin('users', 'users.id', '=', 'notifications.displayed_by')
+            ->where('status','!=',0)
+            ->where('displayed_by', '=', Auth::user()->id)
             ->get();
 
         return datatables($data)->make(true);
