@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Department_info;
 use App\HourReport;
 use App\Pbx_report_extension;
+use Illuminate\Support\Facades\Storage;
 use Session;
+use Mail;
 use App\User;
 
 
@@ -114,5 +116,62 @@ class ScreensController extends Controller
         $reportData = HourReport::where('report_date', '=', $today)->get();
         $department_info = Department_info::where('id_dep_type', '=', '2')->get();
         return view('screens.charts')->with('reportData', $reportData)->with('department_info', $department_info);
+    }
+
+    /**
+     * THis method return necesary data for displaying all charts at once
+     */
+    public function allCharts() {
+        $today = date("Y-m-d"); //2000-10-11
+        $reportData = HourReport::where('report_date', '=', $today)->get();
+        $department_info = Department_info::where('id_dep_type', '=', '2')->get();
+        return view('screens.allCharts')->with('reportData', $reportData)->with('department_info', $department_info);
+    }
+
+    /**
+     * Upload charts screenshots
+     */
+    public function uploadScreenshotsAjax(Request $request){
+        $fileName = 'allChartsImage';
+        $chartScreenshotsPath =  $fileName.'_files';
+
+        $file = $request->file($fileName);
+
+        if ($file !== null) {
+            $img = $file->getClientOriginalName();
+
+            // get uploaded file's extension
+            $ext = $this->getExtension($file->getMimeType());
+
+            if(in_array($ext, ['png','jpeg'])){
+                if (!in_array('public/'.$chartScreenshotsPath, Storage::allDirectories())) {
+                    Storage::makeDirectory('public/'.$chartScreenshotsPath);
+                }
+                $file->storeAs('public/'.$chartScreenshotsPath, $fileName.'.'.$ext);
+                return 'success';
+            }else{
+                return 'fail';
+            }
+        }
+        return 'fail';
+    }
+
+    private function getExtension ($mime_type){
+        $extensions = array(
+            'image/jpeg' => 'jpeg',
+            'image/png' => 'png',
+        );
+
+        // Add as many other Mime Types / File Extensions as you like
+
+        return $extensions[$mime_type];
+    }
+
+    public function sendAllChartsMail(){
+        Mail::send('mail/allCharts',['fileURL' => Storage::url("allChartsImage_files/allChartsImage.png")],function ($message){
+            $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+            $message->to('tokarski.verona@gmail.com','Marcin Tokarski')->subject('Statystki oddziałów');
+        });
+        dd('poszlo');
     }
 }

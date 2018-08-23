@@ -2451,14 +2451,17 @@ class CrmRouteController extends Controller
         }
 
         if($departments[0] != '0') {
-            $campaignsInfo = $campaignsInfo->whereIn('client_route_info.department_info_id', $departments);
-        }
-
-        if(in_array('-1',$departments)){
-            $campaignsInfo->orWhere(function ($query){
-               $query->whereNull('client_route_info.department_info_id');
+            $campaignsInfo->where(function ($query) use ($departments){
+                $query->whereIn('client_route_info.department_info_id', $departments);
+                if(in_array('-1',$departments)){
+                    $query->orWhere(function ($query){
+                        $query->whereNull('client_route_info.department_info_id');
+                    });
+                }
             });
         }
+
+
         if($typ[0] != '0') {
             $campaignsInfo = $campaignsInfo->whereIn('client_route.type', $typ);
         }
@@ -2627,12 +2630,22 @@ class CrmRouteController extends Controller
         $departmentInfo = DB::table('department_info')->select(DB::raw('
         department_info.id as id, 
         department_type.name as name, 
-        departments.name as name2
+        departments.name as name2,
+        0 as departmentOrder 
         '))
         ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
         ->join('departments', 'department_info.id_dep', '=', 'departments.id')
         ->where('id_dep_type','=',2)
         ->get();
+        $kosteckiWishList = [6 => 1, 5 => 2, 9 => 3, 3 => 4, 11 => 5, 2 => 6, 16 => 7, 7 => 8, 10 => 9, 14 => 10,8 => 11];
+        foreach($departmentInfo as $item){
+            try{
+                $item->departmentOrder = $kosteckiWishList[$item->id];
+            }catch (\Exception $e){
+                $item->departmentOrder = -1;
+            }
+        };
+        $departmentInfo = $departmentInfo->sortBy('departmentOrder');
 
         $allClients = Clients::where('status','1')->get();
 

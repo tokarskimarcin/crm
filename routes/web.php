@@ -260,8 +260,6 @@ Route::post('/allCitiesInGivenVoivodeAjax', 'CrmRouteController@allCitiesInGiven
 Route::post('/deleteRouteTemplate', 'CrmRouteController@deleteRouteTemplate')->name('api.deleteRouteTemplate');
 Route::post('/removeCampaignComment','CrmRouteController@removeCampaignCommentAjax')->name('api.removeCampaignComment');
 Route::delete('editAssignedRoute/{id}', 'CrmRouteController@deleteGivenRouteAjax')->name('api.deleteGivenRouteAjax');
-Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clientReport');
-Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.changeLimits');
 
 Route::post('/getConfirmHotelInfo','CrmRouteController@getConfirmHotelInfo')->name('api.getConfirmHotelInfo');
 Route::post('/changeConfirmStatus','CrmRouteController@changeConfirmStatus')->name('api.changeConfirmStatus');
@@ -949,6 +947,11 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 //CHARTS
 Route::get('/charts', 'ScreensController@showScreensGet');
+
+Route::get('/allCharts','ScreensController@allCharts');
+Route::post('/uploadScreenshotsAjax','ScreensController@uploadScreenshotsAjax')->name('api.uploadScreenshotsAjax');
+
+Route::get('/sendAllChartsMail','ScreensController@sendAllChartsMail');
 //ENDCHARTS
 
 //SCREENS
