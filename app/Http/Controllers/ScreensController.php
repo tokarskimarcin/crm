@@ -112,7 +112,7 @@ class ScreensController extends Controller
      * THis method return necesary data for displaying charts
      */
     public function showScreensGet() {
-        $today = date("Y-m-d", strtotime('-1 Day')); //2000-10-11
+        $today = date("Y-m-d"); //2000-10-11
         $reportData = HourReport::where('report_date', '=', $today)->get();
         $department_info = Department_info::where('id_dep_type', '=', '2')->get();
         return view('screens.charts')->with('reportData', $reportData)->with('department_info', $department_info);
@@ -122,7 +122,7 @@ class ScreensController extends Controller
      * THis method return necesary data for displaying all charts at once
      */
     public function allCharts() {
-        $today = date("Y-m-d", strtotime('-1 Day')); //2000-10-11
+        $today = date("Y-m-d"); //2000-10-11
         $reportData = HourReport::where('report_date', '=', $today)->get();
         $department_info = Department_info::where('id_dep_type', '=', '2')->get();
         return view('screens.allCharts')->with('reportData', $reportData)->with('department_info', $department_info);
@@ -169,7 +169,9 @@ class ScreensController extends Controller
 
     public function sendAllChartsMail(){
         Mail::send('mail/allCharts',['fileURL' => Storage::url("allChartsImage_files/allChartsImage.png")],function ($message){
-            $message->to('tokarski.verona@gmail.com','Marcin Tokarski')->subject('Statystki oddziałów');});
+            $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+            $message->to('tokarski.verona@gmail.com','Marcin Tokarski')->subject('Statystki oddziałów');
+        });
         dd('poszlo');
     }
 }
