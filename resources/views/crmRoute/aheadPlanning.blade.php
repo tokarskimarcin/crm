@@ -152,6 +152,16 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="simulationTypes"  style="margin-top:1em; display:none">
+                                    <div class="col-md-12">
+                                        <label for="simulationType">Rodzaj symulacji</label>
+                                        <select id="simulationType" class="form-control">
+                                            <option value="1">Najbardziej prawdopodobna</option>
+                                            <option value="2">W najgorszym przypadku</option>
+                                            <option value="3">W najlepszym przypadku</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="row factorsSection" style="margin-top:1em; display:none">
                                     <div class="col-md-6">
                                         <label>Mnożnik sobót <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right"
@@ -1130,6 +1140,14 @@
                 //clear selected days
                 selectedRowDays = [];
                 colorSelectedRowDays();
+                let typeSelect = $('#simulationType');
+                if($(this).val() == 0) {
+                    typeSelect.prop('disabled', false);
+                }
+                else {
+                    typeSelect.val(1);
+                    typeSelect.prop('disabled', true);
+                }
 
                 if($('#removeSimulationButton').is(':visible'))
                     $('#removeSimulationButton').click();
@@ -1365,14 +1383,23 @@
             /*  ---------------------- creating available simulations ---------------------- */
             let simulations = [];
 
+            //This function returns type of simulation
+            function getSelectedType() {
+                let simulationTypeSelect = document.querySelector('#simulationType');
+                console.log(simulationTypeSelect);
+                return simulationTypeSelect.options[simulationTypeSelect.selectedIndex].value;
+            }
+
             simulations.push(Simulation(
                 'Przewidywanie wyprzedzenia na wybrany dzień',
                 1, // available days to select
-                ['factorsSection'], //sections to show
+                ['factorsSection', 'simulationTypes'], //sections to show
                 true, // flag that identify is ahead planning data after simulation are changed
                 /* ---------------- simulation function ----------------------- */
                 function (thisObj){
+                    console.log(thisObj);
                     let selectedDay = getSelectedDay(selectedRowDays[0]);
+                    let selectedType = getSelectedType();
                     let daysBetweenSelectedAndActualDay = Math.abs(Math.round(moment.duration(moment(new Date(selectedDay)).diff(moment(new Date(today)))).asDays()));
                     let workingHoursLeft = Math.abs(Math.round(moment.duration((moment().diff(moment().hour(16).minute(0)))).asHours()));
                     let simulatedData = null;
@@ -1418,18 +1445,61 @@
                         //counting simulated result for every department
                         $.each(departmentInfo,function (index, department) {
                             department.simulatedResult = 0;
-                            department.simulatedResult += department.multiplier.workingDays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays;
-                            department.simulatedResult += department.multiplier.saturdays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturday;
-                            department.simulatedResult += department.multiplier.sundays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sunday;
+
+                            if(selectedType == 1) {
+                                department.simulatedResult += department.multiplier.workingDays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays;
+                                department.simulatedResult += department.multiplier.saturdays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturday;
+                                department.simulatedResult += department.multiplier.sundays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sunday;
+                            }
+                            else if(selectedType == 2) {
+                                department.simulatedResult += department.multiplier.workingDays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMin;
+                                department.simulatedResult += department.multiplier.saturdays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMin;
+                                department.simulatedResult += department.multiplier.sundays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMin;
+                            }
+                            else if(selectedType == 3) {
+                                department.simulatedResult += department.multiplier.workingDays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMax;
+                                department.simulatedResult += department.multiplier.saturdays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMax;
+                                department.simulatedResult += department.multiplier.sundays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMax;
+                            }
+
                             let thisDayOfWeek = moment().format('E');
                             let thisDayMultiplier = workingHoursLeft/8;
                             let thisDaySimulatedResult = 0;
+
+                            // console.log('aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays', aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays);
+
                             if(thisDayOfWeek < 6){
-                                thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays*thisDayMultiplier;
+                                if(selectedType == 1) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays*thisDayMultiplier;
+                                }
+                                else if(selectedType == 2) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMin*thisDayMultiplier;
+                                }
+                                else if(selectedType == 3) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMax*thisDayMultiplier;
+                                }
                             }else if(thisDayOfWeek == 6){
-                                thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturday*thisDayMultiplier;
+                                if(selectedType == 1) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturday*thisDayMultiplier;
+                                }
+                                else if(selectedType == 2) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMin*thisDayMultiplier;
+                                }
+                                else if(selectedType == 3) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMax*thisDayMultiplier;
+                                }
+                                // thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturday*thisDayMultiplier;
                             }else{
-                                thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sunday*thisDayMultiplier;
+                                if(selectedType == 1) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sunday*thisDayMultiplier;
+                                }
+                                else if(selectedType == 2) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMin*thisDayMultiplier;
+                                }
+                                else if(selectedType == 3) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMax*thisDayMultiplier;
+                                }
+                                // thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sunday*thisDayMultiplier;
                             }
                             department.simulatedResult += Math.round(thisDaySimulatedResult);
                             department.simulatedResult = Math.round(department.simulatedResult);
