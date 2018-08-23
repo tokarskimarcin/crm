@@ -2942,7 +2942,7 @@ class CrmRouteController extends Controller
         $departmentsInvitationsAverages = $request->departmentsInvitationsAverages;
         if($departmentsInvitationsAverages == null or $request->factors['isChanged'] === 'true'){
             $stopDate = date('Y-m-d');
-            $startDate = date('Y-m-d', strtotime($stopDate. ' - 100 days'));
+            $startDate = date('Y-m-d', strtotime($stopDate. ' - 30 days'));
             $departmentsInvitationsAverages = $this->getDepartmentsInvitationsAverages($startDate,$stopDate,$request->factors, $routeInfoOverall,$departmentInfo);
         }
         $allInfoCollect = collect();
@@ -2953,6 +2953,7 @@ class CrmRouteController extends Controller
 
     private function getDepartmentsInvitationsAverages($startDate, $stopDate, $factors, $routeInfoOverall, $departmentInfo){
         $departmentsInvitationsAveragesInfo = collect();
+//        dd($departmentInfo);
         foreach ($departmentInfo as $item) {
             $actualDate = $startDate;
             $weekSum = 0;
@@ -2966,10 +2967,12 @@ class CrmRouteController extends Controller
             $sundaySum = 0;
             $sundayScoresArr = [];
             $sundayDivider = 0;
+
             while ($actualDate < $stopDate) {
                 $routeInfo = $routeInfoOverall->where('department_info_id' ,'=', $item->id)
                     ->where('date', '=', $actualDate)
                     ->first();
+
                 if($routeInfo['sumOfActualSuccess'] != 0){
                     if(date('N',strtotime($actualDate)) <6){
                         $weekSum += $routeInfo['sumOfActualSuccess'];
@@ -2989,6 +2992,7 @@ class CrmRouteController extends Controller
                 $actualDate = date('Y-m-d', strtotime($actualDate. ' + 1 days'));
             }
 
+            //Zakładamy, że pozyskane dane mają rozkład Normalny(średnia, odchylenie). Brak sprawdzenia testem parametrycznym.
             $departmentAverages = collect();
             $average = 0;
             $weekVariance = 0;
@@ -3001,14 +3005,14 @@ class CrmRouteController extends Controller
                 }
 
                 if($weekDivider >= 2) {
-                    $weekVariance = $sumOfSquaresOfDifferences / ($weekDivider - 1);
+                    $weekVariance = $sumOfSquaresOfDifferences / ($weekDivider - 1); //wariancja dla próby
                 }
                 else {
-                    $weekVariance = $sumOfSquaresOfDifferences / ($weekDivider);
+                    $weekVariance = $sumOfSquaresOfDifferences / ($weekDivider); //wariancja dla populacji (wymuszone działanie)
                 }
 
             }
-//            dd($this->getCzynnikC4($weekDivider));
+
             $stdDev = ($weekDivider >= 2 && $weekDivider <= 75) ? sqrt($weekVariance) / $this->getCzynnikC4($weekDivider) : sqrt($weekVariance);  //week standard deviation
 
             $percentOfAvgWeek = (100 * $stdDev / $average) / 100; // procent średniej jakim jest odchylenie standardowe
@@ -3026,6 +3030,7 @@ class CrmRouteController extends Controller
             }
 
             $departmentAverages->offsetSet('$weekScoresArr', $weekScoresArr);
+            //**********
 
             $saturdayVariance = 0;
             $saturdayAvg = 0;
@@ -3081,6 +3086,7 @@ class CrmRouteController extends Controller
             }
             $departmentAverages->offsetSet('$saturdayScoresArr', $saturdayScoresArr);
 
+            //**********
             $sundayVariance = 0;
             $sundayAvg = 0;
             $sundayStdDev = 0;
