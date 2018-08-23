@@ -947,6 +947,11 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 //CHARTS
 Route::get('/charts', 'ScreensController@showScreensGet');
+
+Route::get('/allCharts','ScreensController@allCharts');
+Route::post('/uploadScreenshotsAjax','ScreensController@uploadScreenshotsAjax')->name('api.uploadScreenshotsAjax');
+
+Route::get('/sendAllChartsMail','ScreensController@sendAllChartsMail');
 //ENDCHARTS
 
 //SCREENS
@@ -1004,3 +1009,4 @@ Route::get('/checkPenatly', 'AutoScriptController@checkPenatly');
 Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clientReport');
 
 Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.changeLimits');
+
