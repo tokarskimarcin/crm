@@ -20,7 +20,7 @@
                     <div class="alert alert-success">
                         <h4>
                             <p>W toku - coachingi, w których konsultant nie przepracował <strong>18 RBH.</strong> </p>
-                            <p>Nierozliczone - coachingi, po przepracowaniu 18RHB od daty założenia coachingu, <strong>oczekujące na akceptacje</strong> przez trenera. </p>
+                            <p>Nierozliczone - coachingi, po przepracowaniu 14RHB od daty założenia coachingu, <strong>oczekujące na akceptacje</strong> przez trenera. </p>
                             <p>Rozliczone  - coachingi <strong>zakończone</strong>, zaakceptowane przez trenera.<p>
                             <p>(Cel osiągnięty - <strong>'osiągnięta średnia' większa bądź równa 'założonemu celowi').</strong></p>
                             <p>(Cel nieosiągnięty - <strong>'osiągnięta średnia' mniejsza od ''założonego  celu').</strong></p>
