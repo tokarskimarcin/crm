@@ -630,6 +630,7 @@
                autoWidth: true,
                processing: true,
                serverSide: true,
+               ordering: false,
                scrollY: datatableHeight,
                "drawCallback": function( settings ) {
 
@@ -722,7 +723,7 @@
                        else {
                            return data.cityName;
                        }
-                       },"name":"cityName","orderable" : false
+                       },"name":"cityName"
                    },
                    {"data": function (data, type, dataToSet) {
                            if(data.baseDivision != null) {

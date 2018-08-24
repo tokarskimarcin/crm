@@ -237,7 +237,7 @@
         $(document).ready(function(){
 
 
-            let hoursAfterWhichItBecomesUnsettled = 18;
+            let hoursAfterWhichItBecomesUnsettled = 14;
             changeHoursAfterWhichItBecomseUnsettledDependsOnSelectedDep();
 
 
@@ -250,7 +250,7 @@
                     if({{$dep->id_dep_type}} == 1){
                         hoursAfterWhichItBecomesUnsettled = 14;
                     }else{
-                        hoursAfterWhichItBecomesUnsettled = 18;
+                        hoursAfterWhichItBecomesUnsettled = 14;
                     }
                 }
                 @endforeach
