@@ -2465,7 +2465,12 @@ class CrmRouteController extends Controller
         if($typ[0] != '0') {
             $campaignsInfo = $campaignsInfo->whereIn('client_route.type', $typ);
         }
-        return datatables($campaignsInfo->get())->make(true);
+        return datatables($campaignsInfo
+            ->orderBy('date')
+            ->orderBy('clientName')
+            ->orderBy('cityName')
+            ->orderBy('hour')
+            ->get())->make(true);
     }
 
     public function removeCampaignCommentAjax(Request $request){

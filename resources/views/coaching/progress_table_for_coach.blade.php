@@ -403,7 +403,7 @@
             <script>
 
                 var user_department_type = "{{$coachingManagerList['user_department_type']}}";
-                let hoursAfterWhichItBecomesUnsettled = 18;
+                let hoursAfterWhichItBecomesUnsettled = 14;
 
                 @if($userDepartmentInfo->id_dep_type == 1)
                     hoursAfterWhichItBecomesUnsettled = 14;
