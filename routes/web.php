@@ -692,6 +692,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pbxReportDetailed', 'StatisticsController@pbxReportDetailedGet');
 
     Route::get('/pageHourReportTimeOnRecord', 'StatisticsController@pageHourReportTimeOnRecord');
+    Route::get('/statisticsCharts', 'StatisticsController@statisticsChartsGet');
 
     Route::get('/pageMailMonthReportDepartments', 'StatisticsController@pageMailMonthReportDepartments');
 
