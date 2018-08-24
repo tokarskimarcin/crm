@@ -1012,5 +1012,7 @@ Route::get('/checkPenatly', 'AutoScriptController@checkPenatly');
 
 Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.changeLimits');
 
-
 Route::get('/getAllTask', 'MyUserTestController@getAllTask');
+
+Route::get('/engraverForConfirming', 'CrmRouteController@engraverForConfirmingGet');
+Route::get('/engraverForConfirmingAjax', 'CrmRouteController@engraverForConfirmingDatatable')->name('api.engraverForConfirmingDatatable');

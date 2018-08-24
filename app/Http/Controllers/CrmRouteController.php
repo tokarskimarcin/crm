@@ -4202,4 +4202,92 @@ class CrmRouteController extends Controller
         }
     }
 
+    public function engraverForConfirmingGet() {
+        $year = date('Y',strtotime("this year"));
+
+        $weeksString = date('W', strtotime("this week"));
+        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
+
+        $departmentInfo = DB::table('department_info')->select(DB::raw('
+        department_info.id as id, 
+        department_type.name as name, 
+        departments.name as name2
+        '))
+            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->get();
+
+        return view('crmRoute.engraverForConfirming')
+            ->with('lastWeek', $numberOfLastYearsWeek)
+            ->with('currentWeek', $weeksString)
+            ->with('currentYear', $year)
+            ->with('departmentInfo', $departmentInfo);
+    }
+
+    public function engraverForConfirmingDatatable(Request $request) {
+        $years = $request->years;
+        $weeks = $request->weeks;
+        $departments = $request->departments;
+        $typ = $request->typ;
+
+        $campaignsInfo = ClientRouteInfo::select(DB::raw('
+        client_route_info.id as id,
+        client_route_info.date as date,
+        client_route_info.hour as hour,
+        client_route_info.pbx_campaign_id as nrPBX,
+        client_route_info.baseDivision as baseDivision,
+        client_route_info.verification as verification,
+        client_route_info.weekOfYear as weekOfYear,
+        client_route_info.limits as limits,
+        client_route_info.actual_success as actual_success,
+        YEAR(client_route_info.date) as year,       
+        ( case when client_route_info.actual_success is null then 0 - client_route_info.limits
+         when 
+          client_route_info.actual_success - client_route_info.limits > 0 then 0
+           else
+           client_route_info.actual_success - client_route_info.limits
+           end) as loseSuccess,       
+        client.name as clientName,
+        departments.name as departmentName,
+        department_type.name as departmentName2,
+        client_route_info.comment as comment,
+        city.name as cityName,
+        0 as totalScore,
+        client_route.type as typ
+        '))
+            ->join('client_route','client_route.id','client_route_info.client_route_id')
+            ->leftjoin('client','client.id','client_route.client_id')
+            ->leftjoin('city','city.id','client_route_info.city_id')
+            ->leftjoin('department_info','department_info.id','client_route_info.department_info_id')
+            ->leftjoin('departments','departments.id','department_info.id_dep')
+            ->leftjoin('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->where('client_route_info.status', '=', 1) //now it's important
+            ->whereIn('client_route.status',[1,2]);
+
+        if($years[0] != '0') {
+            $campaignsInfo = $campaignsInfo->whereIn(DB::raw('YEAR(client_route_info.date)'), $years);
+        }
+
+        if($weeks[0] != '0') {
+            $campaignsInfo = $campaignsInfo->whereIn('weekOfYear', $weeks);
+        }
+
+        if($departments[0] != '0') {
+            $campaignsInfo->where(function ($query) use ($departments){
+                $query->whereIn('client_route_info.department_info_id', $departments);
+                if(in_array('-1',$departments)){
+                    $query->orWhere(function ($query){
+                        $query->whereNull('client_route_info.department_info_id');
+                    });
+                }
+            });
+        }
+
+
+        if($typ[0] != '0') {
+            $campaignsInfo = $campaignsInfo->whereIn('client_route.type', $typ);
+        }
+        return datatables($campaignsInfo->get())->make(true);
+    }
+
 }

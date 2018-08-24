@@ -1,0 +1,994 @@
+{{--/*--}}
+{{--*@category: CRM,--}}
+{{--*@info: This view shows user detailed info about show hours with possibility of edition,--}}
+{{--*@controller: CrmRouteController,--}}
+{{--*@methods: showRoutesDetailedUpdateAjax, campaignsInfo, showRoutesDetailedGet--}}
+{{--*/--}}
+
+@extends('layouts.main')
+@section('style')
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/rowgroup/1.0.3/css/rowGroup.dataTables.min.css" rel="stylesheet" />
+    {{--<link rel="stylesheet" href="{{asset('/css/fixedHeader.dataTables.min.css')}}">
+--}}
+@endsection
+@section('content')
+
+    <style>
+        textarea.baseDivision {
+            resize: none;
+        }
+
+        .colorRow {
+            /*background-color: #565fff !important;*/
+            animation-name: example;
+            animation-duration: 1s;
+            animation-fill-mode: forwards;
+        }
+
+        .page-info {
+            font-size: 1.3em;
+        }
+
+        @keyframes example {
+            from {background-color: white;}
+            to {background-color: #565fff ;}
+        }
+    </style>
+
+{{--Header page --}}
+
+    <div class="col-md-12">
+        <div class="page-header">
+            <div class="alert gray-nav "> Grafik dla potwierdzeń
+        </div>
+    </div>
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Szczegółowe informacje o grafiku
+            </div>
+            <div class="panel-body">
+                <div class="alert alert-info page-info">
+                    Legenda..
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="year">Rok</label>
+                            <select id="year" multiple="multiple" style="width: 100%;">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="weeks">Tygodnie</label>
+                            <select id="weeks" multiple="multiple" style="width: 100%;">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="departments">Oddział</label>
+                            <select id="departments" multiple="multiple" style="width: 100%;">
+                                    <option value="dep_-1">Nieprzydzielone</option>
+                                @foreach($departmentInfo as $item)
+                                    <option value="dep_{{$item->id}}">{{$item->name2}} {{$item->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="typ">Typ</label>
+                            <select id="typ" multiple="multiple" style="width: 100%;">
+                                <option value="2">Wysyłka</option>
+                                <option value="1">Badania</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 buttonSection" style="min-height: 3.5em;">
+                        <button class="btn btn-info" data-toggle="modal" data-target="#editModal" style="margin-bottom: 1em;  width: 100%;" id="editOneRecord" disabled="true">
+                            <span class='glyphicon glyphicon-edit'></span> Edytuj rekordy</button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-default" id="clearButton" style="width:100%;">
+                            <span class='glyphicon glyphicon-unchecked'></span> Wyczyść zaznaczenia</button>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <table id="datatable" class="thead-inverse table table-striped table-bordered" style="max-width:100%;">
+                        <thead>
+                        <tr>
+                            <th>Tydzien</th>
+                            <th>Data</th>
+                            <th>Miasto</th>
+                            <th>Projekt</th>
+                            <th>Godzina</th>
+                            <th>Oddział</th>
+                            <th>Potw.</th>
+                            <th>Limit</th>
+                            <th>Zgody</th>
+                            <th>Frekwencja</th>
+                            <th>Pary</th>
+                            <th>Data potw.</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+
+                <div class="row">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Modal -->
+<div id="editModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Edytuj</h4>
+            </div>
+            <div class="modal-body edit-modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij okno</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@endsection
+
+@section('script')
+        <script src="https://cdn.datatables.net/rowgroup/1.0.3/js/dataTables.rowGroup.min.js"></script>
+        <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+        {{--<script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>--}}
+    <script>
+       document.addEventListener('DOMContentLoaded', function() {
+           /********** GLOBAL VARIABLES ***********/
+           let selectedYears = ["0"]; //this array collect selected by user years
+           let selectedWeeks = ["0"]; //this array collect selected by user weeks
+           let selectedDepartments = ["0"]; //this array collect selected by user departments
+           let clientRouteInfoIdArr = []; //array of client_route_info ids
+           let selectedTypes = ['0']; //array of selected by user types
+           let arrayOfTableRows = []; //array of modal table rows
+           let datatableHeight = '75vh'; //this variable defines height of table
+           const clearButton = document.querySelector('#clearButton');
+           const editButton = document.querySelector('#editOneRecord');
+           /*******END OF GLOBAL VARIABLES*********/
+
+           $('#menu-toggle').change(()=>{
+               table.columns.adjust().draw();
+           });
+
+
+           /**
+            * This function shows notification.
+            */
+           function notify(htmltext$string, type$string = 'info', delay$miliseconds$number = 5000) {
+               $.notify({
+                   // options
+                   message: htmltext$string
+               },{
+                   // settings
+                   type: type$string,
+                   delay: delay$miliseconds$number,
+                   animate: {
+                       enter: 'animated fadeInRight',
+                       exit: 'animated fadeOutRight'
+                   }
+               });
+           }
+
+           /**
+            * This function color selected row and add id value to array.
+            */
+           function colorRowAndAddIdToArray(id, row) {
+               let flag = false;
+               let iterator = 0; //in this variable we will store position of id in array, that has been found.
+               clientRouteInfoIdArr.forEach(stringId => {
+                   if (id === stringId) {
+                       flag = true; //true - this row is already checked
+                   }
+                   if (!flag) {
+                       iterator++;
+                   }
+               });
+
+               if (flag) {
+                   clientRouteInfoIdArr.splice(iterator, 1);
+                   row.removeClass('colorRow');
+
+                   //this part removes object with given id form arrayOfTableRows
+                   iterator = 0;
+                   arrayOfTableRows.forEach(clientId => {
+                       if(id == clientId.id) {
+                           arrayOfTableRows.splice(iterator, 1);
+                       }
+                       iterator++;
+                   });
+
+               }
+               else {
+                   clientRouteInfoIdArr.push(id);
+                   row.addClass('colorRow');
+               }
+           }
+
+           /**
+            * This function append modify button with proper name and remove it if necessary
+            */
+           function showModifyButton() {
+               if (clientRouteInfoIdArr.length >0) {
+                   editButton.disabled = false;
+                   addModalBodyContext();
+               }
+               else {
+                   editButton.disabled = true;
+               }
+           }
+
+           /**********************************************************/
+           /*****************MODAL FUNCTIONS**************************/
+           /**********************************************************/
+
+           /**
+            * This function fill modal body and attach event listener to submit button.
+            */
+           function addModalBodyContext() {
+               let modalBody = document.querySelector('.edit-modal-body');
+               modalBody.innerHTML = ''; //clear modal body
+
+               appendModalAlert(modalBody);
+               createModalTable(modalBody); //table part of modal
+               appendNrPBXInput(modalBody);
+               appendBaseDivisionInput(modalBody);
+               appendVerificationSelect(modalBody);
+               // appendInvitationInput(modalBody);
+               appendLiveInvitationsInput(modalBody);
+               appendLimitInput(modalBody);
+               appendDepartmentSelect(modalBody);
+               appendCommentInput(modalBody);
+
+               let submitButton = document.createElement('button');
+               submitButton.id = 'submitEdition';
+               submitButton.classList.add('btn', 'btn-success');
+               submitButton.style.marginTop = '1em';
+               submitButton.style.width = "100%";
+               $(submitButton).append($("<span class='glyphicon glyphicon-save'></span>"));
+               $(submitButton).append(" Zapisz");
+
+               modalBody.appendChild(submitButton);
+
+               /*Event Listener Part*/
+               submitButton.addEventListener('click', function() {
+                   const nrPBXInput = document.querySelector('#changeNrPBX');
+                   const baseDivisionInput = document.querySelector('#changeBaseDivision');
+                   const limitInput = document.querySelector('#changeLimits');
+                   const commentInput = document.querySelector('#changeComments');
+                   const verificationInput = document.querySelector('#changeVerification');
+                   // const invitationInput = document.querySelector('#invitations');
+                   const departmentSelect = document.querySelector('#modalDepartment');
+                   const liveInput = document.querySelector('#liveInvitation');
+
+                   const nrPBXValue = nrPBXInput.value;
+                   const baseDivisionValue = baseDivisionInput.value;
+                   const limitValue = limitInput.value;
+                   const commentValue = commentInput.value;
+                   const verificationValue = verificationInput.options[verificationInput.selectedIndex].value;
+                   // const invitationValue = invitationInput.value;
+                   const departmentValue = departmentSelect.options[departmentSelect.selectedIndex].value;
+                   const liveInvitationValue = liveInput.value;
+
+                   const url = `{{route('api.updateClientRouteInfoRecords')}}`;
+                   const header = new Headers();
+                   header.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+                   const data = new FormData();
+                   const JSONClientRouteInfoIdArr = JSON.stringify(clientRouteInfoIdArr);
+                   data.append('ids', JSONClientRouteInfoIdArr);
+
+                   if(nrPBXValue != ''){
+                       data.append('nrPBX', nrPBXValue);
+                   }
+                   if(baseDivisionValue != ''){
+                       data.append('baseDivision', baseDivisionValue);
+                   }
+                   if(limitValue != '') {
+                       data.append('limit', limitValue);
+                   }
+                   if(commentValue != '') {
+                       data.append('comment', commentValue);
+                   }
+                   if(verificationValue != -1) {
+                       data.append('verification', verificationValue);
+                   }
+                   // if(invitationValue != '') {
+                   //     data.append('invitation', invitationValue);
+                   // }
+                   if(departmentValue != '0') {
+                       data.append('department', departmentValue);
+                   }
+                   if(liveInvitationValue > 0) {
+                       data.append('liveInvitation', liveInvitationValue);
+                   }
+
+                   fetch(url, {
+                       method: "POST",
+                       headers: header,
+                       body: data,
+                       credentials: "same-origin"
+                   })
+                       .then(response => response.text())
+                       .then(response => {
+                           notify("Rekordy zostały zmienione!", "info");
+                           table.ajax.reload();
+                       })
+                       .catch(error => console.error("Błąd :", error))
+
+                   $('#editModal').modal('toggle');
+               });
+           }
+
+           /**
+            * This function create one row of modal table and place it in rows array.
+            */
+           function createModalTableRow() {
+               clientRouteInfoIdArr.forEach(item => {
+                   let addFlag = true;
+                   let idItem = item;
+                   arrayOfTableRows.forEach(clientId => {
+                       if(item == clientId.id) {
+                           addFlag = false;
+                       }
+                   });
+
+                   if(addFlag == true) {
+                       let givenRow = document.querySelector('[data-id="' + idItem + '"]');
+                       let givenRowData = givenRow.cells[1].textContent;
+                       let givenRowKampania = givenRow.cells[3].textContent;
+                       let givenRowProjekt = givenRow.cells[9].textContent;
+                       let tr = document.createElement('tr');
+                       let td1 = document.createElement('td');
+                       td1.textContent = givenRowData;
+                       tr.appendChild(td1);
+                       let td2 = document.createElement('td');
+                       td2.textContent = givenRowKampania;
+                       tr.appendChild(td2);
+                       let td3 = document.createElement('td');
+                       td3.textContent = givenRowProjekt;
+                       tr.appendChild(td3);
+
+                       let rowObject = {
+                           id: idItem,
+                           row: tr
+                       };
+
+                       arrayOfTableRows.push(rowObject);
+                   }
+               });
+           }
+
+           /**
+            * This function create on-fly table with basic info about selected rows by user.
+            */
+           function createModalTable(placeToAppend) {
+               createModalTableRow();
+
+               let infoTable = document.createElement('table');
+               infoTable.classList.add('table', 'table-stripped');
+               let theadElement = document.createElement('thead');
+               let tbodyElement = document.createElement('tbody');
+               let tr1 = document.createElement('tr');
+               let th1 = document.createElement('th');
+               let th2 = document.createElement('th');
+               let th3 = document.createElement('th');
+
+               th1.textContent = "Data";
+               tr1.appendChild(th1);
+
+               th2.textContent = "Kampania";
+               tr1.appendChild(th2);
+
+               th3.textContent = "Projekt";
+               tr1.appendChild(th3);
+
+               theadElement.appendChild(tr1);
+
+               infoTable.appendChild(theadElement);
+               clientRouteInfoIdArr.forEach(item => {
+                   arrayOfTableRows.forEach(tableRow => {
+                       if(item == tableRow.id){
+                           tbodyElement.appendChild(tableRow.row);
+                       }
+                   })
+
+               });
+
+               infoTable.appendChild(tbodyElement);
+               placeToAppend.appendChild(infoTable);
+           }
+
+           /**
+            * This function append to modal Live Invitation input
+            */
+           function appendLiveInvitationsInput(placeToAppend) {
+               let label = document.createElement('label');
+               label.setAttribute('for', 'liveInvitation');
+               label.textContent = 'Zaproszenia Live';
+               placeToAppend.appendChild(label);
+
+               let liveInput = document.createElement('input');
+               liveInput.id = 'liveInvitation';
+               liveInput.setAttribute('type', 'text');
+               //liveInput.setAttribute('step', '1');
+               //liveInput.setAttribute('min', '0');
+               liveInput.setAttribute('placeholder', 'Aktualna liczba wydzwonionych zaproszeń np: 20');
+               liveInput.classList.add('form-control');
+               $(liveInput).on('input',function (e) {
+                   if(!$.isNumeric($(e.target).val())){
+                       $(e.target).val('');
+                   }else if($(e.target).val()<0){
+                       $(e.target).val(0);
+                   }
+               });
+               placeToAppend.appendChild(liveInput);
+           }
+
+           /**
+            * This function append to modal verification input
+            */
+           function appendVerificationSelect(placeToAppend) {
+               let label3 = document.createElement('label');
+               label3.setAttribute('for', 'changeVerification');
+               label3.textContent = "Sprawdzenie";
+               placeToAppend.appendChild(label3);
+
+               let verificationSelect = document.createElement('select');
+               verificationSelect.classList.add('form-control');
+               verificationSelect.id = 'changeVerification';
+
+               let option1 = document.createElement('option');
+               option1.value = '-1';
+               option1.textContent = "Wybierz";
+
+               let option2 = document.createElement('option');
+               option2.value = '0';
+               option2.textContent = "Nie";
+
+               let option3 = document.createElement('option');
+               option3.value = '1';
+               option3.textContent = "Tak";
+               verificationSelect.appendChild(option1);
+               verificationSelect.appendChild(option2);
+               verificationSelect.appendChild(option3);
+               placeToAppend.appendChild(verificationSelect);
+           }
+           /**
+            * This function append to modal nr pbx input
+            */
+           function appendNrPBXInput(placeToAppend){
+               let label = document.createElement('label');
+               label.setAttribute('for', 'changeNrPBX');
+               label.textContent = 'Numer kampanii (PBX)';
+               placeToAppend.appendChild(label);
+
+               let NrPBXInput = document.createElement('input');
+               NrPBXInput.id = 'changeNrPBX';
+               NrPBXInput.setAttribute('type', 'text');
+               //NrPBXInput.setAttribute('step', '1');
+               //NrPBXInput.setAttribute('min', '0');
+               NrPBXInput.setAttribute('placeholder', 'Numer kampanii z PBX');
+               NrPBXInput.classList.add('form-control');
+               $(NrPBXInput).on('input',function (e) {
+                   if(!$.isNumeric($(e.target).val())){
+                       $(e.target).val('');
+                   }else if($(e.target).val()<0){
+                       $(e.target).val(0);
+                   }
+               });
+               placeToAppend.appendChild(NrPBXInput);
+           }
+           /**
+            * This function append to modal division base input
+            */
+           function appendBaseDivisionInput(placeToAppend){
+               let label = document.createElement('label');
+               label.setAttribute('for', 'changeBaseDivision');
+               label.textContent = 'Podział bazy';
+               placeToAppend.appendChild(label);
+
+               let baseDivisionInput = document.createElement('input');
+               baseDivisionInput.id = 'changeBaseDivision';
+               baseDivisionInput.setAttribute('type', 'text');
+               baseDivisionInput.classList.add('form-control');
+               placeToAppend.appendChild(baseDivisionInput);
+           }
+           /**
+            * This function append to modal limit input
+            */
+           function appendLimitInput(placeToAppend) {
+               let label = document.createElement('label');
+               label.setAttribute('for', 'changeLimits');
+               label.textContent = 'Limit';
+               placeToAppend.appendChild(label);
+
+               let limitInput = document.createElement('input');
+               limitInput.id = 'changeLimits';
+               limitInput.setAttribute('type', 'text');
+               limitInput.setAttribute('placeholder', 'Limit dla danej godziny z kampanii');
+               //limitInput.setAttribute('step', '1');
+               //limitInput.setAttribute('min', '0');
+               limitInput.classList.add('form-control');
+               $(limitInput).on('input',function (e) {
+                   if(!$.isNumeric($(e.target).val())){
+                       $(e.target).val('');
+                   }else if($(e.target).val()<0){
+                       $(e.target).val(0);
+                   }
+               });
+               placeToAppend.appendChild(limitInput);
+           }
+
+           /**
+            * This function append to modal comment input
+            */
+           function appendCommentInput(placeToAppend) {
+               let label2 = document.createElement('label');
+               label2.setAttribute('for', 'changeComments');
+               label2.textContent = 'Uwagi';
+               placeToAppend.appendChild(label2);
+
+               let commentInput = document.createElement('input');
+               commentInput.id = 'changeComments';
+               commentInput.setAttribute('type', 'text');
+               commentInput.setAttribute('placeholder', 'Tutaj można umieścić krótki komentarz');
+               commentInput.classList.add('form-control');
+               placeToAppend.appendChild(commentInput);
+           }
+
+           /**
+            * This function append to modal alert info
+            */
+           function appendModalAlert(placeToAppend) {
+               let alertElement = document.createElement('div');
+               alertElement.classList.add('alert', 'alert-danger');
+               alertElement.textContent = "Jeśli nie chcesz zmieniać wartości danego pola, pozostaw puste miejsce w okienku.";
+               placeToAppend.appendChild(alertElement);
+           }
+
+           /**
+            * This function append to modal invitation input
+            */
+           function appendInvitationInput(placeToAppend) {
+               let label = document.createElement('label');
+               label.setAttribute('for', 'invitations');
+               label.textContent = 'Zaproszenia Live';
+               placeToAppend.appendChild(label);
+
+               let invitationInput = document.createElement('input');
+               invitationInput.id = 'invitations';
+               invitationInput.classList.add('form-control');
+               invitationInput.setAttribute('type', 'number');
+               invitationInput.setAttribute('min', '0');
+               invitationInput.setAttribute('step', '1');
+               placeToAppend.appendChild(invitationInput);
+           }
+
+           /**
+            * This function append to modal department select
+            */
+           function appendDepartmentSelect(placeToAppend) {
+               let label = document.createElement('label');
+               label.setAttribute('for', 'modalDepartment');
+               label.textContent = 'Oddział';
+               placeToAppend.appendChild(label);
+
+               let departmentSelect = document.createElement('select');
+               departmentSelect.id = 'modalDepartment';
+               departmentSelect.classList.add('form-control');
+
+               let basicOption = document.createElement('option');
+               basicOption.value = '0';
+               basicOption.textContent = 'Wybierz';
+               departmentSelect.appendChild(basicOption);
+
+               @foreach($departmentInfo as $department)
+                    var option = document.createElement('option');
+                    option.value = `{{$department->id}}`;
+                    option.textContent = `{{$department->name2}} {{$department->name}}`;
+                    departmentSelect.appendChild(option);
+               @endforeach
+
+               placeToAppend.appendChild(departmentSelect);
+           }
+
+           /**********************************************************/
+           /****************END OF MODAL FUNCTIONS********************/
+           /**********************************************************/
+
+           let table = $('#datatable').DataTable({
+               autoWidth: true,
+               processing: true,
+               serverSide: true,
+               scrollY: datatableHeight,
+               "drawCallback": function( settings ) {
+
+               },
+               "rowCallback": function( row, data, index ) {
+                   if(data.comment+'' != 'null' && data.comment !== ''){
+                       $(row).css('background-color', '#fffc8b');
+                   }
+                   row.setAttribute('data-id', data.id);
+                   clientRouteInfoIdArr.forEach(specificId => { //when someone change table page, we have to reassign classes to rows.
+                       if (specificId == data.id) {
+                           row.classList.add('colorRow');
+                       }
+                   });
+                   $(row).find('.commentInput').val(data.comment);
+                   $(row).find('.comment button').click(function (e) {
+                       let campaignId = $(e.target).attr('id');
+                       swal({
+                           title: 'Czy na pewno?',
+                           text: 'Czy chcesz usunąc uwagę?',
+                           type:'warning',
+                           showCancelButton: true
+                       }).then((result) => {
+                           if(result.value){
+                               $.ajax({
+                                   type: 'POST',
+                                   url: '{{route('api.removeCampaignComment')}}',
+                                   headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                                   data: {
+                                       campaignId: campaignId
+                                   },
+                                   success: function (response) {
+                                       console.log(response);
+                                       if(response == 'success')
+                                           table.ajax.reload();
+                                   }
+                               });
+                           }
+                       });
+
+                   });
+               },
+               "fnDrawCallback": function(settings) {
+                   $('#datatable tbody tr').on('click', function(e) {
+                        if(e.target.dataset.type != "noAction") {
+                            const givenRow = $(this);
+                            const clientRouteInfoId = givenRow.attr('data-id');
+                            colorRowAndAddIdToArray(clientRouteInfoId, givenRow);
+                            showModifyButton();
+                        }
+                   });
+
+               },"ajax": {
+                   'url': "{{route('api.campaignsInfo')}}",
+                   'type': 'POST',
+                   'data': function (d) {
+                        d.years = selectedYears;
+                        d.weeks = selectedWeeks;
+                        d.departments = selectedDepartments;
+                        d.typ = selectedTypes;
+                   },
+                   'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+               },
+               "language": {
+                   "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+               },
+               "columns":[
+                   {"data":function (data, type, dataToSet) {
+                           return data.weekOfYear;
+                       },"name":"weekOfYear"
+                   },
+                   {"data":function (data, type, dataToSet) {
+                           return data.date;
+                       },"name":"date"
+                   },
+                   {"data":function (data, type, dataToSet) {
+                           if(data.nrPBX != null) {
+                               return data.cityName +" ("+data.nrPBX+")";
+                           }
+                           else {
+                               return data.cityName;
+                           }
+                       },"name":"cityName"
+                   },
+                   {"data":function (data, type, dataToSet) {
+                           let clientNameVariable = '';
+                           if(data.typ == '2') {
+                               clientNameVariable = data.clientName + ' (W)'
+                           }
+                           else {
+                               clientNameVariable = data.clientName + ' (B)'
+                           }
+                           return clientNameVariable;
+                       },"name":"clientName"
+                   },
+
+                   {"data":function (data, type, dataToSet) {
+                            if(data.hour) {
+                                return data.hour.slice(0,-3);
+                            }
+                            else {
+                                return '';
+                            }
+
+                       },"name":"hour"
+                   },
+                   {"data":function (data, type, dataToSet) {
+                           //let fullDepartmentName = data.departmentName == null ? null : data.departmentName + ' ' + data.departmentName2;
+                           return data.departmentName;
+                       },"name":"departmentName", "searchable": "false"
+                   },
+                   {"data":function(data, type, dataToSet) {
+                       return "1";
+                        }, "name": "potwierdzający"
+                   },
+                   {"data":function (data, type, dataToSet) {
+                           return data.limits;
+                       },"name":"limits"
+                   },
+                   {"data":function (data, type, dataToSet) {
+                           return data.actual_success;
+                       },"name":"actual_success"
+                   },
+                   {"data":function(data, type, dataToSet) {
+                           return "2";
+                       }, "name": "Frekwencja"
+                   },
+                   {"data":function(data, type, dataToSet) {
+                           return "3";
+                       }, "name": "pary"
+                   },
+                   {"data":function(data, type, dataToSet) {
+                           return "2018-03-01";
+                       }, "name": "dataPotwierdzenia"
+                   }
+               ],
+               order: [[1, 'asc'], [3, 'desc'], [2, 'asc']],
+               rowGroup: {
+                   dataSrc: 'date',
+                   startRender: null,
+                   endRender: function (rows, group) {
+                       let sumAllSuccess = 0;
+                       sumAllSuccess =
+                           rows
+                           .data()
+                           .pluck('actual_success')
+                           .reduce( function (a, b) {
+                               return a + b*1;
+                           }, 0);
+                       let sumAllCampaings = rows.data().count();
+                       let sumAllLimit =
+                           rows
+                               .data()
+                               .pluck('limits')
+                               .reduce( function (a, b) {
+                                   return a + b*1;
+                               }, 0);
+                       return $('<tr/>')
+                           .append('<td colspan="2">Podsumowanie Dnia: ' + group + '</td>')
+                           .append('<td></td>')
+                           .append('<td>' + sumAllCampaings + '</td>')
+                           .append('<td></td>')
+                           .append('<td></td>')
+                           .append('<td></td>')
+                           .append('<td></td>')
+                           .append('<td></td>')
+                           .append('<td colspan="3"></td>')
+                   },
+               },
+           });
+
+           /**
+            * This function appends week numbers to week select element and years to year select element
+            * IIFE function, execute after page is loaded automaticaly
+            */
+           (function appendWeeksAndYears() {
+               const maxWeekInYear = {{$lastWeek}}; //number of last week in current year
+               const weekSelect = document.querySelector('#weeks');
+               const yearSelect = document.querySelector('#year');
+               const baseYear = '2017';
+               const currentYear = {{$currentYear}};
+               const currentWeek = {{$currentWeek}};
+
+               for(let j = baseYear; j <= currentYear + 1; j++) {
+                   const opt = document.createElement('option');
+                   opt.value = j;
+                   opt.textContent = j;
+                   if(j == currentYear) {
+                       opt.setAttribute('selected', 'selected');
+                       selectedYears = [j];
+                   }
+                   yearSelect.appendChild(opt);
+               }
+
+               for(let i = 1; i <= maxWeekInYear + 1; i++) {
+                   const opt = document.createElement('option');
+                   opt.value = i;
+                   opt.textContent = i;
+                   if(i == currentWeek) {
+                       opt.setAttribute('selected', 'selected');
+                       selectedWeeks = [i];
+                   }
+                   weekSelect.appendChild(opt);
+               }
+           })();
+
+           /*********************EVENT LISTENERS FUNCTIONS****************************/
+           /*Functions from this section moslty update arrays which are going to be send by ajax for datatable.
+           /**********************************************************/
+
+           /**
+            * This event listener change elements of array selected Years while user selects another year
+            */
+           $('#year').on('select2:select', function () {
+               let yearArr = $('#year').val();
+               if(yearArr.length > 0) { //no values, removed by user
+                   selectedYears = yearArr;
+               }
+               else {
+                   selectedYears = ["0"];
+               }
+               table.ajax.reload();
+           });
+
+           /**
+            * This event listener change elements of array selected Years while user unselects some year
+            */
+           $('#year').on('select2:unselect', function() {
+               if($('#year').val().length != 0) {
+                   selectedYears = $('#year').val();
+               }
+               else {
+                   selectedYears = ["0"];
+               }
+               table.ajax.reload();
+           });
+
+           /**
+            * This event listener change elements of array selecteWeeks while user selects another week
+            */
+           $('#weeks').on('select2:select', function() {
+               let weeksArr = $('#weeks').val();
+               console.log('weeksArr', weeksArr);
+               if(weeksArr.length > 0) {
+                   selectedWeeks = weeksArr;
+               }
+               else {
+                   selectedWeeks = ["0"];
+               }
+               table.ajax.reload();
+           });
+
+           /**
+            * This event listener change elements of array selectedWeeks while user unselects any week.
+            */
+           $("#weeks").on('select2:unselect', function() {
+               if($('#weeks').val().length != 0) {
+                   selectedWeeks = $('#weeks').val();
+               }
+               else {
+                   selectedWeeks = ['0'];
+               }
+               table.ajax.reload();
+           });
+
+           /**
+            * This event listener change elements of array selectedDepartments while user selects a department
+            */
+           $("#departments").on('select2:select', function() {
+               let departments = $('#departments').val();
+               if(departments.length > 0) {
+                   let helpArray = [];
+                   departments.forEach(item => {
+                       let tempArray = [];
+                      tempArray = item.split('_');
+                      helpArray.push(tempArray[1]);
+                   });
+                   selectedDepartments = helpArray;
+               }
+               else {
+                   selectedDepartments = ["0"];
+               }
+               table.ajax.reload();
+           });
+
+           /**
+            * This event listener change elements of array selectedDepartments while user unselects a department
+            */
+           $("#departments").on('select2:unselect', function() {
+              if($('#departments').val().length != 0) {
+                  let departments = $('#departments').val();
+                  let helpArray = [];
+                  departments.forEach(item => {
+                      let tempArray = [];
+                      tempArray = item.split('_');
+                      helpArray.push(tempArray[1]);
+                  });
+                  selectedDepartments = helpArray;
+              }
+              else {
+                  selectedDepartments = ["0"];
+              }
+
+              table.ajax.reload();
+           });
+
+           /**
+            * This event listener change elements of array selectedTypes while user selects any type
+            */
+           $('#typ').on('select2:select', function() {
+               let types = $('#typ').val();
+               if(types.length > 0) {
+                   selectedTypes = types;
+               }
+               else {
+                   selectedTypes = ['0'];
+               }
+               table.ajax.reload();
+           });
+
+           /**
+            * This event listener change elements of array selectedTypes while user unselects any type
+            */
+           $('#typ').on('select2:unselect', function() {
+               if($('#typ').val().length != 0) {
+                   selectedTypes = $('#typ').val();
+               }
+               else {
+                   selectedTypes = ['0'];
+               }
+               table.ajax.reload();
+           });
+
+           /***************************END OF EVENT LISTENERS FUNCTIONS********************/
+
+           /*Activation select2 framework*/
+           (function initial() {
+               $('#weeks').select2();
+               $('#year').select2();
+               $('#departments').select2();
+               $('#typ').select2();
+           })();
+
+           /**
+            * This function clear all row selections and disable edit button
+            */
+           function clearAllSelections() {
+               if(arrayOfTableRows.length > 0) {
+                   if(document.querySelectorAll('.colorRow')) {
+                       const coloredRows = document.querySelectorAll('.colorRow');
+                       coloredRows.forEach(colorRow => {
+                           colorRow.classList.remove('colorRow');
+                       });
+                       editButton.disabled = true;
+
+                       notify("<strong>Wszystkie zaznaczenia zostały usuniete</strong>", 'success', 4000);
+                   }
+               }
+               clientRouteInfoIdArr = [];
+               arrayOfTableRows = [];
+           }
+
+           clearButton.addEventListener('click', clearAllSelections);
+       });
+    </script>
+@endsection
