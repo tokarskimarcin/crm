@@ -53,7 +53,7 @@
             </div>
             <div class="panel-body">
                 <div class="alert alert-info page-info">
-                    Legenda..
+                    Moduł <strong>Grafik dla potwierdzeń</strong> wyświetla informacje o pokazo-godzinach. <br>
                 </div>
                 <div class="row">
                     <div class="col-md-2">
@@ -93,12 +93,8 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4 buttonSection" style="min-height: 3.5em;">
-                        <button class="btn btn-info" data-toggle="modal" data-target="#editModal" style="margin-bottom: 1em;  width: 100%;" id="editOneRecord" disabled="true">
-                            <span class='glyphicon glyphicon-edit'></span> Edytuj rekordy</button>
-                    </div>
-                    <div class="col-md-4">
-                        <button class="btn btn-default" id="clearButton" style="width:100%;">
-                            <span class='glyphicon glyphicon-unchecked'></span> Wyczyść zaznaczenia</button>
+                        <button class="btn btn-success" style="margin-bottom: 1em;  width: 100%;" id="save" disabled="true">
+                            <span class='glyphicon glyphicon-save'></span> Zapisz zmiany</button>
                     </div>
 
                 </div>
@@ -146,6 +142,8 @@
            let selectedDepartments = ["0"]; //this array collect selected by user departments
            let selectedTypes = ['0']; //array of selected by user types
            let datatableHeight = '75vh'; //this variable defines height of table
+           let changeArr = []; //This array collect changed rows
+           let saveButton = document.querySelector('#save');
 
            let testArr = [
                {
@@ -211,20 +209,88 @@
                });
            }
 
+           function appendBasicOption(placeToAppend) {
+               console.assert(placeToAppend.tagName == "SELECT", "placeToAppend in appendBasicOption is not SELECT element");
+               let basicOptionElement = document.createElement('option');
+               basicOptionElement.value = 0;
+               basicOptionElement.textContent = "Wybierz";
+               placeToAppend.appendChild(basicOptionElement);
+           }
+
            function addPersonToConfirmationList(person, placeToAppend) {
                console.assert(placeToAppend.tagName == "SELECT", "placeToAppend in addPersonToConfirmationList is not SELECT element");
-
-               if(placeToAppend.options.length == 0) { //there is no option in select
-                   let basicOptionElement = document.createElement('option');
-                   basicOptionElement.value = 0;
-                   basicOptionElement.textContent = "Wybierz";
-                   placeToAppend.appendChild(basicOptionElement);
-               }
 
                let optionElement = document.createElement('option');
                optionElement.value = person.userId;
                optionElement.textContent = `${person.name} ${person.surname}`;
                placeToAppend.appendChild(optionElement);
+           }
+
+           /**
+            * This method returns selected option from select element
+            */
+           function getSelectedOption(selectElement) {
+               console.assert(selectElement.tagName == 'SELECT', 'selectElement in getSelectedOption is not SELECT element');
+               return selectElement.options[selectElement.selectedIndex].value;
+           }
+
+           /**
+            * This method sets given value in given list
+            */
+           function setOldValues(selectElement, givenValue) {
+               let elementExistInList = false;
+
+               for(let i = 0, max = selectElement.length; i < max; i++) {
+                   if(selectElement[i].value == givenValue) {
+                       selectElement[i].selected = true;
+                       elementExistInList = true;
+                   }
+               }
+
+               if(!elementExistInList) {
+                   $(selectElement).val('0');
+               }
+           }
+
+           //This object contructor has all info about changed row.
+           function ChangeObject(confirmingPerson, frequency, pairs, date, id) {
+               this.confirmingPerson = confirmingPerson;
+               this.frequency = frequency;
+               this.pairs = pairs;
+               this.date = date;
+               this.id = id;
+           }
+
+           function existInArr(id, array) {
+               let exist = false;
+               array.forEach(item => {
+                   if(item.hasOwnProperty('id')) {
+                       if(item['id'] == id) {
+                           exist = true;
+                       }
+                   }
+               });
+
+               return exist;
+           }
+
+           function setProperRowValues(row, item) {
+               let confirmDateInput = row.querySelector('.confirm-date');
+               let confirmingPeopleSelect = row.querySelector('.confirming');
+               let frequencyElement = row.querySelector('.frequency');
+               let pairElement = row.querySelector('.pairs');
+
+               confirmDateInput.value = item.date;
+               frequencyElement.value = item.frequency;
+               pairElement.value = item.pairs;
+
+               for(let i = 0, max = confirmingPeopleSelect.length; i < max; i++) {
+                   console.log('confirmingPeopleSelect[i].value', confirmingPeopleSelect[i].value);
+                   console.log('item.confirmingPerson', item.confirmingPerson);
+                   if(confirmingPeopleSelect[i].value == item.confirmingPerson) {
+                       setOldValues(confirmingPeopleSelect, item.confirmingPerson);
+                   }
+               }
            }
 
            let table = $('#datatable').DataTable({
@@ -237,6 +303,7 @@
                },
                "rowCallback": function( row, data, index ) {
                    row.setAttribute('data-id', data.id);
+
                    const confirmDateInput = row.querySelector('.confirm-date');
                    const confirmDate = confirmDateInput.value;
                    let confirmingPeopleSelect = row.querySelector('.confirming');
@@ -249,15 +316,36 @@
                            });
                        }
                    });
+
+                   changeArr.forEach(item => { //when someone change table page, we have to reassign classes to rows.
+                       if(item.hasOwnProperty('id')) {
+                           if (item['id'] == data.id) {
+                               row.classList.add('colorRow');
+                               setProperRowValues(row, item);
+                           }
+                       }
+
+                   });
                },
                "fnDrawCallback": function(settings) {
                    $('#datatable tbody tr').on('change', function(e) {
                         const changedElement = e.target;
                         const elementRow = this;
+                        const id = elementRow.dataset.id;
+
+                        let confirmingPeopleSelect = elementRow.querySelector('.confirming');
+                        const frequencyElement = elementRow.querySelector('.frequency');
+                        const frequencyValue = frequencyElement.value;
+                        const pairElement = elementRow.querySelector('.pairs');
+                        const pairValue = pairElement.value;
+                        let actualConfirmingPerson = getSelectedOption(confirmingPeopleSelect);
+
                         if(changedElement.matches('.confirm-date')) { //confirm date has been changed.
                             const newConfirmDate = e.target.value;
-                            let confirmingPeopleSelect = elementRow.querySelector('.confirming');
+                            // let confirmingPeopleSelect = elementRow.querySelector('.confirming');
+
                             confirmingPeopleSelect.innerHTML = ''; //clearing list of current people
+                            appendBasicOption(confirmingPeopleSelect);
                             testArr.forEach(person => { //looping over all data about people
                                if(person.hasOwnProperty('date')) {
                                    person.date.forEach(day => {
@@ -267,7 +355,50 @@
                                    });
                                }
                             });
+
+                            //If actual confirming person exist in new list, he will be selected.
+                            for(let i = 0, max = confirmingPeopleSelect.length; i < max; i++) {
+                                if(confirmingPeopleSelect[i].value == actualConfirmingPerson) {
+                                    setOldValues(confirmingPeopleSelect, actualConfirmingPerson);
+                                }
+                            }
+
                         }
+
+                        let confDate = elementRow.querySelector('.confirm-date');
+
+                       //if only data has changed + dodac warunek na date zeby nie byla wieksza niz data pokazu
+                       if(confirmingPeopleSelect.options[confirmingPeopleSelect.selectedIndex].value != 0) {
+                           let exist = existInArr(id, changeArr);
+                           let newConfirmingPerson = getSelectedOption(confirmingPeopleSelect);
+                           let changedRow = new ChangeObject(newConfirmingPerson, frequencyValue, pairValue, confDate.value, id);
+
+                           //remove existing item
+                           if(exist) {
+                               for(let j = 0, max = changeArr.length; j < max; j++) {
+                                   if(changeArr[j].hasOwnProperty('id')) {
+                                       if(changeArr[j].id == id) {
+                                           changeArr.splice(j,1);
+                                       }
+                                   }
+                               }
+                           }
+                           changeArr.push(changedRow);
+                           elementRow.classList.add('colorRow');
+                       }
+                       else { //check whether confirming person exist in array. If yes, delete him
+                           for(let j = 0, max = changeArr.length; j < max; j++) {
+                               if(changeArr[j].hasOwnProperty('id')) {
+                                   if(changeArr[j]['id'] == id) {
+                                       changeArr.splice(j,1);
+                                   }
+                               }
+                           }
+                           elementRow.classList.remove('colorRow');
+                       }
+
+                       console.log(changeArr);
+                       saveButton.disabled = changeArr.length > 0 ? false : true;
                    });
                },"ajax": {
                    'url': "{{route('api.campaignsInfo')}}",
@@ -361,7 +492,7 @@
                        }, "name": "dataPotwierdzenia"
                    }
                ],
-               order: [[1, 'asc'], [3, 'desc'], [2, 'asc']],
+               order: [[1, 'asc'], [3, 'desc'], [4, 'asc']],
                rowGroup: {
                    dataSrc: 'date',
                    startRender: null,
@@ -382,6 +513,7 @@
                                .reduce( function (a, b) {
                                    return a + b*1;
                                }, 0);
+
                        return $('<tr/>')
                            .append('<td colspan="2">Podsumowanie Dnia: ' + group + '</td>')
                            .append('<td></td>')
@@ -389,8 +521,8 @@
                            .append('<td></td>')
                            .append('<td></td>')
                            .append('<td></td>')
-                           .append('<td></td>')
-                           .append('<td></td>')
+                           .append('<td>' + sumAllLimit + '</td>')
+                           .append('<td>' + sumAllSuccess + '</td>')
                            .append('<td colspan="3"></td>')
                    },
                },
@@ -558,7 +690,41 @@
                table.ajax.reload();
            });
 
+           function saveHandler(e) {
+               const saveBtn = e.target;
+               if(saveBtn.disabled == false) { //user clicked on active save button, it mean there are rows to change
+                   const dataJSON = JSON.stringify(changeArr);
+
+                   const ourHeaders = new Headers();
+                   ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+
+                   let data = new FormData();
+                   data.append('data', dataJSON);
+
+                   fetch('{{route('api.engraverForConfirmingUpdate')}}', {
+                       method: 'post',
+                       headers: ourHeaders,
+                       credentials: "same-origin",
+                       body: data
+                   })
+                       .then(resp => resp.text())
+                       .then(resp => {
+                           notify(resp);
+                           changeArr = [];
+                           saveButton.disabled = true;
+                           let allHighlightedRows = document.querySelectorAll('.colorRow');
+                           allHighlightedRows.forEach(item => {
+                               item.classList.remove('colorRow');
+                           })
+
+                       })
+
+               }
+           }
+
            /***************************END OF EVENT LISTENERS FUNCTIONS********************/
+
+           saveButton.addEventListener('click', saveHandler);
 
            /*Activation select2 framework*/
            (function initial() {
@@ -568,26 +734,7 @@
                $('#typ').select2();
            })();
 
-           /**
-            * This function clear all row selections and disable edit button
-            */
-           function clearAllSelections() {
-               if(arrayOfTableRows.length > 0) {
-                   if(document.querySelectorAll('.colorRow')) {
-                       const coloredRows = document.querySelectorAll('.colorRow');
-                       coloredRows.forEach(colorRow => {
-                           colorRow.classList.remove('colorRow');
-                       });
-                       editButton.disabled = true;
 
-                       notify("<strong>Wszystkie zaznaczenia zostały usuniete</strong>", 'success', 4000);
-                   }
-               }
-               clientRouteInfoIdArr = [];
-               arrayOfTableRows = [];
-           }
-
-           clearButton.addEventListener('click', clearAllSelections);
        });
     </script>
 @endsection

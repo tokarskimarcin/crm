@@ -4290,4 +4290,19 @@ class CrmRouteController extends Controller
         return datatables($campaignsInfo->get())->make(true);
     }
 
+    public function engraverForConfirmingUpdate(Request $request) {
+        $data = json_decode($request->data);
+        $idsArr = [];
+        foreach($data as $item) {
+            ClientRouteInfo::where('id', '=', $item->id)
+                ->update([
+                    'frequency' => $item->frequency,
+                    'pairs' => $item->pairs,
+                    'confirmingUser' => $item->confirmingPerson,
+                    'confirmDate' => $item->date
+                ]);
+        }
+        return 'Zmiany zostały zapisane!';
+    }
+
 }
