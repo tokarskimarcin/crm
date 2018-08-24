@@ -152,6 +152,16 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="simulationTypes"  style="margin-top:1em; display:none">
+                                    <div class="col-md-12">
+                                        <label for="simulationType">Rodzaj symulacji</label>
+                                        <select id="simulationType" class="form-control">
+                                            <option value="1">Najbardziej prawdopodobna</option>
+                                            <option value="2">W najgorszym przypadku</option>
+                                            <option value="3">W najlepszym przypadku</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="row factorsSection" style="margin-top:1em; display:none">
                                     <div class="col-md-6">
                                         <label>Mnożnik sobót <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right"
@@ -340,13 +350,14 @@
             /********** GLOBAL VARIABLES ***********/
 
             class SimulationChangeLimitForClient{
-                constructor(arrayOfClinet, dateStart,dateStop,arrayOfLimit,limitForOneHour,saveStatus){
-                    this.arrayOfClinet      = arrayOfClinet;
-                    this.dateStart          = dateStart;
-                    this.dateStop           = dateStop;
-                    this.arrayOfLimit       = arrayOfLimit;
-                    this.limitForOneHour    = limitForOneHour;
-                    this.saveStatus         = saveStatus;
+                constructor(arrayOfClinet, dateStart,dateStop,arrayOfLimit,limitForOneHour,saveStatus,arrayOfIncreaseLimit){
+                    this.arrayOfClinet          = arrayOfClinet;
+                    this.dateStart              = dateStart;
+                    this.dateStop               = dateStop;
+                    this.arrayOfLimit           = arrayOfLimit;
+                    this.limitForOneHour        = limitForOneHour;
+                    this.saveStatus             = saveStatus;
+                    this.arrayOfIncreaseLimit   = arrayOfIncreaseLimit;
                 }
             }
 
@@ -373,7 +384,39 @@
 
             let factorsChanged = false;
             let selectedRowDays = [];
+            //Pass only number
+            $onyNumber = (function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+            $disablePartOfContent = (function() {
+                let selectObject = $(this);
+                selectObject.find('.AllLimitIncrease').attr('disabled','true');
+                let divContent      = selectObject.parent().parent().parent().parent();
+                let inputIncrease   = divContent.find('.limitInputIncrease input');
+                let limitInput      = divContent.find('.limitInput input');
+                let disabled        = false;
+                if(selectObject.val().length <= 1){
+                    disabled        = true;
+                }
+                inputIncrease.each(function (item,value) {
+                    // if(disabled){
+                    //     $(value).prop('disabled',true);
+                    //     $(value).val('');
+                    // }
+                    //
+                    // else
+                        $(value).prop('disabled',false);
+                });
+                limitInput.each(function (item,value) {
+                    //if(disabled)
+                        $(value).prop('disabled',false);
+                    // else{
+                    //     $(value).prop('disabled',true);
+                    //     $(value).val('');
+                    // }
 
+                });
+            });
             let workFreeDaysForDepartments = {};
 
             const warningResult = {
@@ -446,7 +489,6 @@
                 let divChoiceClientLimitSelect = document.createElement('select');
                 divChoiceClientLimitSelect.classList.add('form-control');
                 divChoiceClientLimitSelect.classList.add('selectpicker');
-                divChoiceClientLimitSelect.setAttribute('data-live-search','true');
                 divChoiceClientLimitSelect.setAttribute('data-selected-text-format','count');
                 divChoiceClientLimitSelect.setAttribute('data-width','100%');
                 if(className){
@@ -454,6 +496,8 @@
                 }
                 if(multiSelect){
                     divChoiceClientLimitSelect.setAttribute('multiple','multiple');
+                    divChoiceClientLimitSelect.setAttribute('data-actions-box','true');
+                    divChoiceClientLimitSelect.onchange = $disablePartOfContent;
                 }
                 return divChoiceClientLimitSelect;
             }
@@ -474,13 +518,18 @@
                 divDate.setAttribute('style','width:100%');
                 return divDate;
             }
-            function getInputDate(className,dateValue) {
+            function getInputDate(className,dateValue,type = 'text') {
                 let inputDate = document.createElement('input');
                 inputDate.classList.add('form-control');
                 inputDate.classList.add(className);
                 inputDate.setAttribute('name',className);
-                inputDate.setAttribute('type','text');
-                inputDate.value = dateValue;
+                inputDate.setAttribute('type',type);
+                if(dateValue != "{{date("Y-m-d")}}" && type == 'text'){
+                    inputDate.onkeypress = $onyNumber;
+                    inputDate.onfocusout = $onyNumber;
+                    inputDate.onkeyup = $onyNumber;
+                }
+                    inputDate.value = dateValue;
                 return inputDate;
             }
             function getGlyphiconDate() {
@@ -496,7 +545,7 @@
                 glyphicon.classList.add('glyphicon', 'glyphicon-'+type);
                 return glyphicon
             }
-            var polishDayArray = ["Poniedziałek","Wtorek","Środa","Czwartek","Piątek","Sobota","Niedziela","Suma"];
+            let  polishDayArray = ["Poniedziałek","Wtorek","Środa","Czwartek","Piątek","Sobota","Niedziela","Suma"];
             function TemplateDOMOfNewClientSimulation(placeToAppend) {
                 let mainDiv = document.createElement('div');
                 mainDiv.classList.add('col-md-12');
@@ -756,6 +805,27 @@
                 divLimitForOneEvent.appendChild(limitInput);
                 divLimitPanel.appendChild(divLimitForOneEvent);
 
+
+
+                let divLimitForAllEventIncrease = document.createElement('div');
+                divLimitForAllEventIncrease.classList.add('col-md-4');
+                let divLimitForAllEventLabelIncrease = document.createElement('label');
+                divLimitForAllEventLabelIncrease.textContent = "Zwiększanie/Zmniejszanie limitów o wartość";
+                divLimitForAllEventIncrease.appendChild(divLimitForAllEventLabelIncrease);
+                for( let i =0;i<3;i++){
+                    let limitInput = document.createElement('div');
+                    limitInput.classList.add('input-group','limitInputIncrease');
+                    let span = getSpan('Limit #'+(i+1));
+                    let inputLimit = getInputDate('AllLimitIncrease'+(i+1),'','number');
+                   // inputLimit.setAttribute('disabled',true);
+                    inputLimit.classList.add('AllLimitIncrease');
+                    limitInput.appendChild(span);
+                    limitInput.appendChild(inputLimit);
+                    divLimitForAllEventIncrease.appendChild(limitInput);
+                }
+                divLimitPanel.appendChild(divLimitForAllEventIncrease);
+
+
                 let divLimitConteinerButton = document.createElement('div');
                 divLimitConteinerButton.classList.add('col-md-12');
 
@@ -810,6 +880,7 @@
                 });
                 $(modalToHide).modal('hide');
             }
+
             $('.renderSimulation, .saveSimulation').on('click',function (e) {
                 simulationEditLimitArray     = [];
                 let valide          = true;
@@ -821,6 +892,7 @@
                     let dateStartSimulation     = jObject.find('.dateStartLimit').val();
                     let dateStopSimulation      = jObject.find('.dateStopLimit').val();
                     let arrayOfLimit            = [];
+                    let arrayOfIncreaseLimit    = [];
                     let saveStatus              = false;
                     if(btnType == 'renderSimulation'){
                         saveStatus              = false;
@@ -830,8 +902,11 @@
                     arrayOfLimit.push(jObject.find('.AllLimit1').val());
                     arrayOfLimit.push(jObject.find('.AllLimit2').val());
                     arrayOfLimit.push(jObject.find('.AllLimit3').val());
+                    arrayOfIncreaseLimit.push(jObject.find('.AllLimitIncrease1').val());
+                    arrayOfIncreaseLimit.push(jObject.find('.AllLimitIncrease2').val());
+                    arrayOfIncreaseLimit.push(jObject.find('.AllLimitIncrease3').val());
                     let onlyFirstLimit          = jObject.find('.OnlyFirstLimit').val();
-                    simulationEditLimitArray.push(new SimulationChangeLimitForClient(arrayOfClinet,dateStartSimulation,dateStopSimulation,arrayOfLimit,onlyFirstLimit,saveStatus));
+                    simulationEditLimitArray.push(new SimulationChangeLimitForClient(arrayOfClinet,dateStartSimulation,dateStopSimulation,arrayOfLimit,onlyFirstLimit,saveStatus,arrayOfIncreaseLimit));
                     if(arrayOfClinet.length == 0){
                         valide = false;
                         swal("Wybierz klienta do zmiany limitów")
@@ -930,10 +1005,6 @@
                     }
                 });
             });
-            //Pass only number
-            $('.AllLimit1, .OnlyFirstLimit, .dayEventCountNumber, .NewClientLimit').on("input propertychange", function (e) {
-                this.value = this.value.replace(/[^0-9]/g, '');
-            });
 
             TemplateDOMOfClientSimulationEditLimits('placeToAppendClientLimit');
             /*********************DataTable FUNCTUONS****************************/
@@ -977,6 +1048,7 @@
                             }
                         },
                         success: function (response) {
+                            console.log(response);
                             obj.data.aheadPlaning = response.aheadPlanningData;
                             obj.data.departmentsInvitationsAverages = response.departmentsInvitationsAveragesData;
                             deferred.resolve(obj.data.aheadPlaning);
@@ -1129,6 +1201,14 @@
                 //clear selected days
                 selectedRowDays = [];
                 colorSelectedRowDays();
+                let typeSelect = $('#simulationType');
+                if($(this).val() == 0) {
+                    typeSelect.prop('disabled', false);
+                }
+                else {
+                    typeSelect.val(1);
+                    typeSelect.prop('disabled', true);
+                }
 
                 if($('#removeSimulationButton').is(':visible'))
                     $('#removeSimulationButton').click();
@@ -1364,14 +1444,23 @@
             /*  ---------------------- creating available simulations ---------------------- */
             let simulations = [];
 
+            //This function returns type of simulation
+            function getSelectedType() {
+                let simulationTypeSelect = document.querySelector('#simulationType');
+                console.log(simulationTypeSelect);
+                return simulationTypeSelect.options[simulationTypeSelect.selectedIndex].value;
+            }
+
             simulations.push(Simulation(
                 'Przewidywanie wyprzedzenia na wybrany dzień',
                 1, // available days to select
-                ['factorsSection'], //sections to show
+                ['factorsSection', 'simulationTypes'], //sections to show
                 true, // flag that identify is ahead planning data after simulation are changed
                 /* ---------------- simulation function ----------------------- */
                 function (thisObj){
+                    console.log(thisObj);
                     let selectedDay = getSelectedDay(selectedRowDays[0]);
+                    let selectedType = getSelectedType();
                     let daysBetweenSelectedAndActualDay = Math.abs(Math.round(moment.duration(moment(new Date(selectedDay)).diff(moment(new Date(today)))).asDays()));
                     let workingHoursLeft = Math.abs(Math.round(moment.duration((moment().diff(moment().hour(16).minute(0)))).asHours()));
                     let simulatedData = null;
@@ -1417,18 +1506,61 @@
                         //counting simulated result for every department
                         $.each(departmentInfo,function (index, department) {
                             department.simulatedResult = 0;
-                            department.simulatedResult += department.multiplier.workingDays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays;
-                            department.simulatedResult += department.multiplier.saturdays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturday;
-                            department.simulatedResult += department.multiplier.sundays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sunday;
+
+                            if(selectedType == 1) {
+                                department.simulatedResult += department.multiplier.workingDays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays;
+                                department.simulatedResult += department.multiplier.saturdays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturday;
+                                department.simulatedResult += department.multiplier.sundays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sunday;
+                            }
+                            else if(selectedType == 2) {
+                                department.simulatedResult += department.multiplier.workingDays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMin;
+                                department.simulatedResult += department.multiplier.saturdays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMin;
+                                department.simulatedResult += department.multiplier.sundays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMin;
+                            }
+                            else if(selectedType == 3) {
+                                department.simulatedResult += department.multiplier.workingDays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMax;
+                                department.simulatedResult += department.multiplier.saturdays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMax;
+                                department.simulatedResult += department.multiplier.sundays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMax;
+                            }
+
                             let thisDayOfWeek = moment().format('E');
                             let thisDayMultiplier = workingHoursLeft/8;
                             let thisDaySimulatedResult = 0;
+
+                            // console.log('aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays', aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays);
+
                             if(thisDayOfWeek < 6){
-                                thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays*thisDayMultiplier;
+                                if(selectedType == 1) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays*thisDayMultiplier;
+                                }
+                                else if(selectedType == 2) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMin*thisDayMultiplier;
+                                }
+                                else if(selectedType == 3) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMax*thisDayMultiplier;
+                                }
                             }else if(thisDayOfWeek == 6){
-                                thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturday*thisDayMultiplier;
+                                if(selectedType == 1) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturday*thisDayMultiplier;
+                                }
+                                else if(selectedType == 2) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMin*thisDayMultiplier;
+                                }
+                                else if(selectedType == 3) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMax*thisDayMultiplier;
+                                }
+                                // thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturday*thisDayMultiplier;
                             }else{
-                                thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sunday*thisDayMultiplier;
+                                if(selectedType == 1) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sunday*thisDayMultiplier;
+                                }
+                                else if(selectedType == 2) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMin*thisDayMultiplier;
+                                }
+                                else if(selectedType == 3) {
+                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMax*thisDayMultiplier;
+                                }
+                                // thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sunday*thisDayMultiplier;
                             }
                             department.simulatedResult += Math.round(thisDaySimulatedResult);
                             department.simulatedResult = Math.round(department.simulatedResult);
