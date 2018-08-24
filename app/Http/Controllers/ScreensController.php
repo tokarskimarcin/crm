@@ -113,9 +113,22 @@ class ScreensController extends Controller
      */
     public function showScreensGet() {
         $today = date("Y-m-d"); //2000-10-11
-        $reportData = HourReport::where('report_date', '=', $today)->get();
+        $today = date("2018-08-22"); //2000-10-11
         $department_info = Department_info::where('id_dep_type', '=', '2')->get();
-        return view('screens.charts')->with('reportData', $reportData)->with('department_info', $department_info);
+
+        $departmentsAveragesForEveryHour = StatisticsController::getDepartmentsAveragesForEveryHour($today, $department_info);
+
+        return view('screens.charts')->with('departmentsAveragesForEveryHour', $departmentsAveragesForEveryHour);
+    }
+
+    public function showScreenGet($id){
+        $today = date("Y-m-d"); //2000-10-11
+        $today = date("2018-08-22"); //2000-10-11
+        $department_info = Department_info::where('id_dep_type', '=', '2')->get();
+
+        $departmentsAveragesForEveryHour = StatisticsController::getDepartmentsAveragesForEveryHour($today, $department_info);
+
+        return view('screens.chart')->with('departmentsAveragesForEveryHour', $departmentsAveragesForEveryHour)->with('dep_info_id', $id);
     }
 
     /**
@@ -123,10 +136,12 @@ class ScreensController extends Controller
      */
     public function allCharts() {
         $today = date("Y-m-d");
-        //$today = date("2018-08-22"); //2000-10-11
-        $reportData = HourReport::where('report_date', '=', $today)->get();
+        $today = date("2018-08-22"); //2000-10-11
         $department_info = Department_info::where('id_dep_type', '=', '2')->get();
-        return view('screens.allCharts')->with('reportData', $reportData)->with('department_info', $department_info);
+
+        $departmentsAveragesForEveryHour = StatisticsController::getDepartmentsAveragesForEveryHour($today, $department_info);
+
+        return view('screens.allCharts')->with('departmentsAveragesForEveryHour', $departmentsAveragesForEveryHour);
     }
 
     /**
@@ -141,8 +156,8 @@ class ScreensController extends Controller
         if ($file !== null) {
             $img = $file->getClientOriginalName();
 
-            // get uploaded file's extension
-            $ext = $this->getExtension($file->getMimeType());
+            // get uploaded file's extension`
+            $ext = $this->getExtensionFromMimeType($file->getMimeType());
 
             if(in_array($ext, ['png','jpeg'])){
                 if (!in_array('public/'.$chartScreenshotsPath, Storage::allDirectories())) {
@@ -158,7 +173,7 @@ class ScreensController extends Controller
         return 'fail';
     }
 
-    private function getExtension ($mime_type){
+    private function getExtensionFromMimeType ($mime_type){
         $extensions = array(
             'image/jpeg' => 'jpeg',
             'image/png' => 'png',

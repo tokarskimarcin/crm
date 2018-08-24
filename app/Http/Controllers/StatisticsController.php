@@ -5433,9 +5433,49 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     public function statisticsChartsGet(){
         $today = date("Y-m-d"); //2000-10-11
         $today = date("2018-08-22"); //2000-10-11
-        $reportData = HourReport::where('report_date', '=', $today)->get();
         $department_info = Department_info::where('id_dep_type', '=', '2')->get();
 
-        return view('statistics.statisticsCharts')->with('reportData', $reportData)->with('department_info', $department_info);
+        $departmentsAveragesForEveryHour = $this->getDepartmentsAveragesForEveryHour($today,$department_info);
+
+        return view('statistics.statisticsCharts')->with('departmentsAveragesForEveryHour', $departmentsAveragesForEveryHour);
+    }
+
+    public static function getDepartmentsAveragesForEveryHour($date, $departments_info){
+        $reportData = HourReport::where('report_date', '=', $date)->get();
+
+        $departmentsAveragesForEveryHour = [];
+        //dd($departments_info,$reportData->where('department_info_id',8));
+        foreach ($departments_info as $dep_info){
+            $depReportData = $reportData->where('department_info_id',$dep_info->id);
+            $depAveragesForEveryHour = [];
+            $successBefore = null;
+            $useBefore = null;
+            foreach ($depReportData as $depHourReportData){
+                $hourAndMinutes = substr($depHourReportData->hour,0,5);
+                if(count($depAveragesForEveryHour) <1){
+                    array_push($depAveragesForEveryHour,['hourAndMinutes' => $hourAndMinutes,'average' => $depHourReportData->average]);
+                }else{
+                    $nominator = $depHourReportData->success - $successBefore;
+                    $denominator = $depHourReportData->hour_time_use - $useBefore;
+                    if($nominator > 0 and $denominator > 0){
+                        $average = ($nominator/$denominator);
+                        array_push($depAveragesForEveryHour,['hourAndMinutes' => $hourAndMinutes,'average' => round($average,2)]);
+
+                    }
+                }
+                $successBefore = $depHourReportData->success;
+                $useBefore =  $depHourReportData->hour_time_use;
+            }
+            array_push($departmentsAveragesForEveryHour, [
+                'dep_info_id' => $dep_info->id,
+                'departmentName'=>$dep_info->departments->name.' '.$dep_info->department_type->name,
+                'depAveragesForEveryHour' => $depAveragesForEveryHour]);
+        }
+        return $departmentsAveragesForEveryHour;
+    }
+
+
+    public function getDepartmentsAveragesForEveryDay(){
+
     }
 }
