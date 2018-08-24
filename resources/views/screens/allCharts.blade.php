@@ -154,7 +154,7 @@
         deferred.promise().then(function (resolve) {
             console.log(resolve);
             html2canvas(document.querySelector('#my_charts'),{logging:false}).then(canvas => {
-                saveImage(canvas);
+                saveImage(canvas,1);
                 uploadFilesAjax();
             });
         },
@@ -220,7 +220,9 @@
     }
 
 
-    function saveImage(canvas){
+    function saveImage(canvas, size){/*
+        canvas.width = Math.floor(canvas.width*size);
+        canvas.height = Math.floor(canvas.height*size);*/
         var dataURL = canvas.toDataURL('image/png');
         var blob = dataURItoBlob(dataURL);
         formData.append("allChartsImage", blob);
