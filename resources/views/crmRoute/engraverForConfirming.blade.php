@@ -102,13 +102,13 @@
                     <table id="datatable" class="thead-inverse table table-striped table-bordered" style="max-width:100%;">
                         <thead>
                         <tr>
-                            <th>Tydzien</th>
+                            <th>T</th>
                             <th>Data</th>
                             <th>Miasto</th>
-                            <th>Projekt</th>
-                            <th>Godzina</th>
+                            <th>Nazwa klienta</th>
+                            <th>G</th>
                             <th>Oddział</th>
-                            <th>Potw.</th>
+                            <th>Potwierdzający</th>
                             <th>Limit</th>
                             <th>Zgody</th>
                             <th>Frekw.</th>
@@ -317,6 +317,8 @@
                        }
                    });
 
+                   setOldValues(confirmingPeopleSelect, data.confirmingUser);
+
                    changeArr.forEach(item => { //when someone change table page, we have to reassign classes to rows.
                        if(item.hasOwnProperty('id')) {
                            if (item['id'] == data.id) {
@@ -379,6 +381,7 @@
                                    if(changeArr[j].hasOwnProperty('id')) {
                                        if(changeArr[j].id == id) {
                                            changeArr.splice(j,1);
+                                           max--;
                                        }
                                    }
                                }
@@ -391,6 +394,7 @@
                                if(changeArr[j].hasOwnProperty('id')) {
                                    if(changeArr[j]['id'] == id) {
                                        changeArr.splice(j,1);
+                                       max--;
                                    }
                                }
                            }
@@ -400,8 +404,9 @@
                        console.log(changeArr);
                        saveButton.disabled = changeArr.length > 0 ? false : true;
                    });
+
                },"ajax": {
-                   'url': "{{route('api.campaignsInfo')}}",
+                   'url': "{{route('api.engraverForConfirmingDatatable')}}",
                    'type': 'POST',
                    'data': function (d) {
                         d.years = selectedYears;
@@ -417,7 +422,7 @@
                "columns":[
                    {"data":function (data, type, dataToSet) {
                            return data.weekOfYear;
-                       },"name":"weekOfYear", "width": "1%"
+                       },"name":"weekOfYear", "width": "1%",
                    },
                    {"data":function (data, type, dataToSet) {
                            return data.date;
@@ -474,14 +479,18 @@
                        },"name":"actual_success"
                    },
                    {"data":function(data, type, dataToSet) {
-                           return `<input class="frequency form-control" type="number" min="0" step="1" style="width: 5em;">`;
+                           return `<input class="frequency form-control" type="number" min="0" step="1" style="width: 5em;" value="${data.frequency}">`;
                        }, "name": "Frekw."
                    },
                    {"data":function(data, type, dataToSet) {
-                           return `<input class="pairs form-control" type="number" min="0" step="1" style="width: 5em;">`;
-                       }, "name": "pary"
+                           return `<input class="pairs form-control" type="number" min="0" step="1" style="width: 5em;" value="${data.pairs}">`;
+                       }, "name": "pairs"
                    },
                    {"data":function(data, type, dataToSet) {
+                       if(data.confirmDate != null) {
+                           return `<input type="date" style="width: 100%;" class="form-control confirm-date" value="${data.confirmDate}">`;
+                       }
+                       else {
                            const showDate = new Date(data.date);
                            const dayBeforeShowDate = new Date(showDate.setDate(showDate.getDate() - 1));
                            const day = ("0" + dayBeforeShowDate.getDate()).slice(-2);
@@ -489,6 +498,8 @@
                            const year = dayBeforeShowDate.getFullYear();
                            const fullDate =  year + "-" + month + "-" + day;
                            return `<input type="date" style="width: 100%;" class="form-control confirm-date" value="${fullDate}">`;
+                       }
+
                        }, "name": "dataPotwierdzenia"
                    }
                ],

@@ -4235,24 +4235,18 @@ class CrmRouteController extends Controller
         client_route_info.date as date,
         client_route_info.hour as hour,
         client_route_info.pbx_campaign_id as nrPBX,
-        client_route_info.baseDivision as baseDivision,
-        client_route_info.verification as verification,
         client_route_info.weekOfYear as weekOfYear,
         client_route_info.limits as limits,
+        client_route_info.frequency as frequency,
+        client_route_info.pairs as pairs,
+        client_route_info.confirmingUser as confirmingUser,
+        client_route_info.confirmDate as confirmDate,
         client_route_info.actual_success as actual_success,
-        YEAR(client_route_info.date) as year,       
-        ( case when client_route_info.actual_success is null then 0 - client_route_info.limits
-         when 
-          client_route_info.actual_success - client_route_info.limits > 0 then 0
-           else
-           client_route_info.actual_success - client_route_info.limits
-           end) as loseSuccess,       
+        YEAR(client_route_info.date) as year,
         client.name as clientName,
         departments.name as departmentName,
         department_type.name as departmentName2,
-        client_route_info.comment as comment,
         city.name as cityName,
-        0 as totalScore,
         client_route.type as typ
         '))
             ->join('client_route','client_route.id','client_route_info.client_route_id')
@@ -4282,7 +4276,6 @@ class CrmRouteController extends Controller
                 }
             });
         }
-
 
         if($typ[0] != '0') {
             $campaignsInfo = $campaignsInfo->whereIn('client_route.type', $typ);

@@ -1015,5 +1015,5 @@ Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.c
 Route::get('/getAllTask', 'MyUserTestController@getAllTask');
 
 Route::get('/engraverForConfirming', 'CrmRouteController@engraverForConfirmingGet');
-Route::get('/engraverForConfirmingAjax', 'CrmRouteController@engraverForConfirmingDatatable')->name('api.engraverForConfirmingDatatable');
+Route::post('/engraverForConfirmingAjax', 'CrmRouteController@engraverForConfirmingDatatable')->name('api.engraverForConfirmingDatatable');
 Route::post('/engraverForConfirmingUpdate', 'CrmRouteController@engraverForConfirmingUpdate')->name('api.engraverForConfirmingUpdate');
