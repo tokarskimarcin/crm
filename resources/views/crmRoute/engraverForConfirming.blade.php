@@ -303,6 +303,7 @@
                },
                "rowCallback": function( row, data, index ) {
                    row.setAttribute('data-id', data.id);
+                   row.setAttribute('data-depid', data.depId);
 
                    const confirmDateInput = row.querySelector('.confirm-date');
                    const confirmDate = confirmDateInput.value;
@@ -311,7 +312,9 @@
                        if(person.hasOwnProperty('date')) {
                            person.date.forEach(day => {
                                if(day == confirmDate) { //current person is available this day
-                                   addPersonToConfirmationList(person, confirmingPeopleSelect);
+                                   if(data.depId == person.depId) {
+                                       addPersonToConfirmationList(person, confirmingPeopleSelect);
+                                   }
                                }
                            });
                        }
@@ -333,6 +336,7 @@
                    $('#datatable tbody tr').on('change', function(e) {
                         const changedElement = e.target;
                         const elementRow = this;
+                        const depId = elementRow.dataset.depid
                         const id = elementRow.dataset.id;
 
                         let confirmingPeopleSelect = elementRow.querySelector('.confirming');
@@ -352,7 +356,9 @@
                                if(person.hasOwnProperty('date')) {
                                    person.date.forEach(day => {
                                        if(day == newConfirmDate) { //current person is available this day
-                                           addPersonToConfirmationList(person, confirmingPeopleSelect);
+                                           if(person.depId == depId) {
+                                               addPersonToConfirmationList(person, confirmingPeopleSelect);
+                                           }
                                        }
                                    });
                                }
@@ -465,7 +471,7 @@
                        },"name":"departmentName", "searchable": "false"
                    },
                    {"data":function(data, type, dataToSet) {
-                       return `<select class="confirming form-control">
+                       return `<select class="confirming form-control" style="width: 100%;">
                                     <option value="0">Wybierz</option>
                                 </select>`;
                         }, "name": "potwierdzający"

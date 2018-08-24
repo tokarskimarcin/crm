@@ -4220,8 +4220,9 @@ class CrmRouteController extends Controller
 
         $limitDate = Date('W', strtotime('-100 days'));
 
-        $scheduleData = Schedule::select('id_user as userId', 'users.first_name as name', 'users.last_name as surname', 'week_num', 'year', 'monday_comment as pon', 'tuesday_comment as wt', 'wednesday_comment as sr', 'thursday_comment as czw', 'friday_comment as pt', 'saturday_comment as sob','sunday_comment as nd')
+        $scheduleData = Schedule::select('id_user as userId', 'users.first_name as name','department_info.id as depId' ,'users.last_name as surname', 'week_num', 'year', 'monday_comment as pon', 'tuesday_comment as wt', 'wednesday_comment as sr', 'thursday_comment as czw', 'friday_comment as pt', 'saturday_comment as sob','sunday_comment as nd')
             ->join('users', 'schedule.id_user', '=', 'users.id')
+            ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
             ->where('week_num', '>', $limitDate)
             ->get();
 
@@ -4237,7 +4238,9 @@ class CrmRouteController extends Controller
                 if($i == 0) {
                     $user->name = $item->name;
                     $user->surname = $item->surname;
+                    $user->depId = $item->depId;
                 }
+                $i++;
                 $firstDayOfGivenWeek = Date('Y-m-d', strtotime($item->year . 'W' . $item->week_num));
                 if($item->pon != '') {
                     array_push($dataArr, $firstDayOfGivenWeek);
@@ -4302,6 +4305,7 @@ class CrmRouteController extends Controller
         YEAR(client_route_info.date) as year,
         client.name as clientName,
         departments.name as departmentName,
+        client_route_info.department_info_id as depId,
         department_type.name as departmentName2,
         city.name as cityName,
         client_route.type as typ
