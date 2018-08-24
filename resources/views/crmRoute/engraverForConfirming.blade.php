@@ -115,7 +115,7 @@
                             <th>Potw.</th>
                             <th>Limit</th>
                             <th>Zgody</th>
-                            <th>Frekwencja</th>
+                            <th>Frekw.</th>
                             <th>Pary</th>
                             <th>Data potw.</th>
                         </tr>
@@ -131,27 +131,6 @@
 </div>
 </div>
 
-<!-- Modal -->
-<div id="editModal" class="modal fade" role="dialog">
-    <div class="modal-dialog modal-lg">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Edytuj</h4>
-            </div>
-            <div class="modal-body edit-modal-body">
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij okno</button>
-            </div>
-        </div>
-
-    </div>
-</div>
-
 @endsection
 
 @section('script')
@@ -165,13 +144,49 @@
            let selectedYears = ["0"]; //this array collect selected by user years
            let selectedWeeks = ["0"]; //this array collect selected by user weeks
            let selectedDepartments = ["0"]; //this array collect selected by user departments
-           let clientRouteInfoIdArr = []; //array of client_route_info ids
            let selectedTypes = ['0']; //array of selected by user types
-           let arrayOfTableRows = []; //array of modal table rows
            let datatableHeight = '75vh'; //this variable defines height of table
-           const clearButton = document.querySelector('#clearButton');
-           const editButton = document.querySelector('#editOneRecord');
-           /*******END OF GLOBAL VARIABLES*********/
+
+           let testArr = [
+               {
+                   name: "Paweł",
+                   surname: "Chmielewski",
+                   userId: '6009',
+                   date: [
+                       "2018-08-20",
+                       "2018-08-21",
+                       "2018-08-22",
+                       "2018-08-23",
+                       "2018-08-24",
+                       "2018-08-25",
+                   ]
+               },
+               {
+                   name: "Sebastian",
+                   surname: "Cytawa",
+                   userId: '20',
+                   date: [
+                       "2018-08-20",
+                       "2018-08-21",
+                       "2018-08-22",
+                       "2018-08-23",
+                       "2018-08-24",
+                       "2018-08-25",
+                   ]
+               },
+               {
+                   name: "Adam",
+                   surname: "Bogacewicz",
+                   userId: '5000',
+                   date: [
+                       "2018-08-21",
+                       "2018-08-22",
+                       "2018-08-23",
+                       "2018-08-24",
+                       "2018-08-25",
+                   ]
+               }
+           ]
 
            $('#menu-toggle').change(()=>{
                table.columns.adjust().draw();
@@ -196,431 +211,21 @@
                });
            }
 
-           /**
-            * This function color selected row and add id value to array.
-            */
-           function colorRowAndAddIdToArray(id, row) {
-               let flag = false;
-               let iterator = 0; //in this variable we will store position of id in array, that has been found.
-               clientRouteInfoIdArr.forEach(stringId => {
-                   if (id === stringId) {
-                       flag = true; //true - this row is already checked
-                   }
-                   if (!flag) {
-                       iterator++;
-                   }
-               });
+           function addPersonToConfirmationList(person, placeToAppend) {
+               console.assert(placeToAppend.tagName == "SELECT", "placeToAppend in addPersonToConfirmationList is not SELECT element");
 
-               if (flag) {
-                   clientRouteInfoIdArr.splice(iterator, 1);
-                   row.removeClass('colorRow');
-
-                   //this part removes object with given id form arrayOfTableRows
-                   iterator = 0;
-                   arrayOfTableRows.forEach(clientId => {
-                       if(id == clientId.id) {
-                           arrayOfTableRows.splice(iterator, 1);
-                       }
-                       iterator++;
-                   });
-
+               if(placeToAppend.options.length == 0) { //there is no option in select
+                   let basicOptionElement = document.createElement('option');
+                   basicOptionElement.value = 0;
+                   basicOptionElement.textContent = "Wybierz";
+                   placeToAppend.appendChild(basicOptionElement);
                }
-               else {
-                   clientRouteInfoIdArr.push(id);
-                   row.addClass('colorRow');
-               }
+
+               let optionElement = document.createElement('option');
+               optionElement.value = person.userId;
+               optionElement.textContent = `${person.name} ${person.surname}`;
+               placeToAppend.appendChild(optionElement);
            }
-
-           /**
-            * This function append modify button with proper name and remove it if necessary
-            */
-           function showModifyButton() {
-               if (clientRouteInfoIdArr.length >0) {
-                   editButton.disabled = false;
-                   addModalBodyContext();
-               }
-               else {
-                   editButton.disabled = true;
-               }
-           }
-
-           /**********************************************************/
-           /*****************MODAL FUNCTIONS**************************/
-           /**********************************************************/
-
-           /**
-            * This function fill modal body and attach event listener to submit button.
-            */
-           function addModalBodyContext() {
-               let modalBody = document.querySelector('.edit-modal-body');
-               modalBody.innerHTML = ''; //clear modal body
-
-               appendModalAlert(modalBody);
-               createModalTable(modalBody); //table part of modal
-               appendNrPBXInput(modalBody);
-               appendBaseDivisionInput(modalBody);
-               appendVerificationSelect(modalBody);
-               // appendInvitationInput(modalBody);
-               appendLiveInvitationsInput(modalBody);
-               appendLimitInput(modalBody);
-               appendDepartmentSelect(modalBody);
-               appendCommentInput(modalBody);
-
-               let submitButton = document.createElement('button');
-               submitButton.id = 'submitEdition';
-               submitButton.classList.add('btn', 'btn-success');
-               submitButton.style.marginTop = '1em';
-               submitButton.style.width = "100%";
-               $(submitButton).append($("<span class='glyphicon glyphicon-save'></span>"));
-               $(submitButton).append(" Zapisz");
-
-               modalBody.appendChild(submitButton);
-
-               /*Event Listener Part*/
-               submitButton.addEventListener('click', function() {
-                   const nrPBXInput = document.querySelector('#changeNrPBX');
-                   const baseDivisionInput = document.querySelector('#changeBaseDivision');
-                   const limitInput = document.querySelector('#changeLimits');
-                   const commentInput = document.querySelector('#changeComments');
-                   const verificationInput = document.querySelector('#changeVerification');
-                   // const invitationInput = document.querySelector('#invitations');
-                   const departmentSelect = document.querySelector('#modalDepartment');
-                   const liveInput = document.querySelector('#liveInvitation');
-
-                   const nrPBXValue = nrPBXInput.value;
-                   const baseDivisionValue = baseDivisionInput.value;
-                   const limitValue = limitInput.value;
-                   const commentValue = commentInput.value;
-                   const verificationValue = verificationInput.options[verificationInput.selectedIndex].value;
-                   // const invitationValue = invitationInput.value;
-                   const departmentValue = departmentSelect.options[departmentSelect.selectedIndex].value;
-                   const liveInvitationValue = liveInput.value;
-
-                   const url = `{{route('api.updateClientRouteInfoRecords')}}`;
-                   const header = new Headers();
-                   header.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
-                   const data = new FormData();
-                   const JSONClientRouteInfoIdArr = JSON.stringify(clientRouteInfoIdArr);
-                   data.append('ids', JSONClientRouteInfoIdArr);
-
-                   if(nrPBXValue != ''){
-                       data.append('nrPBX', nrPBXValue);
-                   }
-                   if(baseDivisionValue != ''){
-                       data.append('baseDivision', baseDivisionValue);
-                   }
-                   if(limitValue != '') {
-                       data.append('limit', limitValue);
-                   }
-                   if(commentValue != '') {
-                       data.append('comment', commentValue);
-                   }
-                   if(verificationValue != -1) {
-                       data.append('verification', verificationValue);
-                   }
-                   // if(invitationValue != '') {
-                   //     data.append('invitation', invitationValue);
-                   // }
-                   if(departmentValue != '0') {
-                       data.append('department', departmentValue);
-                   }
-                   if(liveInvitationValue > 0) {
-                       data.append('liveInvitation', liveInvitationValue);
-                   }
-
-                   fetch(url, {
-                       method: "POST",
-                       headers: header,
-                       body: data,
-                       credentials: "same-origin"
-                   })
-                       .then(response => response.text())
-                       .then(response => {
-                           notify("Rekordy zostały zmienione!", "info");
-                           table.ajax.reload();
-                       })
-                       .catch(error => console.error("Błąd :", error))
-
-                   $('#editModal').modal('toggle');
-               });
-           }
-
-           /**
-            * This function create one row of modal table and place it in rows array.
-            */
-           function createModalTableRow() {
-               clientRouteInfoIdArr.forEach(item => {
-                   let addFlag = true;
-                   let idItem = item;
-                   arrayOfTableRows.forEach(clientId => {
-                       if(item == clientId.id) {
-                           addFlag = false;
-                       }
-                   });
-
-                   if(addFlag == true) {
-                       let givenRow = document.querySelector('[data-id="' + idItem + '"]');
-                       let givenRowData = givenRow.cells[1].textContent;
-                       let givenRowKampania = givenRow.cells[3].textContent;
-                       let givenRowProjekt = givenRow.cells[9].textContent;
-                       let tr = document.createElement('tr');
-                       let td1 = document.createElement('td');
-                       td1.textContent = givenRowData;
-                       tr.appendChild(td1);
-                       let td2 = document.createElement('td');
-                       td2.textContent = givenRowKampania;
-                       tr.appendChild(td2);
-                       let td3 = document.createElement('td');
-                       td3.textContent = givenRowProjekt;
-                       tr.appendChild(td3);
-
-                       let rowObject = {
-                           id: idItem,
-                           row: tr
-                       };
-
-                       arrayOfTableRows.push(rowObject);
-                   }
-               });
-           }
-
-           /**
-            * This function create on-fly table with basic info about selected rows by user.
-            */
-           function createModalTable(placeToAppend) {
-               createModalTableRow();
-
-               let infoTable = document.createElement('table');
-               infoTable.classList.add('table', 'table-stripped');
-               let theadElement = document.createElement('thead');
-               let tbodyElement = document.createElement('tbody');
-               let tr1 = document.createElement('tr');
-               let th1 = document.createElement('th');
-               let th2 = document.createElement('th');
-               let th3 = document.createElement('th');
-
-               th1.textContent = "Data";
-               tr1.appendChild(th1);
-
-               th2.textContent = "Kampania";
-               tr1.appendChild(th2);
-
-               th3.textContent = "Projekt";
-               tr1.appendChild(th3);
-
-               theadElement.appendChild(tr1);
-
-               infoTable.appendChild(theadElement);
-               clientRouteInfoIdArr.forEach(item => {
-                   arrayOfTableRows.forEach(tableRow => {
-                       if(item == tableRow.id){
-                           tbodyElement.appendChild(tableRow.row);
-                       }
-                   })
-
-               });
-
-               infoTable.appendChild(tbodyElement);
-               placeToAppend.appendChild(infoTable);
-           }
-
-           /**
-            * This function append to modal Live Invitation input
-            */
-           function appendLiveInvitationsInput(placeToAppend) {
-               let label = document.createElement('label');
-               label.setAttribute('for', 'liveInvitation');
-               label.textContent = 'Zaproszenia Live';
-               placeToAppend.appendChild(label);
-
-               let liveInput = document.createElement('input');
-               liveInput.id = 'liveInvitation';
-               liveInput.setAttribute('type', 'text');
-               //liveInput.setAttribute('step', '1');
-               //liveInput.setAttribute('min', '0');
-               liveInput.setAttribute('placeholder', 'Aktualna liczba wydzwonionych zaproszeń np: 20');
-               liveInput.classList.add('form-control');
-               $(liveInput).on('input',function (e) {
-                   if(!$.isNumeric($(e.target).val())){
-                       $(e.target).val('');
-                   }else if($(e.target).val()<0){
-                       $(e.target).val(0);
-                   }
-               });
-               placeToAppend.appendChild(liveInput);
-           }
-
-           /**
-            * This function append to modal verification input
-            */
-           function appendVerificationSelect(placeToAppend) {
-               let label3 = document.createElement('label');
-               label3.setAttribute('for', 'changeVerification');
-               label3.textContent = "Sprawdzenie";
-               placeToAppend.appendChild(label3);
-
-               let verificationSelect = document.createElement('select');
-               verificationSelect.classList.add('form-control');
-               verificationSelect.id = 'changeVerification';
-
-               let option1 = document.createElement('option');
-               option1.value = '-1';
-               option1.textContent = "Wybierz";
-
-               let option2 = document.createElement('option');
-               option2.value = '0';
-               option2.textContent = "Nie";
-
-               let option3 = document.createElement('option');
-               option3.value = '1';
-               option3.textContent = "Tak";
-               verificationSelect.appendChild(option1);
-               verificationSelect.appendChild(option2);
-               verificationSelect.appendChild(option3);
-               placeToAppend.appendChild(verificationSelect);
-           }
-           /**
-            * This function append to modal nr pbx input
-            */
-           function appendNrPBXInput(placeToAppend){
-               let label = document.createElement('label');
-               label.setAttribute('for', 'changeNrPBX');
-               label.textContent = 'Numer kampanii (PBX)';
-               placeToAppend.appendChild(label);
-
-               let NrPBXInput = document.createElement('input');
-               NrPBXInput.id = 'changeNrPBX';
-               NrPBXInput.setAttribute('type', 'text');
-               //NrPBXInput.setAttribute('step', '1');
-               //NrPBXInput.setAttribute('min', '0');
-               NrPBXInput.setAttribute('placeholder', 'Numer kampanii z PBX');
-               NrPBXInput.classList.add('form-control');
-               $(NrPBXInput).on('input',function (e) {
-                   if(!$.isNumeric($(e.target).val())){
-                       $(e.target).val('');
-                   }else if($(e.target).val()<0){
-                       $(e.target).val(0);
-                   }
-               });
-               placeToAppend.appendChild(NrPBXInput);
-           }
-           /**
-            * This function append to modal division base input
-            */
-           function appendBaseDivisionInput(placeToAppend){
-               let label = document.createElement('label');
-               label.setAttribute('for', 'changeBaseDivision');
-               label.textContent = 'Podział bazy';
-               placeToAppend.appendChild(label);
-
-               let baseDivisionInput = document.createElement('input');
-               baseDivisionInput.id = 'changeBaseDivision';
-               baseDivisionInput.setAttribute('type', 'text');
-               baseDivisionInput.classList.add('form-control');
-               placeToAppend.appendChild(baseDivisionInput);
-           }
-           /**
-            * This function append to modal limit input
-            */
-           function appendLimitInput(placeToAppend) {
-               let label = document.createElement('label');
-               label.setAttribute('for', 'changeLimits');
-               label.textContent = 'Limit';
-               placeToAppend.appendChild(label);
-
-               let limitInput = document.createElement('input');
-               limitInput.id = 'changeLimits';
-               limitInput.setAttribute('type', 'text');
-               limitInput.setAttribute('placeholder', 'Limit dla danej godziny z kampanii');
-               //limitInput.setAttribute('step', '1');
-               //limitInput.setAttribute('min', '0');
-               limitInput.classList.add('form-control');
-               $(limitInput).on('input',function (e) {
-                   if(!$.isNumeric($(e.target).val())){
-                       $(e.target).val('');
-                   }else if($(e.target).val()<0){
-                       $(e.target).val(0);
-                   }
-               });
-               placeToAppend.appendChild(limitInput);
-           }
-
-           /**
-            * This function append to modal comment input
-            */
-           function appendCommentInput(placeToAppend) {
-               let label2 = document.createElement('label');
-               label2.setAttribute('for', 'changeComments');
-               label2.textContent = 'Uwagi';
-               placeToAppend.appendChild(label2);
-
-               let commentInput = document.createElement('input');
-               commentInput.id = 'changeComments';
-               commentInput.setAttribute('type', 'text');
-               commentInput.setAttribute('placeholder', 'Tutaj można umieścić krótki komentarz');
-               commentInput.classList.add('form-control');
-               placeToAppend.appendChild(commentInput);
-           }
-
-           /**
-            * This function append to modal alert info
-            */
-           function appendModalAlert(placeToAppend) {
-               let alertElement = document.createElement('div');
-               alertElement.classList.add('alert', 'alert-danger');
-               alertElement.textContent = "Jeśli nie chcesz zmieniać wartości danego pola, pozostaw puste miejsce w okienku.";
-               placeToAppend.appendChild(alertElement);
-           }
-
-           /**
-            * This function append to modal invitation input
-            */
-           function appendInvitationInput(placeToAppend) {
-               let label = document.createElement('label');
-               label.setAttribute('for', 'invitations');
-               label.textContent = 'Zaproszenia Live';
-               placeToAppend.appendChild(label);
-
-               let invitationInput = document.createElement('input');
-               invitationInput.id = 'invitations';
-               invitationInput.classList.add('form-control');
-               invitationInput.setAttribute('type', 'number');
-               invitationInput.setAttribute('min', '0');
-               invitationInput.setAttribute('step', '1');
-               placeToAppend.appendChild(invitationInput);
-           }
-
-           /**
-            * This function append to modal department select
-            */
-           function appendDepartmentSelect(placeToAppend) {
-               let label = document.createElement('label');
-               label.setAttribute('for', 'modalDepartment');
-               label.textContent = 'Oddział';
-               placeToAppend.appendChild(label);
-
-               let departmentSelect = document.createElement('select');
-               departmentSelect.id = 'modalDepartment';
-               departmentSelect.classList.add('form-control');
-
-               let basicOption = document.createElement('option');
-               basicOption.value = '0';
-               basicOption.textContent = 'Wybierz';
-               departmentSelect.appendChild(basicOption);
-
-               @foreach($departmentInfo as $department)
-                    var option = document.createElement('option');
-                    option.value = `{{$department->id}}`;
-                    option.textContent = `{{$department->name2}} {{$department->name}}`;
-                    departmentSelect.appendChild(option);
-               @endforeach
-
-               placeToAppend.appendChild(departmentSelect);
-           }
-
-           /**********************************************************/
-           /****************END OF MODAL FUNCTIONS********************/
-           /**********************************************************/
 
            let table = $('#datatable').DataTable({
                autoWidth: true,
@@ -631,53 +236,39 @@
 
                },
                "rowCallback": function( row, data, index ) {
-                   if(data.comment+'' != 'null' && data.comment !== ''){
-                       $(row).css('background-color', '#fffc8b');
-                   }
                    row.setAttribute('data-id', data.id);
-                   clientRouteInfoIdArr.forEach(specificId => { //when someone change table page, we have to reassign classes to rows.
-                       if (specificId == data.id) {
-                           row.classList.add('colorRow');
+                   const confirmDateInput = row.querySelector('.confirm-date');
+                   const confirmDate = confirmDateInput.value;
+                   let confirmingPeopleSelect = row.querySelector('.confirming');
+                   testArr.forEach(person => { //looping over all data about people
+                       if(person.hasOwnProperty('date')) {
+                           person.date.forEach(day => {
+                               if(day == confirmDate) { //current person is available this day
+                                   addPersonToConfirmationList(person, confirmingPeopleSelect);
+                               }
+                           });
                        }
-                   });
-                   $(row).find('.commentInput').val(data.comment);
-                   $(row).find('.comment button').click(function (e) {
-                       let campaignId = $(e.target).attr('id');
-                       swal({
-                           title: 'Czy na pewno?',
-                           text: 'Czy chcesz usunąc uwagę?',
-                           type:'warning',
-                           showCancelButton: true
-                       }).then((result) => {
-                           if(result.value){
-                               $.ajax({
-                                   type: 'POST',
-                                   url: '{{route('api.removeCampaignComment')}}',
-                                   headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
-                                   data: {
-                                       campaignId: campaignId
-                                   },
-                                   success: function (response) {
-                                       console.log(response);
-                                       if(response == 'success')
-                                           table.ajax.reload();
-                                   }
-                               });
-                           }
-                       });
-
                    });
                },
                "fnDrawCallback": function(settings) {
-                   $('#datatable tbody tr').on('click', function(e) {
-                        if(e.target.dataset.type != "noAction") {
-                            const givenRow = $(this);
-                            const clientRouteInfoId = givenRow.attr('data-id');
-                            colorRowAndAddIdToArray(clientRouteInfoId, givenRow);
-                            showModifyButton();
+                   $('#datatable tbody tr').on('change', function(e) {
+                        const changedElement = e.target;
+                        const elementRow = this;
+                        if(changedElement.matches('.confirm-date')) { //confirm date has been changed.
+                            const newConfirmDate = e.target.value;
+                            let confirmingPeopleSelect = elementRow.querySelector('.confirming');
+                            confirmingPeopleSelect.innerHTML = ''; //clearing list of current people
+                            testArr.forEach(person => { //looping over all data about people
+                               if(person.hasOwnProperty('date')) {
+                                   person.date.forEach(day => {
+                                       if(day == newConfirmDate) { //current person is available this day
+                                           addPersonToConfirmationList(person, confirmingPeopleSelect);
+                                       }
+                                   });
+                               }
+                            });
                         }
                    });
-
                },"ajax": {
                    'url': "{{route('api.campaignsInfo')}}",
                    'type': 'POST',
@@ -695,7 +286,7 @@
                "columns":[
                    {"data":function (data, type, dataToSet) {
                            return data.weekOfYear;
-                       },"name":"weekOfYear"
+                       },"name":"weekOfYear", "width": "1%"
                    },
                    {"data":function (data, type, dataToSet) {
                            return data.date;
@@ -738,7 +329,9 @@
                        },"name":"departmentName", "searchable": "false"
                    },
                    {"data":function(data, type, dataToSet) {
-                       return "1";
+                       return `<select class="confirming form-control">
+                                    <option value="0">Wybierz</option>
+                                </select>`;
                         }, "name": "potwierdzający"
                    },
                    {"data":function (data, type, dataToSet) {
@@ -750,15 +343,21 @@
                        },"name":"actual_success"
                    },
                    {"data":function(data, type, dataToSet) {
-                           return "2";
-                       }, "name": "Frekwencja"
+                           return `<input class="frequency form-control" type="number" min="0" step="1" style="width: 5em;">`;
+                       }, "name": "Frekw."
                    },
                    {"data":function(data, type, dataToSet) {
-                           return "3";
+                           return `<input class="pairs form-control" type="number" min="0" step="1" style="width: 5em;">`;
                        }, "name": "pary"
                    },
                    {"data":function(data, type, dataToSet) {
-                           return "2018-03-01";
+                           const showDate = new Date(data.date);
+                           const dayBeforeShowDate = new Date(showDate.setDate(showDate.getDate() - 1));
+                           const day = ("0" + dayBeforeShowDate.getDate()).slice(-2);
+                           const month = ("0" + (dayBeforeShowDate.getMonth() + 1)).slice(-2);
+                           const year = dayBeforeShowDate.getFullYear();
+                           const fullDate =  year + "-" + month + "-" + day;
+                           return `<input type="date" style="width: 100%;" class="form-control confirm-date" value="${fullDate}">`;
                        }, "name": "dataPotwierdzenia"
                    }
                ],
