@@ -145,7 +145,6 @@
            let changeArr = []; //This array collect changed rows
            let saveButton = document.querySelector('#save');
            let userData = @json($userData);
-           console.log(userData);
 
            // let testArr = [
            //     {
@@ -407,7 +406,7 @@
                            elementRow.classList.remove('colorRow');
                        }
 
-                       console.log(changeArr);
+                       // console.log(changeArr);
                        saveButton.disabled = changeArr.length > 0 ? false : true;
                    });
 
@@ -616,7 +615,7 @@
             */
            $('#weeks').on('select2:select', function() {
                let weeksArr = $('#weeks').val();
-               console.log('weeksArr', weeksArr);
+               // console.log('weeksArr', weeksArr);
                if(weeksArr.length > 0) {
                    selectedWeeks = weeksArr;
                }
