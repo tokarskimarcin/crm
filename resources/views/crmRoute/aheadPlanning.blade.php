@@ -276,6 +276,13 @@
                     <h4 class="modal-title" id="modal_title">Sekcja symulatcji<span id="modal_category"></span></h4>
                 </div>
                 <div class="modal-body">
+                    <div class="alert alert-info">
+                        Moduł symulacji limitów klienta, w tej części symulacji możemy zmienić limity wybranm klientom/klientowi na poszczególne godziny w wybranym zakresie dni.
+                        <i>Limity dla pokazów pełnych (3)</i> oraz <i>Limit dla pokazów godzinowych</i> możemy ustalić limity  na godziny np (60/70/80), 50 - dla godzinnej kampani.
+                        <i>Zwiększanie/Zmniejszanie limitów o wartość</i> zmniejsza limity lub zwiększa o zadaną wartość np: -10 na wszystkie drugie limity w kampaniach.
+                        Symualcja może być łączona z <i>Symulacja nowego kilienta</i>.
+                        Aby zrestartować symulację należy kliknąć <i>Resetuj symulację</i>.
+                    </div>
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             Symalacja limitów klienta
@@ -307,6 +314,12 @@
                 </div>
                 <div class="modal-body">
                     <div class="panel panel-default">
+                        <div class="alert alert-info">
+                            Moduł symulacji <i>nowego klienta</i>, w tej części możemy zasymulować obecność nowego klienta,
+                            ustalając <i>ilość pokazów</i> na tydzień oraz <i>poszczególne limity</i>, w konkretnych <i>numerach tygodnia</i>.
+                            Symulacja może być łączona z <i>Symulacja Klienta(Edycja Limitów)</i>.
+                            Aby zrestartować symulację należy kliknąć <i>Resetuj symulację</i>.
+                        </div>
                         <div class="panel-heading">
                             Symalacja nowego klienta
                         </div>
