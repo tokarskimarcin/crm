@@ -20,6 +20,7 @@ use App\PaymentMethod;
 use App\PbxCrmInfo;
 use App\Route;
 use App\RouteInfo;
+use App\Schedule;
 use App\User;
 use App\Voivodes;
 use DateTime;
@@ -4217,11 +4218,67 @@ class CrmRouteController extends Controller
             ->join('departments', 'department_info.id_dep', '=', 'departments.id')
             ->get();
 
+        $limitDate = Date('W', strtotime('-100 days'));
+
+        $scheduleData = Schedule::select('id_user as userId', 'users.first_name as name', 'users.last_name as surname', 'week_num', 'year', 'monday_comment as pon', 'tuesday_comment as wt', 'wednesday_comment as sr', 'thursday_comment as czw', 'friday_comment as pt', 'saturday_comment as sob','sunday_comment as nd')
+            ->join('users', 'schedule.id_user', '=', 'users.id')
+            ->where('week_num', '>', $limitDate)
+            ->get();
+
+        $scheduleGroupedByUser = $scheduleData->groupBy('userId', 'week_num');
+
+        $userArr = [];
+        foreach($scheduleGroupedByUser as $id => $data) {
+            $user = new \stdClass();
+            $user->userId = $id;
+            $dataArr = [];
+            $i = 0;
+            foreach($data as $item) {
+                if($i == 0) {
+                    $user->name = $item->name;
+                    $user->surname = $item->surname;
+                }
+                $firstDayOfGivenWeek = Date('Y-m-d', strtotime($item->year . 'W' . $item->week_num));
+                if($item->pon != '') {
+                    array_push($dataArr, $firstDayOfGivenWeek);
+                }
+
+                if($item->wt != '') {
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 1 day')));
+                }
+
+                if($item->sr != '') {
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 2 days')));
+                }
+
+                if($item->czw != '') {
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 4 days')));
+                }
+
+                if($item->pt != '') {
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 5 days')));
+                }
+
+                if($item->sob != '') {
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 6 days')));
+                }
+
+                if($item->nd != '') {
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 7 days')));
+                }
+            }
+            $user->date = $dataArr;
+            array_push($userArr, $user);
+        }
+
+//        dd($userArr[1]);
+
         return view('crmRoute.engraverForConfirming')
             ->with('lastWeek', $numberOfLastYearsWeek)
             ->with('currentWeek', $weeksString)
             ->with('currentYear', $year)
-            ->with('departmentInfo', $departmentInfo);
+            ->with('departmentInfo', $departmentInfo)
+            ->with('userData', $userArr);
     }
 
     public function engraverForConfirmingDatatable(Request $request) {

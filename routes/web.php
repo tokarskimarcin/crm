@@ -260,6 +260,8 @@ Route::post('/allCitiesInGivenVoivodeAjax', 'CrmRouteController@allCitiesInGiven
 Route::post('/deleteRouteTemplate', 'CrmRouteController@deleteRouteTemplate')->name('api.deleteRouteTemplate');
 Route::post('/removeCampaignComment','CrmRouteController@removeCampaignCommentAjax')->name('api.removeCampaignComment');
 Route::delete('editAssignedRoute/{id}', 'CrmRouteController@deleteGivenRouteAjax')->name('api.deleteGivenRouteAjax');
+Route::post('/engraverForConfirmingAjax', 'CrmRouteController@engraverForConfirmingDatatable')->name('api.engraverForConfirmingDatatable');
+Route::post('/engraverForConfirmingUpdate', 'CrmRouteController@engraverForConfirmingUpdate')->name('api.engraverForConfirmingUpdate');
 
 Route::post('/getConfirmHotelInfo','CrmRouteController@getConfirmHotelInfo')->name('api.getConfirmHotelInfo');
 Route::post('/changeConfirmStatus','CrmRouteController@changeConfirmStatus')->name('api.changeConfirmStatus');
@@ -940,6 +942,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::GET('/downloadCampaignInvoicePDF/{id}', 'CrmRouteController@downloadCampaignInvoicePDF');
 
     Route::get('/hotelConfirmationGet', 'CrmRouteController@hotelConfirmationGet');
+
+    Route::get('/engraverForConfirming', 'CrmRouteController@engraverForConfirmingGet');
     /** KONIEC CRM **/
 
 });
@@ -1014,6 +1018,4 @@ Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.c
 
 Route::get('/getAllTask', 'MyUserTestController@getAllTask');
 
-Route::get('/engraverForConfirming', 'CrmRouteController@engraverForConfirmingGet');
-Route::post('/engraverForConfirmingAjax', 'CrmRouteController@engraverForConfirmingDatatable')->name('api.engraverForConfirmingDatatable');
-Route::post('/engraverForConfirmingUpdate', 'CrmRouteController@engraverForConfirmingUpdate')->name('api.engraverForConfirmingUpdate');
+

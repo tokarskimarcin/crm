@@ -144,47 +144,49 @@
            let datatableHeight = '75vh'; //this variable defines height of table
            let changeArr = []; //This array collect changed rows
            let saveButton = document.querySelector('#save');
+           let userData = @json($userData);
+           console.log(userData);
 
-           let testArr = [
-               {
-                   name: "Paweł",
-                   surname: "Chmielewski",
-                   userId: '6009',
-                   date: [
-                       "2018-08-20",
-                       "2018-08-21",
-                       "2018-08-22",
-                       "2018-08-23",
-                       "2018-08-24",
-                       "2018-08-25",
-                   ]
-               },
-               {
-                   name: "Sebastian",
-                   surname: "Cytawa",
-                   userId: '20',
-                   date: [
-                       "2018-08-20",
-                       "2018-08-21",
-                       "2018-08-22",
-                       "2018-08-23",
-                       "2018-08-24",
-                       "2018-08-25",
-                   ]
-               },
-               {
-                   name: "Adam",
-                   surname: "Bogacewicz",
-                   userId: '5000',
-                   date: [
-                       "2018-08-21",
-                       "2018-08-22",
-                       "2018-08-23",
-                       "2018-08-24",
-                       "2018-08-25",
-                   ]
-               }
-           ]
+           // let testArr = [
+           //     {
+           //         name: "Paweł",
+           //         surname: "Chmielewski",
+           //         userId: '6009',
+           //         date: [
+           //             "2018-08-20",
+           //             "2018-08-21",
+           //             "2018-08-22",
+           //             "2018-08-23",
+           //             "2018-08-24",
+           //             "2018-08-25",
+           //         ]
+           //     },
+           //     {
+           //         name: "Sebastian",
+           //         surname: "Cytawa",
+           //         userId: '20',
+           //         date: [
+           //             "2018-08-20",
+           //             "2018-08-21",
+           //             "2018-08-22",
+           //             "2018-08-23",
+           //             "2018-08-24",
+           //             "2018-08-25",
+           //         ]
+           //     },
+           //     {
+           //         name: "Adam",
+           //         surname: "Bogacewicz",
+           //         userId: '5000',
+           //         date: [
+           //             "2018-08-21",
+           //             "2018-08-22",
+           //             "2018-08-23",
+           //             "2018-08-24",
+           //             "2018-08-25",
+           //         ]
+           //     }
+           // ]
 
            $('#menu-toggle').change(()=>{
                table.columns.adjust().draw();
@@ -285,8 +287,6 @@
                pairElement.value = item.pairs;
 
                for(let i = 0, max = confirmingPeopleSelect.length; i < max; i++) {
-                   console.log('confirmingPeopleSelect[i].value', confirmingPeopleSelect[i].value);
-                   console.log('item.confirmingPerson', item.confirmingPerson);
                    if(confirmingPeopleSelect[i].value == item.confirmingPerson) {
                        setOldValues(confirmingPeopleSelect, item.confirmingPerson);
                    }
@@ -307,7 +307,7 @@
                    const confirmDateInput = row.querySelector('.confirm-date');
                    const confirmDate = confirmDateInput.value;
                    let confirmingPeopleSelect = row.querySelector('.confirming');
-                   testArr.forEach(person => { //looping over all data about people
+                   userData.forEach(person => { //looping over all data about people
                        if(person.hasOwnProperty('date')) {
                            person.date.forEach(day => {
                                if(day == confirmDate) { //current person is available this day
@@ -348,7 +348,7 @@
 
                             confirmingPeopleSelect.innerHTML = ''; //clearing list of current people
                             appendBasicOption(confirmingPeopleSelect);
-                            testArr.forEach(person => { //looping over all data about people
+                            userData.forEach(person => { //looping over all data about people
                                if(person.hasOwnProperty('date')) {
                                    person.date.forEach(day => {
                                        if(day == newConfirmDate) { //current person is available this day
