@@ -371,8 +371,8 @@
             }
 
 
-            var simulationEditLimitArray = [];
-            var simulationNewClientArray = [];
+            let simulationEditLimitArray = [];
+            let simulationNewClientArray = [];
             let departmentInfo = <?php echo json_encode($departmentInfo->toArray()) ?>;
 
             let elementsToSum = {
@@ -416,6 +416,16 @@
                     // }
 
                 });
+            });
+            $sumAllEvent = (function () {
+                let selectObject = $(this);
+                let parentTR = selectObject.parent().parent();
+                let allInput = parentTR.find('.dayEventCountNumber');
+                let sumAllEventInWeek = 0;
+                allInput.each(function(key,value){
+                    sumAllEventInWeek += $(value).val() != '' ? parseInt($(value).val()) : 0;
+                });
+                $(parentTR.find('.dayEventCountSum')[0]).val(sumAllEventInWeek);
             });
             let workFreeDaysForDepartments = {};
 
@@ -572,6 +582,7 @@
                 polishDayArray.forEach(function (value,index) {
                     let tableTbodyTd = document.createElement('td');
                     let tableTbodyTdInput = document.createElement('input');
+                    tableTbodyTdInput.onchange = $sumAllEvent;
                     tableTbodyTdInput.classList.add('form-control');
                     if(polishDayArray.length-1 == index){
                         tableTbodyTdInput.classList.add('dayEventCountSum');
