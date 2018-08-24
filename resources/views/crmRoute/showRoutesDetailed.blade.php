@@ -722,7 +722,7 @@
                        else {
                            return data.cityName;
                        }
-                       },"name":"cityName"
+                       },"name":"cityName","orderable" : false
                    },
                    {"data": function (data, type, dataToSet) {
                            if(data.baseDivision != null) {
@@ -734,7 +734,7 @@
                                /*return data.baseDivision;
                            else
                                return "";*/
-                   },"name":"baseDivision"
+                   },"name":"baseDivision","orderable" : false
                    },
                    {"data":function (data, type, dataToSet) {
                        let verificationInfo;
@@ -746,15 +746,15 @@
                            verificationInfo = 'NIE'; // return '<select class="form-control" style="width:100%;" data-id="' + data.id + '" data-type="noAction"><option value="0" data-type="noAction">Nie</option><option data-type="noAction" value="1" selected>Tak</option></select>';
                        }
                            return verificationInfo;
-                       },"name":"verification"
+                       },"name":"verification","orderable" : false
                    },
                    {"data":function (data, type, dataToSet) {
                            return data.actual_success;
-                       },"name":"actual_success"
+                       },"name":"actual_success","orderable" : false
                    },
                    {"data":function (data, type, dataToSet) {
                            return data.limits;
-                       },"name":"limits"
+                       },"name":"limits","orderable" : false
                    },
                    {"data":function (data, type, dataToSet) {
                        if(data.loseSuccess <= 0) {
@@ -763,7 +763,7 @@
                        else {
                            return 0;
                        }
-                       },"name":"loseSuccess"
+                       },"name":"loseSuccess","orderable" : false
                    },
                    {"data":function (data, type, dataToSet) {
                        let clientNameVariable = '';
@@ -779,7 +779,7 @@
                    {"data":function (data, type, dataToSet) {
                             //let fullDepartmentName = data.departmentName == null ? null : data.departmentName + ' ' + data.departmentName2;
                            return data.departmentName;
-                       },"name":"departmentName", "searchable": "false"
+                       },"name":"departmentName", "searchable": "false","orderable" : false
                    },
                    {"data":function (data, type, dataToSet) {
                             if(data.comment == '' || data.comment == null){
@@ -801,12 +801,12 @@
                                 commentDivRow.append(commentColumn);
                                 return commentDivRow.prop('outerHTML');
                             }
-                       },"name":"comment"
+                       },"name":"comment","orderable" : false
                    },
                    {"data":"nrPBX", "visible":false}
 
                ],
-               order: [[1, 'asc'], [3, 'desc'], [2, 'asc']],
+               order: [[1, 'asc'], [9, 'asc'],[3, 'desc'], [2, 'asc']],
                rowGroup: {
                    dataSrc: 'date',
                    startRender: null,
