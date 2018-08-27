@@ -114,7 +114,7 @@ class ScreensController extends Controller
      */
     public function showScreensGet() {
         $today = date("Y-m-d"); //2000-10-11
-        $today = date("2018-08-22"); //2000-10-11
+        //$today = date("2018-08-22"); //2000-10-11
         $department_info = Department_info::where('id_dep_type', '=', '2')->get();
 
         $departmentsAveragesForEveryHour = StatisticsController::getDepartmentsAveragesForEveryHour($today, $department_info);
@@ -124,7 +124,7 @@ class ScreensController extends Controller
 
     public function showScreenGet($id){
         $today = date("Y-m-d"); //2000-10-11
-        $today = date("2018-08-22"); //2000-10-11
+        //$today = date("2018-08-22"); //2000-10-11
         $department_info = Department_info::where('id_dep_type', '=', '2')->get();
 
         $departmentsAveragesForEveryHour = StatisticsController::getDepartmentsAveragesForEveryHour($today, $department_info);
@@ -137,7 +137,7 @@ class ScreensController extends Controller
      */
     public function allCharts() {
         $today = date("Y-m-d");
-        $today = date("2018-08-22"); //2000-10-11
+        //$today = date("2018-08-22"); //2000-10-11
         $department_info = Department_info::where('id_dep_type', '=', '2')->get();
 
         $departmentsAveragesForEveryHour = StatisticsController::getDepartmentsAveragesForEveryHour($today, $department_info);
