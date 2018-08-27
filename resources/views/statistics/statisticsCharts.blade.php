@@ -43,7 +43,7 @@
                     <ul class="nav nav-tabs">
                         <li role="presentation" class="navOption active" id="dailyIntervals"><a >Statystyki dzienne</a></li>
                         <li role="presentation" class="navOption" id="hourlyIntervals"><a >Statystyki godzinowe</a></li>
-                        <li role="presentation"  id="departments">
+                        <li role="presentation" id="departments">
                             <select class="form-control selectpicker" id="departmentsSelect">
                             </select>
                         </li>
@@ -101,6 +101,7 @@
 @endsection
 @include('chartsScripts.averageDepartmentsChartScript')
 @section('script')
+    <script src="{{ asset('/js/moment.js')}}"></script>
     <script>
         let departmentsAveragesForEveryHour = null;
         let departmentsAveragesForEveryHourChartsData = null;
@@ -115,6 +116,8 @@
                     autoclose: 1,
                     minView: 2,
                     pickTime: false,
+                    endDate: new Date(),
+                    todayHighlight: true
                 });
             })();
 
@@ -266,5 +269,15 @@
                 }
             });
         }
+
+        setInterval(function(){
+            if($('#date').val() === moment().format('YYYY-MM-DD')  || $('#date_stop').val() === moment().format('YYYY-MM-DD') && moment().minute() === 5) {
+                getDepartmentsAveragesForEveryDayAjax($('#date_start').val(), $('#date_stop').val()).then(function (){
+                    return getDepartmentsAveragesForEveryHourAjax($('#date').val());
+                }).then(function () {
+                    drawProperTypeChart($('#departmentsSelect').val());
+                });
+            }
+        }, 1000*60);
     </script>
 @endsection
