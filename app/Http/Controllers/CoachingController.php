@@ -896,29 +896,58 @@ class CoachingController extends Controller
                     ->select(DB::raw('users.id as manager_id,
                                 users.first_name,
                                 users.last_name,
+                                secondHR.first_name as secondHRFirstName,
+                                secondHR.last_name as secondHRLastName,
+                                secondHR.id as secondHRID,
                                 department_info.id as department_info_id'))
-                    ->join('users', 'users.id', $columnName)
+                    ->leftjoin('users', 'users.id', $columnName);
+                if($isHr)
+                    $manager = $manager->leftjoin('users as secondHR', 'secondHR.id', "department_info.hr_id_second");
+                $manager = $manager
                     ->where('department_info.id', '=', $item)
                     ->first();
                 if(is_object($manager)){
-                    $data = new \stdClass();
-                    $data->department_info_id = $item;
-                    $data->date_start = $date_start;
-                    $data->date_stop = $date_stop;
-                    $data->menager_id = $manager->manager_id;
-                    $data->manager_name = $manager->first_name . ' ' . $manager->last_name;
-                    if($isHr){
-                        $data->success          = 0;
-                        $data->avg_average      = 0;
-                        $data->realRBH          = 0;
-                        $data->sum_janky_count  = 0;
-                    }else{
-                        $data->success          = $succes;
-                        $data->avg_average      = round($succes / $rbh, 2);
-                        $data->realRBH          = $rbh;
-                        $data->sum_janky_count  = $janky;
+                    if($manager->manager_id != null)
+                    {
+                        $data = new \stdClass();
+                        $data->department_info_id = $item;
+                        $data->date_start = $date_start;
+                        $data->date_stop = $date_stop;
+                        $data->menager_id = $manager->manager_id;
+                        $data->manager_name = $manager->first_name . ' ' . $manager->last_name;
+                        if($isHr){
+                            $data->success          = 0;
+                            $data->avg_average      = 0;
+                            $data->realRBH          = 0;
+                            $data->sum_janky_count  = 0;
+                        }else{
+                            $data->success          = $succes;
+                            $data->avg_average      = round($succes / $rbh, 2);
+                            $data->realRBH          = $rbh;
+                            $data->sum_janky_count  = $janky;
+                        }
+                        $ready_data->push($data);
                     }
-                    $ready_data->push($data);
+                    if($manager->secondHRID != null){
+                        $data = new \stdClass();
+                        $data->department_info_id = $item;
+                        $data->date_start = $date_start;
+                        $data->date_stop = $date_stop;
+                        $data->menager_id = $manager->secondHRID;
+                        $data->manager_name = $manager->secondHRFirstName . ' ' . $manager->secondHRLastName;
+                        if($isHr){
+                            $data->success          = 0;
+                            $data->avg_average      = 0;
+                            $data->realRBH          = 0;
+                            $data->sum_janky_count  = 0;
+                        }else{
+                            $data->success          = $succes;
+                            $data->avg_average      = round($succes / $rbh, 2);
+                            $data->realRBH          = $rbh;
+                            $data->sum_janky_count  = $janky;
+                        }
+                        $ready_data->push($data);
+                    }
                 }
 
             }

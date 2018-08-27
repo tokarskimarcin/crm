@@ -189,7 +189,7 @@ class ScreensController extends Controller
 
         $title = 'Godzinowy wykres Telemarketingu';
         $data = ['fileURL' => Storage::url("allChartsImage_files/allChartsImage.png")];
-        $preperMail = new VeronaMail('allCharts',$data,$title,User::where('id',1364)->get());
+        $preperMail = new VeronaMail('allCharts',$data,$title);
         if($preperMail->sendMail()){
             return 'Mail wysłano';
         }else{
